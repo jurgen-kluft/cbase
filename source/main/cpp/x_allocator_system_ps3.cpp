@@ -1,5 +1,7 @@
 #include "xbase\x_target.h"
+#include "xbase\x_debug.h"
 #ifdef TARGET_PS3
+#ifndef SPU
 
 #include <new>
 #include <stdlib.h>
@@ -44,6 +46,9 @@ namespace xcore
 
 		virtual void*			reallocate(void* ptr, u32 size, u32 alignment)
 		{
+			if (ptr == NULL)
+				return allocate(size, alignment);
+
 			void* p = reallocalign(ptr, size, alignment);
 			return p;
 		}
@@ -71,12 +76,14 @@ namespace xcore
 	x_iallocator*		gCreateSystemAllocator()
 	{
 		static x_allocator_ps3_system sPs3SystemAllocator;
-		if (sPs3SystemAllocator.isInitialized())
-			return &sPs3SystemAllocator;
-		sPs3SystemAllocator.init();
+		if (!sPs3SystemAllocator.isInitialized())
+		{
+			sPs3SystemAllocator.init();
+		}
 		return &sPs3SystemAllocator;
 	}
 
 };
 
+#endif
 #endif

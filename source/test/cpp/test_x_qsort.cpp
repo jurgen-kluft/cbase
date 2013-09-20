@@ -1,12 +1,10 @@
-#include "xbase\x_types.h"
 #include "xbase\x_qsort.h"
-#include "xbase\x_string.h"
 
 #include "xunittest\xunittest.h"
 
 using namespace xcore;
 
-static s32 s32_compare(const xbyte* const a, const xbyte* const b)
+static s32 s32_compare(const void* const a, const void* const b, u32)
 {
 	const xcore::s32* aa = (const xcore::s32*)a;
 	const xcore::s32* bb = (const xcore::s32*)b;
@@ -17,7 +15,7 @@ static s32 s32_compare(const xbyte* const a, const xbyte* const b)
 	return 0;
 }
 
-static s32 f32_compare(const xbyte* const a, const xbyte* const b)
+static s32 f32_compare(const void* const a, const void* const b, u32)
 {
 	const xcore::f32* aa = (const xcore::f32*)a;
 	const xcore::f32* bb = (const xcore::f32*)b;

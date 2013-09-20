@@ -1,15 +1,25 @@
-// x_console.cpp - Core console
-#include "xbase\x_target.h"
-#ifdef TARGET_PS3
+/**
+* @file x_console_ps3.cpp
+* Core console on ps3
+*/
 
+#ifndef SPU
+
+#include "xbase\x_target.h"
+#if defined(TARGET_PS3)
+
+#ifndef SPU
 #include <stdio.h>
+#else
+#include <spu_printf.h>
+#endif
 
 #include "xbase\x_console.h"
 #include "xbase\x_string_std.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 
@@ -41,21 +51,30 @@ namespace xcore
 
 		s32 color(xconsole::EColor color)
 		{
+#ifndef SPU
 			printf(sTTYColors[color]);
+#else
+			spu_printf(sTTYColors[color]);
+#endif // SPU
 			return x_strlen(sTTYColors[color]);
 		}
 
 		s32 write(const char* str, s32 len)
 		{
+#ifndef SPU
 			printf(str);
+#else
+			spu_printf(str);
+#endif
 			return len;
 		}
 	};
 
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
-
+/**
+ *  END xCore namespace
+ */
 
 #endif
+
+#endif // ifndef SPU

@@ -1,15 +1,19 @@
+/**
+* @file x_console_x360.cpp
+* Core console on x360
+*/
+
 #include "xbase\x_target.h"
 #ifdef TARGET_360
 
 // Windows includes first
 #include <stdio.h>
 
-// x_console.cpp - Core console
 #include "xbase\x_console.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
     namespace xconsole_out
@@ -26,10 +30,9 @@ namespace xcore
         }
     };
 
-    //==============================================================================
-    // END xCore namespace
-    //==============================================================================
 };
-
+/**
+ *  END xCore namespace
+ */
 
 #endif

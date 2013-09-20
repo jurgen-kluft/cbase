@@ -1,14 +1,19 @@
-// x_log_to_console.cpp - xCore logging to xconsole
-#include "xbase\x_types.h"
+/**
+* @file x_log_to_console.cpp
+* xCore logging to xconsole
+*/
+
+#ifndef SPU
+
 #include "xbase\x_debug.h"
 #include "xbase\x_string_std.h"
 #include "xbase\x_log.h"
 #include "xbase\x_console.h"
 
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	void				xlog_to_console_imp::initialize()
@@ -142,9 +147,10 @@ namespace xcore
 	{
 		xconsole::writeLine(format, arguments);
 	}
-
-
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
+
+
+#endif

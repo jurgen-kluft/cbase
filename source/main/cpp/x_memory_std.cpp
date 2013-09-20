@@ -11,6 +11,7 @@
 #ifdef TARGET_PS3
 	#include <string.h>
 #endif
+
 #ifdef TARGET_WII
 	#include <revolution/os.h>
 	#include <string.h>
@@ -23,99 +24,99 @@
 namespace xcore
 {
 #ifdef TARGET_WII
-	// -----------------------------------------------------------
-	// Memory copy
-	// -----------------------------------------------------------
-	void xmem_utils::memcpy(void *dest, const void *src, s32 count)
+	/**
+	 * Memory copy
+	 */
+	void xmem_utils::memcpy(void *dest, const void *src, u32 count)
 	{
 		::memcpy(dest, src, count);
 	}
 
-	// -----------------------------------------------------------
-	// Sets the first count characters of dest to the character c.
-	// -----------------------------------------------------------
-	void xmem_utils::memset(void* buf, s32 c, s32 inLength)
+	/**
+	 * Sets the first count characters of dest to the character c.
+	 */
+	void xmem_utils::memset(void* buf, u32 c, u32 inLength)
 	{
 		::memset(buf, c, inLength);
 	}
 
 	//------------------------------------------------------------------------------
-	void* xmem_utils::memmove(void* inDest, const void* inSrc, s32 inLength)
+	void* xmem_utils::memmove(void* inDest, const void* inSrc, u32 inLength)
 	{
 		return ::memmove(inDest, inSrc, inLength);
 	}
 
-	// --------------------------------------------------------
-	// Compares the first count characters of buf1 and buf2 and
-	// \returns a value indicating their relationship.
-	// --------------------------------------------------------
-	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, s32 inLength)
+	/**
+	 * Compares the first count characters of buf1 and buf2 and
+	 * \returns a value indicating their relationship.
+	 */
+	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength)
 	{
 		return ::memcmp(bufPtr1, bufPtr2, inLength);
 	}
 #endif
 
 #ifdef TARGET_PC
-	// -----------------------------------------------------------
-	// Memory copy
-	// -----------------------------------------------------------
-	void xmem_utils::memcpy(void *dest, const void *src, s32 count)
+	/**
+	 * Memory copy
+	 */
+	void xmem_utils::memcpy(void *dest, const void *src, u32 count)
 	{
 		::memcpy(dest, src, count);
 	}
 
-	// -----------------------------------------------------------
-	// Sets the first count characters of dest to the character c.
-	// -----------------------------------------------------------
-	void xmem_utils::memset(void* buf, s32 c, s32 inLength)
+	/**
+	 * Sets the first count characters of dest to the character c.
+	 */
+	void xmem_utils::memset(void* buf, u32 c, u32 inLength)
 	{
 		::memset(buf, c, inLength);
 	}
 
 	//------------------------------------------------------------------------------
-	void* xmem_utils::memmove(void* inDest, const void* inSrc, s32 inLength)
+	void* xmem_utils::memmove(void* inDest, const void* inSrc, u32 inLength)
 	{
 		return ::memmove(inDest, inSrc, inLength);
 	}
 
-	// --------------------------------------------------------
-	// Compares the first count characters of buf1 and buf2 and
-	// \returns a value indicating their relationship.
-	// --------------------------------------------------------
-	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, s32 inLength)
+	/**
+	 * Compares the first count characters of buf1 and buf2 and
+	 * \returns a value indicating their relationship.
+	 */
+	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength)
 	{
 		return ::memcmp(bufPtr1, bufPtr2, inLength);
 	}
 #endif
-#ifdef TARGET_PS3
+#if defined(TARGET_PS3)
 
-	// -----------------------------------------------------------
-	// Memory copy
-	// -----------------------------------------------------------
-	void xmem_utils::memcpy(void *dest, const void *src, s32 count)
+	/**
+	 * Memory copy
+	 */
+	void xmem_utils::memcpy(void *dest, const void *src, u32 count)
 	{
 		::memcpy(dest, src, count);
 	}
 
-	// -----------------------------------------------------------
-	// Sets the first count characters of inDest to the character c.
-	// -----------------------------------------------------------
-	void xmem_utils::memset(void* inDest, s32 c, s32 inLength)
+	/**
+	 * Sets the first count characters of inDest to the character c.
+	 */
+	void xmem_utils::memset(void* inDest, u32 c, u32 inLength)
 	{
 		::memset(inDest, c, inLength);
 	}
 
 	//------------------------------------------------------------------------------
-	void* xmem_utils::memmove(void* inDest, const void* inSrc, s32 inLength)
+	void* xmem_utils::memmove(void* inDest, const void* inSrc, u32 inLength)
 	{
 		return ::memmove(inDest, inSrc, inLength);
 	}
 
-	// --------------------------------------------------------
-	// Compares the first count characters of buf1 and buf2 and
-	// \returns a value indicating their relationship.
-	// --------------------------------------------------------
-	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, s32 inLength)
+	/**
+	 * Compares the first count characters of buf1 and buf2 and
+	 * \returns a value indicating their relationship.
+	 */
+	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength)
 	{
 		return ::memcmp(bufPtr1, bufPtr2, inLength);
 	}
@@ -123,33 +124,33 @@ namespace xcore
 
 #ifdef TARGET_360
 
-	// -----------------------------------------------------------
-	// Memory copy
-	// -----------------------------------------------------------
-	void xmem_utils::memcpy(void *dest, const void *src, s32 count)
+	/*
+	 * Memory copy
+	 */
+	void xmem_utils::memcpy(void *dest, const void *src, u32 count)
 	{
 		::memcpy(dest, src, count);
 	}
 
-	// -----------------------------------------------------------
-	// Sets the first count characters of dest to the character c.
-	// -----------------------------------------------------------
-	void xmem_utils::memset(void* buf, s32 c, s32 inLength)
+	/**
+	 * Sets the first count characters of dest to the character c.
+	 */
+	void xmem_utils::memset(void* buf, u32 c, u32 inLength)
 	{
 		::memset(buf, c, inLength);
 	}
 
 	//------------------------------------------------------------------------------
-	void* xmem_utils::memmove(void* inDest, const void* inSrc, s32 inLength)
+	void* xmem_utils::memmove(void* inDest, const void* inSrc, u32 inLength)
 	{
 		return ::memmove(inDest, inSrc, inLength);
 	}
 
-	// --------------------------------------------------------
-	// Compares the first count characters of buf1 and buf2 and
-	// \returns a value indicating their relationship.
-	// --------------------------------------------------------
-	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, s32 inLength)
+	/**
+	 * Compares the first count characters of buf1 and buf2 and
+	 * \returns a value indicating their relationship.
+	 */
+	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength)
 	{
 		return ::memcmp(bufPtr1, bufPtr2, inLength);
 	}
@@ -157,43 +158,43 @@ namespace xcore
 
 #ifdef TARGET_3DS
 
-	// -----------------------------------------------------------
-	// Memory copy
-	// -----------------------------------------------------------
-	void xmem_utils::memcpy(void *dest, const void *src, s32 count)
+	/**
+	 * Memory copy
+	 */
+	void xmem_utils::memcpy(void *dest, const void *src, u32 count)
 	{
 		::memcpy(dest, src, count);
 	}
 
-	// -----------------------------------------------------------
-	// Sets the first count characters of inDest to the character c.
-	// -----------------------------------------------------------
-	void xmem_utils::memset(void* inDest, s32 c, s32 inLength)
+	/**
+	 * Sets the first count characters of inDest to the character c.
+	 */
+	void xmem_utils::memset(void* inDest, u32 c, u32 inLength)
 	{
 		::memset(inDest, c, inLength);
 	}
 
 	//------------------------------------------------------------------------------
-	void* xmem_utils::memmove(void* inDest, const void* inSrc, s32 inLength)
+	void* xmem_utils::memmove(void* inDest, const void* inSrc, u32 inLength)
 	{
 		return ::memmove(inDest, inSrc, inLength);
 	}
 
-	// --------------------------------------------------------
-	// Compares the first count characters of buf1 and buf2 and
-	// \returns a value indicating their relationship.
-	// --------------------------------------------------------
-	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, s32 inLength)
+	/**
+	 * Compares the first count characters of buf1 and buf2 and
+	 * \returns a value indicating their relationship.
+	 */
+	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength)
 	{
 		return ::memcmp(bufPtr1, bufPtr2, inLength);
 	}
 #endif
 
-	void			xmem_utils::memswap(void* inLHS, const void* inRHS, int inLength)
+	void			xmem_utils::memswap(void* inLHS, const void* inRHS, u32 inLength)
 	{
 		u8* lhs = (u8*)inLHS;
 		u8* rhs = (u8*)inRHS;
-		for (int i=0; i<inLength; i++)
+		for (u32 i=0; i<inLength; i++)
 		{
 			const u8 t = lhs[i];
 			lhs[i] = rhs[i];
@@ -206,16 +207,16 @@ namespace xcore
 
 
 	/**
-	@brief		Read an unaligned N-bit unsigned integer in build target processor endian
-				mode (little endian in our case!)
-
-	@desc		This function reads an unaligned N-bit integer from an address. This is
-				guaranteed to be legal, even if the processor normally doesn't allow
-				unaligned N-bit reads.
-
-	Note:		PC and XBOX are little endian and that PS2 and PSP can be set 
-				to both little or big endian mode (set to little endian in our engine).
-	**/
+	 * @brief		Read an unaligned N-bit unsigned integer in build target processor endian
+	 *  			mode (little endian in our case!)
+	 *
+	 * @desc		This function reads an unaligned N-bit integer from an address. This is
+	 *	    		guaranteed to be legal, even if the processor normally doesn't allow
+	 *  			unaligned N-bit reads.
+	 *
+	 * Note:		PC and XBOX are little endian and that PS2 and PSP can be set 
+	 *  			to both little or big endian mode (set to little endian in our engine).
+	 */
 	u16 const*	xmem_utils::readunaligned16(u16 const* inAddress, u16& outValue)
 	{
 		u8 byte0 = *(const u8*)(inAddress);
@@ -260,16 +261,16 @@ namespace xcore
 	///@name Unaligned memory writing
 
 	/**
-	@brief		Write an unaligned N-bit unsigned integer in build target processor 
-				endian mode (little endian in our case!)
-
-	@desc		This function writes an unaligned N-bit integer to an address. This is
-				guaranteed to be legal, even if the processor normally doesn't allow
-				unaligned N-bit write.
-
-	Note		PC and XBOX are little endian and that PS2 and PSP can be set 
-				to both little or big endian mode (set to little endian in our engine).
-	**/
+	 * @brief		Write an unaligned N-bit unsigned integer in build target processor 
+	 *  			endian mode (little endian in our case!)
+	 *
+	 * @desc		This function writes an unaligned N-bit integer to an address. This is
+	 *  			guaranteed to be legal, even if the processor normally doesn't allow
+	 *  			unaligned N-bit write.
+	 *
+	 * Note		PC and XBOX are little endian and that PS2 and PSP can be set 
+	 *			to both little or big endian mode (set to little endian in our engine).
+	 */
 	u16*			xmem_utils::writeunaligned16(u16* inAddress, u16 inData)
 	{
 		*(u8*)(inAddress)= inData>>8;

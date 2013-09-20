@@ -1,129 +1,149 @@
-#include "xbase\x_target.h"
-#include "xbase\x_types.h"
+#include "xbase\x_base.h"
 #include "xbase\x_allocator.h"
-#include "xbase\x_string.h"
+#include "xbase\x_console.h"
 
 #include "xunittest\xunittest.h"
+#include "xunittest\private\ut_ReportAssert.h"
 
 UNITTEST_SUITE_LIST(xCoreUnitTest);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdouble);
+
+
+// SPU-only test list
+
+#ifdef SPU
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsingleton);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xallocator);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbinary_search);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xqsort);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbitfield);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xfloat);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xguid);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xinteger);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_std);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_tmp);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xcstring);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xccstring);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
+#endif
+
+#ifndef SPU
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsingleton);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xallocator);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbinary_search);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xqsort);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, x_binary_search);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xguid);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbitfield);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xinteger);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xfloat);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdouble);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsprintf);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtls);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xrbtree15);
+#endif
 
 #ifndef X_NO_CUSTOM_INT64
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, __xint64);
 #endif // X_NO_CUSTOM_INT64
 
-
 namespace xcore
 {
-	class TestHeapAllocator : public x_iallocator
+	// Our own assert handler
+	class UnitTestAssertHandler : public xcore::x_asserthandler
 	{
 	public:
-		TestHeapAllocator(xcore::x_iallocator* allocator)
-			: mAllocator(allocator)
-			, mNumAllocations(0)
+		UnitTestAssertHandler()
 		{
+			NumberOfAsserts = 0;
 		}
 
+		virtual xcore::xbool	HandleAssert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+		{
+			UnitTest::reportAssert(exprString, fileName, lineNumber);
+			NumberOfAsserts++;
+			return false;
+		}
+
+
+		xcore::s32		NumberOfAsserts;
+	};
+
+	class UnitTestAllocator : public UnitTest::Allocator
+	{
 		xcore::x_iallocator*	mAllocator;
-		s32						mNumAllocations;
+	public:
+						UnitTestAllocator(xcore::x_iallocator* allocator)	{ mAllocator = allocator; }
+		virtual void*	Allocate(int size)									{ return mAllocator->allocate(size, 4); }
+		virtual void	Deallocate(void* ptr)								{ mAllocator->deallocate(ptr); }
+	};
 
-		virtual const char*	name() const
-		{
-			return "xbase unittest test heap allocator";
-		}
+	class TestAllocator : public x_iallocator
+	{
+		x_iallocator*		mAllocator;
+	public:
+							TestAllocator(x_iallocator* allocator) : mAllocator(allocator) { }
+
+		virtual const char*	name() const										{ return "xbase unittest test heap allocator"; }
 
 		virtual void*		allocate(u32 size, u32 alignment)
 		{
-			++mNumAllocations;
+			UnitTest::IncNumAllocations();
 			return mAllocator->allocate(size, alignment);
 		}
 
 		virtual void*		reallocate(void* mem, u32 size, u32 alignment)
 		{
-			return mAllocator->reallocate(mem, size, alignment);
+			if (mem==NULL)
+				return allocate(size, alignment);
+			else 
+				return mAllocator->reallocate(mem, size, alignment);
 		}
 
 		virtual void		deallocate(void* mem)
 		{
-			--mNumAllocations;
+			UnitTest::DecNumAllocations();
 			mAllocator->deallocate(mem);
 		}
 
 		virtual void		release()
 		{
+			mAllocator->release();
+			mAllocator = NULL;
 		}
 	};
 }
 
-class UnitTestAllocator : public UnitTest::Allocator
-{
-public:
-	xcore::x_iallocator*	mAllocator;
-	int						mNumAllocations;
-
-	UnitTestAllocator(xcore::x_iallocator* allocator)
-		: mNumAllocations(0)
-	{
-		mAllocator = allocator;
-	}
-
-	virtual void*	Allocate(int size)
-	{
-		++mNumAllocations;
-		return mAllocator->allocate(size, 4);
-	}
-	virtual void	Deallocate(void* ptr)
-	{
-		--mNumAllocations;
-		mAllocator->deallocate(ptr);
-	}
-};
+xcore::x_iallocator* gTestAllocator = NULL;
+xcore::UnitTestAssertHandler gAssertHandler;
 
 bool gRunUnitTest(UnitTest::TestReporter& reporter)
 {
+#ifdef SPU
+	xcore::s32 progSize;
+	xcore::s32 stackSize;
+
+	::getProgramAndStackSizeForSPU(&progSize, &stackSize);
+
+	xcore::gSetSPUConfig(progSize, stackSize);
+#endif
+
+	xcore::x_asserthandler::sRegisterHandler(&gAssertHandler);
+
 	xcore::x_iallocator* systemAllocator = xcore::gCreateSystemAllocator();
-	UnitTestAllocator unittestAllocator( systemAllocator );
+	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
-
-	xcore::TestHeapAllocator stringHeapAllocator(systemAllocator);
-	xcore::xstring::sSetAllocator(&stringHeapAllocator);
-	xcore::TestHeapAllocator stringTmpAllocator(systemAllocator);
-	xcore::xstring_tmp::sSetAllocator(&stringTmpAllocator);
 	
-	int r = UNITTEST_SUITE_RUN(reporter, xCoreUnitTest);
-	if (unittestAllocator.mNumAllocations!=0)
-	{
-		reporter.reportFailure(__FILE__, __LINE__, "xunittest", "memory leaks detected!");
-		r = -1;
-	}
-	if (stringHeapAllocator.mNumAllocations!=0)
-	{
-		reporter.reportFailure(__FILE__, __LINE__, "xbase::xstring", "memory leaks detected!");
-		r = -1;
-	}
-	if (stringTmpAllocator.mNumAllocations!=0)
-	{
-		reporter.reportFailure(__FILE__, __LINE__, "xbase::xstring_tmp", "memory leaks detected!");
-		r = -1;
-	}
+	xcore::xconsole::addDefault();
 
-	xcore::xstring::sSetAllocator(NULL);
-	xcore::xstring_tmp::sSetAllocator(NULL);
+	xcore::TestAllocator testAllocator(systemAllocator);
+	gTestAllocator = &testAllocator;
+
+	xbase::x_Init();
+	int r = UNITTEST_SUITE_RUN(reporter, xCoreUnitTest);
+	xbase::x_Exit();
+
+	gTestAllocator->release();
 
 	UnitTest::SetAllocator(NULL);
-	systemAllocator->release();
+
 	return r==0;
 }
 

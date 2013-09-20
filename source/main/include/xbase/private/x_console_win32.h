@@ -1,4 +1,11 @@
-// x_console_win32.h - Core console for Input, Output and Error on Windows
+/**
+* @file x_console_win32.h
+*
+* Core console for Input, Output and Error on Windows.
+*
+* @author Virtuos
+*/
+
 #ifndef __XBASE_CONSOLE_WIN32_H__
 #define __XBASE_CONSOLE_WIN32_H__
 #include "xbase\x_target.h"
@@ -8,4 +15,4 @@
 
 
 
-#endif	// __XBASE_CONSOLE_WIN32_H__
+#endif	///< __XBASE_CONSOLE_WIN32_H__

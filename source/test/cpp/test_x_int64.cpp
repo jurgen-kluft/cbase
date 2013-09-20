@@ -2,7 +2,6 @@
 
 #ifndef X_NO_CUSTOM_INT64
 
-#include "xbase\x_types.h"
 #include "xbase\x_int64.h"
 #include "xunittest\xunittest.h"
 

@@ -12,7 +12,7 @@ namespace xcore
 	// Custom QuickSort
 	namespace __xqsort
 	{
-		static inline xbyte*			sMed3(xbyte*, xbyte*, xbyte*, s32(*)(const xbyte* const, const xbyte* const));
+		static inline xbyte*			sMed3(xbyte*, xbyte*, xbyte*, s32(*)(const void* const, const void* const, u32), u32);
 		static inline void				sSwapFunc(xbyte*, xbyte*, s32, s32);
 
 		#define __xqsort_MIN(a, b)	(a) < (b) ? a : b
@@ -54,13 +54,18 @@ namespace xcore
 
 		#define __xqsort_VecSwap(a, b, n) 	if ((n) > 0) __xqsort::sSwapFunc(a, b, n, swaptype)
 
-		static inline xbyte* sMed3(xbyte* a, xbyte* b, xbyte* c, s32 (*cmp)(const xbyte* const, const xbyte* const))
+		static inline xbyte* sMed3(xbyte* a, xbyte* b, xbyte* c,
+			s32 (*cmp)(const void* const, const void* const, u32), u32 data)
 		{
-			return cmp(a, b) < 0 ? (cmp(b, c) < 0 ? b : (cmp(a, c) < 0 ? c : a )) : (cmp(b, c) > 0 ? b : (cmp(a, c) < 0 ? a : c ));
+			return cmp(a, b, data) < 0 ? (cmp(b, c, data) < 0 ? b : (cmp(a, c, data) < 0 ? c : a )) : (cmp(b, c, data) > 0 ? b : (cmp(a, c, data) < 0 ? a : c ));
 		}
 	}
 
-	void xqsort(void *a /*element_array*/, s32 n /*element_count*/, s32 es /*element_size*/, s32 (*cmp)(const xbyte* const, const xbyte* const))
+	void xqsort(void *a /*element_array*/,
+		s32 n /*element_count*/,
+		s32 es /*element_size*/,
+		s32 (*cmp)(const void* const, const void* const, u32),
+		u32 data)
 	{
 		xbyte *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 		s32 d, r, swaptype, swap_cnt;
@@ -71,7 +76,7 @@ namespace xcore
 		if (n < 7)
 		{
 			for (pm = (xbyte*) a + es; pm < (xbyte*) a + n * es; pm += es)
-				for (pl = pm; pl > (xbyte*) a && cmp(pl - es, pl) > 0; pl -= es)
+				for (pl = pm; pl > (xbyte*) a && cmp(pl - es, pl, data) > 0; pl -= es)
 					__xqsort_Swap(pl, pl - es);
 			return;
 		}
@@ -83,18 +88,18 @@ namespace xcore
 			if (n > 40)
 			{
 				d = (n / 8) * es;
-				pl = __xqsort::sMed3(pl, pl + d, pl + 2 * d, cmp);
-				pm = __xqsort::sMed3(pm - d, pm, pm + d, cmp);
-				pn = __xqsort::sMed3(pn - 2 * d, pn - d, pn, cmp);
+				pl = __xqsort::sMed3(pl, pl + d, pl + 2 * d, cmp, data);
+				pm = __xqsort::sMed3(pm - d, pm, pm + d, cmp, data);
+				pn = __xqsort::sMed3(pn - 2 * d, pn - d, pn, cmp, data);
 			}
-			pm = __xqsort::sMed3(pl, pm, pn, cmp);
+			pm = __xqsort::sMed3(pl, pm, pn, cmp, data);
 		}
 		__xqsort_Swap((xbyte*) a, pm);
 		pa = pb = (xbyte*) a + es;
 		pc = pd = (xbyte*) a + (n - 1) * es;
 		for (;;)
 		{
-			while (pb <= pc && (r = cmp(pb, (xbyte*)a)) <= 0)
+			while (pb <= pc && (r = cmp(pb, (xbyte*)a, data)) <= 0)
 			{
 				if (r == 0)
 				{
@@ -105,7 +110,7 @@ namespace xcore
 				pb += es;
 			}
 
-			while (pb <= pc && (r = cmp(pc, (xbyte*)a)) >= 0)
+			while (pb <= pc && (r = cmp(pc, (xbyte*)a, data)) >= 0)
 			{
 				if (r == 0)
 				{
@@ -128,7 +133,7 @@ namespace xcore
 		if (swap_cnt == 0)	// Switch to insertion sort
 		{
 			for (pm = (xbyte*) a + es; pm < (xbyte*) a + n * es; pm += es)
-				for (pl = pm; pl > (xbyte*) a && cmp(pl - es, pl) > 0; pl -= es)
+				for (pl = pm; pl > (xbyte*) a && cmp(pl - es, pl, data) > 0; pl -= es)
 					__xqsort_Swap(pl, pl - es);
 			return;
 		}
@@ -140,7 +145,7 @@ namespace xcore
 		__xqsort_VecSwap(pb, pn - r, r);
 
 		if ((r = pb - pa) > es)
-			xqsort((xbyte*)a, r / es, es, cmp);
+			xqsort((xbyte*)a, r / es, es, cmp, data);
 	
 		if ((r = pd - pc) > es)
 		{ 

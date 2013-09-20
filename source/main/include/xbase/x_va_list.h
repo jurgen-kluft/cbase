@@ -1,4 +1,8 @@
-// x_va_list.h - Core Variable Argument List
+/**
+* @file Head file x_va_list.h
+* Core Variable Argument List
+*/
+
 #ifndef __XBASE_CORE_VA_LIST_H__
 #define __XBASE_CORE_VA_LIST_H__
 #include "xbase\x_target.h"
@@ -9,12 +13,11 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_types.h"
 
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	//==============================================================================
@@ -23,31 +26,33 @@ namespace xcore
 	class xstring_tmp;
 	class xstring;
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Jurgen Kluft
-	// Description:
-	//     x_va_list using x_va is a type safe implementation of the variable argument
-	//     functionality that is provided by C/C++. The disadvantage of the variable
-	//     argument functionality is that it is not 'type safe'. That is why we have
-	//     overridden this by using a custom va_list.
-	//
-	//<P>  The printf and sprintf as we all know can still be used as we have always
-	//     done, there are no changes in their use. The only main difference is that
-	//     these functions have become 'type safe'. This means that if you have specified
-	//     %s in the format string and have passed a variable which is NOT a string
-	//     then the printf code will not crash and it will display NULL. For some types
-	//     type conversion is supported, like s32 to float, float to s32 etc.
-	//
-	//<CODE>
-	//      printf("This is a test, %s, %d, %f", "hello", 2009, 3.1415f);
-	//      sprintf(dest, "This is a test, %s, %d, %f", "hello", 2009, 3.1415f);
-	//</CODE>
-	//
-	//<P>  When you specify a %d or %u and have passed a 'const char*', the pointer value
-	//     will be displayed instead of the string.
-	//
-	//------------------------------------------------------------------------------
+	/** 
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Jurgen Kluft
+	 * Description:
+	 *     x_va_list using x_va is a type safe implementation of the variable argument
+	 *     functionality that is provided by C/C++. The disadvantage of the variable
+	 *     argument functionality is that it is not 'type safe'. That is why we have
+	 *     overridden this by using a custom va_list.
+	 *
+	 *<P>  The printf and sprintf as we all know can still be used as we have always
+	 *     done, there are no changes in their use. The only main difference is that
+	 *     these functions have become 'type safe'. This means that if you have specified
+	 *     %s in the format string and have passed a variable which is NOT a string
+	 *     then the printf code will not crash and it will display NULL. For some types
+	 *     type conversion is supported, like s32 to float, float to s32 etc.
+	 *
+	 *<CODE>
+	 *      printf("This is a test, %s, %d, %f", "hello", 2009, 3.1415f);
+	 *      sprintf(dest, "This is a test, %s, %d, %f", "hello", 2009, 3.1415f);
+	 *</CODE>
+	 *
+	 *<P>  When you specify a %d or %u and have passed a 'const char*', the pointer value
+	 *     will be displayed instead of the string.
+	 *
+	 *------------------------------------------------------------------------------
+	 */
 	class x_va
 	{
 		enum EProperty
@@ -199,36 +204,38 @@ namespace xcore
 	};
 
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Jurgen Kluft
-	// Description:
-	//     x_va_r_list using x_va_r is a type safe implementation of 'pointer to argument'
-	//     passing used by sscanf.
-	//
-	//<P>  The sscanf as we all know can be used as we have always done, there are no 
-	//     changes in the interface and it's use. The only main difference is that
-	//     this function has become 'type safe'. This means that if you have specified
-	//     %s in the format string and have passed a variable which is NOT a string
-	//     then the sscanf code will not crash and in some cases it will convert the type
-	//     it reads to the type the user has supplied (e.g. float to int). 
-	//
-	//<CODE>
-	//      const char* myString;
-	//      s32 myInteger;
-	//      f32 myFloat;
-	//      sscanf("This is a test, hello, 2009, 3.1415", "This is a test, %s, %d, %f", myString, myInteger, myFloat);
-	//</CODE>
-	//
-	// An example of automatic conversion (int->float, float->int):
-	// 
-	//<CODE>
-	//      s32 myInteger;
-	//      f32 myFloat;
-	//      sscanf("This is a test, 2009, 3.1415", "This is a test, %d, %f", myFloat, myInteger);
-	//</CODE>
-	//
-	//------------------------------------------------------------------------------
+	/** 
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Jurgen Kluft
+	 * Description:
+	 *     x_va_r_list using x_va_r is a type safe implementation of 'pointer to argument'
+	 *     passing used by sscanf.
+	 *
+	 *<P>  The sscanf as we all know can be used as we have always done, there are no 
+	 *     changes in the interface and it's use. The only main difference is that
+	 *     this function has become 'type safe'. This means that if you have specified
+	 *     %s in the format string and have passed a variable which is NOT a string
+	 *     then the sscanf code will not crash and in some cases it will convert the type
+	 *     it reads to the type the user has supplied (e.g. float to int). 
+	 *
+	 *<CODE>
+	 *      const char* myString;
+	 *      s32 myInteger;
+	 *      f32 myFloat;
+	 *      sscanf("This is a test, hello, 2009, 3.1415", "This is a test, %s, %d, %f", myString, myInteger, myFloat);
+	 *</CODE>
+	 *
+	 * An example of automatic conversion (int->float, float->int):
+	 * 
+	 *<CODE>
+	 *      s32 myInteger;
+	 *      f32 myFloat;
+	 *      sscanf("This is a test, 2009, 3.1415", "This is a test, %d, %f", myFloat, myInteger);
+	 *</CODE>
+	 *
+	 *------------------------------------------------------------------------------
+	 */
 	class x_va_r
 	{
 		enum EProperty
@@ -364,8 +371,8 @@ namespace xcore
 	// END xCore namespace
 	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 
-//==============================================================================
-// END __X_CORE_VA_LIST_H__
-//==============================================================================
-#endif
+#endif ///< END __X_CORE_VA_LIST_H__

@@ -1,4 +1,9 @@
-// x_int256.h - xCore custom 256 bit signed integer
+/**
+* @file Head file x_int256.h
+*
+* xCore custom 256 bit signed integer.
+*/
+
 #ifndef __XBASE_256_BIT_SIGNED_INTEGER_H__
 #define __XBASE_256_BIT_SIGNED_INTEGER_H__
 #include "xbase\x_target.h"
@@ -8,11 +13,9 @@
 
 #ifndef X_NO_CUSTOM_INT256
 
-#include "xbase\x_types.h"
-
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	// Forward declares
@@ -36,7 +39,9 @@ namespace xcore
 		};
 
 	public:
-								// Constructors
+								/** 
+								 *  Constructors
+								 */
 								__xint256();
 		explicit				__xint256(s8 value);
 		explicit				__xint256(u8 value);
@@ -52,11 +57,11 @@ namespace xcore
 								__xint256(const __xuint256& value);
 								__xint256(u32 b255_224, u32 b223_192, u32 b191_160, u32 b159_128, u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0);
 
-		// Assignment operator
+		/** 
+		 *  Arithmetic operators
+		 */
 		__xint256&				operator=(const __xint256& value);
 		__xint256&				operator=(const __xuint256& value);
-
-		// Arithmetic operators
 		__xint256& 				operator++();
 		__xint256& 				operator--();
 		__xint256	 			operator++(s32)											{ __xint256 r(*this); (*this)++; return r; }
@@ -69,7 +74,9 @@ namespace xcore
 		friend __xint256  		operator-(const __xint256& value);
 		__xint256  				operator~() const;
 
-		// Misc operators
+		/**
+		 *  Misc operators
+		 */
 		__xint256  				operator>>(s32 nShift) const;
 		__xint256  				operator<<(s32 nShift) const;
 		__xint256& 				operator>>=(s32 nShift);
@@ -78,7 +85,9 @@ namespace xcore
 		__xint256& 				operator|=(const __xint256& value);
 		__xint256& 				operator&=(const __xint256& value);
 
-								// Operators to convert back to basic types
+	                         	/**
+	                         	 *  Operators to convert back to basic types.
+	                          	 */
 								operator s32() const;
 								operator u32() const;
 								operator s64() const;
@@ -87,7 +96,9 @@ namespace xcore
 		inline u32&				operator [] (s32 index)									{ return mUInt32[index]; }
 		inline u32				operator [] (s32 index) const							{ return mUInt32[index]; }
 
-		//Misc. Functions
+		/**
+		 *  Misc operators
+		 */
 		void 					SetBit(s32 nIndex, xbool value);
 		xbool 					IsBitSet(s32 nIndex) const;
 
@@ -108,7 +119,9 @@ namespace xcore
 
 		friend class __xuint256;
 
-		// Actual member data variables
+		/**
+		 *  Actual member data variables
+		 */
 		union
 		{
 			struct
@@ -157,11 +170,10 @@ namespace xcore
 	inline xbool		operator>=(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) != -1); }
 	inline xbool		operator==(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) == 0); }
 	inline xbool		operator!=(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) != 0); }
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 
 #endif
 #endif	///< __XBASE_256_BIT_SIGNED_INTEGER_H__

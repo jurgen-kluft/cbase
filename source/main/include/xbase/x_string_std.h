@@ -5,74 +5,77 @@
 #pragma once 
 #endif
 
-//==============================================================================
-// TODO
-//==============================================================================
-// - Convert char to xtchar	(1 byte char)
-// - Add support for xwchar (2 byte char)
+/**
+ * TODO
+ *==============================================================================
+ * - Convert char to xtchar	(1 byte char)
+ * - Add support for xwchar (2 byte char)
+ */
 
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_types.h"
 #include "xbase\x_debug.h"
 #include "xbase\x_va_list.h"
 #include "xbase\x_integer.h"
 #include "xbase\x_console.h"
 
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
-	//==============================================================================
-	//==============================================================================
-	// string functions
-	//==============================================================================
-	//==============================================================================
-	// TODO: 
-	//       * I need to explain all the different options for formated strings
-	//       * inline things properly
-	//
-	//  Type Field Characters
-	//  Character       Output format
-	//  =========       --------------------------------------------------------
-	//     %%            a percent sign
-	//     %b,%B,%#b     a boolean as true/false (%b=lower-case true/false, %B=upper-case TRUE/FALSE, %#b/%B#=capital-case True/False)
-	//     %c            a character with the given number
-	//     %s            a string
-	//     %d            a signed integer, in decimal
-	//     %u            an unsigned integer, in decimal
-	//     %o            an unsigned integer, in octal
-	//     %x            an unsigned integer, in hexadecimal (lower case)
-	//     %e            a floating-point number, in scientific notation
-	//     %f            a floating-point number, in fixed decimal notation
-	//     %g            a floating-point number, in %e or %f notation
-	//     %X            like %x, but using upper-case letters
-	//     %E            like %e, but using an upper-case "E"
-	//     %G            like %g, but with an upper-case "E" (if applicable)
-	//     %p            a pointer (outputs the Perl value's address in hexadecimal)
-	//     %n            special: *stores* the number of characters output so far into the next variable in the parameter list
-	//     %y,%Y,%#y     a boolean as yes/no (%y=lower-case yes/no, %Y=upper-case YES/NO, %#y/%#Y=capital-case Yes/No)
-	//
-	//  Size flags
-	//  Character    Output
-	//  =========    ------------------------------------------------------------
-	//   h           interpret integer as s16 or u16
-	//   l           interpret integer as s32 or u32
-	//   q, L        interpret integer as s64 or u64
-	//   L           interpret floating point as higher precision adds a few extra floating point numbers
-	//
-	// Examples:
-	//
-	//      x_printf("%Lf %Lf %Lf", Vec.X, Vec.Y, Vec.Z);  // Note that we use the higher precision floating point representation
-	//      x_printf("%Ld" (s64)123);                      // This is a way to print an s64 bit number
-	//      x_printf("%d" 123);                            // Nothing special here printing an 32bit integer
-	//      x_printf("%f" 123.0);                          // Nothing special here printing a floating point number
-	//      x_printf("%+010.4f", 123.456);                 // The printf works like you will expect
-	//
-	//==============================================================================
+	/**
+	 *==============================================================================
+	 * string functions
+	 *==============================================================================
+	 *==============================================================================
+	 * TODO: 
+	 *       * I need to explain all the different options for formated strings
+	 *       * inline things properly
+	 *
+	 *  Type Field Characters
+	 *  Character       Output format
+	 *  =========       --------------------------------------------------------
+	 *     %%            a percent sign
+	 *     %b,%B,%#b     a boolean as true/false (%b=lower-case true/false, %B=upper-case TRUE/FALSE, %#b/%B#=capital-case True/False)
+	 *     %c            a character with the given number
+	 *     %s            a string
+	 *     %d            a signed integer, in decimal
+	 *     %u            an unsigned integer, in decimal
+	 *     %o            an unsigned integer, in octal
+	 *     %x            an unsigned integer, in hexadecimal (lower case)
+	 *     %e            a floating-point number, in scientific notation
+	 *     %f            a floating-point number, in fixed decimal notation
+	 *     %g            a floating-point number, in %e or %f notation
+	 *     %X            like %x, but using upper-case letters
+	 *     %E            like %e, but using an upper-case "E"
+	 *     %G            like %g, but with an upper-case "E" (if applicable)
+	 *     %p            a pointer (outputs the Perl value's address in hexadecimal)
+	 *     %n            special: *stores* the number of characters output so far into the next variable in the parameter list
+	 *     %y,%Y,%#y     a boolean as yes/no (%y=lower-case yes/no, %Y=upper-case YES/NO, %#y/%#Y=capital-case Yes/No)
+	 *
+	 *  Size flags
+	 *  Character    Output
+	 *  =========    ------------------------------------------------------------
+	 *   h           interpret integer as s16 or u16
+	 *   l           interpret integer as s32 or u32
+	 *   q, L        interpret integer as s64 or u64
+	 *   L           interpret floating point as higher precision adds a few extra floating point numbers
+	 *
+	 * Examples:
+	 *
+	 *      x_printf("%Lf %Lf %Lf", Vec.X, Vec.Y, Vec.Z);  // Note that we use the higher precision floating point representation
+	 *      x_printf("%Ld" (s64)123);                      // This is a way to print an s64 bit number
+	 *      x_printf("%d" 123);                            // Nothing special here printing an 32bit integer
+	 *      x_printf("%f" 123.0);                          // Nothing special here printing a floating point number
+	 *      x_printf("%+010.4f", 123.456);                 // The printf works like you will expect
+	 *
+	 */
+
+
+
 
 	extern char*		x_strcpy    			(char* dest, s32 dest_buffer_size, const char* src);
 	extern s32  		x_strlen    			(const char* str);
@@ -195,19 +198,20 @@ namespace xcore
 	extern bool			x_strIsQuoted			(const char* inStr, char quote='\"', s32 inStrLen=-1);						///< Check if string is enclosed in f64 quotes
 
 
-	//==============================================================================
-	// FORMATTED STRING FUNCTIONS
-	//==============================================================================
-	//
-	//  x_cprintf    
-	//
-	//      Formatted print counting function, will return the number of characters needed.
-	//
-	//  x_sprintf    
-	//
-	//      Formatted print to "string".
-	//
-	//==============================================================================
+	/**
+	 * FORMATTED STRING FUNCTIONS
+	 *==============================================================================
+	 *
+	 *  x_cprintf    
+	 *
+	 *      Formatted print counting function, will return the number of characters needed.
+	 *
+	 *  x_sprintf    
+	 *
+	 *      Formatted print to "string".
+	 *
+	 *==============================================================================
+	 */
 	extern s32		x_cprintf   			(                            const char* formatStr, const x_va& v1=x_va::sEmpty, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
 																								const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
 	extern s32		x_sprintf   			(char* buffer, s32 maxChars, const char* formatStr, const x_va& v1=x_va::sEmpty, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
@@ -215,32 +219,37 @@ namespace xcore
 	extern s32		x_vcprintf  			(                            const char* formatStr, const x_va_list& args);
 	extern s32		x_vsprintf  			(char* buffer, s32 maxChars, const char* formatStr, const x_va_list& args);
 
-	//==============================================================================
-	// FORMATTED STRING FUNCTIONS
-	//==============================================================================
-	//
-	//  x_printf    
-	//
-	//      Formatted print to "standard text output".  This is straight forward for
-	//      text mode programs and is handled by the xBase.  Graphical programs
-	//      must register a function to handle this operation.
-	//
-	//==============================================================================
+	/**
+	 * FORMATTED STRING FUNCTIONS
+	 *==============================================================================
+	 *
+	 *  x_printf    
+	 *
+	 *      Formatted print to "standard text output".  This is straight forward for
+	 *      text mode programs and is handled by the xBase.  Graphical programs
+	 *      must register a function to handle this operation.
+	 *
+	 *==============================================================================
+	 */
 
-	inline s32		x_printf   				(const char* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
-																	const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty) { return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16); }
-	inline s32		x_printf				(const char* formatStr, const x_va_list& args)		{ return xconsole::write(formatStr, args); }
-	inline s32		x_printf				(const char* str)									{ return xconsole::write(str); }
 
-	//==============================================================================
-	// STRING SCAN FUNCTIONS
-	//==============================================================================
-	//
-	//  x_sscanf  
-	//
-	//      Scan "string" to values.
-	//
-	//==============================================================================
+	s32		x_printf   				(const char* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+																	const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
+	s32		x_printf				(const char* formatStr, const x_va_list& args)	;
+	s32		x_printf				(const char* str);
+		
+
+
+	/**
+	 * STRING SCAN FUNCTIONS
+	 *==============================================================================
+	 *
+	 *  x_sscanf  
+	 *
+	 *      Scan "string" to values.
+	 *
+	 *==============================================================================
+	 */
 
 	extern s32		x_sscanf				(const char *buf, const char *fmt, const x_va_r& v1=x_va_r::sEmpty, const x_va_r& v2=x_va_r::sEmpty, const x_va_r& v3=x_va_r::sEmpty, const x_va_r& v4=x_va_r::sEmpty, const x_va_r& v5=x_va_r::sEmpty, const x_va_r& v6=x_va_r::sEmpty, const x_va_r& v7=x_va_r::sEmpty, const x_va_r& v8=x_va_r::sEmpty,
 																				const x_va_r& v9=x_va_r::sEmpty, const x_va_r& v10=x_va_r::sEmpty, const x_va_r& v11=x_va_r::sEmpty, const x_va_r& v12=x_va_r::sEmpty, const x_va_r& v13=x_va_r::sEmpty, const x_va_r& v14=x_va_r::sEmpty, const x_va_r& v15=x_va_r::sEmpty, const x_va_r& v16=x_va_r::sEmpty);
@@ -250,8 +259,7 @@ namespace xcore
 	// END xCore namespace
 	//==============================================================================
 };
-
-//==============================================================================
-// END
-//==============================================================================
-#endif    /// __X_STRING_STD_H__
+/**
+ *  END xCore namespace
+ */
+#endif    ///< __X_STRING_STD_H__

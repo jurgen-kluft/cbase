@@ -1,14 +1,18 @@
+/**
+* @file x_console_wii.cpp
+* Core console on wii
+*/
+
 #include "xbase\x_target.h"
 #ifdef TARGET_WII
 
 #include <revolution/os.h>
 
-// x_console.cpp - Core console
 #include "xbase\x_console.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	namespace xconsole_out
@@ -24,11 +28,9 @@ namespace xcore
 			return len;
 		}
 	};
-
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
-
+/**
+ *  END xCore namespace
+ */
 
 #endif

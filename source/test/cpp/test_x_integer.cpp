@@ -1,4 +1,3 @@
-#include "xbase\x_types.h"
 #include "xbase\x_integer.h"
 #include "xunittest\xunittest.h"
 

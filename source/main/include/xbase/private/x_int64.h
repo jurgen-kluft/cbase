@@ -1,4 +1,9 @@
-// x_int64.h - xCore custom 64 bit signed integer
+/**
+* @file Head file x_int64.h
+*
+* xCore custom 64 bit signed integer.
+*/
+
 #ifndef __XBASE_64_BIT_SIGNED_INTEGER_H__
 #define __XBASE_64_BIT_SIGNED_INTEGER_H__
 #include "xbase\x_target.h"
@@ -7,22 +12,21 @@
 #endif
 #ifndef X_NO_CUSTOM_INT64
 
-#include "xbase\x_types.h"
 #include "xbase\x_debug.h"
 
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	// Forward declares
 	class __xuint64;
 
 
-	//---------------------------------------------------------------------------------------------------------------------
-	// 64 bit signed integer
-	//---------------------------------------------------------------------------------------------------------------------
+	/**
+	 * 64 bit signed integer
+	 */
 	class __xint64
 	{
 		enum ESettings
@@ -37,7 +41,9 @@ namespace xcore
 		};
 
 	public:
-								// Constructors
+								/** 
+								 *  Constructors
+								 */
 								__xint64();
 		explicit				__xint64(s8 _value);
 		explicit				__xint64(s16 _value);
@@ -48,8 +54,9 @@ namespace xcore
 								__xint64(const s64& _value);
 								__xint64(const u64& _value);
 								__xint64(u32 msb, u32 lsb);
-
-		// Assignment operator
+		/** 
+		 *  Assignment operators
+		 */
 		__xint64&				operator=(char _value)									{ *this = __xint64(_value); return *this; }
 		__xint64&				operator=(s16 _value)									{ *this = __xint64(_value); return *this; }
 		__xint64&				operator=(s32 _value)									{ *this = __xint64(_value); return *this; }
@@ -59,7 +66,9 @@ namespace xcore
 		__xint64&				operator=(u32 _value)									{ *this = __xint64((u32)_value); return *this; }
 		__xint64&				operator=(const u64& _value);
 
-		// Arithmetic operators
+		/** 
+		 *  Arithmetic operators
+		 */
 		__xint64& 				operator++();
 		__xint64& 				operator--();
 		__xint64	 			operator++(s32)											{ __xint64 r(*this); ++(*this); return r; }
@@ -78,7 +87,9 @@ namespace xcore
 		__xint64& 				operator-=(s32 _value)									{ return *this *= __xint64(_value); }
 		__xint64& 				operator%=(s32 _value)									{ return *this *= __xint64(_value); }
 
-		// Misc operators
+		/**
+		 *  Misc operators
+		 */
 		__xint64  				operator>>(s32 nShift) const;
 		__xint64  				operator<<(s32 nShift) const;
 		__xint64& 				operator>>=(s32 nShift);
@@ -87,7 +98,9 @@ namespace xcore
 		__xint64& 				operator|=(const __xint64& _value);
 		__xint64& 				operator&=(const __xint64& _value);
 
-		// Operators to convert back to basic types
+	                         	/**
+	                         	 *  Operators to convert back to basic types.
+	                          	 */
 								operator s32() const;
 								operator u32() const;
 								operator s64() const;
@@ -95,7 +108,9 @@ namespace xcore
 
 		u32						operator [] (s32 index) const							{ ASSERT(index>=0 && index<2); return mUInt32[index]; }
 
-		//Misc. Functions
+		/**
+		 *  Misc operators
+		 */
 		void 					SetBit(s32 nIndex, xbool _value);
 		xbool 					IsBitSet(s32 nIndex) const;
 
@@ -116,7 +131,9 @@ namespace xcore
 
 		friend class __xuint64;
 
-		// Actual member data variables
+		/**
+		 *  Actual member data variables
+		 */
 		union
 		{
 			struct
@@ -180,10 +197,9 @@ namespace xcore
 	inline xbool		operator>=(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) != -1); }
 	inline xbool		operator==(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) == 0); }
 	inline xbool		operator!=(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) != 0); }
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 #endif
 #endif	///< __XBASE_64_BIT_SIGNED_INTEGER_H__

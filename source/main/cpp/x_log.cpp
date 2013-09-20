@@ -1,13 +1,19 @@
-// xlog.cpp - Logging
+/**
+* @file xlog.cpp
+* Logging
+*/
+
+#ifndef SPU
+
 #include "xbase\x_log.h"
 #include "xbase\x_va_list.h"
 #include "xbase\x_string_std.h"
 
 #include "xbase\private\x_log_to_console.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	static x_log_info	x_ST_LogInfo;	///< Single-Thread log info
@@ -234,26 +240,28 @@ namespace xcore
 	//==============================================================================
 	//==============================================================================
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     Output log message.
-	// Arguments:
-	//     channel        - Message channel. This is only a string to output. 
-	//                      No affect for function.
-	//     messageFormat  - Message format. See format for x_sprintf() for detail.
-	//     args           - The arguments output consists with message format.
-	// Returns:
-	//     void
-	// Description:
-	//     The function outputs log message. It works like x_printf except:
-	//     (a)The output goes to the debugger if possible.
-	//     (b)It only works when X_DEBUG is defined.
-	//     (c)Add necessary information like file name before message.
-	// See Also:
-	//     __x_LogWarning, __x_LogError
-	//------------------------------------------------------------------------------
+    /**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     Output log message.
+	 * Arguments:
+	 *     channel        - Message channel. This is only a string to output. 
+	 *                      No affect for function.
+	 *     messageFormat  - Message format. See format for x_sprintf() for detail.
+	 *     args           - The arguments output consists with message format.
+	 * Returns:
+	 *     void
+	 * Description:
+	 *     The function outputs log message. It works like x_printf except:
+	 *     (a)The output goes to the debugger if possible.
+	 *     (b)It only works when X_DEBUG is defined.
+	 *     (c)Add necessary information like file name before message.
+	 * See Also:
+	 *     __x_LogWarning, __x_LogError
+	 *------------------------------------------------------------------------------
+	 */
 	void __x_LogMessage(const char* channel, const char* messageFormat, const x_va_list& args)
 	{
 		x_log_info& info = sGetLogInfoFunc();
@@ -270,26 +278,28 @@ namespace xcore
 		__x_LogMessage(channel, message, x_va_list());
 	}
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     Output log warning.
-	// Arguments:
-	//     channel        - Warning channel. This is only a string to output. 
-	//                      No affect for function.
-	//     messageFormat  - Warning format. See format for x_sprintf() for detail.
-	//     args           - The arguments output consists with warning format.
-	// Returns:
-	//     void
-	// Description:
-	//     The function outputs log warning. It works like x_printf except:
-	//     (a)The output goes to the debugger if possible.
-	//     (b)It only works when X_DEBUG is defined.
-	//     (c)Add necessary information like file name before warning.
-	// See Also:
-	//     __x_LogError, __x_LogMessage
-	//------------------------------------------------------------------------------
+	/**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     Output log warning.
+	 * Arguments:
+	 *     channel        - Warning channel. This is only a string to output. 
+	 *                      No affect for function.
+	 *     messageFormat  - Warning format. See format for x_sprintf() for detail.
+	 *     args           - The arguments output consists with warning format.
+	 * Returns:
+	 *     void
+	 * Description:
+	 *     The function outputs log warning. It works like x_printf except:
+	 *     (a)The output goes to the debugger if possible.
+	 *     (b)It only works when X_DEBUG is defined.
+	 *     (c)Add necessary information like file name before warning.
+	 * See Also:
+	 *     __x_LogError, __x_LogMessage
+	 *------------------------------------------------------------------------------
+	 */
 	void __x_LogWarning(const char* channel, const char* messageFormat, const x_va_list& args)
 	{
 		x_log_info& info = sGetLogInfoFunc();
@@ -306,26 +316,28 @@ namespace xcore
 		__x_LogWarning(channel, message, x_va_list());
 	}
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     Output log error.
-	// Arguments:
-	//     channel        - Error channel. This is only a string to output. 
-	//                      No affect for function.
-	//     messageFormat  - Error format. See format for x_sprintf() for detail.
-	//     args           - The arguments output consists with error format.
-	// Returns:
-	//     void
-	// Description:
-	//     The function outputs log error. It works like x_printf except:
-	//     (a)The output goes to the debugger if possible.
-	//     (b)It only works when X_DEBUG is defined.
-	//     (c)Add necessary information like file name before error.
-	// See Also:
-	//     __x_LogWarning, __x_LogMessage
-	//------------------------------------------------------------------------------
+    /**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     Output log error.
+	 * Arguments:
+	 *     channel        - Error channel. This is only a string to output. 
+	 *                      No affect for function.
+	 *     messageFormat  - Error format. See format for x_sprintf() for detail.
+	 *     args           - The arguments output consists with error format.
+	 * Returns:
+	 *     void
+	 * Description:
+	 *     The function outputs log error. It works like x_printf except:
+	 *     (a)The output goes to the debugger if possible.
+	 *     (b)It only works when X_DEBUG is defined.
+	 *     (c)Add necessary information like file name before error.
+	 * See Also:
+	 *     __x_LogWarning, __x_LogMessage
+	 *------------------------------------------------------------------------------
+	 */
 	void __x_LogError(const char* channel, const char* messageFormat, const x_va_list& args)
 	{
 		x_log_info& info = sGetLogInfoFunc();
@@ -349,19 +361,21 @@ namespace xcore
 		xlog::flush();
 	}
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     Log flush into debug local.
-	// Arguments:
-	//     fileName        - FileName to log.
-	//     lineNum         - Line number to log.
-	// Returns:
-	//     void
-	// Description:
-	//     The function log fileName and lineNum into current x_log_info.
-	//------------------------------------------------------------------------------
+    /**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     Log flush into debug local.
+	 * Arguments:
+	 *     fileName        - FileName to log.
+	 *     lineNum         - Line number to log.
+	 * Returns:
+	 *     void
+	 * Description:
+	 *     The function log fileName and lineNum into current x_log_info.
+	 *------------------------------------------------------------------------------
+	 */
 	void x_LogPush(const char* fileName, s32 lineNum)
 	{
 		x_log_info& info = sGetLogInfoFunc();
@@ -370,8 +384,10 @@ namespace xcore
 	}
 
 	#endif
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
+
+
+#endif

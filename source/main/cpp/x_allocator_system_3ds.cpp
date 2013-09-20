@@ -4,6 +4,7 @@
 #include <nn\fnd.h>
 #include <nn\init.h>
 #include <nn\os.h>
+#include <nn\err.h>
 
 #include "xbase\x_allocator.h"
 #include "xbase\x_debug.h"
@@ -68,10 +69,7 @@ namespace xcore
 
 		bool initHeap()
 		{
-			if (isInitialized())
-				return true;
-
-			mHeapAddress = nn::os::GetHeapAddress();
+			mHeapAddress = (void*)nn::os::GetHeapAddress();
 			mHeapSize = nn::os::GetHeapSize();
 			mSystemHeap.Initialize(nn::os::GetHeapAddress(), nn::os::GetHeapSize(), nn::os::ALLOCATE_OPTION_LINEAR);
 
@@ -81,10 +79,7 @@ namespace xcore
 
 		bool initDeviceMem()
 		{
-			if (isInitialized())
-				return true;
-
-			mHeapAddress = nn::os::GetDeviceMemoryAddress();
+			mHeapAddress = (void*)nn::os::GetDeviceMemoryAddress();
 			mHeapSize = nn::os::GetDeviceMemorySize();
 			mSystemHeap.Initialize(nn::os::GetDeviceMemoryAddress(), nn::os::GetDeviceMemorySize(), nn::os::ALLOCATE_OPTION_LINEAR);
 
@@ -100,6 +95,9 @@ namespace xcore
 
 		virtual void*			reallocate(void* ptr, u32 size, u32 alignment)
 		{
+			if (ptr == NULL)
+				return allocate(size, alignment);
+
 			size_t newsize = mSystemHeap.ResizeBlock(ptr, size);
 			ASSERTS(newsize > 0, "Reallocate failed!");
 			return ptr;
@@ -125,14 +123,14 @@ namespace xcore
 		static x_allocator_3ds_system sN3dsHeapMemoryAllocator("N3DS Heap memory allocator");
 		static x_allocator_3ds_system sN3dsDeviceMemoryAllocator("N3DS Device memory allocator");
 
-		if (sN3dsHeapMemoryAllocator.isInitialized() == xFALSE)
+		if (sN3dsHeapMemoryAllocator.isInitialized() == false)
 		{
-			if (sN3dsHeapMemoryAllocator.initHeap() == xTRUE)
+			if (sN3dsHeapMemoryAllocator.initHeap() == true)
 				return &sN3dsHeapMemoryAllocator;
 		}
-		else if (sN3dsDeviceMemoryAllocator.isInitialized() == xFALSE)
+		else if (sN3dsDeviceMemoryAllocator.isInitialized() == false)
 		{
-			if (sN3dsDeviceMemoryAllocator.initDeviceMem() == xTRUE)
+			if (sN3dsDeviceMemoryAllocator.initDeviceMem() == true)
 				return &sN3dsDeviceMemoryAllocator;
 		}
 

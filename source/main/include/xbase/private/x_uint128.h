@@ -1,4 +1,9 @@
-// x_uint128.h - xCore custom 128 bit unsigned integer
+/**
+* @file Head file x_uint128.h
+*
+* xCore custom 128 bit unsigned integer.
+*/
+
 #ifndef __XBASE_128_BIT_UNSIGNED_INTEGER_H__
 #define __XBASE_128_BIT_UNSIGNED_INTEGER_H__
 #include "xbase\x_target.h"
@@ -7,12 +12,11 @@
 #endif
 
 #ifndef X_NO_CUSTOM_UINT128
-#include "xbase\x_types.h"
 
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 
@@ -44,7 +48,9 @@ namespace xcore
 								__xuint128(EConstants c);
 
 	public:
-								// Constructors
+								/** 
+								 *  Constructors
+								 */
 								__xuint128();
 		explicit				__xuint128(s16 value);
 		explicit				__xuint128(u16 value);
@@ -56,8 +62,9 @@ namespace xcore
 								__xuint128(const u128& value);
 								__xuint128(const s128& value);
 								__xuint128(u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0);
-
-		// Assignment operator
+		/** 
+		 *  Assignment operators
+		 */
 		__xuint128&				operator=(s8 value);
 		__xuint128&				operator=(u8 value);
 		__xuint128&				operator=(s16 value);
@@ -66,7 +73,9 @@ namespace xcore
 		__xuint128&				operator=(u32 value);
 		__xuint128&				operator=(const __xuint128& value);
 
-		// Arithmetic operators
+		/** 
+		 *  Arithmetic operators
+		 */
 		__xuint128& 			operator++();
 		__xuint128& 			operator--();
 		__xuint128	 			operator++(s32)											{ __xuint128 r(*this); r++; return r; }
@@ -78,7 +87,9 @@ namespace xcore
 		__xuint128& 			operator%=(const __xuint128& value);
 		__xuint128  			operator~() const;
 
-		// Misc operators
+		/**
+		 *  Misc operators
+		 */
 		__xuint128  			operator>>(s32 nShift) const;
 		__xuint128  			operator<<(s32 nShift) const;
 		__xuint128& 			operator>>=(s32 nShift);
@@ -87,7 +98,9 @@ namespace xcore
 		__xuint128& 			operator|=(const __xuint128& value);
 		__xuint128& 			operator&=(const __xuint128& value);
 
-								// Operators to convert back to basic types
+	                         	/**
+	                         	 *  Operators to convert back to basic types.
+	                          	 */
 								operator s32() const;
 								operator u32() const;
 								operator s64() const;
@@ -96,7 +109,9 @@ namespace xcore
 		inline u32&				operator [] (s32 index)									{ return mUInt32[index]; }
 		inline u32				operator [] (s32 index) const							{ return mUInt32[index]; }
 
-		//Misc. Functions
+		/**
+		 *  Misc. Functions
+		 */
 		void 					SetBit(s32 nIndex, xbool value);
 		xbool 					IsBitSet(s32 nIndex) const;
 
@@ -110,7 +125,9 @@ namespace xcore
 	protected:
 		friend class __xint128;
 
-		// Actual member data variables
+		/**
+		 *  Actual member data variables
+		 */
 		union
 		{
 			struct
@@ -210,6 +227,9 @@ namespace xcore
 	// END xCore namespace
 	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 
 #endif
 #endif	///< __XBASE_128_BIT_UNSIGNED_INTEGER_H__

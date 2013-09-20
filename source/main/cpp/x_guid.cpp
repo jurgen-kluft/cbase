@@ -5,12 +5,11 @@
 #include "xbase\x_debug.h"
 #include "xbase\x_guid.h"
 #include "xbase\x_va_list.h"
-#include "xbase\x_string.h"
 #include "xbase\x_string_std.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	//-------------------------------------------------------------------------------
@@ -38,31 +37,34 @@ namespace xcore
 
 	//-------------------------------------------------------------------------------
 
-	void xguid::toString( xcstring& str ) const
+	void xguid::toString( char* str, s32 str_max_len ) const
 	{ 
 		// high, word2, word1, low
-		str.formatV( "%08X:%08X:%08X:%08X", x_va_list( x_va(mGuid[0]), x_va(mGuid[1]), x_va(mGuid[2]), x_va(mGuid[3]) )); 
+		x_sprintf(str, str_max_len, "%08X:%08X:%08X:%08X", x_va(mGuid[0]), x_va(mGuid[1]), x_va(mGuid[2]), x_va(mGuid[3]) ); 
 	}
 
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos
-	// Arguments:
-	//     strGuid - use this string to generate new GUID
-	// Returns:
-	//     void
-	// Summary:
-	//     parse the string and generate new guid. Then assign it to mGuid
-	// Description:
-	//     mGuid will be changed by the input string
-	//------------------------------------------------------------------------------
+	/**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos
+	 * Arguments:
+	 *     strGuid - use this string to generate new GUID
+	 * Returns:
+	 *     void
+	 * Summary:
+	 *     parse the string and generate new guid. Then assign it to mGuid
+	 * Description:
+	 *     mGuid will be changed by the input string
+	 *------------------------------------------------------------------------------
+	 */
 
-	void xguid::fromString( const xccstring& strGuid )
+	void xguid::fromString( const char* strGuid )
 	{
-		ASSERT( strGuid.isEmpty() == false );
-
 		setNull();
+		if (strGuid == NULL)
+			return;
+
 		for (s32 i=0, s=0; s<32; i++)
 		{
 			const char c = strGuid[i];
@@ -85,9 +87,7 @@ namespace xcore
 			}
 		}
 	}
-
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */

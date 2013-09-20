@@ -1,4 +1,8 @@
-// x_uint64.cpp - xCore custom 64 bit unsigned integer
+/**
+* @file x_uint64.cpp
+* xCore custom 64 bit unsigned integer
+*/
+
 #include "xbase\x_target.h"
 #ifndef X_NO_CUSTOM_UINT64
 

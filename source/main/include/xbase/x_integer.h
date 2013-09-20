@@ -1,4 +1,4 @@
- // x_integer.h - Basic bit/int trick operations
+// x_integer.h - Basic bit/int trick operations
 #ifndef __XBASE_INTEGER_UTILS_H__
 #define __XBASE_INTEGER_UTILS_H__
 #include "xbase\x_target.h"
@@ -15,7 +15,6 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_types.h"
 #include "xbase\x_debug.h"
 
 //==============================================================================
@@ -81,6 +80,10 @@ namespace xcore
 		inline s32			findLastBit(u32 integer);					///< find the bit position/index of the first bit from high to low
 		inline u32			rol32(u32 integer, u32 shift);				///< Roll all the bits in integer to the left by shift number of bits
 		inline u32			ror32(u32 integer, u32 shift);				///< Roll all the bits in integer to the right by shift number of bits
+
+		// template specialization declaration
+		template<> s32	min(s32 integerA, s32 integerB);				///< Return the smallest value
+		template<> s32	max(s32 integerA, s32 integerB);				///< Return the biggest value
 	};
 
 	//==============================================================================
@@ -98,7 +101,7 @@ namespace xcore
 		#include "xbase\private\x_integer_inline_win32.h"
 	#elif defined TARGET_PS3
 		#include "xbase\private\x_integer_inline_ps3.h"
-	#elif defined TARGET_N3DS
+	#elif defined TARGET_3DS
 		#include "xbase\private\x_integer_inline_3ds.h"
 	#else
 		#error "Current platform is not supported!"

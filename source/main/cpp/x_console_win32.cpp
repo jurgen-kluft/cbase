@@ -1,3 +1,8 @@
+/**
+* @file x_console_win32.cpp
+* Core console on win32
+*/
+
 #include "xbase\x_target.h"
 #ifdef TARGET_PC
 
@@ -10,12 +15,11 @@
 #include <time.h>
 #include <stdio.h>
 
-// x_console.cpp - Core console
 #include "xbase\x_console.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	namespace xconsole_out
@@ -33,10 +37,9 @@ namespace xcore
 		}
 	};
 
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
-
+/**
+ *  END xCore namespace
+ */
 
 #endif

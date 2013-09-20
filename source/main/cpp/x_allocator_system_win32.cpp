@@ -22,12 +22,9 @@ namespace xcore
 
 		void					init() 
 		{
-			if (!isInitialized())
-			{
-				mInitialized = 1;
-				mAllocationCount = 0;
-				mDefaultAlignment = 4;
-			}
+			mInitialized = 1;
+			mAllocationCount = 0;
+			mDefaultAlignment = 4;
 		}
 
 		bool					isInitialized()
@@ -49,6 +46,9 @@ namespace xcore
 
 		virtual void*			reallocate(void* ptr, u32 size, u32 alignment)
 		{
+			if (ptr == NULL)
+				return allocate(size, alignment);
+
 			void* new_ptr = _aligned_realloc(ptr, size, alignment);
 			return new_ptr;
 		}
@@ -78,9 +78,10 @@ namespace xcore
 	x_iallocator*		gCreateSystemAllocator()
 	{
 		static x_allocator_win32_system sSystemAllocator;
-		if (sSystemAllocator.isInitialized())
-			return &sSystemAllocator;
-		sSystemAllocator.init();
+		if (!sSystemAllocator.isInitialized())
+		{
+			sSystemAllocator.init();
+		}
 		return &sSystemAllocator;
 	}
 

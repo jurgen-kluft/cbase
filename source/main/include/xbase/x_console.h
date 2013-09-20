@@ -1,4 +1,8 @@
-// x_console.h - Core Console for Input, Output and Error
+/**
+* @file Head file x_console.h
+* Core Console for Input, Output and Error
+*/
+
 #ifndef __XBASE_CONSOLE_H__
 #define __XBASE_CONSOLE_H__
 #include "xbase\x_target.h"
@@ -6,12 +10,11 @@
 #pragma once
 #endif
 
-#include "xbase\x_types.h"
 #include "xbase\x_va_list.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	// Forward declares
@@ -127,14 +130,14 @@ namespace xcore
 		}
 	};
 
-	// Platform/Configuration specific console 'out'
+	/// Platform/Configuration specific console 'out'
 	namespace xconsole_out
 	{
 		extern s32				color(xconsole::EColor color);
 		extern s32				write(const char* str, s32 len);
 	};
 
-	// Interface class, has specific (or configurable) implementations for different environments/platforms
+	/// Interface class, has specific (or configurable) implementations for different environments/platforms
 	class xconsole_imp
 	{
 	private:
@@ -184,5 +187,8 @@ namespace xcore
 	// END xCore namespace
 	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 
-#endif	// __XBASE_CONSOLE_H__
+#endif	///< __XBASE_CONSOLE_H__

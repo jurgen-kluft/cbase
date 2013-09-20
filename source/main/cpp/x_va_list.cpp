@@ -1,10 +1,14 @@
-// x_va_list.cpp - x base variable argument
+/**
+* @file x_va_list.cpp
+* x base variable argument
+*/
+
 #include "xbase\x_debug.h"
 #include "xbase\x_va_list.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	const x_va	x_va::sEmpty;
@@ -367,3 +371,6 @@ namespace xcore
 // END xCore namespace
 //==============================================================================
 };
+/**
+ *  END xCore namespace
+ */

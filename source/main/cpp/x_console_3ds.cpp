@@ -1,13 +1,17 @@
-// x_console.cpp - Core console
+/**
+* @file x_console_3ds.cpp
+* Core console on 3ds
+*/
+
 #include "xbase\x_target.h"
 #ifdef TARGET_3DS
 
 #include <nn/os.h>
 #include "xbase\x_console.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 
@@ -24,11 +28,9 @@ namespace xcore
 			return len;
 		}
 	};
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
-
+/**
+ *  END xCore namespace
+ */
 
 #endif

@@ -1,21 +1,11 @@
-//
-// find the number of trailing zeros in 32-bit v
-//
+/**
+ * find the number of trailing zeros in 32-bit v
+ */
 inline s32        x_intu::countTrailingZeros(s32 inInteger)
 {
     if (inInteger == 0)
         return 32;
 
-#ifdef X_INTU_OPTIMIZED
-	register s32 v;
-	register s32 c = (inInteger^(inInteger&(inInteger-1)));
-	register s32 c31 = 31;
-	asm
-	{
-		cntlzw v,c;
-	}
-	return 31-v;
-#else
     s32 count = 0;
     if ((inInteger & 0x0000FFFF) == 0) {count += 16; inInteger = inInteger >>16;}
     if ((inInteger & 0x000000FF) == 0) {count +=  8; inInteger = inInteger >> 8;}
@@ -23,26 +13,16 @@ inline s32        x_intu::countTrailingZeros(s32 inInteger)
     if ((inInteger & 0x00000003) == 0) {count +=  2; inInteger = inInteger >> 2;}
     if ((inInteger & 0x00000001) == 0) {count +=  1;}
     return count;
-#endif
 }
 
-//
-// find the number of leading zeros in 32-bit v
-//
+/**
+ * find the number of leading zeros in 32-bit v
+ */
 inline s32        x_intu::countLeadingZeros(s32 inInteger)
 {
     if (inInteger == 0)
         return 32;
 
-#ifdef X_INTU_OPTIMIZED
-	register s32 v;
-	register s32 c = inInteger;
-	asm
-	{
-		cntlzw v,c;
-	}
-	return v;
-#else
     s32 count = 0;
     if ((inInteger & 0xFFFF0000) == 0) {count += 16; inInteger = inInteger <<16;}
     if ((inInteger & 0xFF000000) == 0) {count +=  8; inInteger = inInteger << 8;}
@@ -50,46 +30,35 @@ inline s32        x_intu::countLeadingZeros(s32 inInteger)
     if ((inInteger & 0xC0000000) == 0) {count +=  2; inInteger = inInteger << 2;}
     if ((inInteger & 0x80000000) == 0) {count +=  1;}
     return count;
-#endif
 }
 
-//
-// Return v but with only the Least Significant Bit "1"
-//
+/**
+ * Return v but with only the Least Significant Bit "1"
+ */
 inline s32        x_intu::leastSignificantOneBit(u32 inInteger)
 {
     return (inInteger^(inInteger&(inInteger-1)));
 }
 
-//
-// Return v but with only the Most Significant Bit "1"
-//
+/**
+ * Return v but with only the Most Significant Bit "1"
+ */
 inline s32        x_intu::mostSignificantOneBit(u32 inInteger)
 {
     if (inInteger == 0)
         return 0;
 
-#ifdef X_INTU_OPTIMIZED
-	register s32 v;
-	register s32 c = inInteger;
-	asm
-	{
-		cntlzw v,c;
-	}
-	return 1<<(31-v);
-#else
     inInteger |= (inInteger >> 1);
     inInteger |= (inInteger >> 2);
     inInteger |= (inInteger >> 4);
     inInteger |= (inInteger >> 8);
     inInteger |= (inInteger >> 16);
     return(inInteger & ~(inInteger >> 1));
-#endif
 }
 
-//
-// Return the bit index of the Least Significant Bit "1"
-//
+/**
+ * Return the bit index of the Least Significant Bit "1"
+ */
 inline s32        x_intu::leastSignificantBit(u32 inInteger)
 {
     if (inInteger==0)
@@ -98,9 +67,9 @@ inline s32        x_intu::leastSignificantBit(u32 inInteger)
     return c;
 }
 
-//
-// Return the bit index of the Most Significant Bit "1"
-//
+/**
+ * Return the bit index of the Most Significant Bit "1"
+ */
 inline s32        x_intu::mostSignificantBit(u32 inInteger)
 {
     if (inInteger==0)
@@ -108,9 +77,9 @@ inline s32        x_intu::mostSignificantBit(u32 inInteger)
     return 31-x_intu::countLeadingZeros(inInteger);
 }
 
-//
-// find the bit position/index of the first bit from low to high
-//
+/**
+ * find the bit position/index of the first bit from low to high
+ */
 inline s32        x_intu::findFirstBit(u32 inInteger)
 {
     if (inInteger==0)
@@ -118,9 +87,9 @@ inline s32        x_intu::findFirstBit(u32 inInteger)
     return x_intu::countTrailingZeros(inInteger);
 }
 
-//
-// find the bit position/index of the first bit from high to low
-//
+/**
+ * find the bit position/index of the first bit from high to low
+ */
 inline s32        x_intu::findLastBit(u32 inInteger)
 {
 	if (inInteger==0)

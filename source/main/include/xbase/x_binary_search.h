@@ -5,19 +5,20 @@
 #pragma once
 #endif
 
-#include "xbase\x_types.h"
-
-//==============================================================================
-// xcore namespace
-//==============================================================================
 namespace xcore
 {
 	typedef	s32		(*compare_predicate)(const void* inItem, const void* inData, s32 inIndex);
-	extern s32		x_BinarySearch(const void* inItem, const void* inData, s32 inLength, compare_predicate predicate);
+
+	// Exact search, behaves like x_LowerBound by returning the index to the lowest equal data (lower bound) and not
+	// just the first equal data that is encountered.
+	extern u32		x_BinarySearch(const void* inItem, const void* inData, u32 inLength, compare_predicate predicate);
+
+	extern u32		x_LowerBound(const void* inItem, const void* inData, u32 inLength, compare_predicate predicate);
+	extern u32		x_UpperBound(const void* inItem, const void* inData, u32 inLength, compare_predicate predicate);
 
 	//==============================================================================
 	// END xcore namespace
 	//==============================================================================
 };
 
-#endif	/// __XCORE_BINARY_SEARCH_H__
+#endif	///< __XCORE_BINARY_SEARCH_H__

@@ -1,4 +1,8 @@
-// HwInt256.cpp - Core custom 256 bit signed integer
+/**
+* @file HwInt256.cpp
+* Core custom 256 bit signed integer
+*/
+
 #include "xbase\x_target.h"
 #ifndef X_NO_CUSTOM_INT256
 #include "xbase\x_limits.h"

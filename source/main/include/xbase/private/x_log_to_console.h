@@ -1,4 +1,9 @@
-// x_log_to_console.h - Logging to xconsole
+/**
+* @file Head file x_log_to_console.h
+*
+* Logging to xconsole.
+*/
+
 #ifndef __XBASE_LOG_TO_CONSOLE_H__
 #define __XBASE_LOG_TO_CONSOLE_H__
 #include "xbase\x_target.h"
@@ -8,9 +13,9 @@
 
 #include "xbase\x_log.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	class xlog_to_console_imp : public xlog_imp
@@ -47,11 +52,9 @@ namespace xcore
 		virtual void 			writeLine(const char* buffer, s32 index, s32 count);
 		virtual void 			writeLine(const char* format, const x_va_list& arguments);
 	};
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 
-
-#endif	// __XBASE_LOG_TO_CONSOLE_H__
+#endif	///< __XBASE_LOG_TO_CONSOLE_H__

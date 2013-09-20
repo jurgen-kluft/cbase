@@ -8,7 +8,6 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_types.h"
 #include "xbase\x_debug.h"
 
 //==============================================================================
@@ -19,7 +18,11 @@ namespace xcore
 	//----------------------------------------------------------------------------------------------------------------
 	// Custom QuickSort
 
-	extern void xqsort(void *a /*element_array*/, s32 n /*element_count*/, s32 es /*element_size*/, s32 (*cmp)(const xbyte* const, const xbyte* const));
+	extern void xqsort(void *a /*element_array*/,
+		s32 n /*element_count*/,
+		s32 es /*element_size*/,
+		s32 (*cmp)(const void* const, const void* const, u32),
+		u32 data = 0);
 
 	//==============================================================================
 	// END xCore namespace

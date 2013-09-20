@@ -1,8 +1,12 @@
+
+#ifndef SPU
+
 #include "xbase/x_types.h"
 #include "xbase/x_limits.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_double.h"
 #include "xbase/x_string_std.h"
+
 
 #ifdef TARGET_PC
 	#include <math.h>
@@ -20,9 +24,9 @@
 	#error "Don't know how fmod for this platform"
 #endif
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 
@@ -32,25 +36,33 @@ namespace xcore
 
 	// --- FLAGS FOR THE VSPRINTF ---
 
-	// NUMERIC VALUES
+	/**
+	 * NUMERIC VALUES
+	 */
 	#define LONGDBL            0x01        // long f64; unimplemented
 	#define LONGINT            0x02        // long integer
 	#define QUADINT            0x04        // quad integer
 	#define SHORTINT           0x08        // short integer
 	#define NUMBERMASK         0x0F
 
-	// OTHER FLAGS
+	/**
+	 * OTHER FLAGS
+	 */
 	#define ALT                0x10        // alternate form
 	#define HEXPREFIX          0x20        // add 0x or 0X prefix
 	#define LADJUST            0x40        // left adjustment
 	#define ZEROPAD            0x80        // zero (as opposed to blank) pad
 
-	// TEXT FLAGS
+	/**
+	 * TEXT FLAGS
+	 */
 	#define UPPERCASE          0x100       // upper-case, YES/NO
 	#define LOWERCASE          0x200       // lower-case, yes/no
 	#define CAMELCASE          0x400       // camel-case, Yes/No
 
-	// CONSTANTS
+	/**
+	 * CONSTANTS
+	 */
 	#define SPF_LONG_MAX    0x7FFFFFFF
 	#define WORKSIZE        128         // space for %c, %[diouxX], %[eEfgG]
 	#define DEFPREC         6           // number of precision for the real numbers
@@ -60,9 +72,9 @@ namespace xcore
 	// FUNCTIONS
 	//==============================================================================
 
-	//------------------------------------------------------------------------------
-	// vsprintf_pow
-	//------------------------------------------------------------------------------
+	/**
+	 * vsprintf_pow for f64
+	 */
 	static f64 vsprintf_pow(f64 x, s32 p)
 	{
 		f64 r;
@@ -95,14 +107,16 @@ namespace xcore
 	}
 
 
-	//------------------------------------------------------------------------------
-	// fmtbase - String where the output is going to go
-	//          (Make sure that the string is at least 24 bytes long)
-	// fpnum   - number which is going to be converted
-	// cvt     - what type of conversion needs
-	// width   - total width of the output number
-	// prec    - how many digits of precision
-	//------------------------------------------------------------------------------
+	/** 
+     *------------------------------------------------------------------------------
+	 * fmtbase - String where the output is going to go
+	 *          (Make sure that the string is at least 24 bytes long)
+	 * fpnum   - number which is going to be converted
+	 * cvt     - what type of conversion needs
+	 * width   - total width of the output number
+	 * prec    - how many digits of precision
+	 *------------------------------------------------------------------------------
+	 */
 	static s32 dtoa(char* fmtbase, f64 fpnum, char cvt, s32 width, s32 prec)
 	{
 		static const f64 powTable[] = {1,10,10e1,10e2,10e3,10e4,10e5,10e6,10e7,10e8,10e9,10e10,10e11,10e12,10e13,10e14,10e15,10e16,10e17,10e18,10e19,10e20,10e21,10e22,10e23};
@@ -484,18 +498,20 @@ namespace xcore
 
 
 
-	//------------------------------------------------------------------------------
-	// Convert an unsigned long to ASCII for printf purposes, returning
-	// a pointer to the first character of the string representation.
-	// Octal numbers can be forced to have a leading zero; hex numbers
-	// use the given digits.
-	//------------------------------------------------------------------------------
-	// val      - Numeric value to be converted
-	// endp     - String to be fill in fromt the end
-	// base     - base of the number (10, 8, 16)
-	// octzero  - flag to add to the oct numbers the 0 in front
-	// xdigs    - Hexadecimal string array of number 0,1,2,3,4,5,9,A,or a, ..etc
-	//------------------------------------------------------------------------------
+	/**
+     *------------------------------------------------------------------------------
+	 * Convert an unsigned long to ASCII for printf purposes, returning
+	 * a pointer to the first character of the string representation.
+	 * Octal numbers can be forced to have a leading zero; hex numbers
+	 * use the given digits.
+	 *------------------------------------------------------------------------------
+	 * val      - Numeric value to be converted
+	 * endp     - String to be fill in fromt the end
+	 * base     - base of the number (10, 8, 16)
+	 * octzero  - flag to add to the oct numbers the 0 in front
+	 * xdigs    - Hexadecimal string array of number 0,1,2,3,4,5,9,A,or a, ..etc
+	 *------------------------------------------------------------------------------
+	 */
 	#define to_digit(c) ((c) - '0')
 	#define is_digit(c) ((u32)to_digit(c) <= 9)
 	#define to_char(n)  ((char)((n) + '0'))
@@ -522,10 +538,12 @@ namespace xcore
 				}
 
 
-				// On many machines, unsigned arithmetic is harder than
-				// signed arithmetic, so we do at most one unsigned mod and
-				// divide; this is sufficient to reduce the range of
-				// the incoming value to where signed arithmetic works.
+				/**
+                 * On many machines, unsigned arithmetic is harder than
+				 * signed arithmetic, so we do at most one unsigned mod and
+				 * divide; this is sufficient to reduce the range of
+				 * the incoming value to where signed arithmetic works.
+				 */
 
 				if (val > SPF_LONG_MAX)
 				{
@@ -572,9 +590,9 @@ namespace xcore
 		return (cp);
 	}
 
-	//------------------------------------------------------------------------------
-	// Same as above but for s64
-	//------------------------------------------------------------------------------
+	/**
+	 * Same as above but for s64
+	 */
 	static
 	char* UQtoA(u64 val, char* endp, s32 base, xbool octzero, char* xdigs)
 	{
@@ -597,10 +615,12 @@ namespace xcore
 				}
 
 
-				// On many machines, unsigned arithmetic is harder than
-				// signed arithmetic, so we do at most one unsigned mod and
-				// divide; this is sufficient to reduce the range of
-				// the incoming value to where signed arithmetic works.
+				/**
+                 * On many machines, unsigned arithmetic is harder than
+				 * signed arithmetic, so we do at most one unsigned mod and
+				 * divide; this is sufficient to reduce the range of
+				 * the incoming value to where signed arithmetic works.
+                 */
 
 				if (val > ((~(u64)0) >> 1))
 				{
@@ -662,9 +682,9 @@ namespace xcore
 		return x_strlen(buf);
 	}
 
-	//------------------------------------------------------------------------------
-	// WriteToBuffer
-	//------------------------------------------------------------------------------
+	/**
+	 * WriteToBuffer
+	 */
 	typedef void (*WriteBufferDelegate)(char** tempBufferPtr, s32 maxChars, char* string, s32 size);
 
 	static
@@ -697,11 +717,11 @@ namespace xcore
 		}
 	}
 
-	//------------------------------------------------------------------------------
-	// Choose PADSIZE to trade efficiency vs. size.  If larger printf
-	// fields occur frequently, increase PADSIZE and make the initializers
-	// below longer.
-	//------------------------------------------------------------------------------
+	/**
+	 * Choose PADSIZE to trade efficiency vs. size.  If larger printf
+	 * fields occur frequently, increase PADSIZE and make the initializers
+	 * below longer.
+	 */
 	typedef void (*PadBufferDelegate)(char** tempBufferPtr, s32 maxChars, s32 howMany, char with);
 
 	static void PadBuffer(char** tempBufferPtr, s32 maxChars, s32 howMany, char with)
@@ -731,73 +751,75 @@ namespace xcore
 		}
 	}
 
-	//DOM-IGNORE-END
+	///< DOM-IGNORE-END
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     write a string formatted output into a buffer.
-	// Arguments:
-	//        buffer                - Storage location for output. 
-	//      maxChars            - Maximum number of characters to store 
-	//        pFormatStr            - String containing the formating specification. 
-	//      Args                - Pointer to list of arguments OR the actual arguments in case of x_sprintf
-	// Returns:
-	//        return the number of characters written, not including the terminating null character.
-	// Description:
-	//      These functions formats and stores a series of characters and values in buffer. 
-	//      Each argument (if any) is converted and output according to the corresponding format 
-	//      specification in format. The format consists of ordinary characters and has the same 
-	//      form and function as the format argument for x_printf. A null character is appended after 
-	//      the last character written. If copying occurs between strings that overlap, the behavior 
-	//      is undefined.
-	//
-	//<P><B>Type Field Characters</B>
-	//<TABLE>
-	//      Character   Output format
-	//      =========   --------------------------------------------------------
-	//      %%            a percent sign
-	//      %b,%B,%#b     a boolean as true/false (%b=lower-case true/false, %B=upper-case TRUE/FALSE, %#b/%B#=capital-case True/False)
-	//      %c            a character with the given number
-	//      %s            a string
-	//      %d            a signed integer, in decimal
-	//      %u            an unsigned integer, in decimal
-	//      %o            an unsigned integer, in octal
-	//      %x            an unsigned integer, in hexadecimal (lower case)
-	//      %e            a floating-point number, in scientific notation
-	//      %f            a floating-point number, in fixed decimal notation
-	//      %g            a floating-point number, in %e or %f notation
-	//      %X            like %x, but using upper-case letters
-	//      %E            like %e, but using an upper-case "E"
-	//      %G            like %g, but with an upper-case "E" (if applicable)
-	//      %p            a pointer (outputs the pointer value's address in hexadecimal)
-	//      %n            special: *stores* the number of characters output so far into the next variable in the parameter list
-	//      %y,%Y,%#y     a boolean as yes/no (%y=lower-case yes/no, %Y=upper-case YES/NO, %#y/%#Y=capital-case Yes/No)
-	//</TABLE>
-	//    
-	//   <B>size flags</B>
-	//<TABLE>
-	//     Character    Output
-	//     =========    ------------------------------------------------------------
-	//         h        interpret integer as s16 or u16
-	//         l        interpret integer as s32 or u32
-	//        q, L      interpret integer as s64 or u64
-	//         L        interpret floating point as higher precision adds a few extra floating point numbers
-	//</TABLE>
-	//
-	// Examples:
-	//<CODE>
-	//      x_printf("%Lf %Lf %Lf", Vec.X, Vec.Y, Vec.Z);  // Note that we use the higher precision floating point representation
-	//      x_printf("%Ld" (s64)123);                      // This is a way to print an s64 bit number
-	//      x_printf("%d" 123);                            // Nothing special here printing an 32bit integer
-	//      x_printf("%f" 123.0);                          // Nothing special here printing a floating point number
-	//      x_printf("%+010.4f", 123.456);                 // The printf works like you will expect
-	//</CODE>
-	//
-	// See Also:
-	//     x_printf x_printfxy
-	//------------------------------------------------------------------------------
+    /**
+	 *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     write a string formatted output into a buffer.
+	 * Arguments:
+	 *        buffer                - Storage location for output. 
+	 *      maxChars            - Maximum number of characters to store 
+	 *        pFormatStr            - String containing the formating specification. 
+	 *      Args                - Pointer to list of arguments OR the actual arguments in case of x_sprintf
+	 * Returns:
+	 *        return the number of characters written, not including the terminating null character.
+	 * Description:
+	 *      These functions formats and stores a series of characters and values in buffer. 
+	 *      Each argument (if any) is converted and output according to the corresponding format 
+	 *      specification in format. The format consists of ordinary characters and has the same 
+	 *      form and function as the format argument for x_printf. A null character is appended after 
+	 *      the last character written. If copying occurs between strings that overlap, the behavior 
+	 *      is undefined.
+	 *
+	 *<P><B>Type Field Characters</B>
+	 *<TABLE>
+	 *      Character   Output format
+	 *      =========   --------------------------------------------------------
+	 *      %%            a percent sign
+	 *      %b,%B,%#b     a boolean as true/false (%b=lower-case true/false, %B=upper-case TRUE/FALSE, %#b/%B#=capital-case True/False)
+	 *      %c            a character with the given number
+	 *      %s            a string
+	 *      %d            a signed integer, in decimal
+	 *      %u            an unsigned integer, in decimal
+	 *      %o            an unsigned integer, in octal
+	 *      %x            an unsigned integer, in hexadecimal (lower case)
+	 *      %e            a floating-point number, in scientific notation
+	 *      %f            a floating-point number, in fixed decimal notation
+	 *      %g            a floating-point number, in %e or %f notation
+	 *      %X            like %x, but using upper-case letters
+	 *      %E            like %e, but using an upper-case "E"
+	 *      %G            like %g, but with an upper-case "E" (if applicable)
+	 *      %p            a pointer (outputs the pointer value's address in hexadecimal)
+	 *      %n            special: *stores* the number of characters output so far into the next variable in the parameter list
+	 *      %y,%Y,%#y     a boolean as yes/no (%y=lower-case yes/no, %Y=upper-case YES/NO, %#y/%#Y=capital-case Yes/No)
+	 *</TABLE>
+	 *    
+	 *   <B>size flags</B>
+	 *<TABLE>
+	 *     Character    Output
+	 *     =========    ------------------------------------------------------------
+	 *         h        interpret integer as s16 or u16
+	 *         l        interpret integer as s32 or u32
+	 *        q, L      interpret integer as s64 or u64
+	 *         L        interpret floating point as higher precision adds a few extra floating point numbers
+	 *</TABLE>
+	 *
+	 * Examples:
+	 *<CODE>
+	 *      x_printf("%Lf %Lf %Lf", Vec.X, Vec.Y, Vec.Z);   * Note that we use the higher precision floating point representation
+	 *      x_printf("%Ld" (s64)123);                       * This is a way to print an s64 bit number
+	 *      x_printf("%d" 123);                             * Nothing special here printing an 32bit integer
+	 *      x_printf("%f" 123.0);                           * Nothing special here printing a floating point number
+	 *      x_printf("%+010.4f", 123.456);                  * The printf works like you will expect
+	 *</CODE>
+	 *
+	 * See Also:
+	 *     x_printf x_printfxy
+	 *------------------------------------------------------------------------------
+	 */
 	s32 x_vsprintf_internal(char* buffer, s32 maxChars, const char* formatStr, const x_va_list& args, WriteBufferDelegate writeBufferDelegate, PadBufferDelegate padBufferDelegate)
 	{
 	   
@@ -805,22 +827,22 @@ namespace xcore
 
 		//TODO: fmt and cp should have same const state
 
-		char  ch;             // character from fmt */
-		s32   n;              // handy integer (short term usage)
-		char* cp;             // handy char pointer (short term usage)
-		s32   flags;          // flags as above
-		s32   width;          // width from format (%8d), or 0
-		s32   prec;           // precision from format (%.3d), or -1
-		char  sign;           // sign prefix (' ', '+', '-', or \0)
-		f64   _double;        // f64 precision arguments %[eEfgG]
-		s32   base;           // base for [diouxX] conversion
-		s32   dprec;          // a copy of prec if [diouxX], 0 otherwise
-		s32   realsz;         // field size expanded by dprec, sign, etc
-		s32   size;           // size of converted field or string
-		char  buf[WORKSIZE];  // space for %c, %[diouxX], %[eEfgG]
-		char  ox[2];          // space for 0x hex-prefix
+		char  ch;             ///< character from fmt */
+		s32   n;              ///< handy integer (short term usage)
+		char* cp;             ///< handy char pointer (short term usage)
+		s32   flags;          ///< flags as above
+		s32   width;          ///< width from format (%8d), or 0
+		s32   prec;           ///< precision from format (%.3d), or -1
+		char  sign;           ///< sign prefix (' ', '+', '-', or \0)
+		f64   _double;        ///< f64 precision arguments %[eEfgG]
+		s32   base;           ///< base for [diouxX] conversion
+		s32   dprec;          ///< a copy of prec if [diouxX], 0 otherwise
+		s32   realsz;         ///< field size expanded by dprec, sign, etc
+		s32   size;           ///< size of converted field or string
+		char  buf[WORKSIZE];  ///< space for %c, %[diouxX], %[eEfgG]
+		char  ox[2];          ///< space for 0x hex-prefix
 
-		// Initialize variables
+		/// Initialize variables
 		const char* fmt      = (char*)formatStr;       // format string */
 			  char* xdigs    = NULL;                   // digits for [xX] conversion
 			  s32   ret      = 0;                      // return value accumulator
@@ -828,7 +850,7 @@ namespace xcore
 			  u64   uqval    = 0;                      // %q integers 
 			  s32   argindex = 0;
 
-		// Scan the format for conversions (`%' character).
+		/// Scan the format for conversions (`%' character).
 		for (;;)
 		{
 			// find the first "interesting symbol"
@@ -1242,19 +1264,22 @@ namespace xcore
 					break;
 				}
 
-				// All reasonable formats wind up here.  at this point, `cp'
-				// points to a string which (if not flags&LADJUST) should be
-				// padded out to `width' places.  If flags&ZEROPAD, it should
-				// first be prefixed by any sign or other prefix; otherwise,
-				// it should be blank padded before the prefix is emitted.
-				// After any left-hand padding and prefixing, emit zeroes
-				// required by a decimal [diouxX] precision, then print the
-				// string proper, then emit zeroes required by any leftover
-				// floating precision; finally, if LADJUST, pad with blanks.
+				/**
+                 * All reasonable formats wind up here.  at this point, `cp'
+				 * points to a string which (if not flags&LADJUST) should be
+				 * padded out to `width' places.  If flags&ZEROPAD, it should
+				 * first be prefixed by any sign or other prefix; otherwise,
+				 * it should be blank padded before the prefix is emitted.
+				 * After any left-hand padding and prefixing, emit zeroes
+				 * required by a decimal [diouxX] precision, then print the
+				 * string proper, then emit zeroes required by any leftover
+				 * floating precision; finally, if LADJUST, pad with blanks.
+				 */
 
-
-				// Compute actual size, so we know how much to pad.
-				// size excludes decimal prec; realsz includes it.
+                /**
+				 * Compute actual size, so we know how much to pad.
+				 * size excludes decimal prec; realsz includes it.
+				 */
 				realsz = dprec > size ? dprec : size;
 				if (sign) realsz++;
 				else
@@ -1333,8 +1358,10 @@ namespace xcore
 		s32 strLen = x_vsprintf_internal(buffer, maxChars, formatStr, args, WriteToBufferDummy, PadBufferDummy);
 		return strLen;
 	}
-
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
+
+
+#endif

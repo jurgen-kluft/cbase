@@ -20,44 +20,6 @@
 //==============================================================================
 namespace xcore
 {
-	//==============================================================================
-	// INCLUDES
-	//==============================================================================
-
-	//DOM-IGNORE-BEGIN
-	//==============================================================================
-
-	#ifndef NULL
-		#define NULL        0
-	#endif
-
-	typedef		unsigned	X_INT8   			u8;
-	typedef		unsigned	X_INT16  			u16;
-	typedef		unsigned	X_INT32  			u32;
-	typedef					X_UINT64 			u64;
-	typedef					X_UINT128			u128;
-	typedef					X_UINT256			u256;
-	typedef		signed      X_INT8   			s8;
-	typedef		signed      X_INT16  			s16;
-	typedef		signed      X_INT32  			s32;
-	typedef					X_INT64  			s64;
-	typedef					X_INT128 			s128;
-	typedef					X_INT256 			s256;
-	typedef					X_FLOAT  			f32;
-	typedef					X_DOUBLE 			f64;
-	typedef					X_BYTE   			xbyte;
-	typedef					X_SIZE   			xalloc_size;
-	typedef					X_BOOL				xbool32;
-	typedef					X_BOOL				xbool;
-	typedef					X_SIZE				xsize_t;
-	typedef		unsigned	X_INT8   			xtchar;
-	typedef					X_WCHAR  			xwchar;
-
-	#define					X_INT32_4BYTE(a,b,c,d)	( (a)<<24 | (b)<<16 | (c)<<8 | (d) )
-
-	//DOM-IGNORE-END
-	//------------------------------------------------------------------------------
-
 	//------------------------------------------------------------------------------
 	// Author:
 	//     Virtuos Games
@@ -121,20 +83,6 @@ namespace xcore
 		inline xcore::xbool     operator  ==			(xcore::xhandle h) const	{ return h.mHandle == mHandle; }		\
 		inline xcore::xbool     operator  !=			(xcore::xhandle h) const	{ return h.mHandle != mHandle; }		\
 	};
-
-	//==============================================================================
-	//  HANDLE BOOL 
-	//==============================================================================
-
-	#ifdef xTRUE
-	#undef xTRUE
-	#endif
-	#define                xTRUE		(X_BOOL)true
-
-	#ifdef xFALSE
-	#undef xFALSE
-	#endif
-	#define                xFALSE		(X_BOOL)false
 
 	//==============================================================================
 	// END xCore namespace

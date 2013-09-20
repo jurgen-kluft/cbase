@@ -1,95 +1,96 @@
 #include "xbase\x_target.h"
-#include "xbase\x_types.h"
 #include "xbase\x_string_std.h"
 #include "xbase\x_va_list.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+#ifndef SPU
+
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 
-	/*
-	Parameters
+	 /**
+	  *Parameters
 
-		str 
-			C string that the function processes as its source to retrieve the data. 
-		format 
-			C string that contains one or more of the following items:
+	  *	str 
+	  *		C string that the function processes as its source to retrieve the data. 
+	  *	format 
+	  *		C string that contains one or more of the following items:
 
-		Whitespace character:    
-								The function will read and ignore any whitespace characters (this includes blank spaces
-								and the newline and tab characters) which are encountered before the next non-whitespace 
-								character. This includes any quantity of whitespace characters, or none. 
+	  *	Whitespace character:    
+	  *							The function will read and ignore any whitespace characters (this includes blank spaces
+	  *							and the newline and tab characters) which are encountered before the next non-whitespace 
+	  *							character. This includes any quantity of whitespace characters, or none. 
 
-		Non-whitespace character, except percentage signs (%):
-								Any character that is not either a whitespace character (blank, newline or tab) or part 
-								of a format specifier (which begin with a % character) causes the function to read the 
-								next character from str, compare it to this non-whitespace character and if it matches, 
-								it is discarded and the function continues with the next character of format and str. 
-								If the character does not match, the function fails and returns. 
+	  *	Non-whitespace character, except percentage signs (%):
+	  *							Any character that is not either a whitespace character (blank, newline or tab) or part 
+	  *							of a format specifier (which begin with a % character) causes the function to read the 
+	  *							next character from str, compare it to this non-whitespace character and if it matches, 
+	  *							it is discarded and the function continues with the next character of format and str. 
+	  *							If the character does not match, the function fails and returns. 
 
-		Format specifiers: 
-								A sequence formed by an initial percentage sign (%) indicates a format specifier, which 
-								is used to specify the type and format of the data to be retrieved from the str string 
-								and stored in the locations pointed by the additional arguments. 
-								A format specifier follows this prototype: [=%[*][width][modifiers]type=]
+	  *	Format specifiers: 
+	  *							A sequence formed by an initial percentage sign (%) indicates a format specifier, which 
+	  *							is used to specify the type and format of the data to be retrieved from the str string 
+	  *							and stored in the locations pointed by the additional arguments. 
+	  *							A format specifier follows this prototype: [=%[ *][width][modifiers]type=]
 
-								where:
+	  *							where:
 
-								*            An optional starting asterisk indicates that the data is to be retrieved from 
-											the str string but ignored, i.e. it is not stored in the corresponding argument. 
-								width        Specifies the maximum number of characters to be read in the current reading operation 
-								modifiers    Specifies a size different from s32 (in the case of d, i and n), unsigned s32 (in
-											the case of o, u and x) or f32 (in the case of e, f and g) for the data pointed by 
-											the corresponding additional argument:
-											h : short s32 (for d, i and n), or unsigned short s32 (for o, u and x)
-											l : long s32 (for d, i and n), or unsigned long s32 (for o, u and x), or f64 (for e, f and g)
-											L : long f64 (for e, f and g)
-	 
-								type        A character specifying the type of data to be read and how it is expected to be read. 
-											See next table. 
+	  *							 *            An optional starting asterisk indicates that the data is to be retrieved from 
+	  *										the str string but ignored, i.e. it is not stored in the corresponding argument. 
+	  *							width        Specifies the maximum number of characters to be read in the current reading operation 
+	  *							modifiers    Specifies a size different from s32 (in the case of d, i and n), unsigned s32 (in
+	  *										the case of o, u and x) or f32 (in the case of e, f and g) for the data pointed by 
+	  *										the corresponding additional argument:
+	  *										h : short s32 (for d, i and n), or unsigned short s32 (for o, u and x)
+	  *										l : long s32 (for d, i and n), or unsigned long s32 (for o, u and x), or f64 (for e, f and g)
+	  *										L : long f64 (for e, f and g)
+	  * 
+	  *							type        A character specifying the type of data to be read and how it is expected to be read. 
+	  *										See next table. 
 
-		fscanf type specifiers: type Qualifying Input Type of argument 
-								c            Single character: Reads the next character. If a width different from 1 is 
-											specified, the function reads width characters and stores them in the successive 
-											locations of the array passed as argument. No null character is appended at the end.
-									type    char * 
+	  *	fscanf type specifiers: type Qualifying Input Type of argument 
+	  *							c            Single character: Reads the next character. If a width different from 1 is 
+	  *										specified, the function reads width characters and stores them in the successive 
+	  *										locations of the array passed as argument. No null character is appended at the end.
+	  *								type    char  * 
 
-								d            Decimal integer: Number optionally preceeded with a + or - sign.
-									type    s32 * 
+	  *							d            Decimal integer: Number optionally preceeded with a + or - sign.
+	  *								type    s32  * 
 
-								e,E,f,g,G    Floating point: Decimal number containing a decimal point, optionally preceeded by a 
-											+ or - sign and optionally folowed by the e or E character and a decimal number. 
-											Two examples of valid entries are -732.103 and 7.12e4 
+	  *							e,E,f,g,G    Floating point: Decimal number containing a decimal point, optionally preceeded by a 
+	  *										+ or - sign and optionally folowed by the e or E character and a decimal number. 
+	  *										Two examples of valid entries are -732.103 and 7.12e4 
 
-									type    f32 * 
+	  *								type    f32  * 
 
-								o            Octal integer. 
-									type    s32 * 
+	  *							o            Octal integer. 
+	  *								type    s32  * 
 
-								s            String of characters. This will read subsequent characters until a whitespace is found 
-											(whitespace characters are considered to be blank, newline and tab). 
-									type    char * 
+	  *							s            String of characters. This will read subsequent characters until a whitespace is found 
+	  *										(whitespace characters are considered to be blank, newline and tab). 
+	  *								type    char  * 
 
-								u            Unsigned decimal integer. 
-									type    unsigned s32 * 
+	  *							u            Unsigned decimal integer. 
+	  *								type    unsigned s32  * 
 
-								x,X            Hexadecimal integer. 
-									type    s32 * 
+	  *							x,X            Hexadecimal integer. 
+	  *								type    s32  * 
 
-		additional arguments 
-								The function expects a sequence of references as additional arguments, each one pointing to 
-								an object of the type specified by their corresponding %-tag within the format string, in the 
-								same order.
-	*/
+	  *	additional arguments 
+	  *							The function expects a sequence of references as additional arguments, each one pointing to 
+	  *							an object of the type specified by their corresponding %-tag within the format string, in the 
+	  *							same order.
+	  */
 
 
 	enum ESScanf
 	{
-		RESPECT_WIDTH    = 1,    // use fixed width
-		ADD_PLUS        = 2,    // use + for positive
-		SPACE_PAD        = 4,    // use padding
+		RESPECT_WIDTH    = 1,    ///< use fixed width
+		ADD_PLUS        = 2,    ///< use + for positive
+		SPACE_PAD        = 4,    ///< use padding
 		ZERO_PAD        = 8,
 		LEFT_PAD         = 16,
 
@@ -324,8 +325,9 @@ namespace xcore
 
 		return x_vsscanf(buf, fmt, vr_args);
 	}
-
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
+
+#endif // ifndef SPU

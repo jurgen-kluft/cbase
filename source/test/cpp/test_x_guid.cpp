@@ -1,6 +1,5 @@
-#include "xbase\x_types.h"
 #include "xbase\x_guid.h"
-#include "xbase\x_string.h"
+#include "xbase\x_string_std.h"
 
 #include "xunittest\xunittest.h"
 
@@ -152,11 +151,10 @@ UNITTEST_SUITE_BEGIN(xguid)
 			xguid id(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
 
 			char strBuffer[256];
-			xcstring str(strBuffer, sizeof(strBuffer));
 
 			const char* guidStr = "11335577:22446688:557799BB:88AACCEE";
-			id.toString(str);
-			CHECK_EQUAL(0, x_strCompare(str.c_str(), guidStr));
+			id.toString(strBuffer, sizeof(strBuffer));
+			CHECK_EQUAL(0, x_strCompare(strBuffer, guidStr));
 		}
 
 		UNITTEST_TEST(fromString)
@@ -164,7 +162,7 @@ UNITTEST_SUITE_BEGIN(xguid)
 			const char* guidStr = "11335577:22446688:557799BB:88AACCEE";
 
 			xguid id1;
-			id1.fromString(xccstring(guidStr));
+			id1.fromString(guidStr);
 
 			xguid id2(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
 

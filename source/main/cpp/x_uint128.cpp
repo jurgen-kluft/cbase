@@ -1,4 +1,8 @@
-// HwUInt128.cpp - Core custom 128 bit unsigned integer
+/**
+* @file HwUInt128.cpp
+* Core custom 128 bit unsigned integer
+*/
+
 #include "xbase\x_target.h"
 #ifndef X_NO_CUSTOM_UINT128
 

@@ -1,4 +1,8 @@
-// HwInt64.cpp - Core custom 64 bit signed integer
+/**
+* @file HwInt64.cpp
+* Core custom 64 bit signed integer
+*/
+
 #include "xbase\x_target.h"
 #ifndef X_NO_CUSTOM_INT64
 #include "xbase\x_limits.h"

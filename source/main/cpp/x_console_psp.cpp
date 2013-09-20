@@ -1,4 +1,8 @@
-// x_console.cpp - Core console
+/**
+* @file x_console_psp.cpp
+* Core console on psp
+*/
+
 #include "xbase\x_target.h"
 #ifdef TARGET_PSP
 
@@ -7,9 +11,9 @@
 #include "xbase\x_console.h"
 #include "xbase\x_string_std.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	namespace xconsole_out
@@ -50,11 +54,9 @@ namespace xcore
 			return len;
 		}
 	};
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
-
+/**
+ *  END xCore namespace
+ */
 
 #endif

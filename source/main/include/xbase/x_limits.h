@@ -8,18 +8,17 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_types.h"
 #include "xbase\x_debug.h"
 
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
-	//==============================================================================
-	//  MACROS  
-	//==============================================================================
+	/**
+	 *  MACROS  
+	 */
 
 	#define X_U8_MIN                      (0)
 	#define X_U8_MAX                      (255)                               
@@ -58,29 +57,29 @@ namespace xcore
 	#define X_XWCHAR_MAX                  U16_MAX
 
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Description:
-	//     class xlimits is a template class, which use the C++ class template specialization. 
-	//     The idea of C++ class template specialization is similar to function template
-	//     overloading. This can make the template code for certain data types to be fixed.
-	//
-	// Example:
-	//<CODE>
-	//      template<class T>
-	//      bool isInRange(T inNum)
-	//      {
-	//          if ((inNum >= xlimits<T>::minimum()) && (inNum <= xlimits<T>::maximum()))
-	//          {
-	//                return true;
-	//            }
-	//            return false;
-	//         }      
-	//      
-	//</CODE>
-	//
-	//------------------------------------------------------------------------------
+	/**
+	 * Author:
+	 *     Virtuos Games
+	 * Description:
+	 *     class xlimits is a template class, which use the C++ class template specialization. 
+	 *     The idea of C++ class template specialization is similar to function template
+	 *     overloading. This can make the template code for certain data types to be fixed.
+	 *
+	 * Example:
+	 *<CODE>
+	 *      template<class T>
+	 *      bool isInRange(T inNum)
+	 *      {
+	 *          if ((inNum >= xlimits<T>::minimum()) && (inNum <= xlimits<T>::maximum()))
+	 *          {
+	 *                return true;
+	 *            }
+	 *            return false;
+	 *         }      
+	 *      
+	 *</CODE>
+	 *
+	 */
 	template<typename T>
 	class xlimits { };
 
@@ -191,8 +190,8 @@ namespace xcore
 	// END xCore namespace
 	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 
-//==============================================================================
-// END __XBASE_LIMITS_H__
-//==============================================================================
-#endif
+#endif ///< END __XBASE_LIMITS_H__

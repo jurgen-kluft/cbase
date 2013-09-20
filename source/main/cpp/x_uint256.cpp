@@ -1,4 +1,8 @@
-// HwUInt256.cpp - Core custom 256 bit unsigned integer
+/**
+* @file HwUInt256.cpp
+* Core custom 256 bit unsigned integer
+*/
+
 #include "xbase\x_target.h"
 #ifndef X_NO_CUSTOM_UINT256
 #include "xbase\x_debug.h"

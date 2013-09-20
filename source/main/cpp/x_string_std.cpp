@@ -1,43 +1,58 @@
-
-//==============================================================================
-// INCLUDES
-//==============================================================================
-#include "xbase\x_types.h"
 #include "xbase\x_debug.h"
 #include "xbase\x_integer.h"
 #include "xbase\x_string_std.h"
 
+#ifdef SPU
+
+	 
+namespace xcore
+ {
+	 s32		x_printf   				(const char* formatStr, const x_va& v1             , const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+																	const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16) { return 0; }
+	 s32		x_printf				(const char* formatStr, const x_va_list& args)		{ return 0; }
+	 s32		x_printf				(const char* str)									{ return 0; }
+ };	
+
+
+#else
+
 
 //==============================================================================
-// xCore namespace
+// INCLUDES
 //==============================================================================
+
+
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 
-	//==============================================================================
-	//==============================================================================
-	//==============================================================================
-	// ANSI functions
-	//==============================================================================
-	//==============================================================================
-	//==============================================================================
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     x_atod64          - Converts a string value to integer base from a particular
-	// Arguments:
-	//        str            - Source string encoded with a particular base
-	//        Base           - Base of the numeric string
-	// Returns:
-	//        Actual integer number
-	// Description:
-	//      Converts a string that has been encoded into an integer of a particular base
-	//      into a actual atomic integer of a particular size (32vs64)bits. If the
-	//      string contains '_' or ':' characters they will be ignore.
-	// See Also:
-	//      x_atod32 x_atoi32 x_atoi64 x_atof32 x_atof64
-	//------------------------------------------------------------------------------
+	/** 
+	 *==============================================================================
+	 *==============================================================================
+	 * ANSI functions
+	 *==============================================================================
+	 *==============================================================================
+	 *==============================================================================
+	 *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     x_atod64          - Converts a string value to integer base from a particular
+	 * Arguments:
+	 *        str            - Source string encoded with a particular base
+	 *        Base           - Base of the numeric string
+	 * Returns:
+	 *        Actual integer number
+	 * Description:
+	 *      Converts a string that has been encoded into an integer of a particular base
+	 *      into a actual atomic integer of a particular size (32vs64)bits. If the
+	 *      string contains '_' or ':' characters they will be ignore.
+	 * See Also:
+	 *      x_atod32 x_atoi32 x_atoi64 x_atof32 x_atof64
+	 *------------------------------------------------------------------------------
+	 */
 	s64 x_atod64(const char* str, s32 base)
 	{
 		ASSERT(str != NULL);
@@ -111,26 +126,31 @@ namespace xcore
 		return (s32)x_atod64(str, base);
 	}
 
-	//------------------------------------------------------------------------------
-	//DOM-IGNORE-BEGIN
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     _x_dtoa    - Converts value to a string in whatever base is passed
-	// Arguments:
-	//      Val             - Number to be converted
-	//      buff            - Destination String 
-	//      sizeOfBuff      - Size of the destination string
-	//      Base            - Numeric base that we are converting to.
-	//      hasNegative     - The number will has minus or not 
-	// Returns:
-	//        length of the final string
-	// Description:
-	//      Converts any 32 bit number into a string which contains the number 
-	//      represented in a particular base. The base for instance could be 16
-	//      for hex numbers.
-	//------------------------------------------------------------------------------
+    /**
+	 *------------------------------------------------------------------------------
+	 *DOM-IGNORE-BEGIN
+	 *------------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     _x_dtoa    - Converts value to a string in whatever base is passed
+	 * Arguments:
+	 *      Val             - Number to be converted
+	 *      buff            - Destination String 
+	 *      sizeOfBuff      - Size of the destination string
+	 *      Base            - Numeric base that we are converting to.
+	 *      hasNegative     - The number will has minus or not 
+	 * Returns:
+	 *        length of the final string
+	 * Description:
+	 *      Converts any 32 bit number into a string which contains the number 
+	 *      represented in a particular base. The base for instance could be 16
+	 *      for hex numbers.
+	 *------------------------------------------------------------------------------
+	 */
 	s32 _x_dtoa(u64 val, char* buff, s32 str_buffer_size, s32 base, bool hasNegative)
 	{
 		ASSERT(buff);
@@ -199,27 +219,29 @@ namespace xcore
 
 		return length;
 	}
-	//DOM-IGNORE-END
+	///< DOM-IGNORE-END
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     x_dtoa    - Converts value to a string in whatever base is passed
-	// Arguments:
-	//      Val             - Number to be converted
-	//      str             - Destination String 
-	//      SizeOfString    - Size of the destination string
-	//      Base            - Numeric base that we are converting to.
-	// Returns:
-	//        length of the final string
-	// Description:
-	//      Converts any 32 bit number into a string which contains the number 
-	//      represented in a particular base. The base for instance could be 16
-	//      for hex numbers.
-	// See Also:
-	//     x_atod64 x_atod32 x_atoi32 x_atoi64 x_atof32 x_atof64
-	//------------------------------------------------------------------------------
+	/**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     x_dtoa    - Converts value to a string in whatever base is passed
+	 * Arguments:
+	 *      Val             - Number to be converted
+	 *      str             - Destination String 
+	 *      SizeOfString    - Size of the destination string
+	 *      Base            - Numeric base that we are converting to.
+	 * Returns:
+	 *        length of the final string
+	 * Description:
+	 *      Converts any 32 bit number into a string which contains the number 
+	 *      represented in a particular base. The base for instance could be 16
+	 *      for hex numbers.
+	 * See Also:
+	 *     x_atod64 x_atod32 x_atoi32 x_atoi64 x_atof32 x_atof64
+	 *------------------------------------------------------------------------------
+	 */
 	s32 x_dtoa(s32 val, char* str, s32 str_buffer_size, s32 base)
 	{
 		if (val < 0)
@@ -375,18 +397,20 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     x_strcpy   - copy two strings
-	// Arguments:
-	//        dest    - destination string
-	//        maxChar - number of characters need to be copied (excluding trailing zero)
-	//        str     - source string        
-	// Returns:
-	//        pointer to the destination string
-	//------------------------------------------------------------------------------
+    /**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     x_strcpy   - copy two strings
+	 * Arguments:
+	 *        dest    - destination string
+	 *        maxChar - number of characters need to be copied (excluding trailing zero)
+	 *        str     - source string        
+	 * Returns:
+	 *        pointer to the destination string
+	 *------------------------------------------------------------------------------
+	 */
 	char* x_strcpy(char* dest, s32 dest_buffer_size, const char* src)
 	{
 		ASSERT(dest);
@@ -522,18 +546,19 @@ namespace xcore
 		else				return 1;
 	}
 
-	//------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     x_strscn    - scan the string for certain parttern
-	// Arguments:
-	//        parttern - the parttern need to be scanned
-	//        str      - source string        
-	// Returns:
-	//        pointer to the parttern of the source string
-	//------------------------------------------------------------------------------
+	/**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     x_strscn    - scan the string for certain parttern
+	 * Arguments:
+	 *        parttern - the parttern need to be scanned
+	 *        str      - source string        
+	 * Returns:
+	 *        pointer to the parttern of the source string
+	 *------------------------------------------------------------------------------
+	 */
 	char* x_strstr(const char* mainStr, const char* subStr)
 	{
 		char* mainString = (char*)mainStr;
@@ -650,81 +675,83 @@ namespace xcore
 	}
 
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     Converts a string to a numeric value
-	// Arguments:
-	//        str     - String to be converted. 
-	// Returns:
-	//      Each function returns the value produced by interpreting the input characters as a number. 
-	//      The return value is 0 if the input cannot be converted to a value of that type. 
-	//      The return value is undefined in case of overflow.
-	// Description:
-	//      These functions convert a character string to a f64-precision, floating-point value 
-	//      (atof64 and atof32), an integer, long integer value (atoi32, atoi64).
-	//
-	//<P>   The input string is a sequence of characters that can be interpreted as a numerical value 
-	//      of the specified type. The function stops reading the input string at the first character 
-	//      that it cannot recognize as part of a number. This character may be the null character 
-	//      ('\\0' or L'\\0') terminating the string.
-	//
-	//<P>   The string argument to atof32 and atof64 has the following form:
-	//
-	//<P>   [whitespace] [sign] [digits] [.digits] [ {d | D | e | E }[sign]digits]
-	//
-	//<P>   A whitespace consists of space or tab characters, which are ignored; sign is either plus (+) or minus (?; 
-	//      and digits are one or more decimal digits. If no digits appear before the decimal point, at least one must 
-	//      appear after the decimal point. The decimal digits may be followed by an exponent, which consists 
-	//      of an introductory letter (d, D, e, or E) and an optionally signed decimal integer.
-	//
-	//<P>   atoi32, and atoi64 do not recognize decimal points or exponents. 
-	//      The string argument for these functions has the form:
-	//
-	//<P>   [whitespace] [sign]digits
-	//
-	//<P>   where whitespace, sign, and digits are as described for atof32 and atof64.
-	//
-	// Example:
-	// <CODE>
-	//      s32 main(void)
-	//      {
-	//         char *s; f64 x; s32 i; s64 li;
-	//
-	//          // Test of atof64
-	//          s = "  -2309.12E-15";     
-	//          x = x_atof64(s);
-	//          x_printf("atof64 test: \\"%s\\"; f32:  %e\\n", s, x);
-	//
-	//          // Test of atof32 
-	//          s = "7.8912654773d210";  
-	//          x = x_atof32(s);
-	//          x_printf("atof32 test: \\"%s\\"; f32:  %e\\n", s, x);
-	//
-	//          // Test of atoi 
-	//          s = "  -9885 pigs";      
-	//          i = x_atoi32(s);
-	//          x_printf("atoi32 test: \\"%s\\"; integer: %d\\n", s, i);
-	//
-	//          // Test of atol 
-	//          s = "98854 dollars";     
-	//          li = x_atoi64(s);
-	//          x_printf("atoi64 test: \\"%s\\"; long: %Ld\\n", s, li);
-	//      }
-	// </CODE>
-	//
-	// <TABLE>
-	//      The Output
-	//      -----------------------------------------------------
-	//      atof64 test: "  -2309.12E-15"; f32:  -2.309120e-012
-	//      atof32 test: "7.8912654773d210"; f32:  7.891265e + 210
-	//      atoi32 test: "  -9885 pigs"; integer: -9885
-	//      atoi64 test: "98854 dollars"; long: 98854
-	// </TABLE>
-	// See Also:
-	//     x_sprintf
-	//------------------------------------------------------------------------------
+    /**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     Converts a string to a numeric value
+	 * Arguments:
+	 *        str     - String to be converted. 
+	 * Returns:
+	 *      Each function returns the value produced by interpreting the input characters as a number. 
+	 *      The return value is 0 if the input cannot be converted to a value of that type. 
+	 *      The return value is undefined in case of overflow.
+	 * Description:
+	 *      These functions convert a character string to a f64-precision, floating-point value 
+	 *      (atof64 and atof32), an integer, long integer value (atoi32, atoi64).
+	 *
+	 *<P>   The input string is a sequence of characters that can be interpreted as a numerical value 
+	 *      of the specified type. The function stops reading the input string at the first character 
+	 *      that it cannot recognize as part of a number. This character may be the null character 
+	 *      ('\\0' or L'\\0') terminating the string.
+	 *
+	 *<P>   The string argument to atof32 and atof64 has the following form:
+	 *
+	 *<P>   [whitespace] [sign] [digits] [.digits] [ {d | D | e | E }[sign]digits]
+	 *
+	 *<P>   A whitespace consists of space or tab characters, which are ignored; sign is either plus (+) or minus (?; 
+	 *      and digits are one or more decimal digits. If no digits appear before the decimal point, at least one must 
+	 *      appear after the decimal point. The decimal digits may be followed by an exponent, which consists 
+	 *      of an introductory letter (d, D, e, or E) and an optionally signed decimal integer.
+	 *
+	 *<P>   atoi32, and atoi64 do not recognize decimal points or exponents. 
+	 *      The string argument for these functions has the form:
+	 *
+	 *<P>   [whitespace] [sign]digits
+	 *
+	 *<P>   where whitespace, sign, and digits are as described for atof32 and atof64.
+	 *
+	 * Example:
+	 * <CODE>
+	 *      s32 main(void)
+	 *      {
+	 *         char *s; f64 x; s32 i; s64 li;
+	 *
+	 *           * Test of atof64
+	 *          s = "  -2309.12E-15";     
+	 *          x = x_atof64(s);
+	 *          x_printf("atof64 test: \\"%s\\"; f32:  %e\\n", s, x);
+	 *
+	 *           * Test of atof32 
+	 *          s = "7.8912654773d210";  
+	 *          x = x_atof32(s);
+	 *          x_printf("atof32 test: \\"%s\\"; f32:  %e\\n", s, x);
+	 *
+	 *           * Test of atoi 
+	 *          s = "  -9885 pigs";      
+	 *          i = x_atoi32(s);
+	 *          x_printf("atoi32 test: \\"%s\\"; integer: %d\\n", s, i);
+	 *
+	 *           * Test of atol 
+	 *          s = "98854 dollars";     
+	 *          li = x_atoi64(s);
+	 *          x_printf("atoi64 test: \\"%s\\"; long: %Ld\\n", s, li);
+	 *      }
+	 * </CODE>
+	 *
+	 * <TABLE>
+	 *      The Output
+	 *      -----------------------------------------------------
+	 *      atof64 test: "  -2309.12E-15"; f32:  -2.309120e-012
+	 *      atof32 test: "7.8912654773d210"; f32:  7.891265e + 210
+	 *      atoi32 test: "  -9885 pigs"; integer: -9885
+	 *      atoi64 test: "98854 dollars"; long: 98854
+	 * </TABLE>
+	 * See Also:
+	 *     x_sprintf
+	 *------------------------------------------------------------------------------
+	 */
 	s32 x_atoi32(const char* str)
 	{
 		ASSERT(str != NULL);
@@ -851,7 +878,7 @@ namespace xcore
 	}
 
 	//------------------------------------------------------------------------------
-	// <COMBINE x_atoi32 >
+	/// <COMBINE x_atoi32 >
 	s64 x_atoi64(const char* str)
 	{
 		ASSERT(str != NULL);
@@ -1427,10 +1454,10 @@ namespace xcore
 		return(result);
 	}
 
-	//------------------------------------------------------------------------------
-	// Assumption: Letters A-Z and a-z are contiguous in the character set.
-	// This is xTRUE for ASCII and UniCode.  (Not so for EBCDIC!)
-
+	/**
+	 * Assumption: Letters A-Z and a-z are contiguous in the character set.
+	 * This is xTRUE for ASCII and UniCode.  (Not so for EBCDIC!)
+	 */
 	char* x_strtoupper(char* str)
 	{
 		ASSERT(str != NULL);
@@ -1446,10 +1473,10 @@ namespace xcore
 		return str;
 	}
 
-	//------------------------------------------------------------------------------
-	// Assumption: Letters A-Z and a-z are contiguous in the character set.
-	// This is xTRUE for ASCII and UniCode.  (Not so for EBCDIC!)
-
+	/**
+	 * Assumption: Letters A-Z and a-z are contiguous in the character set.
+	 * This is xTRUE for ASCII and UniCode.  (Not so for EBCDIC!)
+	 */
 	char* x_strtolower(char* str)
 	{
 		ASSERT(str != NULL);
@@ -1466,25 +1493,27 @@ namespace xcore
 	}
 
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     x_strHash - perform a 32 bit Fowler/Noll/Vo hash on a string
-	// Arguments:
-	//        str     - string to hash
-	//        val     - previous hash value or nothing if first call
-	// Returns:
-	//        32 bit hash as a static hash type
-	// Description:
-	//      FNV hashes are designed to be fast while maintaining a low
-	//      collision rate. The FNV speed allows one to quickly hash lots
-	//      of data while maintaining a reasonable collision rate.  See:
-	//      http://www.isthe.com/chongo/tech/comp/fnv/index.html
-	//      for more details as well as other forms of the FNV hash.
-	// See Also:
-	//     x_memHash
-	//------------------------------------------------------------------------------
+    /**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     x_strHash - perform a 32 bit Fowler/Noll/Vo hash on a string
+	 * Arguments:
+	 *        str     - string to hash
+	 *        val     - previous hash value or nothing if first call
+	 * Returns:
+	 *        32 bit hash as a static hash type
+	 * Description:
+	 *      FNV hashes are designed to be fast while maintaining a low
+	 *      collision rate. The FNV speed allows one to quickly hash lots
+	 *      of data while maintaining a reasonable collision rate.  See:
+	 *      http: *www.isthe.com/chongo/tech/comp/fnv/index.html
+	 *      for more details as well as other forms of the FNV hash.
+	 * See Also:
+	 *     x_memHash
+	 *------------------------------------------------------------------------------
+	 */
 	u32 x_strHash(const char* str, u32 range, u32 val)
 	{
 		const u8* s = (const u8*)str;    // unsigned string 
@@ -1516,25 +1545,27 @@ namespace xcore
 		return val;
 	}
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     x_strIHash - perform a 32 bit Fowler/Noll/Vo hash on a string( ignore upper case or down case)
-	// Arguments:
-	//        str     - string to hash
-	//        val     - previous hash value or nothing if first call
-	// Returns:
-	//        32 bit hash as a static hash type
-	// Description:
-	//      FNV hashes are designed to be fast while maintaining a low
-	//      collision rate. The FNV speed allows one to quickly hash lots
-	//      of data while maintaining a reasonable collision rate.  See:
-	//      http://www.isthe.com/chongo/tech/comp/fnv/index.html
-	//      for more details as well as other forms of the FNV hash.
-	// See Also:
-	//     x_memHash
-	//------------------------------------------------------------------------------
+    /**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     x_strIHash - perform a 32 bit Fowler/Noll/Vo hash on a string( ignore upper case or down case)
+	 * Arguments:
+	 *        str     - string to hash
+	 *        val     - previous hash value or nothing if first call
+	 * Returns:
+	 *        32 bit hash as a static hash type
+	 * Description:
+	 *      FNV hashes are designed to be fast while maintaining a low
+	 *      collision rate. The FNV speed allows one to quickly hash lots
+	 *      of data while maintaining a reasonable collision rate.  See:
+	 *      http: *www.isthe.com/chongo/tech/comp/fnv/index.html
+	 *      for more details as well as other forms of the FNV hash.
+	 * See Also:
+	 *     x_memHash
+	 *------------------------------------------------------------------------------
+	 */
 	u32 x_strIHash (const char* str, u32 range, u32 val)
 	{
 		const u8* s = (const u8*)str;    // unsigned string 
@@ -1569,19 +1600,21 @@ namespace xcore
 		return val;
 	}
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
-	// Summary:
-	//     x_strCRC - calculate and return crc of a string
-	// Arguments:
-	//        str     - string to calculate
-	//        crcSum  - provided to affect crc calculate
-	// Returns:
-	//        32 bit crc of the string
-	// See Also:
-	//     x_memCrc
-	//------------------------------------------------------------------------------
+	/**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     x_strCRC - calculate and return crc of a string
+	 * Arguments:
+	 *        str     - string to calculate
+	 *        crcSum  - provided to affect crc calculate
+	 * Returns:
+	 *        32 bit crc of the string
+	 * See Also:
+	 *     x_memCrc
+	 *------------------------------------------------------------------------------
+	 */
 
 	bool		x_strStartsWith			(const char* inStr, char inStartChar)
 	{
@@ -1676,42 +1709,44 @@ namespace xcore
 		return inStrLen==0 ? '\0' : inStr[inStrLen-1];
 	}
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Jurgen Kluft
-	// Summary:
-	//     String compare, returning 0, 1 or -1
-	// Arguments:
-	//     inStr                - The main string
-	//     inOther              - The 'compare' string to compare to the main string
-	//     inStrLen             - The whole(-1) or sub length of the main string
-	//     inOtherLen           - The whole(-1) or sub length of the 'compare' string
-	// Returns:
-	//     s32 - 0 when inStr==inOther, 1 when inStr>inOther, -1 when inStr<inOther
-	// Description:
-	//     This function can handle a bit more than traditional string compare, it can
-	//     identify the following cases:
-	//
-	//     1) Main string sub length, 'Compare' string sub length
-	//			Required: need to supply both inStrLen or inOtherLen
-	//			Action:   strings are compared until inStrLen==0 or inOtherLen==0
-	//
-	//     2) Main string sub length, 'Compare' string total length = -1
-	//			Required: need to supply inStrLen, no need to supply inOtherLen=-1
-	//			Action:   strings are compared until inStrLen==0 or 'Compare' string encounters '\0'
-	//
-	//     3) Main string total length = -1, 'Compare' string sub length
-	//			Required: need to supply inStrLen with -1, need to supply inOtherLen
-	//			Action:   strings are compared until inOtherLen==0 or 'Compare' string encounters '\0'
-	//
-	//     4) Main string total length = -1, 'Compare' string total length = -1
-	//			Required: no need to supply either inStrLen or inOtherLen
-	//			Action:   strings are compared until one of the strings encounters '\0'
-	//
+	/**
+     *------------------------------------------------------------------------------
+	 * Author:
+	 *     Jurgen Kluft
+	 * Summary:
+	 *     String compare, returning 0, 1 or -1
+	 * Arguments:
+	 *     inStr                - The main string
+	 *     inOther              - The 'compare' string to compare to the main string
+	 *     inStrLen             - The whole(-1) or sub length of the main string
+	 *     inOtherLen           - The whole(-1) or sub length of the 'compare' string
+	 * Returns:
+	 *     s32 - 0 when inStr==inOther, 1 when inStr>inOther, -1 when inStr<inOther
+	 * Description:
+	 *     This function can handle a bit more than traditional string compare, it can
+	 *     identify the following cases:
+	 *
+	 *     1) Main string sub length, 'Compare' string sub length
+	 *			Required: need to supply both inStrLen or inOtherLen
+	 *			Action:   strings are compared until inStrLen==0 or inOtherLen==0
+	 *
+	 *     2) Main string sub length, 'Compare' string total length = -1
+	 *			Required: need to supply inStrLen, no need to supply inOtherLen=-1
+	 *			Action:   strings are compared until inStrLen==0 or 'Compare' string encounters '\0'
+	 *
+	 *     3) Main string total length = -1, 'Compare' string sub length
+	 *			Required: need to supply inStrLen with -1, need to supply inOtherLen
+	 *			Action:   strings are compared until inOtherLen==0 or 'Compare' string encounters '\0'
+	 *
+	 *     4) Main string total length = -1, 'Compare' string total length = -1
+	 *			Required: no need to supply either inStrLen or inOtherLen
+	 *			Action:   strings are compared until one of the strings encounters '\0'
+	 *
 
-	// See Also:
-	//     x_SetAssertHandler
-	//------------------------------------------------------------------------------
+	 * See Also:
+	 *     x_SetAssertHandler
+	 *------------------------------------------------------------------------------
+	 */
 
 	s32  		x_strCompare			(const char* inStr, s32 inStrLen, const char* inOther, s32 inOtherLen)
 	{
@@ -2058,7 +2093,7 @@ namespace xcore
 			return NULL;
 
 		const char* cur_pos = inStr + inPos;
-		const char* end_pos = inStr + inPos + inStrLen;
+		const char* end_pos = inStr + inStrLen;
 		while (cur_pos<end_pos)
 		{
 			if (x_strFind(inCharSet, *cur_pos)!=NULL)
@@ -2082,7 +2117,7 @@ namespace xcore
 		ASSERT((inPos-(inStrLen-1)) >= 0);
 
 		const char* cur_pos = inStr + inPos;
-		const char* end_pos = inStr + inPos - (inStrLen-1);
+		const char* end_pos = inStr;
 		while (cur_pos>=end_pos)
 		{
 			if (x_strFind(inCharSet, *cur_pos)!=NULL)
@@ -2162,7 +2197,20 @@ namespace xcore
 	}
 
 
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
+
+
+
+	 s32		x_printf   				(const char* formatStr, const x_va& v1             , const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+																	const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16) { return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16); }
+	 s32		x_printf				(const char* formatStr, const x_va_list& args)		{ return xconsole::write(formatStr, args); }
+	 s32		x_printf				(const char* str)									{ return xconsole::write(str); }
+
+
 };
+
+/**
+ *  END xCore namespace
+ */
+
+
+ #endif // ifndef SPU

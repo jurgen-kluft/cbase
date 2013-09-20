@@ -8,26 +8,25 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_types.h"
 #include "xbase\x_debug.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	class xcstring;
 	class xccstring;
 
-	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos
-	// Note: For a generator, take a look here http://cvs.ossp.org/dir?d=ossp-pkg/uuid
-	// Description:
-	//     This class described a 128bit guid. The guid is not created here, this is
-	//     a data container holding the guid value. From the point of view of xcore 
-	//     this defines a system type.
-	//------------------------------------------------------------------------------
+	/**
+	 * Author:
+	 *     Virtuos
+	 * Note: For a generator, take a look here http://cvs.ossp.org/dir?d=ossp-pkg/uuid
+	 * Description:
+	 *     This class described a 128bit guid. The guid is not created here, this is
+	 *     a data container holding the guid value. From the point of view of xcore 
+	 *     this defines a system type.
+	 */
 	struct xguid
 	{
 	public:
@@ -46,22 +45,25 @@ namespace xcore
 		bool		operator == (const xguid&) const;
 		bool		operator != (const xguid&) const;
 
-		void		toString(xcstring&) const;     
-		void		fromString(const xccstring&);
+		void		toString(char* str, s32 str_max_len) const;     
+		void		fromString(const char*);
 
 	private:
 		u32			mGuid[4];
 	};
 
-	//==============================================================================
-	// INCLUDE THE INLINE FUNCTIONS
-	//==============================================================================
+	/**
+	 * INCLUDE THE INLINE FUNCTIONS
+	 */
 	#include "private\x_guid_inline.h"
 
 //==============================================================================
 // END xCore namespace
 //==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 
 //==============================================================================
 // END

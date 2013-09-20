@@ -1,11 +1,30 @@
-// x_console.cpp - Core console
+/**
+* @file x_console.cpp
+* Core console
+*/
+
+#ifdef SPU
+
+#include "xbase\x_console.h"
+
+// empty function so other test programs will compile..
+namespace xcore
+{
+	void xconsole::addDefault()
+	{
+
+	}
+}
+
+#else
+
 #include "xbase\x_va_list.h"
 #include "xbase\x_string_std.h"
 #include "xbase\x_console.h"
 
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 	#define XCONSOLE_LOCAL_STR_BUF(local_var_name, size)	char	local_var_name##Buffer[size]
@@ -41,12 +60,13 @@ namespace xcore
 		}
 
 		mNext = node;
+		node->mPrev = this;
 	}
 
 	void					xconsole_node::remove(xconsole_node* node)
 	{
 		if (node->mPrev!=NULL)
-			node->mPrev->mNext = mNext;
+			node->mPrev->mNext = node->mNext;
 		if (node->mNext!=NULL)
 			node->mNext->mPrev = mPrev;
 
@@ -448,9 +468,10 @@ namespace xcore
 			r = i.imp()->writeLine();
 		return r;
 	}
-
-
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
+
+
+#endif // ifndef SPU

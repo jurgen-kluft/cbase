@@ -1,4 +1,9 @@
-// x_uint64.h - xCore custom 64 bit unsigned integer
+/**
+* @file Head file x_uint64.h
+*
+* xCore custom 64 bit unsigned integer.
+*/
+
 #ifndef __XBASE_64_BIT_UNSIGNED_INTEGER_H__
 #define __XBASE_64_BIT_UNSIGNED_INTEGER_H__
 #include "xbase\x_target.h"
@@ -8,12 +13,10 @@
 
 #ifndef X_NO_CUSTOM_UINT64
 
-#include "xbase\x_types.h"
 
-
-//==============================================================================
-// xCore namespace
-//==============================================================================
+/**
+ * xCore namespace
+ */
 namespace xcore
 {
 
@@ -21,9 +24,9 @@ namespace xcore
 	class __xint64;
 
 
-	//---------------------------------------------------------------------------------------------------------------------
-	// 64 bit signed integer
-	//---------------------------------------------------------------------------------------------------------------------
+	/**
+	 * 64 bit unsigned integer
+	 */
 	class __xuint64
 	{
 		enum ESettings
@@ -38,7 +41,9 @@ namespace xcore
 		};
 
 	public:
-							// Constructors
+								/** 
+								 *  Constructors
+								 */
 							__xuint64();
 		explicit			__xuint64(s8 _value);
 		explicit			__xuint64(u8 _value);
@@ -50,7 +55,9 @@ namespace xcore
 		explicit			__xuint64(const u64& _value);
 							__xuint64(u32 msb, u32 lsb);
 
-		// Assignment operator
+		/** 
+		 *  Assignment operators
+		 */
 		__xuint64&			operator=(char _value)									{ *this = __xuint64(_value); return *this; }
 		__xuint64&			operator=(s16 _value)									{ *this = __xuint64(_value); return *this; }
 		__xuint64&			operator=(s32 _value)									{ *this = __xuint64(_value); return *this; }
@@ -60,7 +67,9 @@ namespace xcore
 		__xuint64&			operator=(const u64& _value)							{ *this = __xuint64(_value); return *this; }
 		__xuint64&			operator=(const s64& _value)							{ *this = __xuint64(_value); return *this; }
 
-		// Arithmetic operators
+		/** 
+		 *  Arithmetic operators
+		 */
 		__xuint64& 			operator++();
 		__xuint64& 			operator--();
 		__xuint64	 		operator++(s32);
@@ -71,19 +80,24 @@ namespace xcore
 		__xuint64& 			operator-=(const __xuint64& _value);
 		__xuint64& 			operator%=(const __xuint64& _value);
 		__xuint64  			operator~() const;
-
-		// Bit shift operators
+		/** 
+		 *  Bit shift operators
+		 */
 		__xuint64  			operator>>(s32 nShift) const;
 		__xuint64  			operator<<(s32 nShift) const;
 		__xuint64& 			operator>>=(s32 nShift);
 		__xuint64& 			operator<<=(s32 nShift);
 
-		// Bit operators
+		/** 
+		 *  Bit operators
+		 */
 		__xuint64& 			operator^=(const __xuint64& _value);
 		__xuint64& 			operator|=(const __xuint64& _value);
 		__xuint64& 			operator&=(const __xuint64& _value);
 
-		// Operators to convert back to basic types
+	                        /**
+	                         *  Operators to convert back to basic types.
+	                         */
 							operator bool() const;
 							operator s32() const;
 							operator u32() const;
@@ -93,7 +107,9 @@ namespace xcore
 		inline u32&			operator [] (s32 index)									{ return mUInt32[index]; }
 		inline u32			operator [] (s32 index) const							{ return mUInt32[index]; }
 
-		//Misc. Functions
+		/**
+		 *  Misc. Functions
+		 */
 		void 				SetBit(s32 nIndex, xbool _value);
 		xbool 				IsBitSet(s32 nIndex) const;
 
@@ -107,7 +123,9 @@ namespace xcore
 	protected:
 		friend class __xint64;
 
-		// Actual member data variables
+		/**
+		 *  Actual member data variables
+		 */
 		union
 		{
 			struct
@@ -261,6 +279,9 @@ namespace xcore
 	// END xCore namespace
 	//==============================================================================
 };
+/**
+ *  END xCore namespace
+ */
 
 #endif
 
