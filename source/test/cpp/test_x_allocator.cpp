@@ -26,9 +26,8 @@ UNITTEST_SUITE_BEGIN(xallocator)
         {
 			for (s32 i=0; i<2; ++i)
 			{
-				XASSERT(false);
+				CHECK_THROW(XASSERT(false), UnitTest::AssertException);
 			}
-
 
 			void* object1_tmp = gTestAllocator->allocate(sizeof(test_object1),4);
 			test_object1* object1 = new(object1_tmp) test_object1;
