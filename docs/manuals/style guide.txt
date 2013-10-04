@@ -1,0 +1,52 @@
+================================ File Naming ============================
+
+x_{name}.cpp & x_{name}.h
+
+For example:
+	x_console.cpp & x_console.h
+	x_console_wii.cpp
+
+--------------------------------------------------------------------------
+
+================================ Namespaces ==============================
+Most of the time the best practise is to put the classes into the namespace
+related to the package. For example:
+
+namespace xcore
+{
+	namespace xmemory {}
+	namespace xinput {}
+	namespace xfilesystem {}
+	namespace xthreading {}
+}
+
+Some packages use the xcore namespace:
+- xallocator (namespace xcore)
+- xtime (namespace xcore)
+- xtracker (namespace xmemory)
+- xrandom (namespace xcore)
+
+--------------------------------------------------------------------------
+
+================================ Interface classes =========================
+
+Interface classes naming convention:
+
+class xobject
+{
+	xiobject*		mImplementation;
+public:
+};
+
+For the implementation interface classes we use an 'i' to indicate implementation
+or interface.
+
+For base classes, the convention is to append '_base' although this indirectly
+means that the base class has either some data or some implementation and is not
+a pure interface/'base class'.
+
+class xobject_base
+
+
+
+--------------------------------------------------------------------------

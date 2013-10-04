@@ -1,0 +1,517 @@
+<Package Name="xbase" Group="com.virtuos.tnt">
+	<Versions>
+		<Version>1.0.0</Version>
+	</Versions>
+
+	<Variables>
+		<Name>xbase</Name>
+		<Language>C++</Language>
+		<GUID_Main>c81d02a1-49e5-2933-9dba-f61317eab3be</GUID_Main>
+		<GUID_UnitTest>5ea192c2-4ccf-b3e8-8c3c-6896127b5c36</GUID_UnitTest>
+	</Variables>
+
+	<DirectoryStructure>
+		<Item Folder="docs\manuals"/>
+		<Item Folder="docs\references"/>
+		<Item Folder="source\main\cpp"/>
+		<Item Folder="source\main\include\xbase"/>
+		<Item Folder="source\main\include\xbase\private"/>
+		<Item Folder="source\main\resources"/>
+		<Item Folder="source\test\cpp"/>
+		<Item Folder="source\test\include\xbase"/>
+		<Item Folder="source\test\include\xbase\private"/>
+		<Item Folder="source\test\resources"/>
+		<Item Folder="target"/>
+		<Item Folder="tools"/>
+	</DirectoryStructure>
+
+	<Content>
+		<Item Src="pom.xml" Dst="" Required="True" />
+		<Item Src="pom.props" Dst="" Required="True" />
+		<Item Src="pom.targets" Dst="" Required="True" />
+		<Item Src="source\main\cpp\**\*.cpp" Dst="source\main\cpp\" />
+		<Item Src="source\main\include\**\*.h" Dst="source\main\include\" />
+		<Item Src="source\main\resources\**\*.*" Dst="source\main\resources\" />
+		<Item Src="libs\**\*.*" Dst="libs\" />
+		<Item Src="docs\**\*.*" Dst="docs\" />
+		<Item Src="tools\**\*.*" Dst="Tools\" />
+		<Item Src="target\${Name}\outdir\${Name}_DevDebug_${Platform}\${Name}_DevDebug_${Platform}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_DevRelease_${Platform}\${Name}_DevRelease_${Platform}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_DevFinal_${Platform}\${Name}_DevFinal_${Platform}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_TestDebug_${Platform}\${Name}_TestDebug_${Platform}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_TestRelease_${Platform}\${Name}_TestRelease_${Platform}.lib" Dst="libs\" Required="True"/>
+	</Content>
+
+	<Dependency Package="xunittest">
+		<Group>com.virtuos.tnt</Group>
+		<Version>[1.0,)</Version>
+		<Type>Package</Type>
+	</Dependency>
+
+	<Dependency Package="sdk_ps3" Platform="PS3">
+		<Group>com.virtuos.sdk</Group>
+		<Version>[300.0.01,)</Version>
+		<Type>Package</Type>
+	</Dependency>
+
+	<Dependency Package="sdk_360" Platform="Xbox 360">
+		<Group>com.virtuos.sdk</Group>
+		<Version>[1.0,)</Version>
+		<Type>Package</Type>
+	</Dependency>
+
+	<Dependency Package="sdk_wii" Platform="WII">
+		<Group>com.virtuos.sdk</Group>
+		<Version>[1.0,)</Version>
+		<Type>Package</Type>
+	</Dependency>
+
+	<Dependency Package="sdk_3ds" Platform="N3DS">
+		<Group>com.virtuos.sdk</Group>
+		<Version>[0.14,)</Version>
+		<Type>Package</Type>
+	</Dependency>
+
+	<ProjectProperties>
+		<Properties DependencyType="Root" Platform="*">
+			<PropertyGroup Label="xbase_TargetDirs">
+				<xbase_RootDir>$(SolutionDir)</xbase_RootDir> 
+				<xbase_LibraryDir>$(SolutionDir)target\xbase\outdir\xbase_$(Configuration)_$(Platform)\</xbase_LibraryDir>
+				<xbase_IncludeDir>$(SolutionDir)source\main\include\</xbase_IncludeDir>
+			</PropertyGroup>
+		</Properties>
+				
+		<Properties DependencyType="Package" Platform="*">
+			<PropertyGroup Label="xbase_TargetDirs">
+				<xbase_RootDir>${Location}</xbase_RootDir> 
+				<xbase_LibraryDir>${Location}libs\</xbase_LibraryDir>
+				<xbase_IncludeDir>${Location}source\main\include\</xbase_IncludeDir>
+			</PropertyGroup>
+		</Properties>
+	
+		<Properties DependencyType="Source" Platform="*">
+			<PropertyGroup Label="xbase_TargetDirs">
+				<xbase_RootDir>$(SolutionDir)target\xbase\</xbase_RootDir> 
+				<xbase_LibraryDir>$(SolutionDir)target\xbase\target\xbase\outdir\xbase_$(Configuration)_$(Platform)\</xbase_LibraryDir>
+				<xbase_IncludeDir>$(SolutionDir)target\xbase\source\main\include\</xbase_IncludeDir>
+			</PropertyGroup>
+		</Properties>
+	</ProjectProperties>
+		
+	<Project Name="xbase" Language="C++" Location="source\main\cpp" Scope="Public" DependsOn="sdk_wii:sdk_wii;sdk_3ds:sdk_3ds;sdk_ps3:sdk_ps3;sdk_360:sdk_360">
+		<ProjectFile>
+			<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+				<PropertyGroup Label="Globals">
+					<ProjectGuid>{${GUID_Main}}</ProjectGuid>
+				</PropertyGroup>
+				<ImportGroup Label="TargetDirs">
+					<Import Project="$(SolutionDir)target\xbase\xbase.$(Platform).props" Condition="exists('$(SolutionDir)target\xbase\xbase.$(Platform).props')" Label="xbase_TargetDirs" />
+				</ImportGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|Win32'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_DEV_DEBUG;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevDebug_Win32.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|Win32'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_DEV_RELEASE;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevRelease_Win32.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|Win32'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_DEV_FINAL;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevFinal_Win32.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Win32'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_TEST_DEBUG;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestDebug_Win32.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_TEST_RELEASE;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestRelease_Win32.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|PS3'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PS3_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevDebug_PS3.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|PS3'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PS3_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevRelease_PS3.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|PS3'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PS3_DEV_FINAL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevFinal_PS3.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|PS3'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PS3_TEST_DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestDebug_PS3.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|PS3'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PS3_TEST_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestRelease_PS3.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|Xbox 360'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_360_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevDebug_Xbox 360.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|Xbox 360'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_360_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevRelease_Xbox 360.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|Xbox 360'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_360_DEV_FINAL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevFinal_Xbox 360.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Xbox 360'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_360_TEST_DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestDebug_Xbox 360.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Xbox 360'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_360_TEST_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestRelease_Xbox 360.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|WII'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_WII_DEV_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevDebug_WII.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|WII'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_WII_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevRelease_WII.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|WII'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_WII_DEV_FINAL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevFinal_WII.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|WII'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_WII_TEST_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestDebug_WII.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|WII'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_WII_TEST_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestRelease_WII.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>								
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|N3DS'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_3DS_DEV_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevDebug_N3DS.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|N3DS'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_3DS_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevRelease_N3DS.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|N3DS'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_3DS_DEV_FINAL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevFinal_N3DS.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|N3DS'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_3DS_TEST_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestDebug_N3DS.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|N3DS'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_3DS_TEST_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestRelease_N3DS.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>								
+				<ItemGroup>
+					<ClCompile Include="source\main\cpp\**\*.cpp" />
+				</ItemGroup>
+				<ItemGroup>
+					<ClInclude Include="source\main\include\xbase\**\*.h" />
+				</ItemGroup>
+			</Project>
+		</ProjectFile>
+	</Project>
+
+	<Project Name="xbase_test" Language="C++" Location="source\test\cpp" Scope="Private" DependsOn="xbase:xbase;xunittest:xunittest">
+		<ProjectFile>
+			<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+				<PropertyGroup Label="Globals">
+					<ProjectGuid>{${GUID_UnitTest}}</ProjectGuid>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Win32'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|PS3'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|PS3'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|PS3'">
+				    <TargetExt>.elf</TargetExt>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|PS3'">
+				    <TargetExt>.elf</TargetExt>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Xbox 360'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Xbox 360'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|WII'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|WII'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|WII'">
+				    <TargetExt>.elf</TargetExt>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|WII'">
+				    <TargetExt>.elf</TargetExt>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|N3DS'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|N3DS'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Win32'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_$(Platform).lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_$(Platform).lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|PS3'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_PS3.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|PS3'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_PS3.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Xbox 360'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_Xbox 360.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Xbox 360'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_Xbox 360.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|WII'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_WII.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|WII'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_WII.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>				
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|N3DS'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_N3DS.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|N3DS'">
+					<ClCompile>
+						<AdditionalIncludeDirectories>$(${Name}_TargetDir)\source\test\include</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>xbase_$(Configuration)_N3DS.lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>				
+				<ItemGroup>
+					<ClCompile Include="source\test\cpp\**\*.cpp" />
+				</ItemGroup>
+				<ItemGroup>
+					<ClInclude Include="source\test\include\**\*.h" />
+				</ItemGroup>
+			</Project>
+		</ProjectFile>
+	</Project>
+</Package>

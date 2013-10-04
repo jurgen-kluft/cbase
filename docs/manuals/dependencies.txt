@@ -1,0 +1,2 @@
+xbase has no dependencies
+xbase unittest has two dependencies, xunittest and xsystem
