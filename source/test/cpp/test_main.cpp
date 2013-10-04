@@ -125,7 +125,9 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	xcore::gSetSPUConfig(progSize, stackSize);
 #endif
 
+#ifdef TARGET_DEBUG
 	xcore::x_asserthandler::sRegisterHandler(&gAssertHandler);
+#endif
 
 	xcore::x_iallocator* systemAllocator = xcore::gCreateSystemAllocator();
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
