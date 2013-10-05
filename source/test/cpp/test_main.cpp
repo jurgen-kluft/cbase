@@ -25,6 +25,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
 #ifndef SPU
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsingleton);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xallocator);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xcarray);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbinary_search);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xqsort);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xguid);
