@@ -35,6 +35,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xfloat);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdouble);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsprintf);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsscanf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtls);
