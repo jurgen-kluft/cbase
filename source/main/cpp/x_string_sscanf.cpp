@@ -234,11 +234,53 @@ namespace xcore
 					case 'X':
 						{
 							buf = x_strscn(buf, "1234567890xabcdefABCDEF");
+
+							u32 const varsize = vr_args[i].sizeInBytes();
+							if (w==0)
+								w = varsize * 2;
+
 							u64 n2 = 0;
-							if (buf != NULL)
-								n2 = (u64)x_atoi64(buf, 16, &base);
-							buf = base;
-	                        
+							if (w==2)
+							{
+								u32 const strl = 2;
+								char str[strl + 1];
+								str[strl]= '\0';
+								for (s32 j=0; j<strl; ++j)
+									str[j] = buf[j];
+								n2 = (u64)x_atoi64(str, 16, &base);
+								buf += (base - str);
+							}
+							else if (w == 4)
+							{
+								u32 const strl = 4;
+								char str[strl + 1];
+								str[strl]= '\0';
+								for (s32 j=0; j<strl; ++j)
+									str[j] = buf[j];
+								n2 = (u64)x_atoi64(str, 16, &base);
+								buf += (base - str);
+							}
+							else if (w == 8)
+							{
+								u32 const strl = 8;
+								char str[strl + 1];
+								str[strl]= '\0';
+								for (s32 j=0; j<strl; ++j)
+									str[j] = buf[j];
+								n2 = (u64)x_atoi64(str, 16, &base);
+								buf += (base - str);
+							}
+							else // if (w == 16)
+							{
+								u32 const strl = 16;
+								char str[strl + 1];
+								str[strl]= '\0';
+								for (s32 j=0; j<strl; ++j)
+									str[j] = buf[j];
+								n2 = (u64)x_atoi64(str, 16, &base);
+								buf += (base - str);
+							}
+
 							if (!suppress)
 							{
 								x_va_r r = vr_args[i++];
