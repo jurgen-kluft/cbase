@@ -113,7 +113,6 @@ namespace xcore
 		//
 		// Dump the scope info
 		//
-		x_LogPush(fileName, lineNumber);
 		x_LogError("Assert", "%s(%d): %s; %s ", x_va_list(fileName, lineNumber, exprString, messageString));
 
 		//
