@@ -114,7 +114,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevDebug_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_DevDebug_$(Platform).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|Win32'">
@@ -124,7 +124,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevRelease_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_DevRelease_$(Platform).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|Win32'">
@@ -134,7 +134,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevFinal_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_DevFinal_$(Platform).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Win32'">
@@ -144,7 +144,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestDebug_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_TestDebug_$(Platform).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
@@ -154,9 +154,59 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestRelease_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_TestRelease_$(Platform).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|x64'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_DEV_DEBUG;WIN32;WIN64;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevDebug_$(Platform).lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|x64'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_DEV_RELEASE;WIN32;WIN64;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevRelease_$(Platform).lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|x64'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_DEV_FINAL;WIN32;WIN64;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_DevFinal_$(Platform).lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|x64'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_TEST_DEBUG;WIN32;WIN64;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestDebug_$(Platform).lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>
+				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'">
+					<ClCompile>
+						<PreprocessorDefinitions>TARGET_PC_TEST_RELEASE;WIN32;WIN64;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+						<AdditionalIncludeDirectories>$(xbase_IncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+					</ClCompile>
+					<Link>
+						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
+						<AdditionalDependencies>#xbase_TestRelease_$(Platform).lib</AdditionalDependencies>
+					</Link>
+				</ItemDefinitionGroup>				
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|PS3'">
 					<ClCompile>
 						<PreprocessorDefinitions>TARGET_PS3_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -377,6 +427,12 @@
 					<ConfigurationType>Application</ConfigurationType>
 				</PropertyGroup>
 				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|x64'" Label="Configuration">
+					<ConfigurationType>Application</ConfigurationType>
+				</PropertyGroup>
+				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'" Label="Configuration">
 					<ConfigurationType>Application</ConfigurationType>
 				</PropertyGroup>
 				<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|PS3'" Label="Configuration">
