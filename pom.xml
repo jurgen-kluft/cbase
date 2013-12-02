@@ -35,11 +35,11 @@
 		<Item Src="libs\**\*.*" Dst="libs\" />
 		<Item Src="docs\**\*.*" Dst="docs\" />
 		<Item Src="tools\**\*.*" Dst="Tools\" />
-		<Item Src="target\${Name}\outdir\${Name}_DevDebug_${Platform}\${Name}_DevDebug_${Platform}.lib" Dst="libs\" Required="True"/>
-		<Item Src="target\${Name}\outdir\${Name}_DevRelease_${Platform}\${Name}_DevRelease_${Platform}.lib" Dst="libs\" Required="True"/>
-		<Item Src="target\${Name}\outdir\${Name}_DevFinal_${Platform}\${Name}_DevFinal_${Platform}.lib" Dst="libs\" Required="True"/>
-		<Item Src="target\${Name}\outdir\${Name}_TestDebug_${Platform}\${Name}_TestDebug_${Platform}.lib" Dst="libs\" Required="True"/>
-		<Item Src="target\${Name}\outdir\${Name}_TestRelease_${Platform}\${Name}_TestRelease_${Platform}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_DevDebug_${Platform}_${ToolSet}\${Name}_DevDebug_${Platform}_${ToolSet}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_DevRelease_${Platform}_${ToolSet}\${Name}_DevRelease_${Platform}_${ToolSet}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_DevFinal_${Platform}_${ToolSet}\${Name}_DevFinal_${Platform}_${ToolSet}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_TestDebug_${Platform}_${ToolSet}\${Name}_TestDebug_${Platform}_${ToolSet}.lib" Dst="libs\" Required="True"/>
+		<Item Src="target\${Name}\outdir\${Name}_TestRelease_${Platform}_${ToolSet}\${Name}_TestRelease_${Platform}_${ToolSet}.lib" Dst="libs\" Required="True"/>
 	</Content>
 
 	<Dependency Package="xunittest">
@@ -76,7 +76,7 @@
 		<Properties DependencyType="Root" Platform="*">
 			<PropertyGroup Label="xbase_TargetDirs">
 				<xbase_RootDir>$(SolutionDir)</xbase_RootDir> 
-				<xbase_LibraryDir>$(SolutionDir)target\xbase\outdir\xbase_$(Configuration)_$(Platform)\</xbase_LibraryDir>
+				<xbase_LibraryDir>$(SolutionDir)target\xbase\outdir\xbase_$(PackageSignature)\</xbase_LibraryDir>
 				<xbase_IncludeDir>$(SolutionDir)source\main\include\</xbase_IncludeDir>
 			</PropertyGroup>
 		</Properties>
@@ -92,7 +92,7 @@
 		<Properties DependencyType="Source" Platform="*">
 			<PropertyGroup Label="xbase_TargetDirs">
 				<xbase_RootDir>$(SolutionDir)target\xbase\</xbase_RootDir> 
-				<xbase_LibraryDir>$(SolutionDir)target\xbase\target\xbase\outdir\xbase_$(Configuration)_$(Platform)\</xbase_LibraryDir>
+				<xbase_LibraryDir>$(SolutionDir)target\xbase\target\xbase\outdir\xbase_$(PackageSignature)\</xbase_LibraryDir>
 				<xbase_IncludeDir>$(SolutionDir)target\xbase\source\main\include\</xbase_IncludeDir>
 			</PropertyGroup>
 		</Properties>
@@ -114,7 +114,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevDebug_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|Win32'">
@@ -124,7 +124,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevRelease_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|Win32'">
@@ -134,7 +134,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevFinal_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Win32'">
@@ -144,7 +144,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestDebug_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
@@ -154,7 +154,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestRelease_Win32.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|PS3'">
@@ -164,7 +164,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevDebug_PS3.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|PS3'">
@@ -174,7 +174,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevRelease_PS3.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|PS3'">
@@ -184,7 +184,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevFinal_PS3.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|PS3'">
@@ -194,7 +194,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestDebug_PS3.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|PS3'">
@@ -204,7 +204,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestRelease_PS3.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|Xbox 360'">
@@ -214,7 +214,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevDebug_Xbox 360.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|Xbox 360'">
@@ -224,7 +224,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevRelease_Xbox 360.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|Xbox 360'">
@@ -234,7 +234,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevFinal_Xbox 360.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Xbox 360'">
@@ -244,7 +244,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestDebug_Xbox 360.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Xbox 360'">
@@ -254,7 +254,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestRelease_Xbox 360.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|WII'">
@@ -264,7 +264,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevDebug_WII.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|WII'">
@@ -274,7 +274,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevRelease_WII.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|WII'">
@@ -284,7 +284,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevFinal_WII.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|WII'">
@@ -294,7 +294,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestDebug_WII.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|WII'">
@@ -304,7 +304,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestRelease_WII.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>								
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebug|N3DS'">
@@ -314,7 +314,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevDebug_N3DS.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevRelease|N3DS'">
@@ -324,7 +324,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevRelease_N3DS.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevFinal|N3DS'">
@@ -334,7 +334,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_DevFinal_N3DS.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|N3DS'">
@@ -344,7 +344,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestDebug_N3DS.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|N3DS'">
@@ -354,7 +354,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>#$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>#xbase_TestRelease_N3DS.lib</AdditionalDependencies>
+						<AdditionalDependencies>#xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>								
 				<ItemGroup>
@@ -421,7 +421,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_$(Platform).lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
@@ -430,7 +430,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_$(Platform).lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|PS3'">
@@ -439,7 +439,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_PS3.lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|PS3'">
@@ -448,7 +448,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_PS3.lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|Xbox 360'">
@@ -457,7 +457,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_Xbox 360.lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Xbox 360'">
@@ -466,7 +466,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_Xbox 360.lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|WII'">
@@ -475,7 +475,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_WII.lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|WII'">
@@ -484,7 +484,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_WII.lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>				
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|N3DS'">
@@ -493,7 +493,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_N3DS.lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>
 				<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|N3DS'">
@@ -502,7 +502,7 @@
 					</ClCompile>
 					<Link>
 						<AdditionalLibraryDirectories>$(xbase_LibraryDir)</AdditionalLibraryDirectories>
-						<AdditionalDependencies>xbase_$(Configuration)_N3DS.lib</AdditionalDependencies>
+						<AdditionalDependencies>xbase_$(PackageSignature).lib</AdditionalDependencies>
 					</Link>
 				</ItemDefinitionGroup>				
 				<ItemGroup>
