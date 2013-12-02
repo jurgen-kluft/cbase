@@ -22,6 +22,14 @@ UNITTEST_SUITE_BEGIN(xtypes)
 			sTypeOf_xbool_IsUnique(s32(0));
 			sTypeOf_xbool_IsUnique(u32(0));
 
+#ifdef TARGET_32BIT
+			CHECK_TRUE(sizeof(void*) == 4);
+#endif
+
+#ifdef TARGET_64BIT
+			CHECK_TRUE(sizeof(void*) == 8);
+#endif
+
 			CHECK_TRUE(sizeof(xbyte) == 1);
 			CHECK_TRUE(sizeof(u8) == 1);
 			CHECK_TRUE(sizeof(s8) == 1);

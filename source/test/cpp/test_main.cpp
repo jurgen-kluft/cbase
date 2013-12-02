@@ -137,6 +137,9 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	
 	xcore::xconsole::addDefault();
 
+	xcore::xconsole::write("Configuration: ");
+	xcore::xconsole::writeLine(TARGET_FULL_DESCR_STR);
+
 	xcore::TestAllocator testAllocator(systemAllocator);
 	gTestAllocator = &testAllocator;
 

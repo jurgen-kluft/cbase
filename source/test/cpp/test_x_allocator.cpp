@@ -24,10 +24,12 @@ UNITTEST_SUITE_BEGIN(xallocator)
 
         UNITTEST_TEST(_XCORE_CLASS_PLACEMENT_NEW_DELETE)
         {
+#ifdef TARGET_DEBUG
 			for (s32 i=0; i<2; ++i)
 			{
 				CHECK_THROW(XASSERT(false), UnitTest::AssertException);
 			}
+#endif
 
 			void* object1_tmp = gTestAllocator->allocate(sizeof(test_object1),4);
 			test_object1* object1 = new(object1_tmp) test_object1;
