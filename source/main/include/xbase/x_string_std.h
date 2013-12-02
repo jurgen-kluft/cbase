@@ -188,9 +188,9 @@ namespace xcore
 	inline bool			x_strContainsNoCase		(const char* inStr, const char* inString, s32 inPos = 0, s32 inStrLen = -1)	{ return x_strFindNoCaseInSubstr(inStr, inString, inPos, inStrLen) != NULL; } ///< Check if this string contains <inString> without paying attention to case
 
 	/// IndexOf
-	inline s32 			x_strIndexOf			(const char* inStr, char inChar, s32 inPos = 0, s32 inStrLen = -1)			{ const char* str = x_strFindInSubstr(inStr, inChar, inPos, inStrLen); return str==NULL ? -1 : (str-inStr); }
-	inline s32 			x_strIndexOf			(const char* inStr, const char* inString, s32 inPos = 0, s32 inStrLen = -1)	{ const char* str = x_strFindInSubstr(inStr, inString, inPos, inStrLen); return str==NULL ? -1 : (str-inStr); }
-	inline s32 			x_strLastIndexOf		(const char* inStr, char inChar, s32 inPos = 0, s32 inStrLen = -1)			{ const char* str = x_strRFind(inStr, inChar, inPos, inStrLen); return str==NULL ? -1 : (str-inStr); }
+	inline s32 			x_strIndexOf			(const char* inStr, char inChar, s32 inPos = 0, s32 inStrLen = -1)			{ const char* str = x_strFindInSubstr(inStr, inChar, inPos, inStrLen); return str==NULL ? -1 : (s32)(str-inStr); }
+	inline s32 			x_strIndexOf			(const char* inStr, const char* inString, s32 inPos = 0, s32 inStrLen = -1)	{ const char* str = x_strFindInSubstr(inStr, inString, inPos, inStrLen); return str==NULL ? -1 : (s32)(str-inStr); }
+	inline s32 			x_strLastIndexOf		(const char* inStr, char inChar, s32 inPos = 0, s32 inStrLen = -1)			{ const char* str = x_strRFind(inStr, inChar, inPos, inStrLen); return str==NULL ? -1 : (s32)(str-inStr); }
 
 	extern bool			x_strIsUpper			(const char* inStr, s32 inStrLen=-1);										///< Check if string is all upper case
 	extern bool			x_strIsLower			(const char* inStr, s32 inStrLen=-1);										///< Check if string is all lower case

@@ -41,35 +41,36 @@ namespace xcore
 
 			node*	mTail;
 
-			u32		mMinSize;
+			xsize_t	mMinSize;
 			u32		mMinAlign;
 
-			u32		min_size(u32 size) const			{ return x_intu::max(size, mMinSize); }
+			xsize_t	min_size(xsize_t size) const		{ return x_intu::max(size, mMinSize); }
 			u32		min_align(u32 align) const			{ return x_intu::max(align, mMinAlign); }
 		};
 
 		static void*	ptr_align(void* ptr, u32 alignment)
 		{
-			return (void*)(((u32)ptr + (alignment-1)) & ~(alignment-1));
+			return (void*)(((X_PTR_SIZED_INT)ptr + (alignment-1)) & ~(alignment-1));
 		}
 
-		static void		init(root *s, void *mem, u32 size, u32 default_minimum_size, u32 default_alignment)
+		static void		init(root *s, void *mem, xsize_t size, u32 default_minimum_size, u32 default_alignment)
 		{
 			s->mTail         = (node*)mem;
 			s->mMinSize      = x_intu::max( (xcore::u32)sizeof(node), default_minimum_size);
 			s->mMinAlign     = x_intu::max( (xcore::u32)sizeof(node), default_alignment);
+			s->mMinAlign     = x_intu::ceilPower2(s->mMinAlign);
 
 			s->mTail->mPrev  = NULL;
 			s->mTail->mNext  = NULL;
-			s->mTail->mSize  = size - sizeof(node);
+			s->mTail->mSize  = (u32)(size - sizeof(node));
 			s->mTail->mFlags = 0;
 		}
 
 		static inline 
-		u32				compute_size(node* cell, u32 size, u32 alignment)
+		xsize_t			compute_size(node* cell, xsize_t size, u32 alignment)
 		{
 			node* aligned_cell = node::from_ptr(ptr_align(cell->to_ptr(), alignment));
-			u32 offset = (u32)aligned_cell - (u32)cell;
+			u32 offset = (u32)((xbyte*)aligned_cell - (xbyte*)cell);
 			return offset + size;
 		}
 
@@ -77,7 +78,7 @@ namespace xcore
 		u32				align_node(node*& cell, u32 alignment)
 		{
 			node* aligned_cell = node::from_ptr(ptr_align(cell->to_ptr(), alignment));
-			u32 const offset = (u32)aligned_cell - (u32)cell;
+			u32 const offset = (u32)((xbyte*)aligned_cell - (xbyte*)cell);
 			if (offset != 0)
 			{
 				node* cell_prev = cell->mPrev;
@@ -93,12 +94,12 @@ namespace xcore
 			return offset;
 		}
 
-		static void*	allocate(root *s, u32 size, u32 alignment)
+		static void*	allocate(root *s, xsize_t size, u32 alignment)
 		{
 			node *c1, *c2, *c3;
 
 			size      = s->min_size(size);
-			size      = x_intu::alignUp(size, s->mMinAlign);
+			size      = x_intu::alignUp((s32)size, s->mMinAlign);
 
 			alignment = s->min_align(alignment);
 
@@ -150,14 +151,14 @@ namespace xcore
 
 			if (c2->mSize > (sizeof(node) + s->mMinSize + size))
 			{	// split new cell
-				c3 = (node*)(xmem_utils::ptr_add(c2->to_ptr(), size));
-				c3->mSize   = c2->mSize - size - sizeof(node);
+				c3 = (node*)(xmem_utils::ptr_add(c2->to_ptr(), (s32)size));
+				c3->mSize   = c2->mSize - (u32)size - sizeof(node);
 				c3->mFlags  = 0;
 				c3->mNext   = c2->mNext;
 				c3->mPrev   = c2;
 
 				c2->mNext   = c3;
-				c2->mSize = size;
+				c2->mSize   = (u32)size;
 				c2->set_used();
 			}
 			else
@@ -197,7 +198,7 @@ namespace xcore
 			}
 		}
 
-		static void*	reallocate(root* s, void* old_ptr, u32 new_size, u32 alignment)
+		static void*	reallocate(root* s, void* old_ptr, xsize_t new_size, u32 alignment)
 		{
 			void* p = NULL;
 			if (old_ptr==NULL)
@@ -249,7 +250,7 @@ namespace xcore
 			return "Simple first-fit allocator";
 		}
 
-		virtual void*			allocate(u32 size, u32 alignment)
+		virtual void*			allocate(xsize_t size, u32 alignment)
 		{
 			++mAllocationCount;
 			void* p = ffa::allocate(&mRoot, size, alignment);
@@ -258,12 +259,12 @@ namespace xcore
 			return p;
 		}
 
-		virtual void*			reallocate(void* ptr, u32 size, u32 alignment)
+		virtual void*			reallocate(void* ptr, xsize_t size, u32 alignment)
 		{
 			void* p = ffa::allocate(&mRoot, size, alignment);
 
 			ffa::node* ptr_node = ffa::node::from_ptr(ptr);
-			x_memcpy(p, ptr, ptr_node->mSize < size ? ptr_node->mSize : size);
+			x_memcpy(p, ptr, ptr_node->mSize < (u32)size ? ptr_node->mSize : (u32)size);
 
 			ffa::deallocate(&mRoot, ptr);
 
