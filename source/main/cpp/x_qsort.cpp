@@ -139,15 +139,15 @@ namespace xcore
 		}
 
 		pn = (xbyte*) a + n * es;
-		r = __xqsort_MIN(pa - (xbyte*)a, pb - pa);
+		r = (s32)(__xqsort_MIN(pa - (xbyte*)a, pb - pa));
 		__xqsort_VecSwap((xbyte*)a, pb - r, r);
-		r = __xqsort_MIN(pd - pc, pn - pd - es);
+		r = (s32)(__xqsort_MIN(pd - pc, pn - pd - es));
 		__xqsort_VecSwap(pb, pn - r, r);
 
-		if ((r = pb - pa) > es)
+		if ((r = (s32)(pb - pa)) > es)
 			xqsort((xbyte*)a, r / es, es, cmp, data);
 	
-		if ((r = pd - pc) > es)
+		if ((r = (s32)(pd - pc)) > es)
 		{ 
 			// Iterate rather than recurse to save stack space
 			a = pn - r;

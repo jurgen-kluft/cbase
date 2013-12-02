@@ -43,7 +43,7 @@ public:
 
 	virtual const char*	name() const											{ return "indexed array allocator"; }
 
-	virtual void*		allocate(u32 size, u32 align)
+	virtual void*		allocate(xsize_t size, u32 align)
 	{
 		ASSERT(size < mSizeOfObject);
 		void* p;
@@ -51,7 +51,7 @@ public:
 		return p;
 	}
 
-	virtual void*		reallocate(void* old_ptr, u32 new_size, u32 new_alignment)
+	virtual void*		reallocate(void* old_ptr, xsize_t new_size, u32 new_alignment)
 	{
 		ASSERT(new_size <= mSizeOfObject);
 		return old_ptr;

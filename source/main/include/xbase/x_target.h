@@ -1427,12 +1427,12 @@ namespace xcore
 	 *  Make sure we have defined the architecture type, PLATFORM_32BIT or PLATFORM_64BIT
 	 *
 	 */
-	#ifndef VALID_TARGET
+	#ifdef VALID_TARGET
 		#if !defined(PLATFORM_32BIT) && !defined(PLATFORM_64BIT)
 			// define it by checking sizeof(void*)
-			#if (sizeof(void*) == 4)
+			#if !defined(_M_X64)
 				#define TARGET_32BIT
-			#elif (sizeof(void*) == 8)
+			#elif defined(_M_X64)
 				#define TARGET_64BIT
 			#else
 				#error x_target, error; Unknown target architecture type, only 32-bit or 64-bit are supported
@@ -1662,12 +1662,18 @@ namespace xcore
 		#define X_UINT128                     __xuint128   
 		#define X_INT256                      __xint256
 		#define X_UINT256                     __xuint256
+#ifdef TARGET_64BIT
+		#define X_SIZE                        unsigned __int64
+		#define X_PTR_SIZED_INT               __int64
+		#define X_ALIGNMENT_DEFAULT           8
+#else
 		#define X_SIZE                        unsigned int
 		#define X_PTR_SIZED_INT               int
+		#define X_ALIGNMENT_DEFAULT           4
+#endif
 		#define X_LITTLE_ENDIAN               4321
 		#define X_FLOAT                       float
 		#define X_DOUBLE                      double
-		#define X_ALIGNMENT_DEFAULT           4
 		#define X_ALIGNMENT(a)                __declspec(align(a))
 
 		#define X_ALIGN_BEGIN(a)              __declspec(align(a))
@@ -1678,12 +1684,6 @@ namespace xcore
 		#pragma inline_depth(255)
 
 		#define X_THREAD_LOCAL                __declspec(thread)
-
-		#ifdef _WIN64
-			#define X_TARGET_64BIT
-		#else
-			#define X_TARGET_32BIT
-		#endif
 		
 		/// disable useless warnings
 		#pragma warning(disable:4800)
