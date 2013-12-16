@@ -2,23 +2,31 @@ namespace x_f32u
 {
     inline s32        toS32(f32 inNumber)
     {
+#ifdef TARGET_32BIT
         s32 retv;
         __asm {
             fld inNumber
-                fistp retv
+            fistp retv
         }
         return retv;
+#else
+		return (s32)inNumber;
+#endif
     }
 
     inline u32        toU32(f32 inNumber)
     { 
+#ifdef TARGET_32BIT
         u32 retv;
         __asm {
             fld inNumber
-                fistp retv
+            fistp retv
         }
         return retv;
-    }
+#else
+		return (s32)inNumber;
+#endif
+	}
 
 	/**
      * Function IsLessPositive. 

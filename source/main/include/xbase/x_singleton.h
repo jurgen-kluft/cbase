@@ -48,9 +48,9 @@ namespace xcore
 		template <class T>
 		static void singleton_create(T*& ptr)
 		{
-			static xcore::s32 _memblock[ (((sizeof(T)/T::SINGLETON_ALIGNMENT)+2) * T::SINGLETON_ALIGNMENT) / 4 ];
-			u32 const a = T::SINGLETON_ALIGNMENT;
-			void* mem = (void*)(((u32)_memblock + (a-1)) & ~(a-1));
+			static xcore::s64 _memblock[ ((((sizeof(T)+2*T::SINGLETON_ALIGNMENT-1)/T::SINGLETON_ALIGNMENT) * T::SINGLETON_ALIGNMENT) + 7) / 8 ];
+			X_PTR_SIZED_INT const a = T::SINGLETON_ALIGNMENT;
+			void* mem = (void*)(((X_PTR_SIZED_INT)_memblock + (a-1)) & ~(a-1));
 			ptr = new (mem) T();
 		}
 
@@ -181,7 +181,7 @@ namespace xcore
 			return (T*)sSingleton;
 		}
 	public:
-							xsingleton()			{ }
+		inline				xsingleton()			{ }
 
 		/**
 		* Provide access to the single instance through double-checked locking 

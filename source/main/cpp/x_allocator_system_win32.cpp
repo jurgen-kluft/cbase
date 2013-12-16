@@ -37,14 +37,14 @@ namespace xcore
 			return "win32 system allocator";
 		}
 
-		virtual void*			allocate(u32 size, u32 alignment)
+		virtual void*			allocate(xsize_t size, u32 alignment)
 		{
 			void* mem = _aligned_malloc(size, alignment);
 			++mAllocationCount;
 			return mem;
 		}
 
-		virtual void*			reallocate(void* ptr, u32 size, u32 alignment)
+		virtual void*			reallocate(void* ptr, xsize_t size, u32 alignment)
 		{
 			if (ptr == NULL)
 				return allocate(size, alignment);
@@ -67,7 +67,7 @@ namespace xcore
 			mAllocationCount = 0;
 		}
 
-		void*					operator new(u32 num_bytes, void* mem)		{ return mem; }
+		void*					operator new(xsize_t num_bytes, void* mem)		{ return mem; }
 		void					operator delete(void* pMem, void* )			{ }
 
 		s32						mInitialized;

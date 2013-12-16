@@ -47,8 +47,8 @@ namespace xcore
 	public:
 		virtual const char*	name() const = 0;								///< The name of the allocator
 
-		virtual void*		allocate(u32 size, u32 align) = 0;				///< Allocate memory with alignment
-		virtual void*		reallocate(void* p, u32 size, u32 align) = 0;	///< Reallocate memory
+		virtual void*		allocate(xsize_t size, u32 align) = 0;			///< Allocate memory with alignment
+		virtual void*		reallocate(void* p, xsize_t size, u32 align) = 0;///< Reallocate memory
 		virtual void		deallocate(void* p) = 0;						///< Deallocate/Free memory
 
 		virtual void		release() = 0;									///< Release/Destruct this allocator
