@@ -24,10 +24,12 @@ UNITTEST_SUITE_BEGIN(xallocator)
 
         UNITTEST_TEST(_XCORE_CLASS_PLACEMENT_NEW_DELETE)
         {
+#ifdef TARGET_DEBUG
 			for (s32 i=0; i<2; ++i)
 			{
 				CHECK_THROW(XASSERT(false), UnitTest::AssertException);
 			}
+#endif
 
 			void* object1_tmp = gTestAllocator->allocate(sizeof(test_object1),4);
 			test_object1* object1 = new(object1_tmp) test_object1;
@@ -183,7 +185,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 				,52  ,14  ,99  ,21  ,94  ,17  ,29  , 0  ,88  ,47				
 			};
 
-			u32 mem_size = 16 * 1024;
+			u32 mem_size = 32 * 1024;
 			void* mem_begin = gTestAllocator->allocate(mem_size, 4);
 			x_iallocator* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
 

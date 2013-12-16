@@ -30,16 +30,16 @@ namespace xcore
 		static void*		memmove(void* inDest, const void* inSrc, u32 inLength);
 
 		///@name Pointer arithmetic
-		static void*		ptr_add(void* ptr, s32 size)										{ return (void*)((u32)ptr + size); }
+		static void*		ptr_add(void* ptr, s32 size)										{ return (void*)((xbyte*)ptr + size); }
 		static void*		ptr_add_clamp(void* ptr, s32 size, void* lower, void* upper)
 		{
-			void* p = (void*)((u32)ptr + size);
+			void* p = (void*)((xbyte*)ptr + size);
 			if      (p < lower) p = lower;
 			else if (p > upper) p = upper;
 			return p;
 		}
-		static void*		ptr_align(void* ptr, u32 alignment)									{ return (void*)(((u32)ptr + (alignment-1)) & ~(alignment-1)); }
-		static s32			ptr_diff(void* ptr, void* other)									{ u32 d = (u32)other - (u32)ptr; return (s32)d; }
+		static void*		ptr_align(void* ptr, u32 alignment)									{ return (void*)(((X_PTR_SIZED_INT)ptr + (X_PTR_SIZED_INT)(alignment-1)) & ~((X_PTR_SIZED_INT)(alignment-1))); }
+		static s32			ptr_diff(void* ptr, void* other)									{ X_PTR_SIZED_INT d = (xbyte*)other - (xbyte*)ptr; return (s32)d; }
 
 		///@name Conversion
 		static s64			toKb(s64 inNumBytes)												{ return (inNumBytes + (s64)512) / (s64)1024; }
