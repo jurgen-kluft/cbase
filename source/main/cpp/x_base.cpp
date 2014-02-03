@@ -5,6 +5,7 @@
 
 namespace xbase
 {
+#ifdef X_ASSERT
 	void			x_Init()
 	{
 		xcore::x_asserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
@@ -14,6 +15,15 @@ namespace xbase
 	{
 		xcore::x_asserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
 	}
+#else
+	void			x_Init()
+	{
+	}
+
+	void			x_Exit()
+	{
+	}
+#endif
 };
 
 
