@@ -17,7 +17,6 @@ namespace xcore
 			, mDefaultAlignment(4)
 			, mAllocationCount(0)
 		{
-
 		}
 
 		void					init() 
