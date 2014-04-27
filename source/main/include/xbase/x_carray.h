@@ -15,45 +15,50 @@
 //==============================================================================
 namespace xcore
 {
-	template<class T, s32 N>
+	template<class T>
 	class xcarray
 	{
-		enum
-		{
-			SIZE = N
-		};
 	public:
-		inline			xcarray() : mSize(0)					{ }
+		inline				xcarray() : mLen(0), mSize(0), mArray(0)		{ }
+		inline				xcarray(T* _array, u32 _size) : mLen(0), mSize(_size), mArray(_array)	{ }
 
-		inline void		clear()									{ mSize = 0; }
+		inline void			clear()									{ mLen = 0; }
 
-		inline s32		size() const							{ return mSize; }
-		inline s32		reserved() const						{ return SIZE; }
-		inline bool		empty() const							{ return mSize == 0; }
-		inline bool		full() const							{ return mSize == SIZE; }
+		inline u32			max() const								{ return mSize; }
+		inline u32			size() const								{ return mLen; }
+		inline u32			reserved() const							{ return mSize; }
+		inline bool			empty() const							{ return mLen == 0; }
+		inline bool			full() const								{ ASSERT(mLen<=mSize); return mLen == mSize; }
 
-		inline void		push_back(T const& item)				{ ASSERT(mSize<SIZE); mArray[mSize++] = item; }
-		inline bool		pop_back(T & out_item)					{ if (mSize>0) { out_item = mArray[--mSize]; return true; } return false; }
+		inline void			push_back(T const& item)					{ ASSERT(mLen<mSize); mArray[mLen++] = item; }
+		inline bool			pop_back(T & out_item)					{ if (mLen>0) { out_item = mArray[--mLen]; return true; } else return false; }
 
-		inline T&		operator [] (s32 index)					{ ASSERT(index<mSize); return mArray[index]; }
-		inline T const&	operator [] (s32 index) const			{ ASSERT(index<mSize); return mArray[index]; }
+		inline char const*	begin() const							{ return mArray; }
+		inline char const*	end() const								{ return &mArray[mLen]; }
 
-		s32				index_of(T const& item) const;
+		inline T&			operator [] (s32 index)					{ ASSERT(index<(s32)mLen); return mArray[index]; }
+		inline T const&		operator [] (s32 index) const			{ ASSERT(index<(s32)mLen); return mArray[index]; }
 
-		void			swap(s32 a, s32 b);
-		void			remove(s32 i);
-		void			swap_remove(s32 i);
+		inline T&			operator * ()							{ ASSERT(mLen<mSize); return mArray[mLen]; }
+		inline xcarray<T>	operator ++ (s32)						{ ASSERT(mLen<mSize); xcarray<T> c(&mArray[mLen], mSize-mLen); ++mLen; return c; }
+
+		s32					index_of(T const& item) const;
+
+		void					swap(u32 a, u32 b);
+		void					remove(u32 i);
+		void					swap_remove(u32 i);
 
 	private:
-		s32				mSize;
-		T				mArray[SIZE];
+		u32					mLen;
+		u32					mSize;
+		T*					mArray;
 	};
 
-	template<class T, s32 N>
-	inline s32			xcarray<T,N>::index_of(T const& item) const
+	template<class T>
+	inline s32			xcarray<T>::index_of(T const& item) const
 	{
 		s32 f = -1;
-		for (s32 i=0; i<mSize; ++i)
+		for (u32 i=0; i<mLen; ++i)
 		{
 			if (mArray[i] == item)
 			{
@@ -64,31 +69,37 @@ namespace xcore
 		return f;
 	}
 
-	template<class T, s32 N>
-	inline void			xcarray<T,N>::swap(s32 a, s32 b)
+	template<class T>
+	inline void			xcarray<T>::swap(u32 a, u32 b)
 	{
-		ASSERT (a < mSize && b < mSize);
+		ASSERT (a < mLen && b < mLen);
 		T temp = mArray[a];
 		mArray[a] = mArray[b];
 		mArray[b] = temp;
 	}
 
-	template<class T, s32 N>
-	inline void			xcarray<T,N>::remove(s32 index)
+	template<class T>
+	inline void			xcarray<T>::remove(u32 index)
 	{
-		s32 const s = index + 1;
-		for (s32 i = s; i < mSize; ++i)
-			mArray[i-1] = mArray[i];
-		mSize -= 1;
+		if (index < mLen)
+		{
+			s32 const s = index + 1;
+			for (u32 i = s; i < mLen; ++i)
+				mArray[i-1] = mArray[i];
+			mLen -= 1;
+		}
 	}
 
-	template<class T, s32 N>
-	inline void			xcarray<T,N>::swap_remove(s32 index)
+	template<class T>
+	inline void			xcarray<T>::swap_remove(u32 index)
 	{
-		mSize -= 1;
-		if (index < mSize)
+		if (mLen > 0)
 		{
-			mArray[index] = mArray[mSize];
+			mLen -= 1;
+			if (index < mLen)
+			{
+				mArray[index] = mArray[mLen];
+			}
 		}
 	}
 };

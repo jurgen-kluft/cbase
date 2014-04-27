@@ -2021,12 +2021,12 @@ namespace xcore
 		#define X_ALIGNMENT_DEFAULT        4
 		#define X_ALIGNMENT(a)             __declspec(align(a))
 
-		#define X_ALIGN_BEGIN(a)		   __declspec(align(a))           
+		#define X_ALIGN_BEGIN(a)			   __declspec(align(a))           
 		#define X_ALIGN_END(a)                
 
-		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
+		#define X_OFFSET_OF(type, member)  (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
 
-		#define X_THREAD_LOCAL            __declspec(thread)
+		#define X_THREAD_LOCAL             __declspec(thread)
 
 	#else
 		#error x_target, error; no compiler selected
@@ -2143,9 +2143,9 @@ namespace xcore
 		#define NULL        0
 	#endif
 
-	typedef		unsigned	X_INT8   			u8;
-	typedef		unsigned	X_INT16  			u16;
-	typedef		unsigned	X_INT32  			u32;
+	typedef		unsigned		X_INT8   			u8;
+	typedef		unsigned		X_INT16  			u16;
+	typedef		unsigned		X_INT32  			u32;
 	typedef					X_UINT64 			u64;
 	typedef					X_UINT128			u128;
 	typedef					X_UINT256			u256;
@@ -2160,9 +2160,10 @@ namespace xcore
 	typedef					X_BYTE   			xbyte;
 	typedef					X_SIZE   			xalloc_size;
 	typedef					X_BOOL				xbool32;
-	typedef					bool				xbool;
+	typedef					bool					xbool;
 	typedef					X_SIZE				xsize_t;
-	typedef		unsigned	X_INT8   			xtchar;
+	typedef					X_PTR_SIZED_INT		uptr;
+	typedef		unsigned		X_INT8   			xtchar;
 	typedef					X_WCHAR  			xwchar;
 
 	#define					XCAST(to, from)		((to)(from))
@@ -2175,14 +2176,14 @@ namespace xcore
 	// Min/Max values
 	//==============================================================================
 
-	const u8						xU8Min = (u8) 0x00;							///< minimum value of a u8.
-	const u8						xU8Max = (u8) 0xFF;							///< maximum value of a u8.
-	const s8						xS8Min = (s8) -0x80;						///< minimum value of a s8.
-	const s8						xS8Max = (s8) 0x7F;							///< maximum value of a s8.
+	const u8							xU8Min = (u8) 0x00;							///< minimum value of a u8.
+	const u8							xU8Max = (u8) 0xFF;							///< maximum value of a u8.
+	const s8							xS8Min = (s8) -0x80;							///< minimum value of a s8.
+	const s8							xS8Max = (s8) 0x7F;							///< maximum value of a s8.
 
 	const u16						xU16Min = (u16) 0x0000;						///< minimum value of a u16
 	const u16						xU16Max = (u16) 0xFFFF;						///< maximum value of a u16.
-	const s16						xS16Min = (s16) -0x8000;					///< minimum value of a s16.
+	const s16						xS16Min = (s16) -0x8000;						///< minimum value of a s16.
 	const s16						xS16Max = (s16) 0x7FFF;						///< maximum value of a s16.
 
 	const u32						xU32Min = (u32) 0x00000000;					///< minimum value of a u32.
@@ -2197,10 +2198,10 @@ namespace xcore
 
 	const f32						xF32Min = (f32) 1.175494351e-38f;			///< minimum value of a f32.
 	const f32						xF32Max = (f32) 3.402823466e+38f;			///< maximum value of a f32.
-	const f32                       xF32Eps = (f32) 0.0001f;					///< default epsilon generally good to check values in the range [0 - 1], normalisations, dot products and such.
+	const f32                       xF32Eps = (f32) 0.0001f;						///< default epsilon generally good to check values in the range [0 - 1], normalisations, dot products and such.
 
-	const f64						xF64Min = (f64) 2.2250738585072014e-308;	///< minimum value of a f64.
-	const f64						xF64Max = (f64) 1.7976931348623158e+308;	///< maximum value of a f64.
+	const f64						xF64Min = (f64) 2.2250738585072014e-308;		///< minimum value of a f64.
+	const f64						xF64Max = (f64) 1.7976931348623158e+308;		///< maximum value of a f64.
 
 	//==============================================================================
 	//  HANDLE BOOL 

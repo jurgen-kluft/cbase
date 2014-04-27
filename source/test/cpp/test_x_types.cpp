@@ -7,17 +7,17 @@ using namespace xcore;
 
 UNITTEST_SUITE_BEGIN(xtypes)
 {
-    UNITTEST_FIXTURE(main)
-    {
-        UNITTEST_FIXTURE_SETUP() {}
-        UNITTEST_FIXTURE_TEARDOWN() {}
+	UNITTEST_FIXTURE(main)
+	{
+		UNITTEST_FIXTURE_SETUP() {}
+		UNITTEST_FIXTURE_TEARDOWN() {}
 
 		static void sTypeOf_xbool_IsUnique(xbool a) { }
 		static void sTypeOf_xbool_IsUnique(s32 a) { }
 		static void sTypeOf_xbool_IsUnique(u32 a) { }
 
-        UNITTEST_TEST(type_size_check)
-        {
+		UNITTEST_TEST(type_size_check)
+		{
 			sTypeOf_xbool_IsUnique(xbool(0));
 			sTypeOf_xbool_IsUnique(s32(0));
 			sTypeOf_xbool_IsUnique(u32(0));
@@ -44,7 +44,7 @@ UNITTEST_SUITE_BEGIN(xtypes)
 			CHECK_TRUE(sizeof(f32) == 4);
 			CHECK_TRUE(sizeof(f64) == 8);
 			CHECK_TRUE(sizeof(xbool32) == 4);
-			CHECK_TRUE(sizeof(xbool) == 4);
+			CHECK_TRUE(sizeof(xbool) == 4 || sizeof(xbool) == 1);
 		}
 	}
 }
