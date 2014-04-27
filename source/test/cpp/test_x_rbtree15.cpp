@@ -11,7 +11,7 @@ class x_iidx_array_allocator : public x_iidx_allocator
 	xbyte*			mObjectArrayEnd;
 	u32				mObjectArraySize;
 	u32				mSizeOfObject;
-	u32*			mFreeObjectList;
+	u32*				mFreeObjectList;
 	u32				mAllocCount;
 
 	enum { NILL_IDX = 0xffffffff };
@@ -76,12 +76,12 @@ public:
 			return NILL_IDX;
 		}
 
-		u32 idx = ((u32)mFreeObjectList - (u32)mObjectArray) / mSizeOfObject;
+		u32 idx = (u32)(((uptr)mFreeObjectList - (uptr)mObjectArray) / (uptr)mSizeOfObject);
 		p = (void*)mFreeObjectList;
 
 		u32 next_object = *mFreeObjectList;
 		if (next_object != NILL_IDX)
-			mFreeObjectList = (u32*)((u32)mObjectArray + (next_object * mSizeOfObject));
+			mFreeObjectList = (u32*)(mObjectArray + (next_object * mSizeOfObject));
 		else
 			mFreeObjectList = NULL;
 
@@ -94,7 +94,7 @@ public:
 		if (idx == NILL_IDX)
 			return NULL;
 		ASSERT(mObjectArray!=NULL && idx < mObjectArraySize);
-		void* p = (void*)((u32)mObjectArray + (mSizeOfObject * idx));
+		void* p = (void*)(mObjectArray + (mSizeOfObject * idx));
 		return p;
 	}
 
@@ -129,7 +129,7 @@ public:
 		ASSERT(mObjectArray!=NULL && mObjectArrayEnd!=NULL);
 		if ((xbyte*)p >= mObjectArray && (xbyte*)p < mObjectArrayEnd)
 		{
-			u32 idx = ((u32)p - (u32)mObjectArray) / mSizeOfObject;
+			u32 idx = (u32)(((uptr)p - (uptr)mObjectArray) / (uptr)mSizeOfObject);
 			return idx;
 		}
 		else
@@ -161,13 +161,13 @@ inline u16		alloc_node(x_iidx_array_allocator* a, mynode*& p)
 
 UNITTEST_SUITE_BEGIN(xrbtree15)
 {
-    UNITTEST_FIXTURE(main)
-    {
-        UNITTEST_FIXTURE_SETUP() {}
-        UNITTEST_FIXTURE_TEARDOWN() {}
+	UNITTEST_FIXTURE(main)
+	{
+		UNITTEST_FIXTURE_SETUP() {}
+		UNITTEST_FIXTURE_TEARDOWN() {}
 
-        UNITTEST_TEST(one_node)
-        {
+		UNITTEST_TEST(one_node)
+		{
 			mynode	node_array[16];
 			x_iidx_array_allocator a(node_array, 16, sizeof(mynode));
 

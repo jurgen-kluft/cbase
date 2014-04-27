@@ -10,9 +10,11 @@ UNITTEST_SUITE_BEGIN(xcarray)
 		UNITTEST_FIXTURE_SETUP() {}
 		UNITTEST_FIXTURE_TEARDOWN() {}
 
+		static s32	array_data[64];
+
 		UNITTEST_TEST(construct)
 		{
-			xcarray<s32, 5> a;
+			xcarray<s32> a(array_data, 5);
 
 			CHECK_EQUAL(0, a.size());
 			CHECK_EQUAL(5, a.reserved());
@@ -20,7 +22,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(push_back)
 		{
-			xcarray<s32, 5> a;
+			xcarray<s32> a(array_data, 5);
 
 			CHECK_EQUAL(0, a.size());
 			CHECK_EQUAL(5, a.reserved());
@@ -33,7 +35,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(pop_back)
 		{
-			xcarray<s32, 5> a;
+			xcarray<s32> a(array_data, 5);
 
 			CHECK_EQUAL(0, a.size());
 			CHECK_EQUAL(5, a.reserved());
@@ -47,7 +49,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(push_and_pop_back)
 		{
-			xcarray<s32, 5> a;
+			xcarray<s32> a(array_data, 5);
 
 			CHECK_EQUAL(0, a.size());
 			CHECK_EQUAL(5, a.reserved());
@@ -66,8 +68,8 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(operator_index)
 		{
-			xcarray<s32, 10> a;
-			for (s32 i=0; i<a.reserved(); ++i)
+			xcarray<s32> a(array_data, 10);
+			for (u32 i=0; i<a.reserved(); ++i)
 				a.push_back(i);
 
 			a[0] += 10;
@@ -77,8 +79,8 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(index_of)
 		{
-			xcarray<s32, 10> a;
-			for (s32 i=0; i<a.reserved(); ++i)
+			xcarray<s32> a(array_data, 10);
+			for (u32 i=0; i<a.reserved(); ++i)
 				a.push_back(i);
 
 			s32 i1 = a.index_of(5);
@@ -87,8 +89,8 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(swap)
 		{
-			xcarray<s32, 10> a;
-			for (s32 i=0; i<a.reserved(); ++i)
+			xcarray<s32> a(array_data, 10);
+			for (u32 i=0; i<a.reserved(); ++i)
 				a.push_back(i);
 
 			a.swap(4, 7);
@@ -98,8 +100,8 @@ UNITTEST_SUITE_BEGIN(xcarray)
 		
 		UNITTEST_TEST(remove)
 		{
-			xcarray<s32, 10> a;
-			for (s32 i=0; i<a.reserved(); ++i)
+			xcarray<s32> a(array_data, 10);
+			for (u32 i=0; i<a.reserved(); ++i)
 				a.push_back(i);
 
 			CHECK_EQUAL(10, a.size());
@@ -122,8 +124,8 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(swap_remove)
 		{
-			xcarray<s32, 10> a;
-			for (s32 i=0; i<a.reserved(); ++i)
+			xcarray<s32> a(array_data, 10);
+			for (u32 i=0; i<a.reserved(); ++i)
 				a.push_back(i);
 
 			CHECK_EQUAL(10, a.size());

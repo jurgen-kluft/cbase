@@ -50,7 +50,7 @@ namespace xcore
 
 		static void*	ptr_align(void* ptr, u32 alignment)
 		{
-			return (void*)(((X_PTR_SIZED_INT)ptr + (alignment-1)) & ~(alignment-1));
+			return (void*)(((X_PTR_SIZED_INT)ptr + (X_PTR_SIZED_INT)(alignment-1)) & ~((X_PTR_SIZED_INT)(alignment-1)));
 		}
 
 		static void		init(root *s, void *mem, xsize_t size, u32 default_minimum_size, u32 default_alignment)

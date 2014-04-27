@@ -55,17 +55,17 @@ namespace xcore
                     
         #define				x_LogMessage		xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogMessage
         #define				x_LogWarning		xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogWarning
-        #define				x_LogError			xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogError
+        #define				x_LogError		xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogError
 	#else
-		inline void			x_LogPush			(const char* fileName, s32 lineNum){}
-		inline void			x_LogFlush			(void){}
+		inline void			x_LogPush		(const char* fileName, s32 lineNum){}
+		inline void			x_LogFlush		(void){}
 
         inline void			__x_LogFake	    	(const char* channel, const char* message){}
         inline void			__x_LogFake 		(const char* channel, const char* messageFormat, const x_va_list& formatVars){}
 
         #define				x_LogMessage		xcore::__x_LogFake
         #define				x_LogWarning		xcore::__x_LogFake
-        #define				x_LogError			xcore::__x_LogFake
+        #define				x_LogError		xcore::__x_LogFake
 	#endif
 
 
