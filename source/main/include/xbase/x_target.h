@@ -2146,98 +2146,28 @@ namespace xcore
 	typedef		unsigned		X_INT8   			u8;
 	typedef		unsigned		X_INT16  			u16;
 	typedef		unsigned		X_INT32  			u32;
-	typedef						X_UINT64 			u64;
-	typedef						X_UINT128			u128;
-	typedef						X_UINT256			u256;
-	typedef		signed			X_INT8   			s8;
-	typedef		signed			X_INT16  			s16;
-	typedef		signed			X_INT32  			s32;
-	typedef						X_INT64  			s64;
-	typedef						X_INT128 			s128;
-	typedef						X_INT256 			s256;
-	typedef						X_FLOAT  			f32;
-	typedef						X_DOUBLE 			f64;
-	typedef						X_BYTE   			xbyte;
-	typedef						X_BOOL				xbool32;
-	typedef						bool				xbool;
-	typedef						X_SIZE				xsize_t;
-	typedef						X_PTR_SIZED_INT		uptr;
-
-	//==============================================================================
-	// UTF 8, 16, 32
-	struct uchar8
-	{
-		static const u32 null = 0;
-
-		inline					uchar8() : c(null) {}
-		inline explicit			uchar8(u32 _c) : c(_c) {}
-
-		inline bool				operator <  (const uchar8& _other) const		{ return c < _other.c; }
-		inline bool				operator >  (const uchar8& _other) const		{ return c > _other.c; }
-		inline bool				operator <= (const uchar8& _other) const		{ return c <= _other.c; }
-		inline bool				operator >= (const uchar8& _other) const		{ return c >= _other.c; }
-		inline bool				operator == (const uchar8& _other) const		{ return c == _other.c; }
-		inline bool				operator != (const uchar8& _other) const		{ return c != _other.c; }
-
-		u32		c; 
-	};
-
-	#pragma pack(push, 1)
-	struct ustr8	// UTF-8 string
-	{
-		u8 c;
-	};
-	#pragma pack(pop)
-
-	struct uchar16
-	{
-		static const u32 null = 0;
-
-		inline					uchar16() : c(null) {}
-		inline explicit			uchar16(u32 _c) : c(_c) {}
-
-		inline bool				operator <  (const uchar16& _other) const		{ return c < _other.c; }
-		inline bool				operator >  (const uchar16& _other) const		{ return c > _other.c; }
-		inline bool				operator <= (const uchar16& _other) const		{ return c <= _other.c; }
-		inline bool				operator >= (const uchar16& _other) const		{ return c >= _other.c; }
-		inline bool				operator == (const uchar16& _other) const		{ return c == _other.c; }
-		inline bool				operator != (const uchar16& _other) const		{ return c != _other.c; }
-
-		u32		c; 
-	};
-
-	#pragma pack(push, 2)
-	struct ustr16	// UTF-16 string
-	{
-		u16 c;
-	};
-	#pragma pack(pop)
-
-	struct uchar32
-	{ 
-		static const u32 null = 0;
-
-		inline					uchar32() : c(null) {}
-		inline explicit			uchar32(u32 _c) : c(_c) {}
-
-		inline bool				operator <  (const uchar32& _other) const		{ return c < _other.c; }
-		inline bool				operator >  (const uchar32& _other) const		{ return c > _other.c; }
-		inline bool				operator <= (const uchar32& _other) const		{ return c <= _other.c; }
-		inline bool				operator >= (const uchar32& _other) const		{ return c >= _other.c; }
-		inline bool				operator == (const uchar32& _other) const		{ return c == _other.c; }
-		inline bool				operator != (const uchar32& _other) const		{ return c != _other.c; }
-
-		u32		c; 
-	};
-
-	struct ustr32	// UTF-32 string
-	{
-		u32 c;
-	};
-
-	//==============================================================================
-
-	#define						XCAST(to, from)		((to)(from))
+	typedef					X_UINT64 			u64;
+	typedef					X_UINT128			u128;
+	typedef					X_UINT256			u256;
+	typedef		signed      X_INT8   			s8;
+	typedef		signed      X_INT16  			s16;
+	typedef		signed      X_INT32  			s32;
+	typedef					X_INT64  			s64;
+	typedef					X_INT128 			s128;
+	typedef					X_INT256 			s256;
+	typedef					X_FLOAT  			f32;
+	typedef					X_DOUBLE 			f64;
+	typedef					X_BYTE   			xbyte;
+	typedef					X_SIZE   			xalloc_size;
+	typedef					X_BOOL				xbool32;
+	typedef					bool					xbool;
+	typedef					X_SIZE				xsize_t;
+	typedef					X_PTR_SIZED_INT		uptr;
+	typedef		unsigned		X_INT8   			uchar8;		// UTF8 character
+	typedef		unsigned		X_INT16   			uchar16;		// UTF16 character
+	typedef		unsigned		X_INT32  			uchar32;		// UTF32 character
+	
+	#define					XCAST(to, from)		((to)(from))
 
 	//DOM-IGNORE-END
 	//------------------------------------------------------------------------------
@@ -2247,14 +2177,14 @@ namespace xcore
 	// Min/Max values
 	//==============================================================================
 
-	const u8						xU8Min = (u8) 0x00;							///< minimum value of a u8.
-	const u8						xU8Max = (u8) 0xFF;							///< maximum value of a u8.
-	const s8						xS8Min = (s8) -0x80;						///< minimum value of a s8.
-	const s8						xS8Max = (s8) 0x7F;							///< maximum value of a s8.
+	const u8							xU8Min = (u8) 0x00;							///< minimum value of a u8.
+	const u8							xU8Max = (u8) 0xFF;							///< maximum value of a u8.
+	const s8							xS8Min = (s8) -0x80;							///< minimum value of a s8.
+	const s8							xS8Max = (s8) 0x7F;							///< maximum value of a s8.
 
 	const u16						xU16Min = (u16) 0x0000;						///< minimum value of a u16
 	const u16						xU16Max = (u16) 0xFFFF;						///< maximum value of a u16.
-	const s16						xS16Min = (s16) -0x8000;					///< minimum value of a s16.
+	const s16						xS16Min = (s16) -0x8000;						///< minimum value of a s16.
 	const s16						xS16Max = (s16) 0x7FFF;						///< maximum value of a s16.
 
 	const u32						xU32Min = (u32) 0x00000000;					///< minimum value of a u32.
@@ -2269,10 +2199,10 @@ namespace xcore
 
 	const f32						xF32Min = (f32) 1.175494351e-38f;			///< minimum value of a f32.
 	const f32						xF32Max = (f32) 3.402823466e+38f;			///< maximum value of a f32.
-	const f32                       xF32Eps = (f32) 0.0001f;					///< default epsilon generally good to check values in the range [0 - 1], normalisations, dot products and such.
+	const f32                       xF32Eps = (f32) 0.0001f;						///< default epsilon generally good to check values in the range [0 - 1], normalisations, dot products and such.
 
-	const f64						xF64Min = (f64) 2.2250738585072014e-308;	///< minimum value of a f64.
-	const f64						xF64Max = (f64) 1.7976931348623158e+308;	///< maximum value of a f64.
+	const f64						xF64Min = (f64) 2.2250738585072014e-308;		///< minimum value of a f64.
+	const f64						xF64Max = (f64) 1.7976931348623158e+308;		///< maximum value of a f64.
 
 	//==============================================================================
 	//  HANDLE BOOL 
