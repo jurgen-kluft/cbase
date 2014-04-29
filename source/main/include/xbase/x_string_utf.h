@@ -14,28 +14,28 @@
 #include "xbase\x_carray.h"
 
 /**
- * xCore namespace
- */
+* xCore namespace
+*/
 namespace xcore
 {
 	namespace utf
 	{
-		s32  		strlen		(ustr8 const* _str, ustr8 const** _end = 0);
-		s32  		strlen		(ustr16 const* _str, ustr16 const** _end = 0);
+		s32  		strlen		(ustr8 const* _str, ustr8 const** _end = NULL);
+		s32  		strlen		(ustr16 const* _str, ustr16 const** _end = NULL);
 
-		u32			numBytes	(uchar8 _c);
-		u32			numBytes	(uchar16 _c);
+		u32			numBytes		(uchar8 _c);
+		u32			numBytes		(uchar16 _c);
 
 		s32			digest		(ustr8  const* _str, ustr8  const* _src_end, uchar8 & _out);
 		s32			digest		(ustr16 const* _str, ustr16 const* _src_end, uchar16& _out);
 
-		bool		isLegal		(uchar8  _c);
-		bool		isLegal		(uchar16 _c);
-		bool		isLegal		(const ustr8 * _src, const ustr8 * _src_end = NULL);
-		bool		isLegal		(const ustr16* _src, const ustr16* _src_end = NULL);
+		bool			isLegal		(uchar8  _c);
+		bool			isLegal		(uchar16 _c);
+		bool			isLegal		(const ustr8 * _src, const ustr8 * _src_end = NULL);
+		bool			isLegal		(const ustr16* _src, const ustr16* _src_end = NULL);
 
-		bool		convert		(uchar16 _from, uchar8  _to);
-		bool		convert		(uchar8  _from, uchar16 _to);
+		bool			convert		(uchar16 _from, uchar8  _to);
+		bool			convert		(uchar8  _from, uchar16 _to);
 
 		s32			convert		(ustr8  const* _src, ustr8  const* _src_end, ustr16*& _dst, ustr16 const* _dst_end);
 		s32			convert		(ustr16 const* _src, ustr16 const* _src_end, ustr8 *& _dst, ustr8  const* _dst_end);
@@ -392,7 +392,7 @@ namespace xcore
 				s32 const srcn = digest(src, _src_end, ch8);
 				if (srcn<=0)
 					return srcn;
-				
+
 				uchar16 ch16;
 				if (!convert(ch8, ch16))
 					return -1;
