@@ -19,7 +19,7 @@ namespace xcore
 #else
 
 #include "xbase\x_va_list.h"
-#include "xbase\x_string_std.h"
+#include "xbase\x_string_ascii.h"
 #include "xbase\x_console.h"
 
 /**

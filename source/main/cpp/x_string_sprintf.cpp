@@ -4,7 +4,7 @@
 #include "xbase/x_limits.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_double.h"
-#include "xbase/x_string_std.h"
+#include "xbase/x_string_ascii.h"
 
 
 #ifdef TARGET_PC
@@ -16,7 +16,7 @@
 #elif defined(TARGET_PSP)
 	#include <math.h>
 #elif defined(TARGET_360)
-    #include <math.h>
+	#include <math.h>
 #elif defined(TARGET_N3DS)
 	#include <math.h>
 #else
@@ -91,7 +91,7 @@ namespace xcore
 		}
 
 		r = 1.0;
-	    
+		
 		//TODO: use while?
 		for (;;)
 		{
@@ -107,7 +107,7 @@ namespace xcore
 
 
 	/** 
-     *------------------------------------------------------------------------------
+	 *------------------------------------------------------------------------------
 	 * fmtbase - String where the output is going to go
 	 *          (Make sure that the string is at least 24 bytes long)
 	 * fpnum   - number which is going to be converted
@@ -126,13 +126,13 @@ namespace xcore
 
 		char    fwork[WORKSIZE];
 		char*   fw               = fwork;
-	       
+		   
 		 // setup integer part
 		char    iwork[WORKSIZE];
 		char*   iworkend         = &iwork[sizeof(iwork) - 1];
 		char*   iw               = iworkend;
 		*iw = 0;
-	      
+		  
 
 		// setup exponent part
 		char    ework[16];
@@ -370,7 +370,7 @@ namespace xcore
 				--exp;
 			}
 
-	        
+			
 
 			if (cvt == 'g')     // used up one digit for s32 part...
 			{
@@ -498,7 +498,7 @@ namespace xcore
 
 
 	/**
-     *------------------------------------------------------------------------------
+	 *------------------------------------------------------------------------------
 	 * Convert an unsigned long to ASCII for printf purposes, returning
 	 * a pointer to the first character of the string representation.
 	 * Octal numbers can be forced to have a leading zero; hex numbers
@@ -538,7 +538,7 @@ namespace xcore
 
 
 				/**
-                 * On many machines, unsigned arithmetic is harder than
+				 * On many machines, unsigned arithmetic is harder than
 				 * signed arithmetic, so we do at most one unsigned mod and
 				 * divide; this is sufficient to reduce the range of
 				 * the incoming value to where signed arithmetic works.
@@ -615,11 +615,11 @@ namespace xcore
 
 
 				/**
-                 * On many machines, unsigned arithmetic is harder than
+				 * On many machines, unsigned arithmetic is harder than
 				 * signed arithmetic, so we do at most one unsigned mod and
 				 * divide; this is sufficient to reduce the range of
 				 * the incoming value to where signed arithmetic works.
-                 */
+				 */
 
 				if (val > ((~(u64)0) >> 1))
 				{
@@ -752,7 +752,7 @@ namespace xcore
 
 	///< DOM-IGNORE-END
 
-    /**
+	/**
 	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
@@ -1000,7 +1000,7 @@ namespace xcore
 							temp = -temp;
 							sign = '-';
 						}
-	                    
+						
 						uqval = (u64)temp;
 					}
 					else
@@ -1016,7 +1016,7 @@ namespace xcore
 							temp = -temp;
 							sign = '-';
 						}
-	                    
+						
 						ulval = (u32)(temp);
 					}
 
@@ -1226,7 +1226,7 @@ namespace xcore
 
 		number:     if ((dprec = prec) >= 0)
 						flags &= ~ZEROPAD;
-	                
+					
 					// ``The result of converting a zero value with an
 					// explicit precision of zero is no characters.''
 					// -- ANSI X3J11
@@ -1264,7 +1264,7 @@ namespace xcore
 				}
 
 				/**
-                 * All reasonable formats wind up here.  at this point, `cp'
+				 * All reasonable formats wind up here.  at this point, `cp'
 				 * points to a string which (if not flags&LADJUST) should be
 				 * padded out to `width' places.  If flags&ZEROPAD, it should
 				 * first be prefixed by any sign or other prefix; otherwise,
@@ -1275,7 +1275,7 @@ namespace xcore
 				 * floating precision; finally, if LADJUST, pad with blanks.
 				 */
 
-                /**
+				/**
 				 * Compute actual size, so we know how much to pad.
 				 * size excludes decimal prec; realsz includes it.
 				 */

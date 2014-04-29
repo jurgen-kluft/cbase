@@ -45,6 +45,9 @@ UNITTEST_SUITE_BEGIN(xtypes)
 			CHECK_TRUE(sizeof(f64) == 8);
 			CHECK_TRUE(sizeof(xbool32) == 4);
 			CHECK_TRUE(sizeof(xbool) == 4 || sizeof(xbool) == 1);
+
+			CHECK_TRUE(sizeof(ustr8)  == 1);
+			CHECK_TRUE(sizeof(ustr16) == 2);
 		}
 	}
 }

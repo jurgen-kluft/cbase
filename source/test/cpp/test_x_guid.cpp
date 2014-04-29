@@ -1,5 +1,5 @@
 #include "xbase\x_guid.h"
-#include "xbase\x_string_std.h"
+#include "xbase\x_string_ascii.h"
 
 #include "xunittest\xunittest.h"
 
