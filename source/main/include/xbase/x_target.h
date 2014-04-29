@@ -1466,20 +1466,36 @@ namespace xcore
 	#endif
 
 	#if defined(TARGET_DEBUG)
-		#define TARGET_CONFIG_SHORT_STR		"_D"
+		#if defined(TARGET_TEST)
+			#define TARGET_CONFIG_SHORT_STR		"_TD"
+		#else
+			#define TARGET_CONFIG_SHORT_STR		"_D"	
+		#endif
 	#endif
 	#if defined(TARGET_RELEASE)
-		#define TARGET_CONFIG_SHORT_STR		"_R"
+		#if defined(TARGET_TEST)
+			#define TARGET_CONFIG_SHORT_STR		"_TR"
+		#else
+			#define TARGET_CONFIG_SHORT_STR		"_R"
+		#endif
 	#endif
 	#if defined(TARGET_FINAL)
 		#define TARGET_CONFIG_SHORT_STR		"_F"
 	#endif
 
 	#if defined(TARGET_DEBUG)
-		#define TARGET_CONFIG_FULL_STR		"_DEBUG"
+		#if defined(TARGET_TEST)
+			#define TARGET_CONFIG_FULL_STR		"_TESTDEBUG"
+		#else
+			#define TARGET_CONFIG_FULL_STR		"_DEBUG"
+		#endif
 	#endif
 	#if defined(TARGET_RELEASE)
-		#define TARGET_CONFIG_FULL_STR		"_RELEASE"
+		#if defined(TARGET_TEST)
+			#define TARGET_CONFIG_FULL_STR		"_TESTRELEASE"
+		#else
+			#define TARGET_CONFIG_FULL_STR		"_RELEASE"
+		#endif
 	#endif
 	#if defined(TARGET_FINAL)
 		#define TARGET_CONFIG_FULL_STR		"_FINAL"
@@ -2158,14 +2174,84 @@ namespace xcore
 	typedef					X_FLOAT  			f32;
 	typedef					X_DOUBLE 			f64;
 	typedef					X_BYTE   			xbyte;
-	typedef					X_SIZE   			xalloc_size;
 	typedef					X_BOOL				xbool32;
 	typedef					bool					xbool;
 	typedef					X_SIZE				xsize_t;
 	typedef					X_PTR_SIZED_INT		uptr;
-	typedef		unsigned		X_INT8   			uchar8;		// UTF8 character
-	typedef		unsigned		X_INT16   			uchar16;		// UTF16 character
-	typedef		unsigned		X_INT32  			uchar32;		// UTF32 character
+
+	//==============================================================================
+	// UTF 8, 16, 32
+	struct uchar8
+	{
+		static const u32 null = 0;
+
+		inline					uchar8() : c(null) {}
+		inline explicit			uchar8(u32 _c) : c(_c) {}
+
+		inline bool				operator <  (const uchar8& _other) const		{ return c < _other.c; }
+		inline bool				operator >  (const uchar8& _other) const		{ return c > _other.c; }
+		inline bool				operator <= (const uchar8& _other) const		{ return c <= _other.c; }
+		inline bool				operator >= (const uchar8& _other) const		{ return c >= _other.c; }
+		inline bool				operator == (const uchar8& _other) const		{ return c == _other.c; }
+		inline bool				operator != (const uchar8& _other) const		{ return c != _other.c; }
+
+		u32		c; 
+	};
+
+	#pragma pack(push, 1)
+	struct ustr8	// UTF-8 string
+	{
+		u8 c;
+	};
+	#pragma pack(pop)
+
+	struct uchar16
+	{
+		static const u32 null = 0;
+
+		inline					uchar16() : c(null) {}
+		inline explicit			uchar16(u32 _c) : c(_c) {}
+
+		inline bool				operator <  (const uchar16& _other) const		{ return c < _other.c; }
+		inline bool				operator >  (const uchar16& _other) const		{ return c > _other.c; }
+		inline bool				operator <= (const uchar16& _other) const		{ return c <= _other.c; }
+		inline bool				operator >= (const uchar16& _other) const		{ return c >= _other.c; }
+		inline bool				operator == (const uchar16& _other) const		{ return c == _other.c; }
+		inline bool				operator != (const uchar16& _other) const		{ return c != _other.c; }
+
+		u32		c; 
+	};
+
+	#pragma pack(push, 2)
+	struct ustr16	// UTF-16 string
+	{
+		u16 c;
+	};
+	#pragma pack(pop)
+
+	struct uchar32
+	{ 
+		static const u32 null = 0;
+
+		inline					uchar32() : c(null) {}
+		inline explicit			uchar32(u32 _c) : c(_c) {}
+
+		inline bool				operator <  (const uchar32& _other) const		{ return c < _other.c; }
+		inline bool				operator >  (const uchar32& _other) const		{ return c > _other.c; }
+		inline bool				operator <= (const uchar32& _other) const		{ return c <= _other.c; }
+		inline bool				operator >= (const uchar32& _other) const		{ return c >= _other.c; }
+		inline bool				operator == (const uchar32& _other) const		{ return c == _other.c; }
+		inline bool				operator != (const uchar32& _other) const		{ return c != _other.c; }
+
+		u32		c; 
+	};
+
+	struct ustr32	// UTF-32 string
+	{
+		u32 c;
+	};
+
+	//==============================================================================
 	
 	#define					XCAST(to, from)		((to)(from))
 

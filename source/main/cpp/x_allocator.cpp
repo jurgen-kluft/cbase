@@ -239,7 +239,7 @@ namespace xcore
 		{
 		}
 
-		void					init(void* mem_begin, u32 mem_size, u32 default_minimum_size, u32 default_alignment) 
+		void					init(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment) 
 		{
 			mAllocationCount  = 0;
 			ffa::init(&mRoot, mem_begin, mem_size, default_minimum_size, default_alignment);

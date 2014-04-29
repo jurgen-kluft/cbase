@@ -31,7 +31,7 @@ namespace xcore
 
 		s32 write(const char* str, s32 len)
 		{
-			::OutputDebugString(str);
+			::OutputDebugStringA(str);
 			::fputs(str, stdout);
 			return len;
 		}
