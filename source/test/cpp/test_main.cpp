@@ -41,7 +41,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtypes);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtls);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xutf8);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xutf);
 #endif
 
 #ifndef X_NO_CUSTOM_INT64

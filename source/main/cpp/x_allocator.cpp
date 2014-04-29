@@ -279,7 +279,7 @@ namespace xcore
 
 		virtual void			release()
 		{
-			ASSERTS(mAllocationCount==0, "ERROR: Simple first-fit allocator is being released but still has allocations that are not freed");
+			ASSERTS(mAllocationCount==0, "ERROR: Simple first-fit allocator is being released but still has allocations");
 			mAllocationCount = 0;
 			ASSERT(mRoot.mTail->mPrev == NULL);
 			ASSERT(mRoot.mTail->mNext == NULL);
@@ -295,7 +295,7 @@ namespace xcore
 		u32			mAllocationCount;
 	};
 
-	x_iallocator*		gCreateBasicAllocator(void* mem_begin, u32 mem_size, u32 default_minimum_size, u32 default_alignment)
+	x_iallocator*		gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment)
 	{
 		x_allocator_basic* ba = new (mem_begin) x_allocator_basic();
 		mem_begin = xmem_utils::ptr_add(mem_begin, sizeof(x_allocator_basic));

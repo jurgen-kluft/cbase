@@ -1,14 +1,14 @@
 #include "xbase\x_debug.h"
 #include "xbase\x_integer.h"
-#include "xbase\x_string_std.h"
+#include "xbase\x_string_ascii.h"
 
 #ifdef SPU
 
 	 
 namespace xcore
  {
-	 s32		x_printf   				(const char* formatStr, const x_va& v1             , const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
-																	const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16) { return 0; }
+	 s32		x_printf   				(const char* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+																const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16) { return 0; }
 	 s32		x_printf				(const char* formatStr, const x_va_list& args)		{ return 0; }
 	 s32		x_printf				(const char* str)									{ return 0; }
  };	
@@ -126,7 +126,7 @@ namespace xcore
 		return (s32)x_atod64(str, base);
 	}
 
-    /**
+	/**
 	 *------------------------------------------------------------------------------
 	 *DOM-IGNORE-BEGIN
 	 *------------------------------------------------------------------------------
@@ -222,7 +222,7 @@ namespace xcore
 	///< DOM-IGNORE-END
 
 	/**
-     *------------------------------------------------------------------------------
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
@@ -397,8 +397,8 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-    /**
-     *------------------------------------------------------------------------------
+	/**
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
@@ -447,19 +447,7 @@ namespace xcore
 		}
 		return (s32)(end - str - 1);
 	}
-
-	//------------------------------------------------------------------------------
-	s32  		x_wstrlen    			(const xwchar* str)
-	{
-		ASSERT(str != NULL);
-		const xwchar *end = str;
-		while (*end++) 
-		{
-			//Empty
-		}
-		return (s32)(end - str - 1);
-	}
-
+	
 	//------------------------------------------------------------------------------
 
 	s32 x_strcmp(const char* str1, const char* str2)
@@ -547,7 +535,7 @@ namespace xcore
 	}
 
 	/**
-     *------------------------------------------------------------------------------
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
@@ -675,8 +663,8 @@ namespace xcore
 	}
 
 
-    /**
-     *------------------------------------------------------------------------------
+	/**
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
@@ -1071,130 +1059,6 @@ namespace xcore
 	}
 
 	//------------------------------------------------------------------------------
-#define	LOWER_BYTE_ENCODE_FLAG					0x80
-#define	UPPER_BYTE_ENCODE_FLAG_2_BYTE			0xC0
-#define	UPPER_BYTE_ENCODE_FLAG_3_BYTE			0xE0
-
-	u32			x_strAsciiToUTF8		( char* szDst, const char* szSrc )
-	{
-		u32	uStrLength	= x_strlen(szSrc);
-		u32	uOffset		= 0;
-
-		for (u32 uLoop = 0; uLoop < uStrLength; uLoop++)
-		{
-			u8 uChar = (u8)szSrc[uLoop];
-
-			if (uChar >= (u8)0x80)
-			{
-				if(szDst)
-				{
-					u8	uLower	= uChar & 0x3F;
-					u8	uUpper	= (uChar & 0xC0) >> 6;
-
-					szDst[uOffset++] = UPPER_BYTE_ENCODE_FLAG_2_BYTE | uUpper;
-					szDst[uOffset++] = LOWER_BYTE_ENCODE_FLAG | uLower;
-				}
-				else
-				{
-					uOffset	+= 2;
-				}
-			}
-			else
-			{
-				if(szDst)
-				{
-					szDst[uOffset++] = szDst[uLoop];
-				}
-				else
-				{
-					uOffset++;
-				}
-			}
-		}
-
-		if(szDst)
-		{
-			szDst[uOffset++] = '\0';
-		}
-		else
-		{
-			uOffset++;
-		}
-
-		return uOffset;
-	}
-
-	//------------------------------------------------------------------------------
-
-	u32			x_strUTF16ToUTF8		( char* szDst, const xwchar* wszSrc )
-	{
-		u32	uStrLength	= x_wstrlen (wszSrc);
-		u32	uOffset		= 0;
-
-		for (u32 uLoop = 0; uLoop < uStrLength; uLoop++)
-		{
-			xwchar	uChar = (xwchar)wszSrc[uLoop];
-
-			if (uChar >= (xwchar)0x800)
-			{
-				if(szDst)
-				{
-					xwchar	uLower	= uChar & 0x003F;
-					xwchar	uMid	= (uChar & 0x0FC0) >> 6;
-					xwchar	uUpper	= (uChar & 0xF000) >> 12;
-
-					szDst[uOffset++] = (u8)(UPPER_BYTE_ENCODE_FLAG_3_BYTE | uUpper);
-					szDst[uOffset++] = (u8)(LOWER_BYTE_ENCODE_FLAG | uMid);
-					szDst[uOffset++] = (u8)(LOWER_BYTE_ENCODE_FLAG | uLower);
-				}
-				else
-				{
-					uOffset	+= 3;
-				}
-			}
-			else if(uChar >= (xwchar)0x80)
-			{
-				if(szDst)
-				{
-					u8	uLower	= uChar & 0x3F;
-					u8	uUpper	= (uChar & 0xC0) >> 6;
-
-					szDst[uOffset++] = UPPER_BYTE_ENCODE_FLAG_2_BYTE | uUpper;
-					szDst[uOffset++] = LOWER_BYTE_ENCODE_FLAG | uLower;
-				}
-				else
-				{
-					uOffset	+= 2;
-				}
-			}
-			else
-			{
-				if(szDst)
-				{
-					szDst[uOffset++] = (char)wszSrc[uLoop];
-				}
-				else
-				{
-					uOffset++;
-				}
-
-				uOffset++;
-			}
-		}
-
-		if(szDst)
-		{
-			szDst[uOffset++] = '\0';
-		}
-		else
-		{
-			uOffset++;
-		}
-
-		return uOffset;
-	}
-
-	//------------------------------------------------------------------------------
 	// simple_pow
 	//------------------------------------------------------------------------------
 	/*
@@ -1493,8 +1357,8 @@ namespace xcore
 	}
 
 
-    /**
-     *------------------------------------------------------------------------------
+	/**
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
@@ -1545,8 +1409,8 @@ namespace xcore
 		return val;
 	}
 
-    /**
-     *------------------------------------------------------------------------------
+	/**
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
@@ -1601,7 +1465,7 @@ namespace xcore
 	}
 
 	/**
-     *------------------------------------------------------------------------------
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
@@ -1710,7 +1574,7 @@ namespace xcore
 	}
 
 	/**
-     *------------------------------------------------------------------------------
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Jurgen Kluft
 	 * Summary:

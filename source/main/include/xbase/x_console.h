@@ -101,7 +101,7 @@ namespace xcore
 
 		static s32	 			write(const char* str);
 		static s32	 			write(s32 index, s32 count, const char* str);
-
+	
 		static s32	 			write(const char* formatString, const x_va_list& args);
 		static s32	 			write(const char* formatString, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
 																const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);

@@ -1,4 +1,4 @@
-#include "xbase\x_string_std.h"
+#include "xbase\x_string_ascii.h"
 
 #if defined(TARGET_PS3)
 	#include <math.h>

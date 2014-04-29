@@ -7,7 +7,7 @@
 
 #include "xbase\x_log.h"
 #include "xbase\x_va_list.h"
-#include "xbase\x_string_std.h"
+#include "xbase\x_string_ascii.h"
 
 #include "xbase\private\x_log_to_console.h"
 

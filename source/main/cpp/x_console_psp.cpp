@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #include "xbase\x_console.h"
-#include "xbase\x_string_std.h"
+#include "xbase\x_string_ascii.h"
 
 /**
  * xCore namespace

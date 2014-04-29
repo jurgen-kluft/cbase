@@ -31,7 +31,7 @@ namespace xcore
 	 * Be aware that the behavior (fragmentation, performance) of this allocator gets worse
 	 * the more allocations and deallocations you do with different sizes.
 	 */
-	extern x_iallocator*	gCreateBasicAllocator(void* mem_begin, u32 mem_size, u32 default_minimum_size, u32 default_alignment);
+	extern x_iallocator*	gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment);
 
 
 	// set config variables needed for creating SPU allocator
