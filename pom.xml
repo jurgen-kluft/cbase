@@ -35,7 +35,7 @@
 		<Item Src="libs\**\*.*" Dst="libs\" />
 		<Item Src="docs\**\*.*" Dst="docs\" />
 		<Item Src="tools\**\*.*" Dst="Tools\" />
-		<Item Src="target\xunittest\outdir\${Name}_*_${Platform}_${ToolSet}\${Name}_*_${Platform}_${ToolSet}.lib" Dst="libs\" />
+		<Item Src="target\${Name}\outdir\${Name}_*_${Platform}_${ToolSet}\${Name}_*_${Platform}_${ToolSet}.lib" Dst="libs\" />
 	</Content>
 
 	<Dependency Package="xunittest">
