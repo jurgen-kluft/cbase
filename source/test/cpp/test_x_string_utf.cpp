@@ -32,6 +32,26 @@ UNITTEST_SUITE_BEGIN(xutf)
 
 		}
 
+		UNITTEST_TEST(numBytes_ustr8)
+		{
+			CHECK_TRUE(utf::isLegal(uchar8((u32)'A')));
+			CHECK_EQUAL(1, utf::numBytes(uchar8((u32)'A')));
+			CHECK_TRUE(utf::isLegal(uchar8((u32)'0')));
+			CHECK_EQUAL(1, utf::numBytes(uchar8((u32)'0')));
+			CHECK_TRUE(utf::isLegal(uchar8((u32)0xA9C3)));
+			CHECK_EQUAL(2, utf::numBytes(uchar8((u32)0xA9C3)));
+		}
+
+		UNITTEST_TEST(numBytes_ustr16)
+		{
+			CHECK_TRUE(utf::isLegal(uchar16((u32)'A')));
+			CHECK_EQUAL(2, utf::numBytes(uchar16((u32)'A')));
+			CHECK_TRUE(utf::isLegal(uchar16((u32)'0')));
+			CHECK_EQUAL(2, utf::numBytes(uchar16((u32)'0')));
+			CHECK_TRUE(utf::isLegal(uchar16((u32)0x6C34)));			// 'z'
+			CHECK_EQUAL(2, utf::numBytes(uchar16((u32)0x6C34)));
+		}
+
 		UNITTEST_TEST(isLegal_utf8)
 		{
 			const ustr8* str1 = (const ustr8*)"hi!";
