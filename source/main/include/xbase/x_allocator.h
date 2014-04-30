@@ -45,6 +45,8 @@ namespace xcore
 	class x_iallocator
 	{
 	public:
+		static x_iallocator* default();
+
 		virtual const char*	name() const = 0;								///< The name of the allocator
 
 		virtual void*		allocate(xsize_t size, u32 align) = 0;			///< Allocate memory with alignment

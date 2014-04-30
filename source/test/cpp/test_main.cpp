@@ -129,11 +129,13 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	xcore::gSetSPUConfig(progSize, stackSize);
 #endif
 
+	xbase::x_Init();
+
 #ifdef TARGET_DEBUG
 	xcore::x_asserthandler::sRegisterHandler(&gAssertHandler);
 #endif
 
-	xcore::x_iallocator* systemAllocator = xcore::gCreateSystemAllocator();
+	xcore::x_iallocator* systemAllocator = xcore::x_iallocator::default();
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
 	
@@ -145,14 +147,13 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	xcore::TestAllocator testAllocator(systemAllocator);
 	gTestAllocator = &testAllocator;
 
-	xbase::x_Init();
 	int r = UNITTEST_SUITE_RUN(reporter, xCoreUnitTest);
-	xbase::x_Exit();
 
 	gTestAllocator->release();
 
 	UnitTest::SetAllocator(NULL);
 
+	xbase::x_Exit();
 	return r==0;
 }
 
