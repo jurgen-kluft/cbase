@@ -49,8 +49,9 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:
-			case TYPE_UINT:
-			case TYPE_INT:		{ i = (u32)(*(u32*)mArg); } break;
+			case TYPE_UCHAR8:
+			//case TYPE_UINT:
+			//case TYPE_INT:		{ i = (u32)(*(u32*)mArg); } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	{ i = (u32)(*(u32*)mArg); } break;
 
@@ -63,6 +64,7 @@ namespace xcore
 			case TYPE_FLOAT32:	{ i = (u32)(*(f32*)mArg); } break;
 			case TYPE_FLOAT64:	{ i = (u32)(*(f64*)mArg); } break;
 			case TYPE_PCTCHAR:
+			case TYPE_PCUSTR8:
 			default:			break; // Fall through
 		};
 
@@ -81,8 +83,9 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:
-			case TYPE_UINT:
-			case TYPE_INT:		{ i = (u64)(*(u32*)mArg);  } break;
+			case TYPE_UCHAR8:
+			//case TYPE_UINT:
+			//case TYPE_INT:		{ i = (u64)(*(u32*)mArg);  } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	{ i = (u64)(*(u32*)mArg);  } break;
 
@@ -95,6 +98,7 @@ namespace xcore
 			case TYPE_FLOAT32:	{ i = (u64)(*(f32*)mArg);  } break;
 			case TYPE_FLOAT64:	{ i = (u64)(*(f64*)mArg);  } break;
 			case TYPE_PCTCHAR:
+			case TYPE_PCUSTR8:
 			default:			break; // Fall through
 		};
 
@@ -107,8 +111,9 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:
-			case TYPE_UINT:
-			case TYPE_INT:		{ i = (f32)(*(u32*)mArg); } break;
+			case TYPE_UCHAR8:
+			//case TYPE_UINT:
+			//case TYPE_INT:		{ i = (f32)(*(u32*)mArg); } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	{ i = (f32)(*(u32*)mArg); } break;
 
@@ -122,6 +127,7 @@ namespace xcore
 			case TYPE_FLOAT32:	{ i = (f32)(*(f32*)mArg); } break;
 			case TYPE_FLOAT64:	{ i = (f32)(*(f64*)mArg); } break;
 			case TYPE_PCTCHAR:
+			case TYPE_PCUSTR8:
 			default:			break; // Fall through
 		};
 
@@ -134,8 +140,9 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:
-			case TYPE_UINT:
-			case TYPE_INT:		{ i = (f64)(*(u32*)mArg); } break;
+			case TYPE_UCHAR8:
+			//case TYPE_UINT:
+			//case TYPE_INT:		{ i = (f64)(*(u32*)mArg); } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	{ i = (f64)(*(u32*)mArg); } break;
 
@@ -150,6 +157,7 @@ namespace xcore
 			case TYPE_FLOAT64:	{ i = (f64)(*(f64*)mArg); } break;
 
 			case TYPE_PCTCHAR:
+			case TYPE_PCUSTR8:
 			default:			break; // Fall through
 		};
 
@@ -160,6 +168,34 @@ namespace xcore
 	{
 		u32 i = convertToUInt32();
 		return i != 0;
+	}
+
+	uchar8			x_va::convertToUchar8() const
+	{
+		uchar8 ch((u32)'?');
+		switch (mType)
+		{
+			case TYPE_BOOL:		{ ch.c = (*(u32*)mArg)!=0 ? (u32)'y' : (u32)'n'; } break;
+			case TYPE_UCHAR8:	{ ch.c = (*(u32*)mArg); } break;
+			case TYPE_UINT32:
+			case TYPE_INT32:	
+
+			case TYPE_UINT8:
+			case TYPE_INT8:		
+			case TYPE_UINT16:
+			case TYPE_INT16:	
+			case TYPE_UINT64:
+			case TYPE_INT64:
+
+			case TYPE_FLOAT32:	
+			case TYPE_FLOAT64:
+
+			case TYPE_PCTCHAR:
+			case TYPE_PCUSTR8:
+			default:			break; // Fall through
+		};
+
+		return ch;
 	}
 
 	const char*			x_va::convertToCharPointer() const
@@ -178,6 +214,23 @@ namespace xcore
 		return "?";
 	}
 
+	const ustr8*		x_va::convertToUStr8Pointer() const
+	{
+		switch (mType)
+		{
+			case TYPE_PCUSTR8:
+			case TYPE_PCTCHAR:
+				{
+					const ustr8* p = *(const ustr8**)mArg; 
+					return p;
+				}
+
+			default:			break; // Fall through
+		};
+
+		return (const ustr8*)"?";
+	}
+
 	x_va_r	x_va_r::sEmpty;
 
 
@@ -186,8 +239,8 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UINT:		*((u32*)mRef) = rhs; break;
-			case TYPE_INT:		*((s32*)mRef) = rhs; break;
+			//case TYPE_UINT:		*((u32*)mRef) = rhs; break;
+			//case TYPE_INT:		*((s32*)mRef) = rhs; break;
 			case TYPE_UINT32:	*((u32*)mRef) = rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = rhs; break;
 			case TYPE_UINT8:	*((u8*)mRef) = rhs; break;
@@ -215,8 +268,7 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UINT:		*((u32*)mRef) = rhs; break;
-			case TYPE_INT:		*((s32*)mRef) = rhs; break;
+			case TYPE_UCHAR8:	*((uchar8*)mRef) = uchar8((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = rhs; break;
 			case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
@@ -244,8 +296,7 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UINT:		*((u32*)mRef) = rhs; break;
-			case TYPE_INT:		*((s32*)mRef) = rhs; break;
+			case TYPE_UCHAR8:	*((uchar8*)mRef) = uchar8((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = rhs; break;
 			case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
@@ -273,8 +324,7 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UINT:		*((u32*)mRef) = (u32)rhs; break;
-			case TYPE_INT:		*((s32*)mRef) = (s32)rhs; break;
+			case TYPE_UCHAR8:	*((uchar8*)mRef) = uchar8((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
 			case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
@@ -302,8 +352,7 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UINT:		*((u32*)mRef) = (u32)rhs; break;
-			case TYPE_INT:		*((s32*)mRef) = (s32)rhs; break;
+			case TYPE_UCHAR8:	*((uchar8*)mRef) = uchar8((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
 			case TYPE_UINT8:	*(( u8*)mRef) = ( u8)rhs; break;
@@ -325,8 +374,7 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UINT:		*((u32*)mRef) = (u32)rhs; break;
-			case TYPE_INT:		*((s32*)mRef) = (s32)rhs; break;
+			case TYPE_UCHAR8:	*((uchar8*)mRef) = uchar8((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
 			case TYPE_UINT8:	*(( u8*)mRef) = ( u8)rhs; break;
@@ -348,8 +396,7 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = xbool(rhs); break;
-			case TYPE_UINT:		*((u32*)mRef) = rhs ? 1 : 0; break;
-			case TYPE_INT:		*((s32*)mRef) = rhs ? 1 : 0; break;
+			case TYPE_UCHAR8:	*((uchar8*)mRef) = uchar8((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = rhs ? 1 : 0; break;
 			case TYPE_INT32:	*((s32*)mRef) = rhs ? 1 : 0; break;
 			case TYPE_UINT8:	*((u8*)mRef) = rhs ? 1 : 0; break;
@@ -366,6 +413,26 @@ namespace xcore
 		return *this;
 	}
 
+	x_va_r&					x_va_r::operator=(uchar8 rhs)
+	{
+		switch (mType)
+		{
+			case TYPE_BOOL:		*((xbool*)mRef) = rhs.c ? 1 : 0; break;
+			case TYPE_UINT32:	*((u32*)mRef) = rhs.c; break;
+			case TYPE_INT32:	*((s32*)mRef) = (s32)rhs.c; break;
+			case TYPE_UINT8:	*((u8*)mRef)  = (u8 )rhs.c; break;
+			case TYPE_INT8:		*((s8*)mRef)  = (s8 )rhs.c; break;
+			case TYPE_UINT16:	*((u16*)mRef) = (u16)rhs.c; break;
+			case TYPE_INT16:	*((s16*)mRef) = (s16)rhs.c; break;
+			case TYPE_UINT64:	*((u64*)mRef) = (u32)rhs.c; break;
+			case TYPE_INT64:	*((s64*)mRef) = (u32)rhs.c; break;
+			case TYPE_FLOAT32:	*((f32*)mRef) = (f32)rhs.c; break;
+			case TYPE_FLOAT64:	*((f64*)mRef) = (f64)rhs.c; break;
+			default:			break; // Fall through
+		};
+
+		return *this;
+	}
 
 //==============================================================================
 // END xCore namespace
