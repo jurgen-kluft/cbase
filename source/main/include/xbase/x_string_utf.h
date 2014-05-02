@@ -9,9 +9,7 @@
 // INCLUDES
 //==============================================================================
 #include "xbase\x_debug.h"
-#include "xbase\x_va_list.h"
 #include "xbase\x_integer.h"
-#include "xbase\x_carray.h"
 
 /**
 * xCore namespace
@@ -259,7 +257,8 @@ namespace xcore
 			u32				blen_;	// byte position
 		};
 
-
+		// Forward declare
+		class ucptr8;
 
 		class uptr8
 		{
@@ -305,19 +304,19 @@ namespace xcore
 				return ulen8(ucpos8(1), ubpos8(n));
 			}
 
-			ulen8			copy_char_from(ustr8 const* _ptr)
+			ulen8			copy_char_from(uptr8 const& _ptr)
 			{
 				uchar8 ch;
-				s32 const n = utf::read(_ptr, ch);
+				s32 const n = utf::read(_ptr.str_, ch);
 				utf::write(str_, ch);
 				return ulen8(ucpos8(1), ubpos8(n));
 			}
 
+			ulen8			copy_char_from(ucptr8 const& _ptr);
 
 			bool			at_end() const								{ return str_->c == 0; }
 
 			xuptr8			operator* ()								{ return xuptr8(str_); }
-							operator ustr8* () const					{ return str_; }
 
 			uptr8&			operator++ ()								{ u32 const n=numBytes(uchar8(str_->c)); str_+=n; return *this; }
 			uptr8			operator++ (s32)							{ uptr8 i(str_); u32 const n=numBytes(uchar8(str_->c)); str_+=n; return i; }
@@ -385,7 +384,6 @@ namespace xcore
 			bool			at_end() const								{ return str_->c == 0; }
 
 			uchar8			operator* ()								{ uchar8 ch; read(str_, ch); return ch; }
-							operator ustr8 const * () const				{ return str_; }
 
 			ucptr8&			operator++ ()								{ u32 const n=numBytes(uchar8(str_->c)); str_+=n; return *this; }
 			ucptr8			operator++ (s32)							{ ucptr8 i(str_); u32 const n=numBytes(uchar8(str_->c)); str_+=n; return i; }
@@ -427,6 +425,14 @@ namespace xcore
 		private:
 			ustr8 const*	str_;
 		};
+
+		inline ulen8		uptr8::copy_char_from(ucptr8 const& _ptr)
+		{
+			uchar8 ch;
+			s32 const n = utf::read(_ptr.str(), ch);
+			utf::write(str_, ch);
+			return ulen8(ucpos8(1), ubpos8(n));
+		}
 
 
 		inline s32  		strlen    			(ustr8 const* _str, ustr8 const** _end)	// We assume the string is a valid UTF8 string!

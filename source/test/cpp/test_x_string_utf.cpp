@@ -132,7 +132,7 @@ UNITTEST_SUITE_BEGIN(xutf)
 			const ustr8* str1 = (const ustr8*)"hi!";
 			CHECK_TRUE(utf::isLegal(str1, str1 + utf::strlen(str1)));
 
-			char cstr2[] = { 'h', 'i', 0xFF, '!', '0' };
+			char cstr2[] = { 'h', 'i', (char)0xFF, '!', '0' };
 			const ustr8* str2 = (const ustr8*)cstr2;
 			CHECK_FALSE(utf::isLegal(str2, str2 + 4));
 		}

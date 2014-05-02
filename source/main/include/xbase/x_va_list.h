@@ -27,7 +27,7 @@ namespace xcore
 	class xstring;
 
 	/** 
-     *------------------------------------------------------------------------------
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Jurgen Kluft
 	 * Description:
@@ -57,39 +57,48 @@ namespace xcore
 	{
 		enum EProperty
 		{
-			TYPE_INTEGER  = 0x80000000,
-			TYPE_SIGNED   = 0x40000000,
-			TYPE_UNSIGNED = 0x20000000,
-			TYPE_FLOAT    = 0x10000000,
+			PROP_INTEGER  = 0x0800,
+			PROP_SIGNED   = 0x0400,
+			PROP_UNSIGNED = 0x0200,
+			PROP_FLOAT    = 0x0100,
+			PROP_MASK     = 0x0F00,
+			PROP_SHIFT    = 8,
 		};
 		enum ESize
 		{
-			SIZE_MASK     = 0x0FF00000,
-			SIZE_SHIFT    = 20,
-			SIZE_8        = 0x00800000,
-			SIZE_16       = 0x01000000,
-			SIZE_32       = 0x02000000,
-			SIZE_64       = 0x04000000,
+			SIZE_MASK     = 0xF000,
+			SIZE_SHIFT    = 12,
+			SIZE_8        = 0x1000,
+			SIZE_16       = 0x2000,
+			SIZE_32       = 0x4000,
+			SIZE_64       = 0x8000,
+#ifdef TARGET_32BIT
+			SIZE_PTR      = SIZE_32,
+#else
+			SIZE_PTR      = SIZE_64,
+#endif
 		};
 	public:
 		enum EType
 		{
 			TYPE_EMPTY    = 0,
-
-			TYPE_INT      = 0x001 | TYPE_INTEGER | TYPE_SIGNED | SIZE_32,
-			TYPE_INT8     = 0x002 | TYPE_INTEGER | TYPE_SIGNED | SIZE_8,
-			TYPE_INT16    = 0x004 | TYPE_INTEGER | TYPE_SIGNED | SIZE_16,
-			TYPE_INT32    = 0x008 | TYPE_INTEGER | TYPE_SIGNED | SIZE_32,
-			TYPE_INT64    = 0x010 | TYPE_INTEGER | TYPE_SIGNED | SIZE_64,
-			TYPE_UINT     = 0x001 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_32,
-			TYPE_UINT8    = 0x002 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_8,
-			TYPE_UINT16   = 0x004 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_16,
-			TYPE_UINT32   = 0x008 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_32,
-			TYPE_UINT64   = 0x010 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_64,
-			TYPE_BOOL     = 0x020 | TYPE_INTEGER | TYPE_SIGNED | SIZE_32,
-			TYPE_FLOAT32  = 0x081 | TYPE_FLOAT | SIZE_32,
-			TYPE_FLOAT64  = 0x082 | TYPE_FLOAT | SIZE_64,
-			TYPE_PCTCHAR  = 0x100 | SIZE_32
+			TYPE_MASK     = 0x00FF,
+			TYPE_INT8     = 0x0001 | PROP_INTEGER | PROP_SIGNED | SIZE_8,
+			TYPE_INT16    = 0x0002 | PROP_INTEGER | PROP_SIGNED | SIZE_16,
+			TYPE_INT      = 0x0004 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
+			TYPE_INT32    = 0x0004 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
+			TYPE_INT64    = 0x0008 | PROP_INTEGER | PROP_SIGNED | SIZE_64,
+			TYPE_UINT8    = 0x0001 | PROP_INTEGER | PROP_UNSIGNED | SIZE_8,
+			TYPE_UINT16   = 0x0002 | PROP_INTEGER | PROP_UNSIGNED | SIZE_16,
+			TYPE_UINT     = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
+			TYPE_UINT32   = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
+			TYPE_UINT64   = 0x0008 | PROP_INTEGER | PROP_UNSIGNED | SIZE_64,
+			TYPE_BOOL     = 0x0020 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
+			TYPE_UCHAR8   = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
+			TYPE_FLOAT32  = 0x0040 | PROP_FLOAT | SIZE_32,
+			TYPE_FLOAT64  = 0x0050 | PROP_FLOAT | SIZE_64,
+			TYPE_PCTCHAR  = 0x0060 | SIZE_PTR,
+			TYPE_PCUSTR8  = 0x0070 | SIZE_PTR
 		};
 
 	public:
@@ -103,34 +112,39 @@ namespace xcore
 								x_va(u32 inVar) : mType(TYPE_UINT32)				{ *(u32*)mArg = inVar; }
 								x_va(s64 inVar) : mType(TYPE_INT64)					{ *(s64*)mArg = inVar; }
 								x_va(u64 inVar) : mType(TYPE_UINT64)				{ *(u64*)mArg = inVar; }
+								x_va(uchar8 inVar) : mType(TYPE_UCHAR8)				{ *(u32*)mArg = inVar.c; }
 								x_va(bool inVar) : mType(TYPE_BOOL)					{ *(u32*)mArg = inVar ? 1 : 0; }
 								x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
 								x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
 								x_va(const char* inVar) : mType(TYPE_PCTCHAR)		{ *(const char**)mArg = inVar; }
+								x_va(const ustr8* inVar) : mType(TYPE_PCUSTR8)		{ *(const ustr8**)mArg = inVar; }
 
 		EType					type() const										{ return mType; }
 
 		s32						sizeInBits() const									{ return (mType&SIZE_MASK)>>SIZE_SHIFT; }
 		s32						sizeInBytes() const									{ return ((mType&SIZE_MASK)>>SIZE_SHIFT) >> 3; }
 
-		xbool					isInteger() const									{ return xbool((mType&TYPE_INTEGER)==TYPE_INTEGER && sizeInBits()==8); }
-		xbool					isSignedInteger() const								{ return xbool(isInteger() && ((mType&TYPE_SIGNED)==TYPE_SIGNED)); }
-		xbool					isUnsignedInteger() const							{ return xbool(isInteger() && ((mType&TYPE_UNSIGNED)==TYPE_UNSIGNED)); }
+		xbool					isInteger() const									{ return xbool((mType&PROP_MASK)==PROP_INTEGER && sizeInBits()==8); }
+		xbool					isSignedInteger() const								{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_SIGNED)); }
+		xbool					isUnsignedInteger() const							{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_UNSIGNED)); }
 
 		xbool					isBool() const										{ return xbool(mType == TYPE_BOOL); }
-		xbool					isInt8() const										{ return xbool(isInteger() && isSignedInteger() && sizeInBits()==8); }
-		xbool					isInt16() const										{ return xbool(isInteger() && isSignedInteger() && sizeInBits()==16); }
-		xbool					isInt32() const										{ return xbool(isInteger() && isSignedInteger() && sizeInBits()==32); }
-		xbool					isInt64() const										{ return xbool(isInteger() && isSignedInteger() && sizeInBits()==64); }
-		xbool					isUInt8() const										{ return xbool(isInteger() && isUnsignedInteger() && sizeInBits()==8); }
-		xbool					isUInt16() const									{ return xbool(isInteger() && isUnsignedInteger() && sizeInBits()==16); }
-		xbool					isUInt32() const									{ return xbool(isInteger() && isUnsignedInteger() && sizeInBits()==32); }
-		xbool					isUInt64() const									{ return xbool(isInteger() && isUnsignedInteger() && sizeInBits()==64); }
-		xbool					isF32() const										{ return xbool((mType&TYPE_FLOAT32)==TYPE_FLOAT32); }
-		xbool					isF64() const										{ return xbool((mType&TYPE_FLOAT64)==TYPE_FLOAT64); }
-		xbool					isPCTChar() const									{ return xbool((mType&TYPE_PCTCHAR)==TYPE_PCTCHAR); }
+		xbool					isUchar8() const									{ return xbool(mType == TYPE_UCHAR8); }
+		xbool					isInt8() const										{ return xbool(mType == TYPE_INT8); }
+		xbool					isInt16() const										{ return xbool(mType == TYPE_INT16); }
+		xbool					isInt32() const										{ return xbool(mType == TYPE_INT32); }
+		xbool					isInt64() const										{ return xbool(mType == TYPE_INT64); }
+		xbool					isUInt8() const										{ return xbool(mType == TYPE_UINT8); }
+		xbool					isUInt16() const									{ return xbool(mType == TYPE_UINT16); }
+		xbool					isUInt32() const									{ return xbool(mType == TYPE_UINT32); }
+		xbool					isUInt64() const									{ return xbool(mType == TYPE_UINT64); }
+		xbool					isF32() const										{ return xbool(mType == TYPE_FLOAT32); }
+		xbool					isF64() const										{ return xbool(mType == TYPE_FLOAT64); }
+		xbool					isPCTChar() const									{ return xbool(mType == TYPE_PCTCHAR); }
+		xbool					isPCUSTR8() const									{ return xbool(mType == TYPE_PCUSTR8); }
 
 		operator				char() const										{ return (char)convertToInt8(); }
+		operator				uchar8() const										{ return convertToUchar8(); }
 		operator				s8() const											{ return convertToInt8(); }
 		operator				u8() const											{ return convertToUInt8(); }
 		operator				s16() const											{ return convertToInt16(); }
@@ -143,6 +157,7 @@ namespace xcore
 		operator				f64() const											{ return convertToDouble(); }
 		operator				bool() const										{ return convertToBool(); }
 		operator				const char*() const									{ return convertToCharPointer(); }
+		operator				const ustr8*() const								{ return convertToUStr8Pointer(); }
 
 		static const x_va		sEmpty;
 
@@ -158,7 +173,9 @@ namespace xcore
 		f32						convertToFloat() const;
 		f64						convertToDouble() const;
 		bool					convertToBool() const;
+		uchar8					convertToUchar8() const;
 		const char*				convertToCharPointer() const;
+		const ustr8*			convertToUStr8Pointer() const;
 
 		EType					mType;
 		u8						mArg[8];
@@ -205,7 +222,7 @@ namespace xcore
 
 
 	/** 
-     *------------------------------------------------------------------------------
+	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Jurgen Kluft
 	 * Description:
@@ -240,55 +257,67 @@ namespace xcore
 	{
 		enum EProperty
 		{
-			TYPE_INTEGER  = 0x80000000,
-			TYPE_SIGNED   = 0x40000000,
-			TYPE_UNSIGNED = 0x20000000,
-			TYPE_FLOAT    = 0x10000000,
+			PROP_INTEGER  = 0x0800,
+			PROP_SIGNED   = 0x0400,
+			PROP_UNSIGNED = 0x0200,
+			PROP_FLOAT    = 0x0100,
+			PROP_MASK     = 0x0F00,
+			PROP_SHIFT    = 8,
 		};
 		enum ESize
 		{
-			SIZE_MASK     = 0x0FF00000,
-			SIZE_SHIFT    = 20,
-			SIZE_8        = 0x00800000,
-			SIZE_16       = 0x01000000,
-			SIZE_32       = 0x02000000,
-			SIZE_64       = 0x04000000,
+			SIZE_MASK     = 0xF000,
+			SIZE_SHIFT    = 12,
+			SIZE_8        = 0x1000,
+			SIZE_16       = 0x2000,
+			SIZE_32       = 0x4000,
+			SIZE_64       = 0x8000,
+#ifdef TARGET_32BIT
+			SIZE_PTR      = SIZE_32,
+#else
+			SIZE_PTR      = SIZE_64,
+#endif
 		};
 	public:
 		enum EType
 		{
 			TYPE_EMPTY    = 0,
+			TYPE_MASK     = 0x00FF,
 
-			TYPE_INT      = 0x001 | TYPE_INTEGER | TYPE_SIGNED | SIZE_32,
-			TYPE_INT8     = 0x002 | TYPE_INTEGER | TYPE_SIGNED | SIZE_8,
-			TYPE_INT16    = 0x004 | TYPE_INTEGER | TYPE_SIGNED | SIZE_16,
-			TYPE_INT32    = 0x008 | TYPE_INTEGER | TYPE_SIGNED | SIZE_32,
-			TYPE_INT64    = 0x010 | TYPE_INTEGER | TYPE_SIGNED | SIZE_64,
-			TYPE_UINT     = 0x001 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_32,
-			TYPE_UINT8    = 0x002 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_8,
-			TYPE_UINT16   = 0x004 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_16,
-			TYPE_UINT32   = 0x008 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_32,
-			TYPE_UINT64   = 0x010 | TYPE_INTEGER | TYPE_UNSIGNED | SIZE_64,
-			TYPE_BOOL     = 0x020 | SIZE_32,
-			TYPE_FLOAT32  = 0x081 | TYPE_FLOAT | SIZE_32,
-			TYPE_FLOAT64  = 0x082 | TYPE_FLOAT | SIZE_64,
-			TYPE_STRING   = 0x100
+			TYPE_INT8     = 0x0001 | PROP_INTEGER | PROP_SIGNED | SIZE_8,
+			TYPE_INT16    = 0x0002 | PROP_INTEGER | PROP_SIGNED | SIZE_16,
+			TYPE_INT      = 0x0004 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
+			TYPE_INT32    = 0x0004 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
+			TYPE_INT64    = 0x0008 | PROP_INTEGER | PROP_SIGNED | SIZE_64,
+			TYPE_UINT8    = 0x0001 | PROP_INTEGER | PROP_UNSIGNED | SIZE_8,
+			TYPE_UINT16   = 0x0002 | PROP_INTEGER | PROP_UNSIGNED | SIZE_16,
+			TYPE_UINT     = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
+			TYPE_UINT32   = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
+			TYPE_UINT64   = 0x0008 | PROP_INTEGER | PROP_UNSIGNED | SIZE_64,
+			TYPE_BOOL     = 0x0020 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
+			TYPE_UCHAR8   = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
+			TYPE_FLOAT32  = 0x0040 | PROP_FLOAT | SIZE_32,
+			TYPE_FLOAT64  = 0x0050 | PROP_FLOAT | SIZE_64,
+			TYPE_PTCHAR   = 0x0060 | SIZE_PTR,
+			TYPE_PUSTR8   = 0x0070 | SIZE_PTR
 		};
 	public:
 								x_va_r() : mType(TYPE_EMPTY), mVar(0), mRef(NULL)				{ }
 								x_va_r(const x_va_r& c) : mType(c.mType), mVar(0)				{ mRef = c.mRef; }
-								x_va_r(s8* inRef) : mType(TYPE_INT8), mVar(0)					{ mRef = inRef; }
-								x_va_r(u8* inRef) : mType(TYPE_UINT8), mVar(0)					{ mRef = inRef; }
-								x_va_r(s16* inRef) : mType(TYPE_INT16), mVar(0)					{ mRef = inRef; }
-								x_va_r(u16* inRef) : mType(TYPE_UINT16), mVar(0)				{ mRef = inRef; }
-								x_va_r(s32* inRef) : mType(TYPE_INT32), mVar(0)					{ mRef = inRef; }
-								x_va_r(u32* inRef) : mType(TYPE_UINT32), mVar(0)				{ mRef = inRef; }
-								x_va_r(s64* inRef) : mType(TYPE_INT64), mVar(0)					{ mRef = inRef; }
-								x_va_r(u64* inRef) : mType(TYPE_UINT64), mVar(0)				{ mRef = inRef; }
-								x_va_r(bool* inRef) : mType(TYPE_BOOL), mVar(0)					{ mRef = inRef; }
-								x_va_r(f32* inRef) : mType(TYPE_FLOAT32), mVar(0)				{ mRef = inRef; }
-								x_va_r(f64* inRef) : mType(TYPE_FLOAT64), mVar(0)				{ mRef = inRef; }
-								x_va_r(const char* inRef, u16 inLength) : mType(TYPE_STRING)	{ mRef = (void*)inRef; mVar = inLength; }
+								x_va_r(s8* inRef) : mType(TYPE_INT8), mVar(0)					{ mRef = (void*)inRef; }
+								x_va_r(u8* inRef) : mType(TYPE_UINT8), mVar(0)					{ mRef = (void*)inRef; }
+								x_va_r(s16* inRef) : mType(TYPE_INT16), mVar(0)					{ mRef = (void*)inRef; }
+								x_va_r(u16* inRef) : mType(TYPE_UINT16), mVar(0)				{ mRef = (void*)inRef; }
+								x_va_r(s32* inRef) : mType(TYPE_INT32), mVar(0)					{ mRef = (void*)inRef; }
+								x_va_r(u32* inRef) : mType(TYPE_UINT32), mVar(0)				{ mRef = (void*)inRef; }
+								x_va_r(s64* inRef) : mType(TYPE_INT64), mVar(0)					{ mRef = (void*)inRef; }
+								x_va_r(u64* inRef) : mType(TYPE_UINT64), mVar(0)				{ mRef = (void*)inRef; }
+								x_va_r(bool* inRef) : mType(TYPE_BOOL), mVar(0)					{ mRef = (void*)inRef; }
+								x_va_r(uchar8* inRef) : mType(TYPE_UCHAR8), mVar(0)				{ mRef = (void*)inRef; }
+								x_va_r(f32* inRef) : mType(TYPE_FLOAT32), mVar(0)				{ mRef = (void*)inRef; }
+								x_va_r(f64* inRef) : mType(TYPE_FLOAT64), mVar(0)				{ mRef = (void*)inRef; }
+								x_va_r(const char* inRef, u16 inLength) : mType(TYPE_PTCHAR)	{ mRef = (void*)inRef; mVar = inLength; }
+								x_va_r(const ustr8* inRef, u16 inLength) : mType(TYPE_PUSTR8)	{ mRef = (void*)inRef; mVar = inLength; }
 
 		x_va_r&					operator=(s8 rhs);
 		x_va_r&					operator=(u8 rhs);
@@ -301,37 +330,43 @@ namespace xcore
 		x_va_r&					operator=(f32 rhs);
 		x_va_r&					operator=(f64 rhs);
 		x_va_r&					operator=(bool rhs);
+		x_va_r&					operator=(uchar8 rhs);
 		x_va_r&					operator=(const char* rhs);
+		x_va_r&					operator=(const ustr8* rhs);
 
-								operator char*() const								{ if (mType==TYPE_STRING) return (char*)mRef; else return NULL; }
+								operator char*() const								{ if ((mType&TYPE_MASK)==TYPE_PTCHAR) return (char*)mRef; else return NULL; }
+								operator ustr8*() const								{ if ((mType&TYPE_MASK)==TYPE_PTCHAR || mType==TYPE_PUSTR8) return (ustr8*)mRef; else return NULL; }
 
-		EType					type() const										{ return mType; }
+		EType					type() const										{ return (EType)mType; }
 		u16						var() const											{ return mVar; }
 
 		s32						sizeInBits() const									{ return (mType&SIZE_MASK)>>SIZE_SHIFT; }
 		s32						sizeInBytes() const									{ return ((mType&SIZE_MASK)>>SIZE_SHIFT) >> 3; }
 
-		xbool					isInteger() const									{ return xbool((mType&TYPE_INTEGER)==TYPE_INTEGER && sizeInBits()==8); }
-		xbool					isSignedInteger() const								{ return xbool(isInteger() && ((mType&TYPE_SIGNED)==TYPE_SIGNED)); }
-		xbool					isUnsignedInteger() const							{ return xbool(isInteger() && ((mType&TYPE_UNSIGNED)==TYPE_UNSIGNED)); }
+		xbool					isFloat() const										{ return xbool((mType&PROP_MASK)==PROP_FLOAT); }
+		xbool					isInteger() const									{ return xbool((mType&PROP_MASK)==PROP_INTEGER); }
+		xbool					isSignedInteger() const								{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_SIGNED)); }
+		xbool					isUnsignedInteger() const							{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_UNSIGNED)); }
 
 		xbool					isBool() const										{ return xbool(mType == TYPE_BOOL); }
-		xbool					isInt8() const										{ return xbool(isInteger() && isSignedInteger() && sizeInBits()==8); }
-		xbool					isInt16() const										{ return xbool(isInteger() && isSignedInteger() && sizeInBits()==16); }
-		xbool					isInt32() const										{ return xbool(isInteger() && isSignedInteger() && sizeInBits()==32); }
-		xbool					isInt64() const										{ return xbool(isInteger() && isSignedInteger() && sizeInBits()==64); }
-		xbool					isUInt8() const										{ return xbool(isInteger() && isUnsignedInteger() && sizeInBits()==8); }
-		xbool					isUInt16() const									{ return xbool(isInteger() && isUnsignedInteger() && sizeInBits()==16); }
-		xbool					isUInt32() const									{ return xbool(isInteger() && isUnsignedInteger() && sizeInBits()==32); }
-		xbool					isUInt64() const									{ return xbool(isInteger() && isUnsignedInteger() && sizeInBits()==64); }
-		xbool					isF32() const										{ return xbool((mType&TYPE_FLOAT32)==TYPE_FLOAT32); }
-		xbool					isF64() const										{ return xbool((mType&TYPE_FLOAT64)==TYPE_FLOAT64); }
-		xbool					isString() const									{ return xbool((mType&TYPE_STRING)==TYPE_STRING); }
+		xbool					isUChar8() const									{ return xbool(mType == TYPE_UCHAR8); }
+		xbool					isInt8() const										{ return xbool(mType == TYPE_INT8); }
+		xbool					isInt16() const										{ return xbool(mType == TYPE_INT16); }
+		xbool					isInt32() const										{ return xbool(mType == TYPE_INT32); }
+		xbool					isInt64() const										{ return xbool(mType == TYPE_INT64); }
+		xbool					isUInt8() const										{ return xbool(mType == TYPE_UINT8); }
+		xbool					isUInt16() const									{ return xbool(mType == TYPE_UINT16); }
+		xbool					isUInt32() const									{ return xbool(mType == TYPE_UINT32); }
+		xbool					isUInt64() const									{ return xbool(mType == TYPE_UINT64); }
+		xbool					isF32() const										{ return xbool(mType == TYPE_FLOAT32); }
+		xbool					isF64() const										{ return xbool(mType == TYPE_FLOAT64); }
+		xbool					isPTChar() const									{ return xbool(mType == TYPE_PTCHAR); }
+		xbool					isPUStr8() const									{ return xbool(mType == TYPE_PUSTR8); }
 
 		static x_va_r			sEmpty;
 
 	protected:
-		EType					mType;
+		u16						mType;
 		u16						mVar;
 		void*					mRef;
 	};
