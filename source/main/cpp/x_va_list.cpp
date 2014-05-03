@@ -4,6 +4,7 @@
 */
 
 #include "xbase\x_debug.h"
+#include "xbase\x_string_utf.h"
 #include "xbase\x_va_list.h"
 
 /**
@@ -166,7 +167,35 @@ namespace xcore
 
 	bool			x_va::convertToBool() const
 	{
-		u32 i = convertToUInt32();
+		u32 i = 0;
+		switch (mType)
+		{
+			case TYPE_BOOL:
+			case TYPE_UCHAR8:
+			//case TYPE_UINT:
+			//case TYPE_INT:		{ i = (u32)(*(u32*)mArg); } break;
+			case TYPE_UINT32:
+			case TYPE_INT32:	{ i = (u32)(*(u32*)mArg); } break;
+
+			case TYPE_UINT8:
+			case TYPE_INT8:		{ i = (u32)(*(u8*)mArg);  } break;
+			case TYPE_UINT16:
+			case TYPE_INT16:	{ i = (u32)(*(u16*)mArg); } break;
+			case TYPE_UINT64:
+			case TYPE_INT64:	{ i = (u32)(*(u64*)mArg); } break;
+			case TYPE_FLOAT32:	{ i = (u32)(*(f32*)mArg); } break;
+			case TYPE_FLOAT64:	{ i = (u32)(*(f64*)mArg); } break;
+
+#ifdef TARGET_32BIT
+			case TYPE_PCTCHAR:
+			case TYPE_PCUSTR8:	{ i = (u32)(*(u32*)mArg); } break;
+#else
+			case TYPE_PCTCHAR:
+			case TYPE_PCUSTR8:	{ i = (u32)(*(u64*)mArg); } break;
+#endif
+			default:			break; // Fall through
+		};
+
 		return i != 0;
 	}
 
@@ -176,16 +205,16 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		{ ch.c = (*(u32*)mArg)!=0 ? (u32)'y' : (u32)'n'; } break;
-			case TYPE_UCHAR8:	{ ch.c = (*(u32*)mArg); } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	
+			case TYPE_UCHAR8:	{ ch.c = (u32)(*(u32*)mArg); } break;
 
 			case TYPE_UINT8:
-			case TYPE_INT8:		
+			case TYPE_INT8:		{ ch.c = (u8)(*(u8*)mArg); } break;
 			case TYPE_UINT16:
-			case TYPE_INT16:	
+			case TYPE_INT16:	{ ch.c = (u16)(*(u16*)mArg); } break;
 			case TYPE_UINT64:
-			case TYPE_INT64:
+			case TYPE_INT64:	{ ch.c = (u32)(*(u64*)mArg); } break;
 
 			case TYPE_FLOAT32:	
 			case TYPE_FLOAT64:
@@ -194,6 +223,9 @@ namespace xcore
 			case TYPE_PCUSTR8:
 			default:			break; // Fall through
 		};
+
+		if (false == xcore::utf::isLegal(ch))
+			ch.c = '?';
 
 		return ch;
 	}

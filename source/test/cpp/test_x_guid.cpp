@@ -7,13 +7,13 @@ using namespace xcore;
 
 UNITTEST_SUITE_BEGIN(xguid)
 {
-    UNITTEST_FIXTURE(main)
-    {
-        UNITTEST_FIXTURE_SETUP() {}
-        UNITTEST_FIXTURE_TEARDOWN() {}
+	UNITTEST_FIXTURE(main)
+	{
+		UNITTEST_FIXTURE_SETUP() {}
+		UNITTEST_FIXTURE_TEARDOWN() {}
 
-        UNITTEST_TEST(constructor1)
-        {
+		UNITTEST_TEST(constructor1)
+		{
 			xguid i;
 			CHECK_EQUAL(true, i.isNull());
 
@@ -22,10 +22,10 @@ UNITTEST_SUITE_BEGIN(xguid)
 			CHECK_EQUAL(true, nill.isNull());
 
 			CHECK_TRUE(nill == i);
-        }
+		}
 
 		UNITTEST_TEST(constructor2)
-        {
+		{
 			xguid nill;
 			nill.setNull();
 
@@ -44,8 +44,8 @@ UNITTEST_SUITE_BEGIN(xguid)
 			CHECK_TRUE(i2 != nill);
 		}
 
-        UNITTEST_TEST(constructor3)
-        {
+		UNITTEST_TEST(constructor3)
+		{
 			xguid i(1,2,3,4);
 			CHECK_EQUAL(false, i.isNull());
 
@@ -57,7 +57,7 @@ UNITTEST_SUITE_BEGIN(xguid)
 		}
 
 		UNITTEST_TEST(setNull)
-        {
+		{
 			xguid i(1,2,3,4);
 			CHECK_EQUAL(false, i.isNull());
 
@@ -66,7 +66,7 @@ UNITTEST_SUITE_BEGIN(xguid)
 		}
 
 		UNITTEST_TEST(isNull)
-        {
+		{
 			xguid i(1,2,3,4);
 			CHECK_EQUAL(false, i.isNull());
 			i.setNull();
@@ -76,8 +76,8 @@ UNITTEST_SUITE_BEGIN(xguid)
 			CHECK_EQUAL(true, i2.isNull());
 		}
 
-        UNITTEST_TEST(set)
-        {
+		UNITTEST_TEST(set)
+		{
 			xguid i;
 			i.set(1,2,3,4);
 
@@ -90,7 +90,7 @@ UNITTEST_SUITE_BEGIN(xguid)
 		}
 
 		UNITTEST_TEST(get)
-        {
+		{
 			xguid i1(1,2,3,4);
 
 			u32 a,b,c,d;
@@ -108,8 +108,8 @@ UNITTEST_SUITE_BEGIN(xguid)
 			CHECK_EQUAL(99, d);
 		}
 
-        UNITTEST_TEST(assignment_operator)
-        {
+		UNITTEST_TEST(assignment_operator)
+		{
 			xguid i1(1,2,3,4);
 			xguid i2;
 			CHECK_TRUE(i2.isNull());
@@ -118,8 +118,8 @@ UNITTEST_SUITE_BEGIN(xguid)
 			CHECK_TRUE(i2 == i1);
 		}
 
-        UNITTEST_TEST(equal_operator)
-        {
+		UNITTEST_TEST(equal_operator)
+		{
 			xguid i1(1,2,3,4);
 
 			xguid i2;
@@ -134,8 +134,8 @@ UNITTEST_SUITE_BEGIN(xguid)
 			CHECK_TRUE(i2 == i1);
 		}
 
-        UNITTEST_TEST(not_equal_operator)
-        {
+		UNITTEST_TEST(not_equal_operator)
+		{
 			xguid i(1,2,3,4);
 			CHECK_EQUAL(false, i.isNull());
 
