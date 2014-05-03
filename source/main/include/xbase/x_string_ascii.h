@@ -197,65 +197,63 @@ namespace xcore
 
 
 	/**
-	 * FORMATTED STRING FUNCTIONS
-	 *==============================================================================
-	 *
-	 *  x_cprintf    
-	 *
-	 *      Formatted print counting function, will return the number of characters needed.
-	 *
-	 *  x_sprintf    
-	 *
-	 *      Formatted print to "string".
-	 *
-	 *==============================================================================
-	 */
-	extern s32		x_cprintf   			(                            const char* formatStr, const x_va& v1=x_va::sEmpty, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
-																							const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
-	extern s32		x_sprintf   			(char* buffer, s32 maxChars, const char* formatStr, const x_va& v1=x_va::sEmpty, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
-																							const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
-	extern s32		x_vcprintf  			(                            const char* formatStr, const x_va_list& args);
-	extern s32		x_vsprintf  			(char* buffer, s32 maxChars, const char* formatStr, const x_va_list& args);
+		* FORMATTED STRING FUNCTIONS
+		*==============================================================================
+		*
+		*  x_cprintf    
+		*
+		*      Formatted print counting function, will return the number of characters needed.
+		*
+		*  x_sprintf    
+		*
+		*      Formatted print to "string".
+		*
+		*==============================================================================
+	*/
+	s32		x_cprintf		(                            const char* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+																				const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
+	s32		x_sprintf		(char* buffer, s32 maxChars, const char* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+																				const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
+	s32		x_vcprintf		(                            const char* formatStr, const x_va_list& args);
+	s32		x_vsprintf		(char* buffer, s32 maxChars, const char* formatStr, const x_va_list& args);
 
 	/**
-	 * FORMATTED STRING FUNCTIONS
-	 *==============================================================================
-	 *
-	 *  x_printf    
-	 *
-	 *      Formatted print to "standard text output".  This is straight forward for
-	 *      text mode programs and is handled by the xBase.  Graphical programs
-	 *      must register a function to handle this operation.
-	 *
-	 *==============================================================================
-	 */
+		* FORMATTED STRING FUNCTIONS
+		*==============================================================================
+		*
+		*  x_printf    
+		*
+		*      Formatted print to "standard text output".  This is straight forward for
+		*      text mode programs and is handled by xbase.  Graphical programs
+		*      must register a function to handle this operation.
+		*
+		*==============================================================================
+	*/
 
-
-	s32		x_printf   			(const char* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
-														const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
-	s32		x_printf				(const char* formatStr, const x_va_list& args)	;
-	s32		x_printf				(const char* str);
+	s32		x_printf   		(const char* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+													const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
+	s32		x_printf		(const char* formatStr, const x_va_list& args)	;
+	s32		x_printf		(const char* str);
 		
 
-
 	/**
-	 * STRING SCAN FUNCTIONS
-	 *==============================================================================
-	 *
-	 *  x_sscanf  
-	 *
-	 *      Scan "string" to values.
-	 *
-	 *==============================================================================
-	 */
-
-	extern s32		x_sscanf		(const char *buf, const char *fmt, const x_va_r& v1=x_va_r::sEmpty, const x_va_r& v2=x_va_r::sEmpty, const x_va_r& v3=x_va_r::sEmpty, const x_va_r& v4=x_va_r::sEmpty, const x_va_r& v5=x_va_r::sEmpty, const x_va_r& v6=x_va_r::sEmpty, const x_va_r& v7=x_va_r::sEmpty, const x_va_r& v8=x_va_r::sEmpty,
-																	const x_va_r& v9=x_va_r::sEmpty, const x_va_r& v10=x_va_r::sEmpty, const x_va_r& v11=x_va_r::sEmpty, const x_va_r& v12=x_va_r::sEmpty, const x_va_r& v13=x_va_r::sEmpty, const x_va_r& v14=x_va_r::sEmpty, const x_va_r& v15=x_va_r::sEmpty, const x_va_r& v16=x_va_r::sEmpty);
-	extern s32		x_vsscanf	(const char *buf, const char *fmt, const x_va_r_list& vr_args);
+		* STRING SCAN FUNCTIONS
+		*==============================================================================
+		*
+		*  x_sscanf  
+		*
+		*      Scan "string" to values.
+		*
+		*==============================================================================
+	*/
+	s32		x_sscanf		(const char *buf, const char *fmt, const x_va_r& v1                , const x_va_r& v2=x_va_r::sEmpty, const x_va_r& v3=x_va_r::sEmpty, const x_va_r& v4=x_va_r::sEmpty, const x_va_r& v5=x_va_r::sEmpty, const x_va_r& v6=x_va_r::sEmpty, const x_va_r& v7=x_va_r::sEmpty, const x_va_r& v8=x_va_r::sEmpty,
+																const x_va_r& v9=x_va_r::sEmpty, const x_va_r& v10=x_va_r::sEmpty, const x_va_r& v11=x_va_r::sEmpty, const x_va_r& v12=x_va_r::sEmpty, const x_va_r& v13=x_va_r::sEmpty, const x_va_r& v14=x_va_r::sEmpty, const x_va_r& v15=x_va_r::sEmpty, const x_va_r& v16=x_va_r::sEmpty);
+	s32		x_vsscanf		(const char *buf, const char *fmt, const x_va_r_list& vr_args);
 
 	//==============================================================================
 	// END xCore namespace
 	//==============================================================================
+
 };
 /**
  *  END xCore namespace

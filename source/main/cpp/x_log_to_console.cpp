@@ -88,6 +88,21 @@ namespace xcore
 		xconsole::write(format, arguments);
 	}
 
+	void 				xlog_to_console_imp::write(const ustr8* buffer)
+	{
+		xconsole::write(buffer);
+	}
+
+	void 				xlog_to_console_imp::write(const ustr8* buffer, s32 index, s32 count)
+	{
+		xconsole::write(buffer, index, count);
+	}
+
+	void 				xlog_to_console_imp::write(const ustr8* format, const x_va_list& arguments)
+	{
+		xconsole::write(format, arguments);
+	}
+
 	void 				xlog_to_console_imp::writeLine()
 	{
 		xconsole::writeLine();
@@ -144,6 +159,21 @@ namespace xcore
 	}
 
 	void 				xlog_to_console_imp::writeLine(const char* format, const x_va_list& arguments)
+	{
+		xconsole::writeLine(format, arguments);
+	}
+
+	void 				xlog_to_console_imp::writeLine(const ustr8* buffer)
+	{
+		xconsole::writeLine(buffer);
+	}
+
+	void 				xlog_to_console_imp::writeLine(const ustr8* buffer, s32 index, s32 count)
+	{
+		xconsole::writeLine(buffer, index, count);
+	}
+
+	void 				xlog_to_console_imp::writeLine(const ustr8* format, const x_va_list& arguments)
 	{
 		xconsole::writeLine(format, arguments);
 	}

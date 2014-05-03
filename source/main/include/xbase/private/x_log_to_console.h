@@ -38,6 +38,9 @@ namespace xcore
 		virtual void 			write(const char* buffer);
 		virtual void 			write(const char* buffer, s32 index, s32 count);
 		virtual void 			write(const char* format, const x_va_list& arguments);
+		virtual void 			write(const ustr8* buffer);
+		virtual void 			write(const ustr8* buffer, s32 index, s32 count);
+		virtual void 			write(const ustr8* format, const x_va_list& arguments);
 
 		virtual void 			writeLine();
 		virtual void 			writeLine(bool value);
@@ -51,6 +54,9 @@ namespace xcore
 		virtual void 			writeLine(const char* buffer);
 		virtual void 			writeLine(const char* buffer, s32 index, s32 count);
 		virtual void 			writeLine(const char* format, const x_va_list& arguments);
+		virtual void 			writeLine(const ustr8* buffer);
+		virtual void 			writeLine(const ustr8* buffer, s32 index, s32 count);
+		virtual void 			writeLine(const ustr8* format, const x_va_list& arguments);
 	};
 };
 /**

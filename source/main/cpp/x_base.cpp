@@ -1,6 +1,7 @@
 #include "xbase\x_target.h"
 #include "xbase\x_allocator.h"
 #include "xbase\x_base.h"
+#include "xbase\x_console.h"
 #include "xbase\x_debug.h"
 
 namespace xcore
@@ -17,6 +18,7 @@ namespace xbase
 #ifdef X_ASSERT
 	void			x_Init()
 	{
+		xcore::xconsole::addDefault();
 		xcore::sSystemAllocator = xcore::gCreateSystemAllocator();
 		xcore::x_asserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
 	}
@@ -24,13 +26,13 @@ namespace xbase
 	void			x_Exit()
 	{
 		xcore::x_asserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
-
 		xcore::sSystemAllocator->release();
 		xcore::sSystemAllocator = NULL;
 	}
 #else
 	void			x_Init()
 	{
+		xcore::xconsole::addDefault();
 		xcore::sSystemAllocator = xcore::gCreateSystemAllocator();
 	}
 

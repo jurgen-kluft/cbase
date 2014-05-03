@@ -5,7 +5,7 @@
 #include "xbase/x_debug.h"
 #include "xbase/x_double.h"
 #include "xbase/x_string_ascii.h"
-
+#include "xbase/x_string_utf.h"
 
 #ifdef TARGET_PC
 	#include <math.h>
@@ -684,10 +684,10 @@ namespace xcore
 	/**
 	 * WriteToBuffer
 	 */
-	typedef void (*WriteBufferDelegate)(char** tempBufferPtr, s32 maxChars, char* string, s32 size);
+	typedef void (*WriteBufferDelegate)(ustr8** tempBufferPtr, s32 maxChars, ustr8* string, s32 size);
 
 	static
-	void WriteToBuffer(char** tempBufferPtr, s32 /*maxChars*/, char* string, s32 size)
+	void WriteToBuffer(ustr8** tempBufferPtr, s32 /*maxChars*/, ustr8* string, s32 size)
 	{
 		s32 i;
 
@@ -696,24 +696,18 @@ namespace xcore
 
 		for (i = 0; i < size; i++)
 		{
-			**tempBufferPtr = string[i];
+			(*tempBufferPtr)->c = string[i].c;
 			(*tempBufferPtr)++;
 		}
 	}
 
 	static
-	void WriteToBufferDummy(char** tempBufferPtr, s32 /*maxChars*/, char* string, s32 size)
+	void WriteToBufferDummy(ustr8** tempBufferPtr, s32 /*maxChars*/, ustr8* string, s32 size)
 	{
-		s32 i;
-
 		ASSERT(string);
 		ASSERT(size >= 0);
 
-		for (i = 0; i < size; i++)
-		{
-			//**tempBufferPtr = string[i];
-			(*tempBufferPtr)++;
-		}
+		*tempBufferPtr += size;
 	}
 
 	/**
@@ -743,9 +737,7 @@ namespace xcore
 			if (howMany > maxChars)
 				howMany = maxChars;
 
-			char* dest = *tempBufferPtr;
-			for (s32 i = 0; i<howMany; i++)
-				dest++;
+			char* dest = *tempBufferPtr + howMany;
 			*tempBufferPtr = dest;
 		}
 	}
@@ -819,30 +811,77 @@ namespace xcore
 	 *     x_printf x_printfxy
 	 *------------------------------------------------------------------------------
 	 */
-	s32 x_vsprintf_internal(char* buffer, s32 maxChars, const char* formatStr, const x_va_list& args, WriteBufferDelegate writeBufferDelegate, PadBufferDelegate padBufferDelegate)
+	static inline uchar8 peek(ustr8* _str)
 	{
-	   
+		uchar8 c;
+		utf::read(_str, c);
+		return c;
+	}
+
+	static inline uchar8 peek(ustr8 const* _str)
+	{
+		uchar8 c;
+		utf::read(_str, c);
+		return c;
+	}
+
+	static inline uchar8 next(ustr8*& _str)
+	{
+		uchar8 c;
+		s32 const n = utf::read(_str, c);
+		_str += n;
+		return c;
+	}
+
+	static inline uchar8 next(ustr8 const*& _str)
+	{
+		uchar8 c;
+		s32 const n = utf::read(_str, c);
+		_str += n;
+		return c;
+	}
+
+	static inline s32 advance(ustr8*& _str)
+	{
+		uchar8 c;
+		s32 const n = utf::read(_str, c);
+		_str += n;
+		return n;
+	}
+
+	static inline s32 advance(ustr8 const*& _str)
+	{
+		uchar8 c;
+		s32 const n = utf::read(_str, c);
+		_str += n;
+		return n;
+	}
+
+
+	//s32 x_vsprintf_internal(char* buffer, s32 maxChars, const char* formatStr, const x_va_list& args, WriteBufferDelegate writeBufferDelegate, PadBufferDelegate padBufferDelegate)
+	s32 x_vsprintf_internal(ustr8* buffer, s32 maxChars, const ustr8* formatStr, const x_va_list& args, WriteBufferDelegate writeBufferDelegate, PadBufferDelegate padBufferDelegate)
+	{
 		ASSERT(formatStr);
 
 		//TODO: fmt and cp should have same const state
 
-		char  ch;             ///< character from fmt */
-		s32   n;              ///< handy integer (short term usage)
-		char* cp;             ///< handy char pointer (short term usage)
-		s32   flags;          ///< flags as above
-		s32   width;          ///< width from format (%8d), or 0
-		s32   prec;           ///< precision from format (%.3d), or -1
-		char  sign;           ///< sign prefix (' ', '+', '-', or \0)
-		f64   _double;        ///< f64 precision arguments %[eEfgG]
-		s32   base;           ///< base for [diouxX] conversion
-		s32   dprec;          ///< a copy of prec if [diouxX], 0 otherwise
-		s32   realsz;         ///< field size expanded by dprec, sign, etc
-		s32   size;           ///< size of converted field or string
-		char  buf[WORKSIZE];  ///< space for %c, %[diouxX], %[eEfgG]
-		char  ox[2];          ///< space for 0x hex-prefix
+		uchar8  ch;             ///< character from fmt */
+		s32     n;              ///< handy integer (short term usage)
+		ustr8*  cp;             ///< handy char pointer (short term usage)
+		s32     flags;          ///< flags as above
+		s32     width;          ///< width from format (%8d), or 0
+		s32     prec;           ///< precision from format (%.3d), or -1
+		char    sign;           ///< sign prefix (' ', '+', '-', or \0)
+		f64     _double;        ///< f64 precision arguments %[eEfgG]
+		s32     base;           ///< base for [diouxX] conversion
+		s32     dprec;          ///< a copy of prec if [diouxX], 0 otherwise
+		s32     realsz;         ///< field size expanded by dprec, sign, etc
+		s32     size;           ///< size of converted field or string
+		ustr8   buf[WORKSIZE];  ///< space for %c, %[diouxX], %[eEfgG]
+		ustr8   ox[2];          ///< space for 0x hex-prefix
 
 		/// Initialize variables
-		const char* fmt      = (char*)formatStr;       // format string */
+		const ustr8* fmt     = (ustr8*)formatStr;       // format string */
 			  char* xdigs    = NULL;                   // digits for [xX] conversion
 			  s32   ret      = 0;                      // return value accumulator
 			  u32   ulval    = 0;                      // integer arguments %[diouxX]
@@ -854,7 +893,7 @@ namespace xcore
 		{
 			// find the first "interesting symbol"
 			// TODO: cp was not initialized with a correct way, we should implement this loop to give cp a valid value later
-			for (cp = const_cast<char*>(fmt); (ch = *fmt) != '\0' && ch != '%'; fmt++)
+			for (cp = const_cast<ustr8*>(fmt); (peek(fmt) != uchar8('\0')) && (ch != uchar8('%')); advance(fmt))
 			{
 				// TODO:Empty
 			}
@@ -868,7 +907,7 @@ namespace xcore
 			}
 
 			// are we done?
-			if (ch == '\0') 
+			if (ch.c == '\0') 
 				goto done;
 
 			// skip over '%'
@@ -882,10 +921,11 @@ namespace xcore
 			sign  = '\0';
 
 	rflag:
-			ch = *fmt++;
+			//*fmt++;
+			ch = next(fmt);
 
 	reswitch:
-			switch (ch)
+			switch (ch.c)
 			{
 				case ' ':
 
@@ -923,7 +963,8 @@ namespace xcore
 					goto rflag;
 
 				case '.':
-					if ((ch = *fmt++) == '*')
+					ch = next(fmt);
+					if (ch.c == '*')
 					{
 						n = (s32)args[argindex++];
 						prec = n < 0 ? -1 : n;
@@ -931,16 +972,15 @@ namespace xcore
 					}
 
 					n = 0;
-
-					while (is_digit(ch))
+					while (is_digit(ch.c))
 					{
-						n = 10 * n + to_digit(ch);
-						ch = *fmt++;
+						n = 10 * n + to_digit(ch.c);
+						//ch = *fmt++;
+						ch = next(fmt);
 					}
 
 					prec = n < 0 ? -1 : n;
 					goto reswitch;
-
 
 				case '0':
 					 // ``Note that 0 is taken as a flag, not as the
@@ -954,9 +994,10 @@ namespace xcore
 					n = 0;
 					do
 					{
-						n = 10 * n + to_digit(ch);
-						ch = *fmt++;
-					} while (is_digit(ch));
+						n = 10 * n + to_digit(ch.c);
+						//ch = *fmt++;
+						ch = next(fmt);
+					} while (is_digit(ch.c));
 
 					width = n;
 					goto reswitch;
@@ -978,7 +1019,7 @@ namespace xcore
 					goto rflag;
 
 				case 'c':
-					*(cp = buf) = (char)args[argindex++];
+					(cp = buf)->c = (char)args[argindex++];
 					size = 1;
 					sign = '\0';
 					break;
@@ -994,13 +1035,11 @@ namespace xcore
 					{
 						flags |= QUADINT;
 						s64 temp = (s64)args[argindex++];
-
 						if (temp < 0)
 						{
 							temp = -temp;
 							sign = '-';
 						}
-						
 						uqval = (u64)temp;
 					}
 					else
@@ -1035,7 +1074,7 @@ namespace xcore
 
 					if (sign == '+') 
 					{
-						writeBufferDelegate(&buffer, maxChars, &sign, 1);
+						writeBufferDelegate(&buffer, maxChars, (ustr8*)&sign, 1);
 						width--;
 						ret++;
 					}
@@ -1058,22 +1097,22 @@ namespace xcore
 						width = -width;
 
 					// right-adjusting zero padding
-					size = dtoa(buf, _double, ch, width, prec);
+					size = dtoa((char*)buf, _double, (char)ch.c, width, prec);
 
 					// check whether we have to pad or not
 					if (flags & ZEROPAD)
 					{
 						s32 i;
-						for (i = 0; buf[i] == ' '; i++)
+						for (i = 0; buf[i].c == ' '; i++)
 						{
-							buf[i] = '0';
+							buf[i].c = '0';
 						}
 					}
 
 					writeBufferDelegate(&buffer, maxChars, buf, size);
 
 					if (flags & LADJUST)
-						padBufferDelegate(&buffer, maxChars, -width - size, ' ');
+						padBufferDelegate((char**)&buffer, maxChars, -width - size, ' ');
 
 					// finally, adjust ret
 					ret += width > size ? width : size;
@@ -1110,41 +1149,53 @@ namespace xcore
 					 // of printable characters, in an implementation-
 					 // defined manner." 
 					 // -- ANSI X3J11
-	#ifdef TARGET_PC
-					uqval = (u64)args[argindex++];
-					base  = 16;
-					xdigs = "0123456789abcdef";
+#ifdef TARGET_PC
+					uqval  = (u64)args[argindex++];
+					base   = 16;
+					xdigs  = "0123456789abcdef";
 					flags |= QUADINT;           // | HEXPREFIX; Not prefixes
-					ch    = 'x';
+					ch.c   = 'x';
 
 					// make sure that the precision is at 8
 					if (prec < 0)
 						prec = 8;
-
-	#else
+#else
 					ulval = (u32)args[argindex++];
 					base  = 16;
 					xdigs = "0123456789abcdef";
 					flags = (flags & ~QUADINT); // | HEXPREFIX; Not prefixes
-					ch    = 'x';
+					ch.c  = 'x';
 
 					// make sure that the precision is at 8
 					if (prec < 0)
 						prec = 8;
-	#endif
+#endif
 					goto nosign;
 
 				case 's':
 
 					//cp is not const
-					cp = const_cast<char*>((const char*)args[argindex++]);
+					cp = const_cast<ustr8*>((const ustr8*)args[argindex++]);
 					ASSERT(cp != NULL);
 					if (prec >= 0)
 					{
 						// can't use strlen; can only look for the
 						// NULL in the first `prec' characters, and
 						// strlen() will go further.
-						char *p = (char*)x_memchr(cp, 0, (s32)prec);
+						//char *p = (char*)x_memchr(cp, 0, (s32)prec);
+						ustr8* p = NULL;
+						ustr8* kcp = cp;
+						for (s32 k=0; k<prec; k++)
+						{
+							uchar8 kch = peek(kcp);
+							ASSERT(utf::numBytes(kch)==1);	// currently we only support ASCII here
+							if (kch.c == '\0')
+							{
+								p = kcp;
+								break;
+							}
+							advance(kcp);
+						}
 
 						if (p != NULL)
 						{
@@ -1155,32 +1206,35 @@ namespace xcore
 							size = prec;
 					}
 					else
-						size = x_strlen(cp);
-
+					{
+						utf::ulen8 len = utf::ulen8::strlen(cp);
+						ASSERT(len.blen() == len.clen());		// currently we only support ASCII
+						size = len.clen();
+					}
 					sign = '\0';
 					break;
 
 				case 'B':
 					ulval = ((bool)args[argindex++]) ? 1 : 0;
-					size = boolToStr(ulval, buf, sizeof(buf), false, ((flags&ALT)!=0) ? CAMELCASE : UPPERCASE);
+					size = boolToStr(ulval, (char*)buf, sizeof(buf), false, ((flags&ALT)!=0) ? CAMELCASE : UPPERCASE);
 					cp = buf;
 					break;
 
 				case 'b':
 					ulval = ((bool)args[argindex++]) ? 1 : 0;
-					size = boolToStr(ulval, buf, sizeof(buf), false, ((flags&ALT)!=0) ? CAMELCASE : 0);
+					size = boolToStr(ulval, (char*)buf, sizeof(buf), false, ((flags&ALT)!=0) ? CAMELCASE : 0);
 					cp = buf;
 					break;
 
 				case 'Y':
 					ulval = ((bool)args[argindex++]) ? 1 : 0;
-					size = boolToStr(ulval, buf, sizeof(buf), true, ((flags&ALT)!=0) ? CAMELCASE : UPPERCASE);
+					size = boolToStr(ulval, (char*)buf, sizeof(buf), true, ((flags&ALT)!=0) ? CAMELCASE : UPPERCASE);
 					cp = buf;
 					break;
 
 				case 'y':
 					ulval = ((bool)args[argindex++]) ? 1 : 0;
-					size = boolToStr(ulval, buf, sizeof(buf), true, ((flags&ALT)!=0) ? CAMELCASE : 0);
+					size = boolToStr(ulval, (char*)buf, sizeof(buf), true, ((flags&ALT)!=0) ? CAMELCASE : 0);
 					cp = buf;
 					break;
 
@@ -1236,14 +1290,14 @@ namespace xcore
 					{
 						if (uqval != 0 || prec != 0)
 						{
-							cp = UQtoA(uqval, cp, base, xbool((flags & ALT)!=0), xdigs);
+							cp = (ustr8*)UQtoA(uqval, (char*)cp, base, xbool((flags & ALT)!=0), xdigs);
 						}
 					}
 					else
 					{
 						if (ulval != 0 || prec != 0)
 						{
-							cp = ULtoA(ulval, cp, base, xbool((flags & ALT)!=0), xdigs);
+							cp = (ustr8*)ULtoA(ulval, (char*)cp, base, xbool((flags & ALT)!=0), xdigs);
 						}
 					}
 
@@ -1251,12 +1305,12 @@ namespace xcore
 					break;
 
 				default:    // "%?" prints ?, unless ? is NUL
-					if (ch == '\0')
+					if (ch.c == '\0')
 						goto done;
 
 					// pretend it was %c with argument ch
 					cp   = buf;
-					*cp  = ch;
+					cp  += utf::write(cp, ch);
 					size = 1;
 					sign = '\0';
 
@@ -1286,41 +1340,41 @@ namespace xcore
 
 				// right-adjusting blank padding
 				if ((flags & (LADJUST|ZEROPAD)) == 0)
-					padBufferDelegate(&buffer, maxChars, width - realsz, ' ');
+					padBufferDelegate((char**)&buffer, maxChars, width - realsz, ' ');
 
 				// prefix
 				if (sign)
 				{
-					writeBufferDelegate(&buffer, maxChars, &sign, 1);
+					writeBufferDelegate(&buffer, maxChars, (ustr8*)&sign, 1);
 				}
 				else
 					if (flags & HEXPREFIX)
 					{
-						ox[0] = '0';
-						ox[1] = ch;
+						ox[0].c = '0';
+						ox[1].c = (u8)ch.c;
 						writeBufferDelegate(&buffer, maxChars, ox, 2);
 					}
 
 				// right-adjusting zero padding
 				if ((flags & (LADJUST|ZEROPAD)) == ZEROPAD)
-					padBufferDelegate(&buffer, maxChars, width - realsz, '0');
+					padBufferDelegate((char**)&buffer, maxChars, width - realsz, '0');
 
 				// leading zeroes from decimal precision
-				padBufferDelegate(&buffer, maxChars, dprec - size, '0');
+				padBufferDelegate((char**)&buffer, maxChars, dprec - size, '0');
 
 				// write the integer number
 				writeBufferDelegate(&buffer, maxChars, cp, size);
 
 				// left-adjusting padding (always blank)
 				if (flags & LADJUST)
-					padBufferDelegate(&buffer, maxChars, width - realsz, ' ');
+					padBufferDelegate((char**)&buffer, maxChars, width - realsz, ' ');
 
 				// finally, adjust ret
 				ret += width > realsz ? width : realsz;
 		}
 
 	done:
-		writeBufferDelegate(&buffer, maxChars, "\0", 1);
+		writeBufferDelegate(&buffer, maxChars, (ustr8*)"\0", 1);
 
 		return (ret);
 	}
@@ -1329,7 +1383,7 @@ namespace xcore
 	// <COMBINE x_vsprintf >
 	s32 x_vsprintf(char* buffer, s32 maxChars, const char* formatStr, const x_va_list& args)
 	{
-		s32 strLen = x_vsprintf_internal(buffer, maxChars, formatStr, args, WriteToBuffer, PadBuffer);
+		s32 strLen = x_vsprintf_internal((ustr8*)buffer, maxChars, (ustr8 const*)formatStr, args, WriteToBuffer, PadBuffer);
 		return strLen;
 	}
 
@@ -1337,7 +1391,7 @@ namespace xcore
 																	 const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
 	{
 		x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
-		s32 strLen = x_vsprintf_internal(buffer, maxChars, formatStr, args, WriteToBuffer, PadBuffer);
+		s32 strLen = x_vsprintf_internal((ustr8*)buffer, maxChars, (ustr8 const*)formatStr, args, WriteToBuffer, PadBuffer);
 		return strLen;
 	}
 
@@ -1345,18 +1399,89 @@ namespace xcore
 	{
 		char* buffer = 0;
 		s32 maxChars = X_S32_MAX;
-		s32 strLen = x_vsprintf_internal(buffer, maxChars, formatStr, args, WriteToBufferDummy, PadBufferDummy);
+		s32 strLen = x_vsprintf_internal((ustr8*)buffer, maxChars, (ustr8 const*)formatStr, args, WriteToBufferDummy, PadBufferDummy);
 		return strLen;
 	}
+
 	s32 x_cprintf(                            const char* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
 																	 const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
 	{
 		char* buffer = 0;
 		s32 maxChars = X_S32_MAX;
 		x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
-		s32 strLen = x_vsprintf_internal(buffer, maxChars, formatStr, args, WriteToBufferDummy, PadBufferDummy);
+		s32 strLen = x_vsprintf_internal((ustr8*)buffer, maxChars, (ustr8 const*)formatStr, args, WriteToBufferDummy, PadBufferDummy);
 		return strLen;
 	}
+
+	 s32		x_printf   				(const char* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+																const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
+	 {
+		 return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16); 
+	 }
+
+	 s32		x_printf				(const char* formatStr, const x_va_list& args)		
+	 {
+		 return xconsole::write(formatStr, args); 
+	 }
+
+	 s32		x_printf				(const char* str)									
+	 {
+		 return xconsole::write(str); 
+	 }
+
+	 namespace utf
+	 {
+		//------------------------------------------------------------------------------
+		// <COMBINE x_vsprintf >
+		s32 x_vsprintf(ustr8* buffer, s32 maxChars, const ustr8* formatStr, const x_va_list& args)
+		{
+			s32 strLen = x_vsprintf_internal((ustr8*)buffer, maxChars, (ustr8 const*)formatStr, args, WriteToBuffer, PadBuffer);
+			return strLen;
+		}
+
+		s32 x_sprintf(ustr8* buffer, s32 maxChars, const ustr8* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
+																		 const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
+		{
+			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
+			s32 strLen = x_vsprintf_internal((ustr8*)buffer, maxChars, (ustr8 const*)formatStr, args, WriteToBuffer, PadBuffer);
+			return strLen;
+		}
+
+		s32 x_vcprintf(                           const ustr8* formatStr, const x_va_list& args)
+		{
+			ustr8* buffer = 0;
+			s32 maxChars = X_S32_MAX;
+			s32 strLen = x_vsprintf_internal((ustr8*)buffer, maxChars, (ustr8 const*)formatStr, args, WriteToBufferDummy, PadBufferDummy);
+			return strLen;
+		}
+
+		s32 x_cprintf(                            const ustr8* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
+																		 const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
+		{
+			char* buffer = 0;
+			s32 maxChars = X_S32_MAX;
+			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
+			s32 strLen = x_vsprintf_internal((ustr8*)buffer, maxChars, (ustr8 const*)formatStr, args, WriteToBufferDummy, PadBufferDummy);
+			return strLen;
+		}
+
+		 s32		x_printf   				(const ustr8* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+																	const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
+		 {
+			 return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16); 
+		 }
+
+		 s32		x_printf				(const ustr8* formatStr, const x_va_list& args)		
+		 {
+			 return xconsole::write(formatStr, args); 
+		 }
+
+		 s32		x_printf				(const ustr8* str)									
+		 {
+			 return xconsole::write(str); 
+		 }
+
+	 }
 };
 /**
  *  END xCore namespace

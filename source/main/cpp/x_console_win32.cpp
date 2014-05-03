@@ -16,6 +16,7 @@
 #include <stdio.h>
 
 #include "xbase\x_console.h"
+#include "xbase\x_string_utf.h"
 
 /**
  * xCore namespace
@@ -33,6 +34,16 @@ namespace xcore
 		{
 			::OutputDebugStringA(str);
 			::fputs(str, stdout);
+			return len;
+		}
+
+		s32 write8(const ustr8* str, s32 len)
+		{
+			ustr16 wide_string[1024];
+			ustr16* dst = (ustr16*)wide_string;
+			utf::convert(str, str+len, dst, (dst + 1024));
+			::OutputDebugStringW((LPCWSTR)wide_string);
+			::fputws((const wchar_t*)str, stdout);
 			return len;
 		}
 	};
