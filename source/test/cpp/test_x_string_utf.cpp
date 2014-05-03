@@ -85,19 +85,19 @@ UNITTEST_SUITE_BEGIN(xutf)
 		UNITTEST_TEST(utf_uptr8)
 		{
 			char str1[256];
-			utf::uptr8 i1   = (ustr8*)str1;
-			utf::uptr8 end1 = i1 + 256;
+			uptr8 i1   = (ustr8*)str1;
+			uptr8 end1 = i1 + 256;
 
 			char const* str2 = "This is another simple ASCII string.";
-			utf::ucptr8 i2   = (ustr8 const*)str2;
-			utf::ucptr8 end2 = i2 + i2.strlen();
+			ucptr8 i2   = (ustr8 const*)str2;
+			ucptr8 end2 = i2 + i2.strlen();
 
 			CHECK_TRUE(end2.at_end());
 
 			// copy str2 to str1;
 			while (i1 != end1 && !i2.at_end())
 			{
-				utf::ulen8 n = i1.copy_char_from(i2);
+				ulen8 n = i1.copy_char_from(i2);
 				CHECK_EQUAL(1,n.blen());
 				CHECK_EQUAL(1,n.clen());
 				i1 += n;
