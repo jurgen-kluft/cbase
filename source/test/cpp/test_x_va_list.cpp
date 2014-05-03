@@ -84,10 +84,7 @@ UNITTEST_SUITE_BEGIN(xva)
 			CHECK_TRUE(v.isPCTChar());
 			CHECK_TRUE(v.isPCUSTR8());
 
-			CHECK_TRUE((bool)v);
-			CHECK_EQUAL(100, (s32)v);
-			CHECK_EQUAL(100.0f, (f32)v);
-			CHECK_EQUAL(100.0, (f64)v);
+			CHECK_TRUE((bool)v);	// ptr != NULL
 		}
 
 	}

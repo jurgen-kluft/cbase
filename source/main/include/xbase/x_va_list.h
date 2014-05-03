@@ -141,7 +141,7 @@ namespace xcore
 		xbool					isF32() const										{ return xbool(mType == TYPE_FLOAT32); }
 		xbool					isF64() const										{ return xbool(mType == TYPE_FLOAT64); }
 		xbool					isPCTChar() const									{ return xbool(mType == TYPE_PCTCHAR); }
-		xbool					isPCUSTR8() const									{ return xbool(mType == TYPE_PCUSTR8); }
+		xbool					isPCUSTR8() const									{ return xbool(mType == TYPE_PCUSTR8 || mType == TYPE_PCTCHAR); }
 
 		operator				char() const										{ return (char)convertToInt8(); }
 		operator				uchar8() const										{ return convertToUchar8(); }
@@ -361,7 +361,7 @@ namespace xcore
 		xbool					isF32() const										{ return xbool(mType == TYPE_FLOAT32); }
 		xbool					isF64() const										{ return xbool(mType == TYPE_FLOAT64); }
 		xbool					isPTChar() const									{ return xbool(mType == TYPE_PTCHAR); }
-		xbool					isPUStr8() const									{ return xbool(mType == TYPE_PUSTR8); }
+		xbool					isPUStr8() const									{ return xbool(mType == TYPE_PUSTR8 || mType == TYPE_PTCHAR); }
 
 		static x_va_r			sEmpty;
 

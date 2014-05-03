@@ -893,7 +893,7 @@ namespace xcore
 		{
 			// find the first "interesting symbol"
 			// TODO: cp was not initialized with a correct way, we should implement this loop to give cp a valid value later
-			for (cp = const_cast<ustr8*>(fmt); (peek(fmt) != uchar8('\0')) && (ch != uchar8('%')); advance(fmt))
+			for (cp = const_cast<ustr8*>(fmt); ((ch=peek(fmt)) != uchar8('\0')) && (ch != uchar8('%')); advance(fmt))
 			{
 				// TODO:Empty
 			}
