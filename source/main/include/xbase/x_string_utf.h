@@ -41,8 +41,8 @@ namespace xcore
 		bool		isLegal		(const ustr8 * _src, const ustr8 * _src_end = NULL);
 		bool		isLegal		(const ustr16* _src, const ustr16* _src_end = NULL);
 
-		bool		convert		(uchar16 _from, uchar8  _to);
-		bool		convert		(uchar8  _from, uchar16 _to);
+		bool		convert		(uchar16 _from, uchar8  & _to);
+		bool		convert		(uchar8  _from, uchar16 & _to);
 
 		s32			convert		(ustr8  const* _src, ustr8  const* _src_end, ustr16*& _dst, ustr16 const* _dst_end);
 		s32			convert		(ustr16 const* _src, ustr16 const* _src_end, ustr8 *& _dst, ustr8  const* _dst_end);
@@ -772,8 +772,10 @@ namespace xcore
 		static const u32 byteMask = 0xBF;
 		static const u32 byteMark = 0x80; 
 
-		inline bool			convert		(uchar16 _from, uchar8  _to)
+		inline bool			convert		(uchar16 _from, uchar8& _to)
 		{
+			_to.c = '?';
+
 			u16 ch = _from.c & 0xFFFF;
 			// If we have a surrogate pair, convert to u32 first
 			if (ch >= 0xD800 && ch <= 0xDBFF)
@@ -782,14 +784,9 @@ namespace xcore
 
 				// If it's a low surrogate, convert to u32
 				if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
-				{
 					ch = ((ch - 0xD800) << halfShift) + (ch2 - 0xDC00) + halfBase;
-				}
 				else 
-				{
-					// it's an unpaired high surrogate
-					return false;
-				}
+					return false;	// it's an unpaired high surrogate
 			}
 			else
 			{
@@ -818,8 +815,10 @@ namespace xcore
 			return true;
 		}
 
-		inline bool			convert		(uchar8  _from, uchar16 _to)
+		inline bool			convert		(uchar8  _from, uchar16& _to)
 		{
+			_to.c = '?';
+
 			// Do this check whether lenient or strict
 			if (!isLegal(_from))
 				return false;
@@ -835,7 +834,6 @@ namespace xcore
 			case 3: ch16 += ch8 & 0xFF; ch8=ch8>>8; ch16<<=6;
 			case 2: ch16 += ch8 & 0xFF; ch8=ch8>>8; ch16<<=6;
 			case 1: ch16 += ch8 & 0xFF; break;
-			case 0: 
 			default:
 				return false;
 				break;
@@ -859,14 +857,13 @@ namespace xcore
 				_to.c = (u16)((ch16 >> halfShift) + 0xD800);
 				_to.c = _to.c | (((ch16 & halfMask) + 0xDC00)<<16);
 			}
-
-			return false;
+			return true;
 		}
 
 		inline s32			convert		(ustr8  const* _src, ustr8  const* _src_end, ustr16*& _dst, ustr16 const* _dst_end)
 		{
 			s32 numChars = 0;
-			ustr8  const* src = _src;
+			ustr8 const* src = _src;
 			while (src < _src_end)
 			{
 				uchar8 ch8;
@@ -878,8 +875,31 @@ namespace xcore
 				if (!convert(ch8, ch16))
 					return -1;
 
-				u32 const dstn = write(_dst, ch16, _dst_end);
-				if (dstn==0)
+				bool terminate = false;
+				if (ch8.c == 0)
+				{
+					terminate = true;
+				}
+				else if ((_dst_end - _dst) == 1)
+				{
+					terminate = true;
+				}
+				else if ((_dst_end - _dst) == 2)
+				{
+					terminate = (numBytes(ch16)==4);
+				}
+
+				if (terminate)
+				{
+					ch16.c = '\0';
+					s32 const dstn = write(_dst, ch16, _dst_end);
+					if (dstn<=0)
+						return -1;
+					return numChars;
+				}
+
+				s32 const dstn = write(_dst, ch16, _dst_end);
+				if (dstn<0)
 					return -1;
 				_dst += dstn;
 				++numChars;
@@ -902,14 +922,83 @@ namespace xcore
 				if (!convert(ch16, ch8))
 					return -1;
 
-				u32 const dstn = write(_dst, ch8, _dst_end);
-				if (dstn==0)
+				bool terminate = false;
+				if (ch8.c == 0)
+				{
+					terminate = true;
+				}
+				else 
+				{
+					const u32 n = (u32)(_dst_end - _dst);
+					if (n == 1)
+					{
+						terminate = true;
+					}
+					else if (n <= 4)
+					{
+						terminate = (numBytes(ch8)>=n);
+					}
+				}
+				if (terminate)
+				{
+					ch8.c = '\0';
+					s32 const dstn = write(_dst, ch8, _dst_end);
+					if (dstn<=0)
+						return -1;
+					return numChars;
+				}
+
+				s32 const dstn = write(_dst, ch8, _dst_end);
+				if (dstn<=0)
 					return -1;
 				_dst += dstn;
 				++numChars;
 			}
 			return numChars;
 		}
+	}
+
+	namespace utf
+	{
+		/**
+			* FORMATTED STRING FUNCTIONS
+			*==============================================================================
+			*
+			*  x_cprintf    
+			*
+			*      Formatted print counting function, will return the number of characters needed.
+			*
+			*  x_sprintf    
+			*
+			*      Formatted print to "string".
+			*
+			*==============================================================================
+		*/
+		s32		x_cprintf		(                            const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+																					const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
+		s32		x_sprintf		(ustr8* buffer, s32 maxChars, const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+																					const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
+		s32		x_vcprintf		(                            const ustr8* formatStr, const x_va_list& args);
+		s32		x_vsprintf		(ustr8* buffer, s32 maxChars, const ustr8* formatStr, const x_va_list& args);
+
+		/**
+			* FORMATTED STRING FUNCTIONS
+			*==============================================================================
+			*
+			*  x_printf    
+			*
+			*      Formatted print to "standard text output".  This is straight forward for
+			*      text mode programs and is handled by xbase.  Graphical programs
+			*      must register a function to handle this operation.
+			*
+			*==============================================================================
+		*/
+
+		s32		x_printf   		(const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+														const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
+		s32		x_printf		(const ustr8* formatStr, const x_va_list& args)	;
+		s32		x_printf		(const ustr8* str);
+
 	}
 }
 

@@ -2060,16 +2060,6 @@ namespace xcore
 		return xFALSE;
 	}
 
-
-
-
-
-	 s32		x_printf   				(const char* formatStr, const x_va& v1             , const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
-																	const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16) { return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16); }
-	 s32		x_printf				(const char* formatStr, const x_va_list& args)		{ return xconsole::write(formatStr, args); }
-	 s32		x_printf				(const char* str)									{ return xconsole::write(str); }
-
-
 };
 
 /**

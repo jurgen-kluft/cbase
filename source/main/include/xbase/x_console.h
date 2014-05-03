@@ -80,12 +80,12 @@ namespace xcore
 		};
 
 		typedef s32 (*ConsoleOutDelegate)(const char*, s32);
+		typedef s32 (*ConsoleOut8Delegate)(const ustr8*, s32);
 		typedef s32 (*ConsoleColorDelegate)(xconsole::EColor);
 
 		static void				add(xconsole_imp* imp);							///< Returns old implementation
 		static void				addDefault();									///< Attach default (debug, printf) implementation
 		static void				remove(xconsole_imp* imp);						///< Returns old implementation, sets current implementation to NULL
-		static void				removeAll();
 
 		static void				setColor(EColor color);
 		static void				restoreColor();
@@ -101,9 +101,15 @@ namespace xcore
 
 		static s32	 			write(const char* str);
 		static s32	 			write(s32 index, s32 count, const char* str);
+		static s32	 			write(const ustr8* str);
+		static s32	 			write(s32 index, s32 count, const ustr8* str);
 	
 		static s32	 			write(const char* formatString, const x_va_list& args);
 		static s32	 			write(const char* formatString, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
+																const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
+
+		static s32	 			write(const ustr8* formatString, const x_va_list& args);
+		static s32	 			write(const ustr8* formatString, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
 																const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
 
 		static s32 				writeLine();
@@ -119,9 +125,19 @@ namespace xcore
 
 		inline static s32 		writeLine(const char* str)						{ s32 l = write(str); l += writeLine(); return l; }
 		inline static s32 		writeLine(s32 index, s32 count, const char* str){ s32 l = write(index, count, str); l += writeLine(); return l; }
+		inline static s32 		writeLine(const ustr8* str)						{ s32 l = write(str); l += writeLine(); return l; }
+		inline static s32 		writeLine(s32 index, s32 count, const ustr8* str){ s32 l = write(index, count, str); l += writeLine(); return l; }
 
 		inline static s32 		writeLine(const char* formatString, const x_va_list& args){ s32 l = write(formatString, args); l += writeLine(); return l; }
 		inline static s32 		writeLine(const char* formatString, const x_va& v1, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty)
+		{
+			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9);
+			s32 l = write(formatString, args); 
+			l += writeLine();
+			return l; 
+		}
+		inline static s32 		writeLine(const ustr8* formatString, const x_va_list& args){ s32 l = write(formatString, args); l += writeLine(); return l; }
+		inline static s32 		writeLine(const ustr8* formatString, const x_va& v1, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty)
 		{
 			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9);
 			s32 l = write(formatString, args); 
@@ -135,6 +151,7 @@ namespace xcore
 	{
 		extern s32				color(xconsole::EColor color);
 		extern s32				write(const char* str, s32 len);
+		extern s32				write8(const ustr8* str, s32 len);
 	};
 
 	/// Interface class, has specific (or configurable) implementations for different environments/platforms
@@ -163,8 +180,11 @@ namespace xcore
 
 		virtual s32 			write(const char* buffer) = 0;
 		virtual s32 			write(s32 index, s32 count, const char* buffer) = 0;
+		virtual s32 			write(const ustr8* buffer) = 0;
+		virtual s32 			write(s32 index, s32 count, const ustr8* buffer) = 0;
 
 		virtual s32 			write(const char* formatString, const x_va_list& args) = 0;
+		virtual s32 			write(const ustr8* formatString, const x_va_list& args) = 0;
 
 		virtual s32 			writeLine() = 0;
 
@@ -179,8 +199,11 @@ namespace xcore
 
 		inline s32 				writeLine(const char* str)						{ s32 l = write(str); l+=writeLine(); return l; }
 		inline s32 				writeLine(s32 index, s32 count, const char* str){ s32 l = write(str); l+=writeLine(); return l; }
+		inline s32 				writeLine(const ustr8* str)						{ s32 l = write(str); l+=writeLine(); return l; }
+		inline s32 				writeLine(s32 index, s32 count, const ustr8* str){ s32 l = write(str); l+=writeLine(); return l; }
 
 		inline s32 				writeLine(const char* format, const x_va_list& args) { s32 l = write(format, args); l+=writeLine(); return l; }
+		inline s32 				writeLine(const ustr8* format, const x_va_list& args) { s32 l = write(format, args); l+=writeLine(); return l; }
 	};
 
 	//==============================================================================

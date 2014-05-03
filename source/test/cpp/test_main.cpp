@@ -42,6 +42,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtypes);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtls);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xutf);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xva);
 #endif
 
 #ifndef X_NO_CUSTOM_INT64

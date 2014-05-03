@@ -43,29 +43,29 @@ namespace xcore
 		///< return a x_log_info per thread. The default one only works in a single threaded environment.
 		extern void				x_SetGetLogInfo(x_log_info::_delegate* Function);
 
-		        void		__x_LogMessage		(const char* channel, const char* message);
-		        void		__x_LogWarning		(const char* channel, const char* message);
-		        void		__x_LogError  		(const char* channel, const char* message);
-		        void		__x_LogMessage		(const char* channel, const char* messageFormat, const x_va_list& formatVars);
-		        void		__x_LogWarning		(const char* channel, const char* messageFormat, const x_va_list& formatVars);
-		        void		__x_LogError  		(const char* channel, const char* messageFormat, const x_va_list& formatVars);
+				void		__x_LogMessage		(const char* channel, const char* message);
+				void		__x_LogWarning		(const char* channel, const char* message);
+				void		__x_LogError  		(const char* channel, const char* message);
+				void		__x_LogMessage		(const char* channel, const char* messageFormat, const x_va_list& formatVars);
+				void		__x_LogWarning		(const char* channel, const char* messageFormat, const x_va_list& formatVars);
+				void		__x_LogError  		(const char* channel, const char* messageFormat, const x_va_list& formatVars);
 
-		        void		x_LogPush			(const char* fileName, s32 lineNum);
-		        void		x_LogFlush			(void);
-                    
-        #define				x_LogMessage		xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogMessage
-        #define				x_LogWarning		xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogWarning
-        #define				x_LogError		xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogError
+				void		x_LogPush			(const char* fileName, s32 lineNum);
+				void		x_LogFlush			(void);
+					
+		#define				x_LogMessage		xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogMessage
+		#define				x_LogWarning		xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogWarning
+		#define				x_LogError			xcore::x_LogPush(__FILE__, __LINE__); xcore::__x_LogError
 	#else
-		inline void			x_LogPush		(const char* fileName, s32 lineNum){}
-		inline void			x_LogFlush		(void){}
+		inline void			x_LogPush			(const char* fileName, s32 lineNum){}
+		inline void			x_LogFlush			(void){}
 
-        inline void			__x_LogFake	    	(const char* channel, const char* message){}
-        inline void			__x_LogFake 		(const char* channel, const char* messageFormat, const x_va_list& formatVars){}
+		inline void			__x_LogFake	    	(const char* channel, const char* message){}
+		inline void			__x_LogFake 		(const char* channel, const char* messageFormat, const x_va_list& formatVars){}
 
-        #define				x_LogMessage		xcore::__x_LogFake
-        #define				x_LogWarning		xcore::__x_LogFake
-        #define				x_LogError		xcore::__x_LogFake
+		#define				x_LogMessage		xcore::__x_LogFake
+		#define				x_LogWarning		xcore::__x_LogFake
+		#define				x_LogError			xcore::__x_LogFake
 	#endif
 
 
@@ -102,6 +102,9 @@ namespace xcore
 		static void 			write(ELevel inLevel, const char* buffer);
 		static void 			write(ELevel inLevel, const char* buffer, s32 index, s32 count);
 		static void 			write(ELevel inLevel, const char* format, const x_va_list& arguments);
+		static void 			write(ELevel inLevel, const ustr8* buffer);
+		static void 			write(ELevel inLevel, const ustr8* buffer, s32 index, s32 count);
+		static void 			write(ELevel inLevel, const ustr8* format, const x_va_list& arguments);
 
 		static void 			writeLine(ELevel inLevel);
 		static void 			writeLine(ELevel inLevel, bool _value);
@@ -115,6 +118,9 @@ namespace xcore
 		static void 			writeLine(ELevel inLevel, const char* buffer);
 		static void 			writeLine(ELevel inLevel, const char* buffer, s32 index, s32 count);
 		static void 			writeLine(ELevel inLevel, const char* format, const x_va_list& arguments);
+		static void 			writeLine(ELevel inLevel, const ustr8* buffer);
+		static void 			writeLine(ELevel inLevel, const ustr8* buffer, s32 index, s32 count);
+		static void 			writeLine(ELevel inLevel, const ustr8* format, const x_va_list& arguments);
 	};
 
 	/**
@@ -130,7 +136,7 @@ namespace xcore
 		virtual void			clear() = 0;
 
 	public:
-        virtual                 ~xlog_imp(){};
+		virtual                 ~xlog_imp(){};
 
 		virtual void 			write(bool _value) = 0;
 		virtual void 			write(char _value) = 0;
@@ -143,6 +149,9 @@ namespace xcore
 		virtual void 			write(const char* buffer) = 0;
 		virtual void 			write(const char* buffer, s32 index, s32 count) = 0;
 		virtual void 			write(const char* format, const x_va_list& arguments) = 0;
+		virtual void 			write(const ustr8* buffer) = 0;
+		virtual void 			write(const ustr8* buffer, s32 index, s32 count) = 0;
+		virtual void 			write(const ustr8* format, const x_va_list& arguments) = 0;
 
 		virtual void 			writeLine() = 0;
 		virtual void 			writeLine(bool _value) = 0;
@@ -156,6 +165,9 @@ namespace xcore
 		virtual void 			writeLine(const char* buffer) = 0;
 		virtual void 			writeLine(const char* buffer, s32 index, s32 count) = 0;
 		virtual void 			writeLine(const char* format, const x_va_list& arguments) = 0;
+		virtual void 			writeLine(const ustr8* buffer) = 0;
+		virtual void 			writeLine(const ustr8* buffer, s32 index, s32 count) = 0;
+		virtual void 			writeLine(const ustr8* format, const x_va_list& arguments) = 0;
 	};
 
 //==============================================================================
