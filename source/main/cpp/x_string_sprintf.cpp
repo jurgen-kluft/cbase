@@ -1207,7 +1207,7 @@ namespace xcore
 					}
 					else
 					{
-						utf::ulen8 len = utf::ulen8::strlen(cp);
+						ulen8 len = ulen8::strlen(cp);
 						ASSERT(len.blen() == len.clen());		// currently we only support ASCII
 						size = len.clen();
 					}

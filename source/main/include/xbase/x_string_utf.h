@@ -55,386 +55,308 @@ namespace xcore
 };	// xCore namespace
 
 
+namespace xcore
+{
+	// This represents the byte position in a UTF-8 string, this object is to make the API
+	// clear for the user to indicate which position is a byte position and which a character position.
+	struct ubpos8
+	{
+						ubpos8();
+						ubpos8(const ubpos8& _p);
+		explicit		ubpos8(u32 _bpos);
+
+		bool			is_empty() const;
+
+		u32				bpos() const;
+
+						operator u32() const;
+
+		ubpos8&			operator =  (ubpos8 const& _p);
+
+		ubpos8&			operator ++ ();
+		ubpos8			operator ++ (s32);
+
+		bool			operator == (const ubpos8& p) const;
+		bool			operator != (const ubpos8& p) const;
+		bool			operator <  (const ubpos8& p) const;
+		bool			operator <= (const ubpos8& p) const;
+		bool			operator >  (const ubpos8& p) const;
+		bool			operator >= (const ubpos8& p) const;
+
+		ubpos8			operator +  (u32 i) const;
+		ubpos8			operator -  (u32 i) const;
+		ubpos8&			operator += (u32 i);
+		ubpos8&			operator -= (u32 i);
+
+		ubpos8			operator +  (uchar8 c) const;
+		ubpos8			operator -  (uchar8 c) const;
+		ubpos8&			operator += (uchar8 c);
+		ubpos8&			operator -= (uchar8 c);
+
+	private:
+		u32				bpos_;
+	};
+
+	// This represents the character position in a UTF-8 string, this object is to make the API
+	// clear for the user to indicate a position to be a character position.
+	struct ucpos8
+	{
+						ucpos8();
+						ucpos8(const ucpos8& _p);
+		explicit		ucpos8(u32 _cpos);
+
+		bool			is_empty() const;
+
+		u32				cpos() const;
+
+						operator u32() const;
+
+		ucpos8&			operator =  (ucpos8 const& _p);
+
+		ucpos8&			operator ++ ();
+		ucpos8			operator ++ (s32);
+
+		bool			operator == (const ucpos8& p) const;
+		bool			operator != (const ucpos8& p) const;
+		bool			operator <  (const ucpos8& p) const;
+		bool			operator <= (const ucpos8& p) const;
+		bool			operator >  (const ucpos8& p) const;
+		bool			operator >= (const ucpos8& p) const;
+
+		ucpos8			operator +  (u32 i) const;
+		ucpos8			operator -  (u32 i) const;
+		ucpos8&			operator += (u32 i);
+		ucpos8&			operator -= (u32 i);
+
+		ucpos8			operator +  (uchar8 c) const;
+		ucpos8			operator -  (uchar8 c) const;
+		ucpos8&			operator += (uchar8 c);
+		ucpos8&			operator -= (uchar8 c);
+
+	private:
+		u32				cpos_;
+	};
+
+	// This represents a position in a UTF-8 string where the byte position
+	// and character position are different.
+	struct upos8
+	{
+						upos8();
+						upos8(const upos8& _p);
+						upos8(ucpos8 _cpos, ubpos8 _bpos);
+
+		bool			is_empty() const;
+		bool			is_valid() const;
+
+		ucpos8			cpos() const;
+		ubpos8			bpos() const;
+
+		static upos8	begin();
+		static upos8	at(ustr8 const* _str, ucpos8 _cpos);
+
+		upos8&			operator  = (upos8 const& _p);
+
+		bool			operator == (const upos8& _pos) const;
+		bool			operator != (const upos8& _pos) const;
+		bool			operator <  (const upos8& _pos) const;
+		bool			operator <= (const upos8& _pos) const;
+		bool			operator >  (const upos8& _pos) const;
+		bool			operator >= (const upos8& _pos) const;
+
+		upos8			operator +  (uchar8 c) const;
+		upos8			operator -  (uchar8 c) const;
+		upos8&			operator += (uchar8 c);
+		upos8&			operator -= (uchar8 c);
+
+		upos8			operator +  (upos8 _p) const;
+		upos8			operator -  (upos8 _p) const;
+		upos8&			operator += (upos8 _p);
+		upos8&			operator -= (upos8 _p);
+
+	private:
+		u32				cpos_;	// character position
+		u32				bpos_;	// byte position
+	};
+
+
+	// This represents a length/distance in a UTF-8 string where the byte position
+	// and character position are different.
+	struct ulen8
+	{
+						ulen8();
+						ulen8(const ulen8& _p);
+						ulen8(ucpos8 _cend, ubpos8 _bend);
+						ulen8(ucpos8 _cbegin, ubpos8 _bbegin, ucpos8 _cend, ubpos8 _bend);
+						ulen8(upos8 _end);
+						ulen8(upos8 _begin, upos8 _end);
+
+		bool			is_empty() const;
+		bool			is_valid() const;
+
+		ucpos8			clen() const;
+		ubpos8			blen() const;
+
+		static ulen8	strlen(const ustr8* _str);
+		static ulen8	at(ustr8 const* _str, ucpos8 _cpos);
+
+		ulen8&			operator = (ulen8 const& _p);
+
+		bool			operator == (const ulen8& _pos) const;
+		bool			operator != (const ulen8& _pos) const;
+		bool			operator <  (const ulen8& _pos) const;
+		bool			operator <= (const ulen8& _pos) const;
+		bool			operator >  (const ulen8& _pos) const;
+		bool			operator >= (const ulen8& _pos) const;
+
+		ulen8			operator +  (uchar8 c) const;
+		ulen8			operator -  (uchar8 c) const;
+		ulen8&			operator += (uchar8 c);
+		ulen8&			operator -= (uchar8 c);
+
+		ulen8			operator +  (ulen8 _p) const;
+		ulen8			operator -  (ulen8 _p) const;
+		ulen8&			operator += (ulen8 _p);
+		ulen8&			operator -= (ulen8 _p);
+
+	private:
+		u32				clen_;	// character position
+		u32				blen_;	// byte position
+	};
+
+	// Forward declare
+	class ucptr8;
+
+	class uptr8
+	{
+		struct xuptr8
+		{
+							xuptr8(ustr8* _str) : str_(_str)			{ }
+
+			xuptr8&			operator = (xuptr8 const& _ptr)				{ uchar8 ch; utf::read(_ptr.str_, ch); utf::write(str_, ch); return *this; }
+			xuptr8&			operator = (char _ch)						{ utf::write(str_, uchar8(_ch)); return *this; }
+			xuptr8&			operator = (uchar8 _ch)						{ utf::write(str_, _ch); return *this; }
+							operator uchar8 ()							{ uchar8 ch; utf::read(str_, ch); return ch; }
+
+			ustr8*			str_;
+		};
+
+	public:
+						uptr8(ustr8* _str);
+						uptr8(const uptr8& _ptr);
+
+		ulen8			strlen() const;
+
+		ulen8			copy_char_to(uchar8& c) const;
+		ulen8			copy_char_to(uptr8& _ptr) const;
+		ulen8			copy_char_from(uchar8 c);
+		ulen8			copy_char_from(uptr8 const& _ptr);
+		ulen8			copy_char_from(ucptr8 const& _ptr);
+
+		bool			at_end() const;
+
+		xuptr8			operator* ();
+
+		uptr8&			operator++ ();
+		uptr8			operator++ (s32);
+
+		uptr8&			operator = (uchar8 _c);
+		uptr8&			operator = (ustr8* _str);
+		uptr8&			operator = (uptr8 const& _p);
+
+		uptr8			operator + (uchar8 c) const;
+		uptr8			operator - (uchar8 c) const;
+		uptr8&			operator +=(uchar8 c);
+		uptr8&			operator -=(uchar8 c);
+
+		uptr8			operator + (ulen8 n) const;
+		uptr8			operator - (ulen8 n) const;
+		uptr8&			operator -=(ulen8 n);
+		uptr8&			operator +=(ulen8 n);
+
+		uptr8			operator + (u32 n) const;
+		uptr8			operator - (u32 n) const;
+		uptr8&			operator +=(u32 n);
+		uptr8&			operator -=(u32 n);
+
+		bool			operator == (const uptr8& _iter) const;
+		bool			operator != (const uptr8& _iter) const;
+		bool			operator <  (const uptr8& _iter) const;
+		bool			operator <= (const uptr8& _iter) const;
+		bool			operator >  (const uptr8& _iter) const;
+		bool			operator >= (const uptr8& _iter) const;
+
+		ustr8*			str() const;
+
+	private:
+		ustr8*			str_;
+	};
+
+
+
+	class ucptr8
+	{
+	public:
+						ucptr8(ustr8 const* _str);
+						ucptr8(const ucptr8& _ptr);
+
+		ulen8			strlen() const;
+
+		ulen8			copy_char_to(uchar8& c) const;
+		ulen8			copy_char_to(ustr8* _ptr) const;
+
+		bool			at_end() const;
+
+		uchar8			operator* ();
+
+		ucptr8&			operator++ ();
+		ucptr8			operator++ (s32);
+
+		ucptr8&			operator = (ustr8 const* _str);
+		ucptr8&			operator = (ucptr8 const& _p);
+
+		ucptr8			operator + (uchar8 c) const;
+		ucptr8			operator - (uchar8 c) const;
+		ucptr8&			operator +=(uchar8 c);
+		ucptr8&			operator -=(uchar8 c);
+
+		ucptr8			operator + (ulen8 n) const;
+		ucptr8			operator - (ulen8 n) const;
+		ucptr8&			operator -=(ulen8 n);
+		ucptr8&			operator +=(ulen8 n);
+
+		ucptr8			operator + (u32 n) const;
+		ucptr8			operator - (u32 n) const;
+		ucptr8&			operator +=(u32 n);
+		ucptr8&			operator -=(u32 n);
+
+		bool			operator == (const uptr8& _p) const;
+		bool			operator != (const uptr8& _p) const;
+		bool			operator <  (const uptr8& _p) const;
+		bool			operator <= (const uptr8& _p) const;
+		bool			operator >  (const uptr8& _p) const;
+		bool			operator >= (const uptr8& _p) const;
+
+		bool			operator == (const ucptr8& _p) const;
+		bool			operator != (const ucptr8& _p) const;
+		bool			operator <  (const ucptr8& _p) const;
+		bool			operator <= (const ucptr8& _p) const;
+		bool			operator >  (const ucptr8& _p) const;
+		bool			operator >= (const ucptr8& _p) const;
+
+		ustr8 const*	str() const;
+
+	private:
+		ustr8 const*	str_;
+	};
+
+}
+
+
 
 namespace xcore
 {
 	namespace utf
 	{
-		// This represents the byte position in a UTF-8 string, this object is to make the API
-		// clear for the user to indicate which position is a byte position and which a character position.
-		struct ubpos8
-		{
-			inline			ubpos8() : bpos_(0xffffffff)					{ }
-			inline			ubpos8(const ubpos8& _p) : bpos_(_p.bpos_)		{ }
-			inline explicit	ubpos8(u32 _bpos) : bpos_(_bpos)				{ }
-
-			inline bool		is_empty() const								{ return bpos_ == 0xffffffff; }
-
-			inline u32		bpos() const									{ return bpos_; }
-
-							operator u32() const							{ return bpos_; }
-
-			ubpos8&			operator =  (ubpos8 const& _p)					{ bpos_ = _p.bpos_; return *this; }
-
-			ubpos8&			operator ++ ()									{ bpos_++; return *this; }
-			ubpos8			operator ++ (s32)								{ ubpos8 i(*this); bpos_++; return i; }
-
-			bool			operator == (const ubpos8& p) const				{ return (bpos_==p.bpos_); }
-			bool			operator != (const ubpos8& p) const				{ return (bpos_!=p.bpos_); }
-			bool			operator <  (const ubpos8& p) const				{ return (bpos_ <p.bpos_); }
-			bool			operator <= (const ubpos8& p) const				{ return (bpos_<=p.bpos_); }
-			bool			operator >  (const ubpos8& p) const				{ return (bpos_ >p.bpos_); }
-			bool			operator >= (const ubpos8& p) const				{ return (bpos_>=p.bpos_); }
-
-			ubpos8			operator +  (u32 i) const						{ ubpos8 p(*this); p.bpos_+=i; return p; }
-			ubpos8			operator -  (u32 i) const						{ ubpos8 p(*this); p.bpos_-=i; return p; }
-			ubpos8&			operator += (u32 i)								{ bpos_+=i; return *this; }
-			ubpos8&			operator -= (u32 i)								{ bpos_-=i; return *this; }
-
-			ubpos8			operator +  (uchar8 c) const					{ ubpos8 p(*this); const u32 n = numBytes(c); p.bpos_+=n; return p; }
-			ubpos8			operator -  (uchar8 c) const					{ ubpos8 p(*this); const u32 n = numBytes(c); p.bpos_-=n; return p; }
-			ubpos8&			operator += (uchar8 c)							{ const u32 n = numBytes(c); bpos_+=n; return *this; }
-			ubpos8&			operator -= (uchar8 c)							{ const u32 n = numBytes(c); bpos_-=n; return *this; }
-
-		private:
-			u32				bpos_;
-		};
-
-		// This represents the character position in a UTF-8 string, this object is to make the API
-		// clear for the user to indicate a position to be a character position.
-		struct ucpos8
-		{
-			inline			ucpos8() : cpos_(0xffffffff)					{ }
-			inline			ucpos8(const ucpos8& _p) : cpos_(_p.cpos_)		{ }
-			inline explicit	ucpos8(u32 _cpos) : cpos_(_cpos)				{ }
-
-			inline bool		is_empty() const								{ return cpos_ == 0xffffffff; }
-
-			inline u32		cpos() const									{ return cpos_; }
-
-							operator u32() const							{ return cpos_; }
-
-			ucpos8&			operator =  (ucpos8 const& _p)					{ cpos_ = _p.cpos_; return *this; }
-
-			ucpos8&			operator ++ ()									{ cpos_++; return *this; }
-			ucpos8			operator ++ (s32)								{ ucpos8 i(*this); cpos_++; return i; }
-
-			bool			operator == (const ucpos8& p) const				{ return (cpos_==p.cpos_); }
-			bool			operator != (const ucpos8& p) const				{ return (cpos_!=p.cpos_); }
-			bool			operator <  (const ucpos8& p) const				{ return (cpos_ <p.cpos_); }
-			bool			operator <= (const ucpos8& p) const				{ return (cpos_<=p.cpos_); }
-			bool			operator >  (const ucpos8& p) const				{ return (cpos_ >p.cpos_); }
-			bool			operator >= (const ucpos8& p) const				{ return (cpos_>=p.cpos_); }
-
-			ucpos8			operator +  (u32 i) const						{ ucpos8 p(*this); p.cpos_+=i; return p; }
-			ucpos8			operator -  (u32 i) const						{ ucpos8 p(*this); p.cpos_-=i; return p; }
-			ucpos8&			operator += (u32 i)								{ cpos_+=i; return *this; }
-			ucpos8&			operator -= (u32 i)								{ cpos_-=i; return *this; }
-
-			ucpos8			operator +  (uchar8 c) const					{ ucpos8 p(*this); const u32 n = numBytes(c); p.cpos_+=n; return p; }
-			ucpos8			operator -  (uchar8 c) const					{ ucpos8 p(*this); const u32 n = numBytes(c); p.cpos_-=n; return p; }
-			ucpos8&			operator += (uchar8 c)							{ const u32 n = numBytes(c); cpos_+=n; return *this; }
-			ucpos8&			operator -= (uchar8 c)							{ const u32 n = numBytes(c); cpos_-=n; return *this; }
-
-		private:
-			u32				cpos_;
-		};
-
-		// This represents a position in a UTF-8 string where the byte position
-		// and character position are different.
-		struct upos8
-		{
-			inline			upos8() : cpos_(0xffffffff), bpos_(0xffffffff) { }
-			inline			upos8(const upos8& _p) : cpos_(_p.cpos_), bpos_(_p.bpos_) { }
-			inline			upos8(ucpos8 _cpos, ubpos8 _bpos) : cpos_(_cpos), bpos_(_bpos) { }
-
-			inline bool		is_empty() const								{ return cpos_ == bpos_ && cpos_ == 0xffffffff; }
-			inline bool		is_valid() const								{ return cpos_ <= bpos_; }
-
-			inline ucpos8	cpos() const									{ return ucpos8(cpos_); }
-			inline ubpos8	bpos() const									{ return ubpos8(bpos_); }
-
-			static upos8	begin()											{ return upos8(ucpos8(0), ubpos8(0)); }
-			static upos8	at(ustr8 const* _str, ucpos8 _cpos)
-			{
-				ubpos8 bpos(0);
-				ucpos8 cpos(0);
-				while (cpos!=_cpos)
-				{
-					const u32 n = numBytes(uchar8(_str->c));
-					_str += n;
-					bpos += n;
-					cpos += 1;
-				}
-				return upos8(cpos, bpos);
-			}
-
-			upos8&			operator  = (upos8 const& _p)					{ cpos_ = _p.cpos_; bpos_ = _p.bpos_; return *this; }
-
-			bool			operator == (const upos8& _pos) const			{ return (cpos_)==(_pos.cpos_) && (bpos_==_pos.bpos_); }
-			bool			operator != (const upos8& _pos) const			{ return (cpos_)!=(_pos.cpos_) && (bpos_!=_pos.bpos_); }
-			bool			operator <  (const upos8& _pos) const			{ return (cpos_) <(_pos.cpos_) && (bpos_ <_pos.bpos_); }
-			bool			operator <= (const upos8& _pos) const			{ return (cpos_)<=(_pos.cpos_) && (bpos_<=_pos.bpos_); }
-			bool			operator >  (const upos8& _pos) const			{ return (cpos_) >(_pos.cpos_) && (bpos_ >_pos.bpos_); }
-			bool			operator >= (const upos8& _pos) const			{ return (cpos_)>=(_pos.cpos_) && (bpos_>=_pos.bpos_); }
-
-			upos8			operator +  (uchar8 c) const					{ upos8 p(*this); const u32 n = numBytes(c); p.bpos_+=n; ++p.cpos_; return p; }
-			upos8			operator -  (uchar8 c) const					{ upos8 p(*this); const u32 n = numBytes(c); p.bpos_-=n; --p.cpos_; return p; }
-			upos8&			operator += (uchar8 c)							{ const u32 n = numBytes(c); bpos_+=n; ++cpos_; return *this; }
-			upos8&			operator -= (uchar8 c)							{ const u32 n = numBytes(c); bpos_-=n; --cpos_; return *this; }
-
-			upos8			operator +  (upos8 _p) const					{ upos8 p(*this); p.cpos_+=_p.cpos_; p.bpos_+=_p.bpos_; return p; }
-			upos8			operator -  (upos8 _p) const					{ upos8 p(*this); p.cpos_-=_p.cpos_; p.bpos_+=_p.bpos_; return p; }
-			upos8&			operator += (upos8 _p)							{ cpos_+=_p.cpos_; bpos_+=_p.bpos_; return *this; }
-			upos8&			operator -= (upos8 _p)							{ cpos_-=_p.cpos_; bpos_-=_p.bpos_; return *this; }
-
-		private:
-			u32				cpos_;	// character position
-			u32				bpos_;	// byte position
-		};
-
-
-		// This represents a length/distance in a UTF-8 string where the byte position
-		// and character position are different.
-		struct ulen8
-		{
-			inline			ulen8() : clen_(0xffffffff), blen_(0xffffffff) { }
-			inline			ulen8(const ulen8& _p) : clen_(_p.clen_), blen_(_p.blen_) { }
-			inline			ulen8(ucpos8 _cend, ubpos8 _bend) : clen_(_cend-ucpos8(0)), blen_(_bend-ubpos8(0)) { }
-			inline			ulen8(ucpos8 _cbegin, ubpos8 _bbegin, ucpos8 _cend, ubpos8 _bend) : clen_(_cend-_cbegin), blen_(_bend-_bbegin) { }
-			inline			ulen8(upos8 _end) : clen_(_end.cpos() - ucpos8(0)), blen_(_end.bpos() - ubpos8(0)) { }
-			inline			ulen8(upos8 _begin, upos8 _end) : clen_(_end.cpos() - _begin.cpos()), blen_(_end.bpos() - _begin.bpos()) { }
-
-			inline bool		is_empty() const								{ return clen_ == blen_ && clen_ == 0xffffffff; }
-			inline bool		is_valid() const								{ return clen_ <= blen_; }
-
-			inline ucpos8	clen() const									{ return ucpos8(clen_); }
-			inline ubpos8	blen() const									{ return ubpos8(blen_); }
-
-			static ulen8	strlen(const ustr8* _str)
-			{
-				const ustr8* end = 0;
-				s32 const len = utf::strlen(_str, &end);
-				return ulen8(ucpos8(len), ubpos8((u32)(end-_str)));
-			}
-
-			static ulen8	at(ustr8 const* _str, ucpos8 _cpos)
-			{
-				ubpos8 bpos(0);
-				ucpos8 cpos(0);
-				while (cpos!=_cpos)
-				{
-					const u32 n = numBytes(uchar8(_str->c));
-					_str += n;
-					bpos += n;
-					cpos += 1;
-				}
-				upos8 end(cpos,bpos);
-				return ulen8(end);
-			}
-
-			ulen8&			operator = (ulen8 const& _p)					{ clen_ = _p.clen_; blen_ = _p.blen_; return *this; }
-
-			bool			operator == (const ulen8& _pos) const			{ return (clen_)==(_pos.clen_) && (blen_==_pos.blen_); }
-			bool			operator != (const ulen8& _pos) const			{ return (clen_)!=(_pos.clen_) && (blen_!=_pos.blen_); }
-			bool			operator <  (const ulen8& _pos) const			{ return (clen_) <(_pos.clen_) && (blen_ <_pos.blen_); }
-			bool			operator <= (const ulen8& _pos) const			{ return (clen_)<=(_pos.clen_) && (blen_<=_pos.blen_); }
-			bool			operator >  (const ulen8& _pos) const			{ return (clen_) >(_pos.clen_) && (blen_ >_pos.blen_); }
-			bool			operator >= (const ulen8& _pos) const			{ return (clen_)>=(_pos.clen_) && (blen_>=_pos.blen_); }
-
-			ulen8			operator +  (uchar8 c) const					{ ulen8 p(*this); const u32 n = numBytes(c); p.blen_+=n; ++p.clen_; return p; }
-			ulen8			operator -  (uchar8 c) const					{ ulen8 p(*this); const u32 n = numBytes(c); p.blen_-=n; --p.clen_; return p; }
-			ulen8&			operator += (uchar8 c)							{ const u32 n = numBytes(c); blen_+=n; ++clen_; return *this; }
-			ulen8&			operator -= (uchar8 c)							{ const u32 n = numBytes(c); blen_-=n; --clen_; return *this; }
-
-			ulen8			operator +  (ulen8 _p) const					{ ulen8 p(*this); p.clen_+=_p.clen_; p.blen_+=_p.blen_; return p; }
-			ulen8			operator -  (ulen8 _p) const					{ ulen8 p(*this); p.clen_-=_p.clen_; p.blen_+=_p.blen_; return p; }
-			ulen8&			operator += (ulen8 _p)							{ clen_+=_p.clen_; blen_+=_p.blen_; return *this; }
-			ulen8&			operator -= (ulen8 _p)							{ clen_-=_p.clen_; blen_-=_p.blen_; return *this; }
-
-		private:
-			u32				clen_;	// character position
-			u32				blen_;	// byte position
-		};
-
-		// Forward declare
-		class ucptr8;
-
-		class uptr8
-		{
-			struct xuptr8
-			{
-								xuptr8(ustr8* _str) : str_(_str)			{ }
-
-				xuptr8&			operator = (xuptr8 const& _ptr)				{ uchar8 ch; utf::read(_ptr.str_, ch); utf::write(str_, ch); return *this; }
-				xuptr8&			operator = (char _ch)						{ utf::write(str_, uchar8(_ch)); return *this; }
-				xuptr8&			operator = (uchar8 _ch)						{ utf::write(str_, _ch); return *this; }
-								operator uchar8 ()							{ uchar8 ch; utf::read(str_, ch); return ch; }
-
-				ustr8*			str_;
-			};
-
-		public:
-			inline			uptr8(ustr8* _str) : str_(_str) { }
-			inline			uptr8(const uptr8& _ptr) : str_(_ptr.str_) { }
-
-			ulen8			strlen() const
-			{
-				ulen8 len = ulen8::strlen(str_);
-				return len;
-			}
-
-			ulen8			copy_char_to(uchar8& c) const
-			{
-				s32 const n = utf::read(str_, c); 
-				return ulen8(ucpos8(1), ubpos8(n));
-			}
-
-			ulen8			copy_char_to(uptr8& _ptr) const
-			{
-				uchar8 ch;
-				s32 const n = utf::read(str_, ch);
-				utf::write(_ptr.str_, ch);
-				return ulen8(ucpos8(1), ubpos8(n));
-			}
-
-			ulen8			copy_char_from(uchar8 c)
-			{
-				s32 const n = utf::write(str_, c); 
-				return ulen8(ucpos8(1), ubpos8(n));
-			}
-
-			ulen8			copy_char_from(uptr8 const& _ptr)
-			{
-				uchar8 ch;
-				s32 const n = utf::read(_ptr.str_, ch);
-				utf::write(str_, ch);
-				return ulen8(ucpos8(1), ubpos8(n));
-			}
-
-			ulen8			copy_char_from(ucptr8 const& _ptr);
-
-			bool			at_end() const								{ return str_->c == 0; }
-
-			xuptr8			operator* ()								{ return xuptr8(str_); }
-
-			uptr8&			operator++ ()								{ u32 const n=numBytes(uchar8(str_->c)); str_+=n; return *this; }
-			uptr8			operator++ (s32)							{ uptr8 i(str_); u32 const n=numBytes(uchar8(str_->c)); str_+=n; return i; }
-
-			uptr8&			operator = (uchar8 _c)						{ utf::write(str_, _c); return *this; }
-			uptr8&			operator = (ustr8* _str)					{ str_ = _str; return *this; }
-			uptr8&			operator = (uptr8 const& _p)				{ str_ = _p.str_; return *this; }
-
-			uptr8			operator + (uchar8 c) const					{ return uptr8(str_ + numBytes(c)); }
-			uptr8			operator - (uchar8 c) const					{ return uptr8(str_ - numBytes(c)); }
-			uptr8&			operator +=(uchar8 c)						{ str_ += numBytes(c); return *this; }
-			uptr8&			operator -=(uchar8 c)						{ str_ -= numBytes(c); return *this; }
-
-			uptr8			operator + (ulen8 n) const					{ uptr8 p(str_ + n.blen()); return p; }
-			uptr8			operator - (ulen8 n) const					{ uptr8 p(str_ - n.blen()); return p; }
-			uptr8&			operator -=(ulen8 n)						{ str_ -= n.blen(); return *this; }
-			uptr8&			operator +=(ulen8 n)						{ str_ += n.blen(); return *this; }
-
-			uptr8			operator + (u32 n) const					{ uptr8 p(str_); while (n>0) { p.str_+=utf::numBytes(uchar8(p.str_->c)); --n; } return p; }
-			uptr8			operator - (u32 n) const					{ uptr8 p(str_); while (n>0) { --p.str_; while (internal::is_trail(p.str_->c)) --p.str_; --n; } return p; }
-			uptr8&			operator +=(u32 n)							{ while (n>0) { str_+=utf::numBytes(uchar8(str_->c)); --n; } return *this; }
-			uptr8&			operator -=(u32 n)							{ while (n>0) { --str_; while (internal::is_trail(str_->c)) --str_; --n; } }
-
-			bool			operator == (const uptr8& _iter) const		{ return (str_) == (_iter.str_); }
-			bool			operator != (const uptr8& _iter) const		{ return (str_) != (_iter.str_); }
-			bool			operator <  (const uptr8& _iter) const		{ return (str_) < (_iter.str_); }
-			bool			operator <= (const uptr8& _iter) const		{ return (str_) <= (_iter.str_); }
-			bool			operator >  (const uptr8& _iter) const		{ return (str_) > (_iter.str_); }
-			bool			operator >= (const uptr8& _iter) const		{ return (str_) >= (_iter.str_); }
-
-			ustr8*			str() const									{ return str_; }
-
-		private:
-			ustr8*			str_;
-		};
-
-
-
-		class ucptr8
-		{
-		public:
-			inline			ucptr8(ustr8 const* _str) : str_(_str) { }
-			inline			ucptr8(const ucptr8& _ptr) : str_(_ptr.str_) { }
-
-			ulen8			strlen() const
-			{
-				ulen8 len = ulen8::strlen(str_);
-				return len;
-			}
-
-			ulen8			copy_char_to(uchar8& c) const
-			{
-				s32 const n = utf::read(str_, c); 
-				return ulen8(ucpos8(1), ubpos8(n));
-			}
-
-			ulen8			copy_char_to(ustr8* _ptr) const
-			{
-				uchar8 ch;
-				s32 const n = utf::read(str_, ch);
-				utf::write(_ptr, ch);
-				return ulen8(ucpos8(1), ubpos8(n));
-			}
-
-			bool			at_end() const								{ return str_->c == 0; }
-
-			uchar8			operator* ()								{ uchar8 ch; read(str_, ch); return ch; }
-
-			ucptr8&			operator++ ()								{ u32 const n=numBytes(uchar8(str_->c)); str_+=n; return *this; }
-			ucptr8			operator++ (s32)							{ ucptr8 i(str_); u32 const n=numBytes(uchar8(str_->c)); str_+=n; return i; }
-
-			ucptr8&			operator = (ustr8 const* _str)				{ str_ = _str; return *this; }
-			ucptr8&			operator = (ucptr8 const& _p)				{ str_ = _p.str_; return *this; }
-
-			ucptr8			operator + (uchar8 c) const					{ return ucptr8(str_ + numBytes(c)); }
-			ucptr8			operator - (uchar8 c) const					{ return ucptr8(str_ - numBytes(c)); }
-			ucptr8&			operator +=(uchar8 c)						{ str_ += numBytes(c); return *this; }
-			ucptr8&			operator -=(uchar8 c)						{ str_ -= numBytes(c); return *this; }
-
-			ucptr8			operator + (ulen8 n) const					{ ucptr8 p(str_ + n.blen()); return p; }
-			ucptr8			operator - (ulen8 n) const					{ ucptr8 p(str_ - n.blen()); return p; }
-			ucptr8&			operator -=(ulen8 n)						{ str_ -= n.blen(); return *this; }
-			ucptr8&			operator +=(ulen8 n)						{ str_ += n.blen(); return *this; }
-
-			ucptr8			operator + (u32 n) const					{ ucptr8 p(str_); while (n>0) { p.str_+=utf::numBytes(uchar8(p.str_->c)); --n; } return p; }
-			ucptr8			operator - (u32 n) const					{ ucptr8 p(str_); while (n>0) { --p.str_; while (internal::is_trail(p.str_->c)) --p.str_; --n; } return p; }
-			ucptr8&			operator +=(u32 n)							{ while (n>0) { str_+=utf::numBytes(uchar8(str_->c)); --n; } return *this; }
-			ucptr8&			operator -=(u32 n)							{ while (n>0) { --str_; while (internal::is_trail(str_->c)) --str_; --n; } }
-
-			bool			operator == (const uptr8& _p) const			{ return (str_) == (_p.str()); }
-			bool			operator != (const uptr8& _p) const			{ return (str_) != (_p.str()); }
-			bool			operator <  (const uptr8& _p) const			{ return (str_)  < (_p.str()); }
-			bool			operator <= (const uptr8& _p) const			{ return (str_) <= (_p.str()); }
-			bool			operator >  (const uptr8& _p) const			{ return (str_)  > (_p.str()); }
-			bool			operator >= (const uptr8& _p) const			{ return (str_) >= (_p.str()); }
-
-			bool			operator == (const ucptr8& _p) const		{ return (str_) == (_p.str_); }
-			bool			operator != (const ucptr8& _p) const		{ return (str_) != (_p.str_); }
-			bool			operator <  (const ucptr8& _p) const		{ return (str_) <  (_p.str_); }
-			bool			operator <= (const ucptr8& _p) const		{ return (str_) <= (_p.str_); }
-			bool			operator >  (const ucptr8& _p) const		{ return (str_) >  (_p.str_); }
-			bool			operator >= (const ucptr8& _p) const		{ return (str_) >= (_p.str_); }
-
-			ustr8 const*	str() const									{ return str_; }
-
-		private:
-			ustr8 const*	str_;
-		};
-
-		inline ulen8		uptr8::copy_char_from(ucptr8 const& _ptr)
-		{
-			uchar8 ch;
-			s32 const n = utf::read(_ptr.str(), ch);
-			utf::write(str_, ch);
-			return ulen8(ucpos8(1), ubpos8(n));
-		}
-
-
 		inline s32  		strlen    			(ustr8 const* _str, ustr8 const** _end)	// We assume the string is a valid UTF8 string!
 		{
 			s32 len = 0;
@@ -957,7 +879,334 @@ namespace xcore
 			return numChars;
 		}
 	}
+}
 
+	
+
+namespace xcore
+{
+
+	inline			ubpos8::ubpos8() : bpos_(0xffffffff)					{ }
+	inline			ubpos8::ubpos8(const ubpos8& _p) : bpos_(_p.bpos_)		{ }
+	inline			ubpos8::ubpos8(u32 _bpos) : bpos_(_bpos)				{ }
+
+	inline bool		ubpos8::is_empty() const								{ return bpos_ == 0xffffffff; }
+
+	inline u32		ubpos8::bpos() const									{ return bpos_; }
+
+	inline			ubpos8::operator u32() const							{ return bpos_; }
+
+	inline ubpos8&	ubpos8::operator =  (ubpos8 const& _p)					{ bpos_ = _p.bpos_; return *this; }
+
+	inline ubpos8&	ubpos8::operator ++ ()									{ bpos_++; return *this; }
+	inline ubpos8	ubpos8::operator ++ (s32)								{ ubpos8 i(*this); bpos_++; return i; }
+
+	inline bool		ubpos8::operator == (const ubpos8& p) const				{ return (bpos_==p.bpos_); }
+	inline bool		ubpos8::operator != (const ubpos8& p) const				{ return (bpos_!=p.bpos_); }
+	inline bool		ubpos8::operator <  (const ubpos8& p) const				{ return (bpos_ <p.bpos_); }
+	inline bool		ubpos8::operator <= (const ubpos8& p) const				{ return (bpos_<=p.bpos_); }
+	inline bool		ubpos8::operator >  (const ubpos8& p) const				{ return (bpos_ >p.bpos_); }
+	inline bool		ubpos8::operator >= (const ubpos8& p) const				{ return (bpos_>=p.bpos_); }
+
+	inline ubpos8	ubpos8::operator +  (u32 i) const						{ ubpos8 p(*this); p.bpos_+=i; return p; }
+	inline ubpos8	ubpos8::operator -  (u32 i) const						{ ubpos8 p(*this); p.bpos_-=i; return p; }
+	inline ubpos8&	ubpos8::operator += (u32 i)								{ bpos_+=i; return *this; }
+	inline ubpos8&	ubpos8::operator -= (u32 i)								{ bpos_-=i; return *this; }
+
+	inline ubpos8	ubpos8::operator +  (uchar8 c) const					{ ubpos8 p(*this); const u32 n = utf::numBytes(c); p.bpos_+=n; return p; }
+	inline ubpos8	ubpos8::operator -  (uchar8 c) const					{ ubpos8 p(*this); const u32 n = utf::numBytes(c); p.bpos_-=n; return p; }
+	inline ubpos8&	ubpos8::operator += (uchar8 c)							{ const u32 n = utf::numBytes(c); bpos_+=n; return *this; }
+	inline ubpos8&	ubpos8::operator -= (uchar8 c)							{ const u32 n = utf::numBytes(c); bpos_-=n; return *this; }
+
+
+	inline			ucpos8::ucpos8() : cpos_(0xffffffff)					{ }
+	inline			ucpos8::ucpos8(const ucpos8& _p) : cpos_(_p.cpos_)		{ }
+	inline			ucpos8::ucpos8(u32 _cpos) : cpos_(_cpos)				{ }
+
+	inline bool		ucpos8::is_empty() const								{ return cpos_ == 0xffffffff; }
+
+	inline u32		ucpos8::cpos() const									{ return cpos_; }
+
+	inline			ucpos8::operator u32() const							{ return cpos_; }
+
+	inline ucpos8&	ucpos8::operator =  (ucpos8 const& _p)					{ cpos_ = _p.cpos_; return *this; }
+
+	inline ucpos8&	ucpos8::operator ++ ()									{ cpos_++; return *this; }
+	inline ucpos8	ucpos8::operator ++ (s32)								{ ucpos8 i(*this); cpos_++; return i; }
+
+	inline bool		ucpos8::operator == (const ucpos8& p) const				{ return (cpos_==p.cpos_); }
+	inline bool		ucpos8::operator != (const ucpos8& p) const				{ return (cpos_!=p.cpos_); }
+	inline bool		ucpos8::operator <  (const ucpos8& p) const				{ return (cpos_ <p.cpos_); }
+	inline bool		ucpos8::operator <= (const ucpos8& p) const				{ return (cpos_<=p.cpos_); }
+	inline bool		ucpos8::operator >  (const ucpos8& p) const				{ return (cpos_ >p.cpos_); }
+	inline bool		ucpos8::operator >= (const ucpos8& p) const				{ return (cpos_>=p.cpos_); }
+
+	inline ucpos8	ucpos8::operator +  (u32 i) const						{ ucpos8 p(*this); p.cpos_+=i; return p; }
+	inline ucpos8	ucpos8::operator -  (u32 i) const						{ ucpos8 p(*this); p.cpos_-=i; return p; }
+	inline ucpos8&	ucpos8::operator += (u32 i)								{ cpos_+=i; return *this; }
+	inline ucpos8&	ucpos8::operator -= (u32 i)								{ cpos_-=i; return *this; }
+
+	inline ucpos8	ucpos8::operator +  (uchar8 c) const					{ ucpos8 p(*this); const u32 n = utf::numBytes(c); p.cpos_+=n; return p; }
+	inline ucpos8	ucpos8::operator -  (uchar8 c) const					{ ucpos8 p(*this); const u32 n = utf::numBytes(c); p.cpos_-=n; return p; }
+	inline ucpos8&	ucpos8::operator += (uchar8 c)							{ const u32 n = utf::numBytes(c); cpos_+=n; return *this; }
+	inline ucpos8&	ucpos8::operator -= (uchar8 c)							{ const u32 n = utf::numBytes(c); cpos_-=n; return *this; }
+
+
+	inline			upos8::upos8() : cpos_(0xffffffff), bpos_(0xffffffff) { }
+	inline			upos8::upos8(const upos8& _p) : cpos_(_p.cpos_), bpos_(_p.bpos_) { }
+	inline			upos8::upos8(ucpos8 _cpos, ubpos8 _bpos) : cpos_(_cpos), bpos_(_bpos) { }
+
+	inline bool		upos8::is_empty() const								{ return cpos_ == bpos_ && cpos_ == 0xffffffff; }
+	inline bool		upos8::is_valid() const								{ return cpos_ <= bpos_; }
+
+	inline ucpos8	upos8::cpos() const									{ return ucpos8(cpos_); }
+	inline ubpos8	upos8::bpos() const									{ return ubpos8(bpos_); }
+
+	inline upos8	upos8::begin()										{ return upos8(ucpos8(0), ubpos8(0)); }
+	inline upos8	upos8::at(ustr8 const* _str, ucpos8 _cpos)
+	{
+		ubpos8 bpos(0);
+		ucpos8 cpos(0);
+		while (cpos!=_cpos)
+		{
+			const u32 n = utf::numBytes(uchar8(_str->c));
+			_str += n;
+			bpos += n;
+			cpos += 1;
+		}
+		return upos8(cpos, bpos);
+	}
+
+	inline upos8&	upos8::operator  = (upos8 const& _p)					{ cpos_ = _p.cpos_; bpos_ = _p.bpos_; return *this; }
+
+	inline bool		upos8::operator == (const upos8& _pos) const			{ return (cpos_)==(_pos.cpos_) && (bpos_==_pos.bpos_); }
+	inline bool		upos8::operator != (const upos8& _pos) const			{ return (cpos_)!=(_pos.cpos_) && (bpos_!=_pos.bpos_); }
+	inline bool		upos8::operator <  (const upos8& _pos) const			{ return (cpos_) <(_pos.cpos_) && (bpos_ <_pos.bpos_); }
+	inline bool		upos8::operator <= (const upos8& _pos) const			{ return (cpos_)<=(_pos.cpos_) && (bpos_<=_pos.bpos_); }
+	inline bool		upos8::operator >  (const upos8& _pos) const			{ return (cpos_) >(_pos.cpos_) && (bpos_ >_pos.bpos_); }
+	inline bool		upos8::operator >= (const upos8& _pos) const			{ return (cpos_)>=(_pos.cpos_) && (bpos_>=_pos.bpos_); }
+
+	inline upos8	upos8::operator +  (uchar8 c) const						{ upos8 p(*this); const u32 n = utf::numBytes(c); p.bpos_+=n; ++p.cpos_; return p; }
+	inline upos8	upos8::operator -  (uchar8 c) const						{ upos8 p(*this); const u32 n = utf::numBytes(c); p.bpos_-=n; --p.cpos_; return p; }
+	inline upos8&	upos8::operator += (uchar8 c)							{ const u32 n = utf::numBytes(c); bpos_+=n; ++cpos_; return *this; }
+	inline upos8&	upos8::operator -= (uchar8 c)							{ const u32 n = utf::numBytes(c); bpos_-=n; --cpos_; return *this; }
+
+	inline upos8	upos8::operator +  (upos8 _p) const						{ upos8 p(*this); p.cpos_+=_p.cpos_; p.bpos_+=_p.bpos_; return p; }
+	inline upos8	upos8::operator -  (upos8 _p) const						{ upos8 p(*this); p.cpos_-=_p.cpos_; p.bpos_+=_p.bpos_; return p; }
+	inline upos8&	upos8::operator += (upos8 _p)							{ cpos_+=_p.cpos_; bpos_+=_p.bpos_; return *this; }
+	inline upos8&	upos8::operator -= (upos8 _p)							{ cpos_-=_p.cpos_; bpos_-=_p.bpos_; return *this; }
+
+
+	inline			ulen8::ulen8() : clen_(0xffffffff), blen_(0xffffffff) { }
+	inline			ulen8::ulen8(const ulen8& _p) : clen_(_p.clen_), blen_(_p.blen_) { }
+	inline			ulen8::ulen8(ucpos8 _cend, ubpos8 _bend) : clen_(_cend-ucpos8(0)), blen_(_bend-ubpos8(0)) { }
+	inline			ulen8::ulen8(ucpos8 _cbegin, ubpos8 _bbegin, ucpos8 _cend, ubpos8 _bend) : clen_(_cend-_cbegin), blen_(_bend-_bbegin) { }
+	inline			ulen8::ulen8(upos8 _end) : clen_(_end.cpos() - ucpos8(0)), blen_(_end.bpos() - ubpos8(0)) { }
+	inline			ulen8::ulen8(upos8 _begin, upos8 _end) : clen_(_end.cpos() - _begin.cpos()), blen_(_end.bpos() - _begin.bpos()) { }
+
+	inline bool		ulen8::is_empty() const								{ return clen_ == blen_ && clen_ == 0xffffffff; }
+	inline bool		ulen8::is_valid() const								{ return clen_ <= blen_; }
+
+	inline ucpos8	ulen8::clen() const									{ return ucpos8(clen_); }
+	inline ubpos8	ulen8::blen() const									{ return ubpos8(blen_); }
+
+	inline ulen8	ulen8::strlen(const ustr8* _str)
+	{
+		const ustr8* end = 0;
+		s32 const len = utf::strlen(_str, &end);
+		return ulen8(ucpos8(len), ubpos8((u32)(end-_str)));
+	}
+
+	inline ulen8	ulen8::at(ustr8 const* _str, ucpos8 _cpos)
+	{
+		ubpos8 bpos(0);
+		ucpos8 cpos(0);
+		while (cpos!=_cpos)
+		{
+			const u32 n = utf::numBytes(uchar8(_str->c));
+			_str += n;
+			bpos += n;
+			cpos += 1;
+		}
+		upos8 end(cpos,bpos);
+		return ulen8(end);
+	}
+
+	inline ulen8&	ulen8::operator = (ulen8 const& _p)						{ clen_ = _p.clen_; blen_ = _p.blen_; return *this; }
+
+	inline bool		ulen8::operator == (const ulen8& _pos) const			{ return (clen_)==(_pos.clen_) && (blen_==_pos.blen_); }
+	inline bool		ulen8::operator != (const ulen8& _pos) const			{ return (clen_)!=(_pos.clen_) && (blen_!=_pos.blen_); }
+	inline bool		ulen8::operator <  (const ulen8& _pos) const			{ return (clen_) <(_pos.clen_) && (blen_ <_pos.blen_); }
+	inline bool		ulen8::operator <= (const ulen8& _pos) const			{ return (clen_)<=(_pos.clen_) && (blen_<=_pos.blen_); }
+	inline bool		ulen8::operator >  (const ulen8& _pos) const			{ return (clen_) >(_pos.clen_) && (blen_ >_pos.blen_); }
+	inline bool		ulen8::operator >= (const ulen8& _pos) const			{ return (clen_)>=(_pos.clen_) && (blen_>=_pos.blen_); }
+
+	inline ulen8	ulen8::operator +  (uchar8 c) const						{ ulen8 p(*this); const u32 n = utf::numBytes(c); p.blen_+=n; ++p.clen_; return p; }
+	inline ulen8	ulen8::operator -  (uchar8 c) const						{ ulen8 p(*this); const u32 n = utf::numBytes(c); p.blen_-=n; --p.clen_; return p; }
+	inline ulen8&	ulen8::operator += (uchar8 c)							{ const u32 n = utf::numBytes(c); blen_+=n; ++clen_; return *this; }
+	inline ulen8&	ulen8::operator -= (uchar8 c)							{ const u32 n = utf::numBytes(c); blen_-=n; --clen_; return *this; }
+
+	inline ulen8	ulen8::operator +  (ulen8 _p) const						{ ulen8 p(*this); p.clen_+=_p.clen_; p.blen_+=_p.blen_; return p; }
+	inline ulen8	ulen8::operator -  (ulen8 _p) const						{ ulen8 p(*this); p.clen_-=_p.clen_; p.blen_+=_p.blen_; return p; }
+	inline ulen8&	ulen8::operator += (ulen8 _p)							{ clen_+=_p.clen_; blen_+=_p.blen_; return *this; }
+	inline ulen8&	ulen8::operator -= (ulen8 _p)							{ clen_-=_p.clen_; blen_-=_p.blen_; return *this; }
+
+
+
+
+	inline				uptr8::uptr8(ustr8* _str) : str_(_str) { }
+	inline				uptr8::uptr8(const uptr8& _ptr) : str_(_ptr.str_) { }
+
+	inline ulen8		uptr8::strlen() const
+	{
+		ulen8 len = ulen8::strlen(str_);
+		return len;
+	}
+
+	inline ulen8		uptr8::copy_char_to(uchar8& c) const
+	{
+		s32 const n = utf::read(str_, c); 
+		return ulen8(ucpos8(1), ubpos8(n));
+	}
+
+	inline ulen8		uptr8::copy_char_to(uptr8& _ptr) const
+	{
+		uchar8 ch;
+		s32 const n = utf::read(str_, ch);
+		utf::write(_ptr.str_, ch);
+		return ulen8(ucpos8(1), ubpos8(n));
+	}
+
+	inline ulen8		uptr8::copy_char_from(uchar8 c)
+	{
+		s32 const n = utf::write(str_, c); 
+		return ulen8(ucpos8(1), ubpos8(n));
+	}
+
+	inline ulen8		uptr8::copy_char_from(uptr8 const& _ptr)
+	{
+		uchar8 ch;
+		s32 const n = utf::read(_ptr.str_, ch);
+		utf::write(str_, ch);
+		return ulen8(ucpos8(1), ubpos8(n));
+	}
+
+	inline bool			uptr8::at_end() const								{ return str_->c == 0; }
+
+	inline uptr8::xuptr8 uptr8::operator* ()								{ return xuptr8(str_); }
+
+	inline uptr8&		uptr8::operator++ ()								{ u32 const n=utf::numBytes(uchar8(str_->c)); str_+=n; return *this; }
+	inline uptr8		uptr8::operator++ (s32)								{ uptr8 i(str_); u32 const n=utf::numBytes(uchar8(str_->c)); str_+=n; return i; }
+
+	inline uptr8&		uptr8::operator = (uchar8 _c)						{ utf::write(str_, _c); return *this; }
+	inline uptr8&		uptr8::operator = (ustr8* _str)						{ str_ = _str; return *this; }
+	inline uptr8&		uptr8::operator = (uptr8 const& _p)					{ str_ = _p.str_; return *this; }
+
+	inline uptr8		uptr8::operator + (uchar8 c) const					{ return uptr8(str_ + utf::numBytes(c)); }
+	inline uptr8		uptr8::operator - (uchar8 c) const					{ return uptr8(str_ - utf::numBytes(c)); }
+	inline uptr8&		uptr8::operator +=(uchar8 c)						{ str_ += utf::numBytes(c); return *this; }
+	inline uptr8&		uptr8::operator -=(uchar8 c)						{ str_ -= utf::numBytes(c); return *this; }
+
+	inline uptr8		uptr8::operator + (ulen8 n) const					{ uptr8 p(str_ + n.blen()); return p; }
+	inline uptr8		uptr8::operator - (ulen8 n) const					{ uptr8 p(str_ - n.blen()); return p; }
+	inline uptr8&		uptr8::operator -=(ulen8 n)							{ str_ -= n.blen(); return *this; }
+	inline uptr8&		uptr8::operator +=(ulen8 n)							{ str_ += n.blen(); return *this; }
+
+	inline uptr8		uptr8::operator + (u32 n) const						{ uptr8 p(str_); while (n>0) { p.str_+=utf::numBytes(uchar8(p.str_->c)); --n; } return p; }
+	inline uptr8		uptr8::operator - (u32 n) const						{ uptr8 p(str_); while (n>0) { --p.str_; while (utf::internal::is_trail(p.str_->c)) --p.str_; --n; } return p; }
+	inline uptr8&		uptr8::operator +=(u32 n)							{ while (n>0) { str_+=utf::numBytes(uchar8(str_->c)); --n; } return *this; }
+	inline uptr8&		uptr8::operator -=(u32 n)							{ while (n>0) { --str_; while (utf::internal::is_trail(str_->c)) --str_; --n; } }
+
+	inline bool			uptr8::operator == (const uptr8& _iter) const		{ return (str_) == (_iter.str_); }
+	inline bool			uptr8::operator != (const uptr8& _iter) const		{ return (str_) != (_iter.str_); }
+	inline bool			uptr8::operator <  (const uptr8& _iter) const		{ return (str_) < (_iter.str_); }
+	inline bool			uptr8::operator <= (const uptr8& _iter) const		{ return (str_) <= (_iter.str_); }
+	inline bool			uptr8::operator >  (const uptr8& _iter) const		{ return (str_) > (_iter.str_); }
+	inline bool			uptr8::operator >= (const uptr8& _iter) const		{ return (str_) >= (_iter.str_); }
+
+	inline ustr8*		uptr8::str() const									{ return str_; }
+
+
+
+	inline				ucptr8::ucptr8(ustr8 const* _str) : str_(_str) { }
+	inline				ucptr8::ucptr8(const ucptr8& _ptr) : str_(_ptr.str_) { }
+
+	inline ulen8		ucptr8::strlen() const
+	{
+		ulen8 len = ulen8::strlen(str_);
+		return len;
+	}
+
+	inline ulen8		ucptr8::copy_char_to(uchar8& c) const
+	{
+		s32 const n = utf::read(str_, c); 
+		return ulen8(ucpos8(1), ubpos8(n));
+	}
+
+	inline ulen8		ucptr8::copy_char_to(ustr8* _ptr) const
+	{
+		uchar8 ch;
+		s32 const n = utf::read(str_, ch);
+		utf::write(_ptr, ch);
+		return ulen8(ucpos8(1), ubpos8(n));
+	}
+
+	inline bool			ucptr8::at_end() const								{ return str_->c == 0; }
+
+	inline uchar8		ucptr8::operator* ()								{ uchar8 ch; utf::read(str_, ch); return ch; }
+
+	inline ucptr8&		ucptr8::operator++ ()								{ u32 const n=utf::numBytes(uchar8(str_->c)); str_+=n; return *this; }
+	inline ucptr8		ucptr8::operator++ (s32)							{ ucptr8 i(str_); u32 const n=utf::numBytes(uchar8(str_->c)); str_+=n; return i; }
+
+	inline ucptr8&		ucptr8::operator = (ustr8 const* _str)				{ str_ = _str; return *this; }
+	inline ucptr8&		ucptr8::operator = (ucptr8 const& _p)				{ str_ = _p.str_; return *this; }
+
+	inline ucptr8		ucptr8::operator + (uchar8 c) const					{ return ucptr8(str_ + utf::numBytes(c)); }
+	inline ucptr8		ucptr8::operator - (uchar8 c) const					{ return ucptr8(str_ - utf::numBytes(c)); }
+	inline ucptr8&		ucptr8::operator +=(uchar8 c)						{ str_ += utf::numBytes(c); return *this; }
+	inline ucptr8&		ucptr8::operator -=(uchar8 c)						{ str_ -= utf::numBytes(c); return *this; }
+
+	inline ucptr8		ucptr8::operator + (ulen8 n) const					{ ucptr8 p(str_ + n.blen()); return p; }
+	inline ucptr8		ucptr8::operator - (ulen8 n) const					{ ucptr8 p(str_ - n.blen()); return p; }
+	inline ucptr8&		ucptr8::operator -=(ulen8 n)						{ str_ -= n.blen(); return *this; }
+	inline ucptr8&		ucptr8::operator +=(ulen8 n)						{ str_ += n.blen(); return *this; }
+
+	inline ucptr8		ucptr8::operator + (u32 n) const					{ ucptr8 p(str_); while (n>0) { p.str_+=utf::numBytes(uchar8(p.str_->c)); --n; } return p; }
+	inline ucptr8		ucptr8::operator - (u32 n) const					{ ucptr8 p(str_); while (n>0) { --p.str_; while (utf::internal::is_trail(p.str_->c)) --p.str_; --n; } return p; }
+	inline ucptr8&		ucptr8::operator +=(u32 n)							{ while (n>0) { str_+=utf::numBytes(uchar8(str_->c)); --n; } return *this; }
+	inline ucptr8&		ucptr8::operator -=(u32 n)							{ while (n>0) { --str_; while (utf::internal::is_trail(str_->c)) --str_; --n; } }
+
+	inline bool			ucptr8::operator == (const uptr8& _p) const			{ return (str_) == (_p.str()); }
+	inline bool			ucptr8::operator != (const uptr8& _p) const			{ return (str_) != (_p.str()); }
+	inline bool			ucptr8::operator <  (const uptr8& _p) const			{ return (str_)  < (_p.str()); }
+	inline bool			ucptr8::operator <= (const uptr8& _p) const			{ return (str_) <= (_p.str()); }
+	inline bool			ucptr8::operator >  (const uptr8& _p) const			{ return (str_)  > (_p.str()); }
+	inline bool			ucptr8::operator >= (const uptr8& _p) const			{ return (str_) >= (_p.str()); }
+
+	inline bool			ucptr8::operator == (const ucptr8& _p) const		{ return (str_) == (_p.str_); }
+	inline bool			ucptr8::operator != (const ucptr8& _p) const		{ return (str_) != (_p.str_); }
+	inline bool			ucptr8::operator <  (const ucptr8& _p) const		{ return (str_) <  (_p.str_); }
+	inline bool			ucptr8::operator <= (const ucptr8& _p) const		{ return (str_) <= (_p.str_); }
+	inline bool			ucptr8::operator >  (const ucptr8& _p) const		{ return (str_) >  (_p.str_); }
+	inline bool			ucptr8::operator >= (const ucptr8& _p) const		{ return (str_) >= (_p.str_); }
+
+	inline ustr8 const*	ucptr8::str() const									{ return str_; }
+
+
+	inline ulen8		uptr8::copy_char_from(ucptr8 const& _ptr)
+	{
+		uchar8 ch;
+		s32 const n = utf::read(_ptr.str(), ch);
+		utf::write(str_, ch);
+		return ulen8(ucpos8(1), ubpos8(n));
+	}
+}
+
+
+
+
+namespace xcore
+{
 	namespace utf
 	{
 		/**
