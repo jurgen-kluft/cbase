@@ -184,6 +184,7 @@ namespace xcore
 	struct ulen8
 	{
 						ulen8();
+						ulen8(u32 _l);
 						ulen8(const ulen8& _p);
 						ulen8(ucpos8 _cend, ubpos8 _bend);
 						ulen8(ucpos8 _cbegin, ubpos8 _bbegin, ucpos8 _cend, ubpos8 _bend);
@@ -998,6 +999,7 @@ namespace xcore
 
 
 	inline			ulen8::ulen8() : clen_(0xffffffff), blen_(0xffffffff) { }
+	inline			ulen8::ulen8(u32 _l) : clen_(_l), blen_(_l) { }
 	inline			ulen8::ulen8(const ulen8& _p) : clen_(_p.clen_), blen_(_p.blen_) { }
 	inline			ulen8::ulen8(ucpos8 _cend, ubpos8 _bend) : clen_(_cend-ucpos8(0)), blen_(_bend-ubpos8(0)) { }
 	inline			ulen8::ulen8(ucpos8 _cbegin, ubpos8 _bbegin, ucpos8 _cend, ubpos8 _bend) : clen_(_cend-_cbegin), blen_(_bend-_bbegin) { }
