@@ -138,5 +138,26 @@ UNITTEST_SUITE_BEGIN(xutf)
 		}
 
 	}
+
+	UNITTEST_FIXTURE(uclen8)
+	{
+		UNITTEST_FIXTURE_SETUP()
+		{
+		}
+
+		UNITTEST_FIXTURE_TEARDOWN()
+		{
+		}
+
+		UNITTEST_TEST(construct)
+		{
+			uclen8 l1(0);
+			uclen8 l2(10);
+
+			uclen8 l3 = l1 + l2;
+
+			CHECK_EQUAL(10, (u32)l3);
+		}
+	}
 }
 UNITTEST_SUITE_END
