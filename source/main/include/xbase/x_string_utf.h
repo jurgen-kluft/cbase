@@ -21,8 +21,8 @@ namespace xcore
 		s32  		strlen		(ustr8 const* _str, ustr8 const** _end = NULL);
 		s32  		strlen		(ustr16 const* _str, ustr16 const** _end = NULL);
 
-		u32			numBytes	(uchar8 _c);
-		u32			numBytes	(uchar16 _c);
+		u32			charlen		(uchar8 _c);
+		u32			charlen		(uchar16 _c);
 
 		s32			read		(ustr8  const* _str, uchar8 & _out);
 		s32			read		(ustr16 const* _str, uchar16& _out);
@@ -61,6 +61,8 @@ namespace xcore
 	// clear for the user to indicate which position is a byte position and which a character position.
 	struct ubpos8
 	{
+		static ubpos8	begin()									{ return ubpos8(0); }
+
 						ubpos8();
 						ubpos8(const ubpos8& _p);
 		explicit		ubpos8(u32 _bpos);
@@ -75,6 +77,8 @@ namespace xcore
 
 		ubpos8&			operator ++ ();
 		ubpos8			operator ++ (s32);
+		ubpos8&			operator -- ();
+		ubpos8			operator -- (s32);
 
 		bool			operator == (const ubpos8& p) const;
 		bool			operator != (const ubpos8& p) const;
@@ -101,12 +105,13 @@ namespace xcore
 	// clear for the user to indicate a position to be a character position.
 	struct ucpos8
 	{
+		static ucpos8	begin()									{ return ucpos8(0); }
+
 						ucpos8();
 						ucpos8(const ucpos8& _p);
 		explicit		ucpos8(u32 _cpos);
 
 		bool			is_empty() const;
-
 		u32				cpos() const;
 
 						operator u32() const;
@@ -115,6 +120,8 @@ namespace xcore
 
 		ucpos8&			operator ++ ();
 		ucpos8			operator ++ (s32);
+		ucpos8&			operator -- ();
+		ucpos8			operator -- (s32);
 
 		bool			operator == (const ucpos8& p) const;
 		bool			operator != (const ucpos8& p) const;
@@ -178,7 +185,6 @@ namespace xcore
 		u32				bpos_;	// byte position
 	};
 
-
 	// This represents a length/distance in a UTF-8 string where the byte position
 	// and character position are different.
 	struct ulen8
@@ -223,6 +229,43 @@ namespace xcore
 		u32				clen_;	// character position
 		u32				blen_;	// byte position
 	};
+
+
+	// This represents a length/range of a UTF-8 string
+	struct uclen8
+	{
+						uclen8();
+						uclen8(u32 _l);
+						uclen8(const ulen8& _p);
+						uclen8(ucpos8 _cbegin, ucpos8 _cend);
+						uclen8(upos8 _begin, upos8 _end);
+
+		bool			is_empty() const;
+
+						operator u32() const;
+		uclen8&			operator = (uclen8 const& _p);
+
+		bool			operator == (const uclen8& _pos) const;
+		bool			operator != (const uclen8& _pos) const;
+		bool			operator <  (const uclen8& _pos) const;
+		bool			operator <= (const uclen8& _pos) const;
+		bool			operator >  (const uclen8& _pos) const;
+		bool			operator >= (const uclen8& _pos) const;
+
+		uclen8&			operator++ ();
+		uclen8			operator++ (s32);
+		uclen8&			operator-- ();
+		uclen8			operator-- (s32);
+
+		uclen8			operator +  (uclen8 _p) const;
+		uclen8			operator -  (uclen8 _p) const;
+		uclen8&			operator += (uclen8 _p);
+		uclen8&			operator -= (uclen8 _p);
+
+	private:
+		u32				clen_;	// num characters
+	};
+
 
 	// Forward declare
 	class ucptr8;
@@ -887,11 +930,11 @@ namespace xcore
 namespace xcore
 {
 
-	inline			ubpos8::ubpos8() : bpos_(0xffffffff)					{ }
+	inline			ubpos8::ubpos8() : bpos_(0)								{ }
 	inline			ubpos8::ubpos8(const ubpos8& _p) : bpos_(_p.bpos_)		{ }
 	inline			ubpos8::ubpos8(u32 _bpos) : bpos_(_bpos)				{ }
 
-	inline bool		ubpos8::is_empty() const								{ return bpos_ == 0xffffffff; }
+	inline bool		ubpos8::is_empty() const								{ return bpos_ == 0; }
 
 	inline u32		ubpos8::bpos() const									{ return bpos_; }
 
@@ -899,6 +942,8 @@ namespace xcore
 
 	inline ubpos8&	ubpos8::operator =  (ubpos8 const& _p)					{ bpos_ = _p.bpos_; return *this; }
 
+	inline ubpos8&	ubpos8::operator -- ()									{ if (bpos_!=0) --bpos_; return *this; }
+	inline ubpos8	ubpos8::operator -- (s32)								{ ubpos8 i(*this); if (bpos_!=0) --bpos_; return i; }
 	inline ubpos8&	ubpos8::operator ++ ()									{ bpos_++; return *this; }
 	inline ubpos8	ubpos8::operator ++ (s32)								{ ubpos8 i(*this); bpos_++; return i; }
 
@@ -910,21 +955,20 @@ namespace xcore
 	inline bool		ubpos8::operator >= (const ubpos8& p) const				{ return (bpos_>=p.bpos_); }
 
 	inline ubpos8	ubpos8::operator +  (u32 i) const						{ ubpos8 p(*this); p.bpos_+=i; return p; }
-	inline ubpos8	ubpos8::operator -  (u32 i) const						{ ubpos8 p(*this); p.bpos_-=i; return p; }
+	inline ubpos8	ubpos8::operator -  (u32 i) const						{ ubpos8 p(*this); if (i<=p.bpos_) p.bpos_-=i; else p.bpos_=0; return p; }
 	inline ubpos8&	ubpos8::operator += (u32 i)								{ bpos_+=i; return *this; }
-	inline ubpos8&	ubpos8::operator -= (u32 i)								{ bpos_-=i; return *this; }
+	inline ubpos8&	ubpos8::operator -= (u32 i)								{ if (i<=bpos_) bpos_-=i; else bpos_=0; return *this; }
 
 	inline ubpos8	ubpos8::operator +  (uchar8 c) const					{ ubpos8 p(*this); const u32 n = utf::numBytes(c); p.bpos_+=n; return p; }
-	inline ubpos8	ubpos8::operator -  (uchar8 c) const					{ ubpos8 p(*this); const u32 n = utf::numBytes(c); p.bpos_-=n; return p; }
+	inline ubpos8	ubpos8::operator -  (uchar8 c) const					{ ubpos8 p(*this); const u32 n = utf::numBytes(c); if (n<=p.bpos_) p.bpos_-=n; return p; }
 	inline ubpos8&	ubpos8::operator += (uchar8 c)							{ const u32 n = utf::numBytes(c); bpos_+=n; return *this; }
-	inline ubpos8&	ubpos8::operator -= (uchar8 c)							{ const u32 n = utf::numBytes(c); bpos_-=n; return *this; }
+	inline ubpos8&	ubpos8::operator -= (uchar8 c)							{ const u32 n = utf::numBytes(c); if (n<=bpos_) bpos_-=n; return *this; }
 
-
-	inline			ucpos8::ucpos8() : cpos_(0xffffffff)					{ }
+	inline			ucpos8::ucpos8() : cpos_(0)								{ }
 	inline			ucpos8::ucpos8(const ucpos8& _p) : cpos_(_p.cpos_)		{ }
 	inline			ucpos8::ucpos8(u32 _cpos) : cpos_(_cpos)				{ }
 
-	inline bool		ucpos8::is_empty() const								{ return cpos_ == 0xffffffff; }
+	inline bool		ucpos8::is_empty() const								{ return cpos_ == 0; }
 
 	inline u32		ucpos8::cpos() const									{ return cpos_; }
 
@@ -934,6 +978,8 @@ namespace xcore
 
 	inline ucpos8&	ucpos8::operator ++ ()									{ cpos_++; return *this; }
 	inline ucpos8	ucpos8::operator ++ (s32)								{ ucpos8 i(*this); cpos_++; return i; }
+	inline ucpos8&	ucpos8::operator -- ()									{ if (cpos_>0) --cpos_; return *this; }
+	inline ucpos8	ucpos8::operator -- (s32)								{ ucpos8 i(*this); if (cpos_>0) --cpos_; return i; }
 
 	inline bool		ucpos8::operator == (const ucpos8& p) const				{ return (cpos_==p.cpos_); }
 	inline bool		ucpos8::operator != (const ucpos8& p) const				{ return (cpos_!=p.cpos_); }
@@ -943,27 +989,27 @@ namespace xcore
 	inline bool		ucpos8::operator >= (const ucpos8& p) const				{ return (cpos_>=p.cpos_); }
 
 	inline ucpos8	ucpos8::operator +  (u32 i) const						{ ucpos8 p(*this); p.cpos_+=i; return p; }
-	inline ucpos8	ucpos8::operator -  (u32 i) const						{ ucpos8 p(*this); p.cpos_-=i; return p; }
+	inline ucpos8	ucpos8::operator -  (u32 i) const						{ ucpos8 p(*this); if (i<=p.cpos_) p.cpos_-=i; else p.cpos_ = 0; return p; }
 	inline ucpos8&	ucpos8::operator += (u32 i)								{ cpos_+=i; return *this; }
-	inline ucpos8&	ucpos8::operator -= (u32 i)								{ cpos_-=i; return *this; }
+	inline ucpos8&	ucpos8::operator -= (u32 i)								{ if (i<=cpos_) cpos_-=i; else cpos_ = 0; return *this; }
 
 	inline ucpos8	ucpos8::operator +  (uchar8 c) const					{ ucpos8 p(*this); const u32 n = utf::numBytes(c); p.cpos_+=n; return p; }
-	inline ucpos8	ucpos8::operator -  (uchar8 c) const					{ ucpos8 p(*this); const u32 n = utf::numBytes(c); p.cpos_-=n; return p; }
+	inline ucpos8	ucpos8::operator -  (uchar8 c) const					{ ucpos8 p(*this); const u32 n = utf::numBytes(c); if (n<=p.cpos_) p.cpos_-=n; else p.cpos_ = 0; return p; }
 	inline ucpos8&	ucpos8::operator += (uchar8 c)							{ const u32 n = utf::numBytes(c); cpos_+=n; return *this; }
-	inline ucpos8&	ucpos8::operator -= (uchar8 c)							{ const u32 n = utf::numBytes(c); cpos_-=n; return *this; }
+	inline ucpos8&	ucpos8::operator -= (uchar8 c)							{ const u32 n = utf::numBytes(c); if (n<=cpos_) cpos_-=n; else cpos_ = 0; return *this; }
 
 
-	inline			upos8::upos8() : cpos_(0xffffffff), bpos_(0xffffffff) { }
+	inline			upos8::upos8() : cpos_(0), bpos_(0)						{ }
 	inline			upos8::upos8(const upos8& _p) : cpos_(_p.cpos_), bpos_(_p.bpos_) { }
 	inline			upos8::upos8(ucpos8 _cpos, ubpos8 _bpos) : cpos_(_cpos), bpos_(_bpos) { }
 
-	inline bool		upos8::is_empty() const								{ return cpos_ == bpos_ && cpos_ == 0xffffffff; }
-	inline bool		upos8::is_valid() const								{ return cpos_ <= bpos_; }
+	inline bool		upos8::is_empty() const									{ return cpos_ == bpos_ && cpos_ == 0; }
+	inline bool		upos8::is_valid() const									{ return cpos_ <= bpos_; }
 
-	inline ucpos8	upos8::cpos() const									{ return ucpos8(cpos_); }
-	inline ubpos8	upos8::bpos() const									{ return ubpos8(bpos_); }
+	inline ucpos8	upos8::cpos() const										{ return ucpos8(cpos_); }
+	inline ubpos8	upos8::bpos() const										{ return ubpos8(bpos_); }
 
-	inline upos8	upos8::begin()										{ return upos8(ucpos8(0), ubpos8(0)); }
+	inline upos8	upos8::begin()											{ return upos8(ucpos8(0), ubpos8(0)); }
 	inline upos8	upos8::at(ustr8 const* _str, ucpos8 _cpos)
 	{
 		ubpos8 bpos(0);
@@ -998,15 +1044,45 @@ namespace xcore
 	inline upos8&	upos8::operator -= (upos8 _p)							{ cpos_-=_p.cpos_; bpos_-=_p.bpos_; return *this; }
 
 
-	inline			ulen8::ulen8() : clen_(0xffffffff), blen_(0xffffffff) { }
-	inline			ulen8::ulen8(u32 _l) : clen_(_l), blen_(_l) { }
+	inline			uclen8::uclen8() : clen_(0)								{ }
+	inline			uclen8::uclen8(u32 _l) : clen_(_l)						{ }
+	inline			uclen8::uclen8(const ulen8& _p) : clen_(_p.clen())		{ }
+	inline			uclen8::uclen8(ucpos8 _cbegin, ucpos8 _cend) : clen_(0)	{ if (_cend.cpos() < _cbegin.cpos()) clen_ = _cend.cpos() - _cbegin.cpos(); else clen_ = 0; }
+	inline			uclen8::uclen8(upos8 _begin, upos8 _end) : clen_(0)		{ if (_end.cpos() < _begin.cpos()) clen_ = _end.cpos() - _begin.cpos(); else clen_ = 0; }
+
+	inline bool		uclen8::is_empty() const								{ return clen_ == 0; }
+
+	inline			uclen8::operator u32() const							{ return clen_; }
+	inline uclen8&	uclen8::operator = (uclen8 const& _l)					{ clen_ = _l.clen_; return *this; }
+
+	inline bool		uclen8::operator == (const uclen8& _l) const			{ return clen_ == _l.clen_; }
+	inline bool		uclen8::operator != (const uclen8& _l) const			{ return clen_ != _l.clen_; }
+	inline bool		uclen8::operator <  (const uclen8& _l) const			{ return clen_ <  _l.clen_; }
+	inline bool		uclen8::operator <= (const uclen8& _l) const			{ return clen_ <= _l.clen_; }
+	inline bool		uclen8::operator >  (const uclen8& _l) const			{ return clen_ >  _l.clen_; }
+	inline bool		uclen8::operator >= (const uclen8& _l) const			{ return clen_ >= _l.clen_; }
+
+	inline uclen8&	uclen8::operator++ ()									{ clen_++; return *this; }
+	inline uclen8	uclen8::operator++ (s32)								{ uclen8 l(clen_); ++clen_; return l; }
+	inline uclen8&	uclen8::operator-- ()									{ if (clen_>0) clen_--; return *this; }
+	inline uclen8	uclen8::operator-- (s32)								{ uclen8 l(clen_); if (clen_>0) --clen_; return l; }
+
+	inline uclen8	uclen8::operator +  (uclen8 _l) const					{ uclen8 l(clen_); l += _l; return l; }
+	inline uclen8	uclen8::operator -  (uclen8 _l) const					{ uclen8 l(clen_); l -= _l; return l; }
+	inline uclen8&	uclen8::operator += (uclen8 _l)							{ clen_ += _l.clen_; return *this; }
+	inline uclen8&	uclen8::operator -= (uclen8 _l)							{ clen_ += _l.clen_; return *this; }
+
+
+
+	inline			ulen8::ulen8() : clen_(0), blen_(0)						{ }
+	inline			ulen8::ulen8(u32 _l) : clen_(_l), blen_(_l)				{ }
 	inline			ulen8::ulen8(const ulen8& _p) : clen_(_p.clen_), blen_(_p.blen_) { }
 	inline			ulen8::ulen8(ucpos8 _cend, ubpos8 _bend) : clen_(_cend-ucpos8(0)), blen_(_bend-ubpos8(0)) { }
 	inline			ulen8::ulen8(ucpos8 _cbegin, ubpos8 _bbegin, ucpos8 _cend, ubpos8 _bend) : clen_(_cend-_cbegin), blen_(_bend-_bbegin) { }
 	inline			ulen8::ulen8(upos8 _end) : clen_(_end.cpos() - ucpos8(0)), blen_(_end.bpos() - ubpos8(0)) { }
 	inline			ulen8::ulen8(upos8 _begin, upos8 _end) : clen_(_end.cpos() - _begin.cpos()), blen_(_end.bpos() - _begin.bpos()) { }
 
-	inline bool		ulen8::is_empty() const								{ return clen_ == blen_ && clen_ == 0xffffffff; }
+	inline bool		ulen8::is_empty() const								{ return clen_ == blen_ && clen_ == 0; }
 	inline bool		ulen8::is_valid() const								{ return clen_ <= blen_; }
 
 	inline ucpos8	ulen8::clen() const									{ return ucpos8(clen_); }
