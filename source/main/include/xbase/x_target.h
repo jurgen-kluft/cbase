@@ -2186,6 +2186,8 @@ namespace xcore
 		static const u32 null = 0;
 
 		inline					uchar8() : c(null) {}
+		inline explicit			uchar8(char _c) : c(_c) {}
+		inline explicit			uchar8(u8 _c) : c(_c) {}
 		inline explicit			uchar8(u32 _c) : c(_c) {}
 
 		inline bool				operator <  (const uchar8& _other) const		{ return c < _other.c; }
@@ -2210,6 +2212,7 @@ namespace xcore
 		static const u32 null = 0;
 
 		inline					uchar16() : c(null) {}
+		inline explicit			uchar16(u16 _c) : c(_c) {}
 		inline explicit			uchar16(u32 _c) : c(_c) {}
 
 		inline bool				operator <  (const uchar16& _other) const		{ return c < _other.c; }
