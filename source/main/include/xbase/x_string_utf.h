@@ -57,11 +57,20 @@ namespace xcore
 
 namespace xcore
 {
+	struct ubpos8;
+	struct ucpos8;
+	struct uclen8;
+
+	struct upos8;
+	struct ulen8;
+
 	// This represents the byte position in a UTF-8 string, this object is to make the API
 	// clear for the user to indicate which position is a byte position and which a character position.
 	struct ubpos8
 	{
 		static ubpos8	begin()									{ return ubpos8(0); }
+		static ubpos8	min(ubpos8 a, ubpos8 b)					{ if (a<=b) return a; else return b; }
+		static ubpos8	max(ubpos8 a, ubpos8 b)					{ if (a>=b) return a; else return b; }
 
 						ubpos8();
 						ubpos8(const ubpos8& _p);
@@ -106,15 +115,19 @@ namespace xcore
 	struct ucpos8
 	{
 		static ucpos8	begin()									{ return ucpos8(0); }
+		static ucpos8	min(ucpos8 a, ucpos8 b)					{ if (a<=b) return a; else return b; }
+		static ucpos8	max(ucpos8 a, ucpos8 b)					{ if (a>=b) return a; else return b; }
 
 						ucpos8();
 						ucpos8(const ucpos8& _p);
 		explicit		ucpos8(u32 _cpos);
 
 		bool			is_empty() const;
-		u32				cpos() const;
 
+		u32				cpos() const;
 						operator u32() const;
+
+		uclen8			clen() const;
 
 		ucpos8&			operator =  (ucpos8 const& _p);
 
@@ -200,8 +213,12 @@ namespace xcore
 		bool			is_empty() const;
 		bool			is_valid() const;
 
-		ucpos8			clen() const;
-		ubpos8			blen() const;
+		uclen8			clen() const;
+		ubpos8			bpos() const;
+		ucpos8			cpos() const;
+
+		bool			in_range(ubpos8 _p) const;
+		bool			in_range(ucpos8 _p) const;
 
 		static ulen8	strlen(const ustr8* _str);
 		static ulen8	at(ustr8 const* _str, ucpos8 _cpos);
@@ -234,13 +251,18 @@ namespace xcore
 	// This represents a length/range of a UTF-8 string
 	struct uclen8
 	{
+		static uclen8	min(uclen8 a, uclen8 b)					{ if (a<=b) return a; else return b; }
+		static uclen8	max(uclen8 a, uclen8 b)					{ if (a>=b) return a; else return b; }
+
 						uclen8();
 						uclen8(u32 _l);
 						uclen8(const ulen8& _p);
+						uclen8(ucpos8 _cpos);
 						uclen8(ucpos8 _cbegin, ucpos8 _cend);
 						uclen8(upos8 _begin, upos8 _end);
 
 		bool			is_empty() const;
+		bool			in_range(ucpos8 _p) const;
 
 						operator u32() const;
 		uclen8&			operator = (uclen8 const& _p);
@@ -266,8 +288,8 @@ namespace xcore
 		u32				clen_;	// num characters
 	};
 
-
 	// Forward declare
+	class uptr8;
 	class ucptr8;
 
 	class uptr8
@@ -1047,10 +1069,12 @@ namespace xcore
 	inline			uclen8::uclen8() : clen_(0)								{ }
 	inline			uclen8::uclen8(u32 _l) : clen_(_l)						{ }
 	inline			uclen8::uclen8(const ulen8& _p) : clen_(_p.clen())		{ }
+	inline			uclen8::uclen8(ucpos8 _cpos) : clen_(0)					{ clen_ = _cpos.cpos(); }
 	inline			uclen8::uclen8(ucpos8 _cbegin, ucpos8 _cend) : clen_(0)	{ if (_cend.cpos() < _cbegin.cpos()) clen_ = _cend.cpos() - _cbegin.cpos(); else clen_ = 0; }
 	inline			uclen8::uclen8(upos8 _begin, upos8 _end) : clen_(0)		{ if (_end.cpos() < _begin.cpos()) clen_ = _end.cpos() - _begin.cpos(); else clen_ = 0; }
 
 	inline bool		uclen8::is_empty() const								{ return clen_ == 0; }
+	inline bool		uclen8::in_range(ucpos8 _p) const						{ return (u32)_p < clen_; }
 
 	inline			uclen8::operator u32() const							{ return clen_; }
 	inline uclen8&	uclen8::operator = (uclen8 const& _l)					{ clen_ = _l.clen_; return *this; }
@@ -1084,9 +1108,12 @@ namespace xcore
 
 	inline bool		ulen8::is_empty() const								{ return clen_ == blen_ && clen_ == 0; }
 	inline bool		ulen8::is_valid() const								{ return clen_ <= blen_; }
+	inline bool		ulen8::in_range(ubpos8 _p) const					{ return (u32)_p < blen_; }
+	inline bool		ulen8::in_range(ucpos8 _p) const					{ return (u32)_p < clen_; }
 
-	inline ucpos8	ulen8::clen() const									{ return ucpos8(clen_); }
-	inline ubpos8	ulen8::blen() const									{ return ubpos8(blen_); }
+	inline uclen8	ulen8::clen() const									{ return uclen8(clen_); }
+	inline ubpos8	ulen8::bpos() const									{ return ubpos8(blen_); }
+	inline ucpos8	ulen8::cpos() const									{ return ucpos8(blen_); }
 
 	inline ulen8	ulen8::strlen(const ustr8* _str)
 	{
@@ -1185,10 +1212,10 @@ namespace xcore
 	inline uptr8&		uptr8::operator +=(uchar8 c)						{ str_ += utf::numBytes(c); return *this; }
 	inline uptr8&		uptr8::operator -=(uchar8 c)						{ str_ -= utf::numBytes(c); return *this; }
 
-	inline uptr8		uptr8::operator + (ulen8 n) const					{ uptr8 p(str_ + n.blen()); return p; }
-	inline uptr8		uptr8::operator - (ulen8 n) const					{ uptr8 p(str_ - n.blen()); return p; }
-	inline uptr8&		uptr8::operator -=(ulen8 n)							{ str_ -= n.blen(); return *this; }
-	inline uptr8&		uptr8::operator +=(ulen8 n)							{ str_ += n.blen(); return *this; }
+	inline uptr8		uptr8::operator + (ulen8 n) const					{ uptr8 p(str_ + n.bpos()); return p; }
+	inline uptr8		uptr8::operator - (ulen8 n) const					{ uptr8 p(str_ - n.bpos()); return p; }
+	inline uptr8&		uptr8::operator -=(ulen8 n)							{ str_ -= n.bpos(); return *this; }
+	inline uptr8&		uptr8::operator +=(ulen8 n)							{ str_ += n.bpos(); return *this; }
 
 	inline uptr8		uptr8::operator + (u32 n) const						{ uptr8 p(str_); while (n>0) { p.str_+=utf::numBytes(uchar8(p.str_->c)); --n; } return p; }
 	inline uptr8		uptr8::operator - (u32 n) const						{ uptr8 p(str_); while (n>0) { --p.str_; while (utf::internal::is_trail(p.str_->c)) --p.str_; --n; } return p; }
@@ -1244,10 +1271,10 @@ namespace xcore
 	inline ucptr8&		ucptr8::operator +=(uchar8 c)						{ str_ += utf::numBytes(c); return *this; }
 	inline ucptr8&		ucptr8::operator -=(uchar8 c)						{ str_ -= utf::numBytes(c); return *this; }
 
-	inline ucptr8		ucptr8::operator + (ulen8 n) const					{ ucptr8 p(str_ + n.blen()); return p; }
-	inline ucptr8		ucptr8::operator - (ulen8 n) const					{ ucptr8 p(str_ - n.blen()); return p; }
-	inline ucptr8&		ucptr8::operator -=(ulen8 n)						{ str_ -= n.blen(); return *this; }
-	inline ucptr8&		ucptr8::operator +=(ulen8 n)						{ str_ += n.blen(); return *this; }
+	inline ucptr8		ucptr8::operator + (ulen8 n) const					{ ucptr8 p(str_ + n.bpos()); return p; }
+	inline ucptr8		ucptr8::operator - (ulen8 n) const					{ ucptr8 p(str_ - n.bpos()); return p; }
+	inline ucptr8&		ucptr8::operator -=(ulen8 n)						{ str_ -= n.bpos(); return *this; }
+	inline ucptr8&		ucptr8::operator +=(ulen8 n)						{ str_ += n.bpos(); return *this; }
 
 	inline ucptr8		ucptr8::operator + (u32 n) const					{ ucptr8 p(str_); while (n>0) { p.str_+=utf::numBytes(uchar8(p.str_->c)); --n; } return p; }
 	inline ucptr8		ucptr8::operator - (u32 n) const					{ ucptr8 p(str_); while (n>0) { --p.str_; while (utf::internal::is_trail(p.str_->c)) --p.str_; --n; } return p; }

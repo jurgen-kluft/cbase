@@ -98,7 +98,7 @@ UNITTEST_SUITE_BEGIN(xutf)
 			while (i1 != end1 && !i2.at_end())
 			{
 				ulen8 n = i1.copy_char_from(i2);
-				CHECK_EQUAL(1,n.blen());
+				CHECK_EQUAL(1,n.bpos());
 				CHECK_EQUAL(1,n.clen());
 				i1 += n;
 				i2 += n;
