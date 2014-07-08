@@ -2186,7 +2186,7 @@ namespace xcore
 		static const u32 null = 0;
 
 		inline					uchar8() : c(null) {}
-		inline explicit			uchar8(char _c) : c(_c) {}
+		inline					uchar8(char _c) : c(_c) {}
 		inline explicit			uchar8(u8 _c) : c(_c) {}
 		inline explicit			uchar8(u32 _c) : c(_c) {}
 
