@@ -1565,12 +1565,13 @@ namespace xcore
 		#ifdef _MSC_VER
 			/**
 			 * 1200      == VC++ 6.0
-			 * 1200-1202 == eVC++4
+			 * 1200-1202 == VC++ 4
 			 * 1300      == VC++ 7.0
 			 * 1400      == VC++ 8.0
 			 * 1500      == VC++ 9.0
-			 * 1600      == VC++ 10.0
-			 * 1700      == VC++ 11.0
+			 * 1600      == VC++ 10.0 (Visual Studio 2010)
+			 * 1700      == VC++ 11.0 (Visual Studio 2012)
+			 * 1800      == VC++ 12.0 (Visual Studio 2013)
 			 */
 			#if _MSC_VER < 1400
 			#elif _MSC_VER == 1400
@@ -1587,7 +1588,11 @@ namespace xcore
 			#elif _MSC_VER == 1700
 				#define COMPILER_MSVC
 				#define COMPILER_DEFAULT
-				#define COMPILER_VERSION            2012 
+				#define COMPILER_VERSION            2012
+			#elif _MSC_VER == 1800
+				#define COMPILER_MSVC
+				#define COMPILER_DEFAULT
+				#define COMPILER_VERSION            2013
 			#else
 				#error x_target, error; Unknown _MSVC_VER compiler ID
 			#endif
