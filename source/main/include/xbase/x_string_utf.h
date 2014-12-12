@@ -213,9 +213,14 @@ namespace xcore
 		bool			is_empty() const;
 		bool			is_valid() const;
 
+		u32				blen() const;
 		uclen8			clen() const;
 		ubpos8			bpos() const;
 		ucpos8			cpos() const;
+
+		ucpos8			clamp(ucpos8 p) const;
+		ulen8			clamp(ucpos8 p, ulen8 l) const;
+		uclen8			clamp(ucpos8 p, uclen8 l) const;
 
 		bool			in_range(ubpos8 _p) const;
 		bool			in_range(ucpos8 _p) const;
@@ -1097,7 +1102,6 @@ namespace xcore
 	inline uclen8&	uclen8::operator -= (uclen8 _l)							{ clen_ += _l.clen_; return *this; }
 
 
-
 	inline			ulen8::ulen8() : clen_(0), blen_(0)						{ }
 	inline			ulen8::ulen8(u32 _l) : clen_(_l), blen_(_l)				{ }
 	inline			ulen8::ulen8(const ulen8& _p) : clen_(_p.clen_), blen_(_p.blen_) { }
@@ -1108,9 +1112,15 @@ namespace xcore
 
 	inline bool		ulen8::is_empty() const								{ return clen_ == blen_ && clen_ == 0; }
 	inline bool		ulen8::is_valid() const								{ return clen_ <= blen_; }
+
+	inline ucpos8	ulen8::clamp(ucpos8 p) const						{ return p.cpos < clen_ ? p : ucpos8(clen_); }
+	inline ulen8	ulen8::clamp(ucpos8 p, ulen8 l) const				{ if (p.cpos >= clen_); return ulen8();  if (l.in_range(p + l.clen())) return l; }
+	inline uclen8	ulen8::clamp(ucpos8 p, uclen8 l) const				{ if (p.cpos >= clen_); return uclen8();  if (l.in_range(p + l)) return l; return uclen8(clen_ - p); }
+
 	inline bool		ulen8::in_range(ubpos8 _p) const					{ return (u32)_p < blen_; }
 	inline bool		ulen8::in_range(ucpos8 _p) const					{ return (u32)_p < clen_; }
 
+	inline u32		ulen8::blen() const									{ return blen_; }
 	inline uclen8	ulen8::clen() const									{ return uclen8(clen_); }
 	inline ubpos8	ulen8::bpos() const									{ return ubpos8(blen_); }
 	inline ucpos8	ulen8::cpos() const									{ return ucpos8(blen_); }
