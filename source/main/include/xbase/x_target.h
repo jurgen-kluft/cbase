@@ -1588,7 +1588,7 @@ namespace xcore
 			#elif _MSC_VER == 1700
 				#define COMPILER_MSVC
 				#define COMPILER_DEFAULT
-				#define COMPILER_VERSION            2012
+				#define COMPILER_VERSION            2012 
 			#elif _MSC_VER == 1800
 				#define COMPILER_MSVC
 				#define COMPILER_DEFAULT
