@@ -1593,6 +1593,10 @@ namespace xcore
 				#define COMPILER_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2013
+			#elif _MSC_VER == 1900
+				#define COMPILER_MSVC
+				#define COMPILER_DEFAULT
+				#define COMPILER_VERSION            2015
 			#else
 				#error x_target, error; Unknown _MSVC_VER compiler ID
 			#endif
