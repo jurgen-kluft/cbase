@@ -47,28 +47,28 @@ namespace xcore
 		inline void			clear()										{ parent = child[LEFT] = child[RIGHT] = this; }
 
 		inline void			set_child(xrbnode* node, s32 dir)			{ child[dir] = node; }
-		inline xrbnode*		get_child(s32 dir) const						{ return child[dir]; }
+		inline xrbnode*		get_child(s32 dir) const					{ return child[dir]; }
 		inline xrbnode*		get_non_null_child() const					{ s32 d = child[LEFT]->is_nill(); return child[d]; }
 
-		inline void			set_right(xrbnode* node)						{ child[RIGHT] = node; }
+		inline void			set_right(xrbnode* node)					{ child[RIGHT] = node; }
 		inline xrbnode*		get_right() const							{ return child[RIGHT]; }
 
 		inline void			set_left(xrbnode* node)						{ child[LEFT] = node; }
-		inline xrbnode*		get_left() const								{ return child[LEFT]; }
+		inline xrbnode*		get_left() const							{ return child[LEFT]; }
 
-		inline void			set_parent(xrbnode* node)					{ u32 const flags = (u32)parent & 0x3; parent = (xrbnode*)((X_PTR_SIZED_INT)node | (X_PTR_SIZED_INT)flags); }
-		inline xrbnode*		get_parent() const							{ return (xrbnode*)((u8*)parent - ((u32)parent&0x3)); }
+		inline void			set_parent(xrbnode* node)					{ u32 const flags = (u32)((uptr)parent & 0x3); parent = (xrbnode*)((uptr)node | (uptr)flags); }
+		inline xrbnode*		get_parent() const							{ return (xrbnode*)((u8*)parent - ((u32)((uptr)parent&0x3))); }
 
-		inline void			set_parent_side(s32 side)					{ ASSERT(side==LEFT || side==RIGHT); if (side==RIGHT) { parent = (xrbnode*)((X_PTR_SIZED_INT)parent | (X_PTR_SIZED_INT)0x1); } else { parent = (xrbnode*)((X_PTR_SIZED_INT)parent & (X_PTR_SIZED_INT)-2); } }
-		inline s32			get_parent_side() const						{ s32 const side = (s32)parent & 0x1; ASSERT(side==LEFT || side==RIGHT); return side; }
+		inline void			set_parent_side(s32 side)					{ ASSERT(side==LEFT || side==RIGHT); if (side==RIGHT) { parent = (xrbnode*)((uptr)parent | (uptr)0x1); } else { parent = (xrbnode*)((uptr)parent & (uptr)-2); } }
+		inline s32			get_parent_side() const						{ s32 const side = (s32)((uptr)parent & 0x1); ASSERT(side==LEFT || side==RIGHT); return side; }
 
-		inline void			set_red()									{ parent = (xrbnode*)((X_PTR_SIZED_INT)parent | (X_PTR_SIZED_INT)RED); }
-		inline void			set_black()									{ parent = (xrbnode*)((X_PTR_SIZED_INT)parent & (X_PTR_SIZED_INT)-3); }
-		inline void			set_color(s32 colr)							{ if (colr==RED) { parent = (xrbnode*)((X_PTR_SIZED_INT)parent | (X_PTR_SIZED_INT)RED); } else { parent = (xrbnode*)((X_PTR_SIZED_INT)parent & (X_PTR_SIZED_INT)-3); } }
-		inline s32			get_color() const							{ s32 const colr = (s32)parent & 0x2; ASSERT(colr == RED || colr == BLACK); return colr; }
+		inline void			set_red()									{ parent = (xrbnode*)((uptr)parent | (uptr)RED); }
+		inline void			set_black()									{ parent = (xrbnode*)((uptr)parent & (uptr)-3); }
+		inline void			set_color(s32 colr)							{ if (colr==RED) { parent = (xrbnode*)((uptr)parent | (uptr)RED); } else { parent = (xrbnode*)((uptr)parent & (uptr)-3); } }
+		inline s32			get_color() const							{ s32 const colr = (s32)((uptr)parent & 0x2); ASSERT(colr == RED || colr == BLACK); return colr; }
 
-		inline bool			is_red() const								{ return ((u32)parent & 0x2) == RED; }
-		inline bool			is_black() const								{ return ((u32)parent & 0x2) == BLACK; }
+		inline bool			is_red() const								{ return ((u32)((uptr)parent & 0x2)) == RED; }
+		inline bool			is_black() const							{ return ((u32)((uptr)parent & 0x2)) == BLACK; }
 		inline bool			is_used() const								{ return this != child[RIGHT]; }
 		inline bool			is_nill() const								{ return this == child[RIGHT]; }
 
