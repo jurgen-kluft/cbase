@@ -3,7 +3,6 @@
 
 namespace xcore
 {
-
 	u32		x_BinarySearch(const void* inItem, const void* inData, u32 inLength, compare_predicate predicate)
 	{
 		// Do a binary search on the data to obtain the index of the found item
@@ -20,7 +19,7 @@ namespace xcore
 		else if (r == 0)
 			return inLength-1;
 
-		s32 bounds[2] = {0, inLength};
+		s32 bounds[2] = {0, (s32)inLength};
 		s32 mid = bounds[1] / 2;
 		while (true)
 		{

@@ -6,6 +6,9 @@
 
 	<Variables>
 		<Name>xbase</Name>
+		<Language>C++</Language>
+		<GUID_Main>bc8151eb-5dce-8775-4131-6e7835a38191</GUID_Main>
+		<GUID_UnitTest>2bf2b594-46d4-6ec8-adfb-503a6db26713</GUID_UnitTest>
 	</Variables>
 
 	<Dependency Package="sdk_win32" Platform="Win32">
