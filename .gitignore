@@ -1,3 +1,8 @@
+# Visual Studio project files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
 # Compiled Object files
 *.slo
 *.lo
@@ -26,3 +31,6 @@
 *.exe
 *.out
 *.app
+
+# CTags
+tags
