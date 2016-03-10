@@ -11,6 +11,7 @@ func GetPackage() *denv.Package {
 
 	// The main (xbase) package
 	mainpkg := denv.NewPackage("xbase")
+	mainpkg.AddPackage(unittestpkg)
 
 	// 'xbase' library
 	mainlib := denv.SetupDefaultCppLibProject("xbase", "github.com\\jurgen-kluft\\xbase")
