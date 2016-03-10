@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	xcode.Generate(xbase.GetProject())
+	xcode.Generate(xbase.GetPackage())
 }
