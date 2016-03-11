@@ -7,6 +7,7 @@ import (
 
 // GetPackage returns the package object of 'xbase'
 func GetPackage() *denv.Package {
+	// Dependencies
 	unittestpkg := xunittest.GetPackage()
 
 	// The main (xbase) package
