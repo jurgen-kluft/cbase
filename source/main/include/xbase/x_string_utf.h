@@ -1,8 +1,8 @@
 #ifndef __XBASE_STRING_UTF_H__
 #define __XBASE_STRING_UTF_H__
 #include "xbase\x_target.h"
-#ifdef USE_PRAGMA_ONCE 
-#pragma once 
+#ifdef USE_PRAGMA_ONCE
+#pragma once
 #endif
 
 //==============================================================================
@@ -51,7 +51,7 @@ namespace xcore
 		{
 			inline bool		is_trail	(u8 c)	{ return ((c>>6)==0x2); }
 		}
-	}	// utf  
+	}	// utf
 };	// xCore namespace
 
 
@@ -612,7 +612,7 @@ namespace xcore
 				case 4: _dst->c = c&0xFF; c>>=8; ++_dst;
 				case 3: _dst->c = c&0xFF; c>>=8; ++_dst;
 				case 2: _dst->c = c&0xFF; c>>=8; ++_dst;
-				case 1: _dst->c = c&0xFF; 
+				case 1: _dst->c = c&0xFF;
 				};
 				return n;
 			}
@@ -629,7 +629,7 @@ namespace xcore
 				case 4: _dst->c = c&0xFF; c>>=8; ++_dst;
 				case 3: _dst->c = c&0xFF; c>>=8; ++_dst;
 				case 2: _dst->c = c&0xFF; c>>=8; ++_dst;
-				case 1: _dst->c = c&0xFF; 
+				case 1: _dst->c = c&0xFF;
 				};
 				return n;
 			}
@@ -647,7 +647,7 @@ namespace xcore
 				switch (n)
 				{
 				case 4: _dst->c = c&0xFFFF; c>>=16; ++_dst;
-				case 2: _dst->c = c&0xFFFF; 
+				case 2: _dst->c = c&0xFFFF;
 				};
 				return n;
 			}
@@ -662,7 +662,7 @@ namespace xcore
 				switch (n)
 				{
 				case 4: _dst->c = c&0xFFFF; c>>=16; ++_dst;
-				case 2: _dst->c = c&0xFFFF; 
+				case 2: _dst->c = c&0xFFFF;
 				};
 				return n;
 			}
@@ -686,7 +686,7 @@ namespace xcore
 					b = (_c.c >> 24) & 0xFF;
 					if (b<0x80 || b>0xBF) return false;
 				};
-			case 0xE0: // 3 
+			case 0xE0: // 3
 				{
 					b = (_c.c >> 16) & 0xFF;
 					if (b<0x80 || b>0xBF) return false;
@@ -763,7 +763,7 @@ namespace xcore
 		static const u32 halfMask = 0x000003FF;
 
 		static const u32 byteMask = 0xBF;
-		static const u32 byteMark = 0x80; 
+		static const u32 byteMark = 0x80;
 
 		inline bool			convert		(uchar16 _from, uchar8& _to)
 		{
@@ -778,7 +778,7 @@ namespace xcore
 				// If it's a low surrogate, convert to u32
 				if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
 					ch = ((ch - 0xD800) << halfShift) + (ch2 - 0xDC00) + halfBase;
-				else 
+				else
 					return false;	// it's an unpaired high surrogate
 			}
 			else
@@ -835,11 +835,11 @@ namespace xcore
 			ch16 -= offsetsFromUTF8[bytesToRead];
 
 			if (ch16 <= 0x0000FFFF)	// Target is a character <= 0xFFFF
-			{	
+			{
 				if (ch16 >= 0xD800 && ch16 <= 0xDFFF)	// UTF-16 surrogate values are illegal
 					return false;
 				_to.c = ch16;
-			} 
+			}
 			else if (ch16 > 0x0010FFFF)
 			{
 				return false;
@@ -920,7 +920,7 @@ namespace xcore
 				{
 					terminate = true;
 				}
-				else 
+				else
 				{
 					const u32 n = (u32)(_dst_end - _dst);
 					if (n == 1)
@@ -952,7 +952,7 @@ namespace xcore
 	}
 }
 
-	
+
 
 namespace xcore
 {
@@ -1180,7 +1180,7 @@ namespace xcore
 
 	inline ulen8		uptr8::copy_char_to(uchar8& c) const
 	{
-		s32 const n = utf::read(str_, c); 
+		s32 const n = utf::read(str_, c);
 		return ulen8(ucpos8(1), ubpos8(n));
 	}
 
@@ -1194,7 +1194,7 @@ namespace xcore
 
 	inline ulen8		uptr8::copy_char_from(uchar8 c)
 	{
-		s32 const n = utf::write(str_, c); 
+		s32 const n = utf::write(str_, c);
 		return ulen8(ucpos8(1), ubpos8(n));
 	}
 
@@ -1254,7 +1254,7 @@ namespace xcore
 
 	inline ulen8		ucptr8::copy_char_to(uchar8& c) const
 	{
-		s32 const n = utf::read(str_, c); 
+		s32 const n = utf::read(str_, c);
 		return ulen8(ucpos8(1), ubpos8(n));
 	}
 
@@ -1328,19 +1328,19 @@ namespace xcore
 			* FORMATTED STRING FUNCTIONS
 			*==============================================================================
 			*
-			*  x_cprintf    
+			*  x_cprintf
 			*
 			*      Formatted print counting function, will return the number of characters needed.
 			*
-			*  x_sprintf    
+			*  x_sprintf
 			*
 			*      Formatted print to "string".
 			*
 			*==============================================================================
 		*/
-		s32		x_cprintf		(                            const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+		s32		x_cprintf		(                            const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
 																					const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
-		s32		x_sprintf		(ustr8* buffer, s32 maxChars, const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+		s32		x_sprintf		(ustr8* buffer, s32 maxChars, const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
 																					const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
 		s32		x_vcprintf		(                            const ustr8* formatStr, const x_va_list& args);
 		s32		x_vsprintf		(ustr8* buffer, s32 maxChars, const ustr8* formatStr, const x_va_list& args);
@@ -1349,7 +1349,7 @@ namespace xcore
 			* FORMATTED STRING FUNCTIONS
 			*==============================================================================
 			*
-			*  x_printf    
+			*  x_printf
 			*
 			*      Formatted print to "standard text output".  This is straight forward for
 			*      text mode programs and is handled by xbase.  Graphical programs
@@ -1358,7 +1358,7 @@ namespace xcore
 			*==============================================================================
 		*/
 
-		s32		x_printf   		(const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, 
+		s32		x_printf   		(const ustr8* formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
 														const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
 		s32		x_printf		(const ustr8* formatStr, const x_va_list& args)	;
 		s32		x_printf		(const ustr8* str);
@@ -1367,4 +1367,3 @@ namespace xcore
 }
 
 #endif    ///< __XBASE_STRING_UTF_H__
-
