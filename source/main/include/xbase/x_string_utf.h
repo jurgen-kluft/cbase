@@ -28,10 +28,8 @@ namespace xcore
 		s32			convert		(ustr32 const* _src, u32 _srclen, ustr8 *& _dst, u32 _dstmaxleninbytes);
 		s32			convert		(ustr32 const* _src, u32 _srclen, ustr16*& _dst, u32 _dstmaxleninbytes);
 
-
 	}	// utf
 };	// xCore namespace
-
 
 
 #endif    ///< __XBASE_STRING_UTF_H__
