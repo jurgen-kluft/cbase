@@ -91,7 +91,7 @@ namespace xcore
 		}
 
 		r = 1.0;
-		
+
 		//TODO: use while?
 		for (;;)
 		{
@@ -106,7 +106,7 @@ namespace xcore
 	}
 
 
-	/** 
+	/**
 	 *------------------------------------------------------------------------------
 	 * fmtbase - String where the output is going to go
 	 *          (Make sure that the string is at least 24 bytes long)
@@ -119,20 +119,20 @@ namespace xcore
 	static s32 dtoa(char* fmtbase, f64 fpnum, char cvt, s32 width, s32 prec)
 	{
 		static const f64 powTable[] = {1,10,10e1,10e2,10e3,10e4,10e5,10e6,10e7,10e8,10e9,10e10,10e11,10e12,10e13,10e14,10e15,10e16,10e17,10e18,10e19,10e20,10e21,10e22,10e23};
-	 
+
 		ASSERT(fmtbase);
 		//ASSERT(width > 0);
 		ASSERT(prec >= 0);
 
 		char    fwork[WORKSIZE];
 		char*   fw               = fwork;
-		   
+
 		 // setup integer part
 		char    iwork[WORKSIZE];
 		char*   iworkend         = &iwork[sizeof(iwork) - 1];
 		char*   iw               = iworkend;
 		*iw = 0;
-		  
+
 
 		// setup exponent part
 		char    ework[16];
@@ -160,17 +160,17 @@ namespace xcore
 
 		// grab sign & make non-negative
 		s32 is_neg = fpnum < 0;
-		if (is_neg) 
+		if (is_neg)
 			fpnum = -fpnum;
 
 		// precision matters
 
 		// can't have more prec than supported
-		if (prec > WORKSIZE - 2) 
+		if (prec > WORKSIZE - 2)
 			prec = WORKSIZE - 2;
 
 		f64 powprec;
-		if (prec == 6) 
+		if (prec == 6)
 		{
 			powprec = 1.0e6;
 		}
@@ -370,7 +370,7 @@ namespace xcore
 				--exp;
 			}
 
-			
+
 
 			if (cvt == 'g')     // used up one digit for s32 part...
 			{
@@ -457,7 +457,7 @@ namespace xcore
 
 		// arrange everything in returned string
 		s32 showdot = cvt != 'g' || fwidth > 0;
-	   
+
 		s32 fmtwidth = is_neg + iwidth + showdot + fwidth + ewidth;
 
 		s32 pad = width - fmtwidth;
@@ -675,7 +675,7 @@ namespace xcore
 		else if (flags & UPPERCASE)
 			i += 2;
 
-		i += (_boolean==0) ? 0 : 1;		
+		i += (_boolean==0) ? 0 : 1;
 
 		x_strcpy(buf, maxBufSize, t[i]);
 		return x_strlen(buf);
@@ -751,18 +751,18 @@ namespace xcore
 	 * Summary:
 	 *     write a string formatted output into a buffer.
 	 * Arguments:
-	 *        buffer                - Storage location for output. 
-	 *      maxChars            - Maximum number of characters to store 
-	 *        pFormatStr            - String containing the formating specification. 
+	 *        buffer                - Storage location for output.
+	 *      maxChars            - Maximum number of characters to store
+	 *        pFormatStr            - String containing the formating specification.
 	 *      Args                - Pointer to list of arguments OR the actual arguments in case of x_sprintf
 	 * Returns:
 	 *        return the number of characters written, not including the terminating null character.
 	 * Description:
-	 *      These functions formats and stores a series of characters and values in buffer. 
-	 *      Each argument (if any) is converted and output according to the corresponding format 
-	 *      specification in format. The format consists of ordinary characters and has the same 
-	 *      form and function as the format argument for x_printf. A null character is appended after 
-	 *      the last character written. If copying occurs between strings that overlap, the behavior 
+	 *      These functions formats and stores a series of characters and values in buffer.
+	 *      Each argument (if any) is converted and output according to the corresponding format
+	 *      specification in format. The format consists of ordinary characters and has the same
+	 *      form and function as the format argument for x_printf. A null character is appended after
+	 *      the last character written. If copying occurs between strings that overlap, the behavior
 	 *      is undefined.
 	 *
 	 *<P><B>Type Field Characters</B>
@@ -787,7 +787,7 @@ namespace xcore
 	 *      %n            special: *stores* the number of characters output so far into the next variable in the parameter list
 	 *      %y,%Y,%#y     a boolean as yes/no (%y=lower-case yes/no, %Y=upper-case YES/NO, %#y/%#Y=capital-case Yes/No)
 	 *</TABLE>
-	 *    
+	 *
 	 *   <B>size flags</B>
 	 *<TABLE>
 	 *     Character    Output
@@ -885,7 +885,7 @@ namespace xcore
 			  char* xdigs    = NULL;                   // digits for [xX] conversion
 			  s32   ret      = 0;                      // return value accumulator
 			  u32   ulval    = 0;                      // integer arguments %[diouxX]
-			  u64   uqval    = 0;                      // %q integers 
+			  u64   uqval    = 0;                      // %q integers
 			  s32   argindex = 0;
 
 		/// Scan the format for conversions (`%' character).
@@ -907,7 +907,7 @@ namespace xcore
 			}
 
 			// are we done?
-			if (ch.c == '\0') 
+			if (ch.c == '\0')
 				goto done;
 
 			// skip over '%'
@@ -932,7 +932,7 @@ namespace xcore
 					// ``If the space and + flags both appear, the space
 					// flag will be ignored.''
 					//  -- ANSI X3J11
-					if (!sign) 
+					if (!sign)
 						sign = ' ';
 					goto rflag;
 
@@ -948,7 +948,7 @@ namespace xcore
 					 // They don't exclude field widths read from args.
 					{
 						const s32 w = (s32)args[argindex++];
-						if ((width = w) >= 0) 
+						if ((width = w) >= 0)
 							goto rflag;
 
 						width = -width;
@@ -1045,7 +1045,7 @@ namespace xcore
 					else
 					{
 						s32 temp;
-						if (flags & SHORTINT) 
+						if (flags & SHORTINT)
 							temp = (s16)args[argindex++];
 						else
 							temp = (s32)args[argindex++];
@@ -1055,7 +1055,7 @@ namespace xcore
 							temp = -temp;
 							sign = '-';
 						}
-						
+
 						ulval = (u32)(temp);
 					}
 
@@ -1072,7 +1072,7 @@ namespace xcore
 				case 'f':
 					/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
 
-					if (sign == '+') 
+					if (sign == '+')
 					{
 						writeBufferDelegate(&buffer, maxChars, (ustr8*)&sign, 1);
 						width--;
@@ -1082,7 +1082,7 @@ namespace xcore
 					if (prec == -1)
 						prec = DEFPREC;
 
-					if (flags & LONGDBL) 
+					if (flags & LONGDBL)
 					{
 						// add additional precision when we say long f64
 						prec += 4;
@@ -1147,7 +1147,7 @@ namespace xcore
 					 // "The argument shall be a pointer to void.  The
 					 // value of the pointer is converted to a sequence
 					 // of printable characters, in an implementation-
-					 // defined manner." 
+					 // defined manner."
 					 // -- ANSI X3J11
 #ifdef TARGET_PC
 					uqval  = (u64)args[argindex++];
@@ -1280,7 +1280,7 @@ namespace xcore
 
 		number:     if ((dprec = prec) >= 0)
 						flags &= ~ZEROPAD;
-					
+
 					// ``The result of converting a zero value with an
 					// explicit precision of zero is no characters.''
 					// -- ANSI X3J11
@@ -1413,20 +1413,20 @@ namespace xcore
 		return strLen;
 	}
 
-	 s32		x_printf   				(const char* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+	 s32		x_printf   				(const char* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
 																const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
 	 {
-		 return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16); 
+		 return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
 	 }
 
-	 s32		x_printf				(const char* formatStr, const x_va_list& args)		
+	 s32		x_printf				(const char* formatStr, const x_va_list& args)
 	 {
-		 return xconsole::write(formatStr, args); 
+		 return xconsole::write(formatStr, args);
 	 }
 
-	 s32		x_printf				(const char* str)									
+	 s32		x_printf				(const char* str)
 	 {
-		 return xconsole::write(str); 
+		 return xconsole::write(str);
 	 }
 
 	 namespace utf
@@ -1465,20 +1465,20 @@ namespace xcore
 			return strLen;
 		}
 
-		 s32		x_printf   				(const ustr8* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+		 s32		x_printf   				(const ustr8* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
 																	const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
 		 {
-			 return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16); 
+			 return xconsole::write(formatStr,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
 		 }
 
-		 s32		x_printf				(const ustr8* formatStr, const x_va_list& args)		
+		 s32		x_printf				(const ustr8* formatStr, const x_va_list& args)
 		 {
-			 return xconsole::write(formatStr, args); 
+			 return xconsole::write(formatStr, args);
 		 }
 
-		 s32		x_printf				(const ustr8* str)									
+		 s32		x_printf				(const ustr8* str)
 		 {
-			 return xconsole::write(str); 
+			 return xconsole::write(str);
 		 }
 
 	 }

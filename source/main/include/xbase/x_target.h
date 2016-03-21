@@ -10,12 +10,12 @@
  *     providing a standard set of platform definitions with
  *     anticipated variations. The selection of a platform and
  *     variation is based on a key macro definition.
- *     
+ *
  *     The target macro is provided in different ways depending on
  *     the development environment. But usually it is provided by
  *     the user when he sets the build configuration in the
  *     development environment.
- *     
+ *
  *     <table>
  *     Target Macro                \Description                           MFC Safe?
  *     --------------------------  -------------------------------------  ----------
@@ -103,19 +103,19 @@
  *     TARGET_3DS_TEST_DEBUG       Nintendo 3ds Test Debug                       N
  *     TARGET_3DS_TEST_RELEASE     Nintendo 3ds Test Release                     N
  *     </table>
- *     
+ *
  *     Targets which are "MFC safe" (and have _MFC in the macro)
  *     will disable the x_files version of operators new and delete.
  *     Graphic engines prepared for MFC configurations should not
  *     provide a main() function.
- *     
+ *
  *     When present, each of the primary target macros in the list
  *     above will, in turn, cause other secondary macros to be
  *     defined. These Secondary macros are set automatically for the
  *     user.
- *     
- *     
- *     
+ *
+ *
+ *
  *     <table>
  *     Secondary Macro   \Description
  *     ----------------  --------------------------------------
@@ -136,7 +136,7 @@
  *                        the Debug stuff
  *     TARGET_TEST       Test (UnitTest, exceptions are enabled)
  *     </table>
- *     
+ *
  *     <table>
  *     Target Macro                Secondary Macros
  *     --------------------------  ---------------------------
@@ -219,7 +219,7 @@
  *     that we must specify and that is 32-bit or 64-bit. This has mainly an impact
  *     on sizeof(void*), for 32-bit this results in 4, meaning a pointer will occupy
  *     4 bytes on a 32-bit system. On a 64-bit system this will be 8 bytes.
- *     
+ *
  *     <table>
  *     Dat Size Macro     \Description              \Version   Platform
  *     -----------------  ------------------------  ---------  ---------
@@ -230,17 +230,17 @@
  *     Finally the user needs to define in the configuration which
  *     kind of build is he trying to do. X_DEBUG could be use even
  *     if the compiler is set in optimization.
- *     
+ *
  *     <table>
  *     Target Macro   \Description
  *     -------------  -------------------------------------------
  *     none           Ignores debugging features such asserts.
  *     X_DEBUG        Activates debugging features such asserts.
  *     </table>
- *     
+ *
  *     The target macro is provided in different ways depending on
  *     the compiler.
- *     
+ *
  *     <table>
  *     Compiler Macro     \Description              \Version   Platform
  *     -----------------  ------------------------  ---------  ---------
@@ -252,9 +252,9 @@
  *     COMPILER_SN_PSP    SNSystems                  PSP       PSP
  *     COMPILER_SN_PS3    SNSystems                  PS3       PS3
  *     </table>
- *     
+ *
  *     Other Macros provided to the user automatically are:
- *     
+ *
  *     <table>
  *     Target Macro      \Description
  *     ----------------  ---------------------------
@@ -262,9 +262,9 @@
  *     X_BIG_ENDIAN      Endianness of the hardware
  *     X_LITTLE_ENDIAN   Endianness of the hardware
  *     </table>
- *     
+ *
  *     Finally there is a convenient platform enumeration that can
- *     be use with logical operations. ex: (PLATFORM_PC | PLATFORM_360)                                                                
+ *     be use with logical operations. ex: (PLATFORM_PC | PLATFORM_360)
  * ---------------------------------------------------------------------------------
  */
 
@@ -277,7 +277,7 @@
 namespace xcore
 {
 	/**
-	 *  
+	 *
 	 * Hardware enumeration
 	 *
 	 */
@@ -303,14 +303,14 @@ namespace xcore
 	#undef TARGET_3DS
 
 	/**
-	 *  
+	 *
 	 *  Check for ambiguous or insufficiently qualified target specification.
-	 *  
-	 *  *** IF YOU GOT AN ERROR HERE ***, then you specified a target platform 
+	 *
+	 *  *** IF YOU GOT AN ERROR HERE ***, then you specified a target platform
 	 *  without sufficiently qualifying the target.
 	 *
 	 */
-	#if !defined(TARGET_PS3_DEV_DEBUG) && !defined(TARGET_PS3_DEV_RELEASE) && !defined(TARGET_PS3_DEV_FINAL) && !defined(TARGET_PS3_CLIENT_DEBUG) && !defined(TARGET_PS3_CLIENT_RELEASE) && !defined(TARGET_PS3_CLIENT_FINAL) && !defined(TARGET_PS3_RETAIL_DEBUG) && !defined(TARGET_PS3_RETAIL_RELEASE) && !defined(TARGET_PS3_RETAIL_FINAL)      
+	#if !defined(TARGET_PS3_DEV_DEBUG) && !defined(TARGET_PS3_DEV_RELEASE) && !defined(TARGET_PS3_DEV_FINAL) && !defined(TARGET_PS3_CLIENT_DEBUG) && !defined(TARGET_PS3_CLIENT_RELEASE) && !defined(TARGET_PS3_CLIENT_FINAL) && !defined(TARGET_PS3_RETAIL_DEBUG) && !defined(TARGET_PS3_RETAIL_RELEASE) && !defined(TARGET_PS3_RETAIL_FINAL)
 		#ifdef TARGET_PS3
 			#error x_target, error; Incorrect target specification.
 			#error x_target, error; Use either TARGET_PS3_DEV, TARGET_PS3_CLIENT, or TARGET_PS3_RETAIL.
@@ -319,7 +319,7 @@ namespace xcore
 		#undef TARGET_PS3
 	#endif
 
-	#if !defined(TARGET_360_DEV_DEBUG) && !defined(TARGET_360_DEV_RELEASE) && !defined(TARGET_360_DEV_FINAL) && !defined(TARGET_360_CLIENT_DEBUG) && !defined(TARGET_360_CLIENT_RELEASE) && !defined(TARGET_360_CLIENT_FINAL) && !defined(TARGET_360_RETAIL_DEBUG) && !defined(TARGET_360_RETAIL_RELEASE) && !defined(TARGET_360_RETAIL_FINAL)      
+	#if !defined(TARGET_360_DEV_DEBUG) && !defined(TARGET_360_DEV_RELEASE) && !defined(TARGET_360_DEV_FINAL) && !defined(TARGET_360_CLIENT_DEBUG) && !defined(TARGET_360_CLIENT_RELEASE) && !defined(TARGET_360_CLIENT_FINAL) && !defined(TARGET_360_RETAIL_DEBUG) && !defined(TARGET_360_RETAIL_RELEASE) && !defined(TARGET_360_RETAIL_FINAL)
 		#ifdef TARGET_360
 			#error x_target, error; TARGET_360 is not a sufficient target specification.
 			#error x_target, error; Use either TARGET_360_DEV, TARGET_360_CLIENT, or TARGET_360_RETAIL.
@@ -328,7 +328,7 @@ namespace xcore
 		#undef TARGET_360
 	#endif
 
-	#if !defined(TARGET_WII_DEV_DEBUG) && !defined(TARGET_WII_DEV_RELEASE) && !defined(TARGET_WII_DEV_FINAL) && !defined(TARGET_WII_CLIENT_DEBUG) && !defined(TARGET_WII_CLIENT_RELEASE) && !defined(TARGET_WII_CLIENT_FINAL) && !defined(TARGET_WII_RETAIL_DEBUG) && !defined(TARGET_WII_RETAIL_RELEASE) && !defined(TARGET_WII_RETAIL_FINAL)      
+	#if !defined(TARGET_WII_DEV_DEBUG) && !defined(TARGET_WII_DEV_RELEASE) && !defined(TARGET_WII_DEV_FINAL) && !defined(TARGET_WII_CLIENT_DEBUG) && !defined(TARGET_WII_CLIENT_RELEASE) && !defined(TARGET_WII_CLIENT_FINAL) && !defined(TARGET_WII_RETAIL_DEBUG) && !defined(TARGET_WII_RETAIL_RELEASE) && !defined(TARGET_WII_RETAIL_FINAL)
 		#ifdef TARGET_WII
 			#error x_target, error; TARGET_WII is not a sufficient target specification.
 			#error x_target, error; Use either PLATFORM_WII_DEV_DEBUG, PLATFORM_WII_DEV_RELEASE or PLATFORM_WII_DEV_FINAL
@@ -337,7 +337,7 @@ namespace xcore
 		#undef TARGET_WII
 	#endif
 
-	#if !defined(TARGET_3DS_DEV_DEBUG) && !defined(TARGET_3DS_DEV_RELEASE) && !defined(TARGET_3DS_DEV_FINAL) && !defined(TARGET_3DS_CLIENT_DEBUG) && !defined(TARGET_3DS_CLIENT_RELEASE) && !defined(TARGET_3DS_CLIENT_FINAL) && !defined(TARGET_3DS_RETAIL_DEBUG) && !defined(TARGET_3DS_RETAIL_RELEASE) && !defined(TARGET_3DS_RETAIL_FINAL)      
+	#if !defined(TARGET_3DS_DEV_DEBUG) && !defined(TARGET_3DS_DEV_RELEASE) && !defined(TARGET_3DS_DEV_FINAL) && !defined(TARGET_3DS_CLIENT_DEBUG) && !defined(TARGET_3DS_CLIENT_RELEASE) && !defined(TARGET_3DS_CLIENT_FINAL) && !defined(TARGET_3DS_RETAIL_DEBUG) && !defined(TARGET_3DS_RETAIL_RELEASE) && !defined(TARGET_3DS_RETAIL_FINAL)
 		#ifdef TARGET_3DS
 			#error x_target, error; TARGET_3DS is not a sufficient target specification.
 			#error x_target, error; Use either PLATFORM_3DS_DEV_DEBUG, PLATFORM_3DS_DEV_RELEASE or PLATFORM_3DS_DEV_FINAL
@@ -345,8 +345,8 @@ namespace xcore
 	#else
 		#undef TARGET_3DS
 	#endif
-	
-	#if !defined(TARGET_PSP_DEV_DEBUG) && !defined(TARGET_PSP_DEV_RELEASE) && !defined(TARGET_PSP_DEV_FINAL) && !defined(TARGET_PSP_CLIENT_DEBUG) && !defined(TARGET_PSP_CLIENT_RELEASE) && !defined(TARGET_PSP_CLIENT_FINAL) && !defined(TARGET_PSP_RETAIL_DEBUG) && !defined(TARGET_PSP_RETAIL_RELEASE) && !defined(TARGET_PSP_RETAIL_FINAL)      
+
+	#if !defined(TARGET_PSP_DEV_DEBUG) && !defined(TARGET_PSP_DEV_RELEASE) && !defined(TARGET_PSP_DEV_FINAL) && !defined(TARGET_PSP_CLIENT_DEBUG) && !defined(TARGET_PSP_CLIENT_RELEASE) && !defined(TARGET_PSP_CLIENT_FINAL) && !defined(TARGET_PSP_RETAIL_DEBUG) && !defined(TARGET_PSP_RETAIL_RELEASE) && !defined(TARGET_PSP_RETAIL_FINAL)
 		#ifdef TARGET_PSP
 			#error x_target, error; TARGET_PSP is not a sufficient target specification.
 			#error x_target, error; Use either TARGET_PSP_DEV, TARGET_PSP_CLIENT, or TARGET_PSP_RETAIL.
@@ -1046,7 +1046,7 @@ namespace xcore
 			#define TARGET_TEST
 			#define TARGET_PLATFORM X_PLATFORM_360
 			#define VALID_TARGET
-			#define X_DEBUG        
+			#define X_DEBUG
 		#endif
 	#endif
 
@@ -1076,7 +1076,7 @@ namespace xcore
 			#define TARGET_DEBUG
 			#define TARGET_PLATFORM X_PLATFORM_360
 			#define VALID_TARGET
-			#define X_DEBUG        
+			#define X_DEBUG
 		#endif
 	#endif
 
@@ -1396,7 +1396,7 @@ namespace xcore
 
 	/**
 	 *
-	 *  Make sure we found a proper target specification.  If you get a compilation 
+	 *  Make sure we found a proper target specification.  If you get a compilation
 	 *  error here, then your compilation environment is not specifying one of the
 	 *  target macros.
 	 *
@@ -1416,7 +1416,7 @@ namespace xcore
 				#define TARGET_RELEASE
 			#endif
 
-		#else 
+		#else
 			#error x_target, error; Target specification invalid or not found.
 			#error x_target, error; The compilation environment must define one of the macros listed in x_targets.h
 		#endif
@@ -1444,7 +1444,7 @@ namespace xcore
 	 *
 	 *  generate string containing the target description
 	 *
-	 *  TARGET_PC + TARGET_DEBUG + 
+	 *  TARGET_PC + TARGET_DEBUG +
 	 *
 	 *
 	 *
@@ -1469,7 +1469,7 @@ namespace xcore
 		#if defined(TARGET_TEST)
 			#define TARGET_CONFIG_SHORT_STR		"_TD"
 		#else
-			#define TARGET_CONFIG_SHORT_STR		"_D"	
+			#define TARGET_CONFIG_SHORT_STR		"_D"
 		#endif
 	#endif
 	#if defined(TARGET_RELEASE)
@@ -1588,7 +1588,7 @@ namespace xcore
 			#elif _MSC_VER == 1700
 				#define COMPILER_MSVC
 				#define COMPILER_DEFAULT
-				#define COMPILER_VERSION            2012 
+				#define COMPILER_VERSION            2012
 			#elif _MSC_VER == 1800
 				#define COMPILER_MSVC
 				#define COMPILER_DEFAULT
@@ -1684,7 +1684,7 @@ namespace xcore
 		#define X_INT64                       signed __int64
 		#define X_UINT64                      unsigned __int64
 		#define X_INT128                      __xint128
-		#define X_UINT128                     __xuint128   
+		#define X_UINT128                     __xuint128
 		#define X_INT256                      __xint256
 		#define X_UINT256                     __xuint256
 #ifdef TARGET_64BIT
@@ -1702,14 +1702,14 @@ namespace xcore
 		#define X_ALIGNMENT(a)                __declspec(align(a))
 
 		#define X_ALIGN_BEGIN(a)              __declspec(align(a))
-		#define X_ALIGN_END(a)                
+		#define X_ALIGN_END(a)
 
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
 
 		#pragma inline_depth(255)
 
 		#define X_THREAD_LOCAL                __declspec(thread)
-		
+
 		/// disable useless warnings
 		#pragma warning(disable:4800)
 
@@ -1728,7 +1728,7 @@ namespace xcore
 		#define f_noinline                __declspec(noinline)
 		#define X_FORCE_INLINE			  inline
 		#define X_STD_CALL                __stdcall
-		#define X_C_DECL        
+		#define X_C_DECL
 		#define X_BOOL                    signed long
 		#define X_BYTE                    unsigned char
 		#define X_WCHAR                   unsigned short
@@ -1738,7 +1738,7 @@ namespace xcore
 		#define X_INT64                   signed long long
 		#define X_UINT64                  unsigned long long
 		#define X_INT128                  __xint128
-		#define X_UINT128                 __xuint128   
+		#define X_UINT128                 __xuint128
 		#define X_INT256                  __xint256
 		#define X_UINT256                 __xuint256
 		#define X_SIZE                    unsigned long
@@ -1749,7 +1749,7 @@ namespace xcore
 		#define X_ALIGNMENT_DEFAULT           4
 		#define X_ALIGNMENT(a)            __attribute__((aligned(a)))
 
-		#define X_ALIGN_BEGIN(a)          
+		#define X_ALIGN_BEGIN(a)
 		#define X_ALIGN_END(a)            __attribute__((aligned(a)))
 
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&((((type *)0)->member))
@@ -1771,7 +1771,7 @@ namespace xcore
 		#define f_noinline                __declspec(noinline)
 		#define X_FORCE_INLINE			  inline
 		#define X_STD_CALL                __stdcall
-		#define X_C_DECL        
+		#define X_C_DECL
 		#define X_BOOL                    signed long
 		#define X_BYTE                    unsigned char
 		#define X_WCHAR                   unsigned short
@@ -1781,7 +1781,7 @@ namespace xcore
 		#define X_INT64                   signed __int64
 		#define X_UINT64                  unsigned __int64
 		#define X_INT128                  __xint128
-		#define X_UINT128                 __xuint128   
+		#define X_UINT128                 __xuint128
 		#define X_INT256                  __xint256
 		#define X_UINT256                 __xuint256
 		#define X_SIZE                    unsigned int
@@ -1792,7 +1792,7 @@ namespace xcore
 		#define X_ALIGNMENT_DEFAULT           4
 		#define X_ALIGNMENT(a)            __attribute__((aligned(a)))
 
-		#define X_ALIGN_BEGIN(a)          
+		#define X_ALIGN_BEGIN(a)
 		#define X_ALIGN_END(a)            __attribute__((aligned(a)))
 
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
@@ -1830,7 +1830,7 @@ namespace xcore
 		#define X_INT64                       signed long long
 		#define X_UINT64                      unsigned long long
 		#define X_INT128                      __xint128
-		#define X_UINT128                     __xuint128   
+		#define X_UINT128                     __xuint128
 		#define X_INT256                      __xint256
 		#define X_UINT256                     __xuint256
 #ifdef SPU
@@ -1845,8 +1845,8 @@ namespace xcore
 		#define X_ALIGNMENT_DEFAULT           4
 		#define X_ALIGNMENT(a)                __attribute__((aligned(a)))
 
-		#define X_ALIGN_BEGIN(a)              
-		#define X_ALIGN_END(a)				  __attribute__((aligned(a)))              
+		#define X_ALIGN_BEGIN(a)
+		#define X_ALIGN_END(a)				  __attribute__((aligned(a)))
 
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
 
@@ -1887,7 +1887,7 @@ namespace xcore
 		#define X_INT64                       signed long long
 		#define X_UINT64                      unsigned long long
 		#define X_INT128                      __xint128
-		#define X_UINT128                     __xuint128   
+		#define X_UINT128                     __xuint128
 		#define X_INT256                      __xint256
 		#define X_UINT256                     __xuint256
 #ifdef SPU
@@ -1902,11 +1902,11 @@ namespace xcore
 		#define X_ALIGNMENT_DEFAULT           4
 		#define X_ALIGNMENT(a)                __attribute__((aligned(a)))
 
-		#define X_ALIGN_BEGIN(a)              
-		#define X_ALIGN_END(a)				  __attribute__((aligned(a)))              
+		#define X_ALIGN_BEGIN(a)
+		#define X_ALIGN_END(a)				  __attribute__((aligned(a)))
 
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
-		
+
 		#define X_THREAD_LOCAL                __declspec(thread)
 
 	#elif defined(COMPILER_SN_PSP)
@@ -1921,7 +1921,7 @@ namespace xcore
 		#define X_CHAR_BIT                  8
 		#define X_USE_PRAGMA_ONCE
 		#define X_STD_CALL                  __stdcall
-		#define X_C_DECL        
+		#define X_C_DECL
 		#define f_inline                  inline
 		#define f_noinline                __attribute__((noinline))
 		#define X_FORCE_INLINE            __attribute__((always_inline))
@@ -1934,7 +1934,7 @@ namespace xcore
 		#define X_INT64                   signed long long
 		#define X_UINT64                  unsigned long long
 		#define X_INT128                  __xint128
-		#define X_UINT128                 __xuint128   
+		#define X_UINT128                 __xuint128
 		#define X_INT256                  __xint256
 		#define X_UINT256                 __xuint256
 		#define X_SIZE                    unsigned int
@@ -1946,7 +1946,7 @@ namespace xcore
 		#define X_ALIGNMENT(a)            __attribute__((aligned(a)))
 
 		#define X_ALIGN_BEGIN(a)
-		#define X_ALIGN_END(a)            __attribute__((aligned(a)))               
+		#define X_ALIGN_END(a)            __attribute__((aligned(a)))
 
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
 
@@ -1976,9 +1976,9 @@ namespace xcore
 		#define X_USE_PRAGMA_ONCE
 		#define X_IEEE_FLOATS
 		#define X_STD_CALL                __stdcall
-		#define X_C_DECL        
+		#define X_C_DECL
 		#define f_inline                  inline
-		#define f_noinline                
+		#define f_noinline
 		#define X_FORCE_INLINE            inline
 		#define X_BOOL                    signed int
 		#define X_BYTE                    unsigned char
@@ -1989,7 +1989,7 @@ namespace xcore
 		#define X_INT64                   signed long long
 		#define X_UINT64                  unsigned long long
 		#define X_INT128                  __xint128
-		#define X_UINT128                 __xuint128   
+		#define X_UINT128                 __xuint128
 		#define X_INT256                  __xint256
 		#define X_UINT256                 __xuint256
 		#define X_SIZE                    unsigned int
@@ -1999,7 +1999,7 @@ namespace xcore
 		#define X_ALIGNMENT_DEFAULT       4
 		#define X_ALIGNMENT(a)            __attribute__((aligned(a)))
 
-		#define X_ALIGN_BEGIN(a)          
+		#define X_ALIGN_BEGIN(a)
 		#define X_ALIGN_END(a)			  __attribute__((aligned(a)))
 
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
@@ -2035,7 +2035,7 @@ namespace xcore
 		#define X_INT64                    signed __int64
 		#define X_UINT64                   unsigned __int64
 		#define X_INT128                   __xint128
-		#define X_UINT128                  __xuint128   
+		#define X_UINT128                  __xuint128
 		#define X_INT256                   __xint256
 		#define X_UINT256                  __xuint256
 		#define X_SIZE                     unsigned int
@@ -2046,8 +2046,8 @@ namespace xcore
 		#define X_ALIGNMENT_DEFAULT        4
 		#define X_ALIGNMENT(a)             __declspec(align(a))
 
-		#define X_ALIGN_BEGIN(a)			   __declspec(align(a))           
-		#define X_ALIGN_END(a)                
+		#define X_ALIGN_BEGIN(a)			   __declspec(align(a))
+		#define X_ALIGN_END(a)
 
 		#define X_OFFSET_OF(type, member)  (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
 
@@ -2098,14 +2098,14 @@ namespace xcore
 
 	#if defined(TARGET_PC) || defined(TARGET_PS3) || defined(TARGET_360)
 		#define TARGET_MULTI_CORE
-	#else	
+	#else
 		#define TARGET_SINGLE_CORE
 	#endif
 
 
 	/**
 	 *
-	 *  Memory manager configuration 
+	 *  Memory manager configuration
 	 *
 	 */
 	#if defined(TARGET_PC) || defined(TARGET_PS3) || defined(TARGET_360)
@@ -2171,43 +2171,25 @@ namespace xcore
 	typedef		unsigned		X_INT8   			u8;
 	typedef		unsigned		X_INT16  			u16;
 	typedef		unsigned		X_INT32  			u32;
-	typedef					X_UINT64 			u64;
-	typedef					X_UINT128			u128;
-	typedef					X_UINT256			u256;
-	typedef		signed      X_INT8   			s8;
-	typedef		signed      X_INT16  			s16;
-	typedef		signed      X_INT32  			s32;
-	typedef					X_INT64  			s64;
-	typedef					X_INT128 			s128;
-	typedef					X_INT256 			s256;
-	typedef					X_FLOAT  			f32;
-	typedef					X_DOUBLE 			f64;
-	typedef					X_BYTE   			xbyte;
-	typedef					X_BOOL				xbool32;
-	typedef					bool					xbool;
-	typedef					X_SIZE				xsize_t;
-	typedef					X_PTR_SIZED_INT		uptr;
+	typedef						X_UINT64 			u64;
+	typedef						X_UINT128			u128;
+	typedef						X_UINT256			u256;
+	typedef		signed      	X_INT8   			s8;
+	typedef		signed      	X_INT16  			s16;
+	typedef		signed      	X_INT32  			s32;
+	typedef						X_INT64  			s64;
+	typedef						X_INT128 			s128;
+	typedef						X_INT256 			s256;
+	typedef						X_FLOAT  			f32;
+	typedef						X_DOUBLE 			f64;
+	typedef						X_BYTE   			xbyte;
+	typedef						X_BOOL				xbool32;
+	typedef						bool				xbool;
+	typedef						X_SIZE				xsize_t;
+	typedef						X_PTR_SIZED_INT		uptr;
 
 	//==============================================================================
 	// UTF 8, 16, 32
-	struct uchar8
-	{
-		static const u32 null = 0;
-
-		inline					uchar8() : c(null) {}
-		inline					uchar8(char _c) : c(_c) {}
-		inline explicit			uchar8(u8 _c) : c(_c) {}
-		inline explicit			uchar8(u32 _c) : c(_c) {}
-
-		inline bool				operator <  (const uchar8& _other) const		{ return c < _other.c; }
-		inline bool				operator >  (const uchar8& _other) const		{ return c > _other.c; }
-		inline bool				operator <= (const uchar8& _other) const		{ return c <= _other.c; }
-		inline bool				operator >= (const uchar8& _other) const		{ return c >= _other.c; }
-		inline bool				operator == (const uchar8& _other) const		{ return c == _other.c; }
-		inline bool				operator != (const uchar8& _other) const		{ return c != _other.c; }
-
-		u32		c; 
-	};
 
 	#pragma pack(push, 1)
 	struct ustr8	// UTF-8 string
@@ -2216,24 +2198,6 @@ namespace xcore
 	};
 	#pragma pack(pop)
 
-	struct uchar16
-	{
-		static const u32 null = 0;
-
-		inline					uchar16() : c(null) {}
-		inline explicit			uchar16(u16 _c) : c(_c) {}
-		inline explicit			uchar16(u32 _c) : c(_c) {}
-
-		inline bool				operator <  (const uchar16& _other) const		{ return c < _other.c; }
-		inline bool				operator >  (const uchar16& _other) const		{ return c > _other.c; }
-		inline bool				operator <= (const uchar16& _other) const		{ return c <= _other.c; }
-		inline bool				operator >= (const uchar16& _other) const		{ return c >= _other.c; }
-		inline bool				operator == (const uchar16& _other) const		{ return c == _other.c; }
-		inline bool				operator != (const uchar16& _other) const		{ return c != _other.c; }
-
-		u32		c; 
-	};
-
 	#pragma pack(push, 2)
 	struct ustr16	// UTF-16 string
 	{
@@ -2241,30 +2205,13 @@ namespace xcore
 	};
 	#pragma pack(pop)
 
-	struct uchar32
-	{ 
-		static const u32 null = 0;
-
-		inline					uchar32() : c(null) {}
-		inline explicit			uchar32(u32 _c) : c(_c) {}
-
-		inline bool				operator <  (const uchar32& _other) const		{ return c < _other.c; }
-		inline bool				operator >  (const uchar32& _other) const		{ return c > _other.c; }
-		inline bool				operator <= (const uchar32& _other) const		{ return c <= _other.c; }
-		inline bool				operator >= (const uchar32& _other) const		{ return c >= _other.c; }
-		inline bool				operator == (const uchar32& _other) const		{ return c == _other.c; }
-		inline bool				operator != (const uchar32& _other) const		{ return c != _other.c; }
-
-		u32		c; 
-	};
-
 	struct ustr32	// UTF-32 string
 	{
 		u32 c;
 	};
 
 	//==============================================================================
-	
+
 	#define					XCAST(to, from)		((to)(from))
 
 	//DOM-IGNORE-END
@@ -2275,14 +2222,14 @@ namespace xcore
 	// Min/Max values
 	//==============================================================================
 
-	const u8							xU8Min = (u8) 0x00;							///< minimum value of a u8.
-	const u8							xU8Max = (u8) 0xFF;							///< maximum value of a u8.
-	const s8							xS8Min = (s8) -0x80;							///< minimum value of a s8.
-	const s8							xS8Max = (s8) 0x7F;							///< maximum value of a s8.
+	const u8						xU8Min = (u8) 0x00;							///< minimum value of a u8.
+	const u8						xU8Max = (u8) 0xFF;							///< maximum value of a u8.
+	const s8						xS8Min = (s8) -0x80;						///< minimum value of a s8.
+	const s8						xS8Max = (s8) 0x7F;							///< maximum value of a s8.
 
 	const u16						xU16Min = (u16) 0x0000;						///< minimum value of a u16
 	const u16						xU16Max = (u16) 0xFFFF;						///< maximum value of a u16.
-	const s16						xS16Min = (s16) -0x8000;						///< minimum value of a s16.
+	const s16						xS16Min = (s16) -0x8000;					///< minimum value of a s16.
 	const s16						xS16Max = (s16) 0x7FFF;						///< maximum value of a s16.
 
 	const u32						xU32Min = (u32) 0x00000000;					///< minimum value of a u32.
@@ -2297,13 +2244,13 @@ namespace xcore
 
 	const f32						xF32Min = (f32) 1.175494351e-38f;			///< minimum value of a f32.
 	const f32						xF32Max = (f32) 3.402823466e+38f;			///< maximum value of a f32.
-	const f32                       xF32Eps = (f32) 0.0001f;						///< default epsilon generally good to check values in the range [0 - 1], normalisations, dot products and such.
+	const f32                       xF32Eps = (f32) 0.0001f;					///< default epsilon generally good to check values in the range [0 - 1], normalisations, dot products and such.
 
-	const f64						xF64Min = (f64) 2.2250738585072014e-308;		///< minimum value of a f64.
-	const f64						xF64Max = (f64) 1.7976931348623158e+308;		///< maximum value of a f64.
+	const f64						xF64Min = (f64) 2.2250738585072014e-308;	///< minimum value of a f64.
+	const f64						xF64Max = (f64) 1.7976931348623158e+308;	///< maximum value of a f64.
 
 	//==============================================================================
-	//  HANDLE BOOL 
+	//  HANDLE BOOL
 	//==============================================================================
 	const xbool						xTrue  = true;								///< the value of True to true
 	const xbool						xFalse = false;								///< the value of False to false
