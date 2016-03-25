@@ -2210,6 +2210,10 @@ namespace xcore
 		u32 c;
 	};
 
+	// Default UTF string is utf-32
+	typedef ustr	ustr32;
+	typedef uchar	u32;
+
 	//==============================================================================
 
 	#define					XCAST(to, from)		((to)(from))

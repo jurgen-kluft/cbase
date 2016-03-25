@@ -16,19 +16,19 @@
 */
 namespace xcore
 {
-	// utf string manipulation is all using utf-32 since it is the only utf format that has a fixed rune length
-	// and thus is easier to manipulate directly than utf-8 or utf-16
-	namespace utf
+	// UTF string manipulation is using UTF-32 since it is the only UTF format that has a fixed rune size
+	// and thus is easier to manipulate directly than UTF-8 or UTF-16
+	namespace UTF
 	{
-		// From utf-8 or utf-16 to utf-32
+		// From UTF-8 or UTF-16 to UTF-32
 		s32			convert		(ustr8  const* _src, ustr8  const* _src_end, ustr32*& _dst, u32 _dstmaxleninbytes);
 		s32			convert		(ustr16 const* _src, ustr16 const* _src_end, ustr32*& _dst, u32 _dstmaxleninbytes);
 
-		// From utf-32 to utf-8 or utf-16
+		// From UTF-32 to UTF-8 or UTF-16
 		s32			convert		(ustr32 const* _src, u32 _srclen, ustr8 *& _dst, u32 _dstmaxleninbytes);
 		s32			convert		(ustr32 const* _src, u32 _srclen, ustr16*& _dst, u32 _dstmaxleninbytes);
 
-	}	// utf
+	}	// UTF
 };	// xCore namespace
 
 
