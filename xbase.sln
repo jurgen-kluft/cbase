@@ -1,0 +1,40 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xbase", "d:\Dev.Go\src\github.com\jurgen-kluft\xbase\xbase.vcxproj", "{681155C5-323F-DC8D-9D9A-1037C4DC5587}"
+	ProjectSection(ProjectDependencies) = postProject
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247} = {33880B18-1395-F7E7-4ED2-DD97CDB3D247}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xunittest", "d:\Dev.Go\src\github.com\jurgen-kluft\xbase\xunittest.vcxproj", "{33880B18-1395-F7E7-4ED2-DD97CDB3D247}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		DevDebugStatic|Win32 = DevDebugStatic|Win32
+		DevDebugStatic|x64 = DevDebugStatic|x64
+		DevReleaseStatic|Win32 = DevReleaseStatic|Win32
+		DevReleaseStatic|x64 = DevReleaseStatic|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{681155C5-323F-DC8D-9D9A-1037C4DC5587}.DevDebugStatic|Win32.ActiveCfg = DevDebugStatic|Win32
+		{681155C5-323F-DC8D-9D9A-1037C4DC5587}.DevDebugStatic|Win32.Build.0 = DevDebugStatic|Win32
+		{681155C5-323F-DC8D-9D9A-1037C4DC5587}.DevDebugStatic|x64.ActiveCfg = DevDebugStatic|x64
+		{681155C5-323F-DC8D-9D9A-1037C4DC5587}.DevDebugStatic|x64.Build.0 = DevDebugStatic|x64
+		{681155C5-323F-DC8D-9D9A-1037C4DC5587}.DevReleaseStatic|Win32.ActiveCfg = DevReleaseStatic|Win32
+		{681155C5-323F-DC8D-9D9A-1037C4DC5587}.DevReleaseStatic|Win32.Build.0 = DevReleaseStatic|Win32
+		{681155C5-323F-DC8D-9D9A-1037C4DC5587}.DevReleaseStatic|x64.ActiveCfg = DevReleaseStatic|x64
+		{681155C5-323F-DC8D-9D9A-1037C4DC5587}.DevReleaseStatic|x64.Build.0 = DevReleaseStatic|x64
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247}.DevDebugStatic|Win32.ActiveCfg = DevDebugStatic|Win32
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247}.DevDebugStatic|Win32.Build.0 = DevDebugStatic|Win32
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247}.DevDebugStatic|x64.ActiveCfg = DevDebugStatic|x64
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247}.DevDebugStatic|x64.Build.0 = DevDebugStatic|x64
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247}.DevReleaseStatic|Win32.ActiveCfg = DevReleaseStatic|Win32
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247}.DevReleaseStatic|Win32.Build.0 = DevReleaseStatic|Win32
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247}.DevReleaseStatic|x64.ActiveCfg = DevReleaseStatic|x64
+		{33880B18-1395-F7E7-4ED2-DD97CDB3D247}.DevReleaseStatic|x64.Build.0 = DevReleaseStatic|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

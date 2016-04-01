@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DevDebugStatic|Win32">
+      <Configuration>DevDebugStatic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevReleaseStatic|Win32">
+      <Configuration>DevReleaseStatic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevDebugStatic|x64">
+      <Configuration>DevDebugStatic</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevReleaseStatic|x64">
+      <Configuration>DevReleaseStatic</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Platform)'=='Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='x64'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{33880B18-1395-F7E7-4ED2-DD97CDB3D247}</ProjectGuid>
+    <PackageType>StaticLibrary</PackageType>
+    <PackageSignature>$(Configuration)_$(Platform)_$(PlatformToolset)</PackageSignature>
+  </PropertyGroup>
+  <ImportGroup Label="TargetDirs" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|Win32'" Label="Configuration">
+    <ConfigurationType>$(PackageType)</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CLRSupport>false</CLRSupport>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|Win32'" Label="Configuration">
+    <ConfigurationType>$(PackageType)</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CLRSupport>false</CLRSupport>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|x64'" Label="Configuration">
+    <ConfigurationType>$(PackageType)</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CLRSupport>false</CLRSupport>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|x64'" Label="Configuration">
+    <ConfigurationType>$(PackageType)</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CLRSupport>false</CLRSupport>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="'$(Platform)'=='x64'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Platform)'=='Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Platform)'=='Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(Configuration)_$(Platform)_$(PlatformToolset)\</OutDir>
+    <IntDir>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\obj\$(Configuration)_$(Platform)_$(PlatformToolset)\</IntDir>
+    <TargetName>xunittest_$(PackageSignature)</TargetName>
+    <ExtensionsToDeleteOnClean>*.obj%3b*.d%3b*.map%3b*.lst%3b*.pch%3b$(TargetPath)</ExtensionsToDeleteOnClean>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(Configuration)_$(Platform)_$(PlatformToolset)\</OutDir>
+    <IntDir>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\obj\$(Configuration)_$(Platform)_$(PlatformToolset)\</IntDir>
+    <TargetName>xunittest_$(PackageSignature)</TargetName>
+    <ExtensionsToDeleteOnClean>*.obj%3b*.d%3b*.map%3b*.lst%3b*.pch%3b$(TargetPath)</ExtensionsToDeleteOnClean>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalLibraryFiles);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalLibraryFiles);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_64BIT;TARGET_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalLibraryFiles);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_64BIT;TARGET_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalLibraryFiles);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\entry\ut_Entry_360.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\entry\ut_Entry_3ds.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\entry\ut_Entry_OSX.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\entry\ut_Entry_ps3.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\entry\ut_Entry_ps3_spu.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\entry\ut_Entry_psp.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\entry\ut_Entry_wii.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\entry\ut_Entry_win32.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_AssertException.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Checks.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_ReportAssert.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Stdout_3ds.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Stdout_OSX.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Stdout_Wii.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Stdout_Win32.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Stdout_X360.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Stdout_ps3.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Stdout_ps3_spu.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Stdout_psp.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_StringBuilder.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TestList.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TestReporter.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TestReporterStdout.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TestReporterTeamCity.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TestResults.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TestResults_ps3_spu.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TestRunner.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TestState.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test_3ds.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test_OSX.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test_Wii.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test_Win32.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test_X360.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test_ps3.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test_ps3_spu.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Test_psp.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Thread_Base.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Thread_PS3.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Thread_Wii.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Thread_Win32.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Thread_X360.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeConstraint.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeHelpers_3ds.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeHelpers_OSX.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeHelpers_Wii.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeHelpers_Win32.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeHelpers_X360.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeHelpers_ps3.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeHelpers_ps3_spu.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_TimeHelpers_psp.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils_3ds.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils_OSX.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils_Wii.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils_Win32.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils_X360.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils_ps3.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils_ps3_spu.cpp" />
+    <ClCompile Include="vendor\github.com\jurgen-kluft\xunittest\source\main\cpp\ut_Utils_psp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_AssertException.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_CheckMacros.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Checks.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Config.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception_3ds.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception_OSX.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception_Wii.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception_Win32.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception_ps3.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception_ps3_spu.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception_psp.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Exception_x360.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_ReportAssert.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Stdout.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_StringBuilder.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Test.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TestList.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TestMacros.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TestReporter.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TestReporterStdout.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TestReporterTeamCity.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TestResults.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TestRunner.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TestState.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Thread.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Thread_Base.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Thread_PS3.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Thread_Wii.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Thread_Win32.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Thread_X360.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TimeConstraint.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_TimeHelpers.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\private\ut_Utils.h" />
+    <ClInclude Include="vendor\github.com\jurgen-kluft\xunittest\source\main\include\xunittest\xunittest.h" />
+  </ItemGroup>
+  <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

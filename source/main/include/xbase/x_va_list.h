@@ -94,7 +94,7 @@ namespace xcore
 			TYPE_UINT32   = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
 			TYPE_UINT64   = 0x0008 | PROP_INTEGER | PROP_UNSIGNED | SIZE_64,
 			TYPE_BOOL     = 0x0020 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
-			TYPE_UCHAR8   = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
+			TYPE_UCHAR   = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
 			TYPE_FLOAT32  = 0x0040 | PROP_FLOAT | SIZE_32,
 			TYPE_FLOAT64  = 0x0050 | PROP_FLOAT | SIZE_64,
 			TYPE_PCTCHAR  = 0x0060 | SIZE_PTR,
@@ -112,7 +112,7 @@ namespace xcore
 								x_va(u32 inVar) : mType(TYPE_UINT32)				{ *(u32*)mArg = inVar; }
 								x_va(s64 inVar) : mType(TYPE_INT64)					{ *(s64*)mArg = inVar; }
 								x_va(u64 inVar) : mType(TYPE_UINT64)				{ *(u64*)mArg = inVar; }
-								x_va(uchar8 inVar) : mType(TYPE_UCHAR8)				{ *(u32*)mArg = inVar.c; }
+								x_va(uchar inVar) : mType(TYPE_UCHAR)				{ *(u32*)mArg = inVar.c; }
 								x_va(bool inVar) : mType(TYPE_BOOL)					{ *(u32*)mArg = inVar ? 1 : 0; }
 								x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
 								x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
@@ -129,7 +129,7 @@ namespace xcore
 		xbool					isUnsignedInteger() const							{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_UNSIGNED)); }
 
 		xbool					isBool() const										{ return xbool(mType == TYPE_BOOL); }
-		xbool					isUchar8() const									{ return xbool(mType == TYPE_UCHAR8); }
+		xbool					isUchar8() const									{ return xbool(mType == TYPE_UCHAR); }
 		xbool					isInt8() const										{ return xbool(mType == TYPE_INT8); }
 		xbool					isInt16() const										{ return xbool(mType == TYPE_INT16); }
 		xbool					isInt32() const										{ return xbool(mType == TYPE_INT32); }
@@ -144,7 +144,7 @@ namespace xcore
 		xbool					isPCUSTR8() const									{ return xbool(mType == TYPE_PCUSTR8 || mType == TYPE_PCTCHAR); }
 
 		operator				char() const										{ return (char)convertToInt8(); }
-		operator				uchar8() const										{ return convertToUchar8(); }
+		operator				uchar() const										{ return convertToUchar(); }
 		operator				s8() const											{ return convertToInt8(); }
 		operator				u8() const											{ return convertToUInt8(); }
 		operator				s16() const											{ return convertToInt16(); }
@@ -173,7 +173,7 @@ namespace xcore
 		f32						convertToFloat() const;
 		f64						convertToDouble() const;
 		bool					convertToBool() const;
-		uchar8					convertToUchar8() const;
+		uchar					convertToUchar() const;
 		const char*				convertToCharPointer() const;
 		const ustr8*			convertToUStr8Pointer() const;
 
@@ -295,7 +295,7 @@ namespace xcore
 			TYPE_UINT32   = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
 			TYPE_UINT64   = 0x0008 | PROP_INTEGER | PROP_UNSIGNED | SIZE_64,
 			TYPE_BOOL     = 0x0020 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
-			TYPE_UCHAR8   = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
+			TYPE_UCHAR    = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
 			TYPE_FLOAT32  = 0x0040 | PROP_FLOAT | SIZE_32,
 			TYPE_FLOAT64  = 0x0050 | PROP_FLOAT | SIZE_64,
 			TYPE_PTCHAR   = 0x0060 | SIZE_PTR,
@@ -313,7 +313,7 @@ namespace xcore
 								x_va_r(s64* inRef) : mType(TYPE_INT64), mVar(0)					{ mRef = (void*)inRef; }
 								x_va_r(u64* inRef) : mType(TYPE_UINT64), mVar(0)				{ mRef = (void*)inRef; }
 								x_va_r(bool* inRef) : mType(TYPE_BOOL), mVar(0)					{ mRef = (void*)inRef; }
-								x_va_r(uchar8* inRef) : mType(TYPE_UCHAR8), mVar(0)				{ mRef = (void*)inRef; }
+								x_va_r(uchar* inRef) : mType(TYPE_UCHAR), mVar(0)				{ mRef = (void*)inRef; }
 								x_va_r(f32* inRef) : mType(TYPE_FLOAT32), mVar(0)				{ mRef = (void*)inRef; }
 								x_va_r(f64* inRef) : mType(TYPE_FLOAT64), mVar(0)				{ mRef = (void*)inRef; }
 								x_va_r(const char* inRef, u16 inLength) : mType(TYPE_PTCHAR)	{ mRef = (void*)inRef; mVar = inLength; }
@@ -330,7 +330,7 @@ namespace xcore
 		x_va_r&					operator=(f32 rhs);
 		x_va_r&					operator=(f64 rhs);
 		x_va_r&					operator=(bool rhs);
-		x_va_r&					operator=(uchar8 rhs);
+		x_va_r&					operator=(uchar rhs);
 		x_va_r&					operator=(const char* rhs);
 		x_va_r&					operator=(const ustr8* rhs);
 
@@ -349,7 +349,7 @@ namespace xcore
 		xbool					isUnsignedInteger() const							{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_UNSIGNED)); }
 
 		xbool					isBool() const										{ return xbool(mType == TYPE_BOOL); }
-		xbool					isUChar8() const									{ return xbool(mType == TYPE_UCHAR8); }
+		xbool					isUChar8() const									{ return xbool(mType == TYPE_UCHAR); }
 		xbool					isInt8() const										{ return xbool(mType == TYPE_INT8); }
 		xbool					isInt16() const										{ return xbool(mType == TYPE_INT16); }
 		xbool					isInt32() const										{ return xbool(mType == TYPE_INT32); }
@@ -401,6 +401,9 @@ namespace xcore
 		s32					mLength;
 		x_va_r				mArg[16];
 	};
+
+	#define X_VA_ARGS_16		const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16
+	#define X_VA_ARGS_16_DEF	const x_va& v1, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty
 
 	//==============================================================================
 	// END xCore namespace

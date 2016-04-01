@@ -22,9 +22,9 @@ namespace xcore
 {
 	namespace ascii
 	{
-		typedef					rune					char
-		typedef					pcrune					rune const*
-		typedef					prune					rune *
+		typedef					char					rune;
+		typedef					rune const*				pcrune;
+		typedef					rune *					prune;
 
 
 		/**
@@ -200,12 +200,10 @@ namespace xcore
 			*
 			*==============================================================================
 		*/
-		s32		Cprintf			(                            pcrune formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
-																				const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
-		s32		Sprintf			(prune buffer, s32 maxChars, pcrune formatStr, const x_va& v1             , const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
-																				const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
-		s32		Vcprintf		(                            pcrune formatStr, const x_va_list& args);
-		s32		Vsprintf		(prune buffer, s32 maxChars, pcrune formatStr, const x_va_list& args);
+		s32		Cprintf(pcrune formatStr, X_VA_ARGS_16_DEF);
+		s32		Sprintf(prune buffer, s32 maxChars, pcrune formatStr, X_VA_ARGS_16_DEF);
+		s32		Vcprintf(pcrune formatStr, const x_va_list& args);
+		s32		Vsprintf(prune buffer, s32 maxChars, pcrune formatStr, const x_va_list& args);
 
 		/**
 			* FORMATTED STRING FUNCTIONS
@@ -220,10 +218,9 @@ namespace xcore
 			*==============================================================================
 		*/
 
-		s32		Printf   	(pcrune formatStr, const x_va& v1, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty,
-												const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty);
-		s32		Printf		(pcrune formatStr, const x_va_list& args);
-		s32		Printf		(pcrune str);
+		s32		Printf(pcrune formatStr, X_VA_ARGS_16_DEF);
+		s32		Printf(pcrune formatStr, const x_va_list& args);
+		s32		Printf(pcrune str);
 
 
 		/**
@@ -236,9 +233,8 @@ namespace xcore
 			*
 			*==============================================================================
 		*/
-		s32		Sscanf		(pcrune buf, pcrune fmt, const x_va_r& v1, const x_va_r& v2=x_va_r::sEmpty, const x_va_r& v3=x_va_r::sEmpty, const x_va_r& v4=x_va_r::sEmpty, const x_va_r& v5=x_va_r::sEmpty, const x_va_r& v6=x_va_r::sEmpty, const x_va_r& v7=x_va_r::sEmpty, const x_va_r& v8=x_va_r::sEmpty,
-													const x_va_r& v9=x_va_r::sEmpty, const x_va_r& v10=x_va_r::sEmpty, const x_va_r& v11=x_va_r::sEmpty, const x_va_r& v12=x_va_r::sEmpty, const x_va_r& v13=x_va_r::sEmpty, const x_va_r& v14=x_va_r::sEmpty, const x_va_r& v15=x_va_r::sEmpty, const x_va_r& v16=x_va_r::sEmpty);
-		s32		Vsscanf		(pcrune buf, pcrune fmt, const x_va_r_list& vr_args);
+		s32		Sscanf(pcrune buf, pcrune fmt, X_VA_ARGS_16_DEF);
+		s32		Vsscanf(pcrune buf, pcrune fmt, const x_va_r_list& vr_args);
 
 		//==============================================================================
 		// END xCore namespace

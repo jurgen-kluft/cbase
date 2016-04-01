@@ -7,10 +7,15 @@
 	 
 namespace xcore
  {
-	 s32		x_printf   				(const char* formatStr, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
-																const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16) { return 0; }
-	 s32		x_printf				(const char* formatStr, const x_va_list& args)		{ return 0; }
-	 s32		x_printf				(const char* str)									{ return 0; }
+	 namespace ascii
+	 {
+		 s32		Printf(pcrune formatStr, VA_ARGS_16)
+		 {
+			 return 0;
+		 }
+		 s32		Printf(pcrune formatStr, const va_list& args) { return 0; }
+		 s32		Printf(pcrune str) { return 0; }
+	 }
  };	
 
 
@@ -27,6 +32,8 @@ namespace xcore
  */
 namespace xcore
 {
+	namespace ascii
+	{
 
 	/** 
 	 *==============================================================================
@@ -39,7 +46,7 @@ namespace xcore
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
-	 *     x_atod64          - Converts a string value to integer base from a particular
+	 *     atod64          - Converts a string value to integer base from a particular
 	 * Arguments:
 	 *        str            - Source string encoded with a particular base
 	 *        Base           - Base of the numeric string
@@ -50,10 +57,10 @@ namespace xcore
 	 *      into a actual atomic integer of a particular size (32vs64)bits. If the
 	 *      string contains '_' or ':' characters they will be ignore.
 	 * See Also:
-	 *      x_atod32 x_atoi32 x_atoi64 x_atof32 x_atof64
+	 *      atod32 atoi32 atoi64 atof32 atof64
 	 *------------------------------------------------------------------------------
 	 */
-	s64 x_atod64(const char* str, s32 base)
+	s64 atod64(pcrune str, s32 base)
 	{
 		ASSERT(str != NULL);
 		ASSERT(base > 2);
@@ -63,11 +70,10 @@ namespace xcore
 		for (; *str == ' '; ++str)
 			; // empty body
 
-		char c;         // Current character.
-		// Save sign indication.
-		c = *str++;
+		rune c;         // Current character.
+		c = *str++;		// Save sign indication.
 
-		char sign;        // If '-', then negative, otherwise positive.
+		rune sign;        // If '-', then negative, otherwise positive.
 		sign = c;
 
 		// Skip sign.
@@ -120,10 +126,10 @@ namespace xcore
 		return total;
 	}
 
-	// <COMBINE x_atod64 >
-	s32 x_atod32(const char* str, s32 base)
+	// <COMBINE atod64 >
+	s32 atod32(pcrune str, s32 base)
 	{
-		return (s32)x_atod64(str, base);
+		return (s32)atod64(str, base);
 	}
 
 	/**
@@ -136,7 +142,7 @@ namespace xcore
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
-	 *     _x_dtoa    - Converts value to a string in whatever base is passed
+	 *     _dtoa    - Converts value to a string in whatever base is passed
 	 * Arguments:
 	 *      Val             - Number to be converted
 	 *      buff            - Destination String 
@@ -151,14 +157,14 @@ namespace xcore
 	 *      for hex numbers.
 	 *------------------------------------------------------------------------------
 	 */
-	s32 _x_dtoa(u64 val, char* buff, s32 str_buffer_size, s32 base, bool hasNegative)
+	s32 d64toa(u64 val, prune buff, s32 str_buffer_size, s32 base, bool hasNegative)
 	{
 		ASSERT(buff);
 		ASSERT(base > 2);
 		ASSERT(base <= (26 + 26 + 10));
 		ASSERT(str_buffer_size > 1);
 
-		char* p      = buff;
+		prune p      = buff;
 		s32   length = 0;  
 		s32   i      = 0;
 		if (hasNegative)
@@ -176,17 +182,17 @@ namespace xcore
 			// convert to ascii and store 
 			if (cVal < 10)
 			{
-				*p = (char)(cVal + '0');
+				*p = (rune)(cVal + '0');
 				p++;
 			}
 			else if (cVal < (10 + 26))
 			{
-				*p = (char)(cVal - 10 + 'a');
+				*p = (rune)(cVal - 10 + 'a');
 				p++;
 			}
 			else if (cVal < (10 + 26 + 26))
 			{
-				*p = (char)(cVal - 10 - 26 + 'A');
+				*p = (rune)(cVal - 10 - 26 + 'A');
 				p++;
 			}
 			else
@@ -212,7 +218,7 @@ namespace xcore
 		// Reverse string order
 		for (p--; p > &buff[i] ; i++, p--)
 		{
-			char t = *p;
+			rune t = *p;
 			*p = buff[i];
 			buff[i] = t;
 		}
@@ -226,7 +232,7 @@ namespace xcore
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
-	 *     x_dtoa    - Converts value to a string in whatever base is passed
+	 *     dtoa    - Converts value to a string in whatever base is passed
 	 * Arguments:
 	 *      Val             - Number to be converted
 	 *      str             - Destination String 
@@ -239,50 +245,50 @@ namespace xcore
 	 *      represented in a particular base. The base for instance could be 16
 	 *      for hex numbers.
 	 * See Also:
-	 *     x_atod64 x_atod32 x_atoi32 x_atoi64 x_atof32 x_atof64
+	 *     atod64 atod32 atoi32 atoi64 atof32 atof64
 	 *------------------------------------------------------------------------------
 	 */
-	s32 x_dtoa(s32 val, char* str, s32 str_buffer_size, s32 base)
+	s32 d32toa(s32 val, prune str, s32 str_buffer_size, s32 base)
 	{
 		if (val < 0)
 		{
-			return _x_dtoa(u64(u32(-val)), str, str_buffer_size, base, xTRUE);
+			return d64toa(u64(u32(-val)), str, str_buffer_size, base, xTRUE);
 		}
 		else
 		{
-			return _x_dtoa(u64(val), str, str_buffer_size, base, xFALSE);
+			return d64toa(u64(val), str, str_buffer_size, base, xFALSE);
 		}
 	}
 
-	// <COMBINE x_dtoa >
-	s32 x_dtoa(u32 val, char* str, s32 str_buffer_size, s32 base)
+	// <COMBINE dtoa >
+	s32 d32toa(u32 val, prune str, s32 str_buffer_size, s32 base)
 	{
-		return _x_dtoa(u64(val), str, str_buffer_size, base, xFALSE);
+		return d64toa(u64(val), str, str_buffer_size, base, xFALSE);
 	}
 
-	// <COMBINE x_dtoa >
-	s32 x_dtoa(s64 val, char* str, s32 str_buffer_size, s32 base)
+	// <COMBINE dtoa >
+	s32 d64toa(s64 val, prune str, s32 str_buffer_size, s32 base)
 	{
 		if (val < 0)
 		{
-			return  _x_dtoa(u64(-val), str, str_buffer_size, base, xTRUE);
+			return  d64toa(u64(-val), str, str_buffer_size, base, xTRUE);
 		}
 		else
 		{
-			return  _x_dtoa(u64(val), str, str_buffer_size, base, xFALSE);
+			return  d64toa(u64(val), str, str_buffer_size, base, xFALSE);
 		}
 	}
 
-	// <COMBINE x_dtoa >
-	s32 x_dtoa(u64 val, char* str, s32 str_buffer_size, s32 base)
+	// <COMBINE dtoa >
+	s32 d64toa(u64 val, prune str, s32 str_buffer_size, s32 base)
 	{
-		return _x_dtoa(u64(val), str, str_buffer_size, base, xFALSE);
+		return d64toa(u64(val), str, str_buffer_size, base, xFALSE);
 	}
 
 
 	#define F32TOA_PSH(X)				(*(dest++)=(X))
 
-	s32			x_f32toa(f32 val, s32 prec, char* str, s32 str_buffer_size, xbool positive_sign, char format)
+	s32			f32toa(f32 val, s32 prec, prune str, s32 str_buffer_size, xbool positive_sign, rune format)
 	{
 		/* converts a floating point number to an ascii string */
 		/* x is stored into str, which should be at least 30 chars long */
@@ -294,7 +300,7 @@ namespace xcore
 		if  (format == 'f' || format == 'F')
 			fstyle = 1;
 
-		char* start = str;
+		prune start = str;
 		f32 x = val;
 
 		/* print in e format unless last arg is 'f' */
@@ -381,17 +387,17 @@ namespace xcore
 		*str = '\0';
 		return (s32)(str - start);
 	}
-	s32			x_f32toa(f32 val, s32 prec, char* str, s32 str_buffer_size)
+	s32			f32toa(f32 val, s32 prec, prune str, s32 str_buffer_size)
 	{
-		return x_f32toa(val, prec, str, str_buffer_size, true, 'f');
+		return f32toa(val, prec, str, str_buffer_size, true, 'f');
 	}
 
 
-	s32			x_f64toa(f64 val, s32 numFractionalDigits, char* str, s32 str_buffer_size)
+	s32			f64toa(f64 val, s32 numFractionalDigits, prune str, s32 str_buffer_size)
 	{
-		char format[8];
-		x_sprintf(format, sizeof(format)-1, "%%.%df", x_va(numFractionalDigits));
-		s32 len = x_sprintf(str, str_buffer_size-1, format, x_va(val));
+		rune format[8];
+		Sprintf(format, sizeof(format)-1, "%%.%df", x_va(numFractionalDigits));
+		s32 len = Sprintf(str, str_buffer_size-1, format, x_va(val));
 		return len;
 	}
 
@@ -402,7 +408,7 @@ namespace xcore
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
-	 *     x_strcpy   - copy two strings
+	 *     strcpy   - copy two strings
 	 * Arguments:
 	 *        dest    - destination string
 	 *        maxChar - number of characters need to be copied (excluding trailing zero)
@@ -411,7 +417,7 @@ namespace xcore
 	 *        pointer to the destination string
 	 *------------------------------------------------------------------------------
 	 */
-	char* x_strcpy(char* dest, s32 dest_buffer_size, const char* src)
+	prune Copy(prune dest, s32 dest_buffer_size, pcrune src)
 	{
 		ASSERT(dest);
 		ASSERT(src != NULL);
@@ -420,7 +426,7 @@ namespace xcore
 		if (dest_buffer_size == 0)
 			return dest;
 
-		char* start = dest;
+		prune start = dest;
 		while (true)
 		{
 			if (dest_buffer_size==1 || *src=='\0')
@@ -436,10 +442,10 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	s32 x_strlen(const char* str)
+	s32 Len(pcrune str)
 	{
 		ASSERT(str != NULL);
-		const char *end = str;
+		const rune *end = str;
 
 		while (*end++) 
 		{
@@ -450,7 +456,7 @@ namespace xcore
 	
 	//------------------------------------------------------------------------------
 
-	s32 x_strcmp(const char* str1, const char* str2)
+	s32 Cmp(pcrune str1, pcrune str2)
 	{
 		s32 result = 0;
 
@@ -469,7 +475,7 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	s32	x_strncmp(const char * cs, const char * ct, s32 n)
+	s32	Cmpn(const rune * cs, const rune * ct, s32 n)
 	{
 		if (n == 0) 
 			return 0;
@@ -489,7 +495,7 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	s32 x_stricmp(const char* str1, const char* str2)
+	s32 Cmpi(pcrune str1, pcrune str2)
 	{
 		s32 f, l;
 
@@ -516,15 +522,15 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	s32 x_strnicmp(const char *s1, const char *s2, s32 count)
+	s32 Cmpin(const rune *s1, const rune *s2, s32 count)
 	{
 		s32 f, l;
 
 		do 
 		{
-			if (((f = (unsigned char)(*(s1++))) >= 'A') && (f <= 'Z'))
+			if (((f = (rune)(*(s1++))) >= 'A') && (f <= 'Z'))
 				f -= 'A' - 'a';
-			if (((l = (unsigned char)(*(s2++))) >= 'A') && (l <= 'Z'))
+			if (((l = (rune)(*(s2++))) >= 'A') && (l <= 'Z'))
 				l -= 'A' - 'a';
 		} while (--count && f && (f == l));
 
@@ -539,7 +545,7 @@ namespace xcore
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
-	 *     x_strscn    - scan the string for certain parttern
+	 *     strscn    - scan the string for certain parttern
 	 * Arguments:
 	 *        parttern - the parttern need to be scanned
 	 *        str      - source string        
@@ -547,19 +553,19 @@ namespace xcore
 	 *        pointer to the parttern of the source string
 	 *------------------------------------------------------------------------------
 	 */
-	char* x_strstr(const char* mainStr, const char* subStr)
+	pcrune Str(pcrune mainStr, pcrune subStr)
 	{
-		char* mainString = (char*)mainStr;
-		char* str1; 
-		char* str2;
+		prune mainString = (prune)mainStr;
+		prune str1; 
+		prune str2;
 
 		if (!*subStr)
-			return((char*)mainStr);
+			return((prune)mainStr);
 
 		while (*mainString)
 		{
 			str1 = mainString;
-			str2 = (char*)subStr;
+			str2 = (prune)subStr;
 
 			while (*str1 && *str2 && !(*str1 - *str2))
 			{
@@ -578,9 +584,9 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	char*		x_strchr    			(const char* mainStr, char c)
+	pcrune		Chr(pcrune mainStr, rune c)
 	{
-		char* mainString = (char*)mainStr;
+		prune mainString = (prune)mainStr;
 
 		while (*mainString)
 		{
@@ -593,11 +599,11 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	char*		x_strrchr    			(const char* mainStr, char c)
+	pcrune		ChrR(pcrune mainStr, rune c)
 	{
-		char* mainString = (char*)mainStr;
+		prune mainString = (prune)mainStr;
 
-		s32 i = x_strlen(mainString);
+		s32 i = Len(mainString);
 		while (--i >= 0)
 		{
 			if (mainString[i] == c)
@@ -608,9 +614,9 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	const char*        x_strscn(const char* str, const char* parttern)
+	pcrune        Scn(pcrune str, pcrune parttern)
 	{
-		const char *scan;
+		const rune *scan;
 
 		while (*str != 0)
 		{
@@ -630,38 +636,6 @@ namespace xcore
 		}
 		return NULL;
 	}
-
-	//------------------------------------------------------------------------------
-
-	char* x_stristr(const char* mainStr, const char* subStr)
-	{
-		char* mainString = (char*)mainStr;
-		char* str1; 
-		char* str2;
-
-		if (!*subStr)
-			return((char*)mainStr);
-
-		while (*mainString)
-		{
-			str1 = mainString;
-			str2 = (char*)subStr;
-
-			while (*str1 && *str2 && !(x_tolower(*str1) - x_tolower(*str2)))
-			{
-				str1++;
-				str2++;
-			}
-
-			if (!*str2)
-				return(mainString);
-
-			mainString++;
-		}
-
-		return NULL ;
-	}
-
 
 	/**
 	 *------------------------------------------------------------------------------
@@ -704,27 +678,27 @@ namespace xcore
 	 * <CODE>
 	 *      s32 main(void)
 	 *      {
-	 *         char *s; f64 x; s32 i; s64 li;
+	 *         rune *s; f64 x; s32 i; s64 li;
 	 *
 	 *           * Test of atof64
 	 *          s = "  -2309.12E-15";     
-	 *          x = x_atof64(s);
-	 *          x_printf("atof64 test: \\"%s\\"; f32:  %e\\n", s, x);
+	 *          x = atof64(s);
+	 *          printf("atof64 test: \\"%s\\"; f32:  %e\\n", s, x);
 	 *
 	 *           * Test of atof32 
 	 *          s = "7.8912654773d210";  
-	 *          x = x_atof32(s);
-	 *          x_printf("atof32 test: \\"%s\\"; f32:  %e\\n", s, x);
+	 *          x = atof32(s);
+	 *          printf("atof32 test: \\"%s\\"; f32:  %e\\n", s, x);
 	 *
 	 *           * Test of atoi 
 	 *          s = "  -9885 pigs";      
-	 *          i = x_atoi32(s);
-	 *          x_printf("atoi32 test: \\"%s\\"; integer: %d\\n", s, i);
+	 *          i = atoi32(s);
+	 *          printf("atoi32 test: \\"%s\\"; integer: %d\\n", s, i);
 	 *
 	 *           * Test of atol 
 	 *          s = "98854 dollars";     
-	 *          li = x_atoi64(s);
-	 *          x_printf("atoi64 test: \\"%s\\"; long: %Ld\\n", s, li);
+	 *          li = atoi64(s);
+	 *          printf("atoi64 test: \\"%s\\"; long: %Ld\\n", s, li);
 	 *      }
 	 * </CODE>
 	 *
@@ -737,49 +711,19 @@ namespace xcore
 	 *      atoi64 test: "98854 dollars"; long: 98854
 	 * </TABLE>
 	 * See Also:
-	 *     x_sprintf
+	 *     sprintf
 	 *------------------------------------------------------------------------------
 	 */
-	s32 x_atoi32(const char* str)
+	s32 atoi32(pcrune str)
 	{
-		ASSERT(str != NULL);
-
-		// Skip whitespace.
-		for (; *str == ' '; ++str)
-			; // empty body
-
-		// Save sign indication.
-		char c = *str++;          // Current character.
-		char sign = c;            // If '-', then negative, otherwise positive.
-
-		// Skip sign.
-		if((c == '-') || (c == '+'))
-		{
-			c = *str++;
-		}
-
-		s32 total = 0;    // Current total.
-
-		while ((c >= '0') && (c <= '9'))
-		{
-			// Accumulate digit.
-			total = (10 * total) + (c - '0');
-
-			// get next char.
-			c = *str++;
-		}
-
-		// Negate the total if negative.
-		if (sign == '-') 
-			total = -total;
-
-		return total;
+		pcrune end;
+		return atoi32(str, &end, 10);
 	}
 
 	//------------------------------------------------------------------------------
-	s32 x_atoi32(const char* str, const char** scanEnd, s32 base)
+	s32 atoi32(pcrune str, pcrune* scanEnd, s32 base)
 	{
-		const char *p = (const char *)str;
+		const rune *p = (const rune *)str;
 		u32 res = 0;
 		s32 negative = 0;
 
@@ -790,7 +734,7 @@ namespace xcore
 		if (p[0] == '\0')
 		{
 			if (scanEnd)
-				*scanEnd = (const char *)p;
+				*scanEnd = (const rune *)p;
 			return 0;
 		}
 
@@ -866,45 +810,15 @@ namespace xcore
 	}
 
 	//------------------------------------------------------------------------------
-	/// <COMBINE x_atoi32 >
-	s64 x_atoi64(const char* str)
+	/// <COMBINE atoi32 >
+	s64 atoi64(pcrune str)
 	{
-		ASSERT(str != NULL);
-
-		// Skip whitespace.
-		for (; *str == ' '; ++str)
-			; // empty body
-
-		// Save sign indication.
-		char c = *str++;            // Current character.
-		char sign = c;              // If '-', then negative, otherwise positive.
-
-		// Skip sign.
-		if((c == '-') || (c == '+'))
-		{
-			c = *str++;
-		}
-
-		s64 total = 0;      // Current total.
-
-		while ((c >= '0') && (c <= '9'))
-		{
-			// Accumulate digit.
-			total = (10 * total) + (c - '0');
-
-			// get next char.
-			c = *str++;
-		}
-
-		// Negate the total if negative.
-		if (sign == '-') 
-			total = -total;
-
-		return total;
+		pcrune end;
+		return atoi64(str, 10, &end);
 	}
 
 	//------------------------------------------------------------------------------
-	s64 x_atoi64(const char* str, s32 base, const char** scanEnd)
+	s64 atoi64(pcrune str, s32 base, pcrune* scanEnd)
 	{
 		// Evaluate sign
 		s32 sign = 1;
@@ -926,10 +840,10 @@ namespace xcore
 		s32 overflow = 0;
 		s64    result = 0;
 		// Convert number
-		while (x_isnumber(*str, base))
+		while (IsNumber(*str, base))
 		{
 			s64    oldresult;
-			val = x_tonumber(*str++);
+			val = ToNumber(*str++);
 			if (val > base || val < 0)
 				return 0;
 
@@ -953,9 +867,9 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	bool x_isnumber(char c, s32 base)
+	bool IsNumber(rune c, s32 base)
 	{
-		const char max10 = (char)((base > 9) ? '9' : ('0' + base - 1));
+		const rune max10 = (rune)((base > 9) ? '9' : ('0' + base - 1));
 
 		if (c >= '0' && c <= max10)
 			return xTRUE;
@@ -963,15 +877,15 @@ namespace xcore
 		if (base < 11)
 			return xFALSE;
 
-		const char max = (char)('A' + (base - 11));
+		const rune max = (rune)('A' + (base - 11));
 
-		c = (char)x_toupper(c);
+		c = (rune)ToUpper(c);
 		return (c >= 'A' && c <= max);
 	}
 
 	//------------------------------------------------------------------------------
 
-	bool x_isstrint(const char* str)
+	bool IsInt(pcrune str)
 	{
 		if (str[0] == '-')
 		{
@@ -997,9 +911,9 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	bool x_isstrfloat(const char* str)
+	bool IsFloat(pcrune str)
 	{
-		static const char* floatStr = "Ee.#QNABIF";
+		static pcrune floatStr = "Ee.#QNABIF";
 
 		// Does it have any other of the strange characters?
 		for (s32 i = 0; str[i]; i++)
@@ -1019,7 +933,7 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	bool x_isstrhex(const char* str)
+	bool IsHex(pcrune str)
 	{
 		for (s32 i = 0; str[i]; i++)
 		{
@@ -1034,7 +948,7 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	bool x_isstrguid(const char* str)
+	bool IsGUID(pcrune str)
 	{
 		s32 i;
 		for (i = 0; str[i]; i++)
@@ -1083,54 +997,16 @@ namespace xcore
 		}
 	}
 	*/
-	//------------------------------------------------------------------------------
-	// This implementation will handle scientific notation such as "1.23e + 7".
-	// <COMBINE x_atoi32 >
-	f32 x_atof32(const char* s)
-	{
-		const char* s_end;
-		return x_strtof(s, &s_end);
-	}
 
-	//------------------------------------------------------------------------------
-	// <COMBINE x_atoi32 >
-
-	f64 x_atof64(const char* s)
-	{
-		const char* s_end;
-		return x_strtod(s, &s_end);
-	}
-
+	
 	//------------------------------------------------------------------------------
 
-	void* x_memchr(void* buf, s32 chr, s32 count)
-	{
-		xbyte* p;
-		xbyte  c;
-
-		ASSERT(buf != NULL);
-		ASSERT(count >= 0);
-
-		p = (xbyte*)buf;
-		c = (xbyte)chr;
-
-		while (count && (*p != c))
-		{
-			p++;
-			count--;
-		}
-
-		return count ? (void*)p : NULL;
-	}
-
-	//------------------------------------------------------------------------------
-
-	char* x_strcat(char* front, s32 maxChars, const char* back)
+	prune Cat(prune front, s32 maxChars, pcrune back)
 	{
 		ASSERT(front != NULL);
 		ASSERT(back != NULL);
 
-		char* p = front;
+		prune p = front;
 		while (*p) 
 		{
 			p++;
@@ -1149,7 +1025,7 @@ namespace xcore
 
 
 	//------------------------------------------------------------------------------
-	f32  x_strtof(const char *s, const char **scan_end)
+	f32  atof32(const rune *s, const rune **scan_end)
 	{
 		// Evaluate sign 
 		s32 sign = 1;
@@ -1227,7 +1103,7 @@ namespace xcore
 				result /= 10.0f;
 
 		if (scan_end != 0)
-			*scan_end = (char*)s;
+			*scan_end = (prune)s;
 
 		return(result);
 	}
@@ -1235,7 +1111,7 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	f64	 x_strtod(const char *s, const char **scan_end)
+	f64	 atof64(const rune *s, const rune **scan_end)
 	{
 		// Evaluate sign 
 		s32 sign = 1;
@@ -1313,7 +1189,7 @@ namespace xcore
 				result /= 10.0;
 
 		if (scan_end != 0)
-			*scan_end = (char*)s;
+			*scan_end = (prune)s;
 
 		return(result);
 	}
@@ -1322,11 +1198,11 @@ namespace xcore
 	 * Assumption: Letters A-Z and a-z are contiguous in the character set.
 	 * This is xTRUE for ASCII and UniCode.  (Not so for EBCDIC!)
 	 */
-	char* x_strtoupper(char* str)
+	prune ToUpper(prune str)
 	{
 		ASSERT(str != NULL);
 
-		char* p = str;
+		prune p = str;
 		while (*p != '\0')
 		{
 			if ((*p >= 'a') && (*p <= 'z'))
@@ -1341,11 +1217,11 @@ namespace xcore
 	 * Assumption: Letters A-Z and a-z are contiguous in the character set.
 	 * This is xTRUE for ASCII and UniCode.  (Not so for EBCDIC!)
 	 */
-	char* x_strtolower(char* str)
+	prune ToLower(prune str)
 	{
 		ASSERT(str != NULL);
 
-		char* p = str;
+		prune p = str;
 		while (*p != '\0')
 		{
 			if ((*p >= 'A') && (*p <= 'Z'))
@@ -1362,7 +1238,7 @@ namespace xcore
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
-	 *     x_strHash - perform a 32 bit Fowler/Noll/Vo hash on a string
+	 *     strHash - perform a 32 bit Fowler/Noll/Vo hash on a string
 	 * Arguments:
 	 *        str     - string to hash
 	 *        val     - previous hash value or nothing if first call
@@ -1375,10 +1251,10 @@ namespace xcore
 	 *      http: *www.isthe.com/chongo/tech/comp/fnv/index.html
 	 *      for more details as well as other forms of the FNV hash.
 	 * See Also:
-	 *     x_memHash
+	 *     memHash
 	 *------------------------------------------------------------------------------
 	 */
-	u32 x_strHash(const char* str, u32 range, u32 val)
+	u32 Hash32(pcrune str, u32 range, u32 val)
 	{
 		const u8* s = (const u8*)str;    // unsigned string 
 
@@ -1414,86 +1290,31 @@ namespace xcore
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
-	 *     x_strIHash - perform a 32 bit Fowler/Noll/Vo hash on a string( ignore upper case or down case)
-	 * Arguments:
-	 *        str     - string to hash
-	 *        val     - previous hash value or nothing if first call
-	 * Returns:
-	 *        32 bit hash as a static hash type
-	 * Description:
-	 *      FNV hashes are designed to be fast while maintaining a low
-	 *      collision rate. The FNV speed allows one to quickly hash lots
-	 *      of data while maintaining a reasonable collision rate.  See:
-	 *      http: *www.isthe.com/chongo/tech/comp/fnv/index.html
-	 *      for more details as well as other forms of the FNV hash.
-	 * See Also:
-	 *     x_memHash
-	 *------------------------------------------------------------------------------
-	 */
-	u32 x_strIHash (const char* str, u32 range, u32 val)
-	{
-		const u8* s = (const u8*)str;    // unsigned string 
-
-		//
-		// FNV-1 hash each octet in the buffer
-		//
-		while (*s) 
-		{
-			//.. multiply by the 32 bit FNV magic prime mod 2^32 
-			val *= 0x01000193;
-
-			// xor the bottom with the current octet 
-			val ^= (s32)x_tolower(*s);
-
-			// move to next character
-			s++;
-		}
-
-		// Do we need to compute a different range?
-		if (range != 0xffffffff)
-		{
-			const u32 retryLevel = (0xffffffff / range) * range;
-			while (val >= retryLevel) 
-			{
-				val = (val * ((u32)16777619)) + (X_CONSTANT_U32(2166136261));
-			}
-			val %= range;
-		}
-
-		// return our new hash value 
-		return val;
-	}
-
-	/**
-	 *------------------------------------------------------------------------------
-	 * Author:
-	 *     Virtuos Games
-	 * Summary:
-	 *     x_strCRC - calculate and return crc of a string
+	 *     strCRC - calculate and return crc of a string
 	 * Arguments:
 	 *        str     - string to calculate
 	 *        crcSum  - provided to affect crc calculate
 	 * Returns:
 	 *        32 bit crc of the string
 	 * See Also:
-	 *     x_memCrc
+	 *     memCrc
 	 *------------------------------------------------------------------------------
 	 */
 
-	bool		x_strStartsWith			(const char* inStr, char inStartChar)
+	bool		StartsWith			(pcrune inStr, rune inStartChar)
 	{
 		return inStr[0] == inStartChar;
 	}
 
-	bool		x_strStartsWith			(const char* inStr, const char* inStartStr)
+	bool		StartsWith			(pcrune inStr, pcrune inStartStr)
 	{
 		// Match from begin of string
 		for (s32 i=0; xTRUE; i++)
 		{
-			const char c1 = inStartStr[i];
+			const rune c1 = inStartStr[i];
 			if (c1 == '\0')
 				break;
-			const char c2 = inStr[i];
+			const rune c2 = inStr[i];
 			if (c1 != c2)
 				return xFALSE;
 		}
@@ -1502,18 +1323,18 @@ namespace xcore
 		return xTRUE;
 	}
 
-	bool		x_strStartsWith			(const char* inStr, s32 inStrLen, const char* inStartStr, s32 inStartStrLen)
+	bool		StartsWith			(pcrune inStr, s32 inLen, pcrune inStartStr, s32 inStartLen)
 	{
-		if (inStartStrLen>inStrLen)
+		if (inStartLen>inLen)
 			return xFALSE;
 
-		s32 minimumLen = x_intu::min(inStrLen, inStartStrLen==-1 ? inStrLen : inStartStrLen);
+		s32 minimumLen = x_intu::min(inLen, inStartLen==-1 ? inLen : inStartLen);
 		for (s32 i=0; i<minimumLen; i++)
 		{
-			const char c1 = inStartStr[i];
+			const rune c1 = inStartStr[i];
 			if (c1 == '\0')
 				return i>0;
-			const char c2 = inStr[i];
+			const rune c2 = inStr[i];
 			if (c1 != c2)
 				return xFALSE;
 		}
@@ -1523,29 +1344,29 @@ namespace xcore
 	}
 
 
-	bool		x_strEndsWith			(const char* inStr, char inEndChar)
+	bool		EndsWith			(pcrune inStr, rune inEndChar)
 	{
-		return x_strEndsWith(inStr, -1, inEndChar);
+		return EndsWith(inStr, -1, inEndChar);
 	}
 
-	bool		x_strEndsWith			(const char* inStr, s32 inStrLen, char inEndChar)
+	bool		EndsWith			(pcrune inStr, s32 inLen, rune inEndChar)
 	{
-		if (inStrLen == -1)
-			inStrLen = x_strlen(inStr);
-		return inStrLen>0 ? xbool(inStr[inStrLen-1] == inEndChar) : (xbool)xFALSE;
+		if (inLen == -1)
+			inLen = Len(inStr);
+		return inLen>0 ? xbool(inStr[inLen-1] == inEndChar) : (xbool)xFALSE;
 	}
 
 
-	bool		x_strEndsWith			(const char* inStr, const char* inEndStr)
+	bool		EndsWith			(pcrune inStr, pcrune inEndStr)
 	{
-		return x_strEndsWith(inStr, -1, inEndStr, -1);
+		return EndsWith(inStr, -1, inEndStr, -1);
 	}
 
-	bool		x_strEndsWith			(const char* inStr, s32 inStrLen, const char* inEndStr, s32 inEndStrLength)
+	bool		EndsWith			(pcrune inStr, s32 inLen, pcrune inEndStr, s32 inEndLength)
 	{
 		// Grab string lengths
-		const s32 l0 = inStrLen==-1 ? x_strlen(inStr) : inStrLen;
-		const s32 l1 = inEndStrLength==-1 ? x_strlen(inEndStr) : inEndStrLength;
+		const s32 l0 = inLen==-1 ? Len(inStr) : inLen;
+		const s32 l1 = inEndLength==-1 ? Len(inEndStr) : inEndLength;
 
 		if (l0 < l1)
 			return xFALSE;
@@ -1560,17 +1381,17 @@ namespace xcore
 		return xTRUE;
 	}
 
-	char 		x_strFirstChar			(const char* inStr)
+	rune 		FirstChar			(pcrune inStr)
 	{
 		ASSERT(inStr!=NULL);
 		return inStr[0];
 	}
 
-	char 		x_strLastChar			(const char* inStr, s32 inStrLen)
+	rune 		LastChar			(pcrune inStr, s32 inLen)
 	{
 		ASSERT(inStr!=NULL);
-		inStrLen = (inStrLen==-1) ? x_strlen(inStr) : inStrLen;
-		return inStrLen==0 ? '\0' : inStr[inStrLen-1];
+		inLen = (inLen==-1) ? Len(inStr) : inLen;
+		return inLen==0 ? '\0' : inStr[inLen-1];
 	}
 
 	/**
@@ -1582,7 +1403,7 @@ namespace xcore
 	 * Arguments:
 	 *     inStr                - The main string
 	 *     inOther              - The 'compare' string to compare to the main string
-	 *     inStrLen             - The whole(-1) or sub length of the main string
+	 *     inLen             - The whole(-1) or sub length of the main string
 	 *     inOtherLen           - The whole(-1) or sub length of the 'compare' string
 	 * Returns:
 	 *     s32 - 0 when inStr==inOther, 1 when inStr>inOther, -1 when inStr<inOther
@@ -1591,103 +1412,103 @@ namespace xcore
 	 *     identify the following cases:
 	 *
 	 *     1) Main string sub length, 'Compare' string sub length
-	 *			Required: need to supply both inStrLen or inOtherLen
-	 *			Action:   strings are compared until inStrLen==0 or inOtherLen==0
+	 *			Required: need to supply both inLen or inOtherLen
+	 *			Action:   strings are compared until inLen==0 or inOtherLen==0
 	 *
 	 *     2) Main string sub length, 'Compare' string total length = -1
-	 *			Required: need to supply inStrLen, no need to supply inOtherLen=-1
-	 *			Action:   strings are compared until inStrLen==0 or 'Compare' string encounters '\0'
+	 *			Required: need to supply inLen, no need to supply inOtherLen=-1
+	 *			Action:   strings are compared until inLen==0 or 'Compare' string encounters '\0'
 	 *
 	 *     3) Main string total length = -1, 'Compare' string sub length
-	 *			Required: need to supply inStrLen with -1, need to supply inOtherLen
+	 *			Required: need to supply inLen with -1, need to supply inOtherLen
 	 *			Action:   strings are compared until inOtherLen==0 or 'Compare' string encounters '\0'
 	 *
 	 *     4) Main string total length = -1, 'Compare' string total length = -1
-	 *			Required: no need to supply either inStrLen or inOtherLen
+	 *			Required: no need to supply either inLen or inOtherLen
 	 *			Action:   strings are compared until one of the strings encounters '\0'
 	 *
 
 	 * See Also:
-	 *     x_SetAssertHandler
+	 *     SetAssertHandler
 	 *------------------------------------------------------------------------------
 	 */
 
-	s32  		x_strCompare			(const char* inStr, s32 inStrLen, const char* inOther, s32 inOtherLen)
+	s32  		Compare			(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen)
 	{
-		if ( inStrLen == 0 && inOtherLen == 0 )
+		if ( inLen == 0 && inOtherLen == 0 )
 			return 0;
 
-		if ( inStrLen == 0 && inOtherLen != 0 )
+		if ( inLen == 0 && inOtherLen != 0 )
 			return 1;
 
-		if ( inStrLen != 0 && inOtherLen == 0 )
+		if ( inLen != 0 && inOtherLen == 0 )
 			return -1;
 
-		if (inStrLen>0 && inOtherLen>0)
+		if (inLen>0 && inOtherLen>0)
 		{
-			// 1/ x_strCompare("aaaa", "aabb", 2, 2) -> return  0;
-			// 2/ x_strCompare("aaaa", "aabb", 3, 3) -> return -1;
-			// 3/ x_strCompare("aaaa", "aabb", 2, 4) -> return  0;
-			// 4/ x_strCompare("aaaa", "aabb", 4, 2) -> return  0;
-			// 5/ x_strCompare("aaaa", "aabb", 3, 4) -> return -1;
-			// 6/ x_strCompare("aaaa", "aabb", 4, 3) -> return -1;
+			// 1/ Compare("aaaa", "aabb", 2, 2) -> return  0;
+			// 2/ Compare("aaaa", "aabb", 3, 3) -> return -1;
+			// 3/ Compare("aaaa", "aabb", 2, 4) -> return  0;
+			// 4/ Compare("aaaa", "aabb", 4, 2) -> return  0;
+			// 5/ Compare("aaaa", "aabb", 3, 4) -> return -1;
+			// 6/ Compare("aaaa", "aabb", 4, 3) -> return -1;
 			while ((*inStr == *inOther))
 			{
 				ASSERT(*inStr != '\0');
 				ASSERT(*inOther != '\0');
-				--inStrLen;
+				--inLen;
 				--inOtherLen;
-				if (inStrLen==0)	return (inOtherLen==0) ? 0 : -1;
+				if (inLen==0)	return (inOtherLen==0) ? 0 : -1;
 				if (inOtherLen==0)	return 1;
 				++inStr;
 				++inOther;
 			}
 		}
-		else if (inStrLen>0)
+		else if (inLen>0)
 		{
-			// 1/ x_strCompare("aaaa", "aabb", 2) -> return  0;
-			// 2/ x_strCompare("aaaa", "aabb", 3) -> return -1;
-			// 3/ x_strCompare("aaaa", "aa"  , 3) -> return  0;
-			// 4/ x_strCompare("aaaa", "aabb", 4) -> return -1;
-			// 5/ x_strCompare("aaaa", "aabb", 3) -> return -1;
+			// 1/ Compare("aaaa", "aabb", 2) -> return  0;
+			// 2/ Compare("aaaa", "aabb", 3) -> return -1;
+			// 3/ Compare("aaaa", "aa"  , 3) -> return  0;
+			// 4/ Compare("aaaa", "aabb", 4) -> return -1;
+			// 5/ Compare("aaaa", "aabb", 3) -> return -1;
 
 			while ((*inStr == *inOther))
 			{
 				ASSERT(*inStr != '\0');
-				--inStrLen;
+				--inLen;
 				if (*inOther=='\0')	break;
-				if (inStrLen==0)	break;
+				if (inLen==0)	break;
 				++inStr;
 				++inOther;
 			}
 		}
 		else if (inOtherLen>0)
 		{
-			// 1/ x_strCompare("aaaa", "aabb", -1, 2) -> return  0;
-			// 2/ x_strCompare("aaaa", "aabb", -1, 3) -> return -1;
-			// 4/ x_strCompare("aaaa", "aabb", -1, 4) -> return -1;
-			// 5/ x_strCompare("aaaa", "aabb", -1, 3) -> return -1;
+			// 1/ Compare("aaaa", "aabb", -1, 2) -> return  0;
+			// 2/ Compare("aaaa", "aabb", -1, 3) -> return -1;
+			// 4/ Compare("aaaa", "aabb", -1, 4) -> return -1;
+			// 5/ Compare("aaaa", "aabb", -1, 3) -> return -1;
 
-			inStrLen = inOtherLen;
+			inLen = inOtherLen;
 			while ((*inStr == *inOther))
 			{
 				ASSERT(*inOther != '\0');
-				--inStrLen;
+				--inLen;
 				if (*inStr=='\0')	break;
-				if (inStrLen==0)	break;
+				if (inLen==0)	break;
 				++inStr;
 				++inOther;
 			}
 		}
 		else
 		{
-			// 1/ x_strCompare("aaaa", "aa"  ) -> return  1;
-			// 2/ x_strCompare("aa"  , "aaaa") -> return -1;
-			// 3/ x_strCompare("ab"  , "aaaa") -> return  1;
-			// 4/ x_strCompare("aaaa", "aaaa") -> return  0;
-			// 5/ x_strCompare("aaaa", "aabb") -> return -1;
-			// 6/ x_strCompare("aabb", "aaaa") -> return  1;
-			inStrLen=0;
+			// 1/ Compare("aaaa", "aa"  ) -> return  1;
+			// 2/ Compare("aa"  , "aaaa") -> return -1;
+			// 3/ Compare("ab"  , "aaaa") -> return  1;
+			// 4/ Compare("aaaa", "aaaa") -> return  0;
+			// 5/ Compare("aaaa", "aabb") -> return -1;
+			// 6/ Compare("aabb", "aaaa") -> return  1;
+			inLen=0;
 			while ((*inStr == *inOther))
 			{
 				if (*inStr=='\0')	break;
@@ -1703,32 +1524,32 @@ namespace xcore
 		else				return 1;
 	}
 
-	s32  		x_strCompareNoCase		(const char* inStr, s32 inStrLen, const char* inOther, s32 inOtherLen)
+	s32  		CompareNoCase		(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen)
 	{
-		if (inStrLen == 0 || inOtherLen == 0)
+		if (inLen == 0 || inOtherLen == 0)
 			return 0;
 
-		if (inStrLen>0 && inOtherLen>0)
+		if (inLen>0 && inOtherLen>0)
 		{
-			while (x_tolower(*inStr) == x_tolower(*inOther))
+			while (ToLower(*inStr) == ToLower(*inOther))
 			{
 				ASSERT(*inStr != '\0');
 				ASSERT(*inOther != '\0');
-				--inStrLen;
+				--inLen;
 				--inOtherLen;
-				if (inStrLen==0)	return (inOtherLen==0) ? 0 : -1;
+				if (inLen==0)	return (inOtherLen==0) ? 0 : -1;
 				if (inOtherLen==0)	return 1;
 				++inStr;
 				++inOther;
 			}
 		}
-		else if (inStrLen>0)
+		else if (inLen>0)
 		{
-			while (x_tolower(*inStr) == x_tolower(*inOther))
+			while (ToLower(*inStr) == ToLower(*inOther))
 			{
-				--inStrLen;
+				--inLen;
 				if (*inOther=='\0')	break;
-				if (inStrLen==0)	break;
+				if (inLen==0)	break;
 				ASSERT(*inStr != '\0');
 				++inStr;
 				++inOther;
@@ -1736,12 +1557,12 @@ namespace xcore
 		}
 		else if (inOtherLen>0)
 		{
-			inStrLen = inOtherLen;
-			while (x_tolower(*inStr) == x_tolower(*inOther))
+			inLen = inOtherLen;
+			while (ToLower(*inStr) == ToLower(*inOther))
 			{
-				--inStrLen;
+				--inLen;
 				if (*inStr=='\0')	break;
-				if (inStrLen==0)	break;
+				if (inLen==0)	break;
 				ASSERT(*inOther != '\0');
 				++inStr;
 				++inOther;
@@ -1749,8 +1570,8 @@ namespace xcore
 		}
 		else
 		{
-			inStrLen=0;
-			while (x_tolower(*inStr) == x_tolower(*inOther))
+			inLen=0;
+			while (ToLower(*inStr) == ToLower(*inOther))
 			{
 				if (*inStr=='\0')	break;
 				if (*inOther=='\0')	break;
@@ -1759,30 +1580,30 @@ namespace xcore
 			}
 		}
 
-		s32 result = x_tolower(*inStr) - x_tolower(*inOther);
+		s32 result = ToLower(*inStr) - ToLower(*inOther);
 		if (result==0)		return 0;
 		else if (result<0)	return -1;
 		else				return 1;
 	}
 
-	bool		x_strEqual				(const char* inStr, s32 inStrLen, const char* inOther, s32 inOtherLen)
+	bool		Equal				(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen)
 	{
-		return x_strCompare(inStr, inStrLen, inOther, inOtherLen) == 0;
+		return Compare(inStr, inLen, inOther, inOtherLen) == 0;
 	}
 
-	bool		x_strEqualNoCase		(const char* inStr, s32 inStrLen, const char* inOther, s32 inOtherLen)
+	bool		EqualNoCase			(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen)
 	{
-		return x_strCompareNoCase(inStr, inStrLen, inOther, inOtherLen) == 0;
+		return CompareNoCase(inStr, inLen, inOther, inOtherLen) == 0;
 	}
 
 
-	const char*	x_strFind				(const char* inStr, char inChar, s32 inStrLen)
+	pcrune		Find(pcrune inStr, rune inChar, s32 inLen)
 	{
 		while (*inStr!='\0')
 		{
-			if (inStrLen==0)
+			if (inLen==0)
 				break;
-			--inStrLen;
+			--inLen;
 			if (*inStr == inChar)
 				return inStr;
 			++inStr;
@@ -1790,22 +1611,22 @@ namespace xcore
 		return NULL;
 	}
 
-	const char*	x_strFind				(const char* inStr, const char* inFind, s32 inStrLen)
+	pcrune		Find(pcrune inStr, pcrune inFind, s32 inLen)
 	{
 		ASSERT(inStr);
 		// If we don't have a valid string then we didn't find anything
 		if (inStr == NULL) 
 			return NULL;
 
-		const char* mainString = inStr;
+		pcrune mainString = inStr;
 		while (*mainString!='\0')
 		{
-			if (inStrLen==0)
+			if (inLen==0)
 				break;
-			--inStrLen;
+			--inLen;
 
-			const char* str1 = mainString;
-			const char* str2 = inFind;
+			pcrune str1 = mainString;
+			pcrune str2 = inFind;
 
 			while (*str1!='\0' && *str2!='\0' && (*str1==*str2))
 			{
@@ -1822,35 +1643,35 @@ namespace xcore
 		return NULL;
 	}
 
-	const char*	x_strRFind				(const char* inStr, char inFind, s32 inPos, s32 inStrLen)
+	pcrune	RFind				(pcrune inStr, rune inFind, s32 inPos, s32 inLen)
 	{
-		char find[2];
+		rune find[2];
 		find[0] = inFind;
 		find[1] = '\0';
-		return x_strRFind(inStr, find, inPos, inStrLen);
+		return RFind(inStr, find, inPos, inLen);
 	}
 
-	const char*	x_strRFind				(const char* inStr, const char* inFind, s32 inPos, s32 inStrLen)
+	pcrune	RFind				(pcrune inStr, pcrune inFind, s32 inPos, s32 inLen)
 	{
-		inStrLen = (inStrLen==-1) ? (x_strlen(inStr)-inPos) : (inStrLen);
-		if (inStrLen<=0)
+		inLen = (inLen==-1) ? (Len(inStr)-inPos) : (inLen);
+		if (inLen<=0)
 			return NULL;
 
 		if (inPos == -1)
-			inPos = inStrLen-1;
+			inPos = inLen-1;
 
-		if ((inPos-(inStrLen-1)) >= 0)
+		if ((inPos-(inLen-1)) >= 0)
 		{
-			const s32 findLen = x_strlen(inFind);
+			const s32 findLen = Len(inFind);
 			if (findLen > 0)
 			{
-				const char* end = inStr + inPos - (inStrLen-1);
-				const char* pos = inStr + inPos;
+				pcrune end = inStr + inPos - (inLen-1);
+				pcrune pos = inStr + inPos;
 				while (pos >= end)
 				{
-					s32 len = inStrLen;
-					const char* poss = pos;
-					const char* find = inFind + (findLen-1);
+					s32 len = inLen;
+					pcrune poss = pos;
+					pcrune find = inFind + (findLen-1);
 					while (poss >= end && *poss == *find)
 					{
 						if (find == inFind)
@@ -1863,8 +1684,8 @@ namespace xcore
 					}
 
 					--pos;
-					--inStrLen;
-					if (inStrLen==0)
+					--inLen;
+					if (inLen==0)
 						break;
 				}
 
@@ -1874,40 +1695,40 @@ namespace xcore
 		return NULL;
 	}
 
-	const char*	x_strFindNoCase			(const char* inStr, char inChar, s32 inStrLen)
+	pcrune	FindNoCase			(pcrune inStr, rune inChar, s32 inLen)
 	{
-		inChar = (char)x_tolower(inChar);
+		inChar = (rune)ToLower(inChar);
 		while (*inStr!='\0')
 		{
-			if (inStrLen == 0)
+			if (inLen == 0)
 				break;
-			--inStrLen;
+			--inLen;
 
-			if (x_tolower(*inStr) == inChar)
+			if (ToLower(*inStr) == inChar)
 				return inStr;
 			++inStr;
 		}
 		return NULL;
 	}
 
-	const char*	x_strFindNoCase			(const char* inStr, const char* inFind, s32 inStrLen)
+	pcrune	FindNoCase			(pcrune inStr, pcrune inFind, s32 inLen)
 	{
 		ASSERT(inStr);
 		// If we don't have a valid string then we didn't find any thing
 		if (inStr == NULL) 
 			return NULL;
 
-		const char* mainString = inStr;
+		pcrune mainString = inStr;
 		while (*mainString)
 		{
-			if (inStrLen==0)
+			if (inLen==0)
 				break;
-			--inStrLen;
+			--inLen;
 
-			const char* str1 = mainString;
-			const char* str2 = inFind;
+			pcrune str1 = mainString;
+			pcrune str2 = inFind;
 
-			while (*str1 && *str2 && !(x_tolower(*str1) - x_tolower(*str2)))
+			while (*str1 && *str2 && !(ToLower(*str1) - ToLower(*str2)))
 			{
 				str1++;
 				str2++;
@@ -1922,45 +1743,45 @@ namespace xcore
 		return NULL;
 	}
 
-	const char*	x_strFindInSubstr		(const char* inStr, char inFind, s32 inPos, s32 inStrLen)
+	pcrune	FindInSubstr		(pcrune inStr, rune inFind, s32 inPos, s32 inLen)
 	{
 		ASSERT(inPos >= 0);
-		const char* findPos = x_strFind(inStr + inPos, inFind, inStrLen);
+		pcrune findPos = Find(inStr + inPos, inFind, inLen);
 		return findPos;
 	}
 
-	const char*	x_strFindInSubstr		(const char* inStr, const char* inFind, s32 inPos, s32 inStrLen)
+	pcrune	FindInSubstr		(pcrune inStr, pcrune inFind, s32 inPos, s32 inLen)
 	{
 		ASSERT(inPos >= 0);
-		const char* findPos = x_strFind(inStr + inPos, inFind, inStrLen);
+		pcrune findPos = Find(inStr + inPos, inFind, inLen);
 		return findPos;
 	}
 
-	const char*	x_strFindNoCaseInSubstr	(const char* inStr, char inFind, s32 inPos, s32 inStrLen)
+	pcrune	FindNoCaseInSubstr	(pcrune inStr, rune inFind, s32 inPos, s32 inLen)
 	{
 		ASSERT(inPos >= 0);
-		const char* findPos = x_strFindNoCase(inStr + inPos, inFind, inStrLen);
+		pcrune findPos = FindNoCase(inStr + inPos, inFind, inLen);
 		return findPos;
 	}
 
-	const char*	x_strFindNoCaseInSubstr	(const char* inStr, const char* inFind, s32 inPos, s32 inStrLen)
+	pcrune	FindNoCaseInSubstr	(pcrune inStr, pcrune inFind, s32 inPos, s32 inLen)
 	{
 		ASSERT(inPos >= 0);
-		const char* findPos = x_strFindNoCase(inStr + inPos, inFind, inStrLen);
+		pcrune findPos = FindNoCase(inStr + inPos, inFind, inLen);
 		return findPos;
 	}
 
-	const char*	x_strFindOneOf			(const char* inStr, const char* inCharSet, s32 inPos, s32 inStrLen)
+	pcrune	FindOneOf			(pcrune inStr, pcrune inCharSet, s32 inPos, s32 inLen)
 	{
-		inStrLen = inStrLen==-1 ? (x_strlen(inStr)) : (inStrLen);
-		if (inStrLen<=0)
+		inLen = inLen==-1 ? (Len(inStr)) : (inLen);
+		if (inLen<=0)
 			return NULL;
 
-		const char* cur_pos = inStr + inPos;
-		const char* end_pos = inStr + inStrLen;
+		pcrune cur_pos = inStr + inPos;
+		pcrune end_pos = inStr + inLen;
 		while (cur_pos<end_pos)
 		{
-			if (x_strFind(inCharSet, *cur_pos)!=NULL)
+			if (Find(inCharSet, *cur_pos)!=NULL)
 				return cur_pos;
 
 			++cur_pos;
@@ -1969,26 +1790,26 @@ namespace xcore
 		return NULL;
 	}
 
-	const char*	x_strRFindOneOf			(const char* inStr, const char* inCharSet, s32 inPos, s32 inStrLen)
+	pcrune	RFindOneOf			(pcrune inStr, pcrune inCharSet, s32 inPos, s32 inLen)
 	{
-		inStrLen = inStrLen==-1 ? (x_strlen(inStr)) : (inStrLen);
-		if (inStrLen<=0)
+		inLen = inLen==-1 ? (Len(inStr)) : (inLen);
+		if (inLen<=0)
 			return NULL;
 
 		if (inPos==-1)
-			inPos = inStrLen - 1;
+			inPos = inLen - 1;
 
-		ASSERT((inPos-(inStrLen-1)) >= 0);
+		ASSERT((inPos-(inLen-1)) >= 0);
 
-		const char* cur_pos = inStr + inPos;
-		const char* end_pos = inStr;
+		pcrune cur_pos = inStr + inPos;
+		pcrune end_pos = inStr;
 		while (cur_pos>=end_pos)
 		{
-			if (x_strFind(inCharSet, *cur_pos)!=NULL)
+			if (Find(inCharSet, *cur_pos)!=NULL)
 				return cur_pos;
 			--cur_pos;
-			--inStrLen;
-			if (inStrLen==0)
+			--inLen;
+			if (inLen==0)
 				break;
 		}
 
@@ -1997,69 +1818,70 @@ namespace xcore
 
 
 
-	bool		x_strIsUpper			(const char* inStr, s32 inStrLen)
+	bool		IsUpper			(pcrune inStr, s32 inLen)
 	{
-		const char* buffer = inStr;
+		pcrune buffer = inStr;
 		if (buffer == NULL)
 			return xFALSE;
 
 		bool isUpper = xTRUE;
-		for (s32 i=0; isUpper; i++, --inStrLen)
+		for (s32 i=0; isUpper; i++, --inLen)
 		{
-			char c = buffer[i];
-			if (c == 0 || inStrLen == 0)
+			rune c = buffer[i];
+			if (c == 0 || inLen == 0)
 			{
 				break;
 			}
-			isUpper = isUpper && !x_islower(c);
+			isUpper = isUpper && !IsLower(c);
 		}
 
 		return isUpper;
 	}
 
-	bool		x_strIsLower			(const char* inStr, s32 inStrLen)
+	bool		IsLower			(pcrune inStr, s32 inLen)
 	{
-		const char* buffer = inStr;
+		pcrune buffer = inStr;
 		if (buffer == NULL)
 			return xFALSE;
 
 		bool isLower = xTRUE;
-		for (s32 i=0; isLower; i++, --inStrLen)
+		for (s32 i=0; isLower; i++, --inLen)
 		{
-			char c = buffer[i];
-			if (c == 0 || inStrLen==0)
+			rune c = buffer[i];
+			if (c == 0 || inLen==0)
 			{
 				break;
 			}
-			isLower = isLower && !x_isupper(c);
+			isLower = isLower && !IsUpper(c);
 		}
 
 		return isLower;
 	}
 
-	bool		x_strIsCapitalized		(const char* inStr, s32 inStrLen)
+	bool		IsCapitalized		(pcrune inStr, s32 inLen)
 	{
 		if (inStr[0]!='\0')
 		{
-			if (x_isupper(inStr[0]))
+			if (IsUpper(inStr[0]))
 			{
-				return x_strIsLower(&inStr[1], inStrLen);
+				return IsLower(&inStr[1], inLen);
 			}
 		}
 		return xFALSE;
 	}
 
-	bool		x_strIsQuoted			(const char* inStr, char quote, s32 inStrLen)
+	bool		IsQuoted			(pcrune inStr, rune quote, s32 inLen)
 	{
 		if (inStr[0]!='\0' && inStr[1]!='\0' && inStr[0]==quote)
 		{
-			inStrLen = (inStrLen==-1) ? x_strlen(inStr) : inStrLen;
-			ASSERT(inStrLen>1);
-			return inStr[inStrLen-1]==quote;
+			inLen = (inLen==-1) ? Len(inStr) : inLen;
+			ASSERT(inLen>1);
+			return inStr[inLen-1]==quote;
 		}
 		return xFALSE;
 	}
 
+	};
 };
 
 /**
