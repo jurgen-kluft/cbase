@@ -23,14 +23,20 @@ namespace xcore
 	// and thus is easier to manipulate directly than UTF-8 or UTF-16
 	namespace UTF
 	{
-		// From UTF-8 or UTF-16 to UTF-32
-		s32			convert		(ustr8  const* _src, ustr8  const* _src_end, ustr32*& _dst, u32 _dstmaxleninbytes);
-		s32			convert		(ustr16 const* _src, ustr16 const* _src_end, ustr32*& _dst, u32 _dstmaxleninbytes);
+		// UTF-8, UTF-16, UTF-32 conversions
+		s32			convert		(uchar8  const * from, uchar32 * to);
+		s32			convert		(uchar16 const * from, uchar32 * to);
 
-		// From UTF-32 to UTF-8 or UTF-16
-		s32			convert		(ustr32 const* _src, u32 _srclen, ustr8 *& _dst, u32 _dstmaxleninbytes);
-		s32			convert		(ustr32 const* _src, u32 _srclen, ustr16*& _dst, u32 _dstmaxleninbytes);
+		s32			convert		(uchar32 const * from, uchar8  * to);
+		s32			convert		(uchar32 const * from, uchar16 * to);
 
+		bool		iseos		(uchar8  const * str);
+		bool		iseos		(uchar16 const * str);
+		bool		iseos		(uchar32 const * str);
+
+		bool		iscrln		(uchar8  const* ustr);
+		bool		iscrln		(uchar16 const* ustr);
+		bool		iscrln		(uchar32 const* ustr);
 	}	// UTF
 
 	// String class, acts as a slice/view with a behaviour of explicit copy (not copy-on-write)
@@ -50,6 +56,7 @@ namespace xcore
 
 		struct cursor { s32 p; uchar c; };
 
+		xstring&		operator=(const char* ascii);
 		xstring&		operator=(xstring& other);
 		xstring&		operator=(cursor c);
 
@@ -57,7 +64,7 @@ namespace xcore
 
 		xstring			create(s32 len) const;
 		xstring			copy() const;
-		
+
 		s32				explode(int n, xstring*& parts) const;
 
 		s32				find(uchar c) const;

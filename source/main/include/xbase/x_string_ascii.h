@@ -20,13 +20,12 @@
  */
 namespace xcore
 {
+	typedef					char					rune;
+	typedef					rune const*				pcrune;
+	typedef					rune *					prune;
+
 	namespace ascii
 	{
-		typedef					char					rune;
-		typedef					rune const*				pcrune;
-		typedef					rune *					prune;
-
-
 		/**
 		 *==============================================================================
 		 * string functions

@@ -23,6 +23,13 @@ namespace xcore
 
 	struct slice
 	{
+		slice(s32 from, s32 to)
+		{
+			mData = NULL;
+			mFrom = from;
+			mTo = to;
+		}
+
 		struct block
 		{
 			block()
@@ -34,13 +41,13 @@ namespace xcore
 
 			static block	sNull;
 
-			block* 			incref()			{ if (mAllocator != NULL && (this != &sNull)) mRefCount++; return (block*)this; }
-			block* 			incref() const		{ block* data = (block*)this;  if (this != &sNull) data->mRefCount++; return data; }
+			block* 			incref()			{ if (mAllocator != NULL) mRefCount++; return (block*)this; }
+			block* 			incref() const		{ block* data = (block*)this;  if (mAllocator!=NULL) data->mRefCount++; return data; }
 
 			block*			decref()
 			{
 				s32 const refs = mRefCount;
-				if (refs == 0 || this == &sNull)
+				if (refs == 0 || mAllocator == NULL)
 					return &sNull;
 				if (refs == 1)
 				{
@@ -84,9 +91,17 @@ namespace xcore
 			xbyte			mData[32 - 4 - sizeof(void*) - 4];		/// Align the size of this struct by itself to 24
 		};
 
-		static slice		alloc(x_iallocator* allocator, s32 tosize) { slice s; s.mData = block::alloc(allocator, tosize); s.mFrom = 0; s.mTo = 16; return s; }
+		slice(x_iallocator* allocator, s32 from, s32 to)
+		{
+			mData = block::alloc(allocator, to - from);
+			mFrom = from;
+			mTo = to;
+		}
 
-		s32					len() const { return mTo - mFrom; }
+		static slice		alloc(x_iallocator* allocator, s32 tosize) { slice s; s.mData = block::alloc(allocator, tosize); s.mFrom = 0; s.mTo = 16; return s; }
+		xbyte* 				resize(s32 len)			{ mData = mData->resize(len); mFrom = 0; mTo = mData->mSize; return &mData->mData[0]; }
+
+		s32					len() const				{ return mTo - mFrom; }
 		slice				incref()				{ slice s(*this); mData->incref(); return s; }
 		slice				view(u32 from, u32 to)
 		{
@@ -102,6 +117,7 @@ namespace xcore
 			s.mTo = 0;
 			return s;
 		}
+
 
 		block*				mData;
 		u32					mFrom;
