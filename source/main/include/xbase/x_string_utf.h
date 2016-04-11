@@ -30,13 +30,13 @@ namespace xcore
 		s32			convert		(uchar32 const * from, uchar8  * to);
 		s32			convert		(uchar32 const * from, uchar16 * to);
 
-		bool		iseos		(uchar8  const * str);
-		bool		iseos		(uchar16 const * str);
-		bool		iseos		(uchar32 const * str);
+		bool		iseos		(ustr8  const * str);
+		bool		iseos		(ustr16 const * str);
+		bool		iseos		(ustr32 const * str);
 
-		bool		iscrln		(uchar8  const* ustr);
-		bool		iscrln		(uchar16 const* ustr);
-		bool		iscrln		(uchar32 const* ustr);
+		bool		iscrln		(ustr8  const* ustr);
+		bool		iscrln		(ustr16 const* ustr);
+		bool		iscrln		(ustr32 const* ustr);
 	}	// UTF
 
 	// String class, acts as a slice/view with a behaviour of explicit copy (not copy-on-write)

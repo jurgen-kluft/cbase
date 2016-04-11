@@ -144,30 +144,30 @@ namespace xcore
 
 		bool		iseos		(ustr8  const * str)
 		{
-			return *str == 0;
+			return str->c == 0;
 		}
-		bool		iseos		(uchar16 const * str)
+		bool		iseos		(ustr16 const * str)
 		{
-			return *str == 0;
+			return str->c == 0;
 		}
-		bool		iseos		(uchar32 const * str)
+		bool		iseos		(ustr32 const * str)
 		{
-			return *str == 0;
-		}
-
-		bool		iscrln		(uchar8  const* ustr)
-		{
-			return *ustr == '\r' && *ustr == '\n';
+			return str->c == 0;
 		}
 
-		bool		iscrln		(uchar16 const* ustr)
+		bool		iscrln		(ustr8  const* ustr)
 		{
-			return *ustr == '\r' && *ustr == '\n';
+			return ustr->c == '\r' && ustr->c == '\n';
 		}
 
-		bool		iscrln		(uchar32 const* ustr)
+		bool		iscrln		(ustr16 const* ustr)
 		{
-			return *ustr == '\r' && *ustr == '\n';
+			return ustr->c == '\r' && ustr->c == '\n';
+		}
+
+		bool		iscrln		(ustr32 const* ustr)
+		{
+			return ustr->c == '\r' && ustr->c == '\n';
 		}
 
 
@@ -267,11 +267,13 @@ namespace xcore
 	{
 		xstring strings(gCreateSystemAllocator());
 
-		xstring string = strings.create(16);
-		xstring view_4_8 = string(4, 8);
+		xstring str1 = strings.create(16);
+		str1 = "Hello UTF World!";
+		xstring view_4_8 = str1(6, 9);
 
-		uchar c = view_4_8[0];
-		view_4_8 = xstring::cursor{ 0, '?' };	// Write a character at first position
+		uchar32 c = view_4_8[15];
+		str1 = xstring::cursor{ 15, '?' };	// Write a character at first position
+		view_4_8 = xstring::cursor{ 0, 'u' };
 	}
 };
 
