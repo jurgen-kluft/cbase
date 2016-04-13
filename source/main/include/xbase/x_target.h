@@ -2190,15 +2190,15 @@ namespace xcore
 
 	//==============================================================================
 	// UTF 8, 16, 32
-	typedef		uchar8		u8;
-	typedef		uchar16		u16;
-	typedef		uchar32		u32;
+	typedef		u8     uchar8;
+	typedef		u16    uchar16;
+	typedef		u32    uchar32;
 
 	#pragma pack(push, 1)
 	struct ustr8	// UTF-8 string
 	{
-		uchar() : c(0) {}
-		uchar(u8 _c) : c(_c) {}
+		ustr8() : c(0) {}
+		ustr8(u8 _c) : c(_c) {}
 		uchar8 c;
 	};
 	#pragma pack(pop)
@@ -2206,22 +2206,22 @@ namespace xcore
 	#pragma pack(push, 2)
 	struct ustr16	// UTF-16 string
 	{
-		uchar() : c(0) {}
-		uchar(u16 _c) : c(_c) {}
+		ustr16() : c(0) {}
+		ustr16(u16 _c) : c(_c) {}
 		uchar16 c;
 	};
 	#pragma pack(pop)
 
 	struct ustr32	// UTF-32 string
 	{
-		uchar() : c(0) {}
-		uchar(u32 _c) : c(_c) {}
+		ustr32() : c(0) {}
+		ustr32(u32 _c) : c(_c) {}
 		uchar32 c;
 	};
 
 	// Default UTF char and string is UTF-32
-	typedef uchar		uchar32;
-	typedef ustr		ustr32;
+	typedef uchar32		uchar;
+	typedef ustr32		ustr;
 
 	//==============================================================================
 

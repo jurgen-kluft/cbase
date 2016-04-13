@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="DevDebugStatic|Win32">
-      <Configuration>DevDebugStatic</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="DevReleaseStatic|Win32">
-      <Configuration>DevReleaseStatic</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="DevDebugStatic|x64">
       <Configuration>DevDebugStatic</Configuration>
       <Platform>x64</Platform>
@@ -17,11 +9,19 @@
       <Configuration>DevReleaseStatic</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="DevReleaseStatic|Win32">
+      <Configuration>DevReleaseStatic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevDebugStatic|Win32">
+      <Configuration>DevDebugStatic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
-  <PropertyGroup Condition="'$(Platform)'=='Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Platform)'=='x64'" Label="Configuration">
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)'=='x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Platform)'=='Win32'" Label="Configuration">
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
@@ -31,6 +31,18 @@
   </PropertyGroup>
   <ImportGroup Label="TargetDirs" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|x64'" Label="Configuration">
+    <ConfigurationType>$(PackageType)</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CLRSupport>false</CLRSupport>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|x64'" Label="Configuration">
+    <ConfigurationType>$(PackageType)</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CLRSupport>false</CLRSupport>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|Win32'" Label="Configuration">
     <ConfigurationType>$(PackageType)</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -43,33 +55,13 @@
     <CLRSupport>false</CLRSupport>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|x64'" Label="Configuration">
-    <ConfigurationType>$(PackageType)</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <CLRSupport>false</CLRSupport>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|x64'" Label="Configuration">
-    <ConfigurationType>$(PackageType)</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <CLRSupport>false</CLRSupport>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Condition="'$(Platform)'=='Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Platform)'=='x64'" Label="PropertySheets">
     <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
-  <PropertyGroup Condition="'$(Platform)'=='Win32'">
-    <LinkIncremental>true</LinkIncremental>
-    <OutDir>target\xbase\bin\$(Configuration)_$(Platform)_$(PlatformToolset)\</OutDir>
-    <IntDir>target\xbase\obj\$(Configuration)_$(Platform)_$(PlatformToolset)\</IntDir>
-    <TargetName>xbase_$(PackageSignature)</TargetName>
-    <ExtensionsToDeleteOnClean>*.obj%3b*.d%3b*.map%3b*.lst%3b*.pch%3b$(TargetPath)</ExtensionsToDeleteOnClean>
-    <GenerateManifest>false</GenerateManifest>
-  </PropertyGroup>
+  <ImportGroup Condition="'$(Platform)'=='Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+  </ImportGroup>
   <PropertyGroup Condition="'$(Platform)'=='x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>target\xbase\bin\$(Configuration)_$(Platform)_$(PlatformToolset)\</OutDir>
@@ -78,42 +70,14 @@
     <ExtensionsToDeleteOnClean>*.obj%3b*.d%3b*.map%3b*.lst%3b*.pch%3b$(TargetPath)</ExtensionsToDeleteOnClean>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>source\main\include;vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <ExceptionHandling>false</ExceptionHandling>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xunittest_$(PackageSignature).lib;%(AdditionalLibraryFiles);</AdditionalDependencies>
-      <AdditionalLibraryDirectories>target\xbase\bin\$(PackageSignature);vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-    </Link>
-    <Lib>
-      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
-    </Lib>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>source\main\include;vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Full</Optimization>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <ExceptionHandling>false</ExceptionHandling>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>xunittest_$(PackageSignature).lib;%(AdditionalLibraryFiles);</AdditionalDependencies>
-      <AdditionalLibraryDirectories>target\xbase\bin\$(PackageSignature);vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-    </Link>
-    <Lib>
-      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
-    </Lib>
-  </ItemDefinitionGroup>
+  <PropertyGroup Condition="'$(Platform)'=='Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>target\xbase\bin\$(Configuration)_$(Platform)_$(PlatformToolset)\</OutDir>
+    <IntDir>target\xbase\obj\$(Configuration)_$(Platform)_$(PlatformToolset)\</IntDir>
+    <TargetName>xbase_$(PackageSignature)</TargetName>
+    <ExtensionsToDeleteOnClean>*.obj%3b*.d%3b*.map%3b*.lst%3b*.pch%3b$(TargetPath)</ExtensionsToDeleteOnClean>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|x64'">
     <ClCompile>
       <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_64BIT;TARGET_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
@@ -135,6 +99,42 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|x64'">
     <ClCompile>
       <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_64BIT;TARGET_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>source\main\include;vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>xunittest_$(PackageSignature).lib;%(AdditionalLibraryFiles);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>target\xbase\bin\$(PackageSignature);vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>source\main\include;vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>xunittest_$(PackageSignature).lib;%(AdditionalLibraryFiles);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>target\xbase\bin\$(PackageSignature);vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>source\main\include;vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>

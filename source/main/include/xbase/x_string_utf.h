@@ -39,6 +39,8 @@ namespace xcore
 		bool		iscrln		(ustr32 const* ustr);
 	}	// UTF
 
+	typedef uchar(*transform_functor)(s32 i, uchar32* begin, uchar32* end);
+
 	// String class, acts as a slice/view with a behaviour of explicit copy (not copy-on-write)
 	class xstring
 	{
@@ -47,42 +49,80 @@ namespace xcore
 						xstring(x_iallocator*);
 						xstring(xstring& copy);
 
+		inline s32		len() const												{ return mSlice.len(); }
 
-		s32				len() const;
+		// Return a copy of this string
+		xstring			copy() const;
 
 		// Return a slice/view of this string
 		xstring			operator()(s32 from, s32 to)							{ return view(from, to); }
+
+		struct puchar
+		{
+			inline		operator uchar() const		{ if (mPtr != NULL) return *mPtr; else return uchar(0); }
+			void		operator = (uchar c)		{ if (mPtr != NULL) *mPtr = c; }
+
+		protected:
+			friend class xstring;
+			inline		puchar(uchar* ptr) : mPtr(ptr) {}
+			uchar*		mPtr;
+		};
+
+		puchar			operator[](s32);
 		uchar			operator[](s32) const;
 
-		struct cursor { s32 p; uchar c; };
+		xstring&		operator=(uchar32);
+		xstring&		operator=(char const*);
+		xstring&		operator=(ustr8 const*);
+		xstring&		operator=(ustr16 const*);
+		xstring&		operator=(ustr32 const*);
+		xstring&		operator=(xstring &);
 
-		xstring&		operator=(const char* ascii);
-		xstring&		operator=(xstring& other);
-		xstring&		operator=(cursor c);
+		xstring			operator+ (char const* other);
+		xstring&		operator+=(char const* other);
+		xstring			operator+ (ustr8 const* other);
+		xstring&		operator+=(ustr8 const* other);
+		xstring			operator+ (xstring const& other);
+		xstring&		operator+=(xstring const& other);
 
 		void 			writeto(xwriter*) const;
 
-		xstring			create(s32 len) const;
-		xstring			copy() const;
-
 		s32				explode(int n, xstring*& parts) const;
 
-		s32				find(uchar c) const;
-		s32				find(xstring const& c) const;
-		s32				findr(uchar c) const;
-		s32				findr(xstring const& c) const;
+		enum eflags
+		{
+			CASE   = 0,
+			NOCASE = 1,
+			SELECT = 2,
+			LEFT   = 3,
+			RIGHT  = 4,
+		};
 
-		s32				findi(uchar c) const;
-		s32				findi(xstring const& c) const;
-		s32				findir(uchar c) const;
-		s32				findir(xstring const& c) const;
+		xstring			find (uchar c, s32 flags = NOCASE) const;
+		xstring			find (char const* str, s32 flags = NOCASE) const;
+		xstring			find (ustr8 const* str, s32 flags = NOCASE) const;
+		xstring			find (xstring const& c, s32 flags = NOCASE) const;
+
+		xstring			findr(uchar c, s32 flags = NOCASE) const;
+		xstring			findr(char const* str, s32 flags = NOCASE) const;
+		xstring			findr(ustr8 const* str, s32 flags = NOCASE) const;
+		xstring			findr(xstring const& c, s32 flags = NOCASE) const;
+
+		xstring			left_of(xstring const&) const;
+		xstring			right_of(xstring const&) const;
+
+		xstring&		tolower();
+		xstring&		toupper();
+		xstring&		tocamel();
 
 		struct data;
 		explicit		xstring(data*);
 
 	protected:
-
 		xstring			view(s32 from, s32 to);
+
+		uchar32*		str_ptr();
+		uchar32 const*	str_ptr() const;
 
 		slice			mSlice;
 	};
