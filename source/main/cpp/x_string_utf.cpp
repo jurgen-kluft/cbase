@@ -11,7 +11,7 @@ namespace xcore
 	namespace UTF
 	{
 		static u8 sUTF8LC[] = { 0, 0, 0xc0, 0xe0, 0xf0 };
-		static s32 uchar32to8(uchar32 rune, ustr8* dest)
+		s32 uchar32to8(uchar32 rune, ustr8* dest)
 		{
 			s32 len = 0;
 			if (rune <= 0x7f) { len = 1; }
@@ -30,13 +30,15 @@ namespace xcore
             };
 			res[0] = rune | sUTF8LC[len];
 
-            for (s32 i = 0; i < len; ++i) {
-                *dest++ = res[i];
-            }
+			if (dest != NULL) {
+				for (s32 i = 0; i < len; ++i) {
+					*dest++ = res[i];
+				}
+			}
 			return len;
 		}
 
-		static s32 uchar32to16(uchar32 rune, ustr16* dest)
+		s32 uchar32to16(uchar32 rune, ustr16* dest)
 		{
 			s32 len = 0;
 			if (rune < 0xd800) { len = 1; }
@@ -45,9 +47,11 @@ namespace xcore
             else if (rune < 0x110000) { len = 2; }
 
 			if (len == 1) {
-                *dest = rune;
-                ++dest;
-            } else {
+				if (dest != NULL) {
+					*dest = rune;
+					++dest;
+				}
+            } else if (dest != NULL) {
 				// 20-bit intermediate value
 	            u32 const iv = rune - 0x10000;
 	            dest[0] = static_cast<uchar16>((iv >> 10) + 0xd800);
@@ -133,6 +137,18 @@ namespace xcore
 				to += l;
 				from += 1;
 				len += l;
+			}
+			return len;
+		}
+
+		s32			len(ustr8 const* str)
+		{
+			uchar c;
+			s32 len = 0;
+			while (!iseos(str)) {
+				s32 l = readu8(str, c);
+				len += l;
+				str += l;
 			}
 			return len;
 		}

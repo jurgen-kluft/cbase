@@ -39,10 +39,18 @@ namespace xcore
 
 		s32 write8(const ustr8* str, s32 len)
 		{
-			ustr16 wide_string[1024];
-			ustr16* dst = (ustr16*)wide_string;
-			utf::convert(str, str+len, dst, (dst + 1024));
-			::OutputDebugStringW((LPCWSTR)wide_string);
+			ustr16 str16[1024];
+			ustr16* dst16 = (ustr16*)str16;
+			ustr16* end16 = dst16 + sizeof(str16);
+			while (!UTF::iseos(str) && dst16 < end16) {
+				uchar32 c;
+				UTF::readu8(str, c);
+				s32 l = UTF::uchar32to16(c, dst16);
+				dst16 += l;
+			}
+			str16[sizeof(str16) - 1] = 0;
+
+			::OutputDebugStringW((LPCWSTR)str16);
 			::fputws((const wchar_t*)str, stdout);
 			return len;
 		}

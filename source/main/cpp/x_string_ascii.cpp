@@ -32,16 +32,13 @@ namespace xcore
  */
 namespace xcore
 {
-	namespace ascii
-	{
-
 	/** 
 	 *==============================================================================
 	 *==============================================================================
-	 * ANSI functions
+	 * ASCII/UTF-8 functions
 	 *==============================================================================
 	 *==============================================================================
-	 *==============================================================================
+
 	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
@@ -60,32 +57,30 @@ namespace xcore
 	 *      atod32 atoi32 atoi64 atof32 atof64
 	 *------------------------------------------------------------------------------
 	 */
-	s64 atod64(pcrune str, s32 base)
+	s64 StrToS64(pcrune str, s32 base)
 	{
 		ASSERT(str != NULL);
 		ASSERT(base > 2);
 		ASSERT(base <= (26 + 26 + 10));
 
 		// Skip whitespace.
-		for (; *str == ' '; ++str)
-			; // empty body
+		while (Peek(str) == ' ') {
+			ReadChar(str);
+		}
 
-		rune c;         // Current character.
-		c = *str++;		// Save sign indication.
-
-		rune sign;        // If '-', then negative, otherwise positive.
-		sign = c;
+		uchar32 c;			// Current character.
+		c = Peek(str);		// Save sign indication.
+		uchar32 sign = c;	// If '-', then negative, otherwise positive.
 
 		// Skip sign.
-		if ((c == '-') || (c == '+'))
-		{
-			c = *str++;
+		if ((c == '-') || (c == '+')) {
+			c = ReadChar(str);
 		}
 
 		s64  total = 0;   // Current total.
 		s32  validBase;
 		// Decode the rest of the string
-		for (;;c = *str++)
+		for (;;c = ReadChar(str))
 		{
 			if ((c >= '0') && (c <= '9'))  
 			{
@@ -127,9 +122,9 @@ namespace xcore
 	}
 
 	// <COMBINE atod64 >
-	s32 atod32(pcrune str, s32 base)
+	s32 StrToS32(pcrune str, s32 base)
 	{
-		return (s32)atod64(str, base);
+		return (s32)StrToS64(str, base);
 	}
 
 	/**
@@ -157,7 +152,7 @@ namespace xcore
 	 *      for hex numbers.
 	 *------------------------------------------------------------------------------
 	 */
-	s32 d64toa(u64 val, prune buff, s32 str_buffer_size, s32 base, bool hasNegative)
+	s32 U64ToStr(u64 val, prune buff, s32 str_buffer_size, s32 base, bool hasNegative)
 	{
 		ASSERT(buff);
 		ASSERT(base > 2);
@@ -248,47 +243,47 @@ namespace xcore
 	 *     atod64 atod32 atoi32 atoi64 atof32 atof64
 	 *------------------------------------------------------------------------------
 	 */
-	s32 d32toa(s32 val, prune str, s32 str_buffer_size, s32 base)
+	s32 S32ToStr(s32 val, prune str, s32 str_buffer_size, s32 base)
 	{
 		if (val < 0)
 		{
-			return d64toa(u64(u32(-val)), str, str_buffer_size, base, xTRUE);
+			return U64ToStr(u64(u32(-val)), str, str_buffer_size, base, xTRUE);
 		}
 		else
 		{
-			return d64toa(u64(val), str, str_buffer_size, base, xFALSE);
+			return U64ToStr(u64(val), str, str_buffer_size, base, xFALSE);
 		}
 	}
 
 	// <COMBINE dtoa >
-	s32 d32toa(u32 val, prune str, s32 str_buffer_size, s32 base)
+	s32 U32ToStr(u32 val, prune str, s32 str_buffer_size, s32 base)
 	{
-		return d64toa(u64(val), str, str_buffer_size, base, xFALSE);
+		return U64ToStr(u64(val), str, str_buffer_size, base, xFALSE);
 	}
 
 	// <COMBINE dtoa >
-	s32 d64toa(s64 val, prune str, s32 str_buffer_size, s32 base)
+	s32 S64ToStr(s64 val, prune str, s32 str_buffer_size, s32 base)
 	{
 		if (val < 0)
 		{
-			return  d64toa(u64(-val), str, str_buffer_size, base, xTRUE);
+			return U64ToStr(u64(-val), str, str_buffer_size, base, xTRUE);
 		}
 		else
 		{
-			return  d64toa(u64(val), str, str_buffer_size, base, xFALSE);
+			return U64ToStr(u64(val), str, str_buffer_size, base, xFALSE);
 		}
 	}
 
 	// <COMBINE dtoa >
-	s32 d64toa(u64 val, prune str, s32 str_buffer_size, s32 base)
+	s32 U64ToStr(u64 val, prune str, s32 str_buffer_size, s32 base)
 	{
-		return d64toa(u64(val), str, str_buffer_size, base, xFALSE);
+		return U64ToStr(u64(val), str, str_buffer_size, base, xFALSE);
 	}
 
 
 	#define F32TOA_PSH(X)				(*(dest++)=(X))
 
-	s32			f32toa(f32 val, s32 prec, prune str, s32 str_buffer_size, xbool positive_sign, rune format)
+	s32	F32ToStr(f32 val, s32 prec, prune str, s32 str_buffer_size, xbool positive_sign, rune format)
 	{
 		/* converts a floating point number to an ascii string */
 		/* x is stored into str, which should be at least 30 chars long */
@@ -387,21 +382,138 @@ namespace xcore
 		*str = '\0';
 		return (s32)(str - start);
 	}
-	s32			f32toa(f32 val, s32 prec, prune str, s32 str_buffer_size)
+
+	//------------------------------------------------------------------------------
+
+	s32	F32ToStr(f32 val, s32 prec, prune str, s32 str_buffer_size)
 	{
-		return f32toa(val, prec, str, str_buffer_size, true, 'f');
+		return F32ToStr(val, prec, str, str_buffer_size, true, 'f');
 	}
 
+	//------------------------------------------------------------------------------
 
-	s32			f64toa(f64 val, s32 numFractionalDigits, prune str, s32 str_buffer_size)
+	s32	F64ToStr(f64 val, s32 numFractionalDigits, prune str, s32 str_buffer_size)
 	{
 		rune format[8];
-		Sprintf(format, sizeof(format)-1, "%%.%df", x_va(numFractionalDigits));
-		s32 len = Sprintf(str, str_buffer_size-1, format, x_va(val));
+		SPrintf(format, sizeof(format)-1, "%%.%df", x_va(numFractionalDigits));
+		s32 len = SPrintf(str, str_buffer_size-1, format, x_va(val));
 		return len;
 	}
 
 	//------------------------------------------------------------------------------
+	uchar32			Peek(pcrune str, s32* len = NULL)
+	{
+		uchar8 c = *str;
+		if ((c & 0x80) == 0x00) {
+			if (len != NULL)
+				*len = 1;
+			return (uchar32)c;
+		}
+
+		s32 l = 0;
+		if ((c & 0xe0) == 0xc0) { l = 2; }
+		else if ((c & 0xf0) == 0xe0) { l = 3; }
+		else if ((c & 0xf8) == 0xf0) { l = 4; }
+
+		uchar32 c32 = 0;
+		for (s32 i = 0; i<l; i++) {
+			c = str[i];
+			c32 = c32 << 8;
+			c32 = c32 | c;
+		}
+		if (len != NULL)
+			*len = l;
+		return c32;
+	}
+
+	//------------------------------------------------------------------------------
+
+	uchar32			ReadChar(prune& str)
+	{
+		s32 l = 0;
+		uchar32 c = Peek(str, &l);
+		str += l;
+		return c;
+	}
+
+	//------------------------------------------------------------------------------
+
+	uchar32			ReadChar(pcrune& str)
+	{
+		s32 l = 0;
+		uchar32 c = Peek(str, &l);
+		str += l;
+		return c;
+	}
+
+	//------------------------------------------------------------------------------
+
+	s32				StrLen(pcrune str, pcrune* end)
+	{
+		ASSERT(str != NULL);
+		s32 len = 0;
+		while (true) {
+			uchar32 c = ReadChar(str);
+			if (c == 0)
+				break;
+			len++;
+		}
+		if (end != NULL)
+			*end = str;
+		return len;
+	}
+
+	//------------------------------------------------------------------------------
+
+	s32				LenInBytes(uchar32 c)
+	{
+		s32 len = 0;
+		if (c <= 0x7f) { len = 1; }
+		else if (c < 0x0800) { len = 2; }
+		else if (c < 0xd800) { len = 3; }
+		else if (c < 0xe000) { len = 0; }
+		else if (c < 0x010000) { len = 3; }
+		else if (c < 0x110000) { len = 4; }
+		return len;
+	}
+
+	//------------------------------------------------------------------------------
+
+	static u8		sUTF8LC[] = { 0, 0, 0xc0, 0xe0, 0xf0 };
+	s32				WriteChar(uchar32 c, prune& str, pcrune end)
+	{
+		s32 len = 0;
+		if (c <= 0x7f) { len = 1; }
+		else if (c < 0x0800) { len = 2; }
+		else if (c < 0xd800) { len = 3; }
+		else if (c < 0xe000) { len = 0; }
+		else if (c < 0x010000) { len = 3; }
+		else if (c < 0x110000) { len = 4; }
+
+		if ((str + len) > end)
+			return 0;
+
+		if (len == 1) {
+			*str++ = c;
+			return 1;
+		}
+
+		uchar8 res[4];
+		switch (len) {
+		case 4: res[3] = (c & 0x3f) | 0x80; c = c >> 6;
+		case 3: res[2] = (c & 0x3f) | 0x80; c = c >> 6;
+		case 2: res[1] = (c & 0x3f) | 0x80; c = c >> 6;
+		default: len = 0;
+		};
+		res[0] = c | sUTF8LC[len];
+
+		if (str != NULL) {
+			for (s32 i = 0; i < len; ++i) {
+				*str++ = res[i];
+			}
+		}
+		return len;
+	}
 
 	/**
 	 *------------------------------------------------------------------------------
@@ -417,127 +529,107 @@ namespace xcore
 	 *        pointer to the destination string
 	 *------------------------------------------------------------------------------
 	 */
-	prune Copy(prune dest, s32 dest_buffer_size, pcrune src)
+	prune StrCopy(prune dest, pcrune dest_end, pcrune src)
 	{
-		ASSERT(dest);
-		ASSERT(src != NULL);
-		ASSERT(dest_buffer_size >= 0);
-
-		if (dest_buffer_size == 0)
-			return dest;
+		ASSERT(dest!=NULL && dest_end!=NULL);
+		ASSERT(src!=NULL);
 
 		prune start = dest;
-		while (true)
+		prune end = dest;
+		while (start < end)
 		{
-			if (dest_buffer_size==1 || *src=='\0')
-			{
-				*dest = '\0';
-				break;
-			}
-			--dest_buffer_size;
-			*dest++ = *src++;
+			uchar32 c = ReadChar(src);
+			WriteChar(c, start, dest_end);
 		}
 		return start;
 	}
 
 	//------------------------------------------------------------------------------
 
-	s32 Len(pcrune str)
+	s32 StrCmp(pcrune str1, pcrune str2)
 	{
-		ASSERT(str != NULL);
-		const rune *end = str;
-
-		while (*end++) 
-		{
-			//Empty
-		}
-		return (s32)(end - str - 1);
-	}
-	
-	//------------------------------------------------------------------------------
-
-	s32 Cmp(pcrune str1, pcrune str2)
-	{
-		s32 result = 0;
-
 		ASSERT(str1);
 		ASSERT(str2);
 
-		if (str1 == str2) return 0;
-
-		while (!((result = ((s32)*str1) - ((s32)*str2)) != 0) && *str1)
-			++str1, ++str2;
-
-		if (result==0)		return 0;
-		else if (result<0)	return -1;
-		else				return 1;
-	}
-
-	//------------------------------------------------------------------------------
-
-	s32	Cmpn(const rune * cs, const rune * ct, s32 n)
-	{
-		if (n == 0) 
+		if (str1 == str2) 
 			return 0;
-
-		while (--n && (*cs == *ct))
-		{
-			if (*cs == 0) 
-				return 0;
-			++cs; ++ct;
-		}
-
-		s32 result = *cs - *ct;
-		if (result==0)		return 0;
-		else if (result<0)	return -1;
-		else				return 1;
+		do {
+			uchar32 c1 = ReadChar(str1);
+			uchar32 c2 = ReadChar(str2);
+			if (c1 == 0 || c2 == 0)
+				break;
+			if (c1 < c2)
+				return -1;
+			if (c1 > c2)
+				return 1;
+		} while (true);
+		return 0;
 	}
 
 	//------------------------------------------------------------------------------
 
-	s32 Cmpi(pcrune str1, pcrune str2)
+	s32	StrCmpn(pcrune str1, pcrune str2, s32 n)
 	{
-		s32 f, l;
-
 		ASSERT(str1);
 		ASSERT(str2);
 
-		if (str1 == str2) return 0;
+		if (n == 0 || (str1 == str2))
+			return 0;
+		do {
+			uchar32 c1 = ReadChar(str1);
+			uchar32 c2 = ReadChar(str2);
+			if (c1 == 0 || c2 == 0)
+				break;
 
+			if (c1 < c2)
+				return -1;
+			if (c1 > c2)
+				return 1;
+		} while (--n > 0);
+		return 0;
+	}
+
+	//------------------------------------------------------------------------------
+
+	s32 StrCmpi(pcrune str1, pcrune str2)
+	{
+		ASSERT(str1);
+		ASSERT(str2);
+		if (str1 == str2) 
+			return 0;
+		do {
+			uchar32 c1 = ReadChar(str1);
+			uchar32 c2 = ReadChar(str2);
+			if (c1 == 0 || c2 == 0)
+				break;
+			c1 = ToLower(c1);
+			c2 = ToLower(c2);
+			if (c1 < c2) return -1;
+			if (c1 > c2) return 1;
+		} while (true);
+		return 0;
+	}
+
+	//------------------------------------------------------------------------------
+
+	s32 StrCmpin(const rune *str1, const rune *str2, s32 n)
+	{
+		ASSERT(str1);
+		ASSERT(str2);
+		if (n == 0 || str1 == str2)
+			return 0;
 		do
 		{
-			if (((l = (s32)(*(str1++))) >= 'A') && (l <= 'Z'))
-				l -= ('A' - 'a');
-
-			if (((f = (s32)(*(str2++))) >= 'A') && (f <= 'Z'))
-				f -= ('A' - 'a');
-
-		} while (f && (f == l));
-
-		s32 result = l - f;
-		if (result==0)		return 0;
-		else if (result<0)	return -1;
-		else				return 1;
-	}
-
-	//------------------------------------------------------------------------------
-
-	s32 Cmpin(const rune *s1, const rune *s2, s32 count)
-	{
-		s32 f, l;
-
-		do 
-		{
-			if (((f = (rune)(*(s1++))) >= 'A') && (f <= 'Z'))
-				f -= 'A' - 'a';
-			if (((l = (rune)(*(s2++))) >= 'A') && (l <= 'Z'))
-				l -= 'A' - 'a';
-		} while (--count && f && (f == l));
-
-		s32 result = f - l;
-		if (result==0)		return 0;
-		else if (result<0)	return -1;
-		else				return 1;
+			uchar32 c1 = ReadChar(str1);
+			uchar32 c2 = ReadChar(str2);
+			if (c1 == 0 || c2 == 0)
+				break;
+			c1 = ToLower(c1);
+			c2 = ToLower(c2);
+			if (c1 < c2) return -1;
+			if (c1 > c2) return 1;
+		} while (--n > 0);
+		return 0;
 	}
 
 	/**
@@ -545,38 +637,36 @@ namespace xcore
 	 * Author:
 	 *     Virtuos Games
 	 * Summary:
-	 *     strscn    - scan the string for certain parttern
+	 *     strscn    - scan the string for certain pattern
 	 * Arguments:
-	 *        parttern - the parttern need to be scanned
+	 *        parttern - the pattern need to be scanned
 	 *        str      - source string        
 	 * Returns:
-	 *        pointer to the parttern of the source string
+	 *        pointer to the pattern of the source string
 	 *------------------------------------------------------------------------------
 	 */
-	pcrune Str(pcrune mainStr, pcrune subStr)
+	pcrune StrStr(pcrune mainStr, pcrune subStr)
 	{
-		prune mainString = (prune)mainStr;
-		prune str1; 
-		prune str2;
-
 		if (!*subStr)
 			return((prune)mainStr);
 
-		while (*mainString)
+		while (true)
 		{
-			str1 = mainString;
-			str2 = (prune)subStr;
+			pcrune str1 = mainStr;
+			pcrune str2 = subStr;
 
-			while (*str1 && *str2 && !(*str1 - *str2))
+			while (true)
 			{
-				str1++;
-				str2++;
+				uchar32 c1 = ReadChar(str1);
+				uchar32 c2 = ReadChar(str2);
+				if (c2 == 0)
+					return mainStr;
+				if (c1 != c2)
+					break;
 			}
-
-			if (!*str2)
-				return(mainString);
-
-			mainString++;
+			uchar32 c = ReadChar(mainStr);
+			if (c == 0)
+				break;
 		}
 
 		return NULL;
@@ -584,58 +674,20 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	pcrune		Chr(pcrune mainStr, rune c)
+	pcrune		StrChr(pcrune mainStr, uchar32 c)
 	{
-		prune mainString = (prune)mainStr;
-
-		while (*mainString)
+		while (true)
 		{
-			if (*mainString == c)
-				return(mainString);
-			++mainString;
+			pcrune str = mainStr;
+			uchar32 ch = ReadChar(mainStr);
+			if (ch == 0)
+				break;
+			if (ch == c)
+				return(str);
 		}
 		return NULL;
 	}
 
-	//------------------------------------------------------------------------------
-
-	pcrune		ChrR(pcrune mainStr, rune c)
-	{
-		prune mainString = (prune)mainStr;
-
-		s32 i = Len(mainString);
-		while (--i >= 0)
-		{
-			if (mainString[i] == c)
-				return(&mainString[i]);
-		}
-		return NULL;
-	}
-
-	//------------------------------------------------------------------------------
-
-	pcrune        Scn(pcrune str, pcrune parttern)
-	{
-		const rune *scan;
-
-		while (*str != 0)
-		{
-			scan = parttern;
-			while (*scan != 0)
-			{
-				if (*str == *scan)
-				{
-					return str;
-				}
-				else
-				{
-					scan++;
-				}
-			}
-			str++;
-		}
-		return NULL;
-	}
 
 	/**
 	 *------------------------------------------------------------------------------
@@ -714,86 +766,89 @@ namespace xcore
 	 *     sprintf
 	 *------------------------------------------------------------------------------
 	 */
-	s32 atoi32(pcrune str)
+	s32 StrToS32(pcrune str)
 	{
 		pcrune end;
-		return atoi32(str, &end, 10);
+		return StrToS32(str, &end, 10);
 	}
 
 	//------------------------------------------------------------------------------
-	s32 atoi32(pcrune str, pcrune* scanEnd, s32 base)
+	s32 StrToS32(pcrune str, pcrune* scanEnd, s32 base)
 	{
-		const rune *p = (const rune *)str;
+		pcrune p = str;
 		u32 res = 0;
 		s32 negative = 0;
 
 		// skip initial white spaces
-		while (*p != '\0' && *p <= ' ')
-			++p;
+		pcrune p1 = p;
+		uchar32 c1 = 0;
+		while (true)
+		{
+			c1 = ReadChar(p1);
+			if (c1 == 0 || c1 == ' ') break;
+		}
 
-		if (p[0] == '\0')
+		if (c1 == '\0')
 		{
 			if (scanEnd)
-				*scanEnd = (const rune *)p;
+				*scanEnd = p;
 			return 0;
 		}
 
 		// check sign
-		if ((p[0] == '+') || (p[0] == '-'))
+		if ((c1 == '+') || (c1 == '-'))
 		{
-			negative = p[0] == '-' ? 1 : 0;
-			++p;
+			negative = c1 == '-' ? 1 : 0;
+			p = p1;
 		}
 
 		// figure out base if not given
+		pcrune p2 = p;
+		uchar32 c2 = ReadChar(p2);
 		if (base == 0)
 		{
-			if (p[0] != '0')
+			if (c1 != '0')
 			{
 				base = 10;
 			} 
 			else
 			{
-				if ((p[1] == 'x') || (p[1] == 'X'))
+				if ((c2 == 'x') || (c2 == 'X'))
 				{
 					base = 16;
-					p += 2;
+					p = p2;
 				}
 				else
 				{
 					base = 8;
-					++p;
+					p = p1;
 				}
 			}
 		}
 		else
 		{
 			// 0x/0X is allowed for hex even when base is given
-			if ((base == 16) && (p[0] == '0'))
+			if ((base == 16) && (c1 == '0'))
 			{
-				if ((p[1] == 'x') || (p[1] == 'X'))
+				if ((c2 == 'x') || (c2 == 'X'))
 				{
-					p += 2;
+					p = p2;
 				}
 			}
 		}
 
-		for (; p[0]; ++p)
+		while (true)
 		{
-			u32 val = p[0];
+			uchar32 val = ReadChar(p);
 
 			if (val >= 'a')
 				val -= 'a' - 'A';
 
-			if (val >= 'A')
-			{
+			if (val >= 'A'){
 				val = val - 'A' + 10;
-			} 
-			else 
-			{
+			} else {
 				if (val < '0' || val > '9') 
 					break;
-
 				val = val - '0';
 			}
 
@@ -811,14 +866,14 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 	/// <COMBINE atoi32 >
-	s64 atoi64(pcrune str)
+	s64 StrToS64(pcrune str)
 	{
 		pcrune end;
-		return atoi64(str, 10, &end);
+		return StrToS64(str, 10, &end);
 	}
 
 	//------------------------------------------------------------------------------
-	s64 atoi64(pcrune str, s32 base, pcrune* scanEnd)
+	s64 StrToS64(pcrune str, s32 base, pcrune* scanEnd)
 	{
 		// Evaluate sign
 		s32 sign = 1;
@@ -867,9 +922,9 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	bool IsNumber(rune c, s32 base)
+	bool IsNumber(uchar32 c, s32 base)
 	{
-		const rune max10 = (rune)((base > 9) ? '9' : ('0' + base - 1));
+		const uchar32 max10 = (uchar32)((base > 9) ? '9' : ('0' + base - 1));
 
 		if (c >= '0' && c <= max10)
 			return xTRUE;
@@ -877,9 +932,9 @@ namespace xcore
 		if (base < 11)
 			return xFALSE;
 
-		const rune max = (rune)('A' + (base - 11));
+		const uchar32 max = (uchar32)('A' + (base - 11));
 
-		c = (rune)ToUpper(c);
+		c = ToUpper(c);
 		return (c >= 'A' && c <= max);
 	}
 
@@ -924,7 +979,7 @@ namespace xcore
 			s32 l;
 			for (l = 0; (str[i] != floatStr[l]) && floatStr[l]; l++);
 
-			// Okay this is not longer a number
+			// Okay this is not a number
 			if (floatStr[l] == 0) return xFALSE;
 		}
 
@@ -935,14 +990,13 @@ namespace xcore
 
 	bool IsHex(pcrune str)
 	{
-		for (s32 i = 0; str[i]; i++)
+		for (s32 i = 0; str[i] != 0; i++)
 		{
 			if (str[i] >= '0' && str[i] <= '9') continue;
 			if (str[i] >= 'A' && str[i] <= 'F') continue;
 			if (str[i] >= 'a' && str[i] <= 'f') continue;
 			return xFALSE;
 		}
-
 		return xTRUE;
 	}
 
@@ -1001,31 +1055,36 @@ namespace xcore
 	
 	//------------------------------------------------------------------------------
 
-	prune Cat(prune front, s32 maxChars, pcrune back)
+	prune StrCat(prune front, pcrune end, pcrune back)
 	{
 		ASSERT(front != NULL);
+		ASSERT(end != NULL);
 		ASSERT(back != NULL);
 
-		prune p = front;
-		while (*p) 
+		prune wptr = front;
+		s32 l = 0;
+		pcrune rptr = wptr;
+		while (*rptr !=0)
 		{
-			p++;
+			ReadChar(rptr);
+			++l;
 		}
-		ASSERT(maxChars > (s32)(p - front));
+		wptr += (rptr - wptr);
 
-		while ((*p++ = *back++) != 0)
+		while (wptr < end)
 		{
-			ASSERT(maxChars > (s32)(p - front));
+			uchar32 c = ReadChar(back);
+			if (c == 0)
+				break;
+			if (WriteChar(c, wptr, end) == 0)
+				break;
 		}
-
-		ASSERT(maxChars >= (s32)(p - front));
-
 		return front;
 	}
 
 
 	//------------------------------------------------------------------------------
-	f32  atof32(const rune *s, const rune **scan_end)
+	f32  StrToF32(const rune *s, const rune **scan_end)
 	{
 		// Evaluate sign 
 		s32 sign = 1;
@@ -1111,7 +1170,7 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	f64	 atof64(const rune *s, const rune **scan_end)
+	f64	 StrToF64(const rune *s, const rune **scan_end)
 	{
 		// Evaluate sign 
 		s32 sign = 1;
@@ -1201,15 +1260,19 @@ namespace xcore
 	prune ToUpper(prune str)
 	{
 		ASSERT(str != NULL);
-
 		prune p = str;
-		while (*p != '\0')
+		while (true)
 		{
-			if ((*p >= 'a') && (*p <= 'z'))
-				*p += ('A' - 'a');
-			p++;
+			uchar32 c = Peek(p);
+			if (c == 0)
+				break;
+			if ((c >= 'a') && (c <= 'z')) {
+				c += ('A' - 'a');
+				WriteChar(c, p, p + 4);
+			} else {
+				ReadChar(p);
+			}
 		}
-
 		return str;
 	}
 
@@ -1220,15 +1283,19 @@ namespace xcore
 	prune ToLower(prune str)
 	{
 		ASSERT(str != NULL);
-
 		prune p = str;
-		while (*p != '\0')
+		while (true)
 		{
-			if ((*p >= 'A') && (*p <= 'Z'))
-				*p += ('a' - 'A');
-			p++;
+			uchar32 c = Peek(p);
+			if (c == 0)
+				break;
+			if ((c >= 'A') && (c <= 'Z')) {
+				c = 'a' + (c - 'A');
+				WriteChar(c, p, p + 4);
+			} else {
+				ReadChar(p);
+			}
 		}
-
 		return str;
 	}
 
@@ -1256,18 +1323,18 @@ namespace xcore
 	 */
 	u32 Hash32(pcrune str, u32 range, u32 val)
 	{
-		const u8* s = (const u8*)str;    // unsigned string 
-
 		//
 		// FNV-1 hash each octet in the buffer
 		//
-		while (*s) 
+		while (true)
 		{
+			uchar32 c = ReadChar(str);
+
 			//.. multiply by the 32 bit FNV magic prime mod 2^32 
 			val *= 0x01000193;
 
 			// xor the bottom with the current octet 
-			val ^= (s32)*s++;
+			val ^= c;
 		}
 
 		// Do we need to compute a different range?
@@ -1301,25 +1368,24 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	bool		StartsWith			(pcrune inStr, rune inStartChar)
+	bool		StartsWith			(pcrune inStr, uchar32 inStartChar)
 	{
-		return inStr[0] == inStartChar;
+		uchar32 c = ReadChar(inStr);
+		return c == inStartChar;
 	}
 
 	bool		StartsWith			(pcrune inStr, pcrune inStartStr)
 	{
 		// Match from begin of string
-		for (s32 i=0; xTRUE; i++)
-		{
-			const rune c1 = inStartStr[i];
+		while(true) {
+			uchar32 c1 = ReadChar(inStartStr);
 			if (c1 == '\0')
 				break;
-			const rune c2 = inStr[i];
+			uchar32 c2 = ReadChar(inStr);
 			if (c1 != c2)
 				return xFALSE;
 		}
-
-		// If matched all the way to the end of inStartStr[i] then success
+		// If matched all the way to the end of inStartStr then success
 		return xTRUE;
 	}
 
@@ -1331,29 +1397,27 @@ namespace xcore
 		s32 minimumLen = x_intu::min(inLen, inStartLen==-1 ? inLen : inStartLen);
 		for (s32 i=0; i<minimumLen; i++)
 		{
-			const rune c1 = inStartStr[i];
+			uchar32 c1 = ReadChar(inStartStr);
 			if (c1 == '\0')
 				return i>0;
-			const rune c2 = inStr[i];
+			uchar32 c2 = ReadChar(inStr);
 			if (c1 != c2)
 				return xFALSE;
 		}
-
 		// If matched all the way to the end of inStartStr[i] then success
 		return xTRUE;
 	}
 
 
-	bool		EndsWith			(pcrune inStr, rune inEndChar)
+	bool		EndsWith			(pcrune inStr, uchar32 inEndChar)
 	{
 		return EndsWith(inStr, -1, inEndChar);
 	}
 
-	bool		EndsWith			(pcrune inStr, s32 inLen, rune inEndChar)
+	bool		EndsWith			(pcrune inStr, s32 inLen, uchar32 inEndChar)
 	{
-		if (inLen == -1)
-			inLen = Len(inStr);
-		return inLen>0 ? xbool(inStr[inLen-1] == inEndChar) : (xbool)xFALSE;
+		uchar32 last = LastChar(inStr, inLen);
+		return inEndChar == last;
 	}
 
 
@@ -1365,33 +1429,44 @@ namespace xcore
 	bool		EndsWith			(pcrune inStr, s32 inLen, pcrune inEndStr, s32 inEndLength)
 	{
 		// Grab string lengths
-		const s32 l0 = inLen==-1 ? Len(inStr) : inLen;
-		const s32 l1 = inEndLength==-1 ? Len(inEndStr) : inEndLength;
+		const s32 l0 = inLen==-1 ? StrLen(inStr) : inLen;
+		const s32 l1 = inEndLength==-1 ? StrLen(inEndStr) : inEndLength;
 
 		if (l0 < l1)
 			return xFALSE;
 
-		// Match from end of string
-		s32 index = l0-l1;
+		// Move to the character in @inStr where @inEndStr should start
+		for (s32 i = 0; i < (l0 - l1); ++i)
+			ReadChar(inStr);
+
 		for (s32 i=0; i<l1; i++)
 		{
-			if (inStr[index+i] != inEndStr[i])
+			uchar32 c1 = ReadChar(inStr);
+			uchar32 c2 = ReadChar(inEndStr);
+			if (c1 != c2)
 				return xFALSE;
 		}
 		return xTRUE;
 	}
 
-	rune 		FirstChar			(pcrune inStr)
+	uchar32 		FirstChar			(pcrune inStr)
 	{
 		ASSERT(inStr!=NULL);
-		return inStr[0];
+		uchar32 c = ReadChar(inStr);
+		return c;
 	}
 
-	rune 		LastChar			(pcrune inStr, s32 inLen)
+	uchar32 		LastChar			(pcrune inStr, s32 inLen)
 	{
-		ASSERT(inStr!=NULL);
-		inLen = (inLen==-1) ? Len(inStr) : inLen;
-		return inLen==0 ? '\0' : inStr[inLen-1];
+		uchar32 last = 0;
+		while (inLen != 0)
+		{
+			uchar32 c = ReadChar(inStr);
+			if (c == 0) break;
+			last = c;
+			--inLen;
+		}
+		return last;
 	}
 
 	/**
@@ -1433,17 +1508,17 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	s32  		Compare			(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen)
+	s32  		Compare_Internal	(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen, bool inIgnoreCase=false)
 	{
 		if ( inLen == 0 && inOtherLen == 0 )
 			return 0;
-
 		if ( inLen == 0 && inOtherLen != 0 )
 			return 1;
-
 		if ( inLen != 0 && inOtherLen == 0 )
 			return -1;
 
+		uchar32 c1 = 0;
+		uchar32 c2 = 0;
 		if (inLen>0 && inOtherLen>0)
 		{
 			// 1/ Compare("aaaa", "aabb", 2, 2) -> return  0;
@@ -1452,16 +1527,28 @@ namespace xcore
 			// 4/ Compare("aaaa", "aabb", 4, 2) -> return  0;
 			// 5/ Compare("aaaa", "aabb", 3, 4) -> return -1;
 			// 6/ Compare("aaaa", "aabb", 4, 3) -> return -1;
-			while ((*inStr == *inOther))
+			while (true)
 			{
-				ASSERT(*inStr != '\0');
-				ASSERT(*inOther != '\0');
+				uchar32 c1 = ReadChar(inStr);
+				uchar32 c2 = ReadChar(inOther);
+				if (c1 == 0)
+					break;
+				if (c2 == 0) {
+					c1 = 0;
+					break;
+				}
+				if (inIgnoreCase) {
+					c1 = ToLower(c1);
+					c2 = ToLower(c2);
+				}
+				if (c1 != c2)
+					break;
 				--inLen;
 				--inOtherLen;
-				if (inLen==0)	return (inOtherLen==0) ? 0 : -1;
-				if (inOtherLen==0)	return 1;
-				++inStr;
-				++inOther;
+				if (inLen==0)
+					return (inOtherLen==0) ? 0 : -1;
+				if (inOtherLen==0)
+					return 1;
 			}
 		}
 		else if (inLen>0)
@@ -1471,15 +1558,25 @@ namespace xcore
 			// 3/ Compare("aaaa", "aa"  , 3) -> return  0;
 			// 4/ Compare("aaaa", "aabb", 4) -> return -1;
 			// 5/ Compare("aaaa", "aabb", 3) -> return -1;
-
-			while ((*inStr == *inOther))
+			while (true)
 			{
-				ASSERT(*inStr != '\0');
+				uchar32 c1 = ReadChar(inStr);
+				uchar32 c2 = ReadChar(inOther);
+				if (c1 == 0)
+					break;
+				if (c2 == 0) {
+					c1 = 0;
+					break;
+				}
+				if (inIgnoreCase) {
+					c1 = ToLower(c1);
+					c2 = ToLower(c2);
+				}
 				--inLen;
-				if (*inOther=='\0')	break;
+				if (c2=='\0')	break;
 				if (inLen==0)	break;
-				++inStr;
-				++inOther;
+				if (c1 != c2)
+					break;
 			}
 		}
 		else if (inOtherLen>0)
@@ -1488,16 +1585,21 @@ namespace xcore
 			// 2/ Compare("aaaa", "aabb", -1, 3) -> return -1;
 			// 4/ Compare("aaaa", "aabb", -1, 4) -> return -1;
 			// 5/ Compare("aaaa", "aabb", -1, 3) -> return -1;
-
 			inLen = inOtherLen;
-			while ((*inStr == *inOther))
+			while (true)
 			{
-				ASSERT(*inOther != '\0');
+				uchar32 c1 = ReadChar(inStr);
+				uchar32 c2 = ReadChar(inOther);
+				if (c1 == 0)
+					break;
+				if (c2 == 0) {
+					c1 = 0;
+					break;
+				}
 				--inLen;
-				if (*inStr=='\0')	break;
 				if (inLen==0)	break;
-				++inStr;
-				++inOther;
+				if (c1 != c2)
+					break;
 			}
 		}
 		else
@@ -1509,81 +1611,34 @@ namespace xcore
 			// 5/ Compare("aaaa", "aabb") -> return -1;
 			// 6/ Compare("aabb", "aaaa") -> return  1;
 			inLen=0;
-			while ((*inStr == *inOther))
+			while (true)
 			{
-				if (*inStr=='\0')	break;
-				if (*inOther=='\0')	break;
-				++inStr;
-				++inOther;
+				uchar32 c1 = ReadChar(inStr);
+				uchar32 c2 = ReadChar(inOther);
+				if (c1 == 0)
+					break;
+				if (c2 == 0) {
+					c1 = 0;
+					break;
+				}
+				if (c1 != c2)
+					break;
 			}
 		}
 
-		s32 result = *inStr - *inOther;
-		if (result==0)		return 0;
-		else if (result<0)	return -1;
-		else				return 1;
+		if (c1==c2)		return 0;
+		else if (c1<c2)	return -1;
+		else			return 1;
+	}
+
+	s32  		Compare(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen)
+	{
+		return Compare_Internal(inStr, inLen, inOther, inOtherLen, false);
 	}
 
 	s32  		CompareNoCase		(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen)
 	{
-		if (inLen == 0 || inOtherLen == 0)
-			return 0;
-
-		if (inLen>0 && inOtherLen>0)
-		{
-			while (ToLower(*inStr) == ToLower(*inOther))
-			{
-				ASSERT(*inStr != '\0');
-				ASSERT(*inOther != '\0');
-				--inLen;
-				--inOtherLen;
-				if (inLen==0)	return (inOtherLen==0) ? 0 : -1;
-				if (inOtherLen==0)	return 1;
-				++inStr;
-				++inOther;
-			}
-		}
-		else if (inLen>0)
-		{
-			while (ToLower(*inStr) == ToLower(*inOther))
-			{
-				--inLen;
-				if (*inOther=='\0')	break;
-				if (inLen==0)	break;
-				ASSERT(*inStr != '\0');
-				++inStr;
-				++inOther;
-			}
-		}
-		else if (inOtherLen>0)
-		{
-			inLen = inOtherLen;
-			while (ToLower(*inStr) == ToLower(*inOther))
-			{
-				--inLen;
-				if (*inStr=='\0')	break;
-				if (inLen==0)	break;
-				ASSERT(*inOther != '\0');
-				++inStr;
-				++inOther;
-			}
-		}
-		else
-		{
-			inLen=0;
-			while (ToLower(*inStr) == ToLower(*inOther))
-			{
-				if (*inStr=='\0')	break;
-				if (*inOther=='\0')	break;
-				++inStr;
-				++inOther;
-			}
-		}
-
-		s32 result = ToLower(*inStr) - ToLower(*inOther);
-		if (result==0)		return 0;
-		else if (result<0)	return -1;
-		else				return 1;
+		return Compare_Internal(inStr, inLen, inOther, inOtherLen, true);
 	}
 
 	bool		Equal				(pcrune inStr, s32 inLen, pcrune inOther, s32 inOtherLen)
@@ -1597,116 +1652,66 @@ namespace xcore
 	}
 
 
-	pcrune		Find(pcrune inStr, rune inChar, s32 inLen)
+	pcrune		Find(pcrune inStr, uchar32 inChar, s32 inLen)
 	{
-		while (*inStr!='\0')
-		{
+		uchar32 c = 0;
+		do {
 			if (inLen==0)
 				break;
 			--inLen;
-			if (*inStr == inChar)
+			c = Peek(inStr);
+			if (c == inChar)
 				return inStr;
-			++inStr;
-		}
+			c = ReadChar(inStr);
+		} while (c != 0);
 		return NULL;
 	}
 
 	pcrune		Find(pcrune inStr, pcrune inFind, s32 inLen)
 	{
 		ASSERT(inStr);
+
 		// If we don't have a valid string then we didn't find anything
 		if (inStr == NULL) 
 			return NULL;
 
-		pcrune mainString = inStr;
-		while (*mainString!='\0')
-		{
+		pcrune str = inStr;
+		while (true) {
 			if (inLen==0)
 				break;
 			--inLen;
 
-			pcrune str1 = mainString;
+			pcrune str1 = str;
 			pcrune str2 = inFind;
-
-			while (*str1!='\0' && *str2!='\0' && (*str1==*str2))
-			{
-				str1++;
-				str2++;
+			while (true) {
+				uchar32 c1 = ReadChar(str1);
+				uchar32 c2 = ReadChar(str2);
+				if (c2 == 0)
+					return str;
+				if (c1 == 0)
+					return NULL;
+				if (c1 != c2)
+					break;
 			}
-
-			if (!*str2)
-				return mainString;
-
-			mainString++;
+			ReadChar(str);
 		}
 
 		return NULL;
 	}
 
-	pcrune	RFind				(pcrune inStr, rune inFind, s32 inPos, s32 inLen)
+	pcrune	FindNoCase			(pcrune inStr, uchar32 inChar, s32 inLen)
 	{
-		rune find[2];
-		find[0] = inFind;
-		find[1] = '\0';
-		return RFind(inStr, find, inPos, inLen);
-	}
-
-	pcrune	RFind				(pcrune inStr, pcrune inFind, s32 inPos, s32 inLen)
-	{
-		inLen = (inLen==-1) ? (Len(inStr)-inPos) : (inLen);
-		if (inLen<=0)
-			return NULL;
-
-		if (inPos == -1)
-			inPos = inLen-1;
-
-		if ((inPos-(inLen-1)) >= 0)
-		{
-			const s32 findLen = Len(inFind);
-			if (findLen > 0)
-			{
-				pcrune end = inStr + inPos - (inLen-1);
-				pcrune pos = inStr + inPos;
-				while (pos >= end)
-				{
-					s32 len = inLen;
-					pcrune poss = pos;
-					pcrune find = inFind + (findLen-1);
-					while (poss >= end && *poss == *find)
-					{
-						if (find == inFind)
-							return poss;
-						--find;
-						--poss;
-						--len;
-						if (len==0)
-							break;
-					}
-
-					--pos;
-					--inLen;
-					if (inLen==0)
-						break;
-				}
-
-				return (pos >= end)? pos : NULL;
-			}
-		}
-		return NULL;
-	}
-
-	pcrune	FindNoCase			(pcrune inStr, rune inChar, s32 inLen)
-	{
-		inChar = (rune)ToLower(inChar);
+		inChar = ToLower(inChar);
 		while (*inStr!='\0')
 		{
 			if (inLen == 0)
 				break;
 			--inLen;
 
-			if (ToLower(*inStr) == inChar)
+			uchar32 c = Peek(inStr);
+			if (ToLower(c) == inChar)
 				return inStr;
-			++inStr;
+			c = ReadChar(inStr);
 		}
 		return NULL;
 	}
@@ -1718,170 +1723,175 @@ namespace xcore
 		if (inStr == NULL) 
 			return NULL;
 
-		pcrune mainString = inStr;
-		while (*mainString)
-		{
+		pcrune str = inStr;
+		while (true) {
 			if (inLen==0)
 				break;
 			--inLen;
 
-			pcrune str1 = mainString;
+			uchar32 c = Peek(str);
+			if (c == 0)
+				break;
+
+			pcrune str1 = str;
 			pcrune str2 = inFind;
-
-			while (*str1 && *str2 && !(ToLower(*str1) - ToLower(*str2)))
-			{
-				str1++;
-				str2++;
+			while (true) {
+				uchar32 c1 = ReadChar(str1);
+				uchar32 c2 = ReadChar(str2);
+				c1 = ToLower(c1);
+				c2 = ToLower(c2);
+				if (c2 == 0)
+					return str;
+				if (c1 == 0)
+					return NULL;
+				if (c1 != c2)
+					break;
 			}
-
-			if (!*str2)
-				return mainString;
-
-			mainString++;
+			c = ReadChar(str);
 		}
-
 		return NULL;
 	}
 
-	pcrune	FindInSubstr		(pcrune inStr, rune inFind, s32 inPos, s32 inLen)
+	pcrune	FindInSubstr		(pcrune inStr, uchar32 inFind, s32 inPos, s32 inLen)
 	{
 		ASSERT(inPos >= 0);
-		pcrune findPos = Find(inStr + inPos, inFind, inLen);
+		while (inPos > 0) {
+			ReadChar(inStr);
+			inPos -= 1;
+		}
+		pcrune findPos = Find(inStr, inFind, inLen);
 		return findPos;
 	}
 
 	pcrune	FindInSubstr		(pcrune inStr, pcrune inFind, s32 inPos, s32 inLen)
 	{
 		ASSERT(inPos >= 0);
-		pcrune findPos = Find(inStr + inPos, inFind, inLen);
+		while (inPos > 0) {
+			ReadChar(inStr);
+			inPos -= 1;
+		}
+		pcrune findPos = Find(inStr, inFind, inLen);
 		return findPos;
 	}
 
-	pcrune	FindNoCaseInSubstr	(pcrune inStr, rune inFind, s32 inPos, s32 inLen)
+	pcrune	FindNoCaseInSubstr	(pcrune inStr, uchar32 inFind, s32 inPos, s32 inLen)
 	{
 		ASSERT(inPos >= 0);
-		pcrune findPos = FindNoCase(inStr + inPos, inFind, inLen);
+		while (inPos > 0) {
+			ReadChar(inStr);
+			inPos -= 1;
+		}
+		pcrune findPos = FindNoCase(inStr, inFind, inLen);
 		return findPos;
 	}
 
 	pcrune	FindNoCaseInSubstr	(pcrune inStr, pcrune inFind, s32 inPos, s32 inLen)
 	{
 		ASSERT(inPos >= 0);
-		pcrune findPos = FindNoCase(inStr + inPos, inFind, inLen);
+		while (inPos > 0) {
+			ReadChar(inStr);
+			inPos -= 1;
+		}
+		pcrune findPos = FindNoCase(inStr, inFind, inLen);
 		return findPos;
 	}
 
 	pcrune	FindOneOf			(pcrune inStr, pcrune inCharSet, s32 inPos, s32 inLen)
 	{
-		inLen = inLen==-1 ? (Len(inStr)) : (inLen);
+		pcrune EndOfInStr = NULL;
+		inLen = inLen==-1 ? (StrLen(inStr, &EndOfInStr)) : (inLen);
 		if (inLen<=0)
 			return NULL;
 
-		pcrune cur_pos = inStr + inPos;
-		pcrune end_pos = inStr + inLen;
+		ASSERT(inPos >= 0);
+		while (inPos > 0) {
+			ReadChar(inStr);
+			inPos -= 1;
+		}
+
+		if (EndOfInStr == NULL)
+		{
+			EndOfInStr = inStr;
+			while (inLen > 0) {
+				uchar32 c = ReadChar(EndOfInStr);
+				if (c == 0)
+					break;
+				--inLen;
+			}
+		}
+
+		pcrune cur_pos = inStr;
+		pcrune end_pos = EndOfInStr;
 		while (cur_pos<end_pos)
 		{
-			if (Find(inCharSet, *cur_pos)!=NULL)
+			uchar32 c = Peek(cur_pos);
+			if (Find(inCharSet, c)!=NULL)
 				return cur_pos;
-
-			++cur_pos;
+			ReadChar(cur_pos);
 		}
-
 		return NULL;
 	}
-
-	pcrune	RFindOneOf			(pcrune inStr, pcrune inCharSet, s32 inPos, s32 inLen)
-	{
-		inLen = inLen==-1 ? (Len(inStr)) : (inLen);
-		if (inLen<=0)
-			return NULL;
-
-		if (inPos==-1)
-			inPos = inLen - 1;
-
-		ASSERT((inPos-(inLen-1)) >= 0);
-
-		pcrune cur_pos = inStr + inPos;
-		pcrune end_pos = inStr;
-		while (cur_pos>=end_pos)
-		{
-			if (Find(inCharSet, *cur_pos)!=NULL)
-				return cur_pos;
-			--cur_pos;
-			--inLen;
-			if (inLen==0)
-				break;
-		}
-
-		return NULL;
-	}
-
 
 
 	bool		IsUpper			(pcrune inStr, s32 inLen)
 	{
-		pcrune buffer = inStr;
-		if (buffer == NULL)
+		if (inStr == NULL)
 			return xFALSE;
-
 		bool isUpper = xTRUE;
 		for (s32 i=0; isUpper; i++, --inLen)
 		{
-			rune c = buffer[i];
+			uchar32 c = ReadChar(inStr);
 			if (c == 0 || inLen == 0)
-			{
 				break;
-			}
 			isUpper = isUpper && !IsLower(c);
 		}
-
 		return isUpper;
 	}
 
 	bool		IsLower			(pcrune inStr, s32 inLen)
 	{
-		pcrune buffer = inStr;
-		if (buffer == NULL)
+		if (inStr == NULL)
 			return xFALSE;
-
 		bool isLower = xTRUE;
-		for (s32 i=0; isLower; i++, --inLen)
+		for (s32 i = 0; isLower && i < inLen; i++)
 		{
-			rune c = buffer[i];
-			if (c == 0 || inLen==0)
-			{
+			uchar32 c = ReadChar(inStr);
+			if (c == 0)
 				break;
-			}
 			isLower = isLower && !IsUpper(c);
 		}
-
 		return isLower;
 	}
 
 	bool		IsCapitalized		(pcrune inStr, s32 inLen)
 	{
-		if (inStr[0]!='\0')
+		uchar32 c = ReadChar(inStr);
+		if (c != '\0')
 		{
-			if (IsUpper(inStr[0]))
+			if (IsUpper(c))
 			{
-				return IsLower(&inStr[1], inLen);
+				return IsLower(inStr, inLen);
 			}
 		}
 		return xFALSE;
 	}
 
-	bool		IsQuoted			(pcrune inStr, rune quote, s32 inLen)
+	bool		IsQuoted			(pcrune inStr, uchar32 quote, s32 inLen)
 	{
-		if (inStr[0]!='\0' && inStr[1]!='\0' && inStr[0]==quote)
+		uchar32 c1 = ReadChar(inStr);
+		if (c1 == 0)
+			return false;
+		uchar32 c2 = ReadChar(inStr);
+		if (c2 == 0)
+			return false;
+		if (c1 == quote)
 		{
-			inLen = (inLen==-1) ? Len(inStr) : inLen;
-			ASSERT(inLen>1);
-			return inStr[inLen-1]==quote;
+			uchar32 last = LastChar(inStr, inLen);
+			return last==quote;
 		}
 		return xFALSE;
 	}
 
-	};
 };
 
 /**

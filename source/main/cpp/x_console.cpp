@@ -282,42 +282,42 @@ namespace xcore
 	s32 				xconsole_default_imp::write(f64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(tmp, 256);
-		x_f64toa(_value, 2, tmpBuffer, sizeof(tmpBuffer));
+		ascii::f64toa(_value, 2, tmpBuffer, sizeof(tmpBuffer));
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(s32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(tmp, 64);
-		x_dtoa(_value, tmpBuffer, sizeof(tmpBuffer), 10);
+		ascii::d32toa(_value, tmpBuffer, sizeof(tmpBuffer), 10);
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(s64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(tmp, 64);
-		x_dtoa(_value, tmpBuffer, sizeof(tmpBuffer), 10);
+		ascii::d64toa(_value, tmpBuffer, sizeof(tmpBuffer), 10);
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(f32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(tmp, 256);
-		x_f32toa(_value, 2, tmpBuffer, sizeof(tmpBuffer));
+		ascii::f32toa(_value, 2, tmpBuffer, sizeof(tmpBuffer));
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(u32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(tmp, 256);
-		x_dtoa(_value, tmpBuffer, sizeof(tmpBuffer), 10);
+		ascii::d32toa(_value, tmpBuffer, sizeof(tmpBuffer), 10);
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(u64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(tmp, 256);
-		x_dtoa(_value, tmpBuffer, sizeof(tmpBuffer), 10);
+		ascii::d64toa(_value, tmpBuffer, sizeof(tmpBuffer), 10);
 		return write(tmpBuffer);
 	}
 	
@@ -332,39 +332,39 @@ namespace xcore
 
 	s32 				xconsole_default_imp::write(const char* str)
 	{
-		return mOut(str, x_strlen(str));
+		return mOut(str, ascii::Len(str));
 	}
 
 	s32 				xconsole_default_imp::write(s32 index, s32 count, const char* str)
 	{
-		ASSERT(index>=0 && index<x_strlen(str));
-		ASSERT((index+count)<x_strlen(str));
+		ASSERT(index>=0 && index<ascii::Len(str));
+		ASSERT((index+count)<ascii::Len(str));
 		return mOut(str + index, count);
 	}
 
 	s32 				xconsole_default_imp::write(const char* formatString, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(str, 512);
-		u32 len = x_vsprintf(strBuffer, 512, formatString, args);
+		u32 len = ascii::Vsprintf(strBuffer, 512, formatString, args);
 		return mOut(strBuffer, len);
 	}
 
 	s32 				xconsole_default_imp::write(const ustr8* str)
 	{
-		return mOut8(str, utf::strlen(str));
+		return mOut8(str, UTF::len(str));
 	}
 
 	s32 				xconsole_default_imp::write(s32 index, s32 count, const ustr8* str)
 	{
-		ASSERT(index>=0 && index<utf::strlen(str));
-		ASSERT((index+count)<utf::strlen(str));
+		ASSERT(index>=0 && index<UTF::len(str));
+		ASSERT((index+count)<UTF::len(str));
 		return mOut8(str + index, count);
 	}
 
 	s32 				xconsole_default_imp::write(const ustr8* formatString, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(str, 2*512);
-		u32 len = xcore::utf::x_vsprintf((ustr8*)strBuffer, 1024, formatString, args);
+		u32 len = xcore::utf::Vsprintf((ustr8*)strBuffer, 1024, formatString, args);
 		return mOut8((ustr8*)strBuffer, len);
 	}
 

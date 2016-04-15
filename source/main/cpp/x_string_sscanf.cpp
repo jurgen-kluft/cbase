@@ -9,7 +9,6 @@
  */
 namespace xcore
 {
-
 	 /**
 	  *Parameters
 
@@ -99,7 +98,7 @@ namespace xcore
 		INT64_SIZE        = 8,
 	};
 
-	s32 x_vsscanf(const char *buf, const char *fmt, const x_va_r_list& vr_args)
+	s32 VSScanf(const char *buf, const char *fmt, const x_va_r_list& vr_args)
 	{
 		s32 i        = 0;
 		s32 w        = 0;
@@ -145,7 +144,7 @@ namespace xcore
 					case '0':
 						if (parsing == 1)
 						{
-							w = x_atoi32(fmt,&base,10);
+							w = StrToS32(fmt,&base,10);
 							flag |= SPACE_PAD;
 							fmt = base-1;
 						}
@@ -167,13 +166,13 @@ namespace xcore
 							const u32 str_len = r.var();
 							u32 i = 0;
 
-							while (*buf != 0 && x_isspace(*buf))
+							while (*buf != 0 && IsSpace(*buf))
 							{
 								buf++;
 							}
 	                        
 							l = 0;
-							while (*buf != 0 && !x_isspace(*buf))
+							while (*buf != 0 && !IsSpace(*buf))
 							{
 								if (!(flag & SPACE_PAD)) 
 								{
@@ -195,8 +194,8 @@ namespace xcore
 					case 'i':
 					case 'd':
 						{
-							buf = x_strscn(buf, "1234567890-+");
-							s64 n1 = x_atoi64(buf, 10, &base);
+							buf = Find(buf, "1234567890-+");
+							s64 n1 = StrToS64(buf, 10, &base);
 							buf = base;
 	                        
 							if (!suppress)
@@ -214,8 +213,8 @@ namespace xcore
 						} break;
 					case 'u':
 						{
-							buf = x_strscn(buf, "1234567890");
-							s64 n2 = x_atoi64(buf, 10, &base);
+							buf = Find(buf, "1234567890");
+							s64 n2 = StrToS64(buf, 10, &base);
 							buf = base;
 							if (!suppress)
 							{
@@ -233,7 +232,7 @@ namespace xcore
 					case 'x':
 					case 'X':
 						{
-							buf = x_strscn(buf, "1234567890xabcdefABCDEF");
+							buf = Find(buf, "1234567890xabcdefABCDEF");
 
 							u32 const varsize = vr_args[i].sizeInBytes();
 							if (w==0)
@@ -247,7 +246,7 @@ namespace xcore
 								str[strl]= '\0';
 								for (s32 j=0; j<strl; ++j)
 									str[j] = buf[j];
-								n2 = (u64)x_atoi64(str, 16, &base);
+								n2 = (u64)StrToS64(str, 16, &base);
 								buf += (base - str);
 							}
 							else if (w == 4)
@@ -257,7 +256,7 @@ namespace xcore
 								str[strl]= '\0';
 								for (s32 j=0; j<strl; ++j)
 									str[j] = buf[j];
-								n2 = (u64)x_atoi64(str, 16, &base);
+								n2 = (u64)StrToS64(str, 16, &base);
 								buf += (base - str);
 							}
 							else if (w == 8)
@@ -267,7 +266,7 @@ namespace xcore
 								str[strl]= '\0';
 								for (s32 j=0; j<strl; ++j)
 									str[j] = buf[j];
-								n2 = (u64)x_atoi64(str, 16, &base);
+								n2 = (u64)StrToS64(str, 16, &base);
 								buf += (base - str);
 							}
 							else // if (w == 16)
@@ -277,7 +276,7 @@ namespace xcore
 								str[strl]= '\0';
 								for (s32 j=0; j<strl; ++j)
 									str[j] = buf[j];
-								n2 = (u64)x_atoi64(str, 16, &base);
+								n2 = (u64)StrToS64(str, 16, &base);
 								buf += (base - str);
 							}
 
@@ -300,9 +299,9 @@ namespace xcore
 					case 'e':
 					case 'E':
 						{
-							buf = x_strscn(buf, "1234567890.e+-");
+							buf = Find(buf, "1234567890.e+-");
 							//TODO: delete an arguments to fix compiling error
-							f64 n3 = x_strtod(buf, &base);
+							f64 n3 = StrToF64(buf, &base);
 							buf = base;
 							if (!suppress)
 							{
@@ -341,7 +340,7 @@ namespace xcore
 
 	s32 x_sscanf(const char *buf, const char *fmt, const x_va_r_list& vr_args)
 	{
-		return x_vsscanf(buf, fmt, vr_args);
+		return VSScanf(buf, fmt, vr_args);
 	}
 
 	s32 x_sscanf(const char *buf, const char *fmt, const x_va_r& v1, const x_va_r& v2, const x_va_r& v3, const x_va_r& v4, const x_va_r& v5, const x_va_r& v6, const x_va_r& v7, const x_va_r& v8,
@@ -365,7 +364,7 @@ namespace xcore
 		vr_args.add(v15);
 		vr_args.add(v16);
 
-		return x_vsscanf(buf, fmt, vr_args);
+		return VSScanf(buf, fmt, vr_args);
 	}
 };
 /**

@@ -204,17 +204,17 @@ namespace xcore
 		uchar ch((u32)'?');
 		switch (mType)
 		{
-			case TYPE_BOOL:		{ ch.c = (*(u32*)mArg)!=0 ? (u32)'y' : (u32)'n'; } break;
+			case TYPE_BOOL:		{ ch = (*(u32*)mArg)!=0 ? (u32)'y' : (u32)'n'; } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	
-			case TYPE_UCHAR:	{ ch.c = (u32)(*(u32*)mArg); } break;
+			case TYPE_UCHAR:	{ ch = (u32)(*(u32*)mArg); } break;
 
 			case TYPE_UINT8:
-			case TYPE_INT8:		{ ch.c = (u8)(*(u8*)mArg); } break;
+			case TYPE_INT8:		{ ch = (u8)(*(u8*)mArg); } break;
 			case TYPE_UINT16:
-			case TYPE_INT16:	{ ch.c = (u16)(*(u16*)mArg); } break;
+			case TYPE_INT16:	{ ch = (u16)(*(u16*)mArg); } break;
 			case TYPE_UINT64:
-			case TYPE_INT64:	{ ch.c = (u32)(*(u64*)mArg); } break;
+			case TYPE_INT64:	{ ch = (u32)(*(u64*)mArg); } break;
 
 			case TYPE_FLOAT32:	
 			case TYPE_FLOAT64:
@@ -425,7 +425,7 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = xbool(rhs); break;
-			case TYPE_UCHAR:	((uchar*)mRef)->c = '?'; break;
+			case TYPE_UCHAR:	*((uchar*)mRef) = '?'; break;
 			case TYPE_UINT32:	*((u32*)mRef) = rhs ? 1 : 0; break;
 			case TYPE_INT32:	*((s32*)mRef) = rhs ? 1 : 0; break;
 			case TYPE_UINT8:	*((u8*)mRef) = rhs ? 1 : 0; break;
@@ -442,26 +442,6 @@ namespace xcore
 		return *this;
 	}
 
-	x_va_r&					x_va_r::operator=(uchar rhs)
-	{
-		switch (mType)
-		{
-			case TYPE_BOOL:		*((xbool*)mRef) = rhs.c ? 1 : 0; break;
-			case TYPE_UINT32:	*((u32*)mRef) = rhs.c; break;
-			case TYPE_INT32:	*((s32*)mRef) = (s32)rhs.c; break;
-			case TYPE_UINT8:	*((u8*)mRef)  = (u8 )rhs.c; break;
-			case TYPE_INT8:		*((s8*)mRef)  = (s8 )rhs.c; break;
-			case TYPE_UINT16:	*((u16*)mRef) = (u16)rhs.c; break;
-			case TYPE_INT16:	*((s16*)mRef) = (s16)rhs.c; break;
-			case TYPE_UINT64:	*((u64*)mRef) = (u32)rhs.c; break;
-			case TYPE_INT64:	*((s64*)mRef) = (u32)rhs.c; break;
-			case TYPE_FLOAT32:	*((f32*)mRef) = (f32)rhs.c; break;
-			case TYPE_FLOAT64:	*((f64*)mRef) = (f64)rhs.c; break;
-			default:			break; // Fall through
-		};
-
-		return *this;
-	}
 
 //==============================================================================
 // END xCore namespace

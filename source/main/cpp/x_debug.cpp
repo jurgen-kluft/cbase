@@ -105,7 +105,7 @@ namespace xcore
 		// Create the report to print
 		//
 		char report[1024];
-		s32 index = x_sprintf(report, sizeof(report)-1,  "*  EXPR: %s\n"
+		s32 index = ascii::Sprintf(report, sizeof(report)-1,  "*  EXPR: %s\n"
 			"*  MSG : %s\n" 
 			"*  FILE: %s\n"
 			"*  LINE: %d\n"

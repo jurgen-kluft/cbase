@@ -24,11 +24,19 @@ namespace xcore
 	namespace UTF
 	{
 		// UTF-8, UTF-16, UTF-32 conversions
+		s32			uchar32to8	(uchar32 rune, ustr8  * dest);
+		s32			uchar32to16	(uchar32 rune, ustr16 * dest);
+
 		s32			convert		(uchar8  const * from, uchar32 * to);
 		s32			convert		(uchar16 const * from, uchar32 * to);
 
 		s32			convert		(uchar32 const * from, uchar8  * to);
 		s32			convert		(uchar32 const * from, uchar16 * to);
+
+		s32			readu8		(ustr8 const* str, uchar32& out_char);
+		s32			readu16		(ustr16 const * str, uchar32& out_char);
+
+		s32			len			(ustr8 const* str);
 
 		bool		iseos		(ustr8  const * str);
 		bool		iseos		(ustr16 const * str);
