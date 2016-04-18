@@ -38,7 +38,35 @@ namespace xcore
 	 * ASCII/UTF-8 functions
 	 *==============================================================================
 	 *==============================================================================
+     */
 
+	//------------------------------------------------------------------------------
+	uchar32			Peek(pcrune str, s32* len = NULL)
+	{
+		uchar8 c = *str;
+		if ((c & 0x80) == 0x00) {
+			if (len != NULL)
+				*len = 1;
+			return (uchar32)c;
+		}
+
+		s32 l = 0;
+		if ((c & 0xe0) == 0xc0) { l = 2; }
+		else if ((c & 0xf0) == 0xe0) { l = 3; }
+		else if ((c & 0xf8) == 0xf0) { l = 4; }
+
+		uchar32 c32 = 0;
+		for (s32 i = 0; i<l; i++) {
+			c = str[i];
+			c32 = c32 << 8;
+			c32 = c32 | c;
+		}
+		if (len != NULL)
+			*len = l;
+		return c32;
+	}
+
+	/**
 	 *------------------------------------------------------------------------------
 	 * Author:
 	 *     Virtuos Games
@@ -401,32 +429,6 @@ namespace xcore
 	}
 
 	//------------------------------------------------------------------------------
-	uchar32			Peek(pcrune str, s32* len = NULL)
-	{
-		uchar8 c = *str;
-		if ((c & 0x80) == 0x00) {
-			if (len != NULL)
-				*len = 1;
-			return (uchar32)c;
-		}
-
-		s32 l = 0;
-		if ((c & 0xe0) == 0xc0) { l = 2; }
-		else if ((c & 0xf0) == 0xe0) { l = 3; }
-		else if ((c & 0xf8) == 0xf0) { l = 4; }
-
-		uchar32 c32 = 0;
-		for (s32 i = 0; i<l; i++) {
-			c = str[i];
-			c32 = c32 << 8;
-			c32 = c32 | c;
-		}
-		if (len != NULL)
-			*len = l;
-		return c32;
-	}
-
-	//------------------------------------------------------------------------------
 
 	uchar32			ReadChar(prune& str)
 	{
@@ -539,6 +541,7 @@ namespace xcore
 		while (start < end)
 		{
 			uchar32 c = ReadChar(src);
+			if (c == 0) break;
 			WriteChar(c, start, dest_end);
 		}
 		return start;
@@ -618,8 +621,7 @@ namespace xcore
 		ASSERT(str2);
 		if (n == 0 || str1 == str2)
 			return 0;
-		do
-		{
+		do {
 			uchar32 c1 = ReadChar(str1);
 			uchar32 c2 = ReadChar(str2);
 			if (c1 == 0 || c2 == 0)
@@ -650,13 +652,11 @@ namespace xcore
 		if (!*subStr)
 			return((prune)mainStr);
 
-		while (true)
-		{
+		while (true) {
 			pcrune str1 = mainStr;
 			pcrune str2 = subStr;
 
-			while (true)
-			{
+			while (true) {
 				uchar32 c1 = ReadChar(str1);
 				uchar32 c2 = ReadChar(str2);
 				if (c2 == 0)
@@ -676,8 +676,7 @@ namespace xcore
 
 	pcrune		StrChr(pcrune mainStr, uchar32 c)
 	{
-		while (true)
-		{
+		while (true) {
 			pcrune str = mainStr;
 			uchar32 ch = ReadChar(mainStr);
 			if (ch == 0)
@@ -877,13 +876,10 @@ namespace xcore
 	{
 		// Evaluate sign
 		s32 sign = 1;
-		if (*str == '-')
-		{
+		if (*str == '-') {
 			sign = -1;
 			str++;
-		}
-		else if (*str == '+')
-		{
+		} else if (*str == '+') {
 			str++;
 		}
 
@@ -942,25 +938,17 @@ namespace xcore
 
 	bool IsInt(pcrune str)
 	{
-		if (str[0] == '-')
-		{
+		if (str[0] == '-') {
 			if (str[1] < '0' || str[1] > '9')
 				return xFALSE;
-
-			for (s32 i = 2; str[i]; i++)
-			{
+			for (s32 i = 2; str[i]; i++) {
+				if (str[i] < '0' || str[i] > '9') return xFALSE;
+			}
+		} else {
+			for (s32 i = 0; str[i]; i++) {
 				if (str[i] < '0' || str[i] > '9') return xFALSE;
 			}
 		}
-		else
-		{
-			for (s32 i = 0; str[i]; i++)
-			{
-				if (str[i] < '0' || str[i] > '9') return xFALSE;
-			}
-
-		}
-
 		return xTRUE;
 	}
 
@@ -980,7 +968,8 @@ namespace xcore
 			for (l = 0; (str[i] != floatStr[l]) && floatStr[l]; l++);
 
 			// Okay this is not a number
-			if (floatStr[l] == 0) return xFALSE;
+			if (floatStr[l] == 0) 
+				return xFALSE;
 		}
 
 		return xTRUE;
@@ -1014,14 +1003,16 @@ namespace xcore
 			if (str[i] == ':') 
 			{
 				nCol++;
-				if (nCol > 1) return xFALSE;
+				if (nCol > 1)
+					return xFALSE;
 				continue;
 			}
 			return xFALSE;
 		}
 
 		// the length of the string must be 17 characters long (16 + 1 for the':')
-		if (i != 17) return xFALSE;
+		if (i != 17) 
+			return xFALSE;
 
 		return xTRUE;
 	}
@@ -1064,7 +1055,7 @@ namespace xcore
 		prune wptr = front;
 		s32 l = 0;
 		pcrune rptr = wptr;
-		while (*rptr !=0)
+		while (*rptr != 0)
 		{
 			ReadChar(rptr);
 			++l;
@@ -1651,7 +1642,6 @@ namespace xcore
 		return CompareNoCase(inStr, inLen, inOther, inOtherLen) == 0;
 	}
 
-
 	pcrune		Find(pcrune inStr, uchar32 inChar, s32 inLen)
 	{
 		uchar32 c = 0;
@@ -1659,10 +1649,10 @@ namespace xcore
 			if (inLen==0)
 				break;
 			--inLen;
-			c = Peek(inStr);
-			if (c == inChar)
-				return inStr;
+			pcrune str = inStr;
 			c = ReadChar(inStr);
+			if (c == inChar)
+				return str;
 		} while (c != 0);
 		return NULL;
 	}
@@ -1884,10 +1874,14 @@ namespace xcore
 		uchar32 c2 = ReadChar(inStr);
 		if (c2 == 0)
 			return false;
-		if (c1 == quote)
+		inLen -= 2;
+		if (inLen >= 0)
 		{
-			uchar32 last = LastChar(inStr, inLen);
-			return last==quote;
+			if (c1 == quote)
+			{
+				uchar32 last = LastChar(inStr, inLen);
+				return last == quote;
+			}
 		}
 		return xFALSE;
 	}

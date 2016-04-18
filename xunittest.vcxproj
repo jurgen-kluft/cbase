@@ -9,12 +9,12 @@
       <Configuration>DevReleaseStatic</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="DevDebugStatic|x64">
-      <Configuration>DevDebugStatic</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="DevReleaseStatic|x64">
       <Configuration>DevReleaseStatic</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevDebugStatic|x64">
+      <Configuration>DevDebugStatic</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -43,15 +43,15 @@
     <CLRSupport>false</CLRSupport>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|x64'" Label="Configuration">
-    <ConfigurationType>$(PackageType)</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <CLRSupport>false</CLRSupport>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|x64'" Label="Configuration">
     <ConfigurationType>$(PackageType)</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <CLRSupport>false</CLRSupport>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|x64'" Label="Configuration">
+    <ConfigurationType>$(PackageType)</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
     <CLRSupport>false</CLRSupport>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -78,24 +78,6 @@
     <ExtensionsToDeleteOnClean>*.obj%3b*.d%3b*.map%3b*.lst%3b*.pch%3b$(TargetPath)</ExtensionsToDeleteOnClean>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <ExceptionHandling>false</ExceptionHandling>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalLibraryFiles);</AdditionalDependencies>
-      <AdditionalLibraryDirectories>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-    </Link>
-    <Lib>
-      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
-    </Lib>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevReleaseStatic|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_DEV_RELEASE;NDEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
@@ -107,6 +89,24 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalLibraryFiles);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevDebugStatic|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>PLATFORM_PC;PLATFORM_32BIT;TARGET_PC;TARGET_DEV_DEBUG;_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>vendor\github.com\jurgen-kluft\xunittest\source\main\include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalLibraryFiles);</AdditionalDependencies>
       <AdditionalLibraryDirectories>vendor\github.com\jurgen-kluft\xunittest\target\xunittest\bin\$(PackageSignature);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
     </Link>
