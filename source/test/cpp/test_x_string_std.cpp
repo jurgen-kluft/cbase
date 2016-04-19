@@ -21,11 +21,11 @@ UNITTEST_SUITE_BEGIN(xstring_std)
 			const char* str = "this is a system string";
 
 			char str1[24];
-			StrCpy(str1, sizeof(str1), str);
+			StrCopy(str1, sizeof(str1), str);
 			CHECK_EQUAL(23, StrLen(str1));
 			CHECK_EQUAL(0, StrCmp(str1, str));
 			char str2[20];
-			StrCpy(str2, sizeof(str2), str);
+			StrCopy(str2, sizeof(str2), str);
 			CHECK_EQUAL(19, StrLen(str2));
 			CHECK_EQUAL(-1, StrCmp(str2, str));
 			CHECK_EQUAL(0, StrCmp(str2, "this is a system st"));

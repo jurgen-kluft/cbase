@@ -22,16 +22,16 @@ UNITTEST_SUITE_BEGIN(xutf)
 		UNITTEST_TEST(type_size_checks)
 		{
 			CHECK_EQUAL(4, sizeof(uchar8));
-			CHECK_EQUAL(1, sizeof(ustr8));
+			CHECK_EQUAL(1, sizeof(char));
 			CHECK_EQUAL(4, sizeof(uchar16));
 			CHECK_EQUAL(2, sizeof(ustr16));
 		}
 
-		UNITTEST_TEST(strlen_ustr8)
+		UNITTEST_TEST(strlen_char)
 		{
-			// s32  		strlen		(ustr8 const* _str, ustr8 const** _end = 0);
-			const ustr8 utf8_str1[] = { 0x66,0x72,0xC3,0xA9,0x6E,0x63,0x68,0 };	// frénch
-			u32 utf8_str1_len = utf::strlen(utf8_str1);
+			// s32  		strlen		(char const* _str, char const** _end = 0);
+			const char utf8_str1[] = { 0x66,0x72,0xC3,0xA9,0x6E,0x63,0x68,0 };	// frénch
+			u32 utf8_str1_len = StrLen(utf8_str1);
 			CHECK_EQUAL(6, utf8_str1_len);
 		}
 
@@ -43,121 +43,62 @@ UNITTEST_SUITE_BEGIN(xutf)
 
 		UNITTEST_TEST(numBytes_utf8)
 		{
-			const ustr8* str1 = (const ustr8*)"test";
-			CHECK_EQUAL(1, utf::numBytes(uchar8(str1->c)));
-			const ustr8 str2[] = { 0x66,0x72,0xC3,0xA9,0x6E,0x63,0x68,0 };	// frénch
-			CHECK_EQUAL(2, utf::numBytes(uchar8(str2[2].c)));	// take the é
+			const char* str1 = (const char*)"test";
+			CHECK_EQUAL(1, LenInBytes(uchar8(str1)));
+			const char str2[] = { 0x66,0x72,0xC3,0xA9,0x6E,0x63,0x68,0 };	// frénch
+			const char* str = (const char*)str2;
+			uchar32 c = ReadChar(str);
+			c = ReadChar(str);
+			c = ReadChar(str);	// take the é
+			CHECK_EQUAL(2, LenInBytes(c));
 		}
 
 		UNITTEST_TEST(read1_utf8)
 		{
-			const ustr8* str1 = (const ustr8*)"test";
+			const char* str1 = (const char*)"test";
 			for (s32 i=0; i<5; ++i)
 			{
-				uchar8 ch;
-				CHECK_EQUAL(1, utf::read(&str1[i], ch));
-				CHECK_TRUE(ch.c == str1[i].c);
+				uchar32 ch = ReadChar(str1);
+				CHECK_EQUAL((uchar32)str1[i], ch);
+				CHECK_TRUE(1, LenInBytes(ch));
 			}
 
-			const ustr8 str2[] = { 0x66,0x72,0xC3,0xA9,0x6E,0x63,0x68,0 };	// frénch
-			CHECK_EQUAL(2, utf::numBytes(uchar8(str2[2].c)));	// take the é
-			for (s32 i=0; i<7; ++i)
+			const char str2[] = { 0x66,0x72,0xC3,0xA9,0x6E,0x63,0x68,0 };	// frénch
+			const char* str = (const char*)str2;
+			ReadChar(str);
+			ReadChar(str);
+			uchar32 c = ReadChar(str);
+			CHECK_EQUAL(2, LenInBytes(c));	// take the é
+			str = (const char*)str2;
+			for (s32 i=0; i<6; ++i)
 			{
-				uchar8 ch;
+				uchar32 ch = ReadChar(str);
 				if (i==2)
 				{
-					CHECK_EQUAL(2, utf::read(&str2[i], ch));
-					CHECK_EQUAL(0xA9C3, ch.c);
+					CHECK_EQUAL(2, LenInBytes(ch));
+					CHECK_EQUAL(0xA9C3, ch);
 				}
 				else if (i>2)
 				{
-					CHECK_EQUAL(1, utf::read(&str2[i+1], ch));
-					CHECK_TRUE(ch.c == str2[i+1].c);
+					CHECK_EQUAL(1, LenInBytes(ch));
+					CHECK_EQUAL(ch, (uchar32)str2[i]);
 				}
 				else
 				{
-					CHECK_EQUAL(1, utf::read(&str2[i], ch));
-					CHECK_TRUE(ch.c == str2[i].c);
+					CHECK_EQUAL(1, LenInBytes(ch));
+					CHECK_EQUAL(ch, (uchar32)str2[i]);
 				}
 			}
 		}
 
-		UNITTEST_TEST(utf_uptr8)
+
+		UNITTEST_TEST(numBytes_char)
 		{
-			char str1[256];
-			uptr8 i1   = (ustr8*)str1;
-			uptr8 end1 = i1 + 256;
-
-			char const* str2 = "This is another simple ASCII string.";
-			ucptr8 i2   = (ustr8 const*)str2;
-			ucptr8 end2 = i2 + i2.strlen();
-
-			CHECK_TRUE(end2.at_end());
-
-			// copy str2 to str1;
-			while (i1 != end1 && !i2.at_end())
-			{
-				ulen8 n = i1.copy_char_from(i2);
-				CHECK_EQUAL(1,n.bpos());
-				CHECK_EQUAL(1,n.clen());
-				i1 += n;
-				i2 += n;
-			}
-			*i1 = '\0';
-		}
-
-
-		UNITTEST_TEST(numBytes_ustr8)
-		{
-			CHECK_TRUE(utf::isLegal(uchar8((u32)'A')));
-			CHECK_EQUAL(1, utf::numBytes(uchar8((u32)'A')));
-			CHECK_TRUE(utf::isLegal(uchar8((u32)'0')));
-			CHECK_EQUAL(1, utf::numBytes(uchar8((u32)'0')));
-			CHECK_TRUE(utf::isLegal(uchar8((u32)0xA9C3)));
-			CHECK_EQUAL(2, utf::numBytes(uchar8((u32)0xA9C3)));
-		}
-
-		UNITTEST_TEST(numBytes_ustr16)
-		{
-			CHECK_TRUE(utf::isLegal(uchar16((u32)'A')));
-			CHECK_EQUAL(2, utf::numBytes(uchar16((u32)'A')));
-			CHECK_TRUE(utf::isLegal(uchar16((u32)'0')));
-			CHECK_EQUAL(2, utf::numBytes(uchar16((u32)'0')));
-			CHECK_TRUE(utf::isLegal(uchar16((u32)0x6C34)));			// 'z'
-			CHECK_EQUAL(2, utf::numBytes(uchar16((u32)0x6C34)));
-		}
-
-		UNITTEST_TEST(isLegal_utf8)
-		{
-			const ustr8* str1 = (const ustr8*)"hi!";
-			CHECK_TRUE(utf::isLegal(str1, str1 + utf::strlen(str1)));
-
-			char cstr2[] = { 'h', 'i', (char)0xFF, '!', '0' };
-			const ustr8* str2 = (const ustr8*)cstr2;
-			CHECK_FALSE(utf::isLegal(str2, str2 + 4));
-		}
-
-	}
-
-	UNITTEST_FIXTURE(uclen8)
-	{
-		UNITTEST_FIXTURE_SETUP()
-		{
-		}
-
-		UNITTEST_FIXTURE_TEARDOWN()
-		{
-		}
-
-		UNITTEST_TEST(construct)
-		{
-			uclen8 l1(0);
-			uclen8 l2(10);
-
-			uclen8 l3 = l1 + l2;
-
-			CHECK_EQUAL(10, (u32)l3);
+			CHECK_EQUAL(1, LenInBytes(uchar32('A')));
+			CHECK_EQUAL(1, LenInBytes(uchar32('0')));
+			CHECK_EQUAL(2, LenInBytes(uchar32(0xA9C3)));
 		}
 	}
+
 }
 UNITTEST_SUITE_END
