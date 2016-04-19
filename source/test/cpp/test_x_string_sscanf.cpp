@@ -30,7 +30,7 @@ UNITTEST_SUITE_BEGIN(xsscanf)
 			const char* const format = "%02x%02x%02x%02x";
 			for (s32 i=0; i<16; i+=4)
 			{
-				l = x_sscanf(example + i*2, format, x_va_r(&d[i+0]), x_va_r(&d[i+1]), x_va_r(&d[i+2]), x_va_r(&d[i+3]));
+				l = SScanf(example + i*2, format, x_va_r(&d[i+0]), x_va_r(&d[i+1]), x_va_r(&d[i+2]), x_va_r(&d[i+3]));
 				CHECK_EQUAL(4, l);
 			}
 
