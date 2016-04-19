@@ -193,7 +193,7 @@ namespace xcore
 
 	//  SScanf
 	//      Scan "string" to values.
-	s32		SScanf(pcrune buf, pcrune fmt, X_VA_ARGS_16_DEF);
+	s32		SScanf(pcrune buf, pcrune fmt, X_VA_R_ARGS_16_DEF);
 	s32		VSScanf(pcrune buf, pcrune fmt, const x_va_r_list& vr_args);
 
 	//==============================================================================
