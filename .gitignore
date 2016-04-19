@@ -16,6 +16,8 @@ tags
 
 !*.pl
 
+!*.go
+
 !*.cs
 !*.csproj
 !*.resx

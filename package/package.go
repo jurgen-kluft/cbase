@@ -20,6 +20,8 @@ func GetPackage() *denv.Package {
 
 	// 'xbase' unittest project
 	maintest := denv.SetupDefaultCppTestProject("xbase_test", "github.com\\jurgen-kluft\\xbase")
+	maintest.Dependencies = append(maintest.Dependencies, unittestpkg.GetMainLib())
+	maintest.Dependencies = append(maintest.Dependencies, mainlib)
 
 	mainpkg.AddMainLib(mainlib)
 	mainpkg.AddUnittest(maintest)
