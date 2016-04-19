@@ -1516,6 +1516,9 @@ namespace xcore
 	#if defined(TARGET_CLIENT)
 		#define TARGET_HW_STR			"_CLIENT"
 	#endif
+	#if !defined(TARGET_HW_STR)
+		#define TARGET_HW_STR			""
+	#endif
 
 	#if defined(TARGET_32BIT)
 		#define TARGET_BIT_STR			"_32"
