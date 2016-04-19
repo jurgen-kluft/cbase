@@ -10,10 +10,6 @@ tags
 !*.h
 !*.inl
 
-!*.sln
-!*.vcproj
-!*.vcxproj
-
 !*.pl
 
 !*.go
