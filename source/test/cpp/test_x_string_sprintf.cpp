@@ -27,7 +27,7 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 			f64 d = 3.1415;
 			s32 l = SPrintf(buffer, sizeof(buffer) - 1, "%f", x_va(d));
 			CHECK_EQUAL(8, l);
-			CHECK_EQUAL(0, StrCompare("3.141500", buffer));
+			CHECK_EQUAL(0, Compare("3.141500", buffer));
 		}
 
 		UNITTEST_TEST(format_string)
@@ -36,16 +36,16 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 			const char* teststr = "test string";
 			s32 l = SPrintf(buffer, sizeof(buffer) - 1, "the %s", x_va(teststr));
 			CHECK_EQUAL(15, l);
-			CHECK_EQUAL(0, StrCompare("the test string", buffer));
+			CHECK_EQUAL(0, Compare("the test string", buffer));
 		}
 
 		UNITTEST_TEST(format_string8)
 		{
 			char buffer[256];
 			const char* teststr = "test string";
-			s32 l = SPrintf((ustr8*)buffer, sizeof(buffer) - 1, (const ustr8*)"the %s", x_va(teststr));
+			s32 l = SPrintf(buffer, sizeof(buffer) - 1, "the %s", x_va(teststr));
 			CHECK_EQUAL(15, l);
-			CHECK_EQUAL(0, StrCompare("the test string", buffer));
+			CHECK_EQUAL(0, Compare("the test string", buffer));
 		}
 
 

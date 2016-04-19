@@ -154,7 +154,7 @@ UNITTEST_SUITE_BEGIN(xguid)
 
 			const char* guidStr = "11335577:22446688:557799BB:88AACCEE";
 			id.toString(strBuffer, sizeof(strBuffer));
-			CHECK_EQUAL(0, StrCompare(strBuffer, guidStr));
+			CHECK_EQUAL(0, Compare(strBuffer, guidStr));
 		}
 
 		UNITTEST_TEST(fromString)
