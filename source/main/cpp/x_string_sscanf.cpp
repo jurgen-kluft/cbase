@@ -343,8 +343,7 @@ namespace xcore
 		return VSScanf(buf, fmt, vr_args);
 	}
 
-	s32 x_sscanf(const char *buf, const char *fmt, const x_va_r& v1, const x_va_r& v2, const x_va_r& v3, const x_va_r& v4, const x_va_r& v5, const x_va_r& v6, const x_va_r& v7, const x_va_r& v8,
-													const x_va_r& v9, const x_va_r& v10, const x_va_r& v11, const x_va_r& v12, const x_va_r& v13, const x_va_r& v14, const x_va_r& v15, const x_va_r& v16)
+	s32 x_sscanf(const char *buf, const char *fmt, X_VA_R_ARGS_16)
 	{
 		x_va_r_list vr_args;
 		vr_args.add(v1);
