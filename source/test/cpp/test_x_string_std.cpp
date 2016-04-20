@@ -16,16 +16,16 @@ UNITTEST_SUITE_BEGIN(xstring_std)
 		{
 		}
 
-		UNITTEST_TEST(StrCpy)
+		UNITTEST_TEST(StrCopy)
 		{
 			const char* str = "this is a system string";
 
 			char str1[24];
-			StrCopy(str1, sizeof(str1), str);
+			StrCopy(str1, str1+sizeof(str1), str);
 			CHECK_EQUAL(23, StrLen(str1));
 			CHECK_EQUAL(0, StrCmp(str1, str));
 			char str2[20];
-			StrCopy(str2, sizeof(str2), str);
+			StrCopy(str2, str2 + sizeof(str2), str);
 			CHECK_EQUAL(19, StrLen(str2));
 			CHECK_EQUAL(-1, StrCmp(str2, str));
 			CHECK_EQUAL(0, StrCmp(str2, "this is a system st"));
