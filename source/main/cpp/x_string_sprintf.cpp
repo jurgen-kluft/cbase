@@ -147,14 +147,14 @@ namespace xcore
 			char* inffmtp = inffmt;
 
 			if (fpnum < 0) *inffmtp++ = '-';
-			StrCopy((prune)inffmtp, 4, (pcrune)"Inf");
+			StrCopy((prune)inffmtp, inffmtp+4, (pcrune)"Inf");
 			return (s32)(inffmt - fmtbase);
 		}
 
 		if (x_f64u::isNAN(fpnum))
 		{
 			char* nanfmt = fmtbase;
-			StrCopy((prune)nanfmt, 4, (pcrune)"NaN");
+			StrCopy((prune)nanfmt, nanfmt+4, (pcrune)"NaN");
 			return (s32)(nanfmt - fmtbase);
 		}
 
@@ -677,7 +677,7 @@ namespace xcore
 
 		i += (_boolean==0) ? 0 : 1;
 
-		StrCopy((prune)buf, maxBufSize, (pcrune)t[i]);
+		StrCopy((prune)buf, buf+maxBufSize, (pcrune)t[i]);
 		return StrLen((prune)buf);
 	}
 

@@ -78,7 +78,7 @@ namespace xcore
 	extern s32  			LenInChars 				(pcrune str, pcrune * end = NULL);				// Return the number of characters that are in 'str'
 
 	extern s32				StrLen					(pcrune str, pcrune * end = NULL);				// Return length of string as number of characters
-	extern prune			StrCopy    				(prune  dst, s32 dest_buffer_size, pcrune src);	// Copy 'src' to 'dst' but not more than 'dest_buffer_size'
+	extern prune			StrCopy    				(prune  dst, pcrune dst_end, pcrune src);		// Copy 'src' to 'dst' but not further than 'dst_end'
 	extern s32  			StrCmp    				(pcrune str1, pcrune str2);						// Compare str1 to str2
 	extern s32  			StrCmpn    				(pcrune str1, pcrune str2, s32 count);			// Compare str1 to str2 for 'n' characters
 	extern s32				StrCmpi   				(pcrune str1, pcrune str2);						// Compare str1 to str2, case insensitive

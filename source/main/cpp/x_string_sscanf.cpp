@@ -338,12 +338,12 @@ namespace xcore
 		return scanned;
 	}
 
-	s32 x_sscanf(const char *buf, const char *fmt, const x_va_r_list& vr_args)
+	s32 SScanf(const char *buf, const char *fmt, const x_va_r_list& vr_args)
 	{
 		return VSScanf(buf, fmt, vr_args);
 	}
 
-	s32 x_sscanf(const char *buf, const char *fmt, X_VA_R_ARGS_16)
+	s32 SScanf(const char *buf, const char *fmt, X_VA_R_ARGS_16)
 	{
 		x_va_r_list vr_args;
 		vr_args.add(v1);
