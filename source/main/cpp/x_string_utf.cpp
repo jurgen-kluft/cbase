@@ -98,9 +98,10 @@ namespace xcore
 			s32 l = 0;
 			while (!iseos(from)) {
 				u32 c;
-				readu8(from, c);
+				s32 n = readu8(from, c);
 				if (to != NULL)
 					*to++ = c;
+				from += n;
 				l++;
 			}
 			return l;
@@ -110,9 +111,10 @@ namespace xcore
 			s32 l = 0;
 			while (!iseos(from)) {
 				u32 c;
-				readu16(from, c);
+				s32 n = readu16(from, c);
 				if (to != NULL)
 					*to++ = c;
+				from += n;
 				l++;
 			}
 			return l;
@@ -189,21 +191,33 @@ namespace xcore
 	}
 
 	xstring::xstring(xstring & copy)
-	: mSlice(copy.mSlice.incref())
+	: mSlice(copy.mSlice)
 	{
 	}
 
 	xstring::xstring(x_iallocator* allocator)
 	{
-		mSlice = slice::alloc(allocator, 0);
+		slice::alloc(mSlice, allocator, 0);
 	}
 
-	uchar			xstring::operator[](s32 i) const
+	xstring::~xstring()
+	{
+	}
+
+	uchar32 *		xstring::operator[](s32 i)
 	{
 		if ((mSlice.mFrom + i) < mSlice.mTo) {
-			return mSlice.mData->mData[mSlice.mFrom + i];
+			return (uchar32 *)&mSlice.mData->mData[(mSlice.mFrom + i) * sizeof(uchar32)];
 		}
-		return (uchar)0;
+		return NULL;
+	}
+
+	uchar32 const*	xstring::operator[](s32 i) const
+	{
+		if ((mSlice.mFrom + i) < mSlice.mTo) {
+			return (uchar32 const*)&mSlice.mData->mData[(mSlice.mFrom + i) * sizeof(uchar32)];
+		}
+		return NULL;
 	}
 
 	xstring&		xstring::operator=(const char* str)
@@ -255,14 +269,14 @@ namespace xcore
 	void			xstring::writeto(xwriter* writer) const
 	{
 		if (len() > 0) {
-			writer->write((xbyte const*)&mSlice.mData->mData[mSlice.mFrom], mSlice.len());
+			writer->write((xbyte const*)&mSlice.mData->mData[mSlice.mFrom * sizeof(uchar)], mSlice.len());
 		}
 	}
 
 	xstring			xstring::copy() const
 	{
 		xstring s;
-		s.mSlice.mData = mSlice.mData->resize(mSlice.mFrom, mSlice.mTo);
+		s.mSlice.mData = mSlice.mData->resize(mSlice.mFrom * sizeof(uchar), mSlice.mTo * sizeof(uchar));
 		s.mSlice.mFrom = 0;
 		s.mSlice.mTo = mSlice.len();
 		return s;
@@ -336,12 +350,12 @@ namespace xcore
 
 	uchar32*		xstring::str_ptr()
 	{
-		return (uchar32*)&mSlice.mData->mData[mSlice.mFrom];
+		return (uchar32*)&mSlice.mData->mData[mSlice.mFrom * sizeof(uchar)];
 	}
 
 	uchar32 const*	xstring::str_ptr() const
 	{
-		return (uchar32*)&mSlice.mData->mData[mSlice.mFrom];
+		return (uchar32*)&mSlice.mData->mData[mSlice.mFrom * sizeof(uchar)];
 	}
 
 	static void xstring_usecase()
@@ -352,8 +366,8 @@ namespace xcore
 		str1 = "Hello UTF World!";
 
 		xstring view_UTF = str1.find("UTF", xstring::SELECT);
-		uchar32 c = view_UTF[0];
-		str1[15] = '?';
+		uchar32* c = view_UTF[0];
+		*str1[15] = '?';
 
 		xstring str3(str1);
 		str3 = str1.left_of(view_UTF) + "SLICE" + str1.right_of(view_UTF);

@@ -344,8 +344,8 @@ namespace xcore
 		EType					type() const										{ return (EType)mType; }
 		u16						var() const											{ return mVar; }
 
-		s32						sizeInBits() const									{ return (mType&SIZE_MASK)>>SIZE_SHIFT; }
-		s32						sizeInBytes() const									{ return ((mType&SIZE_MASK)>>SIZE_SHIFT) >> 3; }
+		s32						sizeInBits() const									{ return ((mType&SIZE_MASK)>>SIZE_SHIFT)<<3; }
+		s32						sizeInBytes() const									{ return ((mType&SIZE_MASK)>>SIZE_SHIFT); }
 
 		xbool					isFloat() const										{ return xbool((mType&PROP_MASK)==PROP_FLOAT); }
 		xbool					isInteger() const									{ return xbool((mType&PROP_MASK)==PROP_INTEGER); }
