@@ -56,8 +56,9 @@ namespace xcore
 						xstring();
 						xstring(x_iallocator*);
 						xstring(xstring& copy);
+						~xstring();
 
-		inline s32		len() const												{ return mSlice.len(); }
+		inline s32		len() const												{ return mSlice.len() / sizeof(uchar32); }
 
 		// Return a copy of this string
 		xstring			copy() const;
@@ -65,19 +66,8 @@ namespace xcore
 		// Return a slice/view of this string
 		xstring			operator()(s32 from, s32 to)							{ return view(from, to); }
 
-		struct puchar
-		{
-			inline		operator uchar() const		{ if (mPtr != NULL) return *mPtr; else return uchar(0); }
-			void		operator = (uchar c)		{ if (mPtr != NULL) *mPtr = c; }
-
-		protected:
-			friend class xstring;
-			inline		puchar(uchar* ptr) : mPtr(ptr) {}
-			uchar*		mPtr;
-		};
-
-		puchar			operator[](s32);
-		uchar			operator[](s32) const;
+		uchar32	*		operator[](s32);
+		uchar32 const *	operator[](s32) const;
 
 		xstring&		operator=(uchar32);
 		xstring&		operator=(char const*);
@@ -102,19 +92,19 @@ namespace xcore
 			CASE   = 0,
 			NOCASE = 1,
 			SELECT = 2,
-			LEFT   = 3,
+			LEFT   = 0,
 			RIGHT  = 4,
 		};
 
-		xstring			find (uchar c, s32 flags = NOCASE) const;
-		xstring			find (char const* str, s32 flags = NOCASE) const;
-		xstring			find (ustr8 const* str, s32 flags = NOCASE) const;
-		xstring			find (xstring const& c, s32 flags = NOCASE) const;
+		xstring			find (uchar c, eflags flags = NOCASE) const;
+		xstring			find (char const* str, eflags flags = NOCASE) const;
+		xstring			find (ustr8 const* str, eflags flags = NOCASE) const;
+		xstring			find (xstring const& c, eflags flags = NOCASE) const;
 
-		xstring			findr(uchar c, s32 flags = NOCASE) const;
-		xstring			findr(char const* str, s32 flags = NOCASE) const;
-		xstring			findr(ustr8 const* str, s32 flags = NOCASE) const;
-		xstring			findr(xstring const& c, s32 flags = NOCASE) const;
+		xstring			findr(uchar c, eflags flags = NOCASE) const;
+		xstring			findr(char const* str, eflags flags = NOCASE) const;
+		xstring			findr(ustr8 const* str, eflags flags = NOCASE) const;
+		xstring			findr(xstring const& c, eflags flags = NOCASE) const;
 
 		xstring			left_of(xstring const&) const;
 		xstring			right_of(xstring const&) const;
