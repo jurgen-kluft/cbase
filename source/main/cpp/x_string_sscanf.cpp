@@ -146,7 +146,7 @@ namespace xcore
 						{
 							w = StrToS32(fmt,&base,10);
 							flag |= SPACE_PAD;
-							fmt = base-1;
+							fmt = base - 1;
 						}
 						break;
 					case 'c':
@@ -232,52 +232,53 @@ namespace xcore
 					case 'x':
 					case 'X':
 						{
-							buf = Find(buf, "1234567890xabcdefABCDEF");
+							const char* buf2 = Find(buf, "1234567890xabcdefABCDEF");
 
 							u32 const varsize = vr_args[i].sizeInBytes();
-							if (w==0)
-								w = varsize * 2;
+							w = varsize * 2;
 
 							u64 n2 = 0;
-							if (w==2)
-							{
-								u32 const strl = 2;
-								char str[strl + 1];
-								str[strl]= '\0';
-								for (s32 j=0; j<strl; ++j)
-									str[j] = buf[j];
-								n2 = (u64)StrToS64(str, 16, &base);
-								buf += (base - str);
-							}
-							else if (w == 4)
-							{
-								u32 const strl = 4;
-								char str[strl + 1];
-								str[strl]= '\0';
-								for (s32 j=0; j<strl; ++j)
-									str[j] = buf[j];
-								n2 = (u64)StrToS64(str, 16, &base);
-								buf += (base - str);
-							}
-							else if (w == 8)
-							{
-								u32 const strl = 8;
-								char str[strl + 1];
-								str[strl]= '\0';
-								for (s32 j=0; j<strl; ++j)
-									str[j] = buf[j];
-								n2 = (u64)StrToS64(str, 16, &base);
-								buf += (base - str);
-							}
-							else // if (w == 16)
-							{
-								u32 const strl = 16;
-								char str[strl + 1];
-								str[strl]= '\0';
-								for (s32 j=0; j<strl; ++j)
-									str[j] = buf[j];
-								n2 = (u64)StrToS64(str, 16, &base);
-								buf += (base - str);
+							if (buf2 != NULL) {
+								if (w == 2)
+								{
+									u32 const strl = 2;
+									char str[strl + 1];
+									str[strl] = '\0';
+									for (s32 j = 0; j < strl; ++j)
+										str[j] = buf2[j];
+									n2 = (u64)StrToS64(str, 16, &base);
+									buf = buf2 + (base - str);
+								}
+								else if (w == 4)
+								{
+									u32 const strl = 4;
+									char str[strl + 1];
+									str[strl] = '\0';
+									for (s32 j = 0; j < strl; ++j)
+										str[j] = buf2[j];
+									n2 = (u64)StrToS64(str, 16, &base);
+									buf = buf2 + (base - str);
+								}
+								else if (w == 8)
+								{
+									u32 const strl = 8;
+									char str[strl + 1];
+									str[strl] = '\0';
+									for (s32 j = 0; j < strl; ++j)
+										str[j] = buf2[j];
+									n2 = (u64)StrToS64(str, 16, &base);
+									buf = buf2 + (base - str);
+								}
+								else // if (w == 16)
+								{
+									u32 const strl = 16;
+									char str[strl + 1];
+									str[strl] = '\0';
+									for (s32 j = 0; j < strl; ++j)
+										str[j] = buf2[j];
+									n2 = (u64)StrToS64(str, 16, &base);
+									buf = buf2 + (base - str);
+								}
 							}
 
 							if (!suppress)

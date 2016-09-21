@@ -41,7 +41,7 @@ namespace xcore
      */
 
 	//------------------------------------------------------------------------------
-	uchar32			Peek(pcrune str, s32* len = NULL)
+	uchar32			PeekChar(pcrune str, s32* len = NULL)
 	{
 		uchar8 c = *str;
 		if ((c & 0x80) == 0x00) {
@@ -92,13 +92,13 @@ namespace xcore
 		ASSERT(base <= (26 + 26 + 10));
 
 		// Skip whitespace.
-		while (Peek(str) == ' ') {
+		while (PeekChar(str) == ' ') {
 			ReadChar(str);
 		}
 
-		uchar32 c;			// Current character.
-		c = Peek(str);		// Save sign indication.
-		uchar32 sign = c;	// If '-', then negative, otherwise positive.
+		uchar32 c;				// Current character.
+		c = PeekChar(str);		// Save sign indication.
+		uchar32 sign = c;		// If '-', then negative, otherwise positive.
 
 		// Skip sign.
 		if ((c == '-') || (c == '+')) {
@@ -433,7 +433,7 @@ namespace xcore
 	uchar32			ReadChar(prune& str)
 	{
 		s32 l = 0;
-		uchar32 c = Peek(str, &l);
+		uchar32 c = PeekChar(str, &l);
 		str += l;
 		return c;
 	}
@@ -443,7 +443,7 @@ namespace xcore
 	uchar32			ReadChar(pcrune& str)
 	{
 		s32 l = 0;
-		uchar32 c = Peek(str, &l);
+		uchar32 c = PeekChar(str, &l);
 		str += l;
 		return c;
 	}
@@ -469,14 +469,22 @@ namespace xcore
 
 	s32				LenInBytes(uchar32 c)
 	{
-		s32 len = 0;
-		if (c <= 0x7f) { len = 1; }
-		else if (c < 0x0800) { len = 2; }
-		else if (c < 0xd800) { len = 3; }
-		else if (c < 0xe000) { len = 0; }
-		else if (c < 0x010000) { len = 3; }
-		else if (c < 0x110000) { len = 4; }
-		return len;
+		if ((c & 0xffffff80) == 0x00) {
+			return 1;
+		}
+
+		s32 l = 0;
+		if ((c & 0xf8000000) == 0xf0000000) { l = 4; }
+		else if ((c & 0xf00000) == 0xe00000) { l = 3; }
+		else if ((c & 0xe000) == 0xc000) { l = 2; }
+		return l;
+	}
+
+	//------------------------------------------------------------------------------
+
+	s32				LenInChars(pcrune str, pcrune * end)
+	{
+		return StrLen(str, end);
 	}
 
 	//------------------------------------------------------------------------------
@@ -780,17 +788,17 @@ namespace xcore
 
 		// skip initial white spaces
 		pcrune p1 = p;
-		uchar32 c1 = 0;
-		while (true)
+		uchar32 c1 = PeekChar(p1);
+		while (c1 == ' ')
 		{
+			if (c1 == 0) break;
 			c1 = ReadChar(p1);
-			if (c1 == 0 || c1 == ' ') break;
 		}
 
 		if (c1 == '\0')
 		{
 			if (scanEnd)
-				*scanEnd = p;
+				*scanEnd = p1;
 			return 0;
 		}
 
@@ -838,22 +846,23 @@ namespace xcore
 
 		while (true)
 		{
-			uchar32 val = ReadChar(p);
+			s32 l;
+			uchar32 val = PeekChar(p, &l);
 
-			if (val >= 'a')
-				val -= 'a' - 'A';
-
-			if (val >= 'A'){
+			if (val >= 'a' && val <= 'f') {
+				val -= 'a';
+			} else if (val >= 'A' && val <= 'F') {
 				val = val - 'A' + 10;
+			} else if (val < '0' || val > '9') {
+				break;
 			} else {
-				if (val < '0' || val > '9') 
-					break;
 				val = val - '0';
 			}
 
 			if (val >= (u32)base) 
 				break;
 
+			p += l;
 			res = res * (u32)base + val;
 		}
 
@@ -1254,7 +1263,7 @@ namespace xcore
 		prune p = str;
 		while (true)
 		{
-			uchar32 c = Peek(p);
+			uchar32 c = PeekChar(p);
 			if (c == 0)
 				break;
 			if ((c >= 'a') && (c <= 'z')) {
@@ -1277,7 +1286,7 @@ namespace xcore
 		prune p = str;
 		while (true)
 		{
-			uchar32 c = Peek(p);
+			uchar32 c = PeekChar(p);
 			if (c == 0)
 				break;
 			if ((c >= 'A') && (c <= 'Z')) {
@@ -1671,19 +1680,22 @@ namespace xcore
 				break;
 			--inLen;
 
-			pcrune str1 = str;
+			s32 l;
+			uchar32 c1 = PeekChar(str, &l);
+			if (c1 == 0)
+				return NULL;
+
 			pcrune str2 = inFind;
-			while (true) {
-				uchar32 c1 = ReadChar(str1);
+			bool found = false;
+			while (!found) {
 				uchar32 c2 = ReadChar(str2);
-				if (c2 == 0)
-					return str;
-				if (c1 == 0)
-					return NULL;
-				if (c1 != c2)
-					break;
+				found = (c2 == c1);
 			}
-			ReadChar(str);
+
+			if (found) {
+				return str;
+			}
+			str += l;
 		}
 
 		return NULL;
@@ -1698,7 +1710,7 @@ namespace xcore
 				break;
 			--inLen;
 
-			uchar32 c = Peek(inStr);
+			uchar32 c = PeekChar(inStr);
 			if (ToLower(c) == inChar)
 				return inStr;
 			c = ReadChar(inStr);
@@ -1719,7 +1731,7 @@ namespace xcore
 				break;
 			--inLen;
 
-			uchar32 c = Peek(str);
+			uchar32 c = PeekChar(str);
 			if (c == 0)
 				break;
 
@@ -1814,7 +1826,7 @@ namespace xcore
 		pcrune end_pos = EndOfInStr;
 		while (cur_pos<end_pos)
 		{
-			uchar32 c = Peek(cur_pos);
+			uchar32 c = PeekChar(cur_pos);
 			if (Find(inCharSet, c)!=NULL)
 				return cur_pos;
 			ReadChar(cur_pos);

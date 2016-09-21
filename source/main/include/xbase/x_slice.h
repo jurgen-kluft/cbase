@@ -23,19 +23,6 @@ namespace xcore
 
 	struct slice
 	{
-		slice()
-		{
-			mData = NULL;
-			mFrom = 0;
-			mTo = 0;
-		}
-		slice(s32 from, s32 to)
-		{
-			mData = NULL;
-			mFrom = from;
-			mTo = to;
-		}
-
 		struct block
 		{
 			block()
@@ -61,7 +48,7 @@ namespace xcore
 					return &sNull;
 				}
 
-				mRefCount -= 1;
+				mRefCount--;
 				return (block*)this;
 			}
 
@@ -87,15 +74,30 @@ namespace xcore
 					data->mSize = tosize;
 					u32 const size2copy = x_intu::min(tosize, mSize);
 					xmem_utils::memcpy(&data->mData[0], &this->mData[from], size2copy);
+					decref();
 				}
 				return data;
 			}
 
 			s32				mRefCount;
-			x_iallocator*	mAllocator;
 			s32				mSize;									/// Number of allocated bytes
+			x_iallocator*	mAllocator;
 			xbyte			mData[32 - 4 - sizeof(void*) - 4];		/// Align the size of this struct by itself to 24
 		};
+
+		slice()
+		{
+			mData = NULL;
+			mFrom = 0;
+			mTo = 0;
+		}
+
+		slice(s32 from, s32 to)
+		{
+			mData = NULL;
+			mFrom = from;
+			mTo = to;
+		}
 
 		slice(slice const& other)
 		{
@@ -111,11 +113,18 @@ namespace xcore
 			mTo = to;
 		}
 
-		static slice		alloc(x_iallocator* allocator, s32 tosize) { slice s; s.mData = block::alloc(allocator, tosize); s.mFrom = 0; s.mTo = 16; return s; }
+		~slice()
+		{
+			mData->decref();
+			mFrom = 0;
+			mTo = 0;
+		}
+
+		static void			alloc(slice& slice, x_iallocator* allocator, s32 tosize) { slice.mData = block::alloc(allocator, tosize); slice.mFrom = 0; slice.mTo = 16; }
 		xbyte* 				resize(s32 len)			{ mData = mData->resize(mFrom, mFrom + len); mFrom = 0; mTo = len; return &mData->mData[0]; }
 
 		s32					len() const				{ return mTo - mFrom; }
-		slice				incref()				{ slice s(*this); mData->incref(); return s; }
+
 		slice				view(u32 from, u32 to)
 		{
 			slice s;
@@ -130,13 +139,12 @@ namespace xcore
 			return s;
 		}
 
+		void				release()				{ mData = mData->decref(); }
 
 		block*				mData;
 		u32					mFrom;
 		u32					mTo;
 	};
-
-
 }
 
 #endif
