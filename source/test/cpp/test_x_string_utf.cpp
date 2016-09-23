@@ -147,6 +147,19 @@ UNITTEST_SUITE_BEGIN(xutf)
 
 			CHECK_EQUAL(str_copy.len(), LenInChars(ascii_test_string));
 		}
+
+		UNITTEST_TEST(view)
+		{
+			xstring str(gTestAllocator);
+
+			const char* ascii_test_string = "this is a test string";
+			str = ascii_test_string;
+
+			xstring str_view = str(10, str.len());
+
+			CHECK_EQUAL(11, str_view.len());
+		}
+
 	}
 
 }

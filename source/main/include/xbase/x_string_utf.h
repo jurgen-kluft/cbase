@@ -23,28 +23,35 @@ namespace xcore
 	// and thus is easier to manipulate directly than UTF-8 or UTF-16
 	namespace UTF
 	{
-		// UTF-8, UTF-16, UTF-32 conversions
-		s32			uchar32to8	(uchar32 rune, ustr8  * dest);
-		s32			uchar32to16	(uchar32 rune, ustr16 * dest);
+		// ASCII, UTF-8, UTF-16, UTF-32 conversions
+		s32			utf32_to_ascii	(uchar32 rune, char   * dest);
+		s32			utf32_to_utf8	(uchar32 rune, ustr8  * dest);
+		s32			utf32_to_utf16	(uchar32 rune, ustr16 * dest);
 
-		s32			convert		(uchar8  const * from, uchar32 * to);
-		s32			convert		(uchar16 const * from, uchar32 * to);
+		s32			ascii_to_utf32	(char   * src, uchar32& rune);
+		s32			utf8_to_utf32	(ustr8  * src, uchar32& rune);
+		s32			utf16_to_utf32	(ustr16 * src, uchar32& rune);
 
-		s32			convert		(uchar32 const * from, uchar8  * to);
-		s32			convert		(uchar32 const * from, uchar16 * to);
+		s32			convert			(char const * from, uchar32 * to);
+		s32			convert			(ustr8  const * from, uchar32 * to);
+		s32			convert			(ustr16 const * from, uchar32 * to);
 
-		s32			readu8		(ustr8 const* str, uchar32& out_char);
-		s32			readu16		(ustr16 const * str, uchar32& out_char);
+		s32			convert			(uchar32 const * from, ustr8  * to);
+		s32			convert			(uchar32 const * from, ustr16 * to);
 
-		s32			len			(ustr8 const* str);
+		s32			read_ascii		(char const* str, uchar32& out_char);
+		s32			read_utf8		(ustr8 const* str, uchar32& out_char);
+		s32			read_utf16		(ustr16 const * str, uchar32& out_char);
 
-		bool		iseos		(ustr8  const * str);
-		bool		iseos		(ustr16 const * str);
-		bool		iseos		(ustr32 const * str);
+		s32			len				(ustr8 const* str);
 
-		bool		iscrln		(ustr8  const* ustr);
-		bool		iscrln		(ustr16 const* ustr);
-		bool		iscrln		(ustr32 const* ustr);
+		bool		iseos			(ustr8  const * str);
+		bool		iseos			(ustr16 const * str);
+		bool		iseos			(ustr32 const * str);
+
+		bool		iscrln			(ustr8  const* ustr);
+		bool		iscrln			(ustr16 const* ustr);
+		bool		iscrln			(ustr32 const* ustr);
 	}	// UTF
 
 	typedef uchar(*transform_functor)(s32 i, uchar32* begin, uchar32* end);
@@ -74,7 +81,7 @@ namespace xcore
 		xstring&		operator=(ustr8 const*);
 		xstring&		operator=(ustr16 const*);
 		xstring&		operator=(ustr32 const*);
-		xstring&		operator=(xstring &);
+		xstring&		operator=(xstring const&);
 
 		xstring			operator+ (char const* other);
 		xstring&		operator+=(char const* other);
@@ -82,6 +89,12 @@ namespace xcore
 		xstring&		operator+=(ustr8 const* other);
 		xstring			operator+ (xstring const& other);
 		xstring&		operator+=(xstring const& other);
+
+		bool			operator==(char const*) const;
+		bool			operator==(ustr8 const*) const;
+		bool			operator==(ustr16 const*) const;
+		bool			operator==(ustr32 const*) const;
+		bool			operator==(xstring const&) const;
 
 		void 			writeto(xwriter*) const;
 
