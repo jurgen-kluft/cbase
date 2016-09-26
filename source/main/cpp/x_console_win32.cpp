@@ -44,8 +44,8 @@ namespace xcore
 			ustr16* end16 = dst16 + sizeof(str16);
 			while (!UTF::iseos(str) && dst16 < end16) {
 				uchar32 c;
-				UTF::readu8(str, c);
-				s32 l = UTF::uchar32to16(c, dst16);
+				UTF::read_utf8(str, c);
+				s32 l = UTF::utf32_to_utf16(c, dst16);
 				dst16 += l;
 			}
 			str16[sizeof(str16) - 1] = 0;

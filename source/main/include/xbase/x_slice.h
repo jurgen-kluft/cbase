@@ -128,11 +128,11 @@ namespace xcore
 		slice				view(u32 from, u32 to)
 		{
 			slice s;
-			if ((mFrom + from) < mTo && (mFrom + to) < mTo)
+			if ((mFrom + from) < mTo && (mFrom + to) <= mTo)
 			{
 				s.mData = mData->incref();
 				s.mFrom = mFrom + from;
-				s.mTo = mTo + to;
+				s.mTo = mFrom + to;
 				return s;
 			}
 			s.mData = &block::sNull;

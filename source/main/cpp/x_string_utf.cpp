@@ -266,16 +266,16 @@ namespace xcore
 
 	uchar32 *		xstring::operator[](s32 i)
 	{
-		if ((mSlice.mFrom + i) < mSlice.mTo) {
-			return (uchar32 *)&mSlice.mData->mData[(mSlice.mFrom + i) * sizeof(uchar32)];
+		if ((mSlice.mFrom + (i*sizeof(uchar32))) < mSlice.mTo) {
+			return (uchar32 *)&mSlice.mData->mData[mSlice.mFrom + (i * sizeof(uchar32))];
 		}
 		return NULL;
 	}
 
 	uchar32 const*	xstring::operator[](s32 i) const
 	{
-		if ((mSlice.mFrom + i) < mSlice.mTo) {
-			return (uchar32 const*)&mSlice.mData->mData[(mSlice.mFrom + i) * sizeof(uchar32)];
+		if ((mSlice.mFrom + (i * sizeof(uchar32))) < mSlice.mTo) {
+			return (uchar32 const*)&mSlice.mData->mData[mSlice.mFrom + (i * sizeof(uchar32))];
 		}
 		return NULL;
 	}
@@ -313,7 +313,7 @@ namespace xcore
 		s32 const length = len() + str.len();
 		result.mSlice.resize(length * sizeof(uchar32));
 		x_memcopy(result.str_ptr(), str.str_ptr(), length * sizeof(uchar32));
-		result.mSlice.mTo = length;
+		result.mSlice.mTo = length * sizeof(uchar32);
 		return result;
 	}
 
@@ -322,7 +322,7 @@ namespace xcore
 		s32 const length = len() + str.len();
 		mSlice.resize(length * sizeof(uchar32));
 		x_memcopy(str_ptr(), str.str_ptr(), length * sizeof(uchar32));
-		mSlice.mTo = length;
+		mSlice.mTo = length * sizeof(uchar32);
 		return *this;
 	}
 
@@ -407,14 +407,14 @@ namespace xcore
 	void			xstring::writeto(xwriter* writer) const
 	{
 		if (mSlice.len() > 0) {
-			writer->write((xbyte const*)&mSlice.mData->mData[mSlice.mFrom * sizeof(uchar32)], mSlice.len());
+			writer->write((xbyte const*)&mSlice.mData->mData[mSlice.mFrom], mSlice.len());
 		}
 	}
 
 	xstring			xstring::copy() const
 	{
 		xstring s;
-		s.mSlice.mData = mSlice.mData->resize(mSlice.mFrom * sizeof(uchar), mSlice.mTo * sizeof(uchar));
+		s.mSlice.mData = mSlice.mData->resize(mSlice.mFrom, mSlice.mTo);
 		s.mSlice.mFrom = 0;
 		s.mSlice.mTo = mSlice.len();
 		return s;
@@ -482,18 +482,18 @@ namespace xcore
 	xstring			xstring::view(s32 from, s32 to)
 	{
 		xstring s;
-		s.mSlice = mSlice.view(from, to);
+		s.mSlice = mSlice.view(from * sizeof(uchar32), to * sizeof(uchar32));
 		return s;
 	}
 
 	uchar32*		xstring::str_ptr()
 	{
-		return (uchar32*)&mSlice.mData->mData[mSlice.mFrom * sizeof(uchar)];
+		return (uchar32*)&mSlice.mData->mData[mSlice.mFrom];
 	}
 
 	uchar32 const*	xstring::str_ptr() const
 	{
-		return (uchar32*)&mSlice.mData->mData[mSlice.mFrom * sizeof(uchar)];
+		return (uchar32*)&mSlice.mData->mData[mSlice.mFrom];
 	}
 
 	static void xstring_usecase()

@@ -814,21 +814,21 @@ namespace xcore
 	static inline uchar32 peek(ustr8* _str)
 	{
 		uchar32 c;
-		UTF::readu8(_str, c);
+		UTF::read_utf8(_str, c);
 		return c;
 	}
 
 	static inline uchar8 peek(ustr8 const* _str)
 	{
 		uchar32 c;
-		UTF::readu8(_str, c);
+		UTF::read_utf8(_str, c);
 		return c;
 	}
 
 	static inline uchar32 next(ustr8*& _str)
 	{
 		uchar32 c;
-		s32 const n = UTF::readu8(_str, c);
+		s32 const n = UTF::read_utf8(_str, c);
 		_str += n;
 		return c;
 	}
@@ -836,7 +836,7 @@ namespace xcore
 	static inline uchar32 next(ustr8 const*& _str)
 	{
 		uchar32 c;
-		s32 const n = UTF::readu8(_str, c);
+		s32 const n = UTF::read_utf8(_str, c);
 		_str += n;
 		return c;
 	}
@@ -844,7 +844,7 @@ namespace xcore
 	static inline s32 advance(ustr8*& _str)
 	{
 		uchar32 c;
-		s32 const n = UTF::readu8(_str, c);
+		s32 const n = UTF::read_utf8(_str, c);
 		_str += n;
 		return n;
 	}
@@ -852,7 +852,7 @@ namespace xcore
 	static inline s32 advance(ustr8 const*& _str)
 	{
 		uchar32 c;
-		s32 const n = UTF::readu8(_str, c);
+		s32 const n = UTF::read_utf8(_str, c);
 		_str += n;
 		return n;
 	}
@@ -1188,7 +1188,7 @@ namespace xcore
 						for (s32 k=0; k<prec; k++)
 						{
 							uchar32 kch = peek(kcp);
-							ASSERT(UTF::uchar32to8(kch, NULL)==1);	// currently we only support ASCII here
+							ASSERT(UTF::utf32_to_utf8(kch, NULL)==1);	// currently we only support ASCII here
 							if (kch == '\0')
 							{
 								p = kcp;
@@ -1308,7 +1308,7 @@ namespace xcore
 
 					// pretend it was %c with argument ch
 					cp   = buf;
-					cp  += UTF::uchar32to8(ch, cp);
+					cp  += UTF::utf32_to_utf8(ch, cp);
 					size = 1;
 					sign = '\0';
 

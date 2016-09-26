@@ -25,16 +25,16 @@ namespace xcore
 		inline void			clear()									{ mLen = 0; }
 
 		inline u32			max() const								{ return mSize; }
-		inline u32			size() const								{ return mLen; }
-		inline u32			reserved() const							{ return mSize; }
-		inline bool			empty() const							{ return mLen == 0; }
-		inline bool			full() const								{ ASSERT(mLen<=mSize); return mLen == mSize; }
+		inline u32			size() const							{ return mLen; }
+		inline u32			reserved() const						{ return mSize; }
+		inline bool			isempty() const							{ return mLen == 0; }
+		inline bool			isfull() const							{ ASSERT(mLen<=mSize); return mLen == mSize; }
 
-		inline void			push_back(T const& item)					{ ASSERT(mLen<mSize); mArray[mLen++] = item; }
+		inline void			push_back(T const& item)				{ ASSERT(mLen<mSize); mArray[mLen++] = item; }
 		inline bool			pop_back(T & out_item)					{ if (mLen>0) { out_item = mArray[--mLen]; return true; } else return false; }
 
-		inline char const*	begin() const							{ return mArray; }
-		inline char const*	end() const								{ return &mArray[mLen]; }
+		inline T*			begin() const							{ return mArray; }
+		inline T*			end() const								{ return &mArray[mLen]; }
 
 		inline T&			operator [] (s32 index)					{ ASSERT(index<(s32)mLen); return mArray[index]; }
 		inline T const&		operator [] (s32 index) const			{ ASSERT(index<(s32)mLen); return mArray[index]; }
@@ -44,9 +44,9 @@ namespace xcore
 
 		s32					index_of(T const& item) const;
 
-		void					swap(u32 a, u32 b);
-		void					remove(u32 i);
-		void					swap_remove(u32 i);
+		void				swap(u32 a, u32 b);
+		void				remove(u32 i);
+		void				swap_remove(u32 i);
 
 	private:
 		u32					mLen;

@@ -69,7 +69,7 @@ namespace xcore
 	* @date <2011-02-16T17:57:45-0400>
 	* @version 2.2.0
 	*
-	* The xlazy_instantiation policy allows the creation 
+	* The xheap_instantiation policy allows the creation 
 	* and lifetime of an instance of a particular type
 	* to be managed using dynamic allocation and a singleton
 	* destroyer. This will abide by the standard C++ rules 
