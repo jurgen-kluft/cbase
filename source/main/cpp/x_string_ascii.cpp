@@ -545,12 +545,11 @@ namespace xcore
 		ASSERT(src!=NULL);
 
 		prune start = dest;
-		prune end = dest;
-		while (start < end)
+		while (start < dest_end)
 		{
 			uchar32 c = ReadChar(src);
-			if (c == 0) break;
 			WriteChar(c, start, dest_end);
+			if (c == 0) break;
 		}
 		return start;
 	}
@@ -1529,8 +1528,8 @@ namespace xcore
 			// 6/ Compare("aaaa", "aabb", 4, 3) -> return -1;
 			while (true)
 			{
-				uchar32 c1 = ReadChar(inStr);
-				uchar32 c2 = ReadChar(inOther);
+				c1 = ReadChar(inStr);
+				c2 = ReadChar(inOther);
 				if (c1 == 0)
 					break;
 				if (c2 == 0) {
@@ -1560,8 +1559,8 @@ namespace xcore
 			// 5/ Compare("aaaa", "aabb", 3) -> return -1;
 			while (true)
 			{
-				uchar32 c1 = ReadChar(inStr);
-				uchar32 c2 = ReadChar(inOther);
+				c1 = ReadChar(inStr);
+				c2 = ReadChar(inOther);
 				if (c1 == 0)
 					break;
 				if (c2 == 0) {
@@ -1588,8 +1587,8 @@ namespace xcore
 			inLen = inOtherLen;
 			while (true)
 			{
-				uchar32 c1 = ReadChar(inStr);
-				uchar32 c2 = ReadChar(inOther);
+				c1 = ReadChar(inStr);
+				c2 = ReadChar(inOther);
 				if (c1 == 0)
 					break;
 				if (c2 == 0) {
@@ -1613,8 +1612,8 @@ namespace xcore
 			inLen=0;
 			while (true)
 			{
-				uchar32 c1 = ReadChar(inStr);
-				uchar32 c2 = ReadChar(inOther);
+				c1 = ReadChar(inStr);
+				c2 = ReadChar(inOther);
 				if (c1 == 0)
 					break;
 				if (c2 == 0) {
