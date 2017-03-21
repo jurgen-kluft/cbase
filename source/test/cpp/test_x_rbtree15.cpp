@@ -1,4 +1,6 @@
 #include "xbase\private\x_int128.h"
+
+#define DEBUG_RB15TREE
 #include "xbase\private\x_rbtree15.h"
 
 #include "xunittest\xunittest.h"
@@ -144,7 +146,7 @@ public:
 	}
 };
 
-struct mynode : public xrbnode15
+struct mynode : public xrbsnode15
 {
 	s32 mydata1;
 	s32 mydata2;
@@ -210,10 +212,7 @@ UNITTEST_SUITE_BEGIN(xrbtree15)
 
 			rb15_attach_to(node, lastNode, s, a);
 			rb15_insert_fixup(root, node, a);
-
-#ifdef DEBUG_RBTREE
 			rb15_check(root, a);
-#endif
 		}
 
 		UNITTEST_TEST(test_color)

@@ -1,11 +1,13 @@
 #include "xbase\x_tree.h"
 #include "xbase\x_allocator.h"
+#include "xbase\x_slice.h"
 
 #include "xunittest\xunittest.h"
 
 using namespace xcore;
 
 extern xcore::x_iallocator* gTestAllocator;
+
 
 UNITTEST_SUITE_BEGIN(xtree)
 {
@@ -22,8 +24,10 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		struct test_node : public xrbnode
 		{
-			test_node(u64 id_) : id(id_) { clear(); }
+			test_node(u64 id_ = 0) : id(id_) { clear(); }
 			u64		id;
+
+			XCORE_CLASS_PLACEMENT_NEW_DELETE
 		};
 
 		xrbnode*	test_tnd(void* key)
@@ -85,6 +89,67 @@ UNITTEST_SUITE_BEGIN(xtree)
 			{
 				node_to_destroy = xtree_clear(root, iterator);
 			} while (node_to_destroy!=NULL);
+		}
+
+
+		UNITTEST_TEST(case1)
+		{
+			x_type_allocator<test_node, x_cdtor_placement_new<test_node> > node_allocator(gTestAllocator);
+			test_node* root = node_allocator.allocate();
+
+			const int max_tracked_allocs = 1000;
+			test_node*	allocations[max_tracked_allocs];
+			for (s32 i = 0; i < max_tracked_allocs; ++i)
+			{
+				allocations[i] = NULL;
+			}
+
+			for (s32 i = 0; i < 10000; ++i)
+			{
+				for (s32 a = 0; a < 32; ++a)
+				{
+					test_node* node = node_allocator.allocate();
+					node->id = (u64)node;
+
+					int alloc_idx = rand() % max_tracked_allocs;
+					if (allocations[alloc_idx] != NULL)
+					{
+						test_node* p = allocations[alloc_idx];
+
+						xrbnode* f;
+						if (xtree_remove(root, f, p, test_cd))
+						{
+							node_allocator.deallocate(p);
+							allocations[alloc_idx] = NULL;
+						}
+					}
+					allocations[alloc_idx] = node;
+					xtree_insert(root, node, node, test_cd);
+				}
+			}
+
+			for (s32 i = 0; i < max_tracked_allocs; ++i)
+			{
+				if (allocations[i] != NULL)
+				{
+					test_node* p = allocations[i];
+					xrbnode* f;
+					if (xtree_remove(root, f, p, test_cd))
+					{
+						node_allocator.deallocate(p);
+						allocations[i] = NULL;
+					}
+				}
+			}
+
+			xrbnode* node_to_destroy = NULL;
+			xrbnode* iterator = NULL;
+			do
+			{
+				node_to_destroy = xtree_clear(root, iterator);
+			} while (node_to_destroy != NULL);
+
+			node_allocator.deallocate(root);
 		}
 
 	}

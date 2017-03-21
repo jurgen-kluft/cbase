@@ -14,13 +14,18 @@
 #include "xbase\x_memory_std.h"
 
 
-/**
-* xCore namespace
-*/
+//==============================================================================
+// xCore namespace
+//==============================================================================
 namespace xcore
 {
 	class x_iallocator;
 
+	//==============================================================================
+	// slice
+	// A reference counted slice block memory with a view/window (from,to).
+	// This class is used by xstring as a reference counted string.
+	//==============================================================================
 	struct slice
 	{
 		struct block

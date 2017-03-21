@@ -16,8 +16,7 @@ namespace xcore
 	// allows us to compress one node into 8 bytes. This node is also capable
 	// of managing siblings (nodes with the same key).
 	//
-	// Maximum number of nodes that we can use is 32768 since we need the upper
-	// bit of the u16 to store rb-color/parent-side/is-sibling.
+	// Maximum number of nodes is 65535
 	//
 	// Siblings are managed as a double linked list using the 'left' and 'right'
 	// child as 'prev' and 'next'. The 'parent' will point to the node that is
@@ -25,62 +24,82 @@ namespace xcore
 	// The double linked list is organized as a ring.
 	//
 	// sizeof(xrbnode15) == 8 bytes
+	// sizeof(xrbsnode15) == 12 bytes
 	//
-	struct xrbnode15
+	struct xrbnode15_base
 	{
+	public:
+		enum ESide { LEFT = 0x0, RIGHT = 0x1, SIDE_MASK = 0x1 };
+		enum EColor { BLACK = 0x0, RED = 0x2, COLOR_MASK = 0x2 };
+
 	protected:
-		static inline void	set_idx(u16& member, u16 value)				{ member = (member&0x8000) | (value&0x7fff); }
-		static inline u16	get_idx(u16 member)							{ return (member&0x7fff); }
-		static inline s32	get_flag(u16 member)						{ return (member&0x8000) ? 1 : 0; }
-		static inline void	set_flag0(u16& member)						{ member = (member&0x7fff); }
-		static inline void	set_flag1(u16& member)						{ member = (member|0x8000); }
-		static inline void	set_flag(u16& member, s32 flag)				{ member = (member&0x7fff) | ((flag!=0) ? 0x8000 : 0); }
-		static inline bool	is_flag0(u16 member)						{ return (member&0x8000) == 0; }
-		static inline bool	is_flag1(u16 member)						{ return (member&0x8000) != 0; }
+		static inline s32	get_side(u16 member)				{ return (member & SIDE_MASK) == RIGHT ? RIGHT : LEFT; }
+		static inline void	set_side(u16& member, ESide side)	{ member = (member & ~SIDE_MASK) | side; }
+		static inline s32	get_color(u16 member)				{ return (member & COLOR_MASK) == RED ? RED : BLACK; }
+		static inline void	set_color(u16& member, EColor color) { member = (member & ~COLOR_MASK) | color; }
 
 	public:
-		enum ESide	{ LEFT  = 0, RIGHT = 1 };
-		enum EColor { BLACK = 0, RED   = 1 };
+		inline void			set_child(u16 node, s32 dir)		{ child[dir] = node; }
+		inline u16			get_child(s32 dir) const			{ return child[dir]; }
+		inline u16			get_non_null_child(u16 nill) const	{ s32 d = child[LEFT] == nill; return child[d]; }
 
-		inline void			clear(u16 nill)								{ parent = sibling = child[LEFT] = child[RIGHT] = nill; }
+		inline void			set_right(u16 node)					{ child[RIGHT] = node; }
+		inline u16			get_right() const					{ return child[RIGHT]; }
 
-		inline void			set_child(u16 node, s32 dir)				{ child[dir] = node; }
-		inline u16			get_child(s32 dir) const					{ return child[dir]; }
-		inline u16			get_non_null_child(u16 nill) const			{ s32 d = child[LEFT]==nill; return child[d]; }
+		inline void			set_left(u16 node)					{ child[LEFT] = node; }
+		inline u16			get_left() const					{ return child[LEFT]; }
 
-		inline void			set_right(u16 node)							{ child[RIGHT] = node; }
-		inline u16			get_right() const							{ return child[RIGHT]; }
+		inline void			set_parent(u16 node)				{ parent = node; }
+		inline u16			get_parent() const					{ return parent; }
 
-		inline void			set_left(u16 node)							{ child[LEFT] = node; }
-		inline u16			get_left() const							{ return child[LEFT]; }
+		inline void			set_parent_side(s32 side)			{ ASSERT(side == LEFT || side == RIGHT); set_side(flags, (ESide)side); }
+		inline s32			get_parent_side() const				{ return get_side(flags); }
 
-		inline void			set_parent(u16 node)						{ set_idx(parent, node); }
-		inline u16			get_parent() const							{ return get_idx(parent); }
+		inline void			set_red()							{ set_color(flags, RED); }
+		inline void			set_black()							{ set_color(flags, BLACK); }
+		inline void			set_color(s32 colr)					{ ASSERT(colr == RED || colr == BLACK); set_color(flags, (EColor)colr); }
+		inline s32			get_color() const					{ s32 colr = get_color(flags); ASSERT(colr == RED || colr == BLACK); return colr; }
 
-		inline void			set_parent_side(s32 side)					{ ASSERT(side==LEFT || side==RIGHT); set_flag(parent, side); }
-		inline s32			get_parent_side() const						{ return get_flag(parent); }
+		inline bool			is_red() const						{ return get_color(flags) == RED; }
+		inline bool			is_black() const					{ return get_color(flags) == BLACK; }
 
-		inline void			set_red()									{ set_flag1(sibling); }
-		inline void			set_black()									{ set_flag0(sibling); }
-		inline void			set_color(s32 colr)							{ ASSERT(colr==RED || colr==BLACK); set_flag(sibling, colr); }
-		inline s32			get_color() const							{ s32 colr = get_flag(sibling); ASSERT(colr==RED || colr==BLACK); return colr; }
+		inline bool			is_nill(u16 nill) const				{ return child[RIGHT] == nill; }
 
-		inline bool			is_red() const								{ return is_flag1(sibling); }
-		inline bool			is_black() const							{ return is_flag0(sibling); }
+	protected:
+		u16					flags;
+		u16					parent;
+		u16					child[2];
+	};
 
-		static inline 
+	struct xrbnode15 : public xrbnode15_base
+	{
+	public:
+		inline void			clear(u16 nill)								{ flags = 0; parent = child[LEFT] = child[RIGHT] = nill; }
+
+		static inline
 		xrbnode15*			to_ptr(x_indexer* a, u16 i)					{ return (xrbnode15*)a->to_ptr(i); }
+	};
 
-		inline bool			has_sibling(u16 _nill) const				{ return get_idx(sibling)!=_nill; }
-		inline void			set_sibling(u16 s)							{ set_idx(sibling, s); }
-		inline u16			get_sibling() const							{ return get_idx(sibling); }
-		inline bool			is_sibling(u16 _nill) const					{ return (child[LEFT]!=_nill) && (get_idx(parent)==child[LEFT]) && (child[RIGHT]==get_idx(sibling)); }
+	struct xrbsnode15 : public xrbnode15_base
+	{
+		inline void			clear(u16 nill) { flags = 0; parent = sibling = child[LEFT] = child[RIGHT] = nill; }
+
+		static inline
+		xrbsnode15*			to_ptr(x_indexer* a, u16 i)					{ return (xrbsnode15*)a->to_ptr(i); }
+
+		inline bool			has_sibling(u16 _nill) const				{ return sibling != _nill; }
+		inline void			set_sibling(u16 s)							{ sibling = s; }
+		inline u16			get_sibling() const							{ return sibling; }
+		inline bool			is_sibling(u16 _nill) const 
+		{ 
+			return (child[LEFT] != _nill) && (parent == child[LEFT]) && (child[RIGHT] == sibling); 
+		}
 
 		void				insert_sibling(u16 _this, u16 _sib, u16 _nill, x_indexer* a)
 		{
-			xrbnode15* sibp = to_ptr(a, _sib);
+			xrbsnode15* sibp = (xrbsnode15*)a->to_ptr(_sib);
 
-			if (get_sibling() == _nill) 
+			if (get_sibling() == _nill)
 			{
 				set_sibling(_sib);
 				sibp->set_left(_sib);
@@ -91,9 +110,9 @@ namespace xcore
 			else
 			{
 				u16 const next = get_sibling();
-				xrbnode15* nextp = to_ptr(a, next);
+				xrbsnode15* nextp = (xrbsnode15*)a->to_ptr(next);
 				u16 const prev = nextp->get_left();
-				xrbnode15* prevp = to_ptr(a, prev);
+				xrbsnode15* prevp = (xrbsnode15*)a->to_ptr(prev);
 
 				sibp->set_left(prev);
 				sibp->set_parent(prev);
@@ -110,15 +129,15 @@ namespace xcore
 
 		void				remove_sibling(u16 sib, u16 nill, x_indexer* a)
 		{
-			xrbnode15* sibp = to_ptr(a, sib);
+			xrbsnode15* sibp = (xrbsnode15*)a->to_ptr(sib);
 			ASSERT(sibp->is_sibling(nill));
 
 			u16 const next = sibp->get_right();
 			if (next != sib)
 			{
-				xrbnode15* nextp = to_ptr(a, next);
+				xrbsnode15* nextp = (xrbsnode15*)a->to_ptr(next);
 				u16 const prev = sibp->get_left();
-				xrbnode15* prevp = to_ptr(a, prev);
+				xrbsnode15* prevp = (xrbsnode15*)a->to_ptr(prev);
 				nextp->set_left(prev);
 				nextp->set_parent(prev);
 				prevp->set_right(next);
@@ -132,10 +151,8 @@ namespace xcore
 
 			sibp->clear(nill);
 		}
-	protected:
-		u16					parent;
-		u16					child[2];
-		u16					sibling;
+
+		u16	sibling;
 	};
 
 	inline u16	rb15_minimum(u16 root, x_indexer* a)
@@ -174,12 +191,13 @@ namespace xcore
 	// 1 = predecessor
 	inline u16	rb15_inorder(s32 dir, u16 node, u16 nill, x_indexer* a)
 	{
-		if (node == nill)
+		xrbnode15* nodep = xrbnode15::to_ptr(a, node);
+		if (nodep->is_nill(nill))
 			return node;
 
-		xrbnode15* nodep = xrbnode15::to_ptr(a, node);
 		u16 next = nodep->get_child(1-dir);
-		if (next == nill)
+		xrbnode15* nextp = xrbnode15::to_ptr(a, next);
+		if (nextp->is_nill(nill))
 		{
 			if (nodep->get_parent_side() != dir)
 			{
@@ -215,11 +233,10 @@ namespace xcore
 	inline
 	u32				rb15_check_height(u16 nill, u16 node, x_indexer* a)
 	{
-		if (node == nill)
+		xrbnode15* nodep = xrbnode15::to_ptr(a, node);
+		if (node->is_nill())
 			return 0;
 		
-		xrbnode15* nodep = xrbnode15::to_ptr(a, node);
-
 		u16 left  = nodep->get_child(xrbnode15::LEFT );
 		u16 right = nodep->get_child(xrbnode15::RIGHT);
 		if (nodep->is_black())
@@ -260,6 +277,7 @@ namespace xcore
 		xrbnode15* parentp = xrbnode15::to_ptr(a, parent);
 		ASSERT(parentp->get_child(nodep->get_parent_side()) == node);
 		s32 o = (1 - s);
+		ASSERT(o == xrbnode15::LEFT || o == xrbnode15::RIGHT);
 		s32 ps = nodep->get_parent_side();
 		u16 top = nodep->get_child(o);
 		xrbnode15* topp = xrbnode15::to_ptr(a, top);
@@ -290,6 +308,8 @@ namespace xcore
 			ASSERT(gp != head);
 			s32 s = parentp->get_parent_side();
 			s32 o = (1 - s);
+			ASSERT(s == xrbnode15::LEFT || s == xrbnode15::RIGHT);
+			ASSERT(o == xrbnode15::LEFT || o == xrbnode15::RIGHT);
 			u16 gp_right = gpp->get_child(o);
 			xrbnode15* pp_right = xrbnode15::to_ptr(a, gp_right);
 			if (pp_right->is_red())
@@ -339,6 +359,9 @@ namespace xcore
 			ASSERT(parentp != headp && parent != head);
 			s32 const s = curp->get_parent_side();
 			s32 const o = (1 - s);
+			ASSERT(s == xrbnode15::LEFT || s == xrbnode15::RIGHT);
+			ASSERT(o == xrbnode15::LEFT || o == xrbnode15::RIGHT);
+
 			u16 w = parentp->get_child(o);
 			xrbnode15* wp = xrbnode15::to_ptr(a, w);
 

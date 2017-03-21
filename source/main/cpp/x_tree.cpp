@@ -194,7 +194,7 @@ namespace xcore
 		if (!red) 
 			rb_erase_fixup(root, replChild);
 
-		node->clear();
+		node->clear(root);
 
 #ifdef DEBUG_RBTREE
 		rb_check(root);
@@ -238,7 +238,7 @@ namespace xcore
 				save = (xrbnode*)it->get_child(xrbnode::RIGHT);
 				if (it != root)
 				{
-					it->clear();
+					it->clear(it);
 					return it;
 				}
 			}
@@ -253,7 +253,7 @@ namespace xcore
 			it = save;
 			save = NULL;
 		}
-		root->clear();
+		root->clear(root);
 		return NULL;
 	}
 }

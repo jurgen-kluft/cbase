@@ -8,6 +8,7 @@ using namespace xcore;
 
 extern xcore::x_iallocator* gTestAllocator;
 
+
 UNITTEST_SUITE_BEGIN(xutf)
 {
 	UNITTEST_FIXTURE(utilities)

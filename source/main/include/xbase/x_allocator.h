@@ -102,10 +102,10 @@ namespace xcore
 							x_type_allocator(x_iallocator* heap) : mAllocator(heap) { }
 							~x_type_allocator()								{ release(); }
 
-		T*					allocate(u32 align=4)							{ void* mem = mAllocator->allocate(sizeof(T), align); C c; T* obj = c.construct(mem); return obj; }
+		T*					allocate(u32 align=sizeof(void*))				{ void* mem = mAllocator->allocate(sizeof(T), align); C c; T* obj = c.construct(mem); return obj; }
 		void				deallocate(T* p)								{ C c; c.destruct(p); mAllocator->deallocate(p); }
 
-		void				release()										{ mAllocator->release(); mAllocator = NULL; }
+		void				release()										{ mAllocator = NULL; }
 	};
 	//==============================================================================
 	// END xCore namespace
