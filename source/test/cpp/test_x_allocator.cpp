@@ -50,7 +50,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			CHECK_NOT_NULL(object2);
 			CHECK_TRUE(3 == object2->mInteger);
 			CHECK_TRUE(4.0 == object2->mFloat);
-			CHECK_TRUE((s32)object2%4 == 0);
+			CHECK_TRUE((uptr)object2%4 == 0);
 			delete object2;
 		}
 
@@ -73,7 +73,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			CHECK_TRUE(object3[1].mFloat = 3.0);
 			CHECK_TRUE(object3[2].mInteger = 2);
 			CHECK_TRUE(object3[2].mFloat = 3.0);
-			CHECK_TRUE((s32)object3%32 == 0);
+			CHECK_TRUE((uptr)object3%32 == 0);
 			delete[] object3;
 		}
 

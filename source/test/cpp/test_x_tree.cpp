@@ -24,7 +24,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		struct test_node : public xrbnode
 		{
-			test_node(u64 id_ = 0) : id(id_) { clear(); }
+			test_node(u64 id_ = 0) : id(id_) { clear(this); }
 			u64		id;
 
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
@@ -57,7 +57,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 		UNITTEST_TEST(constructor1)
 		{
 			xrbnode root_node;
-			root_node.clear();
+			root_node.clear(&root_node);
 			xrbnode* root = &root_node;
 
 			test_node a(1);
