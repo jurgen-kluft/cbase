@@ -26,7 +26,7 @@ namespace xcore
 	//
 	// sizeof(xrbnode31) == 16 bytes
 	//
-	struct xrbnode31
+	struct xrbnode31_base
 	{
 	public:
 		enum ESide { LEFT = 0x0, RIGHT = 0x1, SIDE_MASK = 0x1 };
@@ -39,11 +39,8 @@ namespace xcore
 		static inline void	set_color(u32& member, EColor color)		{ member = (member & ~COLOR_MASK) | color; }
 
 	public:
-		inline void			clear(u32 nill)								{ flags = 0; parent = child[LEFT] = child[RIGHT] = nill; }
-
 		inline void			set_child(u32 node, s32 dir)				{ child[dir] = node; }
 		inline u32			get_child(s32 dir) const					{ return child[dir]; }
-		inline u32			get_non_null_child(u32 nill) const			{ s32 d = child[LEFT] == nill; return child[d]; }
 
 		inline void			set_right(u32 node)							{ child[RIGHT] = node; }
 		inline u32			get_right() const							{ return child[RIGHT]; }
@@ -65,13 +62,93 @@ namespace xcore
 		inline bool			is_red() const								{ return get_color(flags) == RED; }
 		inline bool			is_black() const							{ return get_color(flags) == BLACK; }
 
-		static inline 
-		xrbnode31*			to_ptr(x_indexer* a, u32 i)					{ return (xrbnode31*)a->to_ptr(i); }
+		inline bool			is_nill(u32 nill) const						{ return child[RIGHT] == nill; }
 
 	protected:
 		u32					flags;
 		u32					parent;
 		u32					child[2];
+	};
+
+	struct xrbnode31 : public xrbnode31_base
+	{
+	public:
+		inline void			clear(u32 nill)								{ flags = 0; parent = child[LEFT] = child[RIGHT] = nill; }
+
+		static inline 
+		xrbnode31*			to_ptr(x_indexer* a, u32 i)					{ return (xrbnode31*)a->to_ptr(i); }
+	};
+
+	struct xrbsnode31 : public xrbnode31_base
+	{
+		inline void			clear(u32 nill) { flags = 0; parent = sibling = child[LEFT] = child[RIGHT] = nill; }
+
+		static inline
+		xrbsnode31*			to_ptr(x_indexer* a, u32 i)					{ return (xrbsnode31*)a->to_ptr(i); }
+
+		inline bool			has_sibling(u32 _nill) const				{ return sibling != _nill; }
+		inline void			set_sibling(u32 s)							{ sibling = s; }
+		inline u32			get_sibling() const							{ return sibling; }
+		inline bool			is_sibling(u32 _nill) const 
+		{ 
+			return (child[LEFT] != _nill) && (parent == child[LEFT]) && (child[RIGHT] == sibling); 
+		}
+
+		void				insert_sibling(u32 _this, u32 _sib, u32 _nill, x_indexer* a)
+		{
+			xrbsnode31* sibp = (xrbsnode31*)a->to_ptr(_sib);
+
+			if (get_sibling() == _nill)
+			{
+				set_sibling(_sib);
+				sibp->set_left(_sib);
+				sibp->set_parent(_sib);
+				sibp->set_right(_sib);
+				sibp->set_sibling(_sib);
+			}
+			else
+			{
+				u16 const next = get_sibling();
+				xrbsnode31* nextp = (xrbsnode31*)a->to_ptr(next);
+				u16 const prev = nextp->get_left();
+				xrbsnode31* prevp = (xrbsnode31*)a->to_ptr(prev);
+				sibp->set_left(prev);
+				sibp->set_parent(prev);
+				sibp->set_right(next);
+				sibp->set_sibling(next);
+				prevp->set_right(_sib);
+				prevp->set_sibling(_sib);
+				nextp->set_left(_sib);
+				nextp->set_parent(_sib);
+			}
+		}
+
+		void				remove_sibling(u32 sib, u32 nill, x_indexer* a)
+		{
+			xrbsnode31* sibp = (xrbsnode31*)a->to_ptr(sib);
+			ASSERT(sibp->is_sibling(nill));
+
+			u32 const next = sibp->get_right();
+			if (next != sib)
+			{
+				xrbsnode31* nextp = (xrbsnode31*)a->to_ptr(next);
+				u32 const prev = sibp->get_left();
+				xrbsnode31* prevp = (xrbsnode31*)a->to_ptr(prev);
+				nextp->set_left(prev);
+				nextp->set_parent(prev);
+				prevp->set_right(next);
+				prevp->set_sibling(next);
+				set_sibling(next);
+			}
+			else
+			{
+				set_sibling(nill);
+			}
+
+			sibp->clear(nill);
+		}
+
+		u32	sibling;
 	};
 
 	inline u32	rb31_minimum(u32 root, x_indexer* a)
@@ -110,12 +187,13 @@ namespace xcore
 	// 1 = predecessor
 	inline u32	rb31_inorder(s32 dir, u32 node, u32 nill, x_indexer* a)
 	{
-		if (node == nill)
+		xrbnode31* nodep = xrbnode31::to_ptr(a, node);
+		if (nodep->is_nill(node))
 			return node;
 
-		xrbnode31* nodep = xrbnode31::to_ptr(a, node);
 		u32 next = nodep->get_child(1-dir);
-		if (next == nill)
+		xrbnode31* nextp = xrbnode31::to_ptr(a, next);
+		if (nextp->is_nill(next))
 		{
 			if (nodep->get_parent_side() != dir)
 			{
@@ -135,9 +213,9 @@ namespace xcore
 		{
 			do {
 				node = next;
-				xrbnode31* nextp = xrbnode31::to_ptr(a, next);
 				next = nextp->get_child(dir);
-			} while (next!=nill);
+				nextp = xrbnode31::to_ptr(a, next);
+			} while (!nextp->is_nill(next));
 		}
 		return node;
 	}
@@ -178,7 +256,7 @@ namespace xcore
 		u32 left  = rootp->get_left();
 		u32 right = rootp->get_right();
 
-		ASSERT(rootp->get_right() == root);
+		ASSERT(rootp->is_nill(root));
 		ASSERT(rootp->is_black());
 		ASSERT(right == root);
 		xrbnode31* leftp = xrbnode31::to_ptr(a, left);
@@ -301,8 +379,8 @@ namespace xcore
 
 			{
 				ASSERT(w != head);
-				u32 const left = wp->get_left();
-				u32 const right = wp->get_right();
+				u32 left = wp->get_left();
+				u32 right = wp->get_right();
 				xrbnode31* leftp = xrbnode31::to_ptr(a, left);
 				xrbnode31* rightp = xrbnode31::to_ptr(a, right);
 				if (leftp->is_black() && rightp->is_black())
@@ -316,22 +394,28 @@ namespace xcore
 					xrbnode31* op = (o==xrbnode31::LEFT) ? leftp : rightp;
 					if (op->is_black()) 
 					{
-						u32 const  c  = (s==xrbnode31::LEFT) ? left : right;
-						xrbnode31* cp = (s==xrbnode31::LEFT) ? leftp : rightp;
-						cp->set_black();
+						u32 const  sc  = (s==xrbnode31::LEFT) ? left : right;
+						xrbnode31* scp = (s==xrbnode31::LEFT) ? leftp : rightp;
+						scp->set_black();
 						wp->set_red();
 						rb31_rotate(w, o, a);
-						w  = c;
-						wp = cp;
+						w  = sc;
+						wp = scp;
 						ASSERT(w != head);
+
+						// w/wp have changed, update left/right
+						left = wp->get_left();
+						right = wp->get_right();
+						leftp = xrbnode31::to_ptr(a, left);
+						rightp = xrbnode31::to_ptr(a, right);
 					}
 					{
-						u32 const  c  = (o==xrbnode31::LEFT) ? left : right;
-						xrbnode31* cp = (o==xrbnode31::LEFT) ? leftp : rightp;
-						ASSERT(cp->is_red());
+						u32 const  oc  = (o==xrbnode31::LEFT) ? left : right;
+						xrbnode31* ocp = (o==xrbnode31::LEFT) ? leftp : rightp;
+						ASSERT(ocp->is_red());
 						wp->set_color(parentp->get_color());
 						parentp->set_black();
-						cp->set_black();
+						ocp->set_black();
 						rb31_rotate(parent, s, a);
 						cur = headp->get_child(xrbnode31::LEFT);
 						curp = xrbnode31::to_ptr(a, cur);

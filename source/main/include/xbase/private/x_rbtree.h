@@ -31,7 +31,6 @@ namespace xcore
 
 		inline void			set_child(xrbnode* node, s32 dir)			{ child[dir] = node; }
 		inline xrbnode*		get_child(s32 dir) const					{ return child[dir]; }
-		inline xrbnode*		get_non_null_child() const					{ s32 d = (child[LEFT]->is_nill()) ? RIGHT : LEFT; return child[d]; }
 
 		inline void			set_right(xrbnode* node)					{ child[RIGHT] = node; }
 		inline xrbnode* 	get_right() const							{ return child[RIGHT]; }

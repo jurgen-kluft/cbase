@@ -33,15 +33,14 @@ namespace xcore
 		enum EColor { BLACK = 0x0, RED = 0x2, COLOR_MASK = 0x2 };
 
 	protected:
-		static inline s32	get_side(u16 member)				{ return (member & SIDE_MASK) == RIGHT ? RIGHT : LEFT; }
+		static inline s32	get_side(u16 member)				{ return ((member & SIDE_MASK) == RIGHT) ? RIGHT : LEFT; }
 		static inline void	set_side(u16& member, ESide side)	{ member = (member & ~SIDE_MASK) | side; }
-		static inline s32	get_color(u16 member)				{ return (member & COLOR_MASK) == RED ? RED : BLACK; }
+		static inline s32	get_color(u16 member)				{ return ((member & COLOR_MASK) == RED) ? RED : BLACK; }
 		static inline void	set_color(u16& member, EColor color) { member = (member & ~COLOR_MASK) | color; }
 
 	public:
 		inline void			set_child(u16 node, s32 dir)		{ child[dir] = node; }
 		inline u16			get_child(s32 dir) const			{ return child[dir]; }
-		inline u16			get_non_null_child(u16 nill) const	{ s32 d = child[LEFT] == nill; return child[d]; }
 
 		inline void			set_right(u16 node)					{ child[RIGHT] = node; }
 		inline u16			get_right() const					{ return child[RIGHT]; }
@@ -192,12 +191,12 @@ namespace xcore
 	inline u16	rb15_inorder(s32 dir, u16 node, u16 nill, x_indexer* a)
 	{
 		xrbnode15* nodep = xrbnode15::to_ptr(a, node);
-		if (nodep->is_nill(nill))
+		if (nodep->is_nill(node))
 			return node;
 
 		u16 next = nodep->get_child(1-dir);
 		xrbnode15* nextp = xrbnode15::to_ptr(a, next);
-		if (nextp->is_nill(nill))
+		if (nextp->is_nill(next))
 		{
 			if (nodep->get_parent_side() != dir)
 			{
@@ -217,9 +216,9 @@ namespace xcore
 		{
 			do {
 				node = next;
-				xrbnode15* nextp = xrbnode15::to_ptr(a, next);
 				next = nextp->get_child(dir);
-			} while (next!=nill);
+				nextp = xrbnode15::to_ptr(a, next);
+			} while (!nextp->is_nill(next));
 		}
 		return node;
 	}
@@ -233,9 +232,10 @@ namespace xcore
 	inline
 	u32				rb15_check_height(u16 nill, u16 node, x_indexer* a)
 	{
-		xrbnode15* nodep = xrbnode15::to_ptr(a, node);
-		if (node->is_nill())
+		if (node == nill)
 			return 0;
+			
+		xrbnode15* nodep = xrbnode15::to_ptr(a, node);
 		
 		u16 left  = nodep->get_child(xrbnode15::LEFT );
 		u16 right = nodep->get_child(xrbnode15::RIGHT);
@@ -259,7 +259,7 @@ namespace xcore
 		u16 left  = rootp->get_left();
 		u16 right = rootp->get_right();
 
-		ASSERT(rootp->get_right() == root);
+		ASSERT(rootp->is_nill(root));
 		ASSERT(rootp->is_black());
 		ASSERT(right == root);
 		xrbnode15* leftp = xrbnode15::to_ptr(a, left);
@@ -383,8 +383,8 @@ namespace xcore
 
 			{
 				ASSERT(w != head);
-				u16 const left = wp->get_left();
-				u16 const right = wp->get_right();
+				u16 left = wp->get_left();
+				u16 right = wp->get_right();
 				xrbnode15* leftp = xrbnode15::to_ptr(a, left);
 				xrbnode15* rightp = xrbnode15::to_ptr(a, right);
 				if (leftp->is_black() && rightp->is_black())
@@ -398,22 +398,29 @@ namespace xcore
 					xrbnode15* op = (o==xrbnode15::LEFT) ? leftp : rightp;
 					if (op->is_black()) 
 					{
-						u16 const  c  = (s==xrbnode15::LEFT) ? left : right;
-						xrbnode15* cp = (s==xrbnode15::LEFT) ? leftp : rightp;
-						cp->set_black();
+						u16 const  sc  = (s==xrbnode15::LEFT) ? left : right;
+						xrbnode15* scp = (s==xrbnode15::LEFT) ? leftp : rightp;
+						scp->set_black();
 						wp->set_red();
 						rb15_rotate(w, o, a);
-						w  = c;
-						wp = cp;
+						w  = sc;
+						wp = scp;
 						ASSERT(w != head);
+						
+						// w/wp have changed, update left/right
+						left = wp->get_left();
+						right = wp->get_right();
+						leftp = xrbnode15::to_ptr(a, left);
+						rightp = xrbnode15::to_ptr(a, right);
 					}
+
 					{
-						u16 const  c  = (o==xrbnode15::LEFT) ? left : right;
-						xrbnode15* cp = (o==xrbnode15::LEFT) ? leftp : rightp;
-						ASSERT(cp->is_red());
+						u16 const  oc  = (o==xrbnode15::LEFT) ? left : right;
+						xrbnode15* ocp = (o==xrbnode15::LEFT) ? leftp : rightp;
+						ASSERT(ocp->is_red());
 						wp->set_color(parentp->get_color());
 						parentp->set_black();
-						cp->set_black();
+						ocp->set_black();
 						rb15_rotate(parent, s, a);
 						cur = headp->get_child(xrbnode15::LEFT);
 						curp = xrbnode15::to_ptr(a, cur);
