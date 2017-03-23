@@ -20,111 +20,140 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		UNITTEST_FIXTURE_TEARDOWN()
 		{
+
 		}
 
-		struct test_node : public xrbnode
+		struct mynode : public xrbnode
 		{
-			test_node(u64 id_ = 0) : id(id_) { clear(this); }
-			u64		id;
+			mynode() : id(0) {}
+			mynode(uptr i) : id(i) { clear(); }
+			uptr id;
 
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
 		};
 
-		xrbnode*	test_tnd(void* key)
+		s32		rb_node_compare(xrbnode* aa, xrbnode* bb)
 		{
-			test_node* tn = (test_node*)key;
-			return tn;
+			mynode* a = (mynode*)aa;
+			mynode* b = (mynode*)bb;
+
+			if (a->id < b->id)
+				return -1;
+			else if (a->id > b->id)
+				return 1;
+			return 0;
 		}
 
-		s32			test_id(const xrbnode* node, const void* key)
+		void	rb_node_remove(xrbnode* to_replace, xrbnode* to_remove)
 		{
-			test_node* tn_node = (test_node*)node;
-			u64 id = (u64)key;
-			if (tn_node->id < id) return 1;
-			else if (tn_node->id > id) return -1;
-			else return 0;
-		}
-
-		s32			test_cd(const xrbnode* node, const void* key)
-		{
-			test_node* tn_node = (test_node*)node;
-			test_node* tn_key  = (test_node*)key;
-			if (tn_node->id < tn_key->id) return 1;
-			else if (tn_node->id > tn_key->id) return -1;
-			else return 0;
+			mynode* replacer = (mynode*)to_replace;
+			mynode* removed = (mynode*)to_remove;
+			uptr id = replacer->id;
+			replacer->id = removed->id;
+			removed->id = id;
 		}
 
 		UNITTEST_TEST(constructor1)
 		{
-			xrbnode root_node;
-			root_node.clear(&root_node);
-			xrbnode* root = &root_node;
+			xrbnode* root = NULL;
 
-			test_node a(1);
-			test_node b(2);
-			test_node c(3);
-			test_node d(4);
+			mynode a(1);
+			mynode b(2);
+			mynode c(3);
+			mynode d(4);
 
-			xtree_insert(root, &c, &c, test_cd);
-			xtree_insert(root, &b, &b, test_cd);
-			xtree_insert(root, &d, &d, test_cd);
-			xtree_insert(root, &a, &a, test_cd);
+			bool inserted;
+			inserted = xtree_insert(root, &a, rb_node_compare);
+			CHECK_TRUE(inserted);
+			inserted = xtree_insert(root, &b, rb_node_compare);
+			CHECK_TRUE(inserted);
+			inserted = xtree_insert(root, &c, rb_node_compare);
+			CHECK_TRUE(inserted);
+			inserted = xtree_insert(root, &d, rb_node_compare);
+			CHECK_TRUE(inserted);
 
-			xrbnode* f3;
-			xtree_find(root, f3, (void*)3, test_id);
-			CHECK_EQUAL(&c, f3);
-			xrbnode* f1;
-			xtree_find(root, f1, (void*)1, test_id);
-			CHECK_EQUAL(&a, f1);
-			xrbnode* f2;
-			xtree_find(root, f2, (void*)2, test_id);
-			CHECK_EQUAL(&b, f2);
-			xrbnode* f4;
-			xtree_find(root, f4, (void*)4, test_id);
-			CHECK_EQUAL(&d, f4);
+			xrbnode* f = NULL;
+			xtree_find(root, &c, rb_node_compare, f);
+			CHECK_EQUAL(&c, f);
+			xtree_find(root, &a, rb_node_compare, f);
+			CHECK_EQUAL(&a, f);
+			xtree_find(root, &b, rb_node_compare, f);
+			CHECK_EQUAL(&b, f);
+			xtree_find(root, &d, rb_node_compare, f);
+			CHECK_EQUAL(&d, f);
 
 			xrbnode* node_to_destroy = NULL;
-			xrbnode* iterator = NULL;
+			s32 i = 0;
 			do
 			{
-				node_to_destroy = xtree_clear(root, iterator);
+				node_to_destroy = xtree_clear(root);
+				if (i == 0)
+				{
+					CHECK_TRUE(node_to_destroy == &a);
+				}
+				else if (i == 1)
+				{
+					CHECK_TRUE(node_to_destroy == &b);
+				}
+				else if (i == 2)
+				{
+					CHECK_TRUE(node_to_destroy == &c);
+				}
+				else if (i == 3)
+				{
+					CHECK_TRUE(node_to_destroy == &d);
+				}
+				else if (i == 4)
+				{
+					CHECK_TRUE(node_to_destroy == NULL);
+				}
+				i++;
 			} while (node_to_destroy!=NULL);
 		}
 
 
 		UNITTEST_TEST(case1)
 		{
-			x_type_allocator<test_node, x_cdtor_placement_new<test_node> > node_allocator(gTestAllocator);
-			test_node* root = node_allocator.allocate();
+			x_type_allocator<mynode, x_cdtor_placement_new<mynode> > node_allocator(gTestAllocator);
+			
+			xrbnode* root = NULL;
 
 			const int max_tracked_allocs = 1000;
-			test_node*	allocations[max_tracked_allocs];
+			uptr allocations[max_tracked_allocs];
 			for (s32 i = 0; i < max_tracked_allocs; ++i)
 			{
-				allocations[i] = NULL;
+				allocations[i] = 0;
 			}
 
 			for (s32 i = 0; i < 10000; ++i)
 			{
 				for (s32 a = 0; a < 32; ++a)
 				{
-					test_node* node = node_allocator.allocate();
-					node->id = (u64)node;
+					mynode* node = node_allocator.allocate();
+					node->clear();
+					node->id = (a*20000 + i);
 
 					int alloc_idx = rand() % max_tracked_allocs;
-					if (allocations[alloc_idx] != NULL)
+					if (allocations[alloc_idx] != 0)
 					{
-						test_node* p = allocations[alloc_idx];
+						uptr pid = allocations[alloc_idx];
+						mynode _p_(pid);
 
-						xrbnode* f;
-						if (xtree_remove(root, f, p, test_cd))
+						xrbnode* f = NULL;
+						if (xtree_remove(root, &_p_, rb_node_compare, rb_node_remove, f))
 						{
-							node_allocator.deallocate(p);
-							allocations[alloc_idx] = NULL;
+							CHECK_EQUAL(((mynode*)f)->id, pid);
+							node_allocator.deallocate((mynode*)f);
 						}
+						else
+						{
+							CHECK_EQUAL(0, 1);
+						}
+						allocations[alloc_idx] = 0;
 					}
-					allocations[alloc_idx] = node;
-					xtree_insert(root, node, node, test_cd);
+					allocations[alloc_idx] = node->id;
+					bool inserted = xtree_insert(root, node, rb_node_compare);
+					CHECK_TRUE(inserted);
 				}
 			}
 
@@ -132,24 +161,27 @@ UNITTEST_SUITE_BEGIN(xtree)
 			{
 				if (allocations[i] != NULL)
 				{
-					test_node* p = allocations[i];
-					xrbnode* f;
-					if (xtree_remove(root, f, p, test_cd))
+					uptr pid = allocations[i];
+					mynode _p_(pid);
+
+					xrbnode* f = NULL;
+					if (xtree_remove(root, &_p_, rb_node_compare, rb_node_remove, f))
 					{
-						node_allocator.deallocate(p);
-						allocations[i] = NULL;
+						CHECK_EQUAL(((mynode*)f)->id, pid);
+						node_allocator.deallocate((mynode*)f);
+						if (f == root)
+							root = NULL;
 					}
+					allocations[i] = 0;
 				}
 			}
 
-			xrbnode* node_to_destroy = NULL;
-			xrbnode* iterator = NULL;
-			do
+			xrbnode* node_to_destroy = xtree_clear(root);
+			while (node_to_destroy != NULL)
 			{
-				node_to_destroy = xtree_clear(root, iterator);
-			} while (node_to_destroy != NULL);
-
-			node_allocator.deallocate(root);
+				node_allocator.deallocate((mynode*)node_to_destroy);
+				node_to_destroy = xtree_clear(root);
+			};
 		}
 
 	}

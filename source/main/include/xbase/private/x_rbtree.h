@@ -6,6 +6,7 @@
 #pragma once 
 #endif
 
+#include "xbase\x_allocator.h"
 #include "xbase\x_debug.h"
 
 namespace xcore
@@ -17,17 +18,15 @@ namespace xcore
 	struct xrbnode
 	{
 	public:
-		enum ESide { LEFT = 0x0, RIGHT = 0x1, SIDE_MASK = 0x1 };
+		enum ESide { LEFT = 0x0, RIGHT = 0x1 };
 		enum EColor { BLACK = 0x0, RED = 0x2, COLOR_MASK = 0x2 };
 
 	protected:
-		static inline s32	get_side(xsize_t member)					{ return ((member & SIDE_MASK) == RIGHT) ? RIGHT : LEFT; }
-		static inline void	set_side(xsize_t& member, ESide side)		{ member = (member & ~SIDE_MASK) | side; }
-		static inline s32	get_color(xsize_t member)					{ return ((member & COLOR_MASK) == RED) ? RED : BLACK; }
-		static inline void	set_color(xsize_t& member, EColor color)	{ member = (member & ~COLOR_MASK) | color; }
+		static inline s32	get_color(u32 member)						{ return (s32)(member & COLOR_MASK); }
+		static inline void	set_color(u32& member, u32 color)			{ member = (member & ~COLOR_MASK) | color; }
 
 	public:
-		inline void			clear()										{ flags = 0; parent = child[LEFT] = child[RIGHT] = NULL; }
+		inline void			clear()										{ child[LEFT] = child[RIGHT] = NULL; flags = 0; }
 
 		inline void			set_child(xrbnode* node, s32 dir)			{ child[dir] = node; }
 		inline xrbnode*		get_child(s32 dir) const					{ return child[dir]; }
@@ -38,27 +37,23 @@ namespace xcore
 		inline void			set_left(xrbnode* node)						{ child[LEFT] = node; }
 		inline xrbnode* 	get_left() const							{ return child[LEFT]; }
 
-		inline void			set_parent(xrbnode* node)					{ parent = node; }
-		inline xrbnode*		get_parent() const							{ return parent; }
-
-		inline void			set_parent_side(s32 side)					{ ASSERT(side==LEFT || side==RIGHT); set_side(flags, (ESide)side); }
-		inline s32			get_parent_side() const						{ return get_side(flags); }
+		inline s32			get_parent_side(xrbnode* node)				{ ASSERT(node==child[LEFT] || node==child[RIGHT]); return child[LEFT] == node ? LEFT : RIGHT; }
 
 		inline void			set_red()									{ set_color(flags, RED); }
 		inline void			set_black()									{ set_color(flags, BLACK); }
-		inline void			set_color(s32 colr)							{ ASSERT(colr==RED || colr==BLACK); set_color(flags, (EColor)colr); }
+		inline void			set_color(s32 colr)							{ ASSERT(colr==RED || colr==BLACK); set_color(flags, (uptr)colr); }
 		inline s32			get_color() const							{ s32 colr = get_color(flags); ASSERT(colr==RED || colr==BLACK); return colr; }
 
 		inline bool			is_red() const								{ return get_color(flags) == RED; }
 		inline bool			is_black() const							{ return get_color(flags) == BLACK; }
 
 		inline bool			is_used() const								{ return this != child[RIGHT]; }
-		inline bool			is_nill() const								{ return this == child[RIGHT]; }
+		inline bool			is_nill() const								{ return child[RIGHT]; }
 
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
 	protected:
-		xsize_t				flags;
-		xrbnode*			parent;
 		xrbnode*			child[2];
+		u32					flags;
 	};
 
 
@@ -101,85 +96,74 @@ namespace xcore
 		xrbnode_multi*		siblings;
 	};
 
-	typedef s32(*xrbnode_cmp_f) (xrbnode * a, xrbnode * b);
-	typedef void(*xrbnode_swap_f) (xrbnode * a, xrbnode * b);
-
-	inline xrbnode*	rb_minimum(xrbnode* root)
+	inline s32 rb_flip_dir(s32 dir)
 	{
-		xrbnode*	node      = root->get_left();
-		xrbnode*	lastNode  = node;
-		while (node != NULL)
-		{
-			lastNode  = node;
-			node      = node->get_left();
-		};
-		return lastNode;
+		ASSERT(xrbnode::RIGHT == 1);
+		return dir ^ xrbnode::RIGHT;
 	}
 
-	inline xrbnode*	rb_maximum(xrbnode* root)
+	inline bool	rb_is_red(xrbnode* node)
 	{
-		xrbnode*	node      = root->get_left();
-		xrbnode*	lastNode  = node;
-		while (node != NULL)
-		{
-			lastNode  = node;
-			node      = node->get_right();
-		};
-		return lastNode;
+		return node != NULL ? node->is_red() : xrbnode::BLACK;
 	}
 
-	// Inorder traversal (minimum -> maximum)
-	inline xrbnode*	rb_inorder(xrbnode* node)
+	struct rb_iterator
 	{
-		xrbnode* right = node->get_right();
-		if (right == NULL)
+		xrbnode*	init(xrbnode * root, s32 dir)
 		{
-			while (node->get_parent_side() == xrbnode::RIGHT)
-				node = node->get_parent();
-			node = node->get_parent();
-		}
-		else
-		{	// Right child and then traverse fully left
-			node = right;
-			xrbnode* left = node->get_left();
-			while (left != NULL)
+			xrbnode * result = NULL;
+			if (root)
 			{
-				node = left;
-				left = left->get_left();
+				node = root;
+				top = 0;
+
+				// Save the path for later selfersal
+				if (node != NULL)
+				{
+					while (node->get_child(dir) != NULL)
+					{
+						path[top++] = node;
+						node = node->get_child(dir);
+					}
+				}
+				result = node;
 			}
+			return result;
 		}
-		return node;
-	}
 
-	#ifdef TARGET_TEST
-		#define DEBUG_RBTREE
-	#endif
+		xrbnode*	move(s32 dir)
+		{
+			if (node->get_child(dir) != NULL)
+			{	// Continue down this branch
+				path[top++] = node;
+				node = node->get_child(dir);
+				while (node->get_child(!dir) != NULL)
+				{
+					path[top++] = node;
+					node = node->get_child(!dir);
+				}
+			}
+			else
+			{	// Move to the next branch
+				xrbnode * last = NULL;
+				do {
+					if (top == 0)
+					{
+						node = NULL;
+						break;
+					}
+					last = node;
+					node = path[--top];
+				} while (last == node->get_child(dir));
+			}
+			return node;
+		}
 
-#ifdef DEBUG_RBTREE
-	inline
-	u32				rb_check_height(xrbnode* nill, xrbnode* node)
-	{
-		if (node == nill)
-			return 0;
-		if (node->is_black())
-			return rb_check_height(nill, node->get_child(xrbnode::LEFT)) + rb_check_height(nill, node->get_child(xrbnode::RIGHT)) + 1;
-		ASSERT(node->get_child(xrbnode::LEFT)->is_black() && node->get_child(xrbnode::RIGHT)->is_black());
-		xcore::u32 lh = rb_check_height(nill, node->get_child(xrbnode::LEFT));
-		xcore::u32 rh = rb_check_height(nill, node->get_child(xrbnode::RIGHT));
-		ASSERT(lh == rh);
-		return lh;
-	}
+		xrbnode*	node;
 
-	inline
-	void			rb_check(xrbnode* root)
-	{
-		ASSERT(root->is_nill());
-		ASSERT(root->is_black());
-		ASSERT(root->get_child(xrbnode::RIGHT) == root);
-		ASSERT(root->get_child(xrbnode::LEFT) == root || root->get_child(xrbnode::LEFT)->is_black());
-		rb_check_height(root, root->get_child(xrbnode::LEFT));
-	}
-#endif
+		s32			top;
+		xrbnode*	path[32];
+	};
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -190,15 +174,14 @@ namespace xcore
 		if (self)
 		{
 			xrbnode* rchild;
+			
+			s32 const sdir = rb_flip_dir(dir);
 
-			result = self->get_child(!dir);
+			result = self->get_child(sdir);
 			rchild =  result->get_child(dir);
 			
-			self->set_child(rchild, !dir);
-			rchild->set_parent_side(!dir);
-
+			self->set_child(rchild, sdir);
 			result->set_child(self, dir);
-			self->set_parent_side(dir);
 			
 			self->set_red();
 			result->set_black();
@@ -211,86 +194,85 @@ namespace xcore
 		xrbnode * result = NULL;
 		if (self)
 		{
-			xrbnode* child = rb_rotate(self->get_child(!dir), dir);
-			self->set_child(child, !dir);
-			child->set_parent_side(!dir);
+			s32 const sdir = rb_flip_dir(dir);
+
+			xrbnode* child = rb_rotate(self->get_child(sdir), sdir);
+			self->set_child(child, sdir);
 			result = rb_rotate(self, dir);
 		}
 		return result;
 	}
 
+	typedef s32(*xrbnode_cmp_f) (xrbnode* a, xrbnode* b);
+	typedef void(*xrbnode_remove_f) (xrbnode* a, xrbnode* b);
+
 	// Returns 1 on success, 0 otherwise.
-	int rb_insert_node(xrbnode*& root, xrbnode * node, xrbnode_cmp_f cmp)
+	inline bool	rb_insert_node(xrbnode*& root, xrbnode * node, xrbnode_cmp_f cmp_f)
 	{
-		s32 result = 0;
+		bool result = false;
 		if (node)
 		{
 			if (root == NULL)
 			{
 				root = node;
-				result = 1;
+				result = true;
 			}
 			else
 			{
 				xrbnode head;		// False tree root
 				head.clear();
 
-				xrbnode *g, *t;		// Grandparent & parent
-				xrbnode *p, *q;		// Iterator & parent
-				
 				s32 dir = 0;
-				s32 last = 0;
+				s32 lastdir = 0;
 
 				// Set up our helpers
-				g = NULL;
-				t = &head;
-				p = NULL;
-				q = root;
+				xrbnode *g = NULL;	// Grandparent
+				xrbnode *t = &head;	// Parent
+				xrbnode *p = NULL;	// Parent
+				xrbnode *q = root;	// Iterator
 
-				t->set_child(root, 1);
+				t->set_child(root, xrbnode::RIGHT);
 
 				// Search down the tree for a place to insert
+				result = false;
 				while (true)
 				{
 					if (q == NULL)
 					{	// Insert node at the first null link.
 						q = node;
+						result = true;
 						p->set_child(q, dir);
-						q->set_parent_side(dir);
 					}
-					else if (q->get_child(0)->is_red() && q->get_child(1)->is_red())
+					else if (rb_is_red(q->get_child(0)) && rb_is_red(q->get_child(1)))
 					{	// Simple red violation: color flip
 						q->set_red();
 						q->get_child(0)->set_black();
 						q->get_child(1)->set_black();
 					}
 
-					if (q->is_red() && p->is_red())
+					if (rb_is_red(q) && rb_is_red(p))
 					{	// Hard red violation: rotations necessary
-						s32 dir2 = t->get_child(1) == g ? 1 : 0;
-						if (q == p->get_child(last))
+						s32 const dir2 = t->get_child(xrbnode::RIGHT)==g ? xrbnode::RIGHT : xrbnode::LEFT;
+						if (q == p->get_child(lastdir))
 						{
-							xrbnode* r = rb_rotate(g, !last);
+							xrbnode* r = rb_rotate(g, !lastdir);
 							t->set_child(r, dir2);
-							r->set_parent_side(dir2);
 						}
 						else
 						{
-							xrbnode* r = rb_rotate2(g, !last);
+							xrbnode* r = rb_rotate2(g, !lastdir);
 							t->set_child(r, dir2);
-							r->set_parent_side(dir2);
 						}
 					}
 
 					// Stop working if we inserted a node.
 					// This check also disallows duplicates in the tree
-					if (cmp(q, node) == 0)
-					{
+					s32 const c = cmp_f(node, q);
+					if (c == 0)
 						break;
-					}
 
-					last = dir;
-					dir = cmp(q, node) < 0;
+					lastdir = dir;
+					dir = c < 0 ? xrbnode::LEFT : xrbnode::RIGHT;
 
 					// Move the helpers down
 					if (g != NULL) 
@@ -304,47 +286,46 @@ namespace xcore
 				}
 
 				// Update the root (it may be different)
-				root = head.get_child(1);
+				root = head.get_child(xrbnode::RIGHT);
 			}
 
 			// Make the root black for simplified logic
 			root->set_black();
 		}
 
-		return 1;
+		return result;
 	}
 
 
 	// Returns 1 if the value was removed, 0 otherwise. Optional node callback
 	// can be provided to dealloc node and/or user data. Use rb_tree_node_dealloc
 	// default callback to deallocate node created by rb_tree_insert(...).
-	int	rb_remove_node(xrbnode *& root, xrbnode* find, xrbnode_cmp_f cmp, xrbnode_swap_f swap, xrbnode*& outnode)
+	inline bool	rb_remove_node(xrbnode *& root, xrbnode* find, xrbnode_cmp_f cmp_f, xrbnode_remove_f remove_f, xrbnode*& outnode)
 	{
 		if (root != NULL)
 		{
 			xrbnode head; // False tree root
 			head.clear();
 
-			xrbnode *q, *p, *g; // Helpers
-			xrbnode *f = NULL;  // Found item
-			s32 dir = 1;
-
 			// Set up our helpers
-			q = &head;
-			g = p = NULL;
+			xrbnode * q = &head;
+			xrbnode * g = NULL;
+			xrbnode * p = NULL;
+			xrbnode * f = NULL;  // Found item
 			q->set_child(root, 1);
 
-			// Search and push a red node down
-			// to fix red violations as we go
-			while (q->get_child(dir) != NULL) 
+			// Search and push a red node down to fix red violations as we go
+			s32 dir = xrbnode::RIGHT;
+			while (q->get_child(dir) != NULL)
 			{
-				s32 last = dir;
+				s32 const lastdir = dir;
 
 				// Move the helpers down
-				g = p, p = q;
+				g = p;
+				p = q;
 				q = q->get_child(dir);
 
-				s32 c = cmp(q, find);
+				s32 const c = cmp_f(find, q);
 
 				// Save the node with matching value and keep
 				// going; we'll do removal tasks at the end
@@ -353,23 +334,23 @@ namespace xcore
 					f = q;
 				}
 
-				dir = c < 0;
+				dir = (c < 0) ? xrbnode::LEFT : xrbnode::RIGHT;
+
 				// Push the red node down with rotations and color flips
-				if (!q->is_red() && !q->get_child(dir)->is_red())
+				if (!rb_is_red(q) && !rb_is_red(q->get_child(dir)))
 				{
-					if (q->get_child(!dir)->is_red())
+					if (rb_is_red(q->get_child(!dir)))
 					{
 						xrbnode* r = rb_rotate(q, dir);
-						p->set_child(r, last);
-						r->set_parent_side(last);
+						p->set_child(r, lastdir);
 						p = r;
 					}
-					else if (!(q->get_child(!dir)->is_red()))
+					else if (!rb_is_red(q->get_child(!dir)))
 					{
-						xrbnode * s = p->get_child(!last);
+						xrbnode * s = p->get_child(!lastdir);
 						if (s)
 						{
-							if (!s->get_child(!last)->is_red() && !s->get_child(last))
+							if (!rb_is_red(s->get_child(!lastdir)) && !rb_is_red(s->get_child(lastdir)))
 							{	// Color flip
 								p->set_black();
 								s->set_red();
@@ -379,23 +360,21 @@ namespace xcore
 							{
 								s32 dir2 = g->get_child(1) == p;
 
-								if (s->get_child(last)->is_red())
+								if (rb_is_red(s->get_child(lastdir)))
 								{
-									xrbnode* r = rb_rotate2(p, last);
+									xrbnode* r = rb_rotate2(p, lastdir);
 									g->set_child(r, dir2);
-									r->set_parent_side(dir2);
 								}
-								else if (s->get_child(!last)->is_red())
+								else if (rb_is_red(s->get_child(!lastdir)))
 								{
-									xrbnode* r = rb_rotate(p, last);
+									xrbnode* r = rb_rotate(p, lastdir);
 									g->set_child(r, dir2);
-									r->set_parent_side(dir2);
 								}
 
 								// Ensure correct coloring
 								s = g->get_child(dir2);
-								q->set_red();
 								s->set_red();
+								q->set_red();
 								s->get_child(0)->set_black();
 								s->get_child(1)->set_black();
 							}
@@ -407,20 +386,24 @@ namespace xcore
 			// Replace and remove the saved node
 			if (f)
 			{
-				// Swap any 'values' that the nodes are holding since node @q has
-				// been removed
-				swap(f, q);
+				remove_f(f, q);
 
-				s32 s1 = p->get_child(1) == q;
-				s32 s2 = q->get_child(0) == NULL;
-				p->set_child(q->get_child(s2), s1);
+				s32 const ps = p->get_child(xrbnode::RIGHT) == q ? xrbnode::RIGHT : xrbnode::LEFT;
+				s32 const qs = q->get_child(xrbnode::LEFT) == NULL ? xrbnode::RIGHT : xrbnode::LEFT;
+				p->set_child(q->get_child(qs), ps);
 
 				// Give the 'removed' node back
+				q->set_left(NULL);
+				q->set_right(NULL);
 				outnode = q;
+			}
+			else
+			{
+				return false;
 			}
 
 			// Update the root (it may be different)
-			root = head.get_child(1);
+			root = head.get_child(xrbnode::RIGHT);
 
 			// Make the root black for simplified logic
 			if (root != NULL)
@@ -428,7 +411,7 @@ namespace xcore
 				root->set_black();
 			}
 		}
-		return 1;
+		return true;
 	}
 };
 

@@ -4,74 +4,60 @@
 namespace xcore
 {
 
-	bool		xtree_insert(xrbnode*& root, xrbnode * node_to_insert, xtree_compare_nodes cmp)
+	bool		xtree_insert(xrbnode*& root, xrbnode * node_to_insert, xrbnode_cmp_f cmp_f)
 	{
 		ASSERT(node_to_insert!=0);
-		return rb_insert_node(root, node_to_insert, cmp) == 1 ? xTRUE : xFALSE;
+		return rb_insert_node(root, node_to_insert, cmp_f);
 	}
 
-	bool		xtree_remove(xrbnode*& root, xrbnode*& remove_node, xtree_compare_nodes cmp, xtree_swap_nodes swap)
+	bool		xtree_remove(xrbnode*& root, xrbnode * key, xrbnode_cmp_f cmp_f, xrbnode_remove_f remove_f, xrbnode *& remove_node)
 	{
-		xrbnode* removed_node;
-		if (rb_remove_node(root, remove_node, cmp, swap, removed_node) == 1)
-		{
-			remove_node = removed_node;
-			return true;
-		}
-		remove_node = NULL;
-		return false;
+		return (rb_remove_node(root, key, cmp_f, remove_f, remove_node));
 	}
 
-	bool		xtree_find  (xrbnode* root, xrbnode*& find_node, xtree_compare_nodes cmp)
+	bool		xtree_find  (xrbnode* root, xrbnode * key, xrbnode_cmp_f cmp_f, xrbnode*& find_node)
 	{
 		xrbnode* it = root;
 		while ( it != NULL )
 		{
-			s32 c = cmp(it, find_node);
+			s32 const c = cmp_f(key, it);
 			if ( c == 0 )
 				break;
-			s32 const s = (c + 1) >> 1;
-			it = it->get_child(s);
+			s32 dir = c < 0 ? xrbnode::LEFT : xrbnode::RIGHT;
+			it = it->get_child(dir);
 		}
-		find_node = ( it == NULL) ? NULL : it;
+		find_node = it;
 		return find_node != NULL;
 	}
 
-	xrbnode*	xtree_clear (xrbnode* root, xrbnode*& save)
+	xrbnode*	xtree_clear (xrbnode*& iterator)
 	{
 		//	Rotate away the left links so that
 		//	we can treat this like the destruction
 		//	of a linked list
-		if (save == NULL)
-			save = root;
+		if (iterator == NULL)
+			return NULL;
 
-		xrbnode* it = save;
-		save = NULL;
+		xrbnode* it = iterator;
+		iterator = NULL;
 
 		while ( it != NULL ) 
 		{
-			if ( it->get_child(xrbnode::LEFT) == root ) 
-			{
-				/* No left links, just kill the node and move on */
-				save = (xrbnode*)it->get_child(xrbnode::RIGHT);
-				if (it != root)
-				{
-					it->clear();
-					return it;
-				}
+			if ( it->get_child(xrbnode::LEFT) == NULL ) 
+			{	// No left links, just kill the node and move on
+				iterator = (xrbnode*)it->get_child(xrbnode::RIGHT);
+				it->clear();
+				return it;
 			}
 			else
-			{
-				/* Rotate away the left link and check again */
-				save = (xrbnode*)it->get_child(xrbnode::LEFT);
-				it->set_child(save->get_child(xrbnode::RIGHT), xrbnode::LEFT);
-				save->set_child(it, xrbnode::RIGHT);
+			{	// Rotate away the left link and check again
+				iterator = (xrbnode*)it->get_child(xrbnode::LEFT);
+				it->set_child(iterator->get_child(xrbnode::RIGHT), xrbnode::LEFT);
+				iterator->set_child(it, xrbnode::RIGHT);
 			}
-
-			it = save;
-			save = NULL;
+			it = iterator;
+			iterator = NULL;
 		}
-		root->clear();
 		return NULL;
 	}
 
