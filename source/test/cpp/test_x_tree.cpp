@@ -25,7 +25,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		struct mynode : public xrbnode
 		{
-			mynode() : id(0) {}
+			mynode() : id(0) { clear(); }
 			mynode(uptr i) : id(i) { clear(); }
 			uptr id;
 
@@ -53,6 +53,15 @@ UNITTEST_SUITE_BEGIN(xtree)
 			removed->id = id;
 		}
 
+		const char*	rb_test(xrbnode* root)
+		{
+			const char* result = NULL;
+			rb_tree_test(root, rb_node_compare, result);
+			if (result != NULL)
+				return result;
+			return NULL;
+		}
+
 		UNITTEST_TEST(constructor1)
 		{
 			xrbnode* root = NULL;
@@ -65,22 +74,30 @@ UNITTEST_SUITE_BEGIN(xtree)
 			bool inserted;
 			inserted = xtree_insert(root, &a, rb_node_compare);
 			CHECK_TRUE(inserted);
+			CHECK_NULL(rb_test(root));
 			inserted = xtree_insert(root, &b, rb_node_compare);
 			CHECK_TRUE(inserted);
+			CHECK_NULL(rb_test(root));
 			inserted = xtree_insert(root, &c, rb_node_compare);
 			CHECK_TRUE(inserted);
+			CHECK_NULL(rb_test(root));
 			inserted = xtree_insert(root, &d, rb_node_compare);
 			CHECK_TRUE(inserted);
+			CHECK_NULL(rb_test(root));
 
 			xrbnode* f = NULL;
 			xtree_find(root, &c, rb_node_compare, f);
 			CHECK_EQUAL(&c, f);
+			CHECK_NULL(rb_test(root));
 			xtree_find(root, &a, rb_node_compare, f);
 			CHECK_EQUAL(&a, f);
+			CHECK_NULL(rb_test(root));
 			xtree_find(root, &b, rb_node_compare, f);
 			CHECK_EQUAL(&b, f);
+			CHECK_NULL(rb_test(root));
 			xtree_find(root, &d, rb_node_compare, f);
 			CHECK_EQUAL(&d, f);
+			CHECK_NULL(rb_test(root));
 
 			xrbnode* node_to_destroy = NULL;
 			s32 i = 0;
@@ -143,6 +160,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 						if (xtree_remove(root, &_p_, rb_node_compare, rb_node_remove, f))
 						{
 							CHECK_EQUAL(((mynode*)f)->id, pid);
+							CHECK_NULL(rb_test(root));
 							node_allocator.deallocate((mynode*)f);
 						}
 						else
@@ -154,6 +172,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 					allocations[alloc_idx] = node->id;
 					bool inserted = xtree_insert(root, node, rb_node_compare);
 					CHECK_TRUE(inserted);
+					CHECK_NULL(rb_test(root));
 				}
 			}
 

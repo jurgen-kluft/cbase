@@ -18,15 +18,15 @@ namespace xcore
 	struct xrbnode
 	{
 	public:
-		enum ESide { LEFT = 0x0, RIGHT = 0x1 };
-		enum EColor { BLACK = 0x0, RED = 0x2, COLOR_MASK = 0x2 };
+		enum ESide	{ LEFT  = 0x0, RIGHT = 0x1 };
+		enum EColor	{ BLACK = 0x0, RED   = 0x1, COLOR_MASK = 0x1 };
 
 	protected:
 		static inline s32	get_color(u32 member)						{ return (s32)(member & COLOR_MASK); }
 		static inline void	set_color(u32& member, u32 color)			{ member = (member & ~COLOR_MASK) | color; }
 
 	public:
-		inline void			clear()										{ child[LEFT] = child[RIGHT] = NULL; flags = 0; }
+		inline void			clear()										{ child[LEFT] = child[RIGHT] = NULL; flags = RED; }
 
 		inline void			set_child(xrbnode* node, s32 dir)			{ child[dir] = node; }
 		inline xrbnode*		get_child(s32 dir) const					{ return child[dir]; }
@@ -109,7 +109,19 @@ namespace xcore
 
 	struct rb_iterator
 	{
-		xrbnode*	init(xrbnode * root, s32 dir)
+		inline		rb_iterator() : node(NULL), top(0) {}
+		inline		rb_iterator(xrbnode* n) : node(n), top(0) {}
+
+		enum EType
+		{
+			FORWARDS = 1,
+			BACKWARDS = 0,
+			MINIMUM = 0,
+			MAXIMUM = 1,
+			MAX_HEIGHT = 64
+		};
+
+		xrbnode*	init(xrbnode * root, EType dir)
 		{
 			xrbnode * result = NULL;
 			if (root)
@@ -117,12 +129,11 @@ namespace xcore
 				node = root;
 				top = 0;
 
-				// Save the path for later selfersal
 				if (node != NULL)
-				{
+				{	// Save the path for later traversal
 					while (node->get_child(dir) != NULL)
 					{
-						path[top++] = node;
+						push(node);
 						node = node->get_child(dir);
 					}
 				}
@@ -131,15 +142,15 @@ namespace xcore
 			return result;
 		}
 
-		xrbnode*	move(s32 dir)
+		xrbnode*	move(EType dir)
 		{
 			if (node->get_child(dir) != NULL)
 			{	// Continue down this branch
-				path[top++] = node;
+				push(node);
 				node = node->get_child(dir);
 				while (node->get_child(!dir) != NULL)
 				{
-					path[top++] = node;
+					push(node);
 					node = node->get_child(!dir);
 				}
 			}
@@ -153,16 +164,19 @@ namespace xcore
 						break;
 					}
 					last = node;
-					node = path[--top];
+					node = pop();
 				} while (last == node->get_child(dir));
 			}
 			return node;
 		}
 
+		void		push(xrbnode* node)		{ ASSERT(top < MAX_HEIGHT); path[top++] = node; }
+		xrbnode*	pop()					{ ASSERT(top > 0); return path[--top]; }
+
 		xrbnode*	node;
 
 		s32			top;
-		xrbnode*	path[32];
+		xrbnode*	path[MAX_HEIGHT];
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -206,6 +220,56 @@ namespace xcore
 	typedef s32(*xrbnode_cmp_f) (xrbnode* a, xrbnode* b);
 	typedef void(*xrbnode_remove_f) (xrbnode* a, xrbnode* b);
 
+	inline s32 rb_tree_test(xrbnode* root, xrbnode_cmp_f cmp_f, const char*& result)
+	{
+		s32 lh, rh;
+
+		if (root == NULL)
+		{
+			return 1;
+		}
+		else
+		{
+			xrbnode* ln = root->get_left();
+			xrbnode* rn = root->get_right();
+
+			/* Consecutive red links */
+			if (rb_is_red(root))
+			{
+				if (rb_is_red(ln) || rb_is_red(rn))
+				{
+					result = "Red violation";
+					return 0;
+				}
+			}
+
+			lh = rb_tree_test(ln, cmp_f, result);
+			rh = rb_tree_test(rn, cmp_f, result);
+
+			/* Invalid binary search tree */
+			if ((ln != NULL && cmp_f(ln, root) >= 0) || (rn != NULL && cmp_f(rn, root) <= 0))
+			{
+				result = "Binary tree violation";
+				return 0;
+			}
+
+			/* Black height mismatch */
+			if (lh != 0 && rh != 0 && lh != rh)
+			{
+				result = "Black violation";
+				return 0;
+			}
+
+			/* Only count black links */
+			if (lh != 0 && rh != 0)
+			{
+				return rb_is_red(root) ? lh : lh + 1;
+			}
+
+			return 0;
+		}
+	}
+
 	// Returns 1 on success, 0 otherwise.
 	inline bool	rb_insert_node(xrbnode*& root, xrbnode * node, xrbnode_cmp_f cmp_f)
 	{
@@ -243,16 +307,16 @@ namespace xcore
 						result = true;
 						p->set_child(q, dir);
 					}
-					else if (rb_is_red(q->get_child(0)) && rb_is_red(q->get_child(1)))
+					else if (rb_is_red(q->get_left()) && rb_is_red(q->get_right()))
 					{	// Simple red violation: color flip
 						q->set_red();
-						q->get_child(0)->set_black();
-						q->get_child(1)->set_black();
+						q->get_left()->set_black();
+						q->get_right()->set_black();
 					}
 
 					if (rb_is_red(q) && rb_is_red(p))
 					{	// Hard red violation: rotations necessary
-						s32 const dir2 = t->get_child(xrbnode::RIGHT)==g ? xrbnode::RIGHT : xrbnode::LEFT;
+						s32 const dir2 = (t->get_right() == g) ? xrbnode::RIGHT : xrbnode::LEFT;
 						if (q == p->get_child(lastdir))
 						{
 							xrbnode* r = rb_rotate(g, !lastdir);
@@ -312,7 +376,7 @@ namespace xcore
 			xrbnode * g = NULL;
 			xrbnode * p = NULL;
 			xrbnode * f = NULL;  // Found item
-			q->set_child(root, 1);
+			q->set_child(root, xrbnode::RIGHT);
 
 			// Search and push a red node down to fix red violations as we go
 			s32 dir = xrbnode::RIGHT;
@@ -375,8 +439,8 @@ namespace xcore
 								s = g->get_child(dir2);
 								s->set_red();
 								q->set_red();
-								s->get_child(0)->set_black();
-								s->get_child(1)->set_black();
+								s->get_left()->set_black();
+								s->get_right()->set_black();
 							}
 						}
 					}
@@ -397,10 +461,6 @@ namespace xcore
 				q->set_right(NULL);
 				outnode = q;
 			}
-			else
-			{
-				return false;
-			}
 
 			// Update the root (it may be different)
 			root = head.get_child(xrbnode::RIGHT);
@@ -410,6 +470,8 @@ namespace xcore
 			{
 				root->set_black();
 			}
+
+			return f != NULL;
 		}
 		return true;
 	}
