@@ -38,7 +38,11 @@ namespace xcore
 
 		virtual void*			allocate(xsize_t size, u32 alignment)
 		{
+#ifdef TARGET_DEBUG
+			void* mem = _aligned_malloc_dbg(size, alignment, NULL, 0);
+#else
 			void* mem = _aligned_malloc(size, alignment);
+#endif
 			++mAllocationCount;
 			return mem;
 		}
@@ -46,16 +50,25 @@ namespace xcore
 		virtual void*			reallocate(void* ptr, xsize_t size, u32 alignment)
 		{
 			if (ptr == NULL)
+			{
 				return allocate(size, alignment);
-
+			}
+#ifdef TARGET_DEBUG
+			void* new_ptr = _aligned_realloc_dbg(ptr, size, alignment, NULL, 0);
+#else
 			void* new_ptr = _aligned_realloc(ptr, size, alignment);
+#endif
 			return new_ptr;
 		}
 
 		virtual void			deallocate(void* ptr)
 		{
 			--mAllocationCount;
+#ifdef TARGET_DEBUG
+			_aligned_free_dbg(ptr);
+#else
 			_aligned_free(ptr);
+#endif
 		}
 
 		virtual void			release()

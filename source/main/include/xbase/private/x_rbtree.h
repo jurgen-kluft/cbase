@@ -66,7 +66,7 @@ namespace xcore
 		inline void			set_red()									{ left = set_bit(left, COLOR_MASK, RED); }
 		inline void			set_black()									{ left = set_bit(left, COLOR_MASK, BLACK); }
 		inline void			set_color(s32 colr)							{ ASSERT(colr==RED || colr==BLACK); left = set_bit(left, COLOR_MASK, colr); }
-		inline s32			get_color() const							{ s32 colr = get_bit(left, COLOR_MASK); ASSERT(colr==RED || colr==BLACK); return colr; }
+		inline s32			get_color() const							{ s32 colr = (s32)get_bit(left, COLOR_MASK); ASSERT(colr==RED || colr==BLACK); return colr; }
 		inline bool			is_red() const								{ return get_bit(left, COLOR_MASK) == RED; }
 		inline bool			is_black() const							{ return get_bit(left, COLOR_MASK) == BLACK; }
 
@@ -77,22 +77,19 @@ namespace xcore
 	};
 
 
-	struct xrbnode_multi : public xrbnode
+	struct xmrbnode : public xrbnode
 	{
 		void				clear()										{ siblings = NULL; xrbnode::clear(); }
 
-		xrbnode_multi*		get_siblings() const
-		{
-			return siblings;
-		}
+		xmrbnode*			get_siblings() const						{ return siblings; }
 
-		void				insert_sibling(xrbnode_multi* sib)
+		void				insert_sibling(xmrbnode* sib)
 		{
 			if (siblings == NULL) siblings = sib;
 			else
 			{
-				xrbnode_multi* next = siblings;
-				xrbnode_multi* prev = (xrbnode_multi*)next->get_child(LEFT);
+				xmrbnode* next = siblings;
+				xmrbnode* prev = (xmrbnode*)next->get_child(LEFT);
 				sib->set_child(prev, LEFT);
 				sib->set_child(next, RIGHT);
 				prev->set_child(sib, RIGHT);
@@ -100,10 +97,10 @@ namespace xcore
 			}
 		}
 
-		void				remove_sibling(xrbnode_multi* sib)
+		void				remove_sibling(xmrbnode* sib)
 		{
-			xrbnode_multi* next = (xrbnode_multi*)sib->get_child(RIGHT);
-			xrbnode_multi* prev = (xrbnode_multi*)sib->get_child(LEFT);
+			xmrbnode* next = (xmrbnode*)sib->get_child(RIGHT);
+			xmrbnode* prev = (xmrbnode*)sib->get_child(LEFT);
 			next->set_child(prev, LEFT);
 			prev->set_child(next, RIGHT);
 			if (siblings == sib && next != sib)
@@ -113,12 +110,13 @@ namespace xcore
 		}
 
 	protected:
-		xrbnode_multi*		siblings;
+		xmrbnode*		siblings;
 	};
 
 	inline s32 rb_flip_dir(s32 dir)
 	{
 		ASSERT(xrbnode::RIGHT == 1);
+		ASSERT(dir == xrbnode::RIGHT || dir == xrbnode::LEFT);
 		return dir ^ xrbnode::RIGHT;
 	}
 
@@ -194,7 +192,6 @@ namespace xcore
 		xrbnode*	pop()					{ ASSERT(top > 0); return path[--top]; }
 
 		xrbnode*	node;
-
 		s32			top;
 		xrbnode*	path[MAX_HEIGHT];
 	};
@@ -240,10 +237,12 @@ namespace xcore
 	typedef s32(*xrbnode_cmp_f) (xrbnode* a, xrbnode* b);
 	typedef void(*xrbnode_remove_f) (xrbnode* a, xrbnode* b);
 
+	// Test the integrity of the red-black tree
+	// @return: The depth of the tree
+	// @result: If any error it returns a description of the error in 'result', when no error it will be NULL
 	inline s32 rb_tree_test(xrbnode* root, xrbnode_cmp_f cmp_f, const char*& result)
 	{
 		s32 lh, rh;
-
 		if (root == NULL)
 		{
 			return 1;
@@ -253,7 +252,7 @@ namespace xcore
 			xrbnode* ln = root->get_left();
 			xrbnode* rn = root->get_right();
 
-			/* Consecutive red links */
+			// Consecutive red links
 			if (rb_is_red(root))
 			{
 				if (rb_is_red(ln) || rb_is_red(rn))
@@ -266,26 +265,25 @@ namespace xcore
 			lh = rb_tree_test(ln, cmp_f, result);
 			rh = rb_tree_test(rn, cmp_f, result);
 
-			/* Invalid binary search tree */
+			// Invalid binary search tree 
 			if ((ln != NULL && cmp_f(ln, root) >= 0) || (rn != NULL && cmp_f(rn, root) <= 0))
 			{
 				result = "Binary tree violation";
 				return 0;
 			}
 
-			/* Black height mismatch */
+			// Black height mismatch
 			if (lh != 0 && rh != 0 && lh != rh)
 			{
 				result = "Black violation";
 				return 0;
 			}
 
-			/* Only count black links */
+			// Only count black links
 			if (lh != 0 && rh != 0)
 			{
 				return rb_is_red(root) ? lh : lh + 1;
 			}
-
 			return 0;
 		}
 	}
@@ -368,15 +366,10 @@ namespace xcore
 					p = q;
 					q = q->get_child(dir);
 				}
-
-				// Update the root (it may be different)
-				root = head.get_child(xrbnode::RIGHT);
+				root = head.get_child(xrbnode::RIGHT);		// Update the root (it may be different)
 			}
-
-			// Make the root black for simplified logic
-			root->set_black();
+			root->set_black();	// Make the root black for simplified logic
 		}
-
 		return result;
 	}
 
@@ -468,7 +461,7 @@ namespace xcore
 			}
 
 			// Replace and remove the saved node
-			if (f)
+			if (f != NULL)
 			{
 				remove_f(f, q);
 
