@@ -16,17 +16,17 @@ namespace xcore
 	//		Jurgen Kluft
 	// Description:
 	//
-	//      Red-black tree structure and helper-functions
+	//      Red-black tree functions
 	// 
 	//<CODE [lang= "c++"]>
 	// 		
-	// 	Need an example here
+	// 	See unittest for examples
 	// 		
 	//</CODE>
 	//     
 	//------------------------------------------------------------------------------
 	
-	// @note	A 'C' style way of managing your own red-black tree, the only xrbnode object you need is a 'root'.
+	// @note	A 'C' style way of managing your own red-black tree, you only need a 'root'.
 	// @see		See test_x_tree.cpp for examples on how to use this.
 	extern bool			xtree_insert(xrbnode*& root, xrbnode * node, xrbnode_cmp_f cmp);
 	extern bool			xtree_remove(xrbnode*& root, xrbnode * key, xrbnode_cmp_f cmp, xrbnode_remove_f remove_f, xrbnode*& node);
@@ -38,8 +38,6 @@ namespace xcore
 	// @note	Initialize 'iterator' to NULL, iterate until NULL is returned.
 	//			The returned node can be destroyed and it is already detached from the tree.
 	extern xrbnode*		xtree_clear (xrbnode*& root);
-
-
 }
 
 

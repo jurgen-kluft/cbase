@@ -11,49 +11,59 @@
 
 namespace xcore
 {
+
+
 	//
 	// This red-black tree node uses pointers to reference nodes, this
-	// results in a node sizeof 16 bytes in 32-bit and 32 bytes in 64-bit.
+	// results in a node sizeof 8 bytes in 32-bit and 16 bytes in 64-bit.
 	//
 	struct xrbnode
 	{
 	public:
+<<<<<<< HEAD
 		enum ESide	{ LEFT  = 0x0, RIGHT = 0x1 };
 		enum EColor	{ BLACK = 0x0, RED   = 0x1, COLOR_MASK = 0x1 };
+=======
+		enum ESide  { LEFT  = 0, RIGHT = 1 };
+		enum EColor { BLACK = 0, RED   = 1, COLOR_MASK = 1 };
+>>>>>>> 56ef8c416adccd0af8736c1ea082885c4327f720
 
 	protected:
-		static inline s32	get_color(u32 member)						{ return (s32)(member & COLOR_MASK); }
-		static inline void	set_color(u32& member, u32 color)			{ member = (member & ~COLOR_MASK) | color; }
+		static inline xrbnode*	get_ptr(xrbnode* p, uptr m)					{ return (xrbnode*)((uptr)p & ~m); }
+		static inline xrbnode*	set_ptr(xrbnode* p, xrbnode* n, uptr m)		{ return (xrbnode*)(((uptr)p & m) | ((uptr)n & ~m)); }
+
+		static inline uptr		get_bit(xrbnode* p, uptr b)		 			{ return (uptr)p & b;}
+		static inline xrbnode*	set_bit(xrbnode* p, uptr m, uptr b)			{ p = (xrbnode*)(((uptr)p & ~m) | b); }
 
 	public:
+<<<<<<< HEAD
 		inline void			clear()										{ child[LEFT] = child[RIGHT] = NULL; flags = RED; }
+=======
+		inline void			clear()										{ child[LEFT] = child[RIGHT] = NULL; }
+>>>>>>> 56ef8c416adccd0af8736c1ea082885c4327f720
 
-		inline void			set_child(xrbnode* node, s32 dir)			{ child[dir] = node; }
-		inline xrbnode*		get_child(s32 dir) const					{ return child[dir]; }
+		inline void			set_child(xrbnode* node, s32 dir)			{ child[dir] = set_ptr(child[dir], node, COLOR_MASK); }
+		inline xrbnode*		get_child(s32 dir) const					{ return get_ptr(child[dir], COLOR_MASK); }
 
 		inline void			set_right(xrbnode* node)					{ child[RIGHT] = node; }
 		inline xrbnode* 	get_right() const							{ return child[RIGHT]; }
 
-		inline void			set_left(xrbnode* node)						{ child[LEFT] = node; }
-		inline xrbnode* 	get_left() const							{ return child[LEFT]; }
+		inline void			set_left(xrbnode* node)						{ child[LEFT] = set_ptr(child[LEFT], node, COLOR_MASK); }
+		inline xrbnode* 	get_left() const							{ return get_ptr(child[LEFT], COLOR_MASK); }
 
-		inline s32			get_parent_side(xrbnode* node)				{ ASSERT(node==child[LEFT] || node==child[RIGHT]); return child[LEFT] == node ? LEFT : RIGHT; }
+		inline s32			get_side(xrbnode* node)						{ ASSERT(node==get_left() || node==get_right()); return child[RIGHT] == node ? RIGHT : LEFT; }
 
-		inline void			set_red()									{ set_color(flags, RED); }
-		inline void			set_black()									{ set_color(flags, BLACK); }
-		inline void			set_color(s32 colr)							{ ASSERT(colr==RED || colr==BLACK); set_color(flags, (uptr)colr); }
-		inline s32			get_color() const							{ s32 colr = get_color(flags); ASSERT(colr==RED || colr==BLACK); return colr; }
-
-		inline bool			is_red() const								{ return get_color(flags) == RED; }
-		inline bool			is_black() const							{ return get_color(flags) == BLACK; }
-
-		inline bool			is_used() const								{ return this != child[RIGHT]; }
-		inline bool			is_nill() const								{ return child[RIGHT]; }
+		inline void			set_red()									{ child[LEFT] = set_bit(child[LEFT], COLOR_MASK, RED); }
+		inline void			set_black()									{ child[LEFT] = set_bit(child[LEFT], COLOR_MASK, BLACK); }
+		inline void			set_color(s32 colr)							{ ASSERT(colr==RED || colr==BLACK); child[LEFT] = set_bit(child[LEFT], COLOR_MASK, colr); }
+		inline s32			get_color() const							{ s32 colr = get_bit(child[LEFT], COLOR_MASK); ASSERT(colr==RED || colr==BLACK); return colr; }
+		inline bool			is_red() const								{ return get_bit(child[LEFT], COLOR_MASK) == RED; }
+		inline bool			is_black() const							{ return get_bit(child[LEFT], COLOR_MASK) == BLACK; }
 
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
+
 	protected:
 		xrbnode*			child[2];
-		u32					flags;
 	};
 
 
