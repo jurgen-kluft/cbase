@@ -11,7 +11,9 @@
 
 namespace xcore
 {
-
+	// This C implementation works with a sentinel and has left/right/parent
+	// https://www.cs.auckland.ac.nz/~jmor159/PLDS210/niemann/s_rbt.htm
+	// http://c-f.spb.ru/files/Sources/rbt.c
 
 	//
 	// This red-black tree node uses pointers to reference nodes, this
