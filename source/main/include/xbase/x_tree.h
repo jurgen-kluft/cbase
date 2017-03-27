@@ -28,9 +28,9 @@ namespace xcore
 	
 	// @note	A 'C' style way of managing your own red-black tree, you only need a 'root'.
 	// @see		See test_x_tree.cpp for examples on how to use this.
-	extern bool			xtree_insert(xrbnode*& root, xrbnode * node, xrbnode_cmp_f cmp);
-	extern bool			xtree_remove(xrbnode*& root, xrbnode * key, xrbnode_cmp_f cmp, xrbnode_remove_f remove_f, xrbnode*& node);
-	extern bool			xtree_find  (xrbnode*  root, xrbnode * key, xrbnode_cmp_f cmp, xrbnode*& node);
+	extern bool			xtree_insert(xrbnode*& root, void    * key, xrbnode * node, xrbnode_cmp_f cmp);
+	extern bool			xtree_remove(xrbnode*& root, void    * key, xrbnode_cmp_f cmp, xrbnode_remove_f remove_f, xrbnode*& node);
+	extern bool			xtree_find  (xrbnode*  root, void    * key, xrbnode_cmp_f cmp, xrbnode*& node);
 
 	extern bool			xtree_min   (xrbnode*  root, xrbnode*& node);
 	extern bool			xtree_max   (xrbnode*  root, xrbnode*& node);

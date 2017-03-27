@@ -1,6 +1,6 @@
 // x_rbtree.h - xCore red-black tree
-#ifndef __XBASE_REDBLACK_TREE_PTR_H__
-#define __XBASE_REDBLACK_TREE_PTR_H__
+#ifndef __XBASE_REDBLACK_TREE_SENTINEL_PTR_H__
+#define __XBASE_REDBLACK_TREE_SENTINEL_PTR_H__
 #include "xbase\x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
@@ -11,50 +11,23 @@
 
 namespace xcore
 {
+	//////////////////////////////////////////////////////////////////////////
 	// This C implementation works with a sentinel and has left/right/parent
 	// https://www.cs.auckland.ac.nz/~jmor159/PLDS210/niemann/s_rbt.htm
 	// http://c-f.spb.ru/files/Sources/rbt.c
-
-	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
-	typedef s32(*xrbsnode_cmp_f) (xrbsnode* a, xrbsnode* b);
+	struct xrbsnode;
+
+	//////////////////////////////////////////////////////////////////////////
+
+	typedef s32(*xrbsnode_cmp_f) (void* data, xrbsnode* n);
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	struct xrbstree
-	{
-		inline				xrbstree()									{ sentinel.clear(); sentinel.set_black(); nill = &sentinel; }
-
-		void				init(xrbsnode_cmp_f cmp_f);
-
-		bool				find(xrbsnode * ) const;
-		bool				insert(xrbsnode * );
-		bool				remove(xrbsnode * );
-
-	private:
-		xrbsnode			m_sentinel;
-		xrbsnode			*m_root;
-		xrbsnode_cmp_f		m_cmp_f;
-		
-		inline bool			is_nill(xrbsnode* n) const					{ return n == &m_sentinel; }
-
-		void 				rotate_right(xrbsnode * x, xrbsnode *& p_root);
-		void 				rotate_left(xrbsnode * x, xrbsnode*& p_root);
-
-		void				insert_fixup(xrbsnode * x, xrbsnode *& p_root);
-		void				remove_fixup(xrbsnode * x, xrbsnode * x_parent, xrbsnode *& p_root);
-
-		void				insert_to_parent(xrbsnode * x, xrbsnode * parent, xrbsnode *& p_root);
-
-		xrbsnode *			find(xrbsnode * find, xrbsnode *& p_root, xrbsnode *& p_insert_parent) const;
-		void				remove(xrbsnode * z, xrbsnode *& p_root);
-	};
-
 	//
 	// This red-black tree node uses pointers to reference nodes, this
-	// results in a node sizeof 8 bytes in 32-bit and 16 bytes in 64-bit.
+	// results in a node sizeof 12 bytes in 32-bit and 24 bytes in 64-bit.
 	//
 	struct xrbsnode
 	{
@@ -70,21 +43,21 @@ namespace xcore
 		static inline xrbsnode*	set_bit(xrbsnode* p, uptr m, uptr b)			{ return (xrbsnode*)(((uptr)p & ~m) | b); }
 
 	public:
-		inline void			clear()										{ parent = (xrbsnode*)RED; left = right = NULL; }
+		inline void			clear()										{ parent = (xrbsnode*)RED; child[LEFT] = child[RIGHT] = NULL; }
 
 		inline void			set_parent(xrbsnode* node)					{ parent = set_ptr(parent, node, COLOR_MASK); }
-		inline xrbsnode*	get_parent() const							{ return get_ptr(parent); }
+		inline xrbsnode*	get_parent() const							{ return get_ptr(parent, COLOR_MASK); }
 
 		inline void			set_child(xrbsnode* node, s32 dir)			{ child[dir] = node; }
 		inline xrbsnode*	get_child(s32 dir) const					{ return child[dir]; }
 
-		inline void			set_right(xrbsnode* node)					{ right = node; }
-		inline xrbsnode* 	get_right() const							{ return right; }
+		inline void			set_right(xrbsnode* node)					{ child[RIGHT] = node; }
+		inline xrbsnode* 	get_right() const							{ return child[RIGHT]; }
 
-		inline void			set_left(xrbsnode* node)					{ left = set_ptr(left, node, COLOR_MASK); }
-		inline xrbsnode* 	get_left() const							{ return get_ptr(left, COLOR_MASK); }
+		inline void			set_left(xrbsnode* node)					{ child[LEFT] = node; }
+		inline xrbsnode* 	get_left() const							{ return child[LEFT]; }
 
-		inline s32			get_side(xrbsnode* node)					{ ASSERT(node==get_left() || node==get_right()); return right == node ? RIGHT : LEFT; }
+		inline s32			get_side(xrbsnode* node)					{ ASSERT(node==get_left() || node==get_right()); return child[RIGHT] == node ? RIGHT : LEFT; }
 
 		inline void			set_red()									{ parent = set_bit(parent, COLOR_MASK, RED); }
 		inline void			set_black()									{ parent = set_bit(parent, COLOR_MASK, BLACK); }
@@ -96,9 +69,57 @@ namespace xcore
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
 
 	private:
-		xrbsnode*			*parent;
-		xrbsnode			*left, *right;
+		xrbsnode			*parent;
+		xrbsnode			*child[2];
 	};
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	struct xrbstree
+	{
+		inline				xrbstree()									
+		{ 
+			m_sentinel.set_parent(NULL);
+			m_sentinel.set_left(&m_sentinel);
+			m_sentinel.set_right(&m_sentinel);
+			m_sentinel.set_black();
+			m_root = NULL;
+			m_cmp_f = NULL;
+		}
+
+		void				init(xrbsnode_cmp_f cmp_f)
+		{
+			m_cmp_f = cmp_f;
+		}
+
+		bool				find(void* data, xrbsnode *& n) const;
+		bool				insert(void* data, xrbsnode * n);
+		bool				remove(xrbsnode * );
+
+		xrbsnode*			clear(xrbsnode*& iterator);
+
+		bool				test(const char*& result) const;
+
+	private:
+		xrbsnode			m_sentinel;
+		xrbsnode			*m_root;
+		xrbsnode_cmp_f		m_cmp_f;
+		
+		inline xrbsnode*	get_nill()									{ return &m_sentinel; }
+		inline bool			is_nill(xrbsnode* n) const					{ return n == &m_sentinel; }
+
+		void 				rotate_right(xrbsnode * x, xrbsnode *& p_root);
+		void 				rotate_left(xrbsnode * x, xrbsnode*& p_root);
+
+		void				insert_fixup(xrbsnode * x, xrbsnode *& p_root);
+		void				remove_fixup(xrbsnode * x, xrbsnode * x_parent, xrbsnode *& p_root);
+
+		void				insert_to_parent(xrbsnode * x, xrbsnode * parent, xrbsnode *& p_root);
+
+		xrbsnode *			find(void * find, xrbsnode * p_root, xrbsnode *& p_insert_parent) const;
+		void				remove(xrbsnode * z, xrbsnode *& p_root);
+	};
+
 
 	struct xmrbsnode : public xrbsnode
 	{
@@ -135,20 +156,6 @@ namespace xcore
 	protected:
 		xmrbsnode*		siblings;
 	};
-
-	inline s32 rbs_flip_dir(s32 dir)
-	{
-		ASSERT(xrbsnode::RIGHT == 1);
-		ASSERT(dir == xrbsnode::RIGHT || dir == xrbsnode::LEFT);
-		return dir ^ xrbsnode::RIGHT;
-	}
-
-	inline bool	rbs_is_red(xrbsnode* node)
-	{
-		return node != NULL ? node->is_red() : xrbsnode::BLACK;
-	}
-
-	
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -211,82 +218,82 @@ namespace xcore
 
 		// link x and y 
 		y->set_right( x );
-		if (is_nill(x))
+		if (!is_nill(x))
 			x->set_parent( y );
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 
-	void xrbstree::insert_fixup(xrbsnode * x, xrbsnode *& p_root)
+	inline void xrbstree::insert_fixup(xrbsnode * x, xrbsnode *& p_root)
 	{
-		/* check Red-Black properties */
-		while (x != p_root && x->get_parent()->get_color() == RED)
+		// check Red-Black properties
+		while (x != p_root && x->get_parent()->is_red())
 		{
-			/* we have a violation */
+			// we have a violation
 			if (x->get_parent() == x->get_parent()->get_parent()->get_left())
 			{
 				xrbsnode * y = x->get_parent()->get_parent()->get_right();
-				if (y->get_color() == RED)
+				if (y->is_red())
 				{
-					/* uncle is RED */
-					x->get_parent()->set_color(BLACK);
-					y->set_color(BLACK);
-					x->get_parent()->get_parent()->set_color(RED);
+					// uncle is RED
+					x->get_parent()->set_black();
+					y->set_black();
+					x->get_parent()->get_parent()->set_red();
 					x = x->get_parent()->get_parent();
 				}
 				else
 				{
-					/* uncle is BLACK */
+					// uncle is BLACK
 					if (x == x->get_parent()->get_right())
 					{
-						/* make x a left child */
+						// make x a left child
 						x = x->get_parent();
 						rotate_left(x, p_root);
 					}
 
-					/* recolor and rotate */
-					x->get_parent()->set_color(BLACK);
-					x->get_parent()->get_parent()->set_color(RED);
+					// recolor and rotate
+					x->get_parent()->set_black();
+					x->get_parent()->get_parent()->set_red();
 					rotate_right(x->get_parent()->get_parent(), p_root);
 				}
 			}
 			else
 			{
-				/* mirror image of above code */
+				// mirror image of above code
 				xrbsnode * y = x->get_parent()->get_parent()->get_left();
-				if (y->get_color() == RED)
+				if (y->is_red())
 				{
-					/* uncle is RED */
-					x->get_parent()->set_color(BLACK);
-					y->set_color(BLACK);
-					x->get_parent()->get_parent()->set_color(RED);
+					// uncle is RED
+					x->get_parent()->set_black();
+					y->set_black();
+					x->get_parent()->get_parent()->set_red();
 					x = x->get_parent()->get_parent();
 				}
 				else
 				{
-					/* uncle is BLACK */
+					// uncle is BLACK
 					if (x == x->get_parent()->get_left())
 					{
 						x = x->get_parent();
 						rotate_right(x, p_root);
 					}
-					x->get_parent()->set_color(BLACK);
-					x->get_parent()->get_parent()->set_color(RED);
-					rotateLeft(x->get_parent()->get_parent(), p_root);
+					x->get_parent()->set_black();
+					x->get_parent()->get_parent()->set_red();
+					rotate_left(x->get_parent()->get_parent(), p_root);
 				}
 			}
 		}
-		p_root->set_color(BLACK);
+		p_root->set_black();
 	}
 
-	void xrbstree::insert_to_parent(xrbsnode * x, xrbsnode * parent, xrbsnode *& p_root)
+	inline void xrbstree::insert_to_parent(xrbsnode * x, xrbsnode * parent, xrbsnode *& p_root)
 	{
 		x->set_parent(parent);
-		x->set_left(NILL);
-		x->set_right(NILL);
-		x->set_color(RED);
+		x->set_left(get_nill());
+		x->set_right(get_nill());
+		x->set_color(xrbsnode::RED);
 		
-		/* insert node in tree */
+		// insert node in tree
 		if (parent)
 		{
 			s32 c = m_cmp_f(x, parent);
@@ -303,38 +310,7 @@ namespace xcore
 
 	//////////////////////////////////////////////////////////////////////////
 
-	xrbsnode * xrbstree::find(xrbsnode * find, xrbsnode *& p_root, xrbsnode *& p_insert_parent) const
-	{
-		if (p_root)
-		{   
-			xrbsnode *current = *p_root;
-			xrbsnode *parent = NULL;
-			while (current != NILL)
-			{
-				s32 const c = m_cmp_f(find, current);
-				if (c == 0)
-					return (current);
-
-				c = (c+1) >> 1;
-				ASSERT(xrbsnode::LEFT == 0);
-				ASSERT(xrbsnode::RIGHT == 1);
-				ASSERT(xrbsnode::RIGHT == c || xrbsnode::LEFT == c);
-				parent = current;
-				current = current->get_child(c);
-			}
-		
-			p_insert_parent = parent;
-			return(NULL);
-		}
-		else
-		{   
-			p_insert_parent = NULL;
-			return(NULL);
-		}
-	}
-
-
-	void xrbstree::remove_fixup(xrbsnode * x, xrbsnode * x_parent, xrbsnode *& p_root)
+	inline void xrbstree::remove_fixup(xrbsnode * x, xrbsnode * x_parent, xrbsnode *& p_root)
 	{
 		while (x != p_root && x->is_black())
 		{
@@ -343,14 +319,14 @@ namespace xcore
 				xrbsnode * w = x_parent->get_right();
 				if (w->is_red())
 				{
-					w->set_color(BLACK);
-					x_parent->set_color(RED);
+					w->set_black();
+					x_parent->set_red();
 					rotate_left(x_parent, p_root);
 					w = x_parent->get_right();
 				}
 				if (w->get_left()->is_black() && w->get_right()->is_black())
 				{
-					w->set_color(RED);
+					w->set_red();
 					x = x_parent;
 					x_parent = x->get_parent();
 				}
@@ -358,14 +334,14 @@ namespace xcore
 				{
 					if (w->get_right()->is_black())
 					{
-						w->get_left()->set_color(BLACK);
-						w->set_color(RED);
+						w->get_left()->set_black();
+						w->set_red();
 						rotate_right(w, p_root);
 						w = x_parent->get_right();
 					}
 					w->set_color(x_parent->get_color());
-					x_parent->set_color(BLACK);
-					w->get_right()->set_color(BLACK);
+					x_parent->set_black();
+					w->get_right()->set_black();
 					rotate_left(x_parent, p_root);
 					x = p_root;
 					x_parent = NULL;
@@ -376,40 +352,39 @@ namespace xcore
 				xrbsnode * w = x_parent->get_left();
 				if (w->is_red())
 				{
-					w->set_color(BLACK);
-					x_parent->set_color(RED);
+					w->set_black();
+					x_parent->set_red();
 					rotate_right(x_parent, p_root);
 					w = x_parent->get_left();
 				}
 				if (w->get_right()->is_black() && w->get_left()->is_black())
 				{
-					w->set_color(RED);
+					w->set_red();
 					x = x_parent;
 					x_parent = x->get_parent();
-
 				}
 				else
 				{
 					if (w->get_left()->is_black())
 					{
-						w->get_right()->set_color(BLACK);
-						w->set_color(RED);
+						w->get_right()->set_black();
+						w->set_red();
 						rotate_left (w, p_root);
 						w = x_parent->get_left();
 					}
 					w->set_color(x_parent->get_color());
-					x_parent->set_color(BLACK);
-					w->get_left()->set_color(BLACK);
+					x_parent->set_black();
+					w->get_left()->set_black();
 					rotate_right (x_parent, p_root);
 					x = p_root;
 					x_parent = NULL;
 				}
 			}
 		}
-		x->set_color(BLACK);
+		x->set_black();
 	}
 
-	void xrbstree::remove(xrbsnode * z, xrbsnode *& p_root)
+	inline void xrbstree::remove(xrbsnode * z, xrbsnode *& p_root)
 	{
 		if (!p_root)
 			return;
@@ -419,27 +394,25 @@ namespace xcore
 
 		xrbsnode *x, *y, *x_parent;
 		if (is_nill(z->get_left()) || is_nill(z->get_right()))
-		{
-			/* y has a NIL node as a child */
+		{	// y has a NIL node as a child
 			y = z;
 		}
 		else
-		{
-			/* find tree successor with a NIL node as a child */
+		{	// find tree successor with a NIL node as a child
 			y = z->get_right();
 			while (!is_nill(y->get_left()))
 				y = y->get_left();
 		}
 
-		/* x is y's only child */
+		// x is y's only child
 		if (!is_nill(y->get_left()))
 			x = y->get_left();
 		else
 			x = y->get_right();
 
-		/* remove y from the parent chain */
+		// remove y from the parent chain
 		x_parent = y->get_parent();
-		if(!is_nill(x))
+		if (!is_nill(x))
 			x->set_parent(x_parent);
 			
 		if (y->get_parent())
@@ -452,10 +425,10 @@ namespace xcore
 			p_root = x;
 		}
 
-		bool const f = (y->get_color() == BLACK);
+		bool const f = (y->is_black());
 		
 		if (y != z)
-		{   /* replace z with y */ 
+		{   // replace z with y
 			y->set_color(z->get_color());
 			y->set_left(z->get_left());
 			y->set_right(z->get_right());
@@ -489,10 +462,125 @@ namespace xcore
 			remove_fixup(x, x_parent, p_root);
 	}
 
-struct rbs_iterator
+	//////////////////////////////////////////////////////////////////////////
+
+	inline xrbsnode * xrbstree::find(void * find, xrbsnode * p_root, xrbsnode *& p_insert_parent) const
 	{
-		inline		rbs_iterator() : node(NULL), top(0) {}
-		inline		rbs_iterator(xrbsnode* n) : node(n), top(0) {}
+		if (p_root)
+		{
+			xrbsnode *current = p_root;
+			xrbsnode *parent = NULL;
+			while (!is_nill(current))
+			{
+				s32 c = m_cmp_f(find, current);
+				if (c == 0)
+					return (current);
+
+				c = (c + 1) >> 1;
+				ASSERT(xrbsnode::LEFT == 0);
+				ASSERT(xrbsnode::RIGHT == 1);
+				ASSERT(xrbsnode::RIGHT == c || xrbsnode::LEFT == c);
+				parent = current;
+				current = current->get_child(c);
+			}
+
+			p_insert_parent = parent;
+			return(NULL);
+		}
+		else
+		{
+			p_insert_parent = NULL;
+			return(NULL);
+		}
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+
+	inline bool			xrbstree::find(void* data, xrbsnode *& n) const
+	{
+		xrbsnode* p;
+		n = find(data, m_root, p);
+		return n != NULL;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	inline bool			xrbstree::insert(void* data, xrbsnode * n)
+	{
+		ASSERT(m_cmp_f(data, n) == 0);
+
+		xrbsnode* p;
+		xrbsnode* f = find(data, m_root, p);
+		if (f == NULL)
+		{
+			insert_to_parent(n, p, m_root);
+			return true;
+		}
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	inline bool			xrbstree::remove(xrbsnode * f)
+	{
+		if (f != NULL)
+		{
+			remove(f, m_root);
+			return true;
+		}
+		return false;
+	}
+
+	inline xrbsnode*	xrbstree::clear(xrbsnode*& iterator)
+	{
+		//	Rotate away the left links so that
+		//	we can treat this like the destruction
+		//	of a linked list
+		if (m_root == NULL && iterator == NULL)
+			return NULL;
+
+		if (iterator == NULL)
+			iterator = m_root;
+
+		xrbsnode* it = iterator;
+		iterator = NULL;
+
+		while (!is_nill(it))
+		{
+			if (is_nill(it->get_left()))
+			{	// No left links, just kill the node and move on
+				iterator = (xrbsnode*)it->get_right();
+				it->clear();
+				return it;
+			}
+			else
+			{	// Rotate away the left link and check again
+				iterator = it->get_left();
+				it->set_left(iterator->get_right());
+				iterator->set_right(it);
+			}
+			it = iterator;
+			iterator = NULL;
+		}
+		m_root = NULL;
+		return NULL;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	inline bool			xrbstree::test(const char*& result) const
+	{
+		result = NULL;
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+
+	struct rbs_iterator
+	{
+		inline		rbs_iterator(xrbsnode* nill) : m_nill(nill), m_node(NULL) {}
 
 		enum EType
 		{
@@ -508,60 +596,44 @@ struct rbs_iterator
 			xrbsnode * result = NULL;
 			if (root)
 			{
-				node = root;
-				top = 0;
-
-				if (node != NULL)
-				{	// Save the path for later traversal
-					while (node->get_child(dir) != NULL)
-					{
-						push(node);
-						node = node->get_child(dir);
-					}
+				m_node = root;
+				// Save the path for later traversal
+				while (m_node->get_child(dir) != m_nill)
+				{
+					m_node = m_node->get_child(dir);
 				}
-				result = node;
+				result = m_node;
 			}
 			return result;
 		}
 
 		xrbsnode*	move(EType dir)
 		{
-			if (node->get_child(dir) != NULL)
+			if (m_node->get_child(dir) != m_nill)
 			{	// Continue down this branch
-				push(node);
-				node = node->get_child(dir);
-				while (node->get_child(!dir) != NULL)
+				m_node = m_node->get_child(dir);
+				while (m_node->get_child(!dir) != m_nill)
 				{
-					push(node);
-					node = node->get_child(!dir);
+					m_node = m_node->get_child(!dir);
 				}
 			}
 			else
 			{	// Move to the next branch
 				xrbsnode * last = NULL;
 				do {
-					if (top == 0)
-					{
-						node = NULL;
-						break;
-					}
-					last = node;
-					node = pop();
-				} while (last == node->get_child(dir));
+					last = m_node;
+					m_node = m_node->get_parent();
+				} while (last == m_node->get_child(dir));
 			}
-			return node;
+			return m_node;
 		}
 
-		void		push(xrbsnode* node)		{ ASSERT(top < MAX_HEIGHT); path[top++] = node; }
-		xrbsnode*	pop()						{ ASSERT(top > 0); return path[--top]; }
-
-		xrbsnode*	node;
-		s32			top;
-		xrbsnode*	path[MAX_HEIGHT];
+		xrbsnode*	m_nill;
+		xrbsnode*	m_node;
 	};
 
 };
 
 
-#endif	///< __XBASE_REDBLACK_TREE_H__
+#endif	///< __XBASE_REDBLACK_TREE_SENTINEL_PTR_H__
 

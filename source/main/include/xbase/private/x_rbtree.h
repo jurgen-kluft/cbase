@@ -78,6 +78,45 @@ namespace xcore
 		xrbnode				*left, *right;
 	};
 
+	//////////////////////////////////////////////////////////////////////////
+
+	typedef s32(*xrbnode_cmp_f) (void* a, xrbnode* b);
+	typedef s32(*xrbnode_cmpn_f) (xrbnode* a, xrbnode* b);
+	typedef void(*xrbnode_remove_f) (xrbnode* a, xrbnode* b);
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	struct xrbtree
+	{
+		inline				xrbtree()
+		{
+			m_root = NULL;
+			m_cmp_f = NULL;
+			m_remove_f = NULL;
+			m_cmpn_f = NULL;
+		}
+
+		void				init(xrbnode_cmp_f cmp_f, xrbnode_remove_f remove_f, xrbnode_cmpn_f cmpn_f)
+		{
+			m_cmp_f = cmp_f;
+			m_remove_f = remove_f;
+			m_cmpn_f = cmpn_f;
+		}
+
+		bool				find(void* data, xrbnode *& n) const;
+		bool				insert(void* data, xrbnode * n);
+		bool				remove(void* data, xrbnode *& n);
+
+		xrbnode*			clear(xrbnode*& iterator);
+
+		bool				test(const char*& result) const;
+
+	private:
+		xrbnode				*m_root;
+		xrbnode_cmp_f		m_cmp_f;
+		xrbnode_remove_f	m_remove_f;
+		xrbnode_cmpn_f		m_cmpn_f;
+	};
 
 	struct xmrbnode : public xrbnode
 	{
@@ -236,13 +275,10 @@ namespace xcore
 		return result;
 	}
 
-	typedef s32(*xrbnode_cmp_f) (xrbnode* a, xrbnode* b);
-	typedef void(*xrbnode_remove_f) (xrbnode* a, xrbnode* b);
-
 	// Test the integrity of the red-black tree
 	// @return: The depth of the tree
 	// @result: If any error it returns a description of the error in 'result', when no error it will be NULL
-	inline s32 rb_tree_test(xrbnode* root, xrbnode_cmp_f cmp_f, const char*& result)
+	inline s32 rb_tree_test(xrbnode* root, xrbnode_cmpn_f cmp_f, const char*& result)
 	{
 		s32 lh, rh;
 		if (root == NULL)
@@ -291,7 +327,7 @@ namespace xcore
 	}
 
 	// Returns 1 on success, 0 otherwise.
-	inline bool	rb_insert_node(xrbnode*& root, xrbnode * node, xrbnode_cmp_f cmp_f)
+	inline bool	rb_insert_node(xrbnode*& root, void* data, xrbnode * node, xrbnode_cmp_f cmp_f)
 	{
 		bool result = false;
 		if (node)
@@ -351,7 +387,7 @@ namespace xcore
 
 					// Stop working if we inserted a node.
 					// This check also disallows duplicates in the tree
-					s32 const c = cmp_f(node, q);
+					s32 const c = cmp_f(data, q);
 					if (c == 0)
 						break;
 
@@ -379,7 +415,7 @@ namespace xcore
 	// Returns 1 if the value was removed, 0 otherwise. Optional node callback
 	// can be provided to dealloc node and/or user data. Use rb_tree_node_dealloc
 	// default callback to deallocate node created by rb_tree_insert(...).
-	inline bool	rb_remove_node(xrbnode *& root, xrbnode* find, xrbnode_cmp_f cmp_f, xrbnode_remove_f remove_f, xrbnode*& outnode)
+	inline bool	rb_remove_node(xrbnode *& root, void* find, xrbnode_cmp_f cmp_f, xrbnode_remove_f remove_f, xrbnode*& outnode)
 	{
 		if (root != NULL)
 		{
@@ -490,6 +526,90 @@ namespace xcore
 		}
 		return true;
 	}
+
+	inline bool				xrbtree::find(void* data, xrbnode *& n) const
+	{
+		if (m_root)
+		{
+			xrbnode *current = m_root;
+			xrbnode *parent = NULL;
+			while (current != NULL)
+			{
+				s32 c = m_cmp_f(data, current);
+				if (c == 0)
+				{
+					n = (current);
+					return true;
+				}
+
+				c = (c + 1) >> 1;
+				ASSERT(xrbnode::LEFT == 0);
+				ASSERT(xrbnode::RIGHT == 1);
+				ASSERT(xrbnode::RIGHT == c || xrbnode::LEFT == c);
+				current = current->get_child(c);
+			}
+			n = NULL;
+			return(false);
+		}
+		else
+		{
+			n = NULL;
+			return(false);
+		}
+	}
+
+	inline bool				xrbtree::insert(void* data, xrbnode * n)
+	{
+		ASSERT(m_cmp_f(data, n) == 0);
+		return rb_insert_node(m_root, data, n, m_cmp_f);
+	}
+
+	inline bool				xrbtree::remove(void* data, xrbnode *& n)
+	{
+		return rb_remove_node(m_root, data, m_cmp_f, m_remove_f, n);
+	}
+
+	inline xrbnode*			xrbtree::clear(xrbnode*& iterator)
+	{
+		//	Rotate away the left links so that
+		//	we can treat this like the destruction
+		//	of a linked list
+		if (m_root == NULL && iterator == NULL)
+			return NULL;
+
+		if (iterator == NULL)
+			iterator = m_root;
+
+		xrbnode* it = iterator;
+		iterator = NULL;
+
+		while (it != NULL)
+		{
+			if (it->get_left() == NULL)
+			{	// No left links, just kill the node and move on
+				iterator = (xrbnode*)it->get_right();
+				it->clear();
+				break;
+			}
+			else
+			{	// Rotate away the left link and check again
+				iterator = it->get_left();
+				it->set_left(iterator->get_right());
+				iterator->set_right(it);
+			}
+			it = iterator;
+			iterator = NULL;
+		}
+		m_root = iterator;
+		return it;
+	}
+
+	inline bool				xrbtree::test(const char*& result) const
+	{
+		s32 height = rb_tree_test(m_root, m_cmpn_f, result);
+		return result == NULL;
+	}
+
 };
 
 

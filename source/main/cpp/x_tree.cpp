@@ -3,19 +3,18 @@
 
 namespace xcore
 {
-
-	bool		xtree_insert(xrbnode*& root, xrbnode * node_to_insert, xrbnode_cmp_f cmp_f)
+	bool		xtree_insert(xrbnode*& root, void * data, xrbnode * node_to_insert, xrbnode_cmp_f cmp_f)
 	{
 		ASSERT(node_to_insert!=0);
-		return rb_insert_node(root, node_to_insert, cmp_f);
+		return rb_insert_node(root, data, node_to_insert, cmp_f);
 	}
 
-	bool		xtree_remove(xrbnode*& root, xrbnode * key, xrbnode_cmp_f cmp_f, xrbnode_remove_f remove_f, xrbnode *& remove_node)
+	bool		xtree_remove(xrbnode*& root, void * key, xrbnode_cmp_f cmp_f, xrbnode_remove_f remove_f, xrbnode *& remove_node)
 	{
 		return (rb_remove_node(root, key, cmp_f, remove_f, remove_node));
 	}
 
-	bool		xtree_find  (xrbnode* root, xrbnode * key, xrbnode_cmp_f cmp_f, xrbnode*& find_node)
+	bool		xtree_find  (xrbnode* root, void * key, xrbnode_cmp_f cmp_f, xrbnode*& find_node)
 	{
 		xrbnode* it = root;
 		while ( it != NULL )
