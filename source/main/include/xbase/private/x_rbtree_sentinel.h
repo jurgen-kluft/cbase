@@ -74,6 +74,54 @@ namespace xcore
 	};
 
 	//////////////////////////////////////////////////////////////////////////
+
+	struct rbs_iterator
+	{
+		inline		rbs_iterator(xrbsnode* nill, xrbsnode* n, s32 dir) : m_nill(nill), m_node(n), m_dir(dir) {}
+
+		xrbsnode*	current() const { return m_node; }
+
+		bool		move(void* data, xrbsnode_cmp_f cmp_f, xrbsnode*& n)
+		{
+			if (m_node == m_nill || m_node == NULL)
+				return false;
+
+			s32 c = cmp_f(data, m_node);
+			if (c == 0)
+			{
+				n = m_node;
+				return false;
+			}
+			c = (c + 1) >> 1;
+			m_node = m_node->get_child(c);
+			return true;
+		}
+
+		xrbsnode*	move()
+		{
+			if (m_node->get_child(m_dir) != m_nill)
+			{	// Continue down this branch
+				m_node = m_node->get_child(m_dir);
+				while (m_node->get_child(!m_dir) != m_nill)
+					m_node = m_node->get_child(!m_dir);
+			}
+			else
+			{	// Move to the next branch
+				xrbsnode * last = NULL;
+				do {
+					last = m_node;
+					m_node = m_node->get_parent();
+				} while (last == m_node->get_child(m_dir));
+			}
+			return m_node;
+		}
+
+		xrbsnode*	m_nill;
+		xrbsnode*	m_node;
+		s32			m_dir;
+	};
+
+	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	struct xrbstree
 	{
@@ -94,7 +142,14 @@ namespace xcore
 
 		bool				find(void* data, xrbsnode *& n) const;
 		bool				insert(void* data, xrbsnode * n);
-		bool				remove(xrbsnode * );
+		bool				remove(void* data, xrbsnode *& n);
+		bool				remove(xrbsnode * n);
+
+		inline bool			is_nill(xrbsnode* n) const					{ return n == &m_sentinel; }
+
+		rbs_iterator		root() const;
+		rbs_iterator		min() const;
+		rbs_iterator		max() const;
 
 		xrbsnode*			clear(xrbsnode*& iterator);
 
@@ -105,8 +160,7 @@ namespace xcore
 		xrbsnode			*m_root;
 		xrbsnode_cmp_f		m_cmp_f;
 		
-		inline xrbsnode*	get_nill()									{ return &m_sentinel; }
-		inline bool			is_nill(xrbsnode* n) const					{ return n == &m_sentinel; }
+		inline xrbsnode*	get_nill() const							{ return (xrbsnode*)&m_sentinel; }
 
 		void 				rotate_right(xrbsnode * x, xrbsnode *& p_root);
 		void 				rotate_left(xrbsnode * x, xrbsnode*& p_root);
@@ -117,7 +171,7 @@ namespace xcore
 		void				insert_to_parent(xrbsnode * x, xrbsnode * parent, xrbsnode *& p_root);
 
 		xrbsnode *			find(void * find, xrbsnode * p_root, xrbsnode *& p_insert_parent) const;
-		void				remove(xrbsnode * z, xrbsnode *& p_root);
+		void				remove_node(xrbsnode * z, xrbsnode *& p_root);
 	};
 
 
@@ -384,12 +438,11 @@ namespace xcore
 		x->set_black();
 	}
 
-	inline void xrbstree::remove(xrbsnode * z, xrbsnode *& p_root)
+	inline void xrbstree::remove_node(xrbsnode * z, xrbsnode *& p_root)
 	{
-		if (!p_root)
+		if (p_root == NULL)
 			return;
-
-		if (!z || is_nill(z))
+		if (z == NULL || is_nill(z))
 			return;
 
 		xrbsnode *x, *y, *x_parent;
@@ -522,14 +575,57 @@ namespace xcore
 
 	//////////////////////////////////////////////////////////////////////////
 
-	inline bool			xrbstree::remove(xrbsnode * f)
+	inline bool			xrbstree::remove(void * d, xrbsnode *& f)
 	{
-		if (f != NULL)
+		if (find(d, f))
 		{
-			remove(f, m_root);
+			remove_node(f, m_root);
 			return true;
 		}
 		return false;
+	}
+
+	inline bool			xrbstree::remove(xrbsnode * n)
+	{
+		remove_node(n, m_root);
+		return true;
+	}
+
+	inline rbs_iterator	xrbstree::root() const
+	{
+		return rbs_iterator(get_nill(), m_root, xrbsnode::RIGHT);
+	}
+
+	inline rbs_iterator	xrbstree::min() const
+	{
+		if (m_root)
+		{
+			xrbsnode *current = m_root;
+			while (true)
+			{
+				xrbsnode * child = current->get_left();
+				if (is_nill(child))
+					return rbs_iterator(get_nill(), current, xrbsnode::RIGHT);
+				current = child;
+			}
+		}
+		return rbs_iterator(get_nill(), NULL, xrbsnode::RIGHT);
+	}
+
+	inline rbs_iterator	xrbstree::max() const
+	{
+		if (m_root)
+		{
+			xrbsnode *current = m_root;
+			while (true)
+			{
+				xrbsnode * child = current->get_right();
+				if (is_nill(child))
+					return rbs_iterator(get_nill(), current, xrbsnode::LEFT);
+				current = child;
+			}
+		}
+		return rbs_iterator(get_nill(), NULL, xrbsnode::RIGHT);
 	}
 
 	inline xrbsnode*	xrbstree::clear(xrbsnode*& iterator)
@@ -576,61 +672,6 @@ namespace xcore
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-
-	struct rbs_iterator
-	{
-		inline		rbs_iterator(xrbsnode* nill) : m_nill(nill), m_node(NULL) {}
-
-		enum EType
-		{
-			FORWARDS = 1,
-			BACKWARDS = 0,
-			MINIMUM = 0,
-			MAXIMUM = 1,
-			MAX_HEIGHT = 64
-		};
-
-		xrbsnode*	init(xrbsnode * root, EType dir)
-		{
-			xrbsnode * result = NULL;
-			if (root)
-			{
-				m_node = root;
-				// Save the path for later traversal
-				while (m_node->get_child(dir) != m_nill)
-				{
-					m_node = m_node->get_child(dir);
-				}
-				result = m_node;
-			}
-			return result;
-		}
-
-		xrbsnode*	move(EType dir)
-		{
-			if (m_node->get_child(dir) != m_nill)
-			{	// Continue down this branch
-				m_node = m_node->get_child(dir);
-				while (m_node->get_child(!dir) != m_nill)
-				{
-					m_node = m_node->get_child(!dir);
-				}
-			}
-			else
-			{	// Move to the next branch
-				xrbsnode * last = NULL;
-				do {
-					last = m_node;
-					m_node = m_node->get_parent();
-				} while (last == m_node->get_child(dir));
-			}
-			return m_node;
-		}
-
-		xrbsnode*	m_nill;
-		xrbsnode*	m_node;
-	};
 
 };
 

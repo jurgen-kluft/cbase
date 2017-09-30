@@ -140,7 +140,7 @@ UNITTEST_SUITE_BEGIN(xtree_sentinel)
 
 			const char* test_result = NULL;
 
-			for (s32 i = 0; i < 320000; ++i)
+			for (s32 i = 0; i < 3200; ++i)
 			{
 				mynode* node = node_allocator.allocate();
 				node->clear();
