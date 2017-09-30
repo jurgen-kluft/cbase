@@ -19,7 +19,6 @@ namespace xcore
 {
 	// Forward declares
 	class xconsole_imp;
-	class xstring_const;
 
 	struct xconsole_node
 	{
