@@ -2193,9 +2193,9 @@ namespace xcore
 
 	//==============================================================================
 	// UTF 8, 16, 32
-	typedef		u8     uchar8;
-	typedef		u16    uchar16;
-	typedef		u32    uchar32;
+	typedef		u8				uchar8;
+	typedef		u16				uchar16;
+	typedef		unsigned long	uchar32;
 
 	#pragma pack(push, 1)
 	struct ustr8	// UTF-8 string
