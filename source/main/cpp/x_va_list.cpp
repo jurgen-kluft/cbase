@@ -4,8 +4,9 @@
 */
 
 #include "xbase\x_debug.h"
-#include "xbase\x_string_utf.h"
 #include "xbase\x_va_list.h"
+#include "xbase\x_string_utf.h"
+#include "xbase\x_string_ascii.h"
 
 /**
  * xCore namespace
@@ -49,24 +50,25 @@ namespace xcore
 		u32 i = 0;
 		switch (mType)
 		{
-			case TYPE_BOOL:
-			case TYPE_UCHAR:
+		case TYPE_BOOL:
+		case TYPE_UCHAR:
 			//case TYPE_UINT:
 			//case TYPE_INT:		{ i = (u32)(*(u32*)mArg); } break;
-			case TYPE_UINT32:
-			case TYPE_INT32:	{ i = (u32)(*(u32*)mArg); } break;
+		case TYPE_UINT32:
+		case TYPE_INT32: { i = (u32)(*(u32*)mArg); } break;
 
-			case TYPE_UINT8:
-			case TYPE_INT8:		{ i = (u32)(*(u8*)mArg);  } break;
-			case TYPE_UINT16:
-			case TYPE_INT16:	{ i = (u32)(*(u16*)mArg); } break;
-			case TYPE_UINT64:
-			case TYPE_INT64:	{ i = (u32)(*(u64*)mArg); } break;
-			case TYPE_FLOAT32:	{ i = (u32)(*(f32*)mArg); } break;
-			case TYPE_FLOAT64:	{ i = (u32)(*(f64*)mArg); } break;
-			case TYPE_PCTCHAR:
-			case TYPE_PCUSTR8:
-			default:			break; // Fall through
+		case TYPE_UINT8:
+		case TYPE_INT8: { i = (u32)(*(u8*)mArg);  } break;
+		case TYPE_UINT16:
+		case TYPE_INT16: { i = (u32)(*(u16*)mArg); } break;
+		case TYPE_UINT64:
+		case TYPE_INT64: { i = (u32)(*(u64*)mArg); } break;
+		case TYPE_FLOAT32: { i = (u32)(*(f32*)mArg); } break;
+		case TYPE_FLOAT64: { i = (u32)(*(f64*)mArg); } break;
+		case TYPE_PCTCHAR:
+		case TYPE_PCUSTR8: { i = (u32)StrToS32(*(pcrune*)mArg); } break;
+			default:
+				break; // Fall through
 		};
 
 		return i;
@@ -99,7 +101,7 @@ namespace xcore
 			case TYPE_FLOAT32:	{ i = (u64)(*(f32*)mArg);  } break;
 			case TYPE_FLOAT64:	{ i = (u64)(*(f64*)mArg);  } break;
 			case TYPE_PCTCHAR:
-			case TYPE_PCUSTR8:
+			case TYPE_PCUSTR8: { i = (u32)StrToS64(*(pcrune*)mArg); } break;
 			default:			break; // Fall through
 		};
 
@@ -128,7 +130,7 @@ namespace xcore
 			case TYPE_FLOAT32:	{ i = (f32)(*(f32*)mArg); } break;
 			case TYPE_FLOAT64:	{ i = (f32)(*(f64*)mArg); } break;
 			case TYPE_PCTCHAR:
-			case TYPE_PCUSTR8:
+			case TYPE_PCUSTR8: { i = (f32)StrToF32(*(pcrune*)mArg); } break;
 			default:			break; // Fall through
 		};
 
@@ -158,7 +160,7 @@ namespace xcore
 			case TYPE_FLOAT64:	{ i = (f64)(*(f64*)mArg); } break;
 
 			case TYPE_PCTCHAR:
-			case TYPE_PCUSTR8:
+			case TYPE_PCUSTR8: { i = (u32)StrToF64(*(pcrune*)mArg); } break;
 			default:			break; // Fall through
 		};
 
@@ -207,7 +209,7 @@ namespace xcore
 			case TYPE_BOOL:		{ ch = (*(u32*)mArg)!=0 ? (u32)'y' : (u32)'n'; } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	
-			case TYPE_UCHAR:	{ ch = (u32)(*(u32*)mArg); } break;
+			case TYPE_UCHAR:	{ ch = (uchar)(*(uchar*)mArg); } break;
 
 			case TYPE_UINT8:
 			case TYPE_INT8:		{ ch = (u8)(*(u8*)mArg); } break;
@@ -219,8 +221,8 @@ namespace xcore
 			case TYPE_FLOAT32:	
 			case TYPE_FLOAT64:
 
-			case TYPE_PCTCHAR:
-			case TYPE_PCUSTR8:
+			case TYPE_PCTCHAR: { UTF::ascii_to_utf32(*(const char**)mArg, ch); } break;
+			case TYPE_PCUSTR8: { UTF::utf8_to_utf32(*(const ustr8**)mArg, ch); } break;
 			default:			break; // Fall through
 		};
 
@@ -259,6 +261,39 @@ namespace xcore
 
 		return (const ustr8*)"?";
 	}
+
+	const ustr32*		x_va::convertToUStr32Pointer() const
+	{
+		switch (mType)
+		{
+		case TYPE_PCUSTR32:
+		{
+			const ustr32* p = *(const ustr32**)mArg;
+			return p;
+		}
+
+		default:			break; // Fall through
+		};
+
+		return (const ustr32*)"?\0\0\0";
+	}
+
+	const xstring*		x_va::convertToXStringPointer() const
+	{
+		switch (mType)
+		{
+		case TYPE_PCXSTRING:
+		{
+			const xstring* p = *(const xstring**)mArg;
+			return p;
+		}
+
+		default:			break; // Fall through
+		};
+
+		return NULL;
+	}
+
 
 	x_va_r	x_va_r::sEmpty;
 
@@ -420,6 +455,31 @@ namespace xcore
 		return *this;
 	}
 
+	x_va_r&					x_va_r::operator=(uchar32 rhs)
+	{
+		switch (mType)
+		{
+		case TYPE_BOOL:		*((xbool*)mRef) = rhs != 0 ? xTRUE : xFALSE; break;
+		case TYPE_UCHAR:	*((uchar*)mRef) = rhs; break;
+		case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
+		case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
+		case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
+		case TYPE_INT8:		*((s8*)mRef) = (s8)rhs; break;
+		case TYPE_UINT16:	*((u16*)mRef) = (u16)rhs; break;
+		case TYPE_INT16:	*((s16*)mRef) = (s16)rhs; break;
+		case TYPE_UINT64:	*((u64*)mRef) = (u64)rhs; break;
+		case TYPE_INT64:	*((s64*)mRef) = (s64)rhs; break;
+		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)rhs; break;
+		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)rhs; break;
+		case TYPE_PTCHAR:    UTF::utf32_to_ascii(rhs, ((char*)mRef)); break;
+		case TYPE_PUSTR8:    UTF::utf32_to_utf8(rhs, ((ustr8*)mRef)); break;
+		case TYPE_PUSTR32:   ((uchar32*)mRef)[0] = rhs; break;
+		default:			break;
+		};
+
+		return *this;
+	}
+
 	x_va_r&					x_va_r::operator=(bool rhs)
 	{
 		switch (mType)
@@ -442,6 +502,106 @@ namespace xcore
 		return *this;
 	}
 
+	x_va_r&					x_va_r::operator=(const char* rhs)
+	{
+		switch (mType)
+		{
+		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs); break;
+		case TYPE_UCHAR:	*((uchar8*)mRef) = (uchar8)StrToS64(rhs); break;
+		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs); break;
+		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs); break;
+		case TYPE_UINT8:	*((u8 *)mRef) = (u8 )StrToS64(rhs); break;
+		case TYPE_INT8:		*((s8 *)mRef) = (s8 )StrToS64(rhs); break;
+		case TYPE_UINT16:	*((u16*)mRef) = (u16)StrToS64(rhs); break;
+		case TYPE_INT16:	*((s16*)mRef) = (s16)StrToS64(rhs); break;
+		case TYPE_UINT64:	*((u64*)mRef) = (u64)StrToS64(rhs); break;
+		case TYPE_INT64:	*((s64*)mRef) = (s64)StrToS64(rhs); break;
+		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs); break;
+		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs); break;
+		case TYPE_PTCHAR:	break;
+		case TYPE_PUSTR8:	break;
+		case TYPE_PUSTR32:	break;
+		case TYPE_PXSTRING:	*((xstring*)mRef) = rhs; break;
+		default:			break; // Fall through
+		};
+
+		return *this;
+	}
+
+	x_va_r&					x_va_r::operator=(const ustr8* rhs)
+	{
+		switch (mType)
+		{
+		case TYPE_BOOL:		break;
+		case TYPE_UCHAR:	break;
+		case TYPE_UINT32:	break;
+		case TYPE_INT32:	break;
+		case TYPE_UINT8:	break;
+		case TYPE_INT8:		break;
+		case TYPE_UINT16:	break;
+		case TYPE_INT16:	break;
+		case TYPE_UINT64:	break;
+		case TYPE_INT64:	break;
+		case TYPE_FLOAT32:	break;
+		case TYPE_FLOAT64:	break;
+		case TYPE_PTCHAR:	break;
+		case TYPE_PUSTR8:	break;
+		case TYPE_PUSTR32:	break;
+		default:			break; // Fall through
+		};
+
+		return *this;
+	}
+
+	x_va_r&					x_va_r::operator=(const ustr32* rhs)
+	{
+		switch (mType)
+		{
+		case TYPE_BOOL:		break;
+		case TYPE_UCHAR:	break;
+		case TYPE_UINT32:	break;
+		case TYPE_INT32:	break;
+		case TYPE_UINT8:	break;
+		case TYPE_INT8:		break;
+		case TYPE_UINT16:	break;
+		case TYPE_INT16:	break;
+		case TYPE_UINT64:	break;
+		case TYPE_INT64:	break;
+		case TYPE_FLOAT32:	break;
+		case TYPE_FLOAT64:	break;
+		case TYPE_PTCHAR:	break;
+		case TYPE_PUSTR8:	break;
+		case TYPE_PUSTR32:	break;
+		default:			break; // Fall through
+		};
+
+		return *this;
+	}
+
+	x_va_r&					x_va_r::operator=(const xstring* rhs)
+	{
+		switch (mType)
+		{
+		case TYPE_BOOL:		break;
+		case TYPE_UCHAR:	break;
+		case TYPE_UINT32:	break;
+		case TYPE_INT32:	break;
+		case TYPE_UINT8:	break;
+		case TYPE_INT8:		break;
+		case TYPE_UINT16:	break;
+		case TYPE_INT16:	break;
+		case TYPE_UINT64:	break;
+		case TYPE_INT64:	break;
+		case TYPE_FLOAT32:	break;
+		case TYPE_FLOAT64:	break;
+		case TYPE_PTCHAR:	break;
+		case TYPE_PUSTR8:	break;
+		case TYPE_PUSTR32:	break;
+		default:			break; // Fall through
+		};
+
+		return *this;
+	}
 
 //==============================================================================
 // END xCore namespace

@@ -678,7 +678,7 @@ namespace xcore
 		i += (_boolean==0) ? 0 : 1;
 
 		StrCopy((prune)buf, buf+maxBufSize, (pcrune)t[i]);
-		return StrLen((prune)buf);
+		return StrLen((prune)buf, NULL);
 	}
 
 	/**
@@ -818,7 +818,7 @@ namespace xcore
 		return c;
 	}
 
-	static inline uchar8 peek(ustr8 const* _str)
+	static inline uchar32 peek(ustr8 const* _str)
 	{
 		uchar32 c;
 		UTF::read_utf8(_str, c);
