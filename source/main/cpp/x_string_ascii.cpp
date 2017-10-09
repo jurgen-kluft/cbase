@@ -74,28 +74,30 @@ namespace xcore
 	}
 
 	//------------------------------------------------------------------------------
-	static rune			ReadChar(prune& str)
+	static uchar32			ReadChar(prune& str)
 	{
 		s32 l = 0;
-		rune c = PeekChar(str, &l);
+		uchar32 c = PeekChar(str, &l);
 		str += l;
 		return c;
 	}
 
 	//------------------------------------------------------------------------------
-	static rune			ReadChar(pcrune& str)
+	static uchar32			ReadChar(pcrune& str)
 	{
 		s32 l = 0;
-		rune c = PeekChar(str, &l);
+		uchar32 c = PeekChar(str, &l);
 		str += l;
 		return c;
 	}
+
 	//------------------------------------------------------------------------------
 	s32						StrLen(pcrune str, pcrune* end)
 	{
 		ASSERT(str != NULL);
 		s32 len = 0;
-		while (true) {
+		while (true) 
+		{
 			uchar32 c = ReadChar(str);
 			if (c == 0)
 				break;
@@ -107,10 +109,10 @@ namespace xcore
 	}
 
 	//------------------------------------------------------------------------------
-
 	static s32				LenInBytes(uchar32 c)
 	{
-		if ((c & 0xffffff80) == 0x00) {
+		if ((c & 0xffffff80) == 0x00)
+		{
 			return 1;
 		}
 
@@ -122,16 +124,16 @@ namespace xcore
 	}
 
 	//------------------------------------------------------------------------------
-
 	static s32				LenInChars(pcrune str, pcrune * end)
 	{
 		return StrLen(str, end);
 	}
 
 	//------------------------------------------------------------------------------
-
 	static u8				sUTF8LC[] = { 0, 0, 0xc0, 0xe0, 0xf0 };
-	static s32				WriteChar(uchar32 c, prune& str, pcrune end)
+	static s32				WRITEMODE_ASCII = 0;
+	static s32				WRITEMODE_UTF8 = 1;
+	static s32				WriteChar(uchar32 c, prune& str, pcrune end, s32 write_mode = WRITEMODE_ASCII)
 	{
 		s32 len = 0;
 		if (c <= 0x7f) { len = 1; }
@@ -141,25 +143,39 @@ namespace xcore
 		else if (c < 0x010000) { len = 3; }
 		else if (c < 0x110000) { len = 4; }
 
-		if ((str + len) > end)
+		if (len == 0)
+		{
 			return 0;
-
-		if (len == 1) {
+		}
+		if ((str + len) > end)
+		{	
+			return 0;
+		}
+		if (len == 1)
+		{
 			*str++ = (rune)c;
+			return 1;
+		}
+		if (write_mode = WRITEMODE_ASCII)
+		{
+			*str++ = (rune)'?';
 			return 1;
 		}
 
 		uchar8 res[4];
-		switch (len) {
-		case 4: res[3] = (c & 0x3f) | 0x80; c = c >> 6;
-		case 3: res[2] = (c & 0x3f) | 0x80; c = c >> 6;
-		case 2: res[1] = (c & 0x3f) | 0x80; c = c >> 6;
-		default: len = 0;
+		switch (len)
+		{
+			case 4: res[3] = (c & 0x3f) | 0x80; c = c >> 6;
+			case 3: res[2] = (c & 0x3f) | 0x80; c = c >> 6;
+			case 2: res[1] = (c & 0x3f) | 0x80; c = c >> 6;
+			default: len = 0;
 		};
 		res[0] = (rune)c | sUTF8LC[len];
 
-		if (str != NULL) {
-			for (s32 i = 0; i < len; ++i) {
+		if (str != NULL)
+		{
+			for (s32 i = 0; i < len; ++i)
+			{
 				*str++ = res[i];
 			}
 		}
@@ -177,30 +193,32 @@ namespace xcore
 	 *        maxChar - number of characters need to be copied (excluding trailing zero)
 	 *        str     - source string        
 	 * Returns:
-	 *        pointer to the destination string
+	 *        number of characters copied from @src to @dest
 	 *------------------------------------------------------------------------------
 	 */
-	prune StrCopy(prune dest, pcrune dest_end, pcrune src, pcrune src_end)
+	s32 StrCopy(prune dest, pcrune dest_end, pcrune src, pcrune src_end)
 	{
 		ASSERT(dest != NULL && dest_end != NULL);
 		ASSERT(src != NULL && src_end != NULL);
 
+		s32 l = 0;
 		prune dst = dest;
 		while (dst < dest_end)
 		{
-			if (dst == dest_end)
-				break;
 			if (src == src_end)
 				break;
 			*dst++ = *src++;
+			l++;
 		}
-		return dest;
+		return l;
 	}
 
 
 	//------------------------------------------------------------------------------
+	const s32	STRCMPMODE_CASE_SENSITIVE = 0;
+	const s32	STRCMPMODE_CASE_IGNORE = 1;
 
-	s32	StrCmpn(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end)
+	s32	StrCmp_Internal(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end, s32 mode = STRCMPMODE_CASE_SENSITIVE)
 	{
 		ASSERT(str1);
 		ASSERT(str2);
@@ -217,17 +235,32 @@ namespace xcore
 			if (str2 == str2_end)
 				return 1;
 
-			rune c1 = *(str1);
-			rune c2 = *(str2);
+			uchar32 c1 = ReadChar(str1);
+			uchar32 c2 = ReadChar(str1);
+			if (mode == STRCMPMODE_CASE_IGNORE)
+			{
+				c1 = ToLower(c1);
+				c2 = ToLower(c2);
+			}
 			if (c1 < c2)
 				return -1;
 			if (c1 > c2)
 				return 1;
-			str1++;
-			str2++;
 		} while (true);
 
 		return 0;
+	}
+
+	//------------------------------------------------------------------------------
+	s32	StrCmp(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end)
+	{
+		return StrCmp_Internal(str1, str1_end, str2, str2_end);
+	}
+
+	//------------------------------------------------------------------------------
+	s32 StrCmpi(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end)
+	{
+		return StrCmp_Internal(str1, str1_end, str2, str2_end, STRCMPMODE_CASE_IGNORE);
 	}
 
 	//------------------------------------------------------------------------------
@@ -238,47 +271,17 @@ namespace xcore
 	static bool		IsLower(uchar32 c) { return((c >= 'a') && (c <= 'z')); }
 	static bool		IsAlpha(uchar32 c) { return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
 	static bool		IsDigit(uchar32 c) { return((c >= '0') && (c <= '9')); }
-	static uchar32	ToNumber(uchar32 c) { if (IsDigit(c)) return ToDigit(c); else if (c >= 'A' && c <= 'F') return(c - 'A' + 10); else if (c >= 'a' && c <= 'f') return(c - 'a' + 10); else return(c); }
+	static uchar32	ToNumber(uchar32 c)
+	{ 
+		if (IsDigit(c))
+			return ToDigit(c);
 
-	//------------------------------------------------------------------------------
-	s32 StrCmpi(pcrune str1, pcrune str2)
-	{
-		ASSERT(str1);
-		ASSERT(str2);
-		if (str1 == str2) 
-			return 0;
-		do {
-			uchar32 c1 = ReadChar(str1);
-			uchar32 c2 = ReadChar(str2);
-			if (c1 == 0 || c2 == 0)
-				break;
-			c1 = ToLower(c1);
-			c2 = ToLower(c2);
-			if (c1 < c2) return -1;
-			if (c1 > c2) return 1;
-		} while (true);
-		return 0;
-	}
+		if (c >= 'A' && c <= 'F')
+			return(c - 'A' + 10);
+		else if (c >= 'a' && c <= 'f') 
+			return(c - 'a' + 10); 
 
-	//------------------------------------------------------------------------------
-
-	s32 StrCmpin(const rune *str1, const rune *str2, s32 n)
-	{
-		ASSERT(str1);
-		ASSERT(str2);
-		if (n == 0 || str1 == str2)
-			return 0;
-		do {
-			uchar32 c1 = ReadChar(str1);
-			uchar32 c2 = ReadChar(str2);
-			if (c1 == 0 || c2 == 0)
-				break;
-			c1 = ToLower(c1);
-			c2 = ToLower(c2);
-			if (c1 < c2) return -1;
-			if (c1 > c2) return 1;
-		} while (--n > 0);
-		return 0;
+		return(c);
 	}
 
 	/**
@@ -294,42 +297,42 @@ namespace xcore
 	 *        pointer to the pattern of the source string
 	 *------------------------------------------------------------------------------
 	 */
-	pcrune StrStr(pcrune mainStr, pcrune subStr)
+	pcrune StrStr(pcrune mainstr, pcrune mainstr_end, pcrune substr, pcrune substr_end)
 	{
-		if (!*subStr)
-			return((prune)mainStr);
+		if (substr >= substr_end)
+			return mainstr;
 
-		while (true) {
-			pcrune str1 = mainStr;
-			pcrune str2 = subStr;
+		while (mainstr < mainstr_end) 
+		{
+			pcrune mstr = mainstr;
+			pcrune sstr = substr;
 
-			while (true) {
-				uchar32 c1 = ReadChar(str1);
-				uchar32 c2 = ReadChar(str2);
-				if (c2 == 0)
-					return mainStr;
+			while (true) 
+			{
+				if (mstr == mainstr_end)
+					return NULL;
+				if (sstr == substr_end)
+					return mainstr;
+				uchar32 c1 = ReadChar(mstr);
+				uchar32 c2 = ReadChar(sstr);
 				if (c1 != c2)
 					break;
 			}
-			uchar32 c = ReadChar(mainStr);
-			if (c == 0)
-				break;
+			ReadChar(mainstr);
 		}
-
 		return NULL;
 	}
 
 	//------------------------------------------------------------------------------
 
-	pcrune		StrChr(pcrune mainStr, uchar32 c)
+	pcrune		StrChr(pcrune str, pcrune str_end, uchar32 c)
 	{
-		while (true) {
-			pcrune str = mainStr;
-			uchar32 ch = ReadChar(mainStr);
-			if (ch == 0)
-				break;
+		while (str < str_end) 
+		{
+			pcrune currentPos = str;
+			uchar32 ch = ReadChar(str);
 			if (ch == c)
-				return(str);
+				return(currentPos);
 		}
 		return NULL;
 	}
@@ -338,9 +341,9 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	bool IsNumber(uchar32 c, s32 base)
+	bool IsNumber(rune c, s32 base)
 	{
-		const uchar32 max10 = (uchar32)((base > 9) ? '9' : ('0' + base - 1));
+		const uchar32 max10 = (rune)((base > 9) ? '9' : ('0' + base - 1));
 
 		if (c >= '0' && c <= max10)
 			return true;
@@ -348,7 +351,7 @@ namespace xcore
 		if (base < 11)
 			return false;
 
-		const uchar32 max = (uchar32)('A' + (base - 11));
+		const uchar32 max = (rune)('A' + (base - 11));
 
 		c = ToUpper(c);
 		return (c >= 'A' && c <= max);
@@ -356,50 +359,68 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	bool IsInt(pcrune str)
+	bool IsInt(pcrune str, pcrune str_end)
 	{
-		s32 i = 0;
-		if (str[0] == '-') {
-			i = 1;
-		}
-		for (; str[i]; i++) {
-			if (str[i] < '0' || str[i] > '9') return false;
-		}
-		return true;
-	}
-
-	//------------------------------------------------------------------------------
-
-	bool IsFloat(pcrune str)
-	{
-		static pcrune floatStr = "Ee.#QNABIF";
-
-		// Does it have any other of the strange characters?
-		for (s32 i = 0; str[i]; i++)
+		pcrune src = str;
+		uchar32 c = PeekChar(src);
+		if (c == '-')
 		{
-			if (str[i] >= '0' && str[i] <= '9') 
-				continue;
+			ReadChar(src);
+		}
 
-			s32 l;
-			for (l = 0; (str[i] != floatStr[l]) && floatStr[l]; l++);
-
-			// Okay this is not a number
-			if (floatStr[l] == 0) 
+		for (; src < str_end; )
+		{
+			c = PeekChar(src);
+			if (c < '0' || c > '9')
 				return false;
 		}
-
 		return true;
 	}
 
 	//------------------------------------------------------------------------------
 
-	bool IsHex(pcrune str)
+	bool IsFloat(pcrune str, pcrune str_end)
 	{
-		for (s32 i = 0; str[i] != 0; i++)
+		static pcrune sFloatStr = "Ee.#QNABIF";
+
+		// Does it have any other of the strange characters?
+		pcrune src = str;
+		for ( ; src<str_end; )
 		{
-			if (str[i] >= '0' && str[i] <= '9') continue;
-			if (str[i] >= 'A' && str[i] <= 'F') continue;
-			if (str[i] >= 'a' && str[i] <= 'f') continue;
+			uchar32 c = ReadChar(src);
+			if (c >= '0' && c <= '9') 
+			{
+				continue;
+			}
+
+			pcrune float_str = sFloatStr;
+			uchar32 f = ReadChar(float_str);;
+			while (f != c)
+			{
+				f = ReadChar(float_str);
+				if (f == '\0')
+					break;
+			}
+			// Okay this is not a number
+			if (f == '\0') 
+				return false;
+			src++;
+		}
+		return true;
+	}
+
+	//------------------------------------------------------------------------------
+
+	bool IsHex(pcrune str, pcrune str_end)
+	{
+		// Does it have only 0-9, a-f, A-F characters
+		pcrune src = str;
+		for ( ; src<str_end; )
+		{
+			uchar32 c = ReadChar(src);
+			if (c >= '0' && c <= '9') continue;
+			if (c >= 'A' && c <= 'F') continue;
+			if (c >= 'a' && c <= 'f') continue;
 			return false;
 		}
 		return true;
@@ -407,19 +428,22 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	bool IsGUID(pcrune str)
+	bool IsGUID(pcrune str, pcrune str_end)
 	{
-		s32 i;
-		for (i = 0; str[i]; i++)
+		// Does it have only 0-9, a-f, A-F characters
+		s32 n = 0;
+		s32 l = 0;
+		pcrune src = str;
+		for ( ; src<str_end; n++)
 		{
-			s32 nCol = 0;
-			if (str[i] >= '0' && str[i] <= '9') continue;
-			if (str[i] >= 'A' && str[i] <= 'F') continue;
-			if (str[i] >= 'a' && str[i] <= 'f') continue;
-			if (str[i] == ':') 
+			uchar32 c = ReadChar(src);
+			if (c >= '0' && c <= '9') continue;
+			if (c >= 'A' && c <= 'F') continue;
+			if (c >= 'a' && c <= 'f') continue;
+			if (c == ':') 
 			{
-				nCol++;
-				if (nCol > 1)
+				l++;
+				if (l > 1)
 					return false;
 				continue;
 			}
@@ -427,36 +451,26 @@ namespace xcore
 		}
 
 		// the length of the string must be 17 characters long (16 + 1 for the':')
-		if (i != 17) 
-			return false;
-
-		return true;
+		return (n == 17);
 	}
 
 	//------------------------------------------------------------------------------
 
-	prune StrCat(prune front, pcrune end, pcrune back)
+	prune StrCat(prune front, pcrune front_end, pcrune front_eos, pcrune back, pcrune back_end)
 	{
 		ASSERT(front != NULL);
-		ASSERT(end != NULL);
+		ASSERT(front_end != NULL);
 		ASSERT(back != NULL);
-
-		prune wptr = front;
+		ASSERT(back_end != NULL);
+		
 		s32 l = 0;
-		pcrune rptr = wptr;
-		while (*rptr != 0)
+		prune wptr = front + (front_end - front);
+		while (wptr < front_eos)
 		{
-			ReadChar(rptr);
-			++l;
-		}
-		wptr += (rptr - wptr);
-
-		while (wptr < end)
-		{
-			uchar32 c = ReadChar(back);
-			if (c == 0)
+			if (back == back_end)
 				break;
-			if (WriteChar(c, wptr, end) == 0)
+			uchar32 c = ReadChar(back);
+			if (WriteChar(c, wptr, front_eos, WRITEMODE_ASCII) == 0)
 				break;
 		}
 		return front;
@@ -466,18 +480,19 @@ namespace xcore
 	 * Assumption: Letters A-Z and a-z are contiguous in the character set.
 	 * This is true for ASCII and UniCode.  (Not so for EBCDIC!)
 	 */
-	prune ToUpper(prune str)
+	prune ToUpper(prune str, pcrune str_end)
 	{
 		ASSERT(str != NULL);
 		prune p = str;
 		while (true)
 		{
-			uchar32 c = PeekChar(p);
-			if (c == 0)
+			if (p == str_end)
 				break;
-			if ((c >= 'a') && (c <= 'z')) {
+			uchar32 c = PeekChar(p);
+			if ((c >= 'a') && (c <= 'z'))
+			{
 				c += ('A' - 'a');
-				WriteChar(c, p, p + 4);
+				WriteChar(c, p, p + 4, WRITEMODE_ASCII);
 			} else {
 				ReadChar(p);
 			}
@@ -489,18 +504,19 @@ namespace xcore
 	 * Assumption: Letters A-Z and a-z are contiguous in the character set.
 	 * This is true for ASCII and UniCode.  (Not so for EBCDIC!)
 	 */
-	prune ToLower(prune str)
+	prune ToLower(prune str, pcrune str_end)
 	{
 		ASSERT(str != NULL);
 		prune p = str;
 		while (true)
 		{
-			uchar32 c = PeekChar(p);
-			if (c == 0)
+			if (p == str_end)
 				break;
-			if ((c >= 'A') && (c <= 'Z')) {
+			uchar32 c = PeekChar(p);
+			if ((c >= 'A') && (c <= 'Z'))
+			{
 				c = 'a' + (c - 'A');
-				WriteChar(c, p, p + 4);
+				WriteChar(c, p, p + 4, WRITEMODE_ASCII);
 			} else {
 				ReadChar(p);
 			}
@@ -524,20 +540,23 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	bool		StartsWith			(pcrune inStr, uchar32 inStartChar)
+	bool		StartsWith(pcrune str, pcrune str_end, uchar32 start_char)
 	{
-		uchar32 c = ReadChar(inStr);
-		return c == inStartChar;
+		uchar32 c = ReadChar(str);
+		return start_char == c;
 	}
 
-	bool		StartsWith			(pcrune inStr, pcrune inStartStr)
+	bool		StartsWith			(pcrune str, pcrune str_end, pcrune start_str, pcrune start_str_end)
 	{
 		// Match from begin of string
-		while(true) {
-			uchar32 c1 = ReadChar(inStartStr);
-			if (c1 == '\0')
+		while(true) 
+		{
+			if (start_str == start_str_end)
 				break;
-			uchar32 c2 = ReadChar(inStr);
+			uchar32 c1 = ReadChar(start_str);
+			if (str == str_end)
+				break;
+			uchar32 c2 = ReadChar(str);
 			if (c1 != c2)
 				return false;
 		}
@@ -545,64 +564,53 @@ namespace xcore
 		return true;
 	}
 
-	bool		StartsWith			(pcrune inStr, s32 inLen, pcrune inStartStr, s32 inStartLen)
-	{
-		if (inStartLen>inLen)
-			return false;
-
-		s32 minimumLen = x_intu::min(inLen, inStartLen==-1 ? inLen : inStartLen);
-		for (s32 i=0; i<minimumLen; i++)
-		{
-			uchar32 c1 = ReadChar(inStartStr);
-			if (c1 == '\0')
-				return i>0;
-			uchar32 c2 = ReadChar(inStr);
-			if (c1 != c2)
-				return false;
-		}
-		// If matched all the way to the end of inStartStr[i] then success
-		return true;
-	}
-
-	bool		EndsWith			(pcrune str, pcrune str_end, uchar32 inEndChar)
+	bool		EndsWith			(pcrune str, pcrune str_end, uchar32 end_char)
 	{
 		if (str == NULL || str_end <= str)
 			return false;
-		rune c = *(str_end - 1);
-		return inEndChar == c;
+		// ASCII only
+		rune c = PeekChar(str_end - 1);
+		return end_char == c;
 	}
 
-	bool		EndsWith			(pcrune str, pcrune str_end, pcrune str2, pcrune str2_end)
+	bool		EndsWith(pcrune srcstr, pcrune srcstr_end, pcrune endstr, pcrune endstr_end)
 	{
-		pcrune strL = str_end - 1;
-		pcrune strR = str2_end - 1;
-		while (strL >= str && strR >= str2)
+		// ASCII only
+		pcrune srcptr = srcstr_end - 1;
+		pcrune endptr = endstr_end - 1;
+		while (true)
 		{
-			rune c1 = *strL;
-			rune c2 = *strR;
+			s32 l1, l2;
+			rune c1 = PeekChar(srcptr, &l1);
+			rune c2 = PeekChar(endptr, &l2);
 			if (c1 != c2)
 				return false;
-			if (strR == str2)
+			if (srcptr == srcstr)
 				return true;
-			strL -= 1;
-			strR -= 1;
+			if (endptr == endstr)
+				return true;
+			srcptr -= l1;
+			endptr -= l2;
 		}
 		return false;
 	}
 
-	rune			FirstChar			(pcrune str, pcrune str_end)
+	uchar32			FirstChar(pcrune str, pcrune str_end)
 	{
 		ASSERT(str != NULL);
+		ASSERT(str_end != NULL);
 		if (str == str_end)
 			return '\0';
-		rune c = *str;
+		uchar32 c = PeekChar(str);
 		return c;
 	}
 
-	rune			LastChar			(pcrune str, pcrune str_end)
+	uchar32			LastChar(pcrune str, pcrune str_end)
 	{
-		if ((str_end - 1) >= str)
-			return *(str_end - 1);
+		ASSERT(str != NULL);
+		ASSERT(str_end != NULL);
+		if (str_end > str)
+			return PeekChar(str_end - 1);
 		return '\0';
 	}
 
@@ -645,10 +653,10 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	s32  		Compare_Internal	(pcrune str, pcrune str_end, pcrune other, pcrune other_end, bool inIgnoreCase=false)
+	s32  		Compare_Internal	(pcrune str, pcrune str_end, pcrune other, pcrune other_end, s32 cmp_mode = STRCMPMODE_CASE_SENSITIVE)
 	{
-		rune c1 = '\0';
-		rune c2 = '\0';
+		uchar32 c1 = '\0';
+		uchar32 c2 = '\0';
 
 		// 1/ Compare("aaaa", "aabb", 2, 2) -> return  0;
 		// 2/ Compare("aaaa", "aabb", 3, 3) -> return -1;
@@ -660,14 +668,16 @@ namespace xcore
 		s32 result = -1;
 		while (true)
 		{
-			c1 = ReadChar(str);
-			c2 = ReadChar(other);
-			if (c1 == '\0')
+			if (str == str_end)
 				break;
-			if (c2 == '\0')
+			if (other == other_end)
 				break;
 
-			if (inIgnoreCase) {
+			c1 = ReadChar(str);
+			c2 = ReadChar(other);
+
+			if (cmp_mode == STRCMPMODE_CASE_IGNORE)
+			{
 				c1 = ToLower(c1);
 				c2 = ToLower(c2);
 			}
@@ -693,40 +703,32 @@ namespace xcore
 		return Compare_Internal(str, str_end, other, other_end, true);
 	}
 
-	pcrune		Find(pcrune inStr, uchar32 inChar, s32 inLen)
-	{
-		uchar32 c = 0;
-		do {
-			if (inLen==0)
-				break;
-			--inLen;
-			pcrune str = inStr;
-			c = ReadChar(inStr);
-			if (c == inChar)
-				return str;
-		} while (c != 0);
-		return NULL;
-	}
-
-	pcrune		Find(pcrune str, pcrune str_end, pcrune find, pcrune find_end)
+	pcrune		Find_Internal(pcrune str, pcrune str_end, pcrune find, pcrune find_end, s32 find_mode = STRCMPMODE_CASE_SENSITIVE)
 	{
 		pcrune str1 = str;
-		while (str1 < str_end) {
+		while (str1 < str_end) 
+		{
 			if (*str1 == *find)
 			{
 				pcrune str2 = str1;
 				pcrune find2 = find;
-				while (true) {
+				while (true) 
+				{
 					if (find2 == find_end)
 						return str1;
 					if (str2 == str_end)
 						break;
-					rune c2 = *str2;
-					rune f2 = *find2;
+					uchar32 c2 = PeekChar(str2);
+					uchar32 f2 = PeekChar(find2);
+					if (find_mode = STRCMPMODE_CASE_IGNORE)
+					{
+						c2 = ToLower(c2);
+						f2 = ToLower(f2);
+					}
 					if (c2 != f2)
 						break;
-					str2++;
-					find2++;
+					ReadChar(str2);
+					ReadChar(find2);
 				}
 			}
 			str1++;
@@ -734,156 +736,82 @@ namespace xcore
 		return NULL;
 	}
 
-	pcrune	FindNoCase			(pcrune str, pcrune str_end, rune find)
+	pcrune		Find(pcrune str, pcrune str_end, uchar32 find_char)
 	{
-		find = ToLower(find);
-		while (str < str_end)
+		uchar32 c = 0;
+		do 
 		{
-			rune c = *str;
-			if (ToLower(c) == find)
-				return str;
-			str++;
-		}
+			pcrune cur_pos = str;
+			c = ReadChar(str);
+			if (c == find_char)
+				return cur_pos;
+		} while (str < str_end);
 		return NULL;
 	}
 
-	pcrune	FindNoCase			(pcrune str, pcrune str_end, pcrune find, pcrune find_end)
+	pcrune	Find(pcrune str, pcrune str_end, pcrune find, pcrune find_end)
 	{
-		pcrune str1 = str;
-		while (str1 < str_end) {
-			rune const c = *str1;
-			pcrune str2 = str1;
-			pcrune find2 = find;
-			while (true) {
-				if (find2 == find_end)
-					return str1;
-				if (str2 == str_end)
-					break;
-				rune const c1 = ToLower(*str2++);
-				rune const c2 = ToLower(*find2++);
-				if (c1 != c2)
-					break;
-			}
-			str1++;
-		}
-		return NULL;
+		return Find_Internal(str, str_end, find, find_end, STRCMPMODE_CASE_SENSITIVE);
 	}
 
-	pcrune	FindInSubstr		(pcrune str, pcrune str_end, rune find)
+	pcrune	FindNoCase(pcrune str, pcrune str_end, uchar32 find)
 	{
-		while (str < str_end) {
-			if (*str == find)
-				return str;
-			str++;
-		}
-		return NULL;
+		return Find_Internal(str, str_end, find, find_end, STRCMPMODE_CASE_IGNORE);
 	}
 
-	pcrune	FindInSubstr_Internal(pcrune str, pcrune str_end, pcrune find, pcrune find_end, bool case_sensitive)
-	{
-		if (str == str_end)
-			return NULL;
-		if (find == find_end)
-			return NULL;
-
-		while (str < str_end) {
-			rune c = *str;
-			if (c == *find)
-			{
-				pcrune fnd = find;
-				pcrune sub = str;
-				do
-				{
-					if (fnd == find_end)
-						return str;
-					if (sub == str_end)
-						break;
-					if (case_sensitive)
-					{
-						if (*sub++ != *fnd++)
-							break;
-					}
-					else
-					{
-						if (ToLower(*sub++) != ToLower(*fnd++))
-							break;
-					}
-				} while (true);
-			}
-			str++;
-		}
-		return NULL;
-	}
-
-	pcrune	FindInSubstr		(pcrune str, pcrune str_end, pcrune find, pcrune find_end)
-	{
-		return FindInSubstr_Internal(str, str_end, find, find_end, true);
-	}
-
-	pcrune	FindNoCaseInSubstr	(pcrune str, pcrune str_end, pcrune find, pcrune find_end)
-	{
-		return FindInSubstr_Internal(str, str_end, find, find_end, false);
-	}
-
-	pcrune	FindOneOf			(pcrune str, pcrune str_end, pcrune charset, pcrune charset_end)
+	pcrune	FindOneOf(pcrune str, pcrune str_end, pcrune charset, pcrune charset_end)
 	{
 		pcrune cur_pos = str;
 		pcrune end_pos = str_end;
 		while (cur_pos < end_pos)
 		{
-			rune c = *cur_pos;
-			if (FindInSubstr(charset, charset_end, c) != NULL)
+			uchar32 c = PeekChar(cur_pos);
+			if (Find(charset, charset_end, c) != NULL)
 				return cur_pos;
 			cur_pos++;
 		}
 		return NULL;
 	}
 
-	bool		IsUpper			(pcrune str, pcrune str_end)
+	bool		IsUpper(pcrune str, pcrune str_end)
 	{
 		bool isUpper = true;
 		while (str < str_end)
 		{
-			rune c = *str++;
+			uchar32 c = ReadChar(str);
 			isUpper = isUpper && !IsLower(c);
 		}
 		return isUpper;
 	}
 
-	bool		IsLower			(pcrune str, pcrune str_end)
+	bool		IsLower(pcrune str, pcrune str_end)
 	{
 		bool isLower = true;
 		while (str < str_end)
 		{
-			rune c = *str++;
+			uchar32 c = ReadChar(str);
 			isLower = isLower && !IsUpper(c);
 		}
 		return isLower;
 	}
 
-	bool		IsCapitalized		(pcrune str, pcrune str_end)
+	bool		IsCapitalized(pcrune str, pcrune str_end)
 	{
 		if (str < str_end)
 		{
-			rune c = *str++;
+			uchar32 c = ReadChar(str);
 			if (IsUpper(c))
 			{
-				c = *str++;
+				c = ReadChar(str);
 				return IsLower(c);
 			}
 		}
 		return false;
 	}
 
-	bool		IsQuoted			(pcrune str, pcrune str_end, rune quote)
+	bool		IsQuoted(pcrune str, pcrune str_end, uchar32 quote)
 	{
-		if (str < (str_end - 1))
-		{
-			rune c1 = *str;
-			rune c2 = *(str_end - 1);
-			return c1 == c2 && c1 == quote;
-		}
-		return false;
+		return StartsWith(str, str_end, rune) && EndsWith(str, str_end, rune);
 	}
 
 
