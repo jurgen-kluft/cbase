@@ -229,6 +229,24 @@ namespace xcore
 	                        
 							parsing = 0;
 						} break;
+					case 'o':
+						{
+							buf = Find(buf, "12345670");
+							s64 n2 = StrToS64(buf, 8, &base);
+							buf = base;
+							if (!suppress)
+							{
+								x_va_r r = vr_args[i++];
+								r = n2;
+								scanned++;
+							}
+							else
+							{
+								i++;
+							}
+	                        
+							parsing = 0;
+						} break;
 					case 'x':
 					case 'X':
 						{

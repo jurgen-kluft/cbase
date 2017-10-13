@@ -40,6 +40,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xslice);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsprintf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsscanf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree_sentinel);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtypes);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtls);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xutf);

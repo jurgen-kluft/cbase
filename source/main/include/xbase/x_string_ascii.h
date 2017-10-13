@@ -20,9 +20,10 @@
  */
 namespace xcore
 {
-	typedef					char					rune;
-	typedef					rune const*				pcrune;
+	typedef					rune					rune;
+	typedef					pcrune				pcrune;
 	typedef					rune *					prune;
+
 
 	/**
 		*==============================================================================
@@ -71,130 +72,391 @@ namespace xcore
 		*
 		*/
 
-	extern uchar32			ReadChar				(pcrune& c);
-	extern s32				WriteChar				(uchar32 c, prune& dest, pcrune end);
-	extern s32				LenInBytes				(uchar32 c);
-	extern s32  			LenInBytes 				(pcrune str);									// Return the number of bytes that are in 'str'
-	extern s32  			LenInChars 				(pcrune str, pcrune * end = NULL);				// Return the number of characters that are in 'str'
+	namespace ucstr
+	{
+		static prune	Len(prune str, s32* str_len);
+		static prune	Len(prune str, pcrune str_eos, s32* str_len);
 
-	extern s32				StrLen					(pcrune str, pcrune * end = NULL);				// Return length of string as number of characters
-	extern prune			StrCopy    				(prune  dst, pcrune dst_end, pcrune src);		// Copy 'src' to 'dst' but not further than 'dst_end'
-	extern s32  			StrCmp    				(pcrune str1, pcrune str2);						// Compare str1 to str2
-	extern s32  			StrCmpn    				(pcrune str1, pcrune str2, s32 count);			// Compare str1 to str2 for 'n' characters
-	extern s32				StrCmpi   				(pcrune str1, pcrune str2);						// Compare str1 to str2, case insensitive
-	extern s32				StrCmpin				(pcrune str1, pcrune str2, s32 count);			// Compare str1 to str2 for 'n' characters, case insensitive
-	extern prune			StrCat 					(prune  dst, s32 dest_buffer_size, pcrune src);	// Concatenate strings, dst = dst + src
+		static prune	Len(pcrune str, s32* str_len);
+		static prune	Len(pcrune str, pcrune str_eos, s32* str_len);
 
-	extern f32  			StrToF32				(pcrune s, pcrune * scan_end);
-	extern f64  			StrToF64				(pcrune s, pcrune * scan_end);
-	extern s32				StrToS32  	  			(pcrune str);
-	extern s32				StrToS32  	  			(pcrune str, s32 base);
-	extern s32				StrToS32  	  			(pcrune str, pcrune * scanEnd, s32 base);
-	extern s64				StrToS64  	  			(pcrune str);
-	extern s64				StrToS64  	  			(pcrune str, s32 base);
-	extern s64				StrToS64  	  			(pcrune str, s32 base, pcrune* scanEnd);
-	extern s32				S32ToStr   	  			(s32 val, prune str, s32 str_buffer_size, s32 base);
-	extern s32				U32ToStr   	  			(u32 val, prune str, s32 str_buffer_size, s32 base);
-	extern s32				S64ToStr   	  			(s64 val, prune str, s32 str_buffer_size, s32 base);
-	extern s32				U64ToStr   	  			(u64 val, prune str, s32 str_buffer_size, s32 base);
-	extern s32				F32ToStr 	    		(f32 val, s32 numFractionalDigits, prune str, s32 str_buffer_size);
-	extern s32				F64ToStr 	    		(f64 val, s32 numFractionalDigits, prune str, s32 str_buffer_size);
+		static prune	Copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
 
-	inline bool				IsSpace  	  			(uchar32 c)		{ return((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
-	inline bool				IsDigit  	  			(uchar32 c)		{ return((c >=  '0') && (c <= '9')); }
-	inline bool				IsAlpha  	  			(uchar32 c)		{ return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
-	inline bool				IsUpper  	  			(uchar32 c)		{ return((c >=  'A') && (c <= 'Z')); }
-	inline bool				IsLower  	  			(uchar32 c)		{ return((c >=  'a') && (c <= 'z')); }
-	inline bool				IsHex    	  			(uchar32 c)		{ return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >=  '0') && (c <= '9'))); }
+		static bool		Find(pcrune find, pcrune find_end, pcrune& str_begin, pcrune str_end);
+		static void		Replace(prune str_begin, prune str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end);
 
-	inline uchar32			ToUpper    				(uchar32 c)		{ return((c >= 'a') && (c <= 'z'))? c + ('A' - 'a') : c; }
-	inline uchar32			ToLower    				(uchar32 c)		{ return((c >= 'A') && (c <= 'Z'))? c + ('a' - 'A') : c; }
-	inline uchar32			ToDigit    				(uchar32 c)		{ return ((c >=  '0') && (c <= '9')) ? (c - '0') : c; }
-	inline uchar32			ToNumber   				(uchar32 c)		{ if (IsDigit(c)) return ToDigit(c); else if (c >= 'A' && c <= 'F') return(c - 'A' + 10); else if (c >= 'a' && c <= 'f') return(c - 'a' + 10); else return(c); }
+		static s32  	Compare_Case_Sensitive(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end);
+		static s32		Compare_Case_Ignore(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end);
 
-	extern bool				IsNumber  				(uchar32 c, s32 base);
-	extern bool				IsHex  					(pcrune str);
-	extern bool				IsInt  					(pcrune str);
-	extern bool				IsFloat					(pcrune str);
-	extern bool				IsGUID 					(pcrune str);
+		static prune	Concatenate(prune dst, pcrune dst_end, pcrune dst_eos, pcrune src, pcrune src_end);		// Concatenate strings, dst = dst + src
 
-	inline bool				EqualNoCase				(uchar32 a, uchar32 b)		{ if (a==b) return true; a = ToLower(a); b = ToLower(b); return (a==b); }
+		static pcrune	ToValue(pcrune str, pcrune str_end, bool& value);
+		static pcrune	ToValue(pcrune str, pcrune str_end, s32& value, s32 base = 10);
+		static pcrune	ToValue(pcrune str, pcrune str_end, s64& value, s32 base = 10);
+		static pcrune	ToValue(pcrune str, pcrune str_end, f32& value);
+		static pcrune	ToValue(pcrune str, pcrune str_end, f64& value);
 
-	/// Hash and CRC string functions
-	extern u32 				Hash32 					(pcrune inStr, u32 range = 0xffffffff, u32 val = 0x811c9dc5);
+		static bool		IsDecimal(pcrune str, pcrune str_end);
+		static bool		IsHexadecimal(pcrune str, pcrune str_end);
+		static bool		IsFloat(pcrune str, pcrune str_end);
+		static bool		IsGUID(pcrune str, pcrune str_end);
 
-	/// Start/End, First/Last
-	extern bool				StartsWith				(pcrune inStr, uchar32 inStartChar);
-	extern bool				StartsWith				(pcrune inStr, pcrune inStartStr);
-	extern bool				StartsWith				(pcrune inStr, s32 inStrLen, pcrune inStartStr, s32 inStartStrLen=-1);
-	extern bool				EndsWith				(pcrune inStr, uchar32 inEndChar);
-	extern bool				EndsWith				(pcrune inStr, s32 inStrLen, uchar32 inEndChar);
-	extern bool				EndsWith				(pcrune inStr, pcrune inEndStr);
-	extern bool				EndsWith				(pcrune inStr, s32 inStrLen, pcrune inEndStr, s32 inEndStrLen=-1);
+		static prune	ToString(s32 val, prune str, pcrune str_end, pcrune str_eos, s32 base = 10);
+		static prune	ToString(u32 val, prune str, pcrune str_end, pcrune str_eos, s32 base = 10);
+		static prune	ToString(s64 val, prune str, pcrune str_end, pcrune str_eos, s32 base = 10);
+		static prune	ToString(u64 val, prune str, pcrune str_end, pcrune str_eos, s32 base = 10);
+		static prune	ToString(f32 val, s32 numFractionalDigits, prune str, pcrune str_end, pcrune str_eos);
+		static prune	ToString(f64 val, s32 numFractionalDigits, prune str, pcrune str_end, pcrune str_eos);
 
-	extern uchar32 			FirstChar				(pcrune inStr);														///< Return first character of string, or 0 if string is empty
-	extern uchar32 			LastChar				(pcrune inStr, s32 inStrLen=-1);									///< Return last character of string, or 0 if string is empty
+		static bool		IsSpace(uchar32 c) { return((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
+		static bool		IsUpper(uchar32 c) { return((c >= 'A') && (c <= 'Z')); }
+		static bool		IsLower(uchar32 c) { return((c >= 'a') && (c <= 'z')); }
+		static bool		IsAlpha(uchar32 c) { return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
+		static bool		IsDigit(uchar32 c) { return((c >= '0') && (c <= '9')); }
+		static bool		IsNumber(uchar32 c) { return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
 
-	/// Comparison
-	extern s32  			Compare					(pcrune inStr, s32 inStrLen, pcrune inOther, s32 inOtherLen);		///< Check if two strings are equal, taking case into account
-	inline s32  			Compare					(pcrune inStr, s32 inStrLen, pcrune inOther)						{ return Compare(inStr, inStrLen, inOther, -1); }
-	inline s32  			Compare					(pcrune inStr, pcrune inOther, s32 inOtherLen)						{ return Compare(inStr, -1, inOther, inOtherLen); }
-	inline s32  			Compare					(pcrune inStr, pcrune inOther)										{ return Compare(inStr, -1, inOther, -1); }
-	extern s32  			CompareNoCase			(pcrune inStr, s32 inStrLen, pcrune inOther, s32 inOtherLen);		///< Check if two strings are equal, not taking case into account
-	inline s32  			CompareNoCase			(pcrune inStr, s32 inStrLen, pcrune inOther)						{ return CompareNoCase(inStr, inStrLen, inOther, -1); }
-	inline s32  			CompareNoCase			(pcrune inStr, pcrune inOther, s32 inOtherLen)						{ return CompareNoCase(inStr, -1, inOther, inOtherLen); }
-	inline s32  			CompareNoCase			(pcrune inStr, pcrune inOther)										{ return CompareNoCase(inStr, -1, inOther, -1); }
-	extern bool				Equal					(pcrune inStr, s32 inStrLen, pcrune inOther, s32 inOtherLen);		///< Check if two strings are equal, taking case into account
-	inline bool				Equal					(pcrune inStr, s32 inStrLen, pcrune inOther)						{ return Equal(inStr, inStrLen, inOther, -1); }
-	inline bool				Equal					(pcrune inStr, pcrune inOther, s32 inOtherLen)						{ return Equal(inStr, -1, inOther, inOtherLen); }
-	inline bool				Equal					(pcrune inStr, pcrune inOther)										{ return Equal(inStr, -1, inOther, -1); }
-	extern bool				EqualNoCase				(pcrune inStr, s32 inStrLen, pcrune inOther, s32 inOtherLen);		///< Check if two strings are equal, not taking case into account
-	inline bool				EqualNoCase				(pcrune inStr, s32 inStrLen, pcrune inOther)						{ return EqualNoCase(inStr, inStrLen, inOther, -1); }
-	inline bool				EqualNoCase				(pcrune inStr, pcrune inOther, s32 inOtherLen)						{ return EqualNoCase(inStr, -1, inOther, inOtherLen); }
-	inline bool				EqualNoCase				(pcrune inStr, pcrune inOther)										{ return EqualNoCase(inStr, -1, inOther, -1); }
+		static uchar32	ToUpper(uchar32 c) { return((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c; }
+		static uchar32	ToLower(uchar32 c) { return((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
+		static u32		ToDigit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
+		static u32		ToNumber(uchar32 c) { if (IsDigit(c)) return ToDigit(c); else if (c >= 'A' && c <= 'F') return(c - 'A' + 10); else if (c >= 'a' && c <= 'f') return(c - 'a' + 10); else return(c); }
+		static bool		EqualNoCase(uchar32 a, uchar32 b) { a = ToLower(a); b = ToLower(b); return (a == b); }
 
-	/// Find
-	extern pcrune			Find					(pcrune inStr, uchar32 inChar, s32 inStrLen = -1);					///< Return position of first occurrence of <inChar> or -1 if not found
-	extern pcrune			Find					(pcrune inStr, pcrune inFind, s32 inStrLen = -1);					///< Return position of first occurrence of <inString> or -1 if not found
-	extern pcrune			FindNoCase				(pcrune inStr, uchar32 inChar, s32 inStrLen = -1);					///< Return position of first occurrence of <inChar> or -1 if not found
-	extern pcrune			FindNoCase				(pcrune inStr, pcrune inFind, s32 inStrLen = -1);					///< Return position of first occurrence of <inString> or -1 if not found
-	extern pcrune			FindInSubstr			(pcrune inStr, uchar32 inChar, s32 inPos = 0, s32 inStrLen = -1);	///< Return position of first occurrence of <inChar> after <inPos> or -1 if not found
-	extern pcrune			FindInSubstr			(pcrune inStr, pcrune inFind, s32 inPos = 0, s32 inStrLen = -1);	///< Return position of first occurrence of <inString> after <inPos> or -1 if not found
-	extern pcrune			FindNoCaseInSubstr		(pcrune inStr, uchar32 inChar, s32 inPos = 0, s32 inStrLen = -1);	///< Return position of first occurrence of <inChar> after <inPos> or -1 if not found
-	extern pcrune			FindNoCaseInSubstr		(pcrune inStr, pcrune inFind, s32 inPos = 0, s32 inStrLen = -1);	///< Return position of first occurrence of <inString> after <inPos> or -1 if not found
-	extern pcrune			FindOneOf				(pcrune inStr, pcrune inSet, s32 inPos = 0, s32 inStrLen = -1);		///< Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
+		static bool		IsUpper(pcrune str, pcrune str_end);											/// Check if string is all upper case
+		static bool		IsLower(pcrune str, pcrune str_end);											/// Check if string is all lower case
+		static bool		IsCapitalized(pcrune str, pcrune str_end);										/// Check if string is capitalized ("Shanghai")
+		static bool		IsDelimited(pcrune str, pcrune str_end, rune delimit_left = '\"', rune delimit_right = '\"');		///< Check if string is enclosed between left and right delimiter
+		static bool		IsQuoted(pcrune str, pcrune str_end, rune quote = '\"')							{ return IsDelimited(str, str_end, quote, quote); }
 
-	/// Contains
-	inline bool				Contains				(pcrune inStr, uchar32 inChar, s32 inPos = 0, s32 inStrLen = -1) 	{ return FindInSubstr(inStr, inChar, inPos, inStrLen) != NULL; } ///< Check if this string contains character <inChar>
-	inline bool				Contains				(pcrune inStr, pcrune inString, s32 inPos = 0, s32 inStrLen = -1)	{ return FindInSubstr(inStr, inString, inPos, inStrLen) != NULL; } ///< Check if this string contains string <inString>
-	inline bool				ContainsNoCase			(pcrune inStr, pcrune inString, s32 inPos = 0, s32 inStrLen = -1)	{ return FindNoCaseInSubstr(inStr, inString, inPos, inStrLen) != NULL; } ///< Check if this string contains <inString> without paying attention to case
+		static prune	ToUpper(prune str, pcrune str_end);
+		static prune	ToLower(prune str, pcrune str_end);
 
-	extern bool				IsUpper					(pcrune inStr, s32 inStrLen=-1);									///< Check if string is all upper case
-	extern bool				IsLower					(pcrune inStr, s32 inStrLen=-1);									///< Check if string is all lower case
-	extern bool				IsCapitalized			(pcrune inStr, s32 inStrLen=-1);									///< Check if string is capitalized ("Shanghai")
-	extern bool				IsQuoted				(pcrune inStr, uchar32 quote='\"', s32 inStrLen=-1);				///< Check if string is enclosed in double quotes
+		static pcrune	Find(pcrune str, pcrune str_end, pcrune find, pcrune find_end);				/// Return position of first occurrence of <inString> or -1 if not found
+		static pcrune	FindNoCase(pcrune str, pcrune str_end, pcrune find, pcrune find_end);		/// Return position of first occurrence of <inString> or -1 if not found
+		static pcrune	FindOneOf(pcrune str, pcrune str_end, pcrune set, pcrune set_end);			/// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
+
+		static s32		CPrintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+		static prune	SPrintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+
+		static s32		VCPrintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		static s32		VSPrintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
+
+		static s32		Printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+		static s32		Printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		static s32		Printf(pcrune str, pcrune str_end);
+
+		static s32		SScanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, X_VA_R_ARGS_16_DEF);
+		static s32		VSScanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, const x_va_r_list& vr_args);
+	};
+
+	struct xbstr
+	{
+		inline			xbstr() : mStr(sNullStr), mEnd(sNullStr), mEos(sNullStr) { }
+		inline			xbstr(prune str) : mStr(str), mEnd(NULL), mEos(NULL) { }
+		inline			xbstr(prune str, prune eos) : mStr(str), mEnd(NULL), mEos(eos) { }
+		inline			xbstr(prune str, prune end, prune eos) : mStr(str), mEnd(end), mEos(eos) { }
+		inline			xbstr(xbstr const& other) : mStr(other.mStr), mEnd(other.mEnd), mEnd(other.mEos) { }
+		
+		inline s32		len() const			{ return mEnd - mStr; }
+		inline s32		is_empty() const	{ return mStr == mEnd; }
+
+		inline xstr		instance() const
+		{
+			if (mEnd == NULL)
+			{
+				if (mEos == NULL)
+				{
+					mEnd = ucstr::Len(str, NULL); 
+					mEos = mEnd;
+				}
+				else 
+				{
+					mEnd = ucstr::Len(str, mEos, NULL); 
+				}
+			}
+			return xstr(this, mStr, mEnd);
+		}
+		
+	protected:
+		prune			mStr;
+		prune			mEnd;
+		prune			mEos;
+		static prune	sNullStr = "";
+	};
+
+	struct xbstrc
+	{
+		inline			xbstrc() : mStr(sNullStr), mEnd(sNullStr) { }
+		inline			xbstrc(pcrune str) : mStr(str), mEnd(NULL) { }
+		inline			xbstrc(pcrune str, pcrune end) : mStr(str), mEnd(end) { }
+		inline			xbstrc(xbstr const& other) : mStr(other.mStr), mEnd(other.mEnd) { }
+		inline			xbstrc(xbstrc const& other) : mStr(other.mStr), mEnd(other.mEnd) { }
+		
+		inline s32		len() const			{ return mEnd - mStr; }
+		inline s32		is_empty() const	{ return mStr == mEnd; }
+
+		inline xcstr	instance() const
+		{
+			if (mEnd == NULL)
+				mEnd = ucstr::Len(mStr, NULL);
+			return xcstr(this, mStr, mEnd);
+		}
+		
+	protected:
+		pcrune			mStr;
+		pcrune			mEnd;
+		static pcrune	sNullStr = "";
+	};
+
+	
+	// ascii, 'c' style 'const' string
+	class xcstr
+	{
+		friend class xstr;
+		
+		xbstrc*			mStr;
+		pcrune			mBegin;
+		pcrune			mEnd;
+
+		inline			xcstr(xbstrc* str) : mStr(str), Begin(str->mBegin), mEnd(str->mEnd) { }
+		inline			xcstr(xbstrc* str, pcrune begin, pcrune end) : mStr(str), mBegin(begin), mEnd(end) { }
+
+	public:
+		inline 			xcstr(xcstr const& other) : mStr(other.mStr), mBegin(other.mBegin), mEnd(other.mEnd) {}
+
+		inline s32		len() const					{ return mEnd - mBegin; }
+
+		bool			is_space() const	{ rune const c = mBegin[0]; return((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
+		bool			is_digit() const	{ rune const c = mBegin[0]; return((c >= '0') && (c <= '9')); }
+		bool			is_alpha() const	{ rune const c = mBegin[0]; return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
+		bool			is_upper() const	{ rune const c = mBegin[0]; return((c >= 'A') && (c <= 'Z')); }
+		bool			is_lower() const	{ rune const c = mBegin[0]; return((c >= 'a') && (c <= 'z')); }
+		bool			is_hex()   const	{ rune const c = mBegin[0]; return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
+		
+		xcstr			read(rune& c) const
+		{
+			if (mBegin < mEnd)
+			{
+				c = mBegin[0];
+				return xccstr(mStr, mBegin + 1, mEnd, mStr->mEos);
+			}
+			else
+			{
+				c = '\0';
+				return xccstr();
+			}
+		}
+
+		xcstr			find(xstr const& other) const	{ return find(other.mBegin, other.mEnd); }
+		xcstr			find(xcstr const& other) const	{ return find(other.mBegin, other.mEnd); }
+		xcstr			find(rune find) const			{ rune str[] = { find, '\0'}; return find(str, str + 1); }
+
+		s32				compare(xcstr const& other, bool ignore_case) const		{ return compare(other.mBegin, other.mEnd, ignore_case); }
+		s32				compare(xccstr const& other, bool ignore_case) const	{ return compare(other.mBegin, other.mEnd, ignore_case); }
+
+		static xcstr	select(xcstr const& from, xcstr const& to)
+		{
+			if (from.mStr == to.mStr)
+				return xccstr(from.mStr, from.mBegin, to.mBegin);
+			return xccstr(from.mStr, from.mStr->mEnd, from.mStr->mEnd);
+		}
+
+		inline			operator rune() const						{ return mBegin[0]; }
+		
+		bool			operator == (const xcstr& other) const		{ return compare(mBegin, mEnd, other.mBegin, other.mEnd, false) == 0; }
+		bool			operator != (const xcstr& other) const		{ return compare(mBegin, mEnd, other.mBegin, other.mEnd, false) != 0; }
+		bool			operator == (const xccstr& other) const		{ return compare(mBegin, mEnd, other.mBegin, other.mEnd, false) == 0; }
+		bool			operator != (const xccstr& other) const		{ return compare(mBegin, mEnd, other.mBegin, other.mEnd, false) != 0; }
+
+		xcstr			operator [](s32 i) const	{ if ((mBegin + i) <= mEnd) return xccstr(mStr, mBegin + i, mEnd, mStr->mEos); return xccstr(); }
+		xcstr			operator ++(s32 i)			{ if ((mBegin + 1) <= mEnd) return xccstr(mStr, mBegin + 1, mEnd, mStr->mEos); return xccstr(); }
+
+	
+	protected:
+		xcstr			find(pcrune find, pcrune find_end) const
+		{
+			pcrune str = mBegin;
+			if (ucstr::Find(find, find_end, str, mEnd))
+				return xcstr(mStr, str, mEnd, mStr->mEos);
+			return xcstr();
+		}
+		s32				compare(pcrune other, pcrune other_end, bool ignore_case) const
+		{
+			if (ignore_case)
+				return ucstr::Compare_Case_Ignore(mBegin, mEnd, other, other_end);
+			return ucstr::Compare_Case_Sensitive(mBegin, mEnd, other, other_end);
+		}
+	
+	};
 
 
-	// CPrintf; Formatted print counting function, will return the number of characters needed.
-	// SPrintf; Formatted print to "string".
-	s32		CPrintf(pcrune formatStr, X_VA_ARGS_16_DEF);
-	s32		SPrintf(prune buffer, s32 maxChars, pcrune formatStr, X_VA_ARGS_16_DEF);
-	s32		VCPrintf(pcrune formatStr, const x_va_list& args);
-	s32		VSPrintf(prune buffer, s32 maxChars, pcrune formatStr, const x_va_list& args);
+	// ascii, 'c' style string
+	// string <string, string_end>
+	// view   <view  , view_end  >
+	class xstr
+	{
+		friend class xcstr;
 
-	//  Printf
-	//      Formatted print to "standard text output".  This is straight forward for
-	//      text mode programs and is handled by xbase.  Graphical programs
-	//      must register a function to handle this operation.
+		xbstr*			mStr;
+		prune			mBegin;
+		prune			mEnd;
+		
+		inline			xstr(xbstr* str) : mStr(str), Begin(str->mBegin), mEnd(str->mEnd) { }
+		inline			xstr(xbstr* str, prune begin, prune end) : mStr(str), mBegin(begin), mEnd(end) { }
+		
+	public:
+		inline			xstr(const xstr& other) : mStr(other.mStr), mBegin(other.mBegin), mEnd(other.mEnd) {}
 
-	s32		Printf(pcrune formatStr, X_VA_ARGS_16_DEF);
-	s32		Printf(pcrune formatStr, const x_va_list& args);
-	s32		Printf(pcrune str);
+		inline s32		len() const			{ return mEnd - mBegin; }
+		inline void		reset()				{ mBegin = mStr->mStr; mEnd = mStr->mEnd; }
 
-	//  SScanf
-	//      Scan "string" to values.
-	s32		SScanf(pcrune buf, pcrune fmt, X_VA_R_ARGS_16_DEF);
-	s32		VSScanf(pcrune buf, pcrune fmt, const x_va_r_list& vr_args);
+		bool			is_space() const	{ rune const c = mBegin[0]; return((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
+		bool			is_digit() const	{ rune const c = mBegin[0]; return((c >= '0') && (c <= '9')); }
+		bool			is_alpha() const	{ rune const c = mBegin[0]; return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
+		bool			is_upper() const	{ rune const c = mBegin[0]; return((c >= 'A') && (c <= 'Z')); }
+		bool			is_lower() const	{ rune const c = mBegin[0]; return((c >= 'a') && (c <= 'z')); }
+		bool			is_hex()   const	{ rune const c = mBegin[0]; return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
+
+		void			to_upper()			{ ucstr::ToUpper(mBegin, mEnd); }
+		void			to_lower()			{ ucstr::ToLower(mBegin, mEnd); }
+		
+		xstr			format(u32 value = 0, pcrune format = "%u");
+		xstr			format(s32 value = 0, pcrune format = "%d");
+		xstr			format(u64 value = 0, pcrune format = "%u");
+		xstr			format(s64 value = 0, pcrune format = "%d");
+		xstr			format(f32 value = 0.0f, pcrune format = "%f");
+		xstr			format(f64 value = 0.0 , pcrune format = "%f");
+
+		xstr			read(rune& c) const { if (mBegin < mEnd)	{ c = mBegin[0]; return xstr(mStr, mBegin + 1, mEnd); } return xstr(mStr, mEnd, mEnd); }
+		xstr			write(rune c) { if (mBegin < mEnd)			{ mBegin[0] = c; return xstr(mStr, mBegin + 1, mEnd); } return xstr(mStr, mEnd, mEnd); }
+
+		xstr&			append(rune c)
+		{
+			if (!is_empty() && (mEnd < mStr->mEos))
+			{
+				if (mEnd[0] == '\0')
+					mEnd[1] = '\0';
+				mEnd[0] = c;
+				mEnd += 1;
+			}
+			return *this;
+		}
+		xstr&			operator += (rune c) { return append(c); }
+
+		xstr&			operator += (xstr const& str) { return append(str.mBegin, str.mEnd); }
+		xstr&			operator += (xcstr const& str) { return append(str.mBegin, str.mEnd); }
+		
+		xstr			last() const
+		{
+			if (!is_empty())
+			{
+				return xstr(mStr, mEnd - 1, mEnd, mStr->mEos);
+			}
+			return xcstr();
+		}
+
+		xstr			end() const
+		{
+			if (!is_empty())
+			{
+				return xstr(mStr, mEnd, mEnd, mStr->mEos);
+			}
+			return xstr();
+		}
+
+		xstr			find(xcstr const& find) const
+		{
+			return find(find.mBegin, find.mEnd);
+		}
+
+		xstr			find_one_of(xccstr const& set) const
+		{
+			pcrune f = ucstr::FindOneOf(mBegin, mEnd, set.mBegin, set.mEnd);
+			if (f == NULL)
+				f = mEnd;
+			return xstr(mStr, f, mEnd, mStr->mEos);
+		}
+
+		xstr			find(rune find) const
+		{
+			rune str[2];
+			str[0] = find;
+			str[1] = '\0';
+			return find(str, str + 1);
+		}
+
+		static xstr&	select(xcstr const& from, xcstr const& to);
+
+		xstr&			select_until_one_of(xcstr const& any_of);
+		xstr&			select_delimited(rune left, rune right);
+	
+		xstr			replace(xstr const& str)
+		{
+			return replace(str.mBegin, str.mEnd);
+		}
+
+		void			copy(xstr const& src)
+		{
+			mStr->End = ucstr::Copy(mStr->mStr, mStr->mEos, src.mBegin, src.mEnd);
+			mBegin = mStr->mStr;
+			mEnd = mStr->mEnd;
+		}
+
+		void			copy(xccstr const& src)
+		{
+			mStr->End = ucstr::Copy(mStr->mStr, mStr->mEos, src.mBegin, src.mEnd);
+			mBegin = mStr->mStr;
+			mEnd = mStr->mEnd;
+		}
+
+		xstr			operator [](s32 i) const { if ((mBegin + i) <= mEnd) return xstr(mStr, mBegin + i, mEnd); return xstr(mStr, mEnd, mEnd); }
+		xstr			operator ++(s32 i) { if (*mBegin != '\0' && (mBegin + i) <= mEnd) return xstr(mStr, mBegin + i, mEnd); return xstr(mStr, mEnd, mEnd); }
+
+		bool			operator == (const xcstr& other) const { return ucstr::Compare_Case_Sensitive(mBegin, mEnd, other.mBegin, other.mEnd) == 0; }
+		bool			operator != (const xcstr& other) const { return ucstr::Compare_Case_Sensitive(mBegin, mEnd, other.mBegin, other.mEnd) != 0; }
+		bool			operator == (const xccstr& other) const { return ucstr::Compare_Case_Sensitive(mBegin, mEnd, other.mBegin, other.mEnd) == 0; }
+		bool			operator != (const xccstr& other) const { return ucstr::Compare_Case_Sensitive(mBegin, mEnd, other.mBegin, other.mEnd) != 0; }
+
+		xcstr&			operator = (const xcstr& other) { mEnd = ucstr::Copy(mBegin, mStr->mEos, other.mBegin, other.mEnd); return *this; }
+		xcstr&			operator = (const xccstr& other) { mEnd = ucstr::Copy(mBegin, mStr->mEos, other.mBegin, other.mEnd); return *this; }
+		
+		inline			operator rune() const { if (!is_empty()) return mBegin[0]; else return '\0'; }
+
+	protected:
+		xstr&			append(pcrune str, pcrune str_end)
+		{
+			if (!is_empty() && (mEnd < mStr->mEos))
+			{
+				bool has_term = (mEnd[0] == '\0')
+				prune str_dst = mEnd;
+				while (str_dst < mStr->mEos && str < str_end)
+				{
+					uchar32 c = ReadChar(str);
+					WriteChar(c, str_dst, str_end);
+				}
+			}
+			return *this;
+		}
+
+		xstr			find(pcrune find, pcrune find_end) const
+		{
+			pcrune str = mBegin;
+			if (ucstr::Find(find, find_end, str, mEnd))
+			{
+				s32 const pos = (str - mBegin);
+				return xstr(mStr, mBegin + pos, mEnd);
+			}
+			return xstr(mStr, mEnd, mEnd);
+		}
+
+		xstr			replace(pcrune replace_str, pcrune replace_end)
+		{
+			mEnd = ucstr::Replace(mStr->mStr, mBegin, mEnd, mStr->mEos, replace_str, replace_end);
+			return *this;
+		}
+	
+	};
+
+
 
 	//==============================================================================
 	// END xCore namespace
