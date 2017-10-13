@@ -1009,16 +1009,27 @@ namespace xcore
 		}
 	}
 
-	xcstr& xcstr::select_until_any_of(xccstr const& any_of)
+	xcstr& xcstr::select(xccstr const& from, xccstr const& to)
 	{
-		prune fpos = ucstr::FindOneOf(mStr_Begin, mStr_End, set.mStr_Begin, set.mStr_End);
-		if (fpos == NULL)
-			fpos = mStr_End;
-		mStr_End = fpos;
+		if (from.mStr == to.mStr && from.mStr_Begin <= to.mStr_Begin)
+		{
+			mStr       = from.mStr;
+			mStr_Begin = from.mStr_Begin;
+			mStr_End   = to.mStr_Begin;
+			mStr_Eos   = to.mStr_Eos;
+		}
 		return *this;
 	}
 
-	xcstr& xcstr::find_delimited(rune left_char, rune right_char)
+	xcstr& xcstr::select_until_one_of(xccstr const& one_of)
+	{
+		prune fpos = ucstr::FindOneOf(mStr_Begin, mStr_End, one_of.mStr_Begin, one_of.mStr_End);
+		if (fpos != NULL)
+			mStr_End = fpos;
+		return *this;
+	}
+
+	xcstr& xcstr::select_delimited(rune left_char, rune right_char)
 	{
 		rune left_str[] = { left_char, '\0' };
 		prune left_end = left_str + 1;
