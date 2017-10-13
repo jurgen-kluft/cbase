@@ -2111,7 +2111,7 @@ namespace xcore
 	 *  Memory manager configuration
 	 *
 	 */
-	#if defined(TARGET_PC) || defined(TARGET_PS3) || defined(TARGET_360)
+	#if defined(TARGET_MULTI_CORE)
 		#define TARGET_MULTITHREADED_MEMORY_MANAGER
 	#endif
 	/**

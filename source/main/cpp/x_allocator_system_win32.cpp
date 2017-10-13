@@ -1,11 +1,11 @@
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef TARGET_PC
 
 #include <string>
 
-#include "xbase\x_memory_std.h"
-#include "xbase\x_integer.h"
-#include "xbase\x_allocator.h"
+#include "xbase/x_memory_std.h"
+#include "xbase/x_integer.h"
+#include "xbase/x_allocator.h"
 
 namespace xcore
 {
