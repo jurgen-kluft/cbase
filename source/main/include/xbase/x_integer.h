@@ -1,21 +1,21 @@
 // x_integer.h - Basic bit/int trick operations
 #ifndef __XBASE_INTEGER_UTILS_H__
 #define __XBASE_INTEGER_UTILS_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
 #endif
 
-#include "xbase\private\x_int64.h"
-#include "xbase\private\x_uint64.h"
+#include "xbase/private/x_int64.h"
+#include "xbase/private/x_uint64.h"
 
-#include "xbase\private\x_int128.h"
-#include "xbase\private\x_uint128.h"
+#include "xbase/private/x_int128.h"
+#include "xbase/private/x_uint128.h"
 
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_debug.h"
+#include "xbase/x_debug.h"
 
 //==============================================================================
 // xCore namespace

@@ -1,6 +1,6 @@
 #ifndef __XBASE_STRING_UTF_H__
 #define __XBASE_STRING_UTF_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
@@ -8,9 +8,9 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_debug.h"
-#include "xbase\x_integer.h"
-#include "xbase\x_slice.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_integer.h"
+#include "xbase/x_slice.h"
 
 /**
 * xCore namespace

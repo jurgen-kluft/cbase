@@ -1,7 +1,7 @@
 // x_double.h - 64 bit floating point functions
 #ifndef __XBASE_F64_FUNCTIONS_H__
 #define __XBASE_F64_FUNCTIONS_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
 #endif
@@ -9,7 +9,7 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_debug.h"
+#include "xbase/x_debug.h"
 
 //==============================================================================
 // xCore namespace

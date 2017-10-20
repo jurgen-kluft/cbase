@@ -5,12 +5,12 @@
 
 #ifndef __XBASE_CONSOLE_H__
 #define __XBASE_CONSOLE_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 
-#include "xbase\x_va_list.h"
+#include "xbase/x_va_list.h"
 
 /**
  * xCore namespace

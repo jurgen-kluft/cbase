@@ -1,7 +1,7 @@
 // x_bit_field.h - xCore bitfield template - 
 #ifndef __XBASE_BITFIELD_H__
 #define __XBASE_BITFIELD_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
 #endif
@@ -9,7 +9,7 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_debug.h"
+#include "xbase/x_debug.h"
 
 //==============================================================================
 // xCore namespace

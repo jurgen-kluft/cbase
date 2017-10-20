@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 #ifndef __XBASE_TYPES_H__
 #define __XBASE_TYPES_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
 #endif        // Include this file only once
