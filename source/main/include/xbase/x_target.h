@@ -2193,51 +2193,23 @@ namespace xcore
 
 	//==============================================================================
 	// UTF 8, 16, 32
+	typedef		s8				uchar;
 	typedef		u8				uchar8;
 	typedef		u16				uchar16;
 	typedef		unsigned long	uchar32;
 
-	#pragma pack(push, 1)
-	struct ustr8	// UTF-8 string
-	{
-		ustr8() : c(0) {}
-		ustr8(u8 _c) : c(_c) {}
-		uchar8 c;
-	};
-	#pragma pack(pop)
-
-	#pragma pack(push, 2)
-	struct ustr16	// UTF-16 string
-	{
-		ustr16() : c(0) {}
-		ustr16(u16 _c) : c(_c) {}
-		uchar16 c;
-	};
-	#pragma pack(pop)
-
-	struct ustr32	// UTF-32 string
-	{
-		ustr32() : c(0) {}
-		ustr32(u32 _c) : c(_c) {}
-		uchar32 c;
-	};
-
-	// Default UTF char and string is UTF-32
-	typedef uchar32		uchar;
-	typedef ustr32		ustr;
+	typedef		char*			ustr;	// ASCII string
+	typedef		uchar8*			ustr8;	// UTF-8 string
+	typedef		uchar16*		ustr16;	// UTF-16 string
+	typedef		uchar32*		ustr32;	// UTF-32 string
 
 	//==============================================================================
 
 	#define					XCAST(to, from)		((to)(from))
 
-	//DOM-IGNORE-END
-	//------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------------------------------------------------------------------------
-
 	//==============================================================================
-	// Interfaces: reader and writer
+	// Interfaces: binary reader and writer
 	//==============================================================================
-
 	class xwriter
 	{
 	public:

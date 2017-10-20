@@ -8,221 +8,127 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_debug.h"
-#include "xbase\x_integer.h"
-#include "xbase\x_slice.h"
 
-/**
-* xCore namespace
-*/
+
 namespace xcore
 {
-	class x_iallocator;
+	// NOTE:
+	//   UTF string manipulation is the easiest with UTF-32 since it is the only UTF format that
+	//   has a fixed rune size and thus is easier to index directly than UTF-8 or UTF-16.
+	// 
 
-	// UTF string manipulation is using UTF-32 since it is the only UTF format that has a fixed rune size
-	// and thus is easier to manipulate directly than UTF-8 or UTF-16
-	namespace UTF
+	// ASCII, UTF-8, UTF-16, UTF-32 conversions
+	namespace utf
 	{
-		// ASCII, UTF-8, UTF-16, UTF-32 conversions
-		s32			utf32_to_ascii	(uchar32 rune, char   * dest);
-		s32			utf32_to_utf8	(uchar32 rune, ustr8  * dest);
-		s32			utf32_to_utf16	(uchar32 rune, ustr16 * dest);
+		uchar   const *	read	(uchar   const * str, uchar32& out_c);
+		uchar8  const *	read	(uchar8  const * str, uchar32& out_c);
+		uchar16 const *	read	(uchar16 const * str, uchar32& out_c);
+		uchar32 const *	read	(uchar32 const * str, uchar32& out_c);
 
-		s32			ascii_to_utf32	(char   const * src, uchar32& rune);
-		s32			utf8_to_utf32	(ustr8  const * src, uchar32& rune);
-		s32			utf16_to_utf32	(ustr16 const * src, uchar32& rune);
+		uchar   *		write	(uchar32 c, uchar   * str);
+		uchar8  *		write	(uchar32 c, uchar8  * str);
+		uchar16 *		write	(uchar32 c, uchar16 * str);
+		uchar32 *		write	(uchar32 c, uchar32 * str);
 
-		s32			convert			(char const * from, uchar32 * to);
-		s32			convert			(ustr8  const * from, uchar32 * to);
-		s32			convert			(ustr16 const * from, uchar32 * to);
+		bool			is_eos	(uchar   const * str);
+		bool			is_eos	(uchar8  const * str);
+		bool			is_eos	(uchar16 const * str);
+		bool			is_eos	(uchar32 const * str);
 
-		s32			convert			(uchar32 const * from, ustr8  * to);
-		s32			convert			(uchar32 const * from, ustr16 * to);
+		bool			is_crln	(uchar   const * ustr);
+		bool			is_crln	(uchar8  const * ustr);
+		bool			is_crln	(uchar16 const * ustr);
+		bool			is_crln	(uchar32 const * ustr);
+	}	// utf
 
-		s32			read_ascii		(char const* str, uchar32& out_char);
-		s32			read_utf8		(ustr8 const* str, uchar32& out_char);
-		s32			read_utf16		(ustr16 const * str, uchar32& out_char);
-		s32			read_utf32		(ustr32 const * str, uchar32& out_char);
 
-		s32			len				(ustr8 const* str);
-		s32			len				(ustr32 const* str);
-
-		bool		iseos			(ustr8  const * str);
-		bool		iseos			(ustr16 const * str);
-		bool		iseos			(ustr32 const * str);
-
-		bool		iscrln			(ustr8  const* ustr);
-		bool		iscrln			(ustr16 const* ustr);
-		bool		iscrln			(ustr32 const* ustr);
-	}	// UTF
-
-	extern bool  			StrToBool(const uchar32 * s);
-	extern bool  			StrToBool(const uchar32 * s, const uchar32 ** scan_end);
-	extern f32  			StrToF32(const uchar32 * s);
-	extern f32  			StrToF32(const uchar32 * s, const uchar32 ** scan_end);
-	extern f64  			StrToF64(const uchar32 * s);
-	extern f64  			StrToF64(const uchar32 * s, const uchar32 ** scan_end);
-	extern s32				StrToS32(const uchar32 * str);
-	extern s32				StrToS32(const uchar32 * str, s32 base);
-	extern s32				StrToS32(const uchar32 * str, const uchar32 ** scanEnd, s32 base);
-	extern s64				StrToS64(const uchar32 * str);
-	extern s64				StrToS64(const uchar32 * str, s32 base);
-	extern s64				StrToS64(const uchar32 * str, s32 base, const uchar32 ** scanEnd);
-
-	// String class, acts as a slice/view with a behaviour of explicit copy (not copy-on-write)
-	class xstring
+	namespace utf32
 	{
-	public:
-		xstring();
-		xstring(x_iallocator* allocator);
-		xstring(x_iallocator* allocator, u32 initial_len);
-		xstring(xstring const& rhs);
-		~xstring();
+		typedef			uchar32					rune;
+		typedef			uchar32 *				prune;
+		typedef			const uchar32 *			pcrune;
 
-		inline s32		len() const { return mSlice.len() / sizeof(uchar32); }
+		static pcrune	len(pcrune str);
+		static pcrune	len(pcrune str, s32* str_len);
+		static pcrune	len(pcrune str, pcrune str_eos, s32* str_len);
 
-		class operation
-		{
-		public:
-			operation(uchar32 c) : mChar(c), mType(TYPE_UCHAR32), mMode(MODE_OVERWRITE) {}
-			operation(char const* str) : mPCCharStr(str), mType(TYPE_PCCHAR), mMode(MODE_OVERWRITE) {}
-			operation(ustr8 const* str) : mPCUStr8Str(str), mType(TYPE_PCUSTR8), mMode(MODE_OVERWRITE) {}
-			operation(ustr16 const* str) : mPCUStr16Str(str), mType(TYPE_PCUSTR16), mMode(MODE_OVERWRITE) {}
-			operation(ustr32 const* str) : mPCUStr32Str(str), mType(TYPE_PCUSTR32), mMode(MODE_OVERWRITE) {}
-			operation(xstring const& str) : mPCXStringStr(&str), mType(TYPE_PCXSTRING), mMode(MODE_OVERWRITE) {}
+		static prune	copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
 
-			enum EType
-			{
-				TYPE_UCHAR32,
-				TYPE_PCCHAR,
-				TYPE_PCUSTR8,
-				TYPE_PCUSTR16,
-				TYPE_PCUSTR32,
-				TYPE_PCXSTRING,
-			};
+		static pcrune	find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found
+		static pcrune	find(pcrune str_begin, pcrune str_end, pcrune find, pcrune find_end);
+		static pcrune	find_one_of(pcrune str, pcrune str_end, pcrune set, pcrune set_end);								/// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 
-			enum EMode
-			{
-				MODE_OVERWRITE,
-				MODE_INSERT
-			};
+		static prune	replace(prune str_begin, prune& str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end);
 
-			union
-			{
-				uchar32			mChar;
-				char const*		mPCCharStr;
-				ustr8 const*	mPCUStr8Str;
-				ustr16 const*	mPCUStr16Str;
-				ustr32 const*	mPCUStr32Str;
-				xstring const*	mPCXStringStr;
-			};
-			EType		mType;
-			EMode		mMode;
-		};
+		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
+		static s32  	compare(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end, ECmpMode mode = CASE_SENSITIVE);
 
-		class overwrite : public operation
-		{
-		public:
-			overwrite(uchar32 c) : operation(c) {}
-			overwrite(char const* str) : operation(str) {}
-			overwrite(ustr8 const* str) : operation(str) {}
-			overwrite(ustr16 const* str) : operation(str) {}
-			overwrite(ustr32 const* str) : operation(str) {}
-			overwrite(xstring const& str) : operation(str) {}
-		};
+		static prune	concatenate(prune dst, pcrune dst_end, pcrune dst_eos, pcrune src, pcrune src_end);		// Concatenate strings, dst = dst + src
 
-		class insert : public operation
-		{
-		public:
-			insert(uchar32 c) : operation(c) { mMode = MODE_INSERT; }
-			insert(char const* str) : operation(str) { mMode = MODE_INSERT; }
-			insert(ustr8 const* str) : operation(str) { mMode = MODE_INSERT; }
-			insert(ustr16 const* str) : operation(str) { mMode = MODE_INSERT; }
-			insert(ustr32 const* str) : operation(str) { mMode = MODE_INSERT; }
-			insert(xstring const& str) : operation(str) { mMode = MODE_INSERT; }
-		};
+		static s32		parse(pcrune str, pcrune str_end, bool& value);
+		static s32		parse(pcrune str, pcrune str_end, s32& value, s32 base = 10);
+		static s32		parse(pcrune str, pcrune str_end, s64& value, s32 base = 10);
+		static s32		parse(pcrune str, pcrune str_end, f32& value);
+		static s32		parse(pcrune str, pcrune str_end, f64& value);
 
-		// Return a copy of this string
-		xstring			copy() const;
+		static bool		is_decimal(pcrune str, pcrune str_end);
+		static bool		is_hexadecimal(pcrune str, pcrune str_end);
+		static bool		is_float(pcrune str, pcrune str_end);
+		static bool		is_GUID(pcrune str, pcrune str_end);
 
-		// Return a slice/view of this string
-		xstring			operator()(s32 from, s32 to) const { return view(from, to); }
-		xstring			operator[](s32) const;
+		static prune	to_string(prune str, prune str_end, pcrune str_eos, s32 val, s32 base = 10);
+		static prune	to_string(prune str, prune str_end, pcrune str_eos, u32 val, s32 base = 10);
+		static prune	to_string(prune str, prune str_end, pcrune str_eos, s64 val, s32 base = 10);
+		static prune	to_string(prune str, prune str_end, pcrune str_eos, u64 val, s32 base = 10);
+		static prune	to_string(prune str, prune str_end, pcrune str_eos, f32 val, s32 num_fractional_digits = 2);
+		static prune	to_string(prune str, prune str_end, pcrune str_eos, f64 val, s32 num_fractional_digits = 2);
 
-		// Overwrite = explicit behavior
-		xstring&		operator=(overwrite const& op);
+		static bool		is_space(rune c) { return((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
+		static bool		is_upper(rune c) { return((c >= 'A') && (c <= 'Z')); }
+		static bool		is_lower(rune c) { return((c >= 'a') && (c <= 'z')); }
+		static bool		is_alpha(rune c) { return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
+		static bool		is_digit(rune c) { return((c >= '0') && (c <= '9')); }
+		static bool		is_number(rune c) { return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
 
-		// Overwrite = default behavior
-		xstring&		operator=(uchar32 c) { *this = overwrite(c); return *this; }
-		xstring&		operator=(char const* other) { *this = overwrite(other); return *this; }
-		xstring&		operator=(ustr8 const* other) { *this = overwrite(other); return *this; }
-		xstring&		operator=(ustr16 const* other) { *this = overwrite(other); return *this; }
-		xstring&		operator=(ustr32 const* other) { *this = overwrite(other); return *this; }
-		xstring&		operator=(xstring const& other) { *this = overwrite(other); return *this; }
+		static rune		to_upper(rune c) { return((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c; }
+		static rune		to_lower(rune c) { return((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
+		static u32		to_digit(rune c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
+		static u32		to_number(rune c) { if (is_digit(c)) return to_digit(c); else if (c >= 'A' && c <= 'F') return(c - 'A' + 10); else if (c >= 'a' && c <= 'f') return(c - 'a' + 10); else return(c); }
+		static bool		is_equal(rune a, rune b, ECmpMode mode = CASE_SENSITIVE) { if (mode == CASE_IGNORE) { a = to_lower(a); b = to_lower(b); } return (a == b); }
 
-		// Insert
-		xstring&		operator=(insert const& op);
+		static bool		is_upper(pcrune str, pcrune str_end);											/// Check if string is all upper case
+		static bool		is_lower(pcrune str, pcrune str_end);											/// Check if string is all lower case
+		static bool		is_capitalized(pcrune str, pcrune str_end);										/// Check if string is capitalized ("Shanghai")
+		static bool		is_delimited(pcrune str, pcrune str_end, rune delimit_left = '\"', rune delimit_right = '\"');		///< Check if string is enclosed between left and right delimiter
+		static bool		is_quoted(pcrune str, pcrune str_end, rune quote = '\"') { return is_delimited(str, str_end, quote, quote); }
 
-		xstring			operator+ (char const* other);
-		xstring&		operator+=(char const* other);
-		xstring			operator+ (ustr8 const* other);
-		xstring&		operator+=(ustr8 const* other);
-		xstring			operator+ (xstring const& other);
-		xstring&		operator+=(xstring const& other);
+		static prune	to_upper(prune str, pcrune str_end);
+		static prune	to_lower(prune str, pcrune str_end);
 
-		bool			operator==(char const*) const;
-		bool			operator==(ustr8 const*) const;
-		bool			operator==(ustr16 const*) const;
-		bool			operator==(ustr32 const*) const;
-		bool			operator==(xstring const&) const;
+		static bool		starts_with(pcrune str, pcrune str_end, uchar32 start_char);
+		static bool		starts_with(pcrune str, pcrune str_end, pcrune start_str, pcrune start_str_end);
 
-		uchar32			readat(s32) const;
-		void 			writeto(xwriter*) const;
+		static bool		ends_with(pcrune str, pcrune str_end, uchar32 end_char);
+		static bool		ends_with(pcrune srcstr, pcrune srcstr_end, pcrune endstr, pcrune endstr_end);
 
-		s32				explode(int n, xstring*& parts) const;
+		static uchar32	first_char(pcrune str, pcrune str_end);
+		static uchar32	last_char(pcrune str, pcrune str_end);
 
-		enum eflags
-		{
-			CASE = 0,
-			NOCASE = 1,
-			SELECT = 2,
-			LEFT = 0,
-			RIGHT = 4,
-		};
+		static s32		cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+		static prune	sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
 
-		xstring			find(uchar c, eflags flags = NOCASE) const;
-		xstring			find(char const* str, eflags flags = NOCASE) const;
-		xstring			find(ustr8 const* str, eflags flags = NOCASE) const;
-		xstring			find(xstring const& c, eflags flags = NOCASE) const;
+		static s32		vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		static s32		vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		xstring			findr(uchar c, eflags flags = NOCASE) const;
-		xstring			findr(char const* str, eflags flags = NOCASE) const;
-		xstring			findr(ustr8 const* str, eflags flags = NOCASE) const;
-		xstring			findr(xstring const& c, eflags flags = NOCASE) const;
+		static s32		printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+		static s32		printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		static s32		printf(pcrune str, pcrune str_end);
 
-		xstring			left_of(xstring const&) const;
-		xstring			right_of(xstring const&) const;
+		static s32		sscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, X_VA_R_ARGS_16_DEF);
+		static s32		vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, const x_va_r_list& vr_args);
 
-		xstring&		tolower();
-		xstring&		toupper();
-		xstring&		tocamel();
-
-	protected:
-		xstring(slice& block);
-
-		struct data;
-		explicit		xstring(data*);
-
-		xstring			view(s32 from, s32 to) const;
-
-		uchar32*		str_ptr();
-		uchar32 const*	str_ptr() const;
-
-		slice			mSlice;
-	};
-
+	} ///< end of utf32 namespace
 
 };	// xCore namespace
-
 
 #endif    ///< __XBASE_STRING_UTF_H__
