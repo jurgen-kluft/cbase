@@ -1,6 +1,3 @@
-
-#ifndef SPU
-
 #include "xbase/x_limits.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_double.h"
@@ -38,6 +35,7 @@ namespace xcore
 
 	struct AsciiBuffer
 	{
+		inline			AsciiBuffer(char * str, u32 len) : mStr(str), mEnd(str + len), mEos(str + len) { }
 		inline			AsciiBuffer(char * str, char * end, char * eos) : mStr(str), mEnd(end), mEos(eos) { }
 		char*			mStr;
 		char*			mEnd;
@@ -46,6 +44,7 @@ namespace xcore
 
 	struct Utf32Buffer
 	{
+		inline			Utf32Buffer(uchar32 * str, u32 len) : mStr(str), mEnd(str + len), mEos(str + len) { }
 		inline			Utf32Buffer(uchar32 * str, uchar32 * end, uchar32 * eos) : mStr(str), mEnd(end), mEos(eos) { }
 		uchar32*		mStr;
 		uchar32*		mEnd;
@@ -54,6 +53,7 @@ namespace xcore
 
 	struct AsciiConstBuffer
 	{
+		inline			AsciiConstBuffer(char const* str, u32 len) : mStr(str), mEnd(str + len) { }
 		inline			AsciiConstBuffer(char const* str, char const* end) : mStr(str), mEnd(end) { }
 		char const*		mStr;
 		char const*		mEnd;
@@ -61,6 +61,7 @@ namespace xcore
 
 	struct Utf32ConstBuffer
 	{
+		inline			Utf32ConstBuffer(uchar32 const* str, u32 len) : mStr(str), mEnd(str + len) { }
 		inline			Utf32ConstBuffer(uchar32 const* str, uchar32 const* end) : mStr(str), mEnd(end) { }
 		uchar32 const*	mStr;
 		uchar32 const*	mEnd;
@@ -100,6 +101,49 @@ namespace xcore
 		}
 	private:
 		uchar32		mFill;
+	};
+
+	class CharBufferPad : public CharBufferModifier
+	{
+	public:
+		enum EMode { HEAD = 0, TAIL = 1 };
+		inline				CharBufferPad(EMode mode, uchar32 f, uchar32 r) : mMode(mode), mFind(f), mReplace(r) {}
+
+		virtual void		Do(AsciiBuffer b)
+		{
+			if (mode == HEAD)
+			{
+				char* ptr = b.mStr;
+				while (ptr < b.mEnd && *ptr == mFind)
+					*ptr++ = mReplace;
+			}
+			else
+			{
+				char* ptr = b.mEnd - 1;
+				while (ptr >= b.mStr && *ptr == mFind)
+					*ptr-- = mReplace;				
+			}
+		}
+
+		virtual void		Do(Utf32Buffer b)
+		{
+			if (mode == HEAD)
+			{
+				uchar32* ptr = b.mStr;
+				while (ptr < b.mEnd && *ptr == mFind)
+					*ptr++ = mReplace;
+			}
+			else
+			{
+				uchar32* ptr = b.mEnd - 1;
+				while (ptr >= b.mStr && *ptr == mFind)
+					*ptr-- = mReplace;				
+			}
+		}
+	private:
+		EMode		mMode;
+		uchar32		mFind;
+		uchar32		mReplace;
 	};
 
 	class CharBufferReverse : public CharBufferModifier
@@ -225,8 +269,6 @@ namespace xcore
 		virtual u64		Count() const { return mCount; }
 
 		virtual void	Reset() { mCount = 0; mCursor = mCache.mStr; mCursor[0] = '\0'; }
-		virtual void	Reverse() { }
-		virtual void	Fill(uchar32 c) { }
 
 		void			Flush()
 		{
@@ -291,16 +333,15 @@ namespace xcore
 		{
 			xconsole::write(mCache.mStr);
 			mCursor = mCache.mStr;
-			mCursor[0] = '\0';
+			*mCursor = '\0';
 		}
 
 		virtual bool	Write(uchar32 c)
 		{
 			if (mCursor == mCache.mEnd)
 				Flush();
-			mCursor[0] = c;
-			mCursor[1] = '\0';
-			mCursor += 1;
+			*mCursor++ = c;
+			*mCursor = '\0';
 			return true;
 		}
 
@@ -335,76 +376,22 @@ namespace xcore
 		Utf32Buffer		mCache;
 		uchar32*		mCursor;
 	};
-	
-	class CharReaderFromAsciiBuffer : public CharReader
-	{
-	public:
-		inline			CharReaderFromAsciiBuffer(const char* str, const char* str_end) : mStr(str), mCursor(str), mStrEnd(str_end) { }
-
-		virtual uchar32	Peek()
-		{
-			if (mCursor == mStrEnd)
-				return '\0';
-			uchar32 c = *mCursor;
-			return c;
-		}
-
-		virtual uchar32	Read()
-		{
-			if (mCursor == mStrEnd)
-				return '\0';
-			uchar32 c = *mCursor++;
-			return c;
-		}
-
-	private:
-		const char*		mStr;
-		const char*		mCursor;
-		const char*		mStrEnd;
-	};
-
-
-	class CharReaderFromUtf32Buffer : public CharReader
-	{
-	public:
-		inline			CharReaderFromUtf32Buffer(const uchar32* str, const uchar32* str_end) : mStr(str), mStrEnd(str_end) { }
-
-		virtual uchar32	Peek()
-		{
-			if (mStr >= mStrEnd)
-				return '\0';
-			uchar32 c = *mStr;
-			return c;
-		}
-
-		virtual uchar32	Read()
-		{
-			if (mStr >= mStrEnd)
-				return '\0';
-			uchar32 c = *mStr++;
-			return c;
-		}
-
-	private:
-		const uchar32*		mStr;
-		const uchar32*		mStrEnd;
-	};
 
 	class CharWriterToAsciiBuffer : public CharWriter
 	{
 	public:
-		inline			CharWriterToAsciiBuffer(char* str, char* str_end) : mStr(str), mCursor(str), mStrEnd(str_end), mCount(0) { mStrEnd[0] = '\0'; }
+		inline			CharWriterToAsciiBuffer(char* str, char* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { mEnd[0] = '\0'; }
 
 		virtual u64		Count() const	{ return mCount; }
-		virtual void	Reset() { mCursor = mStr; mCount = 0; }
+		virtual void	Reset() { mPtr = mStr; mCount = 0; }
 		
 		virtual bool	Write(uchar32 c)
 		{
 			bool const ok = Write_Prologue(c);
 			if (ok)
 			{
-				*mCursor++ = c;
-				*mCursor = '\0';
+				*mPtr++ = c;
+				*mPtr = '\0';
 			}
 			return ok;
 		}
@@ -436,7 +423,7 @@ namespace xcore
 	private:
 		bool			Write_Prologue(uchar32& c) const
 		{
-			if (mCursor > mStr && mCursor < mStrEnd)
+			if (mPtr >= mStr && mPtr < mEnd)
 			{
 				s32 len = 0;
 				if (c <= 0x7f) { len = 1; }
@@ -461,24 +448,24 @@ namespace xcore
 
 		u64				mCount;
 		char*			mStr;
-		char*			mCursor;
-		char*			mStrEnd;
+		char*			mPtr;
+		char*			mEnd;
 	};
 
 	class CharWriterToUtf32Buffer : public CharWriter
 	{
 	public:
-		inline			CharWriterToUtf32Buffer(uchar32* str, uchar32* str_end) : mStr(str), mCursor(str), mStrEnd(str_end), mCount(0) { }
+		inline			CharWriterToUtf32Buffer(uchar32* str, uchar32* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
 
 		virtual u64		Count() const	{ return mCount; }
-		virtual void	Reset() { mCursor = mStr; mCount = 0; }
+		virtual void	Reset() { mPtr = mStr; mCount = 0; }
 		
 		virtual bool	Write(uchar32 c)
 		{
-			if (mCursor >= mStrEnd)
+			if (mPtr >= mEnd)
 				return false;
-			*mCursor++ = c;
-			*mCursor = '\0';
+			*mPtr++ = c;
+			*mPtr = '\0';
 			return true;
 		}
 
@@ -496,21 +483,21 @@ namespace xcore
 
 		virtual void	Iterate(CharBufferIterator* i)
 		{
-			Utf32ConstBuffer buffer(mStr, mCursor);
+			Utf32ConstBuffer buffer(mStr, mPtr);
 			i->Do(buffer);
 		}
 
 		virtual void	Modify(CharBufferModifier* m)
 		{
-			Utf32Buffer buffer(mStr, mCursor, mStrEnd);
+			Utf32Buffer buffer(mStr, mPtr, mEnd);
 			m->Do(buffer);
 		}
 
 	private:
 		u64				mCount;
 		uchar32*		mStr;
-		uchar32*		mCursor;
-		uchar32*		mStrEnd;
+		uchar32*		mPtr;
+		uchar32*		mEnd;
 	};
 
 	template<int SIZE>
@@ -603,12 +590,68 @@ namespace xcore
 		CharWriterToUtf32Buffer mWriter;
 	};
 
+		
+	class CharReaderFromAsciiBuffer : public CharReader
+	{
+	public:
+		inline			CharReaderFromAsciiBuffer(const char* str, const char* str_end) : mStr(str), mPtr(str), mEnd(str_end) { }
+
+		virtual uchar32	Peek()
+		{
+			if (mPtr == mEnd)
+				return '\0';
+			uchar32 c = *mPtr;
+			return c;
+		}
+
+		virtual uchar32	Read()
+		{
+			if (mPtr == mEnd)
+				return '\0';
+			uchar32 c = *mPtr++;
+			return c;
+		}
+
+	private:
+		const char*		mStr;
+		const char*		mPtr;
+		const char*		mEnd;
+	};
+
+
+	class CharReaderFromUtf32Buffer : public CharReader
+	{
+	public:
+		inline			CharReaderFromUtf32Buffer(const uchar32* str, const uchar32* str_end) : mStr(str), mPtr(str), mEnd(str_end) { }
+
+		virtual uchar32	Peek()
+		{
+			if (mPtr >= mEnd)
+				return '\0';
+			uchar32 c = *mPtr;
+			return c;
+		}
+
+		virtual uchar32	Read()
+		{
+			if (mPtr >= mEnd)
+				return '\0';
+			uchar32 c = *mPtr++;
+			return c;
+		}
+
+	private:
+		const uchar32*		mStr;
+		const uchar32*		mPtr;
+		const uchar32*		mEnd;
+	};
+
 
 	//==============================================================================
 	// DEFINES
 	//==============================================================================
 
-	// --- FLAGS FOR THE VSPRINTF ---
+	// --- FLAGS FOR VSPRINTF ---
 
 	/**
 	 * NUMERIC VALUES
@@ -630,10 +673,10 @@ namespace xcore
 	/**
 	 * TEXT FLAGS
 	 */
-	#define UPPERCASE          0x100       // upper-case, YES/NO
-	#define LOWERCASE          0x200       // lower-case, yes/no
+	#define LOWERCASE          0x100       // lower-case, yes/no
+	#define UPPERCASE          0x200       // upper-case, YES/NO
 	#define CAMELCASE          0x400       // camel-case, Yes/No
-
+	
 	/**
 	 * CONSTANTS
 	 */
@@ -647,15 +690,12 @@ namespace xcore
 	//==============================================================================
 
 	/**
-	 * vsprintf_pow for f64
+	 * pow for f64
 	 */
-	static f64 VSPrintf_pow(f64 x, s32 p)
+	static f64 sPow(f64 x, s32 p)
 	{
-		f64 r;
-
 		if (p == 0)
 			return 1.0;
-
 		if (x == 0.0)
 			return 0.0;
 
@@ -665,10 +705,8 @@ namespace xcore
 			x = 1.0 / x;
 		}
 
-		r = 1.0;
-
-		//TODO: use while?
-		for (;;)
+		f64 r = 1.0;
+		while(true)
 		{
 			if (p & 1)
 				r *= x;
@@ -683,7 +721,7 @@ namespace xcore
 
 	/**
 	 *------------------------------------------------------------------------------
-	 * writer  - Where the output is written to (Make sure there are at least 24 bytes)
+	 * writer  - Where the output is written to
 	 * fpnum   - number which is going to be converted
 	 * cvt     - what type of conversion needs
 	 * width   - total width of the output number
@@ -698,35 +736,33 @@ namespace xcore
 		ASSERT(prec >= 0);
 
 		char    fwork[WORKSIZE];
-		char*   fw               = fwork;
+		char*   fw = fwork;
 
 		 // setup integer part
 		char    iwork[WORKSIZE];
-		char*   iworkend         = &iwork[sizeof(iwork) - 1];
-		char*   iw               = iworkend;
-		*iw = 0;
+		char*   iworkend = &iwork[sizeof(iwork) - 1];
+		char*   iw = iworkend;
+		*iw = '\0';
 
 		// setup exponent part
 		char    ework[16];
-		char*   eworkend         = &ework[sizeof(ework) - 1];;
-		char*   ew               = eworkend;
-		*ew = 0;
+		char*   eworkend = &ework[sizeof(ework) - 1];;
+		char*   ew = eworkend;
+		*ew = '\0';
 
 		if (x_f64u::isInfinite(fpnum))
 		{
 			if (fpnum < 0)
 				writer->Write('-');
-			ascii::pcrune str = "Inf";
-			while (*str != '\0')
-				writer->Write(*str++);
+			AsciiConstBuffer str("Inf", 3);
+			write->Write(str);
 			return;
 		}
 
 		if (x_f64u::isNAN(fpnum))
 		{
-			ascii::pcrune str = "NaN";
-			while (*str != '\0')
-				writer->Write(*str++);
+			AsciiConstBuffer str("NaN", 3);
+			writer->Write(str);
 			return;
 		}
 
@@ -750,7 +786,7 @@ namespace xcore
 		{
 			if (prec > 23)
 			{
-				powprec = VSPrintf_pow(10.0, prec);
+				powprec = sPow(10.0, prec);
 			}
 			else
 			{
@@ -759,9 +795,7 @@ namespace xcore
 		}
 		f64 rounder = 0.5 / powprec;
 
-
-		s32 f_fmt;
-		f_fmt = cvt == 'f' || ((cvt == 'g') && (fpnum == 0.0 || (fpnum >= 1e-4 && fpnum < powprec)));
+		s32 f_fmt = cvt == 'f' || ((cvt == 'g') && (fpnum == 0.0 || (fpnum >= 1e-4 && fpnum < powprec)));
 
 		s32 iwidth = 0;
 		s32 fwidth = 0;
@@ -933,16 +967,13 @@ namespace xcore
 				++exp;
 			}
 
-			f64 almost_one;
-			almost_one = 1.0 - rounder;
+			f64 almost_one = 1.0 - rounder;
 
 			while (fpnum > 0.0 && fpnum < almost_one)
 			{
 				fpnum *= 10.0;
 				--exp;
 			}
-
-
 
 			if (cvt == 'g')     // used up one digit for s32 part...
 			{
@@ -987,7 +1018,6 @@ namespace xcore
 				if (cvt == 'g')  // inhibit trailing zeroes if g-fmt
 				{
 					char* p;
-
 					for (p = fw - 1; p >= fwork && *p == '0'; --p)
 					{
 						*p = 0;
@@ -998,7 +1028,7 @@ namespace xcore
 			}
 
 			// convert exponent
-			char eneg = exp < 0;
+			bool const eneg = exp < 0;
 			if (eneg) exp = - exp;
 
 			while (exp > 0)
@@ -1024,7 +1054,6 @@ namespace xcore
 			// convert the one-digit integer part
 			*--iw = (char)('0' + (s32)(ipart));
 			++iwidth;
-
 		}
 
 		// arrange everything in returned string
@@ -1032,32 +1061,21 @@ namespace xcore
 		s32 const fmtwidth = is_neg + iwidth + showdot + fwidth + ewidth;
 		s32 const pad = width - fmtwidth;
 
-		s32 i;
-		if (pad > 0)
-		{
-			for (i = 0; i < pad; ++i)
-				writer->Write(' ');
-		}
+		for (s32 i = 0; pad > 0 && i < pad; ++i)
+			writer->Write(' ');
 
 		if (is_neg)
+		{
 			writer->Write('-');
-
-		for (i = 0; i < iwidth; ++i)
-			writer->Write(*iw++);
-
+		}
+		writer->Write(AsciiConstBuffer(iw, iwidth));
 		if (showdot)
 		{
 			writer->Write('.');
-			fw = fwork;
-			for (i = 0; i < fwidth; ++i)
-				writer->Write(*fw++);
+			writer->Write(AsciiConstBuffer(fwork, fwidth));
 		}
-
-		for (i = 0; i < ewidth; ++i)
-			writer->Write(*ew++);
+		writer->Write(AsciiConstBuffer(ew, ewidth));
 	}
-
-
 
 	/**
 	 *------------------------------------------------------------------------------
@@ -1066,11 +1084,11 @@ namespace xcore
 	 * Octal numbers can be forced to have a leading zero; hex numbers
 	 * use the given digits.
 	 *------------------------------------------------------------------------------
-	 * val      - Numeric value to be converted
-	 * endp     - String to be fill in fromt the end
+	 * val      - numeric value to be converted
+	 * writer   - writer for the destination string
 	 * base     - base of the number (10, 8, 16)
 	 * octzero  - flag to add to the oct numbers the 0 in front
-	 * xdigs    - Hexadecimal string array of number 0,1,2,3,4,5,9,A,or a, ..etc
+	 * xdigs    - hexadecimal string array of number 0,1,2,3,4,5,9,A,or a, ..etc
 	 *------------------------------------------------------------------------------
 	 */
 	#define to_digit(c) ((c) - '0')
@@ -1090,62 +1108,55 @@ namespace xcore
 		switch (base)
 		{
 		case 10:
-				if (val < 10)
-				{   // many numbers are 1 digit
-					c = to_char(val);
-					writer->Write(c);
-					return;
-				}
+			// On many machines, unsigned arithmetic is harder than
+			// signed arithmetic, so we do at most one unsigned mod and
+			// divide; this is sufficient to reduce the range of
+			// the incoming value to where signed arithmetic works.
 
-				// On many machines, unsigned arithmetic is harder than
-				// signed arithmetic, so we do at most one unsigned mod and
-				// divide; this is sufficient to reduce the range of
-				// the incoming value to where signed arithmetic works.
+			if (val > SPF_LONG_MAX)
+			{
+				c = to_char(val % 10);
+				writer->Write(c);
+				sval = (s32)(val / 10);
+			}
+			else
+			{
+				sval = (s32)val;
+			}
 
-				if (val > SPF_LONG_MAX)
-				{
-					c = to_char(val % 10);
-					writer->Write(c);
-					sval = (s32)(val / 10);
-				}
-				else
-				{
-					sval = (s32)val;
-				}
+			do
+			{
+				c = to_char(sval % 10);
+				writer->Write(c);
+				sval /= 10;
+			} while (sval != 0);
 
-				do
-				{
-					c = to_char(sval % 10);
-					writer->Write(c);
-					sval /= 10;
-				} while (sval != 0);
-
-				break;
+			break;
 
 		case 8:
-				do
-				{
-					c = to_char(val & 7);
-					writer->Write(c);
-					val >>= 3;
-				} while (val);
-				if (octzero && c != '0') 
-					writer->Write(uchar32('0'));
-				break;
+			do
+			{
+				c = to_char(val & 7);
+				writer->Write(c);
+				val >>= 3;
+			} while (val);
+			if (octzero && c != '0') 
+				writer->Write(uchar32('0'));
+			break;
 
 		case 16:
-				do
-				{
-					writer->Write(xdigs[val & 15]);
-					val >>= 4;
-				} while (val);
+			do
+			{
+				writer->Write(xdigs[val & 15]);
+				val >>= 4;
+			} while (val);
 
-				break;
+			break;
 
 		default:
-		        /* oops */
-				break;
-			}
+			/* oops */
+			break;
+		}
 	}
 
 	/**
@@ -1162,60 +1173,53 @@ namespace xcore
 		switch (base)
 		{
 		case 10:
-				if (val < 10)
-				{   // many numbers are 1 digit
-					c = to_char(val);
-					writer->Write(c);
-					return;
-				}
+			// On many machines, unsigned arithmetic is harder than
+			// signed arithmetic, so we do at most one unsigned mod and
+			// divide; this is sufficient to reduce the range of
+			// the incoming value to where signed arithmetic works.
 
-				// On many machines, unsigned arithmetic is harder than
-				// signed arithmetic, so we do at most one unsigned mod and
-				// divide; this is sufficient to reduce the range of
-				// the incoming value to where signed arithmetic works.
+			if (val > ((~(u64)0) >> 1))
+			{
+				c = to_char(val % 10);
+				writer->Write(c);
+				sval = (s64)(val / 10);
+			}
+			else
+			{
+				sval = (s64)val;
+			}
 
-				if (val > ((~(u64)0) >> 1))
-				{
-					c = to_char(val % 10);
-					writer->Write(c);
-					sval = (s64)(val / 10);
-				}
-				else
-				{
-					sval = (s64)val;
-				}
+			do
+			{
+				c = to_char(sval % 10);
+				writer->Write(c);
+				sval /= 10;
+			} while (sval != 0);
 
-				do
-				{
-					c = to_char(sval % 10);
-					writer->Write(c);
-					sval /= 10;
-				} while (sval != 0);
-
-				break;
+			break;
 
 		case 8:
-				do
-				{
-					c = to_char(val & 7);
-					writer->Write(c);
-					val >>= 3;
-				} while (val);
+			do
+			{
+				c = to_char(val & 7);
+				writer->Write(c);
+				val >>= 3;
+			} while (val);
 
-				if (octzero && c != '0') 
-					writer->Write('0');
+			if (octzero && c != '0') 
+				writer->Write('0');
 
-				break;
+			break;
 
 		case 16:
-				do
-				{
-					c = xdigs[val & 15];
-					writer->Write(c);
-					val >>= 4;
-				} while (val);
+			do
+			{
+				c = xdigs[val & 15];
+				writer->Write(c);
+				val >>= 4;
+			} while (val);
 
-				break;
+			break;
 
 		default:
 			/* oops */
@@ -1251,36 +1255,15 @@ namespace xcore
 	typedef void (*WriteBufferDelegate)(CharWriter* writer, uchar* string, s32 size);
 
 	static
-	void WriteToBuffer(CharWriter* writer, uchar* string, s32 size)
+	void WriteToBuffer(CharWriter* writer, uchar* str, s32 size)
 	{
-		s32 i;
-
-		ASSERT(string);
+		ASSERT(str);
 		ASSERT(size >= 0);
-
-		for (i = 0; i < size; i++)
-		{
-			uchar32 c = string[i];
-			if (writer->Write(c) == false)
-				break;
-		}
+		writer->Write(AsciiConstBuffer(str, size));
 	}
-
-	static void WriteToBufferDummy(CharWriter* writer, uchar* string, s32 size)
-	{
-
-	}
-
-	static void WriteTo(CharWriter* writer, CharWriter* buffer)
-	{
-
-	}
-	
 
 	/**
-	 * Choose PADSIZE to trade efficiency vs. size.  If larger printf
-	 * fields occur frequently, increase PADSIZE and make the initializers
-	 * below longer.
+	 * PadToBuffer
 	 */
 	typedef void (*PadBufferDelegate)(CharWriter* writer, s32 howMany, char with);
 
@@ -1291,11 +1274,6 @@ namespace xcore
 			if (writer->Write(with) == false)
 				break;
 		}
-	}
-
-	static void PadBufferDummy(CharWriter* writer, s32 howMany, char with)
-	{
-
 	}
 
 	///< DOM-IGNORE-END
@@ -1368,12 +1346,12 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	//s32 x_vsprintf_internal(char* buffer, s32 maxChars, const char* formatStr, const x_va_list& args)
 	s32 VSPrintf_internal(CharWriter* writer, CharReader* reader, CharWriter* buffer, const x_va_list& args)
 	{
 		ASSERT(reader != NULL);
 		ASSERT(writer != NULL);
-
+		ASSERT(buffer != NULL);
+		
 		uchar32		ch;             ///< character 
 		s32     	n;              ///< handy integer (short term usage)
 		CharWriter*	cp = NULL;		///< handy char pointer (short term usage)
@@ -1395,25 +1373,23 @@ namespace xcore
 		u64   uqval    = 0;                      // %q integers
 		s32   argindex = 0;
 
+		CharBufferToCharWriter copy_to_writer(writer);
+		
 		/// Scan the format for conversions (`%' character).
 		for (;;)
 		{
-			// Find the first "interesting symbol"
-			for (; ((ch=reader->Peek()) != uchar32('\0')) && (ch != uchar32('%')); )
-			{
-				// Write all the characters before the "interesting symbol"
+			while (true)
+			{	
 				ch = reader->Read();
-				writer->Write(ch);
+				if ((ch == uchar32('\0')) || (ch == uchar32('%')))	// Find the first "interesting symbol"
+					break;
+				writer->Write(ch);		// Write all the characters before the "interesting symbol"
 				ret += 1;
 			}
-
 
 			// are we done?
 			if (ch == '\0')
 				goto done;
-
-			// skip over '%'
-			reader->Read();
 
 			// reset the temp buffer
 			buffer->Reset();
@@ -1497,7 +1473,6 @@ namespace xcore
 					do
 					{
 						n = 10 * n + to_digit(ch);
-						//ch = *fmt++;
 						ch = reader->Read();
 					} while (is_digit(ch));
 
@@ -1532,8 +1507,7 @@ namespace xcore
 
 				case 'd':
 				case 'i':
-
-					if (flags & QUADINT || args[argindex].type()==x_va::TYPE_INT64 || args[argindex].type()==x_va::TYPE_UINT64)
+					if (flags & QUADINT || args[argindex].isInt64() || args[argindex].isUInt64())
 					{
 						flags |= QUADINT;
 						s64 temp = (s64)args[argindex++];
@@ -1557,7 +1531,6 @@ namespace xcore
 							temp = -temp;
 							sign = '-';
 						}
-
 						ulval = (u32)(temp);
 					}
 
@@ -1568,7 +1541,6 @@ namespace xcore
 				case 'G':
 					if (prec == 0)
 						prec = 1;
-
 				case 'e':
 				case 'E':
 				case 'f':
@@ -1594,23 +1566,23 @@ namespace xcore
 						width = -width;
 
 					// right-adjusting zero padding
-					uchar buf[WORKSIZE + 1];
-					buf[WORKSIZE] = '\0';
-					CharWriterToAsciiBuffer buf_writer((char*)buf, (char*)(&buf[WORKSIZE]));
-					CharBufferFill filler(' ');
-					buf_writer.Modify(&filler);
-					dtoa(&buf_writer, _double, (char)ch, width, prec);
-					buf_writer.Reverse();
-					size = buf_writer.Count();
+					{
+						dtoa(buffer, _double, (char)ch, width, prec);
+
+						CharBufferReverse reverser;
+						buffer->Modify(&reverser);
+
+						size = buffer->Count();
+					}
 
 					// check whether we have to pad or not
 					if (flags & ZEROPAD)
 					{
-						for (s32 i = 0; buf[i] == ' '; i++)
-							buf[i] = '0';
+						CharBufferPad padder(CharBufferPad::HEAD, ' ', '0');
+						buffer->Modify(&padder);
 					}
 
-					WriteToBuffer(writer, buf, size);
+					buffer->Iterate(&copy_to_writer);	// Copy 'buffer' to 'writer'
 
 					if (flags & LADJUST)
 						PadBuffer(writer, -width - size, ' ');
@@ -1860,8 +1832,7 @@ namespace xcore
 			PadBuffer(writer, dprec - size, '0');
 
 			// write the integer number
-			CharBufferToCharWriter iterate_to_copy(writer);
-			buffer->Iterate(&iterate_to_copy);
+			buffer->Iterate(&copy_to_writer);
 
 			// left-adjusting padding (always blank)
 			if (flags & LADJUST)
@@ -2016,6 +1987,3 @@ namespace xcore
 /**
  *  END xCore namespace
  */
-
-
-#endif

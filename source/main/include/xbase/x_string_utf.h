@@ -115,10 +115,10 @@ namespace xcore
 		static uchar32	last_char(pcrune str, pcrune str_end);
 
 		static s32		cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-		static prune	sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+		static prune	sprintf(prune dst_str, prune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
 
 		static s32		vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
-		static s32		vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		static s32		vsprintf(prune dst_str, prune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
 		static s32		printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
 		static s32		printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
