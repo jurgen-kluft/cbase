@@ -1,14 +1,217 @@
-#include "xbase\x_target.h"
-#include "xbase\x_string_ascii.h"
-#include "xbase\x_va_list.h"
+#include "xbase/x_target.h"
+#include "xbase/x_string_ascii.h"
+#include "xbase/x_va_list.h"
 
 #ifndef SPU
+
+// Shared code
+#include "x_string_utils.cpp"
 
 /**
  * xCore namespace
  */
 namespace xcore
-{
+{	
+	/**
+	 *------------------------------------------------------------------------------
+	 * Author:
+	 *     Virtuos Games
+	 * Summary:
+	 *     atod64          - Converts a string value to integer base from a particular
+	 * Arguments:
+	 *        str            - Source string encoded with a particular base
+	 *        Base           - Base of the numeric string
+	 * Returns:
+	 *        Actual integer number
+	 * Description:
+	 *      Converts a string that has been encoded into an integer of a particular base
+	 *      into a actual atomic integer of a particular size (32vs64)bits. If the
+	 *      string contains '_' or ':' characters they will be ignore.
+	 * See Also:
+	 *      atod32 atoi32 atoi64 atof32 atof64
+	 *------------------------------------------------------------------------------
+	 */
+	s64 StrToS64(CharReader* reader, s32 base)
+	{
+		ASSERT(str != NULL);
+		ASSERT(base > 2);
+		ASSERT(base <= (26 + 26 + 10));
+
+		// Skip whitespace.
+		while (reader->Peek() == ' ') 
+		{
+			reader->Read();
+		}
+
+		uchar32 c;				// Current character.
+		c = reader->Peek();		// Save sign indication.
+		uchar32 sign = c;		// If '-', then negative, otherwise positive.
+
+		// Skip sign.
+		if ((c == '-') || (c == '+')) 
+		{
+			c = reader->Read();
+		}
+
+		s64  total = 0;   // Current total.
+
+		// Decode the rest of the string
+		while (true)
+		{
+			c = reader->Read();
+
+			s32  validBase = 0;
+			if ((c >= '0') && (c <= '9'))  
+			{
+				validBase = c - '0';
+			}
+			else if ((c >= 'a') && (c <= 'z'))  
+			{
+				validBase = c - 'a' + 10;
+			}
+			else if ((c >= 'A') && (c <= 'Z'))  
+			{
+				validBase = c - 'A' + 10 + 26;
+			}
+			else if (c == '_' || c == ':')  
+			{
+				// Ignore
+				continue;
+			}
+			else
+			{
+				// Negate the total if negative.
+				if (sign == '-') 
+					total = -total;
+
+				// Any other character is bad news
+				return total;
+			}
+
+			ASSERT(validBase >= 0);
+			ASSERT(validBase <  base);
+
+			// Accumulate digit.
+			total = (base * total) + validBase;
+		}
+
+		// No way to get here
+		return total;
+	}
+
+	// <COMBINE atod64 >
+	s32 StrToS32(CharReader* reader, s32 base)
+	{
+		return (s32)StrToS64(reader, base);
+	}
+
+	//------------------------------------------------------------------------------
+
+	f64	 StrToF64(CharReader* reader)
+	{
+		// Evaluate sign 
+		s32 sign = 1;
+		if (reader->Peek() == '-')
+		{
+			sign = -1;
+			reader->Read();
+		}
+
+		// Skip trailing zeros 
+		while (reader->Peek() == '0')
+			reader->Read();
+
+		// Convert integer part 
+		f64 result = 0;
+		f64 value;
+		while(true)
+		{
+			uchar32 c = reader->Peek();
+			if (c >= '0' && c <= '9')
+			{			
+				value = c - '0';
+				result *= 10.0;
+				result += value;
+				reader->Read();
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		// Detect floating point & mantissa 
+		f64 mantissa = 0;
+		f64 divisor = 1;
+		if (reader->Peek() == '.')
+		{
+			reader->Read();
+
+			while(true)
+			{
+				uchar32 c = reader->Peek();
+				if (c >= '0' && c <= '9')
+				{
+					value = c - '0';
+					mantissa *= 10.0;
+					mantissa += value;
+					divisor *= 10.0;
+					reader->Read();
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+
+		mantissa /= divisor;
+		// Adjust result 
+		result += mantissa;
+		// Adjust sign 
+		result *= sign;
+		// Detect exponent 
+		u16 power = 0;
+
+		uchar32 c = reader->Peek();
+		if (c == 'e' || c == 'E')
+		{
+			reader->Read();
+
+			c = reader->Peek();
+			if (c == '-')
+			{
+				sign = -1;
+				reader->Read();
+			}
+			else if (c == '+')
+			{
+				sign = 1;
+				reader->Read();
+			}
+			else
+				sign = 1;
+
+			while (c <= '9' && c >= '0') 
+			{
+				u16 v = c - '0';
+				power *= 10;
+				power += v;
+				reader->Read();
+			}
+		}
+
+		// Adjust result on exponent sign 
+		if (sign > 0)
+			for (s32 i = 0; i < power; i++)
+				result *= 10.0;
+		else 
+			for (s32 i = 0; i < power; i++)
+				result /= 10.0;
+
+		return(result);
+	}
+
 	 /**
 	  *Parameters
 
@@ -98,7 +301,7 @@ namespace xcore
 		INT64_SIZE        = 8,
 	};
 
-	s32 VSScanf(const char *buf, const char *fmt, const x_va_r_list& vr_args)
+	s32 VSScanf(CharReader* reader, CharReader* fmt, const x_va_r_list& vr_args)
 	{
 		s32 i        = 0;
 		s32 w        = 0;
@@ -108,20 +311,18 @@ namespace xcore
 		s32 scanned  = 0;
 		//s32 size     = 0;
 		s32 suppress = 0;
-	    
-		const char *base = buf;
-	    
-		while (*fmt != 0) 
+	    	    
+		while (fmt->Peek() != '\0') 
 		{
-			if (*fmt != '%' && !parsing) 
+			if (fmt->Peek() != '%' && !parsing) 
 			{
-				fmt++;
+				fmt->Read();
 			} 
 			else
 			{
-				if (*fmt == '%')
+				if (fmt->Peek() == '%')
 				{
-					fmt++;
+					fmt->Read();
 					parsing = 1;
 					//size = INT32_SIZE;
 					suppress = 0;
@@ -130,7 +331,7 @@ namespace xcore
 					l = 0;
 				}
 	            
-				switch(*fmt)
+				switch(fmt->Peek())
 				{
 					case '1':
 					case '2':
@@ -144,14 +345,14 @@ namespace xcore
 					case '0':
 						if (parsing == 1)
 						{
-							w = StrToS32(fmt,&base,10);
+							w = StrToS32(fmt, 10);
 							flag |= SPACE_PAD;
 							fmt = base - 1;
 						}
 						break;
 					case 'c':
 						{
-							char    c = *buf++;
+							char    c = buf->Read();
 							x_va_r  r = vr_args[i++];
 							r = (u8)c;
 							scanned++;
@@ -161,31 +362,36 @@ namespace xcore
 						{
 							x_va_r r = vr_args[i++];
 
-							char* str = (char*)r;
-							
-							const u32 str_len = r.var();
 							u32 i = 0;
-
-							while (*buf != 0 && IsSpace(*buf))
+							while (reader->Peek() != 0 && IsSpace(reader->Peek()))
 							{
-								buf++;
+								reader->Read();
 							}
-	                        
+
+							char* ascii_str = (char*)str;
+							AsciiBuffer ascii_str(str, str!=NULL ? (str + r.var()) : str);
+							CharWriterToAsciiBuffer ascii_str_writer(str);
+
+							Utf32Buffer utf32_str((uchar32*)str, r.var());
+							CharWriterToUtf32Buffer utf32_str_writer(str);
+
+							CharWriter* str_writer = &ascii_str_writer;
+							if (r.isPUChar32())
+								str_writer = &utf32_str_writer;
+
 							l = 0;
-							while (*buf != 0 && !IsSpace(*buf))
+							while (reader->Peek() != 0 && !IsSpace(reader->Peek()))
 							{
 								if (!(flag & SPACE_PAD)) 
 								{
-									if (i < str_len)
-										str[i++] = *buf;
+									str_writer->Write(buf->Read());
 								} 
 								else if (l < w)
 								{
-									if (i < str_len)
-										str[i++] = *buf;
+									str_writer->Write(buf->Read());
 									l++;
 								}
-								buf++;
+								reader->Read();
 							}
 
 							scanned++;
@@ -194,9 +400,8 @@ namespace xcore
 					case 'i':
 					case 'd':
 						{
-							buf = Find(buf, "1234567890-+");
-							s64 n1 = StrToS64(buf, 10, &base);
-							buf = base;
+							FindOneOf(reader, "1234567890-+");
+							s64 n1 = StrToS64(reader, 10);
 	                        
 							if (!suppress)
 							{
@@ -213,9 +418,9 @@ namespace xcore
 						} break;
 					case 'u':
 						{
-							buf = Find(buf, "1234567890");
-							s64 n2 = StrToS64(buf, 10, &base);
-							buf = base;
+							FindOneOf(reader, "1234567890");
+							s64 n2 = StrToS64(reader, 10);
+
 							if (!suppress)
 							{
 								x_va_r r = vr_args[i++];
@@ -231,9 +436,9 @@ namespace xcore
 						} break;
 					case 'o':
 						{
-							buf = Find(buf, "12345670");
-							s64 n2 = StrToS64(buf, 8, &base);
-							buf = base;
+							FindOneOf(reader, "12345670");
+							s64 n2 = StrToS64(reader, 8);
+
 							if (!suppress)
 							{
 								x_va_r r = vr_args[i++];
@@ -250,13 +455,14 @@ namespace xcore
 					case 'x':
 					case 'X':
 						{
-							const char* buf2 = Find(buf, "1234567890xabcdefABCDEF");
+							const char* buf2 = FindOneOf(reader, "1234567890xabcdefABCDEF");
 
 							u32 const varsize = vr_args[i].sizeInBytes();
 							w = varsize * 2;
 
 							u64 n2 = 0;
-							if (buf2 != NULL) {
+							if (buf2 != NULL) 
+							{
 								if (w == 2)
 								{
 									u32 const strl = 2;
@@ -318,9 +524,10 @@ namespace xcore
 					case 'e':
 					case 'E':
 						{
-							buf = Find(buf, "1234567890.e+-");
+							FindOneOf(reader, "1234567890.e+-");
+
 							//TODO: delete an arguments to fix compiling error
-							f64 n3 = StrToF64(buf, &base);
+							f64 n3 = StrToF64(reader);
 							buf = base;
 							if (!suppress)
 							{
@@ -359,7 +566,9 @@ namespace xcore
 
 	s32 SScanf(const char *buf, const char *fmt, const x_va_r_list& vr_args)
 	{
-		return VSScanf(buf, fmt, vr_args);
+		CharReaderFromAsciiBuffer buf_reader(buf, buf + strlen(buf));
+		CharReaderFromAsciiBuffer fmt_reader(fmt, fmt + strlen(fmt));
+		return VSScanf(&buf_reader, &fmt_reader, vr_args);
 	}
 
 	s32 SScanf(const char *buf, const char *fmt, X_VA_R_ARGS_16)
@@ -382,7 +591,9 @@ namespace xcore
 		vr_args.add(v15);
 		vr_args.add(v16);
 
-		return VSScanf(buf, fmt, vr_args);
+		CharReaderFromAsciiBuffer buf_reader(buf, buf + strlen(buf));
+		CharReaderFromAsciiBuffer fmt_reader(fmt, fmt + strlen(fmt));
+		return VSScanf(&buf_reader, &fmt_reader, vr_args);
 	}
 };
 /**

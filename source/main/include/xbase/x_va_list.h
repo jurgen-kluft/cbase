@@ -322,10 +322,9 @@ namespace xcore
 								x_va_r(bool* inRef) : mType(TYPE_BOOL), mVar(0)					{ mRef = (void*)inRef; }
 								x_va_r(f32* inRef) : mType(TYPE_FLOAT32), mVar(0)				{ mRef = (void*)inRef; }
 								x_va_r(f64* inRef) : mType(TYPE_FLOAT64), mVar(0)				{ mRef = (void*)inRef; }
-								x_va_r(uchar32* inRef) : mType(TYPE_UCHAR), mVar(0)				{ mRef = (void*)inRef; }
-								x_va_r(const char* inRef) : mType(TYPE_PTCHAR)					{ mRef = (void*)inRef; }
-								x_va_r(const uchar8* inRef) : mType(TYPE_PUCHAR8)				{ mRef = (void*)inRef; }
-								x_va_r(const uchar32* inRef) : mType(TYPE_PUCHAR32)				{ mRef = (void*)inRef; }
+								x_va_r(char* inRef, u16 max_len) : mType(TYPE_PTCHAR), mVar(max_len)	{ mRef = (void*)inRef; }
+								x_va_r(uchar8* inRef, u16 max_len) : mType(TYPE_PUCHAR8), mVar(max_len)		{ mRef = (void*)inRef; }
+								x_va_r(uchar32* inRef, u16 max_len) : mType(TYPE_PUCHAR32), mVar(max_len)	{ mRef = (void*)inRef; }
 
 		x_va_r&					operator=(s8 rhs);
 		x_va_r&					operator=(u8 rhs);
