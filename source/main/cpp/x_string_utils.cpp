@@ -11,43 +11,48 @@
  */
 namespace xcore
 {
-	class CharReader
-	{
-	public:
-		virtual uchar32		Peek() = 0;
-		virtual uchar32		Read() = 0;
-	};
-
 	struct AsciiBuffer
 	{
-		inline			AsciiBuffer(char * str, u32 len) : mStr(str), mEnd(str + len), mEos(str + len) { }
-		inline			AsciiBuffer(char * str, char * end, char * eos) : mStr(str), mEnd(end), mEos(eos) { }
-		char*			mStr;
-		char*			mEnd;
-		char*			mEos;
+		inline			AsciiBuffer(char * str, u32 len) : mStr((uchar*)str), mEnd((uchar*)str + len), mEos((uchar*)str + len) { }
+		inline			AsciiBuffer(char * str, char const * end) : mStr((uchar*)str), mEnd((uchar const*)end), mEos((uchar const*)end) { }
+		inline			AsciiBuffer(char * str, char const * end, char const * eos) : mStr((uchar *)str), mEnd((uchar const*)end), mEos((uchar const*)eos) { }
+
+		inline			AsciiBuffer(uchar * str, u32 len) : mStr(str), mEnd(str + len), mEos(str + len) { }
+		inline			AsciiBuffer(uchar * str, uchar const * end) : mStr(str), mEnd(end), mEos(end) { }
+		inline			AsciiBuffer(uchar * str, uchar const * end, uchar const * eos) : mStr(str), mEnd(end), mEos(eos) { }
+
+		uchar*			mStr;
+		uchar const*	mEnd;
+		uchar const*	mEos;
 	};
 
 	struct Utf32Buffer
 	{
 		inline			Utf32Buffer(uchar32 * str, u32 len) : mStr(str), mEnd(str + len), mEos(str + len) { }
-		inline			Utf32Buffer(uchar32 * str, uchar32 * end, uchar32 * eos) : mStr(str), mEnd(end), mEos(eos) { }
+		inline			Utf32Buffer(uchar32 * str, uchar32 const * end) : mStr(str), mEnd(end), mEos(end) { }
+		inline			Utf32Buffer(uchar32 * str, uchar32 const * end, uchar32 const * eos) : mStr(str), mEnd(end), mEos(eos) { }
 		uchar32*		mStr;
-		uchar32*		mEnd;
-		uchar32*		mEos;
+		uchar32 const *	mEnd;
+		uchar32 const *	mEos;
 	};
 
 	struct AsciiConstBuffer
 	{
-		inline			AsciiConstBuffer(char const* str, u32 len) : mStr(str), mEnd(str + len) { }
-		inline			AsciiConstBuffer(char const* str, char const* end) : mStr(str), mEnd(end) { }
-		char const*		mStr;
-		char const*		mEnd;
+		inline			AsciiConstBuffer(char const* str, u32 len) : mStr((uchar*)str), mEnd((uchar*)str + len) { }
+		inline			AsciiConstBuffer(char const* str, char const* end) : mStr((uchar*)str), mEnd((uchar*)end) { }
+
+		inline			AsciiConstBuffer(uchar const* str, u32 len) : mStr(str), mEnd(str + len) { }
+		inline			AsciiConstBuffer(uchar const* str, uchar const* end) : mStr(str), mEnd(end) { }
+
+		uchar const*	mStr;
+		uchar const*	mEnd;
 	};
 
 	struct Utf32ConstBuffer
 	{
 		inline			Utf32ConstBuffer(uchar32 const* str, u32 len) : mStr(str), mEnd(str + len) { }
 		inline			Utf32ConstBuffer(uchar32 const* str, uchar32 const* end) : mStr(str), mEnd(end) { }
+
 		uchar32 const*	mStr;
 		uchar32 const*	mEnd;
 	};
@@ -66,6 +71,32 @@ namespace xcore
 		virtual void		Do(Utf32Buffer b) = 0;
 	};
 
+	class CharReader
+	{
+	public:
+		virtual uchar32		Peek() = 0;
+		virtual uchar32		Read() = 0;
+		virtual void		Skip() = 0;
+		virtual void		Reset() = 0;
+
+		virtual void		Iterate(CharBufferIterator* i) = 0;
+	};
+
+	class CharWriter
+	{
+	public:
+		virtual u64			Count() const = 0;
+		virtual void		Reset() = 0;
+
+		virtual bool		Write(uchar32 c) = 0;
+		virtual bool		Write(AsciiConstBuffer c) = 0;
+		virtual bool		Write(Utf32ConstBuffer c) = 0;
+
+		virtual void		Iterate(CharBufferIterator* i) = 0;
+		virtual void		Modify(CharBufferModifier* m) = 0;
+	};
+
+
 	class CharBufferFill : public CharBufferModifier
 	{
 	public:
@@ -73,9 +104,9 @@ namespace xcore
 
 		virtual void		Do(AsciiBuffer b)
 		{
-			char* ptr = b.mStr;
+			uchar* ptr = b.mStr;
 			while (ptr < b.mEnd)
-				*ptr++ = mFill;
+				*ptr++ = (uchar)mFill;
 		}
 
 		virtual void		Do(Utf32Buffer b)
@@ -96,23 +127,23 @@ namespace xcore
 
 		virtual void		Do(AsciiBuffer b)
 		{
-			if (mode == HEAD)
+			if (mMode == HEAD)
 			{
-				char* ptr = b.mStr;
+				uchar* ptr = b.mStr;
 				while (ptr < b.mEnd && *ptr == mFind)
-					*ptr++ = mReplace;
+					*ptr++ = (uchar)mReplace;
 			}
 			else
 			{
-				char* ptr = b.mEnd - 1;
+				uchar* ptr = b.mStr + (b.mEnd - b.mStr) - 1;
 				while (ptr >= b.mStr && *ptr == mFind)
-					*ptr-- = mReplace;				
+					*ptr-- = (uchar)mReplace;
 			}
 		}
 
 		virtual void		Do(Utf32Buffer b)
 		{
-			if (mode == HEAD)
+			if (mMode == HEAD)
 			{
 				uchar32* ptr = b.mStr;
 				while (ptr < b.mEnd && *ptr == mFind)
@@ -120,7 +151,7 @@ namespace xcore
 			}
 			else
 			{
-				uchar32* ptr = b.mEnd - 1;
+				uchar32* ptr = b.mStr + (b.mEnd - b.mStr) - 1;
 				while (ptr >= b.mStr && *ptr == mFind)
 					*ptr-- = mReplace;				
 			}
@@ -138,8 +169,8 @@ namespace xcore
 
 		virtual void		Do(AsciiBuffer b)
 		{
-			char* head = b.mStr;
-			char * tail = b.mStr + (b.mEnd - b.mStr) - 1;
+			uchar* head = b.mStr;
+			uchar * tail = b.mStr + (b.mEnd - b.mStr) - 1;
 			while (head < tail)
 			{
 				char c = *head;
@@ -172,7 +203,7 @@ namespace xcore
 
 		virtual void		Do(AsciiConstBuffer b)
 		{
-			char const* src = b.mStr;
+			uchar const* src = b.mStr;
 			while (src < b.mEnd)
 			{
 				char c = *src++;
@@ -194,18 +225,90 @@ namespace xcore
 		CharWriter*			mWriter;
 	};
 
-	class CharWriter
+	class CharBufferContainsChar : public CharBufferIterator
 	{
 	public:
-		virtual u64			Count() const = 0;
-		virtual void		Reset() = 0;
+		inline				CharBufferContainsChar(uchar32 c) : mChar(c), mFound(false) { }
 
-		virtual bool		Write(uchar32 c) = 0;
-		virtual bool		Write(AsciiConstBuffer c) = 0;
-		virtual bool		Write(Utf32ConstBuffer c) = 0;
+		inline bool			Found() const { return mFound; }
 
-		virtual void		Iterate(CharBufferIterator* i) = 0;
-		virtual void		Modify(CharBufferModifier* m) = 0;
+		virtual void		Do(AsciiConstBuffer b)
+		{
+			uchar const* src = b.mStr;
+			while (src < b.mEnd)
+			{
+				uchar32 c = *src++;
+				if (c == mChar)
+				{
+					mFound = true;
+					break;
+				}
+			}
+		}
+
+		virtual void		Do(Utf32ConstBuffer b)
+		{
+			uchar32 const* src = b.mStr;
+			while (src < b.mEnd)
+			{
+				uchar32 c = *src++;
+				if (c == mChar)
+				{
+					mFound = true;
+					break;
+				}
+			}
+		}
+
+	private:
+		bool				mFound;
+		uchar32				mChar;
+	};
+
+	class CharBufferFindOneOf : public CharBufferIterator
+	{
+	public:
+		inline				CharBufferFindOneOf(CharReader* one_of) : mOneOf(one_of), mFound('\0') { }
+
+		inline uchar		Found() const { return (uchar)mFound; }
+
+		virtual void		Do(AsciiConstBuffer b)
+		{
+			mFound = '\0';
+			uchar const* src = b.mStr;
+			while (src < b.mEnd)
+			{
+				uchar32 c = *src++;
+				CharBufferContainsChar contains(c);
+				mOneOf->Iterate(&contains);
+				if (contains.Found())
+				{
+					mFound = c;
+					break;
+				}
+			}
+		}
+
+		virtual void		Do(Utf32ConstBuffer b)
+		{
+			mFound = '\0';
+			uchar32 const* src = b.mStr;
+			while (src < b.mEnd)
+			{
+				uchar32 c = *src++;
+				CharBufferContainsChar contains(c);
+				mOneOf->Iterate(&contains);
+				if (contains.Found())
+				{
+					mFound = c;
+					break;
+				}
+			}
+		}
+
+	private:
+		CharReader*			mOneOf;
+		uchar32				mFound;
 	};
 
 	class CharWriterCounter : public CharWriter
@@ -303,7 +406,7 @@ namespace xcore
 	private:
 		u64				mCount;
 		AsciiBuffer		mCache;
-		char*			mCursor;
+		uchar*			mCursor;
 	};
 
 	class CharWriterAsUtf32ToConsole : public CharWriter
@@ -365,7 +468,8 @@ namespace xcore
 	class CharWriterToAsciiBuffer : public CharWriter
 	{
 	public:
-		inline			CharWriterToAsciiBuffer(char* str, char* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { mEnd[0] = '\0'; }
+		inline			CharWriterToAsciiBuffer(uchar* str, uchar const* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
+		inline			CharWriterToAsciiBuffer(AsciiBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd), mCount(0) { }
 
 		virtual u64		Count() const	{ return mCount; }
 		virtual void	Reset() { mPtr = mStr; mCount = 0; }
@@ -375,7 +479,7 @@ namespace xcore
 			bool const ok = Write_Prologue(c);
 			if (ok)
 			{
-				*mPtr++ = c;
+				*mPtr++ = (uchar)c;
 				*mPtr = '\0';
 			}
 			return ok;
@@ -395,13 +499,13 @@ namespace xcore
 
 		virtual void	Iterate(CharBufferIterator* i)
 		{
-			AsciiConstBuffer buffer(mStr, mCursor);
+			AsciiConstBuffer buffer(mStr, mPtr);
 			i->Do(buffer);
 		}
 
 		virtual void	Modify(CharBufferModifier* m)
 		{
-			AsciiBuffer buffer(mStr, mCursor, mStrEnd);
+			AsciiBuffer buffer(mStr, mPtr, mEnd);
 			m->Do(buffer);
 		}
 
@@ -432,15 +536,16 @@ namespace xcore
 		}
 
 		u64				mCount;
-		char*			mStr;
-		char*			mPtr;
-		char*			mEnd;
+		uchar*			mStr;
+		uchar*			mPtr;
+		uchar const*	mEnd;
 	};
 
 	class CharWriterToUtf32Buffer : public CharWriter
 	{
 	public:
 		inline			CharWriterToUtf32Buffer(uchar32* str, uchar32* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
+		inline			CharWriterToUtf32Buffer(Utf32Buffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd), mCount(0) { }
 
 		virtual u64		Count() const	{ return mCount; }
 		virtual void	Reset() { mPtr = mStr; mCount = 0; }
@@ -482,7 +587,7 @@ namespace xcore
 		u64				mCount;
 		uchar32*		mStr;
 		uchar32*		mPtr;
-		uchar32*		mEnd;
+		uchar32 const *	mEnd;
 	};
 
 	template<int SIZE>
@@ -562,7 +667,7 @@ namespace xcore
 
 		virtual void	Iterate(CharBufferIterator* i)
 		{
-			mWriter->Iterate(i);
+			mWriter.Iterate(i);
 		}
 
 		virtual void	Modify(CharBufferModifier* m)
@@ -579,7 +684,8 @@ namespace xcore
 	class CharReaderFromAsciiBuffer : public CharReader
 	{
 	public:
-		inline			CharReaderFromAsciiBuffer(const char* str, const char* str_end) : mStr(str), mPtr(str), mEnd(str_end) { }
+		inline			CharReaderFromAsciiBuffer(const uchar* str, const uchar* str_end) : mStr(str), mPtr(str), mEnd(str_end) { }
+		inline			CharReaderFromAsciiBuffer(AsciiBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd) { }
 
 		virtual uchar32	Peek()
 		{
@@ -597,10 +703,27 @@ namespace xcore
 			return c;
 		}
 
+		virtual void	Skip()
+		{
+			if (mPtr < mEnd)
+				mPtr++;
+		}
+
+		virtual void	Reset()
+		{
+			mPtr = mStr;
+		}
+
+		virtual void	Iterate(CharBufferIterator* i)
+		{
+			AsciiConstBuffer buffer(mStr, mEnd);
+			i->Do(buffer);
+		}
+
 	private:
-		const char*		mStr;
-		const char*		mPtr;
-		const char*		mEnd;
+		const uchar*	mStr;
+		const uchar*	mPtr;
+		const uchar*	mEnd;
 	};
 
 
@@ -625,11 +748,199 @@ namespace xcore
 			return c;
 		}
 
+		virtual void	Skip()
+		{
+			if (mPtr < mEnd)
+				mPtr++;
+		}
+
+		virtual void	Reset()
+		{
+			mPtr = mStr;
+		}
+
+		virtual void	Iterate(CharBufferIterator* i)
+		{
+			Utf32ConstBuffer buffer(mStr, mEnd);
+			i->Do(buffer);
+		}
+
 	private:
 		const uchar32*		mStr;
 		const uchar32*		mPtr;
 		const uchar32*		mEnd;
 	};
+
+	static bool StrToBool(const uchar* str)
+	{
+		const uchar* end = ascii::len(str);
+		bool value;
+		ascii::parse(str, end, value);
+		return value;
+	}
+
+	static f32 StrToF32(const uchar* str)
+	{
+		const uchar* end = ascii::len(str);
+		f32 value;
+		ascii::parse(str, end, value);
+		return value;
+	}
+
+	static f64 StrToF64(const uchar* str)
+	{
+		const uchar* end = ascii::len(str);
+		f64 value;
+		ascii::parse(str, end, value);
+		return value;
+	}
+
+	static s32 StrToS32(const uchar* str)
+	{
+		const uchar* end = ascii::len(str);
+		s32 value;
+		ascii::parse(str, end, value);
+		return value;
+	}
+
+	static u32 StrToU32(const uchar* str)
+	{
+		const uchar* end = ascii::len(str);
+		s32 value;
+		ascii::parse(str, end, value);
+		return value;
+	}
+
+	static s64 StrToS64(const uchar* str, s32 base)
+	{
+		const uchar* end = ascii::len(str);
+		s64 value;
+		ascii::parse(str, end, value, base);
+		return value;
+	}
+
+	static u64 StrToU64(const uchar* str, s32 base)
+	{
+		const uchar* end = ascii::len(str);
+		s64 value;
+		ascii::parse(str, end, value, base);
+		return value;
+	}
+
+	static bool StrToBool(const uchar8* str)
+	{
+		const uchar8* end = utf8::len(str);
+		bool value;
+		utf8::parse(str, end, value);
+		return value;
+	}
+
+	static f32 StrToF32(const uchar8* str)
+	{
+		const uchar8* end = utf8::len(str);
+		f32 value;
+		utf8::parse(str, end, value);
+		return value;
+	}
+
+	static f64 StrToF64(const uchar8* str)
+	{
+		const uchar8* end = utf8::len(str);
+		f64 value;
+		utf8::parse(str, end, value);
+		return value;
+	}
+
+	static s32 StrToS32(const uchar8* str)
+	{
+		const uchar8* end = utf8::len(str);
+		s32 value;
+		utf8::parse(str, end, value);
+		return value;
+	}
+
+	static u32 StrToU32(const uchar8* str)
+	{
+		const uchar8* end = utf8::len(str);
+		s32 value;
+		utf8::parse(str, end, value);
+		return value;
+	}
+
+	static s64 StrToS64(const uchar8* str)
+	{
+		const uchar8* end = utf8::len(str);
+		s64 value;
+		utf8::parse(str, end, value);
+		return value;
+	}
+
+	static u64 StrToU64(const uchar8* str)
+	{
+		const uchar8* end = utf8::len(str);
+		s64 value;
+		utf8::parse(str, end, value);
+		return value;
+	}
+
+
+
+
+	static bool StrToBool(const uchar32* str)
+	{
+		const uchar32* end = utf32::len(str);
+		bool value;
+		utf32::parse(str, end, value);
+		return value;
+	}
+
+	static f32 StrToF32(const uchar32* str)
+	{
+		const uchar32* end = utf32::len(str);
+		f32 value;
+		utf32::parse(str, end, value);
+		return value;
+	}
+
+	static f64 StrToF64(const uchar32* str)
+	{
+		const uchar32* end = utf32::len(str);
+		f64 value;
+		utf32::parse(str, end, value);
+		return value;
+	}
+
+	static s32 StrToS32(const uchar32* str)
+	{
+		const uchar32* end = utf32::len(str);
+		s32 value;
+		utf32::parse(str, end, value);
+		return value;
+	}
+
+	static u32 StrToU32(const uchar32* str)
+	{
+		const uchar32* end = utf32::len(str);
+		u32 value;
+		utf32::parse(str, end, value);
+		return value;
+	}
+
+	static s64 StrToS64(const uchar32* str, s32 base)
+	{
+		const uchar32* end = utf32::len(str);
+		s64 value;
+		utf32::parse(str, end, value, base);
+		return value;
+	}
+
+	static u64 StrToU64(const uchar32* str, s32 base)
+	{
+		const uchar32* end = utf32::len(str);
+		s64 value;
+		utf32::parse(str, end, value, base);
+		return value;
+	}
 
 };
 /**

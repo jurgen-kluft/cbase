@@ -30,30 +30,78 @@ namespace xcore
 			return 0;
 		}
 
-		s32 write(const char* str, s32 len)
+		s32 write_uchar(const uchar* str, const uchar* str_end)
 		{
-			::OutputDebugStringA(str);
-			::fputs(str, stdout);
-			return len;
-		}
+			const s32 maxlen = 1020;
+			uchar16 str16[maxlen + 4];
+			uchar16* dst16 = (uchar16*)str16;
+			uchar16* end16 = dst16 + maxlen;
 
-		s32 write8(const ustr8* str, s32 len)
-		{
-			ustr16 str16[1024];
-			ustr16* dst16 = (ustr16*)str16;
-			ustr16* end16 = dst16 + sizeof(str16);
-			while (!UTF::iseos(str) && dst16 < end16) {
+			s32 l = 0;
+			const uchar* src = str;
+			while (!utf::is_eos(src) && src < (const uchar*)str_end && dst16 < end16)
+			{
 				uchar32 c;
-				UTF::read_utf8(str, c);
-				s32 l = UTF::utf32_to_utf16(c, dst16);
-				dst16 += l;
+				utf::read(src, c);
+				uchar16* next = utf::write(c, dst16);
+				dst16 = next;
+				l += 1;
 			}
 			str16[sizeof(str16) - 1] = 0;
 
 			::OutputDebugStringW((LPCWSTR)str16);
-			::fputws((const wchar_t*)str, stdout);
-			return len;
+			::fputws((const wchar_t*)str16, stdout);
+			return l;
 		}
+
+		s32 write_uchar8(const uchar8* str, const uchar8* str_end)
+		{
+			const s32 maxlen = 1020;
+			uchar16 str16[maxlen + 4];
+			uchar16* dst16 = (uchar16*)str16;
+			uchar16* end16 = dst16 + maxlen;
+
+			s32 l = 0;
+			const uchar8* src = (const uchar8*)str;
+			while (!utf::is_eos(src) && src < (const uchar8*)str_end && dst16 < end16)
+			{
+				uchar32 c;
+				utf::read(src, c);
+				uchar16* next = utf::write(c, dst16);
+				dst16 = next;
+				l += 1;
+			}
+			str16[sizeof(str16) - 1] = 0;
+
+			::OutputDebugStringW((LPCWSTR)str16);
+			::fputws((const wchar_t*)str16, stdout);
+			return l;
+		}
+
+		s32 write_uchar32(const uchar32* str, const uchar32* str_end)
+		{
+			const s32 maxlen = 1020;
+			uchar16 str16[maxlen +4];
+			uchar16* dst16 = (uchar16*)str16;
+			uchar16* end16 = dst16 + maxlen;
+
+			s32 l = 0;
+			const uchar32* src = (const uchar32*)str;
+			while (!utf::is_eos(src) && src < (const uchar32*)str_end && dst16 < end16)
+			{
+				uchar32 c;
+				utf::read(src, c);
+				uchar16* next = utf::write(c, dst16);
+				dst16 = next;
+				l += 1;
+			}
+			str16[sizeof(str16) - 1] = 0;
+
+			::OutputDebugStringW((LPCWSTR)str16);
+			::fputws((const wchar_t*)str16, stdout);
+			return l;
+		}
+
 	};
 
 };

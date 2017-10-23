@@ -293,11 +293,13 @@ namespace xcore
 			return NULL;
 		}
 
-		prune	replace(prune str_begin, prune str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end)
+		prune	replace(prune str_begin, pcrune str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end)
 		{
 			// The logic here is based on memory copy, we do not consider characters
-			s32 const selected_len = (xbyte*)str_end - (xbyte*)str_begin;
+			s32 const selected_len = (xbyte const*)str_end - (xbyte const*)str_begin;
 			s32 const replace_len = (xbyte const*)replace_end - (xbyte const*)replace_str;
+			
+			prune end = NULL;
 			if (selected_len < replace_len)
 			{
 				// Move, increasing
@@ -311,7 +313,7 @@ namespace xcore
 				while (dst > (xbyte*)str_end)
 					*dst-- = *src--;
 
-				str_end = (prune)((xbyte*)str_end + move_len);		// Update str_end
+				end = (prune)(str_begin + selected_len + move_len);		// Update str_end
 			}
 			else if (selected_len > replace_len)
 			{
@@ -322,17 +324,21 @@ namespace xcore
 				while (src < (xbyte const*)str_eos)
 					*dst++ = *src++;
 
-				str_end = (prune)((xbyte*)str_end - move_len);		// Update str_end
+				end = (prune)(str_begin + selected_len - move_len);		// Update str_end
+			}
+			else
+			{
+				end = (prune)(str_begin + selected_len);
 			}
 
 			// Replace
 			xbyte const* src = (xbyte const*)replace_str;
-			xbyte const* end = (xbyte const*)replace_str + replace_len;
+			xbyte const* src_end = (xbyte const*)replace_str + replace_len;
 			xbyte* dst = (xbyte*)str_begin;
-			while (src < end)
+			while (src < src_end)
 				*dst++ = *src++;
 
-			return str_end;
+			return end;
 		}
 
 		static s32	compare(pcrune lstr, pcrune lstr_end, pcrune rstr, pcrune rstr_end, ECmpMode mode)
@@ -408,6 +414,20 @@ namespace xcore
 			return s;
 		}
 
+		s32		parse(pcrune str, pcrune str_end, u32& value, s32 base)
+		{
+			rune format_str[] = { '%', 'd' };
+			switch (base)
+			{
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'd'; break;
+			case 8: format_str[1] = 'o'; break;
+			};
+			pcrune format_str_end = format_str + sizeof(format_str);
+			s32 s = sscanf(str, str_end, format_str, format_str_end, x_va_r(&value));
+			return s;
+		}
+
 		s32		parse(pcrune str, pcrune str_end, s64& value, s32 base)
 		{
 			rune format_str[] = { '%', 'd' };
@@ -416,6 +436,20 @@ namespace xcore
 				case 16: format_str[1] = 'x';
 				case 10: format_str[1] = 'd';
 				case 8: format_str[1] = 'o';
+			};
+			pcrune format_str_end = format_str + sizeof(format_str);
+			s32 s = sscanf(str, str_end, format_str, format_str_end, x_va_r(&value));
+			return s;
+		}
+
+		s32		parse(pcrune str, pcrune str_end, u64& value, s32 base)
+		{
+			rune format_str[] = { '%', 'd' };
+			switch (base)
+			{
+			case 16: format_str[1] = 'x';
+			case 10: format_str[1] = 'd';
+			case 8: format_str[1] = 'o';
 			};
 			pcrune format_str_end = format_str + sizeof(format_str);
 			s32 s = sscanf(str, str_end, format_str, format_str_end, x_va_r(&value));
@@ -542,7 +576,10 @@ namespace xcore
 			return (n == 17);
 		}
 
-		prune	to_string(s32 val, prune str, pcrune str_end, pcrune str_eos, s32 base)
+		//------------------------------------------------------------------------------
+		//------------------------------------------------------------------------------
+
+		prune	to_string(prune str, pcrune str_end, pcrune str_eos, s32 val, s32 base)
 		{
 			rune format_str[] = {'%', 'd'};
 			switch (base)
@@ -556,7 +593,7 @@ namespace xcore
 			return end;
 		}
 
-		prune	to_string(u32 val, prune str, pcrune str_end, pcrune str_eos, s32 base)
+		prune	to_string(prune str, pcrune str_end, pcrune str_eos, u32 val, s32 base)
 		{
 			rune format_str[] = {'%', 'u'};
 			switch (base)
@@ -570,7 +607,7 @@ namespace xcore
 			return end;
 		}
 
-		prune	to_string(s64 val, prune str, pcrune str_end, pcrune str_eos, s32 base)
+		prune	to_string(prune str, pcrune str_end, pcrune str_eos, s64 val, s32 base)
 		{
 			rune format_str[] = {'%', 'd'};
 			switch (base)
@@ -584,7 +621,7 @@ namespace xcore
 			return end;
 		}
 
-		prune	to_string(u64 val, prune str, pcrune str_end, pcrune str_eos, s32 base)
+		prune	to_string(prune str, pcrune str_end, pcrune str_eos, u64 val, s32 base)
 		{
 			rune format_str[] = {'%', 'u'};
 			switch (base)
@@ -598,7 +635,7 @@ namespace xcore
 			return end;
 		}
 
-		prune	to_string(f32 val, s32 numFractionalDigits, prune str, pcrune str_end, pcrune str_eos)
+		prune	to_string(prune str, pcrune str_end, pcrune str_eos, f32 val, s32 numFractionalDigits)
 		{
 			rune format_str[] = {'%', 'f'};
 			pcrune format_str_end = format_str + sizeof(format_str);
@@ -606,7 +643,7 @@ namespace xcore
 			return end;
 		}
 
-		prune	to_string(f64 val, s32 numFractionalDigits, prune str, pcrune str_end, pcrune str_eos)
+		prune	to_string(prune str, pcrune str_end, pcrune str_eos, f64 val, s32 numFractionalDigits)
 		{
 			rune format_str[] = {'%', 'f'};
 			pcrune format_str_end = format_str + sizeof(format_str);
@@ -614,6 +651,8 @@ namespace xcore
 			return end;
 		}
 
+		//------------------------------------------------------------------------------
+		//------------------------------------------------------------------------------
 
 		bool		is_upper(pcrune str, pcrune str_end)
 		{

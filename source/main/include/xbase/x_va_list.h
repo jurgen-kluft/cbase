@@ -118,7 +118,7 @@ namespace xcore
 								x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
 								x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
 								x_va(uchar32 inVar) : mType(TYPE_UCHAR)				{ *(uchar32*)mArg = (uchar32)inVar; }
-								x_va(const char* inVar) : mType(TYPE_PCTCHAR)		{ *(const char**)mArg = inVar; }
+								x_va(const uchar* inVar) : mType(TYPE_PCTCHAR)		{ *(const uchar**)mArg = inVar; }
 								x_va(const uchar8* inVar) : mType(TYPE_PCUCHAR8)	{ *(const uchar8**)mArg = inVar; }
 								x_va(const uchar32* inVar) : mType(TYPE_PCUCHAR32)	{ *(const uchar32**)mArg = inVar; }
 
@@ -142,7 +142,7 @@ namespace xcore
 		xbool					isUInt64() const									{ return xbool(mType == TYPE_UINT64); }
 		xbool					isF32() const										{ return xbool(mType == TYPE_FLOAT32); }
 		xbool					isF64() const										{ return xbool(mType == TYPE_FLOAT64); }
-		xbool					isUchar() const										{ return xbool(mType == TYPE_UCHAR); }
+		xbool					isUChar() const										{ return xbool(mType == TYPE_UCHAR); }
 		xbool					isPCTChar() const									{ return xbool(mType == TYPE_PCTCHAR); }
 		xbool					isPCUChar8() const									{ return xbool(mType == TYPE_PCUCHAR8 || mType == TYPE_PCTCHAR); }
 		xbool					isPCUChar32() const									{ return xbool(mType == TYPE_PCUCHAR32); }
@@ -158,9 +158,9 @@ namespace xcore
 		operator				u64() const											{ return convertToUInt64(); }
 		operator				f32() const											{ return convertToFloat(); }
 		operator				f64() const											{ return convertToDouble(); }
-		operator				uchar() const										{ return convertToUchar(); }
+		operator				uchar32() const										{ return convertToUChar(); }
 		operator				bool() const										{ return convertToBool(); }
-		operator				const char*() const									{ return convertToCharPointer(); }
+		operator				const uchar*() const								{ return convertToUCharPointer(); }
 		operator				const uchar8*() const								{ return convertToUChar8Pointer(); }
 		operator				const uchar32*() const								{ return convertToUChar32Pointer(); }
 
@@ -178,8 +178,8 @@ namespace xcore
 		f32						convertToFloat() const;
 		f64						convertToDouble() const;
 		bool					convertToBool() const;
-		uchar					convertToUchar() const;
-		const char*				convertToCharPointer() const;
+		uchar32					convertToUChar() const;
+		const uchar*			convertToUCharPointer() const;
 		const uchar8*			convertToUChar8Pointer() const;
 		const uchar32*			convertToUChar32Pointer() const;
 
@@ -322,7 +322,7 @@ namespace xcore
 								x_va_r(bool* inRef) : mType(TYPE_BOOL), mVar(0)					{ mRef = (void*)inRef; }
 								x_va_r(f32* inRef) : mType(TYPE_FLOAT32), mVar(0)				{ mRef = (void*)inRef; }
 								x_va_r(f64* inRef) : mType(TYPE_FLOAT64), mVar(0)				{ mRef = (void*)inRef; }
-								x_va_r(char* inRef, u16 max_len) : mType(TYPE_PTCHAR), mVar(max_len)	{ mRef = (void*)inRef; }
+								x_va_r(uchar* inRef, u16 max_len) : mType(TYPE_PTCHAR), mVar(max_len)	{ mRef = (void*)inRef; }
 								x_va_r(uchar8* inRef, u16 max_len) : mType(TYPE_PUCHAR8), mVar(max_len)		{ mRef = (void*)inRef; }
 								x_va_r(uchar32* inRef, u16 max_len) : mType(TYPE_PUCHAR32), mVar(max_len)	{ mRef = (void*)inRef; }
 
@@ -338,7 +338,7 @@ namespace xcore
 		x_va_r&					operator=(f64 rhs);
 		x_va_r&					operator=(uchar32 rhs);
 		x_va_r&					operator=(bool rhs);
-		x_va_r&					operator=(const char* rhs);
+		x_va_r&					operator=(const uchar* rhs);
 		x_va_r&					operator=(const uchar8* rhs);
 		x_va_r&					operator=(const uchar32* rhs);
 

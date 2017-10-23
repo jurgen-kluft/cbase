@@ -29,7 +29,7 @@ namespace xcore
  */
 namespace xcore
 {
-	#define XCONSOLE_LOCAL_STR_BUF(local_var_name, size)	char	local_var_name##Buffer[size]
+	#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type local_var_name##Buffer[size]; type* local_var_name = &local_var_name##Buffer[0];
 
 	xconsole_node::xconsole_node()
 		: mNext(NULL)
@@ -118,12 +118,12 @@ namespace xcore
 
 		virtual s32 			write(u32 _value);
 		virtual s32 			write(u64 _value);
-		virtual s32 			write(char _value);
+		virtual s32 			write(uchar32 _value);
 		virtual s32 			write(const char* str);
-		virtual s32 			write(s32 index, s32 count, const char* str);
+		virtual s32 			write(const char* str, const char* str_end);
 		virtual s32 			write(const char* formatString, const x_va_list& args);
 		virtual s32 			write(const uchar32* str);
-		virtual s32 			write(s32 index, s32 count, const uchar32* str);
+		virtual s32 			write(const uchar32* str, const uchar32* str_end);
 		virtual s32 			write(const uchar32* formatString, const x_va_list& args);
 
 		virtual s32 			writeLine();
@@ -177,7 +177,7 @@ namespace xcore
 		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(char _value)
+	s32 				xconsole_null_imp::write(uchar32 _value)
 	{
 		return 0;
 	}
@@ -187,7 +187,7 @@ namespace xcore
 		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(s32 index, s32 count, const char* str)
+	s32 				xconsole_null_imp::write(const char* str, const char* str_end)
 	{
 		return 0;
 	}
@@ -202,7 +202,7 @@ namespace xcore
 		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(s32 index, s32 count, const uchar32* str)
+	s32 				xconsole_null_imp::write(const uchar32* str, const uchar32* str_end)
 	{
 		return 0;
 	}
@@ -223,14 +223,16 @@ namespace xcore
 	class xconsole_default_imp : public xconsole_imp
 	{
 		xconsole::ConsoleOutDelegate mOut;
-		xconsole::ConsoleOut32Delegate mOut8;
+		xconsole::ConsoleOut8Delegate mOut8;
+		xconsole::ConsoleOut32Delegate mOut32;
 		xconsole::ConsoleColorDelegate mColor;
 
 	public:
 								xconsole_default_imp()
 								{
-									mOut = xconsole_out::write;
-									mOut8 = xconsole_out::write8;
+									mOut = xconsole_out::write_uchar;
+									mOut8 = xconsole_out::write_uchar8;
+									mOut32 = xconsole_out::write_uchar32;
 									mColor = xconsole_out::color;
 								}
 
@@ -249,14 +251,14 @@ namespace xcore
 
 		virtual s32 			write(u32 _value);
 		virtual s32 			write(u64 _value);
-		virtual s32 			write(char _value);
+		virtual s32 			write(uchar32 _value);
 
 		virtual s32 			write(const char* str);
-		virtual s32 			write(s32 index, s32 count, const char* str);
+		virtual s32 			write(const char* str, const char* str_end);
 		virtual s32 			write(const char* formatString, const x_va_list& args);
 
 		virtual s32 			write(const uchar32* str);
-		virtual s32 			write(s32 index, s32 count, const uchar32* str);
+		virtual s32 			write(const uchar32* str, const uchar32* str_end);
 		virtual s32 			write(const uchar32* formatString, const x_va_list& args);
 
 		virtual s32 			writeLine();
@@ -282,91 +284,87 @@ namespace xcore
 
 	s32 				xconsole_default_imp::write(f64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(tmp, 256);
-		F64ToStr(_value, 2, tmpBuffer, sizeof(tmpBuffer));
+		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 256);
+		ascii::to_string(tmp, tmp + sizeof(tmpBuffer), tmp + sizeof(tmpBuffer), _value, 2);
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(s32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(tmp, 64);
-		S32ToStr(_value, tmpBuffer, sizeof(tmpBuffer), 10);
+		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 64);
+		ascii::to_string(tmp, tmp + sizeof(tmpBuffer), tmp + sizeof(tmpBuffer), _value, 2);
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(s64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(tmp, 64);
-		S64ToStr(_value, tmpBuffer, sizeof(tmpBuffer), 10);
+		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 64);
+		ascii::to_string(tmp, tmp + sizeof(tmpBuffer), tmp + sizeof(tmpBuffer), _value, 2);
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(f32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(tmp, 256);
-		F32ToStr(_value, 2, tmpBuffer, sizeof(tmpBuffer));
+		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 256);
+		ascii::to_string(tmp, tmp + sizeof(tmpBuffer), tmp + sizeof(tmpBuffer), _value, 2);
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(u32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(tmp, 256);
-		U32ToStr(_value, tmpBuffer, sizeof(tmpBuffer), 10);
+		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 256);
+		ascii::to_string(tmp, tmp + sizeof(tmpBuffer), tmp + sizeof(tmpBuffer), _value, 2);
 		return write(tmpBuffer);
 	}
 
 	s32 				xconsole_default_imp::write(u64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(tmp, 256);
-		U64ToStr(_value, tmpBuffer, sizeof(tmpBuffer), 10);
+		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 256);
+		ascii::to_string(tmp, tmp + sizeof(tmpBuffer), tmp + sizeof(tmpBuffer), _value, 2);
 		return write(tmpBuffer);
 	}
 	
-	s32 				xconsole_default_imp::write(char _value)
+	s32 				xconsole_default_imp::write(uchar32 _value)
 	{
-		char s[3];
+		uchar32 s[3];
 		s[0] = _value;
 		s[1] = '\0';
 		s[2] = '\0';
-		return mOut(s, 1);
+		return mOut32(s, &s[1]);
 	}
 
 	s32 				xconsole_default_imp::write(const char* str)
 	{
-		return mOut(str, StrLen(str));
+		return mOut((const uchar*)str, ascii::len((const uchar*)str));
 	}
 
-	s32 				xconsole_default_imp::write(s32 index, s32 count, const char* str)
+	s32 				xconsole_default_imp::write(const char* str, const char* str_end)
 	{
-		ASSERT(index>=0 && index<StrLen(str));
-		ASSERT((index+count)<StrLen(str));
-		return mOut(str + index, count);
+		return mOut((const uchar*)str, (const uchar*)str_end);
 	}
 
 	s32 				xconsole_default_imp::write(const char* formatString, const x_va_list& args)
 	{
-		XCONSOLE_LOCAL_STR_BUF(str, 512);
-		u32 len = VSPrintf(strBuffer, 512, formatString, args);
-		return mOut(strBuffer, len);
+		XCONSOLE_LOCAL_STR_BUF(uchar, str, 512 + 1);
+		s32 len = ascii::vsprintf(strBuffer, strBuffer + 512, (const uchar*)formatString, ascii::len((const uchar*)formatString), args);
+		return mOut(str, str + len);
 	}
 
 	s32 				xconsole_default_imp::write(const uchar32* str)
 	{
-		return mOut8(str, UTF::len(str));
+		return mOut32(str, utf32::len(str));
 	}
 
-	s32 				xconsole_default_imp::write(s32 index, s32 count, const uchar32* str)
+	s32 				xconsole_default_imp::write(const uchar32* str, const uchar32* str_end)
 	{
-		ASSERT(index>=0 && index<UTF::len(str));
-		ASSERT((index+count)<UTF::len(str));
-		return mOut8(str + index, count);
+		return mOut32(str, str_end);
 	}
 
 	s32 				xconsole_default_imp::write(const uchar32* formatString, const x_va_list& args)
 	{
-		XCONSOLE_LOCAL_STR_BUF(str, 2*512);
-		u32 len = VSPrintf(strBuffer, 1024, (const char*)formatString, args);
-		return mOut8((uchar32*)strBuffer, len);
+		XCONSOLE_LOCAL_STR_BUF(uchar32, str, 1024 + 1);
+		s32 len = utf32::vsprintf(strBuffer, strBuffer + 1024, (const uchar32*)formatString, utf32::len(formatString), args);
+		return mOut32(str, str + len);
 	}
 
 
@@ -466,7 +464,7 @@ namespace xcore
 	}
 
 
-	s32 				xconsole::write(char _value)
+	s32 				xconsole::write(uchar32 _value)
 	{
 		s32 r = 0;
 		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
@@ -482,11 +480,11 @@ namespace xcore
 		return r;
 	}
 
-	s32 				xconsole::write(s32 index, s32 count, const char* str)
+	s32 				xconsole::write(const char* str, const char* str_end)
 	{
 		s32 r = 0;
 		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(index, count, str);
+			r = i.imp()->write(str, str_end);
 		return r;
 	}
 
@@ -516,11 +514,11 @@ namespace xcore
 		return r;
 	}
 
-	s32 				xconsole::write(s32 index, s32 count, const uchar32* str)
+	s32 				xconsole::write(const uchar32* str, const uchar32* str_end)
 	{
 		s32 r = 0;
 		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(index, count, str);
+			r = i.imp()->write(str, str_end);
 		return r;
 	}
 
