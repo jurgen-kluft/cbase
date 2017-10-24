@@ -1,4 +1,13 @@
+#ifndef __XBASE_STRING_UTILS_H__
+#define __XBASE_STRING_UTILS_H__
 #include "xbase/x_target.h"
+#ifdef USE_PRAGMA_ONCE
+#pragma once
+#endif
+
+//==============================================================================
+// INCLUDES
+//==============================================================================
 #include "xbase/x_debug.h"
 #include "xbase/x_double.h"
 #include "xbase/x_string_ascii.h"
@@ -382,6 +391,7 @@ namespace xcore
 			Flush();
 			CharBufferToCharWriter writer(this);
 			writer.Do(b);
+			return true;
 		}
 
 		virtual bool	Write(Utf32ConstBuffer b)
@@ -389,6 +399,7 @@ namespace xcore
 			Flush();
 			CharBufferToCharWriter writer(this);
 			writer.Do(b);
+			return true;
 		}
 
 		virtual void	Iterate(CharBufferIterator* i)
@@ -438,6 +449,7 @@ namespace xcore
 			Flush();
 			CharBufferToCharWriter writer(this);
 			writer.Do(b);
+			return true;
 		}
 
 		virtual bool	Write(Utf32ConstBuffer b)
@@ -445,6 +457,7 @@ namespace xcore
 			Flush();
 			CharBufferToCharWriter writer(this);
 			writer.Do(b);
+			return true;
 		}
 
 		virtual void	Iterate(CharBufferIterator* i)
@@ -487,14 +500,20 @@ namespace xcore
 
 		virtual bool	Write(AsciiConstBuffer b)
 		{
+			if (mPtr >= mEnd)
+				return false;
 			CharBufferToCharWriter writer(this);
 			writer.Do(b);
+			return true;
 		}
 
 		virtual bool	Write(Utf32ConstBuffer b)
 		{
+			if (mPtr >= mEnd)
+				return false;
 			CharBufferToCharWriter writer(this);
 			writer.Do(b);
+			return true;
 		}
 
 		virtual void	Iterate(CharBufferIterator* i)
@@ -561,14 +580,20 @@ namespace xcore
 
 		virtual bool	Write(AsciiConstBuffer b)
 		{
+			if (mPtr >= mEnd)
+				return false;
 			CharBufferToCharWriter writer(this);
 			writer.Do(b);
+			return true;
 		}
 
 		virtual bool	Write(Utf32ConstBuffer b)
 		{
+			if (mPtr >= mEnd)
+				return false;
 			CharBufferToCharWriter writer(this);
 			writer.Do(b);
+			return true;
 		}
 
 		virtual void	Iterate(CharBufferIterator* i)
@@ -609,22 +634,17 @@ namespace xcore
 
 		virtual bool	Write(AsciiConstBuffer b)
 		{
-			mWriter.Write(b);
+			return mWriter.Write(b);
 		}
 
 		virtual bool	Write(Utf32ConstBuffer b)
 		{
-			mWriter.Write(b);
-		}
-
-		virtual void	CopyTo(CharWriter* dst) const
-		{
-			mWriter.CopyTo(dst);
+			return mWriter.Write(b);
 		}
 
 		virtual void	Iterate(CharBufferIterator* i)
 		{
-			mWriter->Iterate(i);
+			mWriter.Iterate(i);
 		}
 
 		virtual void	Modify(CharBufferModifier* m)
@@ -657,12 +677,12 @@ namespace xcore
 
 		virtual bool	Write(AsciiConstBuffer b)
 		{
-			mWriter.Write(b);
+			return mWriter.Write(b);
 		}
 
 		virtual bool	Write(Utf32ConstBuffer b)
 		{
-			mWriter.Write(b);
+			return mWriter.Write(b);
 		}
 
 		virtual void	Iterate(CharBufferIterator* i)
@@ -771,7 +791,11 @@ namespace xcore
 		const uchar32*		mEnd;
 	};
 
-	static bool StrToBool(const uchar* str)
+
+	// ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
+
+	inline bool StrToBool(const uchar* str)
 	{
 		const uchar* end = ascii::len(str);
 		bool value;
@@ -779,7 +803,7 @@ namespace xcore
 		return value;
 	}
 
-	static f32 StrToF32(const uchar* str)
+	inline f32 StrToF32(const uchar* str)
 	{
 		const uchar* end = ascii::len(str);
 		f32 value;
@@ -787,7 +811,7 @@ namespace xcore
 		return value;
 	}
 
-	static f64 StrToF64(const uchar* str)
+	inline f64 StrToF64(const uchar* str)
 	{
 		const uchar* end = ascii::len(str);
 		f64 value;
@@ -795,7 +819,7 @@ namespace xcore
 		return value;
 	}
 
-	static s32 StrToS32(const uchar* str)
+	inline s32 StrToS32(const uchar* str)
 	{
 		const uchar* end = ascii::len(str);
 		s32 value;
@@ -803,7 +827,7 @@ namespace xcore
 		return value;
 	}
 
-	static u32 StrToU32(const uchar* str)
+	inline u32 StrToU32(const uchar* str)
 	{
 		const uchar* end = ascii::len(str);
 		s32 value;
@@ -811,7 +835,7 @@ namespace xcore
 		return value;
 	}
 
-	static s64 StrToS64(const uchar* str, s32 base)
+	inline s64 StrToS64(const uchar* str, s32 base)
 	{
 		const uchar* end = ascii::len(str);
 		s64 value;
@@ -819,7 +843,7 @@ namespace xcore
 		return value;
 	}
 
-	static u64 StrToU64(const uchar* str, s32 base)
+	inline u64 StrToU64(const uchar* str, s32 base)
 	{
 		const uchar* end = ascii::len(str);
 		s64 value;
@@ -827,7 +851,10 @@ namespace xcore
 		return value;
 	}
 
-	static bool StrToBool(const uchar8* str)
+	// ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
+
+	inline bool StrToBool(const uchar8* str)
 	{
 		const uchar8* end = utf8::len(str);
 		bool value;
@@ -835,7 +862,7 @@ namespace xcore
 		return value;
 	}
 
-	static f32 StrToF32(const uchar8* str)
+	inline f32 StrToF32(const uchar8* str)
 	{
 		const uchar8* end = utf8::len(str);
 		f32 value;
@@ -843,7 +870,7 @@ namespace xcore
 		return value;
 	}
 
-	static f64 StrToF64(const uchar8* str)
+	inline f64 StrToF64(const uchar8* str)
 	{
 		const uchar8* end = utf8::len(str);
 		f64 value;
@@ -851,7 +878,7 @@ namespace xcore
 		return value;
 	}
 
-	static s32 StrToS32(const uchar8* str)
+	inline s32 StrToS32(const uchar8* str)
 	{
 		const uchar8* end = utf8::len(str);
 		s32 value;
@@ -859,7 +886,7 @@ namespace xcore
 		return value;
 	}
 
-	static u32 StrToU32(const uchar8* str)
+	inline u32 StrToU32(const uchar8* str)
 	{
 		const uchar8* end = utf8::len(str);
 		s32 value;
@@ -867,26 +894,28 @@ namespace xcore
 		return value;
 	}
 
-	static s64 StrToS64(const uchar8* str)
+	inline s64 StrToS64(const uchar8* str, s32 base)
 	{
 		const uchar8* end = utf8::len(str);
 		s64 value;
-		utf8::parse(str, end, value);
+		utf8::parse(str, end, value, base);
 		return value;
 	}
 
-	static u64 StrToU64(const uchar8* str)
+	inline u64 StrToU64(const uchar8* str, s32 base)
 	{
 		const uchar8* end = utf8::len(str);
 		s64 value;
-		utf8::parse(str, end, value);
+		utf8::parse(str, end, value, base);
 		return value;
 	}
 
 
+	// ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 
 
-	static bool StrToBool(const uchar32* str)
+	inline bool StrToBool(const uchar32* str)
 	{
 		const uchar32* end = utf32::len(str);
 		bool value;
@@ -894,7 +923,7 @@ namespace xcore
 		return value;
 	}
 
-	static f32 StrToF32(const uchar32* str)
+	inline f32 StrToF32(const uchar32* str)
 	{
 		const uchar32* end = utf32::len(str);
 		f32 value;
@@ -902,7 +931,7 @@ namespace xcore
 		return value;
 	}
 
-	static f64 StrToF64(const uchar32* str)
+	inline f64 StrToF64(const uchar32* str)
 	{
 		const uchar32* end = utf32::len(str);
 		f64 value;
@@ -910,7 +939,7 @@ namespace xcore
 		return value;
 	}
 
-	static s32 StrToS32(const uchar32* str)
+	inline s32 StrToS32(const uchar32* str)
 	{
 		const uchar32* end = utf32::len(str);
 		s32 value;
@@ -918,7 +947,7 @@ namespace xcore
 		return value;
 	}
 
-	static u32 StrToU32(const uchar32* str)
+	inline u32 StrToU32(const uchar32* str)
 	{
 		const uchar32* end = utf32::len(str);
 		u32 value;
@@ -926,7 +955,7 @@ namespace xcore
 		return value;
 	}
 
-	static s64 StrToS64(const uchar32* str, s32 base)
+	inline s64 StrToS64(const uchar32* str, s32 base)
 	{
 		const uchar32* end = utf32::len(str);
 		s64 value;
@@ -934,7 +963,7 @@ namespace xcore
 		return value;
 	}
 
-	static u64 StrToU64(const uchar32* str, s32 base)
+	inline u64 StrToU64(const uchar32* str, s32 base)
 	{
 		const uchar32* end = utf32::len(str);
 		s64 value;
@@ -946,3 +975,5 @@ namespace xcore
 /**
  *  END xCore namespace
  */
+
+#endif	

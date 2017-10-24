@@ -296,8 +296,8 @@ namespace xcore
 		prune	replace(prune str_begin, pcrune str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end)
 		{
 			// The logic here is based on memory copy, we do not consider characters
-			s32 const selected_len = (xbyte const*)str_end - (xbyte const*)str_begin;
-			s32 const replace_len = (xbyte const*)replace_end - (xbyte const*)replace_str;
+			s32 const selected_len = (s32)((xbyte const*)str_end - (xbyte const*)str_begin);
+			s32 const replace_len = (s32)((xbyte const*)replace_end - (xbyte const*)replace_str);
 			
 			prune end = NULL;
 			if (selected_len < replace_len)
@@ -305,7 +305,7 @@ namespace xcore
 				// Move, increasing
 				s32 move_len = replace_len - selected_len;
 				if (move_len > ((xbyte const*)str_eos - (xbyte*)str_end))
-					move_len = ((xbyte const*)str_eos - (xbyte*)str_end);
+					move_len = (s32)(((xbyte const*)str_eos - (xbyte*)str_end));
 
 				// No matter what, push out anything at the end!
 				xbyte * dst = (xbyte*)((xbyte*)str_end + ((xbyte const*)str_eos - (xbyte*)str_end) - 1);
@@ -521,7 +521,7 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		bool is_float(pcrune str, pcrune str_end)
 		{
-			static pcrune sFloatStr = "Ee.#QNABIF";
+			static pcrune sFloatStr = (pcrune)"Ee.#QNABIF";
 
 			// Does it have any other of the strange characters?
 			pcrune src = str;
@@ -589,8 +589,8 @@ namespace xcore
 				case 8: format_str[1] = 'o'; break;
 			};
 			pcrune format_str_end = format_str + sizeof(format_str);
-			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return end;
+			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return str + len;
 		}
 
 		prune	to_string(prune str, pcrune str_end, pcrune str_eos, u32 val, s32 base)
@@ -603,8 +603,8 @@ namespace xcore
 				case 8: format_str[1] = 'o'; break;
 			};
 			pcrune format_str_end = format_str + sizeof(format_str);
-			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return end;
+			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return str + len;
 		}
 
 		prune	to_string(prune str, pcrune str_end, pcrune str_eos, s64 val, s32 base)
@@ -617,8 +617,8 @@ namespace xcore
 				case 8: format_str[1] = 'o'; break;
 			};
 			pcrune format_str_end = format_str + sizeof(format_str);
-			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return end;
+			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return str + len;
 		}
 
 		prune	to_string(prune str, pcrune str_end, pcrune str_eos, u64 val, s32 base)
@@ -631,24 +631,24 @@ namespace xcore
 				case 8: format_str[1] = 'o'; break;
 			};
 			pcrune format_str_end = format_str + sizeof(format_str);
-			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return end;
+			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return str + len;
 		}
 
 		prune	to_string(prune str, pcrune str_end, pcrune str_eos, f32 val, s32 numFractionalDigits)
 		{
 			rune format_str[] = {'%', 'f'};
 			pcrune format_str_end = format_str + sizeof(format_str);
-			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return end;
+			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return str + len;
 		}
 
 		prune	to_string(prune str, pcrune str_end, pcrune str_eos, f64 val, s32 numFractionalDigits)
 		{
 			rune format_str[] = {'%', 'f'};
 			pcrune format_str_end = format_str + sizeof(format_str);
-			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return end;
+			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return str + len;
 		}
 
 		//------------------------------------------------------------------------------
@@ -801,7 +801,7 @@ namespace xcore
 			if (str == NULL || str_end <= str)
 				return false;
 			// ASCII only
-			rune c = peek_char(str_end - 1);
+			uchar32 c = peek_char(str_end - 1);
 			return end_char == c;
 		}
 
@@ -813,8 +813,8 @@ namespace xcore
 			while (true)
 			{
 				s32 l1, l2;
-				rune c1 = peek_char(srcptr, &l1);
-				rune c2 = peek_char(endptr, &l2);
+				uchar32 c1 = peek_char(srcptr, &l1);
+				uchar32 c2 = peek_char(endptr, &l2);
 				if (c1 != c2)
 					return false;
 				if (srcptr == srcstr)
@@ -884,48 +884,6 @@ namespace xcore
 		*     SetAssertHandler
 		*------------------------------------------------------------------------------
 		*/
-
-
-		bool		is_upper(pcrune str, pcrune str_end)
-		{
-			bool is_upper = true;
-			while (str < str_end)
-			{
-				uchar32 c = read_char(str);
-				is_upper = is_upper && !is_lower(c);
-			}
-			return is_upper;
-		}
-
-		bool		is_lower(pcrune str, pcrune str_end)
-		{
-			bool is_lower = true;
-			while (str < str_end)
-			{
-				uchar32 c = read_char(str);
-				is_lower = is_lower && !is_upper(c);
-			}
-			return is_lower;
-		}
-
-		bool		is_capitalized(pcrune str, pcrune str_end)
-		{
-			if (str < str_end)
-			{
-				uchar32 c = read_char(str);
-				if (is_upper(c))
-				{
-					c = read_char(str);
-					return is_lower(c);
-				}
-			}
-			return false;
-		}
-
-		bool		is_delimited(pcrune str, pcrune str_end, uchar32 left, uchar32 right)
-		{
-			return starts_with(str, str_end, left) && ends_with(str, str_end, right);
-		}
 		
 	};	///< END ascii namespace
 };	///< END xcore namespace

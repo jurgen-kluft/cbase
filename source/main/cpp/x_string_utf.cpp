@@ -71,6 +71,12 @@ namespace xcore
 			return dst;
 		}
 
+		uchar32* write(uchar32 rune, uchar32* dest)
+		{
+			*dest = rune;
+			return dest + 1;
+		}
+
 		uchar const*	read(uchar const* str, uchar32& out_c)
 		{
 			if (is_eos(str))
@@ -85,7 +91,7 @@ namespace xcore
 
 		uchar8 const*	read(uchar8 const* str, uchar32& out_c)
 		{
-			uchar8 c = str->c;
+			uchar8 c = *str;
 			s32 l = 0;
 			if ((c & 0x80) == 0x00) { l = 1; }
 			else if ((c & 0xe0) == 0xc0) { l = 2; }
@@ -94,14 +100,14 @@ namespace xcore
 
 			out_c = 0;
 			for (s32 i = 0; i<l; i++) {
-				c = str[i].c;
+				c = str[i];
 				out_c = out_c << 8;
 				out_c = out_c | c;
 			}
-			return l;
+			return str + l;
 		}
 
-		ustr16 const*	read(ustr16 const* str, uchar32& out_c)
+		uchar16 const*	read(uchar16 const* str, uchar32& out_c)
 		{
 			if (is_eos(str))
 			{
@@ -120,7 +126,13 @@ namespace xcore
 				out_c = out_c << 16;
 				out_c = out_c | c;
 			}
-			return l;
+			return str + l;
+		}
+
+		uchar32 const *	read(uchar32 const * str, uchar32& out_c)
+		{
+			out_c = *str;
+			return str + 1;
 		}
 
 		bool		is_eos(uchar const* str)

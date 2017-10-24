@@ -40,7 +40,9 @@ namespace xcore
 	void xguid::toString( char* str, s32 str_max_len ) const
 	{ 
 		// high, word2, word1, low
-		SPrintf(str, str_max_len, "%08X:%08X:%08X:%08X", x_va(mGuid[0]), x_va(mGuid[1]), x_va(mGuid[2]), x_va(mGuid[3]) ); 
+		const uchar* fmt = (const uchar*)"%08X:%08X:%08X:%08X";
+		const uchar* fmt_end = fmt + 19;
+		ascii::sprintf((uchar*)str, (uchar const*)str + str_max_len, fmt, fmt_end, x_va(mGuid[0]), x_va(mGuid[1]), x_va(mGuid[2]), x_va(mGuid[3]) );
 	}
 
 

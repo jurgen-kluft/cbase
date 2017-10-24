@@ -5,7 +5,7 @@
 #ifndef SPU
 
 // Shared code
-#include "x_string_utils.cpp"
+#include "xbase/private/x_string_utils.h"
 
 /**
  * xCore namespace
@@ -27,6 +27,7 @@ namespace xcore
 			reader->Skip();
 			c = reader->Peek();
 		}
+		return false;
 	}
 
 	/**
@@ -188,7 +189,7 @@ namespace xcore
 		// Adjust sign 
 		result *= sign;
 		// Detect exponent 
-		u16 power = 0;
+		u32 power = 0;
 
 		uchar32 c = reader->Peek();
 		if (c == 'e' || c == 'E')
@@ -211,7 +212,7 @@ namespace xcore
 
 			while (c <= '9' && c >= '0')
 			{
-				u16 v = c - '0';
+				u32 v = c - '0';
 				power *= 10;
 				power += v;
 				reader->Read();
@@ -220,10 +221,10 @@ namespace xcore
 
 		// Adjust result on exponent sign 
 		if (sign > 0)
-			for (s32 i = 0; i < power; i++)
+			for (u32 i = 0; i < power; i++)
 				result *= 10.0;
 		else
-			for (s32 i = 0; i < power; i++)
+			for (u32 i = 0; i < power; i++)
 				result /= 10.0;
 
 		return(result);
@@ -368,9 +369,9 @@ namespace xcore
 					break;
 				case 'c':
 				{
-					char    c = reader->Read();
+					uchar32 c = reader->Read();
 					x_va_r  r = vr_args[i++];
-					r = (u8)c;
+					r = c;
 					scanned++;
 					parsing = 0;
 				} break;
@@ -501,7 +502,7 @@ namespace xcore
 							uchar str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
-								str[j] = reader->Read();
+								str[j] = (uchar)reader->Read();
 							n2 = StrToU64((const uchar*)str, 16);
 						}
 						else if (w == 4)
@@ -510,7 +511,7 @@ namespace xcore
 							uchar str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
-								str[j] = reader->Read();
+								str[j] = (uchar)reader->Read();
 							n2 = StrToU64((const uchar*)str, 16);
 						}
 						else if (w == 8)
@@ -519,7 +520,7 @@ namespace xcore
 							uchar str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
-								str[j] = reader->Read();
+								str[j] = (uchar)reader->Read();
 							n2 = StrToU64(str, 16);
 						}
 						else // if (w == 16)
@@ -528,7 +529,7 @@ namespace xcore
 							uchar str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
-								str[j] = reader->Read();
+								str[j] = (uchar)reader->Read();
 							n2 = StrToU64(str, 16);
 						}
 					}
@@ -597,7 +598,7 @@ namespace xcore
 
 	namespace ascii
 	{
-		s32 sscanf(const char *str, const char *str_end, const char *fmt, const char *fmt_end, X_VA_R_ARGS_16)
+		s32 sscanf(pcrune str, pcrune str_end, pcrune fmt, pcrune fmt_end, X_VA_R_ARGS_16)
 		{
 			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 			CharReaderFromAsciiBuffer buf_reader((const uchar*)str, (const uchar*)str_end);
@@ -605,7 +606,7 @@ namespace xcore
 			return VSScanf(&buf_reader, &fmt_reader, vr_args);
 		}
 
-		s32 sscanf(const char *str, const char *str_end, const char *fmt, const char *fmt_end, const x_va_r_list& vr_args)
+		s32 vsscanf(pcrune str, pcrune str_end, pcrune fmt, pcrune fmt_end, const x_va_r_list& vr_args)
 		{
 			CharReaderFromAsciiBuffer buf_reader((const uchar*)str, (const uchar*)str_end);
 			CharReaderFromAsciiBuffer fmt_reader((const uchar*)fmt, (const uchar*)fmt_end);
@@ -623,7 +624,7 @@ namespace xcore
 			return VSScanf(&buf_reader, &fmt_reader, vr_args);
 		}
 
-		s32 sscanf(const uchar32 *str, const uchar32 *str_end, const uchar32 *fmt, const uchar32 *fmt_end, const x_va_r_list& vr_args)
+		s32 vsscanf(const uchar32 *str, const uchar32 *str_end, const uchar32 *fmt, const uchar32 *fmt_end, const x_va_r_list& vr_args)
 		{
 			CharReaderFromUtf32Buffer buf_reader((const uchar32*)str, (const uchar32*)str_end);
 			CharReaderFromUtf32Buffer fmt_reader((const uchar32*)fmt, (const uchar32*)fmt_end);

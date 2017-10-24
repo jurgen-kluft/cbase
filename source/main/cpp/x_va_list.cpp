@@ -12,7 +12,7 @@
 /**
 * string utilities
 */
-#include "x_string_utils.cpp"
+#include "xbase/private/x_string_utils.h"
 
 /**
  * xCore namespace
@@ -108,9 +108,9 @@ namespace xcore
 			case TYPE_INT64:	{ i = (u64)(*(u64*)mArg);  } break;
 			case TYPE_FLOAT32:	{ i = (u64)(*(f32*)mArg);  } break;
 			case TYPE_FLOAT64:	{ i = (u64)(*(f64*)mArg);  } break;
-			case TYPE_PCTCHAR: { i = (u32)StrToS64(*(ascii::pcrune*)mArg); } break;
-			case TYPE_PCUCHAR8: { i = (u32)StrToS64(*(utf8::pcrune*)mArg); } break;
-			case TYPE_PCUCHAR32: { i = (u32)StrToS64(*(utf32::pcrune*)mArg); } break;
+			case TYPE_PCTCHAR: { i = (u32)StrToS64(*(ascii::pcrune*)mArg, 10); } break;
+			case TYPE_PCUCHAR8: { i = (u32)StrToS64(*(utf8::pcrune*)mArg, 10); } break;
+			case TYPE_PCUCHAR32: { i = (u32)StrToS64(*(utf32::pcrune*)mArg, 10); } break;
 			default:			break; // Fall through
 		};
 
@@ -251,7 +251,7 @@ namespace xcore
 			default:			break; // Fall through
 		};
 
-		return "?";
+		return (const uchar*)"?";
 	}
 
 	const uchar8*		x_va::convertToUChar8Pointer() const
@@ -454,7 +454,7 @@ namespace xcore
 		switch (mType)
 		{
 		case TYPE_BOOL:		*((xbool*)mRef) = rhs != 0 ? xTRUE : xFALSE; break;
-		case TYPE_UCHAR:	*((uchar*)mRef) = rhs; break;
+		case TYPE_UCHAR:	*((uchar*)mRef) = (uchar)rhs; break;
 		case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
 		case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
 		case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
@@ -501,15 +501,15 @@ namespace xcore
 		switch (mType)
 		{
 		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs); break;
-		case TYPE_UCHAR:	*((uchar8*)mRef) = (uchar8)StrToS64(rhs); break;
-		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs); break;
-		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs); break;
-		case TYPE_UINT8:	*((u8 *)mRef) = (u8 )StrToS64(rhs); break;
-		case TYPE_INT8:		*((s8 *)mRef) = (s8 )StrToS64(rhs); break;
-		case TYPE_UINT16:	*((u16*)mRef) = (u16)StrToS64(rhs); break;
-		case TYPE_INT16:	*((s16*)mRef) = (s16)StrToS64(rhs); break;
-		case TYPE_UINT64:	*((u64*)mRef) = (u64)StrToS64(rhs); break;
-		case TYPE_INT64:	*((s64*)mRef) = (s64)StrToS64(rhs); break;
+		case TYPE_UCHAR:	*((uchar8*)mRef) = (uchar8)StrToS64(rhs, 10); break;
+		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs, 10); break;
+		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs, 10); break;
+		case TYPE_UINT8:	*((u8 *)mRef) = (u8 )StrToS64(rhs, 10); break;
+		case TYPE_INT8:		*((s8 *)mRef) = (s8 )StrToS64(rhs, 10); break;
+		case TYPE_UINT16:	*((u16*)mRef) = (u16)StrToS64(rhs, 10); break;
+		case TYPE_INT16:	*((s16*)mRef) = (s16)StrToS64(rhs, 10); break;
+		case TYPE_UINT64:	*((u64*)mRef) = (u64)StrToS64(rhs, 10); break;
+		case TYPE_INT64:	*((s64*)mRef) = (s64)StrToS64(rhs, 10); break;
 		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs); break;
 		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs); break;
 		case TYPE_PTCHAR:	break;
@@ -525,18 +525,18 @@ namespace xcore
 	{
 		switch (mType)
 		{
-		case TYPE_BOOL:		break;
-		case TYPE_UCHAR:	break;
-		case TYPE_UINT32:	break;
-		case TYPE_INT32:	break;
-		case TYPE_UINT8:	break;
-		case TYPE_INT8:		break;
-		case TYPE_UINT16:	break;
-		case TYPE_INT16:	break;
-		case TYPE_UINT64:	break;
-		case TYPE_INT64:	break;
-		case TYPE_FLOAT32:	break;
-		case TYPE_FLOAT64:	break;
+		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs); break;
+		case TYPE_UCHAR:	*((uchar8*)mRef) = (uchar8)StrToS64(rhs, 10); break;
+		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs, 10); break;
+		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs, 10); break;
+		case TYPE_UINT8:	*((u8 *)mRef) = (u8)StrToS64(rhs, 10); break;
+		case TYPE_INT8:		*((s8 *)mRef) = (s8)StrToS64(rhs, 10); break;
+		case TYPE_UINT16:	*((u16*)mRef) = (u16)StrToS64(rhs, 10); break;
+		case TYPE_INT16:	*((s16*)mRef) = (s16)StrToS64(rhs, 10); break;
+		case TYPE_UINT64:	*((u64*)mRef) = (u64)StrToS64(rhs, 10); break;
+		case TYPE_INT64:	*((s64*)mRef) = (s64)StrToS64(rhs, 10); break;
+		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs); break;
+		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs); break;
 		case TYPE_PTCHAR:	break;
 		case TYPE_PUCHAR8:	break;
 		case TYPE_PUCHAR32:	break;
@@ -550,18 +550,18 @@ namespace xcore
 	{
 		switch (mType)
 		{
-		case TYPE_BOOL:		break;
-		case TYPE_UCHAR:	break;
-		case TYPE_UINT32:	break;
-		case TYPE_INT32:	break;
-		case TYPE_UINT8:	break;
-		case TYPE_INT8:		break;
-		case TYPE_UINT16:	break;
-		case TYPE_INT16:	break;
-		case TYPE_UINT64:	break;
-		case TYPE_INT64:	break;
-		case TYPE_FLOAT32:	break;
-		case TYPE_FLOAT64:	break;
+		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs); break;
+		case TYPE_UCHAR:	*((uchar8*)mRef) = (uchar8)StrToS64(rhs, 10); break;
+		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs, 10); break;
+		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs, 10); break;
+		case TYPE_UINT8:	*((u8 *)mRef) = (u8)StrToS64(rhs, 10); break;
+		case TYPE_INT8:		*((s8 *)mRef) = (s8)StrToS64(rhs, 10); break;
+		case TYPE_UINT16:	*((u16*)mRef) = (u16)StrToS64(rhs, 10); break;
+		case TYPE_INT16:	*((s16*)mRef) = (s16)StrToS64(rhs, 10); break;
+		case TYPE_UINT64:	*((u64*)mRef) = (u64)StrToS64(rhs, 10); break;
+		case TYPE_INT64:	*((s64*)mRef) = (s64)StrToS64(rhs, 10); break;
+		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs); break;
+		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs); break;
 		case TYPE_PTCHAR:	break;
 		case TYPE_PUCHAR8:	break;
 		case TYPE_PUCHAR32:	break;

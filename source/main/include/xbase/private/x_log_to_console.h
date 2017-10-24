@@ -6,12 +6,12 @@
 
 #ifndef __XBASE_LOG_TO_CONSOLE_H__
 #define __XBASE_LOG_TO_CONSOLE_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 
-#include "xbase\x_log.h"
+#include "xbase/x_log.h"
 
 /**
  * xCore namespace
@@ -34,13 +34,13 @@ namespace xcore
 		virtual void 			write(f32 value);
 		virtual void 			write(u32 value);
 		virtual void 			write(u64 value);
-		virtual void 			write(char value);
+		virtual void 			write(uchar32 value);
 		virtual void 			write(const char* buffer);
-		virtual void 			write(const char* buffer, s32 index, s32 count);
+		virtual void 			write(const char* buffer, const char* buffer_end);
 		virtual void 			write(const char* format, const x_va_list& arguments);
-		virtual void 			write(const ustr8* buffer);
-		virtual void 			write(const ustr8* buffer, s32 index, s32 count);
-		virtual void 			write(const ustr8* format, const x_va_list& arguments);
+		virtual void 			write(const uchar32* buffer);
+		virtual void 			write(const uchar32* buffer, const uchar32* buffer_end);
+		virtual void 			write(const uchar32* format, const x_va_list& arguments);
 
 		virtual void 			writeLine();
 		virtual void 			writeLine(bool value);
@@ -50,13 +50,13 @@ namespace xcore
 		virtual void 			writeLine(f32 value);
 		virtual void 			writeLine(u32 value);
 		virtual void 			writeLine(u64 value);
-		virtual void 			writeLine(char value);
+		virtual void 			writeLine(uchar32 value);
 		virtual void 			writeLine(const char* buffer);
-		virtual void 			writeLine(const char* buffer, s32 index, s32 count);
+		virtual void 			writeLine(const char* buffer, const char* buffer_end);
 		virtual void 			writeLine(const char* format, const x_va_list& arguments);
-		virtual void 			writeLine(const ustr8* buffer);
-		virtual void 			writeLine(const ustr8* buffer, s32 index, s32 count);
-		virtual void 			writeLine(const ustr8* format, const x_va_list& arguments);
+		virtual void 			writeLine(const uchar32* buffer);
+		virtual void 			writeLine(const uchar32* buffer, const uchar32* buffer_end);
+		virtual void 			writeLine(const uchar32* format, const x_va_list& arguments);
 	};
 };
 /**

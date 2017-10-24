@@ -5,11 +5,11 @@
 
 #ifndef SPU
 
-#include "xbase\x_log.h"
-#include "xbase\x_va_list.h"
-#include "xbase\x_string_ascii.h"
+#include "xbase/x_log.h"
+#include "xbase/x_va_list.h"
+#include "xbase/x_string_ascii.h"
 
-#include "xbase\private\x_log_to_console.h"
+#include "xbase/private/x_log_to_console.h"
 
 /**
  * xCore namespace
@@ -115,7 +115,7 @@ namespace xcore
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				xlog::write(ELevel inLevel, char _value)
+	void 				xlog::write(ELevel inLevel, uchar32 _value)
 	{
 		sLogger[inLevel]->write(_value);
 	}
@@ -125,9 +125,9 @@ namespace xcore
 		sLogger[inLevel]->write(buffer);
 	}
 
-	void 				xlog::write(ELevel inLevel, const char* buffer, s32 index, s32 count)
+	void 				xlog::write(ELevel inLevel, const char* buffer, const char* buffer_end)
 	{
-		sLogger[inLevel]->write(buffer, index, count);
+		sLogger[inLevel]->write(buffer, buffer_end);
 	}
 
 	void 				xlog::write(ELevel inLevel, const char* format, const x_va_list& arguments)
@@ -135,17 +135,17 @@ namespace xcore
 		sLogger[inLevel]->write(format, arguments);
 	}
 
-	void 				xlog::write(ELevel inLevel, const ustr8* buffer)
+	void 				xlog::write(ELevel inLevel, const uchar32* buffer)
 	{
 		sLogger[inLevel]->write(buffer);
 	}
 
-	void 				xlog::write(ELevel inLevel, const ustr8* buffer, s32 index, s32 count)
+	void 				xlog::write(ELevel inLevel, const uchar32* buffer, const uchar32* buffer_end)
 	{
-		sLogger[inLevel]->write(buffer, index, count);
+		sLogger[inLevel]->write(buffer, buffer_end);
 	}
 
-	void 				xlog::write(ELevel inLevel, const ustr8* format, const x_va_list& arguments)
+	void 				xlog::write(ELevel inLevel, const uchar32* format, const x_va_list& arguments)
 	{
 		sLogger[inLevel]->write(format, arguments);
 	}
@@ -192,7 +192,7 @@ namespace xcore
 		sLogger[inLevel]->writeLine(_value);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, char _value)
+	void 				xlog::writeLine(ELevel inLevel, uchar32 _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}
@@ -202,9 +202,9 @@ namespace xcore
 		sLogger[inLevel]->writeLine(buffer);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const char* buffer, s32 index, s32 count)
+	void 				xlog::writeLine(ELevel inLevel, const char* buffer, const char* buffer_end)
 	{
-		sLogger[inLevel]->writeLine(buffer, index, count);
+		sLogger[inLevel]->writeLine(buffer, buffer_end);
 	}
 
 	void 				xlog::writeLine(ELevel inLevel, const char* format, const x_va_list& arguments)
@@ -212,17 +212,17 @@ namespace xcore
 		sLogger[inLevel]->writeLine(format, arguments);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const ustr8* buffer)
+	void 				xlog::writeLine(ELevel inLevel, const uchar32* buffer)
 	{
 		sLogger[inLevel]->writeLine(buffer);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const ustr8* buffer, s32 index, s32 count)
+	void 				xlog::writeLine(ELevel inLevel, const uchar32* buffer, const uchar32* buffer_end)
 	{
-		sLogger[inLevel]->writeLine(buffer, index, count);
+		sLogger[inLevel]->writeLine(buffer, buffer_end);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const ustr8* format, const x_va_list& arguments)
+	void 				xlog::writeLine(ELevel inLevel, const uchar32* format, const x_va_list& arguments)
 	{
 		sLogger[inLevel]->writeLine(format, arguments);
 	}
@@ -238,24 +238,24 @@ namespace xcore
 		writeLine(buffer); 
 	}
 
-	void 				xlog_imp::write(const ustr8* buffer)									
+	void 				xlog_imp::write(const uchar32* buffer)									
 	{ 
 		write(buffer); 
 	}
 
-	void 				xlog_imp::writeLine(const ustr8* buffer)
+	void 				xlog_imp::writeLine(const uchar32* buffer)
 	{
 		writeLine(buffer); 
 	}
 
-	void 				xlog_imp::write(const char* buffer, s32 index, s32 count)	
+	void 				xlog_imp::write(const char* buffer, const char* buffer_end)
 	{ 
-		write(buffer, index, count);
+		write(buffer, buffer_end);
 	}
 
-	void 				xlog_imp::writeLine(const char* buffer, s32 index, s32 count)	
+	void 				xlog_imp::writeLine(const char* buffer, const char* buffer_end)
 	{ 
-		writeLine(buffer, index, count); 
+		writeLine(buffer, buffer_end);
 	}
 
 	void 				xlog_imp::write(const char* buffer, const x_va_list& arguments)	
@@ -268,22 +268,22 @@ namespace xcore
 		writeLine(buffer, arguments); 
 	}
 
-	void 				xlog_imp::write(const ustr8* buffer, s32 index, s32 count)	
+	void 				xlog_imp::write(const uchar32* buffer, const uchar32* buffer_end)
 	{ 
-		write(buffer, index, count);
+		write(buffer, buffer_end);
 	}
 
-	void 				xlog_imp::writeLine(const ustr8* buffer, s32 index, s32 count)	
+	void 				xlog_imp::writeLine(const uchar32* buffer, const uchar32* buffer_end)
 	{ 
-		writeLine(buffer, index, count); 
+		writeLine(buffer, buffer_end);
 	}
 
-	void 				xlog_imp::write(const ustr8* buffer, const x_va_list& arguments)	
+	void 				xlog_imp::write(const uchar32* buffer, const x_va_list& arguments)	
 	{ 
 		write(buffer, arguments); 
 	}
 
-	void 				xlog_imp::writeLine(const ustr8* buffer, const x_va_list& arguments)
+	void 				xlog_imp::writeLine(const uchar32* buffer, const x_va_list& arguments)
 	{ 
 		writeLine(buffer, arguments); 
 	}

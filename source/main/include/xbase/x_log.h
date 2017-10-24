@@ -92,7 +92,7 @@ namespace xcore
 		static xlog_imp*		redirect(ELevel inLevel, xlog_imp* inLogger);
 
 		static void 			write(ELevel inLevel, bool _value);
-		static void 			write(ELevel inLevel, char _value);
+		static void 			write(ELevel inLevel, uchar32 _value);
 		static void 			write(ELevel inLevel, s32 _value);
 		static void 			write(ELevel inLevel, s64 _value);
 		static void 			write(ELevel inLevel, u32 _value);
@@ -100,15 +100,15 @@ namespace xcore
 		static void 			write(ELevel inLevel, f32 _value);
 		static void 			write(ELevel inLevel, f64 _value);
 		static void 			write(ELevel inLevel, const char* buffer);
-		static void 			write(ELevel inLevel, const char* buffer, s32 index, s32 count);
+		static void 			write(ELevel inLevel, const char* buffer, const char* buffer_end);
 		static void 			write(ELevel inLevel, const char* format, const x_va_list& arguments);
-		static void 			write(ELevel inLevel, const ustr8* buffer);
-		static void 			write(ELevel inLevel, const ustr8* buffer, s32 index, s32 count);
-		static void 			write(ELevel inLevel, const ustr8* format, const x_va_list& arguments);
+		static void 			write(ELevel inLevel, const uchar32* buffer);
+		static void 			write(ELevel inLevel, const uchar32* buffer, const uchar32* buffer_end);
+		static void 			write(ELevel inLevel, const uchar32* format, const x_va_list& arguments);
 
 		static void 			writeLine(ELevel inLevel);
 		static void 			writeLine(ELevel inLevel, bool _value);
-		static void 			writeLine(ELevel inLevel, char _value);
+		static void 			writeLine(ELevel inLevel, uchar32 _value);
 		static void 			writeLine(ELevel inLevel, s32 _value);
 		static void 			writeLine(ELevel inLevel, s64 _value);
 		static void 			writeLine(ELevel inLevel, u32 _value);
@@ -116,11 +116,11 @@ namespace xcore
 		static void 			writeLine(ELevel inLevel, f32 _value);
 		static void 			writeLine(ELevel inLevel, f64 _value);
 		static void 			writeLine(ELevel inLevel, const char* buffer);
-		static void 			writeLine(ELevel inLevel, const char* buffer, s32 index, s32 count);
+		static void 			writeLine(ELevel inLevel, const char* buffer, const char* buffer_end);
 		static void 			writeLine(ELevel inLevel, const char* format, const x_va_list& arguments);
-		static void 			writeLine(ELevel inLevel, const ustr8* buffer);
-		static void 			writeLine(ELevel inLevel, const ustr8* buffer, s32 index, s32 count);
-		static void 			writeLine(ELevel inLevel, const ustr8* format, const x_va_list& arguments);
+		static void 			writeLine(ELevel inLevel, const uchar32* buffer);
+		static void 			writeLine(ELevel inLevel, const uchar32* buffer, const uchar32* buffer_end);
+		static void 			writeLine(ELevel inLevel, const uchar32* format, const x_va_list& arguments);
 	};
 
 	/**
@@ -139,7 +139,7 @@ namespace xcore
 		virtual                 ~xlog_imp(){};
 
 		virtual void 			write(bool _value) = 0;
-		virtual void 			write(char _value) = 0;
+		virtual void 			write(uchar32 _value) = 0;
 		virtual void 			write(s32 _value) = 0;
 		virtual void 			write(s64 _value) = 0;
 		virtual void 			write(u32 _value) = 0;
@@ -147,15 +147,15 @@ namespace xcore
 		virtual void 			write(f32 _value) = 0;
 		virtual void 			write(f64 _value) = 0;
 		virtual void 			write(const char* buffer) = 0;
-		virtual void 			write(const char* buffer, s32 index, s32 count) = 0;
+		virtual void 			write(const char* buffer, const char* buffer_end) = 0;
 		virtual void 			write(const char* format, const x_va_list& arguments) = 0;
-		virtual void 			write(const ustr8* buffer) = 0;
-		virtual void 			write(const ustr8* buffer, s32 index, s32 count) = 0;
-		virtual void 			write(const ustr8* format, const x_va_list& arguments) = 0;
+		virtual void 			write(const uchar32* buffer) = 0;
+		virtual void 			write(const uchar32* buffer, const uchar32* buffer_end) = 0;
+		virtual void 			write(const uchar32* format, const x_va_list& arguments) = 0;
 
 		virtual void 			writeLine() = 0;
 		virtual void 			writeLine(bool _value) = 0;
-		virtual void 			writeLine(char _value) = 0;
+		virtual void 			writeLine(uchar32 _value) = 0;
 		virtual void 			writeLine(s32 _value) = 0;
 		virtual void 			writeLine(s64 _value) = 0;
 		virtual void 			writeLine(u32 _value) = 0;
@@ -163,11 +163,11 @@ namespace xcore
 		virtual void 			writeLine(f32 _value) = 0;
 		virtual void 			writeLine(f64 _value) = 0;
 		virtual void 			writeLine(const char* buffer) = 0;
-		virtual void 			writeLine(const char* buffer, s32 index, s32 count) = 0;
+		virtual void 			writeLine(const char* buffer, const char* buffer_end) = 0;
 		virtual void 			writeLine(const char* format, const x_va_list& arguments) = 0;
-		virtual void 			writeLine(const ustr8* buffer) = 0;
-		virtual void 			writeLine(const ustr8* buffer, s32 index, s32 count) = 0;
-		virtual void 			writeLine(const ustr8* format, const x_va_list& arguments) = 0;
+		virtual void 			writeLine(const uchar32* buffer) = 0;
+		virtual void 			writeLine(const uchar32* buffer, const uchar32* buffer_end) = 0;
+		virtual void 			writeLine(const uchar32* format, const x_va_list& arguments) = 0;
 	};
 
 //==============================================================================
@@ -178,6 +178,6 @@ namespace xcore
  *  END xCore namespace
  */
 
-#include "private\x_log_to_console.h"
+#include "private/x_log_to_console.h"
 
 #endif	///< END __XBASE_LOG_H__

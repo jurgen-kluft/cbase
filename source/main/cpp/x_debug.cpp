@@ -104,12 +104,13 @@ namespace xcore
 		//
 		// Create the report to print
 		//
-		char report[1024];
-		s32 index = SPrintf(report, sizeof(report)-1,  "*  EXPR: %s\n"
-			"*  MSG : %s\n" 
-			"*  FILE: %s\n"
-			"*  LINE: %d\n"
-			, exprString, messageString, fileName, lineNumber);
+		char report_buffer[1024 + 1];
+		uchar* report = (uchar*)&report_buffer[0];
+		uchar const* report_eos = report + 1024;
+		uchar const* fmt = (uchar const*)"*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n";
+		uchar const* fmt_eos = fmt + (4*12);
+		s32 index = ascii::sprintf(report, report_eos, fmt, fmt_eos, exprString, messageString, fileName, lineNumber);
+
 		//
 		// Dump the scope info
 		//
