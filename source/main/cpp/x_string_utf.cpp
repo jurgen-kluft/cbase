@@ -10,6 +10,19 @@ namespace xcore
 {
 	namespace utf
 	{
+		s32		size(uchar32 c)
+		{
+			s32 len = 0;
+			if (c <= 0x7f) { len = 1; }
+			else if (c < 0x0800) { len = 2; }
+			else if (c < 0xd800) { len = 3; }
+			else if (c < 0xe000) { }
+			else if (c < 0x010000) { len = 3; }
+			else if (c < 0x110000) { len = 4; }
+
+			return len;
+		}
+
 		uchar*	write(uchar32 rune, uchar* dest)
 		{
 			uchar* dst = dest;

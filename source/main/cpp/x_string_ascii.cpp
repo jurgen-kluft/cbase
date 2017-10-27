@@ -163,6 +163,14 @@ namespace xcore
 			return str;
 		}
 
+		s32	 size(pcrune str)
+		{
+			s32 l = 0;
+			pcrune end = len(str, &l);
+			return l;
+		}
+
+
 		static s32 len_in_bytes(uchar32 c)
 		{
 			if ((c & 0xffffff80) == 0x00)
@@ -339,6 +347,37 @@ namespace xcore
 				*dst++ = *src++;
 
 			return end;
+		}
+
+		static s32	compare(pcrune lstr, pcrune rstr, ECmpMode mode)
+		{
+			ASSERT(lstr);
+			ASSERT(rstr);
+
+			if (lstr != rstr)
+			{
+				do
+				{
+					uchar32 c1 = read_char(lstr);
+					if (c1 == '\0')
+						return -1;
+
+					uchar32 c2 = read_char(rstr);
+					if (c2 == '\0')
+						return 1;
+
+					if (mode == CASE_IGNORE)
+					{
+						c1 = to_lower(c1);
+						c2 = to_lower(c2);
+					}
+					if (c1 < c2)
+						return -1;
+					if (c1 > c2)
+						return 1;
+				} while (true);
+			}
+			return 0;
 		}
 
 		static s32	compare(pcrune lstr, pcrune lstr_end, pcrune rstr, pcrune rstr_end, ECmpMode mode)

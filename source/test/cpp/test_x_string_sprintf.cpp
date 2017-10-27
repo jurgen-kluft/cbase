@@ -23,32 +23,35 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 
 		UNITTEST_TEST(format_double)
 		{
-			char buffer[256];
+			const s32 str_buffer_size = 256;
+			char str_buffer[str_buffer_size + 1];
+			uchar* str = (uchar*)&str_buffer[0];
+			uchar* str_end = str + str_buffer_size;
+			uchar const* fmt = (uchar const*)"%f";
+			uchar const* fmt_end = fmt + 2;
+
 			f64 d = 3.1415;
-			s32 l = SPrintf(buffer, sizeof(buffer) - 1, "%f", x_va(d));
+			s32 l = ascii::sprintf(str, str_end, fmt, fmt_end, x_va(d));
 			CHECK_EQUAL(8, l);
-			CHECK_EQUAL(0, Compare("3.141500", buffer));
+			const uchar* answer_str = (const uchar*)"3.141500";
+			CHECK_EQUAL(0, ascii::compare(answer_str, ascii::len(answer_str), str, ascii::len(str)));
 		}
 
 		UNITTEST_TEST(format_string)
 		{
-			char buffer[256];
+			const s32 str_buffer_size = 256;
+			char str_buffer[str_buffer_size + 1];
+			uchar* str = (uchar*)&str_buffer[0];
+			uchar* str_end = str + str_buffer_size;
+			uchar const* fmt = (uchar const*)"the %s";
+			uchar const* fmt_end = fmt + 6;
+
 			const char* teststr = "test string";
-			s32 l = SPrintf(buffer, sizeof(buffer) - 1, "the %s", x_va(teststr));
+			s32 l = ascii::sprintf(str, str_end, fmt, fmt_end, x_va(teststr));
 			CHECK_EQUAL(15, l);
-			CHECK_EQUAL(0, Compare("the test string", buffer));
+			const uchar* answer_str = (const uchar*)"the test string";
+			CHECK_EQUAL(0, ascii::compare(answer_str, ascii::len(answer_str), str, str_end));
 		}
-
-		UNITTEST_TEST(format_string8)
-		{
-			char buffer[256];
-			const char* teststr = "test string";
-			s32 l = SPrintf(buffer, sizeof(buffer) - 1, "the %s", x_va(teststr));
-			CHECK_EQUAL(15, l);
-			CHECK_EQUAL(0, Compare("the test string", buffer));
-		}
-
-
 	}
 }
 UNITTEST_SUITE_END

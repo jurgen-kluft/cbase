@@ -26,10 +26,6 @@ namespace xcore
 		inline			AsciiBuffer(char * str, char const * end) : mStr((uchar*)str), mEnd((uchar const*)end), mEos((uchar const*)end) { }
 		inline			AsciiBuffer(char * str, char const * end, char const * eos) : mStr((uchar *)str), mEnd((uchar const*)end), mEos((uchar const*)eos) { }
 
-		inline			AsciiBuffer(uchar * str, u32 len) : mStr(str), mEnd(str + len), mEos(str + len) { }
-		inline			AsciiBuffer(uchar * str, uchar const * end) : mStr(str), mEnd(end), mEos(end) { }
-		inline			AsciiBuffer(uchar * str, uchar const * end, uchar const * eos) : mStr(str), mEnd(end), mEos(eos) { }
-
 		uchar*			mStr;
 		uchar const*	mEnd;
 		uchar const*	mEos;
@@ -49,9 +45,6 @@ namespace xcore
 	{
 		inline			AsciiConstBuffer(char const* str, u32 len) : mStr((uchar*)str), mEnd((uchar*)str + len) { }
 		inline			AsciiConstBuffer(char const* str, char const* end) : mStr((uchar*)str), mEnd((uchar*)end) { }
-
-		inline			AsciiConstBuffer(uchar const* str, u32 len) : mStr(str), mEnd(str + len) { }
-		inline			AsciiConstBuffer(uchar const* str, uchar const* end) : mStr(str), mEnd(end) { }
 
 		uchar const*	mStr;
 		uchar const*	mEnd;
@@ -704,13 +697,14 @@ namespace xcore
 	class CharReaderFromAsciiBuffer : public CharReader
 	{
 	public:
-		inline			CharReaderFromAsciiBuffer(const uchar* str, const uchar* str_end) : mStr(str), mPtr(str), mEnd(str_end) { }
-		inline			CharReaderFromAsciiBuffer(AsciiBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd) { }
+		inline			CharReaderFromAsciiBuffer(const uchar* str, const uchar* str_end) : mStr(str), mPtr(str), mEnd(str_end) { if (mEnd == NULL) mEnd = ascii::len(mStr); }
+		inline			CharReaderFromAsciiBuffer(AsciiBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd) { if (mEnd == NULL) mEnd = ascii::len(mStr); }
 
 		virtual uchar32	Peek()
 		{
 			if (mPtr == mEnd)
 				return '\0';
+
 			uchar32 c = *mPtr;
 			return c;
 		}
@@ -719,6 +713,7 @@ namespace xcore
 		{
 			if (mPtr == mEnd)
 				return '\0';
+			
 			uchar32 c = *mPtr++;
 			return c;
 		}
@@ -750,7 +745,7 @@ namespace xcore
 	class CharReaderFromUtf32Buffer : public CharReader
 	{
 	public:
-		inline			CharReaderFromUtf32Buffer(const uchar32* str, const uchar32* str_end) : mStr(str), mPtr(str), mEnd(str_end) { }
+		inline			CharReaderFromUtf32Buffer(const uchar32* str, const uchar32* str_end) : mStr(str), mPtr(str), mEnd(str_end) { if (mEnd == NULL) mEnd = utf32::len(mStr); }
 
 		virtual uchar32	Peek()
 		{

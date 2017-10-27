@@ -1,6 +1,5 @@
 #include "xbase\x_guid.h"
 #include "xbase\x_string_ascii.h"
-
 #include "xunittest\xunittest.h"
 
 using namespace xcore;
@@ -151,10 +150,9 @@ UNITTEST_SUITE_BEGIN(xguid)
 			xguid id(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
 
 			char strBuffer[256];
-
 			const char* guidStr = "11335577:22446688:557799BB:88AACCEE";
 			id.toString(strBuffer, sizeof(strBuffer));
-			CHECK_EQUAL(0, Compare(strBuffer, guidStr));
+			CHECK_EQUAL(0, ascii::compare((char const*)strBuffer, (char const*)guidStr));
 		}
 
 		UNITTEST_TEST(fromString)

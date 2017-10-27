@@ -25,6 +25,8 @@ namespace xcore
 		pcrune			len(pcrune str, s32* str_len);
 		pcrune			len(pcrune str, pcrune str_eos, s32* str_len);
 
+		s32				size(pcrune str);
+
 		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
 
 		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found
@@ -32,6 +34,7 @@ namespace xcore
 		
 		prune			replace(prune str_begin, pcrune str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end);
 
+		s32  			compare(pcrune str1, pcrune str2, ECmpMode mode = CASE_SENSITIVE);
 		s32  			compare(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end, ECmpMode mode = CASE_SENSITIVE);
 
 		prune			concatenate(prune dst, pcrune dst_end, pcrune dst_eos, pcrune src, pcrune src_end);		// Concatenate strings, dst = dst + src
@@ -87,17 +90,33 @@ namespace xcore
 		uchar32			first_char(pcrune str, pcrune str_end);
 		uchar32			last_char(pcrune str, pcrune str_end);
 		
+		s32				cprintf(pcrune format_str, X_VA_ARGS_16_DEF);
 		s32				cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+
+		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, X_VA_ARGS_16_DEF);
 		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
 
+		s32				vcprintf(pcrune format_str, const x_va_list& args);
 		s32				vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+
+		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, const x_va_list& args);
 		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
+		s32				printf(pcrune format_str, X_VA_ARGS_16_DEF);
 		s32				printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+
+		s32				printf(pcrune format_str, const x_va_list& args);
 		s32				printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+
+		s32				printf(pcrune str);
 		s32				printf(pcrune str, pcrune str_end);
 
+		s32				sscanf(pcrune str, pcrune fmt_str, X_VA_R_ARGS_16_DEF);
+		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, X_VA_R_ARGS_16_DEF);
 		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, X_VA_R_ARGS_16_DEF);
+
+		s32				vsscanf(pcrune str, pcrune fmt_str, const x_va_r_list& vr_args);
+		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, const x_va_r_list& vr_args);
 		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, const x_va_r_list& vr_args);
 
 	}; ///< end of ascii namespace

@@ -2193,15 +2193,19 @@ namespace xcore
 
 	//==============================================================================
 	// UTF 8, 16, 32
-	typedef		s8				uchar;
+	typedef		char			uchar;
 	typedef		u8				uchar8;
 	typedef		u16				uchar16;
 	typedef		unsigned long	uchar32;
 
-	typedef		char*			ustr;	// ASCII string
-	typedef		uchar8*			ustr8;	// UTF-8 string
-	typedef		uchar16*		ustr16;	// UTF-16 string
-	typedef		uchar32*		ustr32;	// UTF-32 string
+	typedef		char*			astr;		// ASCII string
+	typedef		char const*		acstr;		// ASCII string
+	typedef		uchar8*			ustr8;		// UTF-8 string
+	typedef		uchar8 const*	ucstr8;		// UTF-8 string
+	typedef		uchar16*		ustr16;		// UTF-16 string
+	typedef		uchar16 const*	ucstr16;	// UTF-16 string
+	typedef		uchar32*		ustr32;		// UTF-32 string
+	typedef		uchar32 const*	ucstr32;	// UTF-32 string
 
 	//==============================================================================
 
