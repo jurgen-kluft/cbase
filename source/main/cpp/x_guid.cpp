@@ -1,11 +1,11 @@
 //===============================================================================
 // INCLUDES
 //===============================================================================
-#include "xbase\x_target.h"
-#include "xbase\x_debug.h"
-#include "xbase\x_guid.h"
-#include "xbase\x_va_list.h"
-#include "xbase\x_string_ascii.h"
+#include "xbase/x_target.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_guid.h"
+#include "xbase/x_va_list.h"
+#include "xbase/x_string_ascii.h"
 
 /**
  * xCore namespace

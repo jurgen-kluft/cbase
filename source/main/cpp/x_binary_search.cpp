@@ -1,5 +1,5 @@
-#include "xbase\x_debug.h"
-#include "xbase\x_binary_search.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_binary_search.h"
 
 namespace xcore
 {

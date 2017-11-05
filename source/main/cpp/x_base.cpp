@@ -7,7 +7,7 @@
 namespace xcore
 {
 	static x_iallocator*	sSystemAllocator = NULL;
-	x_iallocator*			x_iallocator::default()
+	x_iallocator*			x_iallocator::get_default()
 	{
 		return sSystemAllocator;
 	}

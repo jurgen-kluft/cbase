@@ -1,6 +1,8 @@
 #ignore all files
 *.*
 vendor/
+source/main/builddir/
+source/test/builddir/
 tags
 
 #except the following files

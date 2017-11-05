@@ -3,12 +3,12 @@
 * xCore custom 64 bit unsigned integer
 */
 
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifndef X_NO_CUSTOM_UINT64
 
-#include "xbase\x_limits.h"
-#include "xbase\private\x_int64.h"
-#include "xbase\private\x_uint64.h"
+#include "xbase/x_limits.h"
+#include "xbase/private/x_int64.h"
+#include "xbase/private/x_uint64.h"
 
 namespace xcore
 {

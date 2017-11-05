@@ -1,5 +1,5 @@
 /**
-* @file Head file x_allocator.h
+* @file Header file x_allocator.h
 */
 
 #ifndef __XBASE_ALLOCATOR_H__
@@ -34,19 +34,12 @@ namespace xcore
 	extern x_iallocator*	gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment);
 
 
-	// set config variables needed for creating SPU allocator
-#ifdef SPU
-
-	extern void gSetSPUConfig(xcore::s32 programSize, xcore::s32 stackSize);
-#endif
-
-
 	/// The allocator interface
 	class x_iallocator
 	{
 	public:
-		static x_iallocator* default();
-
+		static x_iallocator* get_default();
+		
 		virtual const char*	name() const = 0;								///< The name of the allocator
 
 		virtual void*		allocate(xsize_t size, u32 align) = 0;			///< Allocate memory with alignment

@@ -21,6 +21,8 @@ namespace xcore
 	class x_asserthandler
 	{
 	public:
+		virtual	~x_asserthandler() {}
+
 		enum EDebugFlags
 		{
 			XDB_FLAG_IGNORE = 1<<1,
@@ -88,25 +90,8 @@ namespace xcore
 		#define XBREAK      { __debugbreak(); }
 	#endif
 
-	#if defined(TARGET_360) && defined(COMPILER_DEFAULT)
-		#define XBREAK      {__debugbreak(); }
-	#endif
-
-	#if defined(TARGET_PS3) && defined(COMPILER_DEFAULT)
+	#if defined(TARGET_MACOS) && defined(COMPILER_DEFAULT)
 		#define XBREAK      { __asm__ volatile("tw 31,1,1"); }
-	#endif
-
-
-	#if defined(TARGET_WII) && defined(COMPILER_DEFAULT)
-		#define XBREAK      { register unsigned int reg0; register unsigned int reg1; asm { mfmsr reg0; ori reg1, reg0, 0x400; mtmsr reg1; mtmsr reg0; } }
-	#endif
-
-	#if defined(TARGET_3DS) && defined(COMPILER_DEFAULT)
-		#define XBREAK      { __breakpoint(0xBA5E); }
-	#endif
-
-	#if defined(TARGET_PSP) && defined(COMPILER_DEFAULT)
-		#define XBREAK      { asm("break"); }
 	#endif
 
 	#if !defined(XBREAK)
@@ -135,24 +120,8 @@ namespace xcore
 		#define XNOP            { __emit(0x00000000); }
 	#endif
 
-	#if defined(TARGET_360) && defined(COMPILER_DEFAULT)
+	#if defined(TARGET_MACOS) && defined(COMPILER_DEFAULT)
 		#define XNOP            { __asm nop }
-	#endif
-
-	#if defined(TARGET_PSP) && defined(COMPILER_DEFAULT)
-		#define XNOP            { _asm { nop } }
-	#endif
-
-	#if defined(TARGET_PS3) && defined(COMPILER_DEFAULT)
-		#define XNOP            { __asm nop }
-	#endif
-
-	#if defined(TARGET_WII) && defined(COMPILER_DEFAULT)
-		#define XNOP            { __asm nop }
-	#endif
-
-	#if defined(TARGET_3DS) && defined(COMPILER_DEFAULT)
-		#define XNOP            { void __nop(void); }
 	#endif
 
 	#if !defined(XNOP)
@@ -274,51 +243,7 @@ namespace xcore
 			#define ASSERTS(expr,str)           (void(0))
 			#define ASSERTSL(level,expr,str)    (void(0))
 			#define ASSERTL(level,expr)         (void(0))
-		#elif defined(TARGET_360) && defined(COMPILER_DEFAULT)
-			#define XASSERTCT(expr)              
-			#define XASSERT(expr)               (void(0))
-			#define XASSERTS(expr,str)          (void(0))
-			#define XASSERTSL(level,expr,str)   (void(0))
-			#define XASSERTL(level,expr)        (void(0))
-			#define ASSERTCT(expr)              
-			#define ASSERT(expr)                (void(0))
-			#define ASSERTS(expr,str)           (void(0))
-			#define ASSERTSL(level,expr,str)    (void(0))
-			#define ASSERTL(level,expr)         (void(0))
-		#elif defined(TARGET_PS3) && defined(COMPILER_DEFAULT)
-			#define XASSERTCT(expr)              
-			#define XASSERT(expr)               (void(0))
-			#define XASSERTS(expr,str)          (void(0))
-			#define XASSERTSL(level,expr,str)   (void(0))
-			#define XASSERTL(level,expr)        (void(0))
-			#define ASSERTCT(expr)              
-			#define ASSERT(expr)                (void(0))
-			#define ASSERTS(expr,str)           (void(0))
-			#define ASSERTSL(level,expr,str)    (void(0))
-			#define ASSERTL(level,expr)         (void(0))
-		#elif defined(TARGET_WII) && defined(COMPILER_DEFAULT)
-			#define XASSERTCT(expr)              
-			#define XASSERT(expr)               (void(0))
-			#define XASSERTS(expr,str)          (void(0))
-			#define XASSERTSL(level,expr,str)   (void(0))
-			#define XASSERTL(level,expr)        (void(0))
-			#define ASSERTCT(expr)              
-			#define ASSERT(expr)                (void(0))
-			#define ASSERTS(expr,str)           (void(0))
-			#define ASSERTSL(level,expr,str)    (void(0))
-			#define ASSERTL(level,expr)         (void(0))
-		#elif defined(TARGET_3DS) && defined(COMPILER_DEFAULT)
-			#define XASSERTCT(expr)              
-			#define XASSERT(expr)               (void(0))
-			#define XASSERTS(expr,str)          (void(0))
-			#define XASSERTSL(level,expr,str)   (void(0))
-			#define XASSERTL(level,expr)        (void(0))
-			#define ASSERTCT(expr)              
-			#define ASSERT(expr)                (void(0))
-			#define ASSERTS(expr,str)           (void(0))
-			#define ASSERTSL(level,expr,str)    (void(0))
-			#define ASSERTL(level,expr)         (void(0))
-		#elif defined(TARGET_PSP) && defined(COMPILER_DEFAULT)
+		#elif defined(TARGET_MACOS) && defined(COMPILER_DEFAULT)
 			#define XASSERTCT(expr)              
 			#define XASSERT(expr)               (void(0))
 			#define XASSERTS(expr,str)          (void(0))

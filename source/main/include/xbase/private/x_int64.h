@@ -6,13 +6,13 @@
 
 #ifndef __XBASE_64_BIT_SIGNED_INTEGER_H__
 #define __XBASE_64_BIT_SIGNED_INTEGER_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 #ifndef X_NO_CUSTOM_INT64
 
-#include "xbase\x_debug.h"
+#include "xbase/x_debug.h"
 
 
 /**

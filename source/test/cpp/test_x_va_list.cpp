@@ -1,5 +1,5 @@
-#include "xbase\x_va_list.h"
-#include "xunittest\xunittest.h"
+#include "xbase/x_va_list.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

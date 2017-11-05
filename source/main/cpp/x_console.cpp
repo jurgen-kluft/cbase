@@ -5,7 +5,7 @@
 
 #ifdef SPU
 
-#include "xbase\x_console.h"
+#include "xbase/x_console.h"
 
 // empty function so other test programs will compile..
 namespace xcore
@@ -18,11 +18,11 @@ namespace xcore
 
 #else
 
-#include "xbase\x_debug.h"
-#include "xbase\x_va_list.h"
-#include "xbase\x_string_ascii.h"
-#include "xbase\x_string_utf.h"
-#include "xbase\x_console.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_va_list.h"
+#include "xbase/x_string_ascii.h"
+#include "xbase/x_string_utf.h"
+#include "xbase/x_console.h"
 
 /**
  * xCore namespace

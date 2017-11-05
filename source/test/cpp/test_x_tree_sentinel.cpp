@@ -1,8 +1,8 @@
-#include "xbase\private\x_rbtree_sentinel.h"
-#include "xbase\x_allocator.h"
-#include "xbase\x_slice.h"
+#include "xbase/private/x_rbtree_sentinel.h"
+#include "xbase/x_allocator.h"
+#include "xbase/x_slice.h"
 
-#include "xunittest\xunittest.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

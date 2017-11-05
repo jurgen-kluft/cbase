@@ -1,5 +1,5 @@
-#include "xbase\x_bit_field.h"
-#include "xunittest\xunittest.h"
+#include "xbase/x_bit_field.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

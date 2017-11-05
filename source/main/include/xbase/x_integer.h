@@ -89,20 +89,10 @@ namespace xcore
 	//==============================================================================
 	// INLINES
 	//==============================================================================
-	#include "xbase\private\x_integer_inline.h"
+	#include "xbase/private/x_integer_inline.h"
 
-	#if defined TARGET_WII
-		#include "xbase\private\x_integer_inline_wii.h"
-	#elif defined TARGET_PSP
-		#include "xbase\private\x_integer_inline_psp.h"
-	#elif defined TARGET_360
-		#include "xbase\private\x_integer_inline_x360.h"
-	#elif defined TARGET_PC
-		#include "xbase\private\x_integer_inline_win32.h"
-	#elif defined TARGET_PS3
-		#include "xbase\private\x_integer_inline_ps3.h"
-	#elif defined TARGET_3DS
-		#include "xbase\private\x_integer_inline_3ds.h"
+	#if defined TARGET_MACOS
+		#include "xbase/private/x_integer_inline_ps3.h"
 	#else
 		#error "Current platform is not supported!"
 	#endif

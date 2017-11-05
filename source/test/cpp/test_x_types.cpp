@@ -1,7 +1,7 @@
-#include "xbase\private\x_int128.h"
-#include "xbase\private\x_uint128.h"
+#include "xbase/private/x_int128.h"
+#include "xbase/private/x_uint128.h"
 
-#include "xunittest\xunittest.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

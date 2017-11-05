@@ -1,6 +1,6 @@
-#include "xbase\x_qsort.h"
+#include "xbase/x_qsort.h"
 
-#include "xunittest\xunittest.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

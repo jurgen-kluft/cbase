@@ -1,7 +1,7 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase\x_qsort.h"
+#include "xbase/x_qsort.h"
 
 //==============================================================================
 // xCore namespace
@@ -19,10 +19,10 @@ namespace xcore
 
 		#define __xqsort_SwapCode(TYPE, parmi, parmj, n) { 		\
 			u32 i = (n) / sizeof (TYPE); 						\
-			register TYPE *pi = (TYPE *) (parmi); 				\
-			register TYPE *pj = (TYPE *) (parmj); 				\
+			TYPE *pi = (TYPE *) (parmi); 						\
+			TYPE *pj = (TYPE *) (parmj); 						\
 			do { 												\
-				register TYPE	t = *pi;						\
+				TYPE	t = *pi;								\
 				*pi++ = *pj;									\
 				*pj++ = t;										\
 			} while (--i > 0);									\

@@ -3,11 +3,11 @@
 * Core custom 64 bit signed integer
 */
 
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifndef X_NO_CUSTOM_INT64
-#include "xbase\x_limits.h"
-#include "xbase\private\x_uint64.h"
-#include "xbase\private\x_int64.h"
+#include "xbase/x_limits.h"
+#include "xbase/private/x_uint64.h"
+#include "xbase/private/x_int64.h"
 
 namespace xcore {
 

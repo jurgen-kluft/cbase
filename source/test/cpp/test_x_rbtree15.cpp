@@ -1,9 +1,9 @@
-#include "xbase\private\x_int128.h"
+#include "xbase/private/x_int128.h"
 
 #define DEBUG_RB15TREE
-#include "xbase\private\x_rbtree15.h"
+#include "xbase/private/x_rbtree15.h"
 
-#include "xunittest\xunittest.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

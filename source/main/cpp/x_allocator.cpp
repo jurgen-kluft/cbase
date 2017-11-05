@@ -1,8 +1,8 @@
-#include "xbase\x_target.h"
-#include "xbase\x_allocator.h"
-#include "xbase\x_debug.h"
-#include "xbase\x_integer.h"
-#include "xbase\x_memory_std.h"
+#include "xbase/x_target.h"
+#include "xbase/x_allocator.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_integer.h"
+#include "xbase/x_memory_std.h"
 
 namespace xcore
 {
@@ -197,39 +197,7 @@ namespace xcore
 					c4->mPrev = c2;
 			}
 		}
-
-		static void*	reallocate(root* s, void* old_ptr, xsize_t new_size, u32 alignment)
-		{
-			void* p = NULL;
-			if (old_ptr==NULL)
-			{
-				p = allocate(s, new_size, alignment);
-			}
-			else if (new_size == 0)
-			{
-				deallocate(s, old_ptr);
-			}
-			else
-			{
-				node* c2 = node::from_ptr(old_ptr);
-
-				// Don't do anything when the new size request is smaller
-				if (new_size <= c2->mSize)
-				{
-					p = old_ptr;
-				}
-				else
-				{
-					// Here we have to allocate to fulfill the new size request
-					p = allocate(s, new_size, alignment);
-
-				}
-			}
-			return NULL;
-		}
-
 	}
-
 
 	class x_allocator_basic : public x_iallocator
 	{
@@ -286,7 +254,7 @@ namespace xcore
 			ASSERT(mRoot.mTail->used() == false);
 		}
 
-		void*		operator new(xcore::xsize_t num_bytes, void* mem)			{ return mem; }
+		void*		operator new(unsigned long num_bytes, void* mem)			{ return mem; }
 		void		operator delete(void* mem, void* )							{ }
 		void		operator delete(void* mem)									{ }						
 

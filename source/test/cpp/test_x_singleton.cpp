@@ -1,7 +1,7 @@
-#include "xbase\x_allocator.h"
-#include "xbase\x_singleton.h"
-#include "xbase\x_integer.h"
-#include "xunittest\xunittest.h"
+#include "xbase/x_allocator.h"
+#include "xbase/x_singleton.h"
+#include "xbase/x_integer.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

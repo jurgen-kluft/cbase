@@ -1,11 +1,11 @@
-#include "xbase\x_string_ascii.h"
-#include "xbase\x_string_utf.h"
+#include "xbase/x_string_ascii.h"
+#include "xbase/x_string_utf.h"
 
 #if defined(TARGET_PS3)
 	#include <math.h>
 #endif
 
-#include "xunittest\xunittest.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

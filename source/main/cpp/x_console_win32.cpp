@@ -3,7 +3,7 @@
 * Core console on win32
 */
 
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifdef TARGET_PC
 
 // Windows includes first
@@ -15,8 +15,8 @@
 #include <time.h>
 #include <stdio.h>
 
-#include "xbase\x_console.h"
-#include "xbase\x_string_utf.h"
+#include "xbase/x_console.h"
+#include "xbase/x_string_utf.h"
 
 /**
  * xCore namespace

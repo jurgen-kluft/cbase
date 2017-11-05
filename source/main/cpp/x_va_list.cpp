@@ -3,10 +3,10 @@
 * x base variable argument
 */
 
-#include "xbase\x_debug.h"
-#include "xbase\x_va_list.h"
-#include "xbase\x_string_utf.h"
-#include "xbase\x_string_ascii.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_va_list.h"
+#include "xbase/x_string_utf.h"
+#include "xbase/x_string_ascii.h"
 
 
 /**

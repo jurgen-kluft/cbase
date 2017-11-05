@@ -1,6 +1,6 @@
-#include "xbase\x_guid.h"
-#include "xbase\x_string_ascii.h"
-#include "xunittest\xunittest.h"
+#include "xbase/x_guid.h"
+#include "xbase/x_string_ascii.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 

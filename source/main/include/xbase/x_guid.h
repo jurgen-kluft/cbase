@@ -55,7 +55,7 @@ namespace xcore
 	/**
 	 * INCLUDE THE INLINE FUNCTIONS
 	 */
-	#include "private\x_guid_inline.h"
+	#include "private/x_guid_inline.h"
 
 //==============================================================================
 // END xCore namespace

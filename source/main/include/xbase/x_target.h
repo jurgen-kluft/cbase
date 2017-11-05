@@ -37,71 +37,25 @@
  *     TARGET_PC_PROFILE_RELEASE   Windows PC Profile Release                  N
  *     TARGET_PC_TEST_DEBUG        Windows PC Test Debug                       N
  *     TARGET_PC_TEST_RELEASE      Windows PC Test Release                     N
- *     TARGET_PS3_DEV_DEBUG        Sony PlayStation 3 DevKit Debug               N
- *     TARGET_PS3_DEV_RELEASE      Sony PlayStation 3 DevKit Release             N
- *     TARGET_PS3_DEV_FINAL        Sony PlayStation 3 DevKit Final               N
- *     TARGET_PS3_CLIENT_DEBUG     Sony PlayStation 3 "Debug Station" Debug      N
- *     TARGET_PS3_CLIENT_RELEASE   Sony PlayStation 3 "Debug Station" Release    N
- *     TARGET_PS3_CLIENT_FINAL     Sony PlayStation 3 "Debug Station" Final      N
- *     TARGET_PS3_RETAIL_DEBUG     Sony PlayStation 3 console Debug              N
- *     TARGET_PS3_RETAIL_RELEASE   Sony PlayStation 3 console Release            N
- *     TARGET_PS3_RETAIL_FINAL     Sony PlayStation 3 console Final              N
- *     TARGET_PS3_PROFILE_DEBUG    Sony PlayStation 3 Profile Debug              N
- *     TARGET_PS3_PROFILE_RELEASE  Sony PlayStation 3 Profile Release            N
- *     TARGET_PS3_TEST_DEBUG       Sony PlayStation 3 Test Debug                 N
- *     TARGET_PS3_TEST_RELEASE     Sony PlayStation 3 Test Release               N
- *     TARGET_PSP_DEV_DEBUG        Sony PlayStation Portable DevKit Debug        N
- *     TARGET_PSP_DEV_RELEASE      Sony PlayStation Portable DevKit Release      N
- *     TARGET_PSP_DEV_FINAL        Sony PlayStation Portable DevKit Final        N
- *     TARGET_PSP_CLIENT_DEBUG     Sony PlayStation Portable "Debug Debug        N
- *     TARGET_PSP_CLIENT_RELEASE   Sony PlayStation Portable "Debug Release      N
- *     TARGET_PSP_CLIENT_FINAL     Sony PlayStation Portable "Debug Final        N
- *     TARGET_PSP_RETAIL_DEBUG     Sony PlayStation Portable Console Debug       N
- *     TARGET_PSP_RETAIL_RELEASE   Sony PlayStation Portable Console Release     N
- *     TARGET_PSP_RETAIL_FINAL     Sony PlayStation Portable Console Final       N
- *     TARGET_PSP_PROFILE_DEBUG    Sony PlayStation Portable Profile Debug       N
- *     TARGET_PSP_PROFILE_RELEASE  Sony PlayStation Portable Profile Release     N
- *     TARGET_PSP_TEST_DEBUG       Sony PlayStation Portable Test Debug          N
- *     TARGET_PSP_TEST_RELEASE     Sony PlayStation Portable Test Release        N
- *     TARGET_360_DEV_DEBUG        Microsoft X-Box 360 DevKit Debug              N
- *     TARGET_360_DEV_RELEASE      Microsoft X-Box 360 DevKit Release            N
- *     TARGET_360_DEV_FINAL        Microsoft X-Box 360 DevKit Final              N
- *     TARGET_360_CLIENT_DEBUG     Microsoft X-Box 360 "Debug Station" Debug     N
- *     TARGET_360_CLIENT_RELEASE   Microsoft X-Box 360 "Debug Station" Release   N
- *     TARGET_360_CLIENT_FINAL     Microsoft X-Box 360 "Debug Station" Final     N
- *     TARGET_360_RETAIL_DEBUG     Microsoft X-Box 360 Console Debug             N
- *     TARGET_360_RETAIL_RELEASE   Microsoft X-Box 360 Console Release           N
- *     TARGET_360_RETAIL_FINAL     Microsoft X-Box 360 Console Final             N
- *     TARGET_360_PROFILE_DEBUG    Microsoft X-Box 360 Profile Debug             N
- *     TARGET_360_PROFILE_RELEASE  Microsoft X-Box 360 Profile Release           N
- *     TARGET_360_TEST_DEBUG       Microsoft X-Box 360 Test Debug                N
- *     TARGET_360_TEST_RELEASE     Microsoft X-Box 360 Test Release              N
- *     TARGET_WII_DEV_DEBUG        Nintendo Wii DevKit Debug                     N
- *     TARGET_WII_DEV_RELEASE      Nintendo Wii DevKit Release                   N
- *     TARGET_WII_DEV_FINAL        Nintendo Wii DevKit Final                     N
- *     TARGET_WII_CLIENT_DEBUG     Nintendo Wii "Debug Station" Debug            N
- *     TARGET_WII_CLIENT_RELEASE   Nintendo Wii "Debug Station" Release          N
- *     TARGET_WII_CLIENT_FINAL     Nintendo Wii "Debug Station" Final            N
- *     TARGET_WII_RETAIL_DEBUG     Nintendo Wii Console Debug                    N
- *     TARGET_WII_RETAIL_RELEASE   Nintendo Wii Console Release                  N
- *     TARGET_WII_RETAIL_FINAL     Nintendo Wii Console Final                    N
- *     TARGET_WII_PROFILE_DEBUG    Nintendo Wii Profile Debug                    N
- *     TARGET_WII_PROFILE_RELEASE  Nintendo Wii Profile Release                  N
- *     TARGET_WII_TEST_DEBUG       Nintendo Wii Test Debug                       N
- *     TARGET_WII_TEST_RELEASE     Nintendo Wii Test Release                     N
- *     TARGET_3DS_DEV_DEBUG        Nintendo 3ds DevKit Debug                     N
- *     TARGET_3DS_DEV_RELEASE      Nintendo 3ds DevKit Release                   N
- *     TARGET_3DS_DEV_FINAL        Nintendo 3ds DevKit Final                     N
- *     TARGET_3DS_CLIENT_DEBUG     Nintendo 3ds "Debug Station" Debug            N
- *     TARGET_3DS_CLIENT_RELEASE   Nintendo 3ds "Debug Station" Release          N
- *     TARGET_3DS_CLIENT_FINAL     Nintendo 3ds "Debug Station" Final            N
- *     TARGET_3DS_RETAIL_DEBUG     Nintendo 3ds Console Debug                    N
- *     TARGET_3DS_RETAIL_RELEASE   Nintendo 3ds Console Release                  N
- *     TARGET_3DS_RETAIL_FINAL     Nintendo 3ds Console Final                    N
- *     TARGET_3DS_PROFILE_DEBUG    Nintendo 3ds Profile Debug                    N
- *     TARGET_3DS_PROFILE_RELEASE  Nintendo 3ds Profile Release                  N
- *     TARGET_3DS_TEST_DEBUG       Nintendo 3ds Test Debug                       N
- *     TARGET_3DS_TEST_RELEASE     Nintendo 3ds Test Release                     N
+ *     -------------------------------------------------------------------------
+ *     TARGET_MAC_EDITOR_DEBUG     Editors                                     N
+ *     TARGET_MAC_EDITOR_RELEASE   Editors                                     N
+ *     TARGET_MAC_TOOL_DEBUG       Tools, command line, etc                    N
+ *     TARGET_MAC_TOOL_RELEASE     Tools, command line, etc                    N
+ *     TARGET_MAC_DEV_DEBUG        Windows PC DevKit Debug                     N
+ *     TARGET_MAC_DEV_RELEASE      Windows PC DevKit Release                   N
+ *     TARGET_MAC_DEV_FINAL        Windows PC DevKit Final                     N
+ *     TARGET_MAC_CLIENT_DEBUG     Windows PC "Debug Station" Debug            N
+ *     TARGET_MAC_CLIENT_RELEASE   Windows PC "Debug Station" Release          N
+ *     TARGET_MAC_CLIENT_FINAL     Windows PC "Debug Station" Final            N
+ *     TARGET_MAC_RETAIL_DEBUG     Windows PC Console Debug                    N
+ *     TARGET_MAC_RETAIL_RELEASE   Windows PC Console Release                  N
+ *     TARGET_MAC_RETAIL_FINAL     Windows PC Console Final                    N
+ *     TARGET_MAC_PROFILE_DEBUG    Windows PC Profile Debug                    N
+ *     TARGET_MAC_PROFILE_RELEASE  Windows PC Profile Release                  N
+ *     TARGET_MAC_TEST_DEBUG       Windows PC Test Debug                       N
+ *     TARGET_MAC_TEST_RELEASE     Windows PC Test Release                     N
+ *     -------------------------------------------------------------------------
  *     </table>
  *
  *     Targets which are "MFC safe" (and have _MFC in the macro)
@@ -122,18 +76,14 @@
  *     TARGET_PC         Platform PC
  *     TARGET_PC_EDITOR  Platform PC Editor
  *     TARGET_MFC        MFC
- *     TARGET_PS3        Platform Sony PlayStation 3
- *     TARGET_PSP        Platform Sony PlayStation Portable
- *     TARGET_360        Platform Microsoft X-Box 360
- *     TARGET_WII        Platform Nintendo Wii
- *     TARGET_3DS        Platform Nintendo 3DS
+ *     TARGET_MACOS      Platform Mac OS
  *     TARGET_DEVKIT     \on DevKit
  *     TARGET_CLIENT     \on "Debug Station"
  *     TARGET_RETAIL     \on Console
  *     TARGET_DEBUG      Debug
+ *     TARGET_DEV        Development, optimized Debug
  *     TARGET_RELEASE    Release, including some Debug stuff
- *     TARGET_FINAL      Final, optimized codes, excluding all
- *                        the Debug stuff
+ *     TARGET_FINAL      Final, optimized codes, excluding all the Debug stuff
  *     TARGET_TEST       Test (UnitTest, exceptions are enabled)
  *     </table>
  *
@@ -144,74 +94,39 @@
  *     TARGET_PC_EDITOR_DEBUG      TARGET_PC TARGET_DEBUG   TARGET_EDITOR TARGET_MFC
  *     TARGET_PC_EDITOR_RELEASE    TARGET_PC TARGET_RELEASE TARGET_EDITOR TARGET_MFC
  *     TARGET_PC_DEBUG             == TARGET_PC_DEV_DEBUG
+ *     TARGET_PC_DEV               == TARGET_PC_DEV_DEV
  *     TARGET_PC_RELEASE           == TARGET_PC_DEV_RELEASE
  *     TARGET_PC_FINAL             == TARGET_PC_DEV_FINAL
  *     TARGET_PC_DEV_DEBUG         TARGET_PC TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_PC_DEV_RELEASE       TARGET_PC TARGET_DEVKIT TARGET_RELASE
+ *     TARGET_PC_DEV_DEV           TARGET_PC TARGET_DEVKIT TARGET_DEV
+ *     TARGET_PC_DEV_RELEASE       TARGET_PC TARGET_DEVKIT TARGET_RELEASE
  *     TARGET_PC_DEV_FINAL         TARGET_PC TARGET_DEVKIT TARGET_FINAL
  *     TARGET_PC_CLIENT_DEBUG      TARGET_PC TARGET_CLIENT TARGET_DEBUG
- *     TARGET_PC_CLIENT_RELEASE    TARGET_PC TARGET_CLIENT TARGET_RELASE
+ *     TARGET_PC_CLIENT_DEV        TARGET_PC TARGET_CLIENT TARGET_DEV
+ *     TARGET_PC_CLIENT_RELEASE    TARGET_PC TARGET_CLIENT TARGET_RELEASE
  *     TARGET_PC_CLIENT_FINAL      TARGET_PC TARGET_CLIENT TARGET_FINAL
  *     TARGET_PC_RETAIL_DEBUG      TARGET_PC TARGET_RETAIL TARGET_DEBUG
- *     TARGET_PC_RETAIL_RELEASE    TARGET_PC TARGET_RETAIL TARGET_RELASE
+ *     TARGET_PC_RETAIL_DEV        TARGET_PC TARGET_RETAIL TARGET_DEV
+ *     TARGET_PC_RETAIL_RELEASE    TARGET_PC TARGET_RETAIL TARGET_RELEASE
  *     TARGET_PC_RETAIL_FINAL      TARGET_PC TARGET_RETAIL TARGET_FINAL
- *     TARGET_PC_TEST_DEBUG        TARGET_PC TARGET_DEVKIT TARGET_DEBUG  TARGET_TEST
- *     TARGET_PS3_TEST_RELEASE     TARGET_PC TARGET_DEVKIT TARGET_RELASE TARGET_TEST
- *     TARGET_PS3_DEV_DEBUG        TARGET_PS3 TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_PS3_DEV_RELEASE      TARGET_PS3 TARGET_DEVKIT TARGET_RELASE
- *     TARGET_PS3_DEV_FINAL        TARGET_PS3 TARGET_DEVKIT TARGET_FINAL
- *     TARGET_PS3_CLIENT_DEBUG     TARGET_PS3 TARGET_CLIENT TARGET_DEBUG
- *     TARGET_PS3_CLIENT_RELEASE   TARGET_PS3 TARGET_CLIENT TARGET_RELASE
- *     TARGET_PS3_CLIENT_FINAL     TARGET_PS3 TARGET_CLIENT TARGET_FINAL
- *     TARGET_PS3_RETAIL_DEBUG     TARGET_PS3 TARGET_RETAIL TARGET_DEBUG
- *     TARGET_PS3_RETAIL_RELEASE   TARGET_PS3 TARGET_RETAIL TARGET_RELASE
- *     TARGET_PS3_RETAIL_FINAL     TARGET_PS3 TARGET_RETAIL TARGET_FINAL
- *     TARGET_PS3_TEST_DEBUG       TARGET_PS3 TARGET_DEVKIT TARGET_DEBUG  TARGET_TEST
- *     TARGET_PS3_TEST_RELEASE     TARGET_PS3 TARGET_DEVKIT TARGET_RELASE TARGET_TEST
- *     TARGET_PSP_DEV_DEBUG        TARGET_PSP TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_PSP_DEV_RELEASE      TARGET_PSP TARGET_DEVKIT TARGET_RELASE
- *     TARGET_PSP_DEV_FINAL        TARGET_PSP TARGET_DEVKIT TARGET_FINAL
- *     TARGET_PSP_CLIENT_DEBUG     TARGET_PSP TARGET_CLIENT TARGET_DEBUG
- *     TARGET_PSP_CLIENT_RELEASE   TARGET_PSP TARGET_CLIENT TARGET_RELASE
- *     TARGET_PSP_CLIENT_FINAL     TARGET_PSP TARGET_CLIENT TARGET_FINAL
- *     TARGET_PSP_RETAIL_DEBUG     TARGET_PSP TARGET_RETAIL TARGET_DEBUG
- *     TARGET_PSP_RETAIL_RELEASE   TARGET_PSP TARGET_RETAIL TARGET_RELASE
- *     TARGET_PSP_RETAIL_FINAL     TARGET_PSP TARGET_RETAIL TARGET_FINAL
- *     TARGET_PSP_TEST_DEBUG       TARGET_PSP TARGET_DEVKIT TARGET_DEBUG  TARGET_TEST
- *     TARGET_PSP_TEST_RELEASE     TARGET_PSP TARGET_DEVKIT TARGET_RELASE TARGET_TEST
- *     TARGET_360_DEV_DEBUG        TARGET_360 TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_360_DEV_RELEASE      TARGET_360 TARGET_DEVKIT TARGET_RELASE
- *     TARGET_360_DEV_FINAL        TARGET_360 TARGET_DEVKIT TARGET_FINAL
- *     TARGET_360_CLIENT_DEBUG     TARGET_360 TARGET_CLIENT TARGET_DEBUG
- *     TARGET_360_CLIENT_RELEASE   TARGET_360 TARGET_CLIENT TARGET_RELEASE
- *     TARGET_360_CLIENT_FINAL     TARGET_360 TARGET_CLIENT TARGET_FINAL
- *     TARGET_360_RETAIL_DEBUG     TARGET_360 TARGET_RETAIL TARGET_DEBUG
- *     TARGET_360_RETAIL_RELEASE   TARGET_360 TARGET_RETAIL TARGET_RELASE
- *     TARGET_360_RETAIL_FINAL     TARGET_360 TARGET_RETAIL TARGET_FINAL
- *     TARGET_360_TEST_DEBUG       TARGET_360 TARGET_DEVKIT TARGET_DEBUG  TARGET_TEST
- *     TARGET_360_TEST_RELEASE     TARGET_360 TARGET_DEVKIT TARGET_RELASE TARGET_TEST
- *     TARGET_WII_DEV_DEBUG        TARGET_WII TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_WII_DEV_RELEASE      TARGET_WII TARGET_DEVKIT TARGET_RELASE
- *     TARGET_WII_DEV_FINAL        TARGET_WII TARGET_DEVKIT TARGET_FINAL
- *     TARGET_WII_CLIENT_DEBUG     TARGET_WII TARGET_CLIENT TARGET_DEBUG
- *     TARGET_WII_CLIENT_RELEASE   TARGET_WII TARGET_CLIENT TARGET_RELASE
- *     TARGET_WII_CLIENT_FINAL     TARGET_WII TARGET_CLIENT TARGET_FINAL
- *     TARGET_WII_RETAIL_DEBUG     TARGET_WII TARGET_RETAIL TARGET_DEBUG
- *     TARGET_WII_RETAIL_RELEASE   TARGET_WII TARGET_RETAIL TARGET_RELASE
- *     TARGET_WII_RETAIL_FINAL     TARGET_WII TARGET_RETAIL TARGET_FINAL
- *     TARGET_WII_TEST_DEBUG       TARGET_WII TARGET_DEVKIT TARGET_DEBUG  TARGET_TEST
- *     TARGET_WII_TEST_RELEASE     TARGET_WII TARGET_DEVKIT TARGET_RELASE TARGET_TEST
- *     TARGET_3DS_DEV_DEBUG        TARGET_3DS TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_3DS_DEV_RELEASE      TARGET_3DS TARGET_DEVKIT TARGET_RELASE
- *     TARGET_3DS_DEV_FINAL        TARGET_3DS TARGET_DEVKIT TARGET_FINAL
- *     TARGET_3DS_CLIENT_DEBUG     TARGET_3DS TARGET_CLIENT TARGET_DEBUG
- *     TARGET_3DS_CLIENT_RELEASE   TARGET_3DS TARGET_CLIENT TARGET_RELASE
- *     TARGET_3DS_CLIENT_FINAL     TARGET_3DS TARGET_CLIENT TARGET_FINAL
- *     TARGET_3DS_RETAIL_DEBUG     TARGET_3DS TARGET_RETAIL TARGET_DEBUG
- *     TARGET_3DS_RETAIL_RELEASE   TARGET_3DS TARGET_RETAIL TARGET_RELASE
- *     TARGET_3DS_RETAIL_FINAL     TARGET_3DS TARGET_RETAIL TARGET_FINAL
- *     TARGET_3DS_TEST_DEBUG       TARGET_3DS TARGET_DEVKIT TARGET_DEBUG  TARGET_TEST
- *     TARGET_3DS_TEST_RELEASE     TARGET_3DS TARGET_DEVKIT TARGET_RELASE TARGET_TEST
+ *     TARGET_PC_TEST_DEBUG        TARGET_PC TARGET_DEBUG  TARGET_TEST
+ *     TARGET_PC_TEST_DEV          TARGET_PC TARGET_DEV    TARGET_TEST
+ *     TARGET_PC_TEST_RELEASE      TARGET_PC TARGET_RELEASE TARGET_TEST
+ *     TARGET_MACOS_DEV_DEBUG      TARGET_MACOS TARGET_DEVKIT TARGET_DEBUG
+ *     TARGET_MACOS_DEV_DEV        TARGET_MACOS TARGET_DEVKIT TARGET_DEV
+ *     TARGET_MACOS_DEV_RELEASE    TARGET_MACOS TARGET_DEVKIT TARGET_RELEASE
+ *     TARGET_MACOS_DEV_FINAL      TARGET_MACOS TARGET_DEVKIT TARGET_FINAL
+ *     TARGET_MACOS_CLIENT_DEBUG   TARGET_MACOS TARGET_CLIENT TARGET_DEBUG
+ *     TARGET_MACOS_CLIENT_DEV     TARGET_MACOS TARGET_CLIENT TARGET_DEV
+ *     TARGET_MACOS_CLIENT_RELEASE TARGET_MACOS TARGET_CLIENT TARGET_RELEASE
+ *     TARGET_MACOS_CLIENT_FINAL   TARGET_MACOS TARGET_CLIENT TARGET_FINAL
+ *     TARGET_MACOS_RETAIL_DEBUG   TARGET_MACOS TARGET_RETAIL TARGET_DEBUG
+ *     TARGET_MACOS_RETAIL_DEV     TARGET_MACOS TARGET_RETAIL TARGET_DEV
+ *     TARGET_MACOS_RETAIL_RELEASE TARGET_MACOS TARGET_RETAIL TARGET_RELEASE
+ *     TARGET_MACOS_RETAIL_FINAL   TARGET_MACOS TARGET_RETAIL TARGET_FINAL
+ *     TARGET_MACOS_TEST_DEBUG     TARGET_MACOS TARGET_DEBUG  TARGET_TEST
+ *     TARGET_MACOS_TEST_DEV       TARGET_MACOS TARGET_DEV    TARGET_TEST
+ *     TARGET_MACOS_TEST_RELEASE   TARGET_MACOS TARGET_RELEASE TARGET_TEST
  *     </table>
  *
  *
@@ -224,7 +139,7 @@
  *     Dat Size Macro     \Description              \Version   Platform
  *     -----------------  ------------------------  ---------  ---------
  *     X_32BIT            32-bit hardware systems   <2005		PC,PS2,PSP,PS3,XBOX,XBOX360,NDS,N3DS,WII
- *     X_64BIT            64-bit hardware systems   >2008       PC,XBOXONE,PS4
+ *     X_64BIT            64-bit hardware systems   >2008       PC,XBOXONE,PS4,SWITCH
  *     </table>
  *
  *     Finally the user needs to define in the configuration which
@@ -244,13 +159,15 @@
  *     <table>
  *     Compiler Macro     \Description              \Version   Platform
  *     -----------------  ------------------------  ---------  ---------
- *     COMPILER_MSVC      Microsoft Visual Studio   2005       PC
- *     COMPILER_MSVC      Microsoft Visual Studio   2008       PC
- *     COMPILER_MSVC      Microsoft Visual Studio   2010       PC
- *     COMPILER_MW_WII    Metrowerks                WII       WII
- *     COMPILER_GCC_PSP   GCC                        PSP       PSP
- *     COMPILER_SN_PSP    SNSystems                  PSP       PSP
- *     COMPILER_SN_PS3    SNSystems                  PS3       PS3
+ *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2005       PC
+ *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2008       PC
+ *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2010       PC
+ *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2015       PC
+ *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2017       PC
+ *     COMPILER_WINDOWS_CLANG     CLang                     7.0        PC
+ * 
+ *     COMPILER_MACOS_CLANG       CLang                     7.0        MacOS
+ * 
  *     </table>
  *
  *     Other Macros provided to the user automatically are:
@@ -285,22 +202,13 @@ namespace xcore
 	{
 		X_PLATFORM_NONE             = 0,
 		X_PLATFORM_PC               = (1<<0),
-		X_PLATFORM_PS3              = (1<<1),
-		X_PLATFORM_PSP              = (1<<2),
-		X_PLATFORM_360              = (1<<3),
-		X_PLATFORM_WII              = (1<<4),
-		X_PLATFORM_3DS              = (1<<5),
+		X_PLATFORM_MACOS            = (1<<1),
 		X_PLATFORM_ALL              = (1<<15),
 		X_PLATFORM_PAD              = 0xffffffff
 	};
 
 	#undef TARGET_PC
-	#undef TARGET_PS3
-	#undef TARGET_PSP
-	#undef TARGET_360
-	#undef TARGET_NDS
-	#undef TARGET_WII
-	#undef TARGET_3DS
+	#undef TARGET_MACOS
 
 	/**
 	 *
@@ -310,65 +218,31 @@ namespace xcore
 	 *  without sufficiently qualifying the target.
 	 *
 	 */
-	#if !defined(TARGET_PS3_DEV_DEBUG) && !defined(TARGET_PS3_DEV_RELEASE) && !defined(TARGET_PS3_DEV_FINAL) && !defined(TARGET_PS3_CLIENT_DEBUG) && !defined(TARGET_PS3_CLIENT_RELEASE) && !defined(TARGET_PS3_CLIENT_FINAL) && !defined(TARGET_PS3_RETAIL_DEBUG) && !defined(TARGET_PS3_RETAIL_RELEASE) && !defined(TARGET_PS3_RETAIL_FINAL)
-		#ifdef TARGET_PS3
+	#if !defined(TARGET_MACOS_DEV_DEBUG) && !defined(TARGET_MACOS_DEV_DEV) && !defined(TARGET_MACOS_DEV_RELEASE) && !defined(TARGET_MACOS_DEV_FINAL) \
+		&& !defined(TARGET_MACOS_CLIENT_DEBUG) && !defined(TARGET_MACOS_CLIENT_DEV) && !defined(TARGET_MACOS_CLIENT_RELEASE) && !defined(TARGET_MACOS_CLIENT_FINAL) \
+			&& !defined(TARGET_MACOS_RETAIL_DEBUG) && !defined(TARGET_MACOS_RETAIL_DEV) && !defined(TARGET_MACOS_RETAIL_RELEASE) && !defined(TARGET_MACOS_RETAIL_FINAL)
+		#ifdef TARGET_MACOS
 			#error x_target, error; Incorrect target specification.
-			#error x_target, error; Use either TARGET_PS3_DEV, TARGET_PS3_CLIENT, or TARGET_PS3_RETAIL.
+			#error x_target, error; Use either TARGET_MACOS_DEV, TARGET_MACOS_CLIENT, or TARGET_MACOS_RETAIL.
 		#endif
 	#else
-		#undef TARGET_PS3
-	#endif
-
-	#if !defined(TARGET_360_DEV_DEBUG) && !defined(TARGET_360_DEV_RELEASE) && !defined(TARGET_360_DEV_FINAL) && !defined(TARGET_360_CLIENT_DEBUG) && !defined(TARGET_360_CLIENT_RELEASE) && !defined(TARGET_360_CLIENT_FINAL) && !defined(TARGET_360_RETAIL_DEBUG) && !defined(TARGET_360_RETAIL_RELEASE) && !defined(TARGET_360_RETAIL_FINAL)
-		#ifdef TARGET_360
-			#error x_target, error; TARGET_360 is not a sufficient target specification.
-			#error x_target, error; Use either TARGET_360_DEV, TARGET_360_CLIENT, or TARGET_360_RETAIL.
-		#endif
-	#else
-		#undef TARGET_360
-	#endif
-
-	#if !defined(TARGET_WII_DEV_DEBUG) && !defined(TARGET_WII_DEV_RELEASE) && !defined(TARGET_WII_DEV_FINAL) && !defined(TARGET_WII_CLIENT_DEBUG) && !defined(TARGET_WII_CLIENT_RELEASE) && !defined(TARGET_WII_CLIENT_FINAL) && !defined(TARGET_WII_RETAIL_DEBUG) && !defined(TARGET_WII_RETAIL_RELEASE) && !defined(TARGET_WII_RETAIL_FINAL)
-		#ifdef TARGET_WII
-			#error x_target, error; TARGET_WII is not a sufficient target specification.
-			#error x_target, error; Use either PLATFORM_WII_DEV_DEBUG, PLATFORM_WII_DEV_RELEASE or PLATFORM_WII_DEV_FINAL
-		#endif
-	#else
-		#undef TARGET_WII
-	#endif
-
-	#if !defined(TARGET_3DS_DEV_DEBUG) && !defined(TARGET_3DS_DEV_RELEASE) && !defined(TARGET_3DS_DEV_FINAL) && !defined(TARGET_3DS_CLIENT_DEBUG) && !defined(TARGET_3DS_CLIENT_RELEASE) && !defined(TARGET_3DS_CLIENT_FINAL) && !defined(TARGET_3DS_RETAIL_DEBUG) && !defined(TARGET_3DS_RETAIL_RELEASE) && !defined(TARGET_3DS_RETAIL_FINAL)
-		#ifdef TARGET_3DS
-			#error x_target, error; TARGET_3DS is not a sufficient target specification.
-			#error x_target, error; Use either PLATFORM_3DS_DEV_DEBUG, PLATFORM_3DS_DEV_RELEASE or PLATFORM_3DS_DEV_FINAL
-		#endif
-	#else
-		#undef TARGET_3DS
-	#endif
-
-	#if !defined(TARGET_PSP_DEV_DEBUG) && !defined(TARGET_PSP_DEV_RELEASE) && !defined(TARGET_PSP_DEV_FINAL) && !defined(TARGET_PSP_CLIENT_DEBUG) && !defined(TARGET_PSP_CLIENT_RELEASE) && !defined(TARGET_PSP_CLIENT_FINAL) && !defined(TARGET_PSP_RETAIL_DEBUG) && !defined(TARGET_PSP_RETAIL_RELEASE) && !defined(TARGET_PSP_RETAIL_FINAL)
-		#ifdef TARGET_PSP
-			#error x_target, error; TARGET_PSP is not a sufficient target specification.
-			#error x_target, error; Use either TARGET_PSP_DEV, TARGET_PSP_CLIENT, or TARGET_PSP_RETAIL.
-		#endif
-	#else
-		#undef TARGET_PSP
+		#undef TARGET_MACOS
 	#endif
 
 	/**
-	 *  Playstation 3 Targets
+	 *  Mac OS Targets
 	 */
 
-	#ifdef TARGET_PS3_TEST_DEBUG
+	#ifdef TARGET_MACOS_TEST_DEBUG
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_DEBUG
 			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -376,31 +250,47 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_TEST_RELEASE
+	#ifdef TARGET_MACOS_TEST_DEV
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
+			#define TARGET_DEVKIT
+			#define TARGET_DEV
+			#define TARGET_TEST
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
+			#define VALID_TARGET
+		#endif
+	#endif
+
+	//------------------------------------------------------------------------------
+
+	#ifdef TARGET_MACOS_TEST_RELEASE
+		#ifdef VALID_TARGET
+			#define MULTIPLE_TARGETS
+		#else
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_RELEASE
 			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 		#endif
 	#endif
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_DEV_DEBUG
+	#if defined(TARGET_MACOS_DEV_DEBUG) || defined(TARGET_MACOS_DEBUG)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -408,30 +298,45 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_DEV_RELEASE
+	#if defined(TARGET_MACOS_DEV_DEV) || defined(TARGET_MACOS_DEV)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
+			#define TARGET_DEVKIT
+			#define TARGET_DEV
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
+			#define VALID_TARGET
+		#endif
+	#endif
+	
+	//------------------------------------------------------------------------------
+
+	#if defined(TARGET_MACOS_DEV_RELEASE) || defined(TARGET_MACOS_RELEASE)
+		#ifdef VALID_TARGET
+			#define MULTIPLE_TARGETS
+		#else
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 		#endif
 	#endif
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_DEV_FINAL
+	#if defined(TARGET_MACOS_DEV_FINAL) || defined(TARGET_MACOS_FINAL)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -439,15 +344,15 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_CLIENT_DEBUG
+	#ifdef TARGET_MACOS_CLIENT_DEBUG
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_CLIENT
 			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -455,15 +360,30 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_CLIENT_RELEASE
+	#ifdef TARGET_MACOS_CLIENT_DEV
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
+			#define TARGET_CLIENT
+			#define TARGET_DEV
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
+			#define VALID_TARGET
+		#endif
+	#endif
+	
+	//------------------------------------------------------------------------------
+
+	#ifdef TARGET_MACOS_CLIENT_RELEASE
+		#ifdef VALID_TARGET
+			#define MULTIPLE_TARGETS
+		#else
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_CLIENT
 			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -471,15 +391,15 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_CLIENT_FINAL
+	#ifdef TARGET_MACOS_CLIENT_FINAL
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_CLIENT
 			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -487,15 +407,15 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_RETAIL_DEBUG
+	#ifdef TARGET_MACOS_RETAIL_DEBUG
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_RETAIL
 			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -503,15 +423,30 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_RETAIL_RELEASE
+	#ifdef TARGET_MACOS_RETAIL_DEV
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
+			#define TARGET_MACOS
+			#define TARGET_64BIT
+			#define TARGET_RETAIL
+			#define TARGET_DEV
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
+			#define VALID_TARGET
+		#endif
+	#endif
+	
+	//------------------------------------------------------------------------------
+
+	#ifdef TARGET_MACOS_RETAIL_RELEASE
+		#ifdef VALID_TARGET
+			#define MULTIPLE_TARGETS
+		#else
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_RETAIL
 			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_PS3
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -519,680 +454,20 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_PS3_RETAIL_FINAL
+	#ifdef TARGET_MACOS_RETAIL_FINAL
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_PS3
-			#define TARGET_32BIT
-			#define TARGET_RETAIL
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_PS3
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-
-	//------------------------------------------------------------------------------
-
-	/**
-	 *  Playstation Portable Targets
-	 */
-
-	#ifdef TARGET_PSP_TEST_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_32BIT
-			#define TARGET_DEVKIT
-			#define TARGET_DEBUG
-			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_TEST_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_32BIT
-			#define TARGET_DEVKIT
-			#define TARGET_RELEASE
-			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_DEV_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_32BIT
-			#define TARGET_DEVKIT
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_DEV_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_DEVKIT
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_DEV_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_DEVKIT
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_CLIENT_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_CLIENT
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_CLIENT_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_CLIENT
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_CLIENT_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_CLIENT
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_RETAIL_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_RETAIL
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_RETAIL_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
-			#define TARGET_RETAIL
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_PSP_RETAIL_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_PSP
+			#define TARGET_MACOS
+			#define TARGET_64BIT
 			#define TARGET_RETAIL
 			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_PSP
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	/**
-	 *  Nintendo Wii Targets
-	 */
-
-	#ifdef TARGET_WII_TEST_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_DEVKIT
-			#define TARGET_DEBUG
-			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_WII
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
 	#endif
 
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_TEST_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_DEVKIT
-			#define TARGET_RELEASE
-			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_DEV_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_DEVKIT
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_DEV_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_DEVKIT
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_DEV_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_DEVKIT
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_CLIENT_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_CLIENT
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_CLIENT_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_CLIENT
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_CLIENT_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_CLIENT
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_RETAIL_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_RETAIL
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_RETAIL_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_RETAIL
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_WII_RETAIL_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_WII
-			#define TARGET_RETAIL
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_WII
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-
-	/**
-	 *  Nintendo 3DS Targets
-	 */
-
-	#if defined(TARGET_3DS_TEST_DEBUG)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_DEVKIT
-			#define TARGET_DEBUG
-			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_TEST_RELEASE)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_DEVKIT
-			#define TARGET_RELEASE
-			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_DEV_DEBUG)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_DEVKIT
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_DEV_RELEASE)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_DEVKIT
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_DEV_FINAL)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_DEVKIT
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_CLIENT_DEBUG)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_CLIENT
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_CLIENT_RELEASE)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_CLIENT
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_CLIENT_FINAL)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_CLIENT
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_RETAIL_DEBUG)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_RETAIL
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_RETAIL_RELEASE)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_RETAIL
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#if defined(TARGET_3DS_RETAIL_FINAL)
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_3DS
-			#define TARGET_RETAIL
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_3DS
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	/**
-	 *  Microsoft X-Box 360 Targets
-	 */
-
-	#ifdef TARGET_360_TEST_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_DEVKIT
-			#define TARGET_DEBUG
-			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_TEST_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_DEVKIT
-			#define TARGET_RELEASE
-			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_DEV_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_DEVKIT
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_DEV_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_DEVKIT
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_DEV_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_DEVKIT
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_CLIENT_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_CLIENT
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_CLIENT_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_CLIENT
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_CLIENT_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_CLIENT
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_RETAIL_DEBUG
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_RETAIL
-			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-			#define X_DEBUG
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_RETAIL_RELEASE
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_RETAIL
-			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-		#endif
-	#endif
-
-	//------------------------------------------------------------------------------
-
-	#ifdef TARGET_360_RETAIL_FINAL
-		#ifdef VALID_TARGET
-			#define MULTIPLE_TARGETS
-		#else
-			#define TARGET_360
-			#define TARGET_RETAIL
-			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_360
-			#define VALID_TARGET
-		#endif
-	#endif
 
 	/**
 	 *  PC Targets
@@ -1209,6 +484,21 @@ namespace xcore
 			#define TARGET_PLATFORM X_PLATFORM_PC
 			#define VALID_TARGET
 			#define X_DEBUG
+		#endif
+	#endif
+
+	//------------------------------------------------------------------------------
+
+	#if defined(TARGET_PC_TEST_DEV)
+		#ifdef VALID_TARGET
+			#define MULTIPLE_TARGETS
+		#else
+			#define TARGET_PC
+			#define TARGET_DEVKIT
+			#define TARGET_DEV
+			#define TARGET_TEST
+			#define TARGET_PLATFORM X_PLATFORM_PC
+			#define VALID_TARGET
 		#endif
 	#endif
 
@@ -1242,6 +532,20 @@ namespace xcore
 		#endif
 	#endif
 
+	//------------------------------------------------------------------------------
+
+	#if defined(TARGET_PC_DEV) || defined(TARGET_PC_DEV_DEV)
+		#ifdef VALID_TARGET
+			#define MULTIPLE_TARGETS
+		#else
+			#define TARGET_PC
+			#define TARGET_DEVKIT
+			#define TARGET_DEV
+			#define TARGET_PLATFORM X_PLATFORM_PC
+			#define VALID_TARGET
+		#endif
+	#endif
+	
 	//------------------------------------------------------------------------------
 
 	#if defined(TARGET_PC_RELEASE) || defined(TARGET_PC_DEV_RELEASE)
@@ -1287,6 +591,20 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
+	#if defined(TARGET_PC_CLIENT_DEV)
+		#ifdef VALID_TARGET
+			#define MULTIPLE_TARGETS
+		#else
+			#define TARGET_PC
+			#define TARGET_CLIENT
+			#define TARGET_DEV
+			#define TARGET_PLATFORM X_PLATFORM_PC
+			#define VALID_TARGET
+		#endif
+	#endif
+	
+	//------------------------------------------------------------------------------
+
 	#if defined(TARGET_PC_CLIENT_RELEASE)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
@@ -1330,16 +648,17 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#if defined(TARGET_PC_RETAIL_RELEASE)
+	#if defined(TARGET_PC_RETAIL_DEV)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
 			#define TARGET_PC
 			#define TARGET_RETAIL
-			#define TARGET_RELEASE
+			#define TARGET_DEV
 			#define TARGET_PLATFORM X_PLATFORM_PC
 			#define VALID_TARGET
-		#endif
+			#define X_DEBUG
+			#endif
 	#endif
 
 	//------------------------------------------------------------------------------
@@ -1375,6 +694,25 @@ namespace xcore
 		#endif
 	#endif
 
+	//------------------------------------------------------------------------------
+
+	#ifdef TARGET_PC_EDITOR_DEV
+		#ifdef VALID_TARGET
+			#define MULTIPLE_TARGETS
+		#else
+			#define TARGET_PC
+			#define TARGET_DEVKIT
+			#define TARGET_MFC
+			#define TARGET_DEV
+			#define TARGET_PLATFORM X_PLATFORM_PC
+			#define TARGET_EDITOR
+			#define VALID_TARGET
+			//#define X_USE_NATIVE_NEW_AND_DELETE
+			//#define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
+			#define X_EXCEPTIONS
+		#endif
+	#endif
+	
 	//------------------------------------------------------------------------------
 
 	#ifdef TARGET_PC_EDITOR_RELEASE
@@ -1413,9 +751,20 @@ namespace xcore
 				#define TARGET_DEBUG
 				#define X_DEBUG
 			#else
-				#define TARGET_RELEASE
+				#define TARGET_DEV
 			#endif
+		#elif defined(__apple__) && defined(__clang)
+			#undef TARGET_MACOS
+			#define TARGET_MACOS
+			#define TARGET_PLATFORM X_PLATFORM_MACOS
+			#define VALID_TARGET
 
+			#ifdef _DEBUG
+				#define TARGET_DEBUG
+				#define X_DEBUG
+			#else
+				#define TARGET_DEV
+			#endif
 		#else
 			#error x_target, error; Target specification invalid or not found.
 			#error x_target, error; The compilation environment must define one of the macros listed in x_targets.h
@@ -1453,19 +802,20 @@ namespace xcore
 		#undef TARGET_PLATFORM_STR
 	#endif
 
-	#if   defined(TARGET_360)
-		#define TARGET_PLATFORM_STR	"X360"
-	#elif defined(TARGET_PSP)
-		#define TARGET_PLATFORM_STR	"PSP"
-	#elif defined(TARGET_PS3)
-		#define TARGET_PLATFORM_STR	"PS3"
-	#elif defined(TARGET_WII)
-		#define TARGET_PLATFORM_STR	"WII"
+	#if   defined(TARGET_MACOS)
+		#define TARGET_PLATFORM_STR	"MACOS"
 	#elif defined(TARGET_PC)
 		#define TARGET_PLATFORM_STR	"PC"
 	#endif
 
 	#if defined(TARGET_DEBUG)
+		#if defined(TARGET_TEST)
+			#define TARGET_CONFIG_SHORT_STR		"_TB"
+		#else
+			#define TARGET_CONFIG_SHORT_STR		"_B"
+		#endif
+	#endif
+	#if defined(TARGET_DEV)
 		#if defined(TARGET_TEST)
 			#define TARGET_CONFIG_SHORT_STR		"_TD"
 		#else
@@ -1490,6 +840,13 @@ namespace xcore
 			#define TARGET_CONFIG_FULL_STR		"_DEBUG"
 		#endif
 	#endif
+	#if defined(TARGET_DEV)
+		#if defined(TARGET_TEST)
+			#define TARGET_CONFIG_FULL_STR		"_TESTDEV"
+		#else
+			#define TARGET_CONFIG_FULL_STR		"_DEV"
+		#endif
+	#endif
 	#if defined(TARGET_RELEASE)
 		#if defined(TARGET_TEST)
 			#define TARGET_CONFIG_FULL_STR		"_TESTRELEASE"
@@ -1508,7 +865,7 @@ namespace xcore
 	#endif
 
 	#if defined(TARGET_DEVKIT)
-		#define TARGET_HW_STR			"_DEV"
+		#define TARGET_HW_STR			"_DEVKIT"
 	#endif
 	#if defined(TARGET_RETAIL)
 		#define TARGET_HW_STR			"_RETAIL"
@@ -1541,9 +898,9 @@ namespace xcore
 	 */
 
 	#ifdef MULTIPLE_TARGETS
-	#pragma message(TARGET_FULL_DESCR_STR)
-	#error x_target, error; Multiple target specification definition macros were detected.
-	#error x_target, error; The compilation environment must define only one of the macros listed in x_targets.h
+		#pragma message(TARGET_FULL_DESCR_STR)
+		#error x_target, error; Multiple target specification definition macros were detected.
+		#error x_target, error; The compilation environment must define only one of the macros listed in x_targets.h
 	#endif
 
 	/**
@@ -1552,15 +909,9 @@ namespace xcore
 	 *
 	 */
 
-	#undef COMPILER_MSVC
-	#undef COMPILER_X360
-	#undef COMPILER_MW_WII
-	#undef COMPILER_3DS
-	#undef COMPILER_GCC_PSP
-	#undef COMPILER_SN_PSP
-	#undef COMPILER_SN_PS2
-	#undef COMPILER_SN_PS3
-	#undef COMPILER_GCC_PS3
+	#undef COMPILER_WINDOWS_MSVC
+	#undef COMPILER_MACOS_CLANG
+	
 	#undef COMPILER_DEFAULT
 	#undef COMPILER_VERSION
 
@@ -1578,89 +929,50 @@ namespace xcore
 			 */
 			#if _MSC_VER < 1400
 			#elif _MSC_VER == 1400
-				#define COMPILER_MSVC
+				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_VERSION            2005
 			#elif _MSC_VER == 1500
-				#define COMPILER_MSVC
+				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2008
 			#elif _MSC_VER == 1600
-				#define COMPILER_MSVC
+				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2010
 			#elif _MSC_VER == 1700
-				#define COMPILER_MSVC
+				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2012
 			#elif _MSC_VER == 1800
-				#define COMPILER_MSVC
+				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2013
 			#elif _MSC_VER == 1900
-				#define COMPILER_MSVC
+				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2015
 			#else
-				#error x_target, error; Unknown _MSVC_VER compiler ID
+				#error x_target, error; Unknown _MSVC_VER compiler version
 			#endif
 		#else
 			#error x_target, error; This compiler is not supported for TARGET_PC
 		#endif
-	#elif defined(TARGET_WII)
-		#ifdef __CWCC__
-			#define COMPILER_MW_WII
+	#elif defined(TARGET_MACOS)
+		#ifdef __clang__
+			#define COMPILER_MACOS_CLANG
 			#define COMPILER_DEFAULT
-			#define COMPILER_VERSION            1
+			#define COMPILER_VERSION            7
 		#else
-			#error x_target, error; This compiler is not supported for TARGET_WII
+			#error x_target, error; This compiler is not supported for TARGET_MACOS
 		#endif
-	#elif defined(TARGET_3DS)
-		#ifdef __arm__
-			#define COMPILER_3DS
-			#define COMPILER_DEFAULT
-			#define COMPILER_VERSION            __ARMCC_VERSION
-		#else
-			#error x_target, error; This compiler is not supported for TARGET_3DS
-		#endif
-	#elif defined(TARGET_PSP)
-		#ifdef __SNC__
-			#define COMPILER_SN_PSP
-			#define COMPILER_DEFAULT
-			#define COMPILER_VERSION            1
-		#elif defined(__GCC__)
-			#error x_target, error; GCC for psp not defined
-		#else
-			#error x_target, error; This compiler is not supported for TARGET_PSP
-		#endif
-	#elif defined(TARGET_360)
-		#if (_MSC_VER == 1400) || (_MSC_VER == 1500) || (_MSC_VER == 1600)
-			#define COMPILER_X360
-			#define COMPILER_DEFAULT
-			#define COMPILER_VERSION            360
-		#else
-			#error x_target, error; The version of Microsoft Visual Studio compiler is not supported for TARGET_360
-		#endif
-	#elif defined(TARGET_PS3)
-		#if defined(__SNC__) || defined(SPU) // It seems in xbase the GCC compiler is still being used for SPUs, but it has the attribute notation only
-			#define COMPILER_SN_PS3
-			#define COMPILER_DEFAULT
-			#define COMPILER_VERSION            1
-		#elif defined(__GCC__)
-			#define COMPILER_GCC_PS3
-			#define COMPILER_DEFAULT
-			#define COMPILER_VERSION            1
-		#else
-			#error PS3 complier not found
-		#endif
-
 	#else
 		#error x_target, error; This compiler is not supported for TARGET_UNKNOWN
 	#endif
 
 	#undef X_CHAR_BIT
 
-	/// This one is for PC
-	#if defined(COMPILER_MSVC)
+	/// This one is for Windows; Microsoft Developer Studio Visual C/C++ Compiler
+	#if defined(COMPILER_WINDOWS_MSVC)
 		#define X_NO_CUSTOM_INT64
 		#define X_NO_CUSTOM_UINT64
 		class __xint128;
@@ -1716,93 +1028,7 @@ namespace xcore
 		/// disable useless warnings
 		#pragma warning(disable:4800)
 
-	#elif defined(COMPILER_MW_WII)
-		#define X_NO_CUSTOM_INT64
-		#define X_NO_CUSTOM_UINT64
-		class __xint128;
-		class __xuint128;
-		class __xint256;
-		class __xuint256;
-
-		#define X_CACHE_LINE_SIZE           32
-		#define X_CHAR_BIT                  8
-		#define X_USE_PRAGMA_ONCE
-		#define f_inline                  inline
-		#define f_noinline                __declspec(noinline)
-		#define X_FORCE_INLINE			  inline
-		#define X_STD_CALL                __stdcall
-		#define X_C_DECL
-		#define X_BOOL                    signed long
-		#define X_BYTE                    unsigned char
-		#define X_WCHAR                   unsigned short
-		#define X_INT8                    char
-		#define X_INT16                   short
-		#define X_INT32                   int
-		#define X_INT64                   signed long long
-		#define X_UINT64                  unsigned long long
-		#define X_INT128                  __xint128
-		#define X_UINT128                 __xuint128
-		#define X_INT256                  __xint256
-		#define X_UINT256                 __xuint256
-		#define X_SIZE                    unsigned long
-		#define X_PTR_SIZED_INT           int
-		#define X_BIG_ENDIAN              1234
-		#define X_FLOAT                   float
-		#define X_DOUBLE                  double
-		#define X_ALIGNMENT_DEFAULT           4
-		#define X_ALIGNMENT(a)            __attribute__((aligned(a)))
-
-		#define X_ALIGN_BEGIN(a)
-		#define X_ALIGN_END(a)            __attribute__((aligned(a)))
-
-		#define X_OFFSET_OF(type, member)     (X_SIZE)&((((type *)0)->member))
-
-		#define __GNU_C__
-
-	#elif defined(COMPILER_3DS)
-		#define X_NO_CUSTOM_INT64
-		#define X_NO_CUSTOM_UINT64
-		class __xint128;
-		class __xuint128;
-		class __xint256;
-		class __xuint256;
-
-		#define X_CACHE_LINE_SIZE         32
-		#define X_CHAR_BIT                8
-		#define X_USE_PRAGMA_ONCE
-		#define f_inline                  __forceinline
-		#define f_noinline                __declspec(noinline)
-		#define X_FORCE_INLINE			  inline
-		#define X_STD_CALL                __stdcall
-		#define X_C_DECL
-		#define X_BOOL                    signed long
-		#define X_BYTE                    unsigned char
-		#define X_WCHAR                   unsigned short
-		#define X_INT8                    char
-		#define X_INT16                   short
-		#define X_INT32                   int
-		#define X_INT64                   signed __int64
-		#define X_UINT64                  unsigned __int64
-		#define X_INT128                  __xint128
-		#define X_UINT128                 __xuint128
-		#define X_INT256                  __xint256
-		#define X_UINT256                 __xuint256
-		#define X_SIZE                    unsigned int
-		#define X_PTR_SIZED_INT           int
-		#define X_LITTLE_ENDIAN           4321
-		#define X_FLOAT                   float
-		#define X_DOUBLE                  double
-		#define X_ALIGNMENT_DEFAULT           4
-		#define X_ALIGNMENT(a)            __attribute__((aligned(a)))
-
-		#define X_ALIGN_BEGIN(a)
-		#define X_ALIGN_END(a)            __attribute__((aligned(a)))
-
-		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
-
-		#pragma anon_unions
-
-	#elif defined(COMPILER_GCC_PS3)
+	#elif defined(COMPILER_MACOS_CLANG_)
 		#define X_NO_CUSTOM_INT64
 		#define X_NO_CUSTOM_UINT64
 		class __xint128;
@@ -1816,11 +1042,7 @@ namespace xcore
 		#define X_USE_PRAGMA_ONCE
 		#define X_STD_CALL                    __stdcall
 		#define X_C_DECL                      __cdecl
-#ifdef SPU
-		#define f_inline                      inline
-#else
 		#define f_inline                      __forceinline
-#endif
 		#define f_noinline
 		#define X_FORCE_INLINE                inline
 		#define X_FORCE_INLINE_SPU			  __forceinline
@@ -1836,11 +1058,7 @@ namespace xcore
 		#define X_UINT128                     __xuint128
 		#define X_INT256                      __xint256
 		#define X_UINT256                     __xuint256
-#ifdef SPU
-		#define X_SIZE                        long unsigned int
-#else
 		#define X_SIZE                        unsigned int
-#endif
 		#define X_PTR_SIZED_INT               int
 		#define X_BIG_ENDIAN                  1234
 		#define X_FLOAT                       float
@@ -1855,7 +1073,7 @@ namespace xcore
 
 		#define X_THREAD_LOCAL                __declspec(thread)
 
-	#elif defined(COMPILER_SN_PS3)
+	#elif defined(COMPILER_MACOS_CLANG)
 		#define X_NO_CUSTOM_INT64
 		#define X_NO_CUSTOM_UINT64
 		class __xint128;
@@ -1869,17 +1087,10 @@ namespace xcore
 		#define X_USE_PRAGMA_ONCE
 		#define X_STD_CALL                    __stdcall
 		#define X_C_DECL                      __cdecl
-#ifdef SPU									// because we dont REALLY want to force stuff to be inlined on SPU.. and the PS3 compiler excels at ignoring "inline"
-		#define f_inline					  inline
-		#define f_noinline                    __attribute__((noinline))
-		#define X_FORCE_INLINE                inline
-		#define X_FORCE_INLINE_SPU			  __attribute__((always_inline))		// this is just for those special cases where we really do want to inline on SPU..
-#else
 		#define f_inline					  __attribute__((always_inline))
 		#define f_noinline                    __attribute__((noinline))
 		#define X_FORCE_INLINE                __attribute__((always_inline))
 		#define X_FORCE_INLINE_SPU			  __attribute__((always_inline))
-#endif
 
 		#define X_BOOL                        signed long
 		#define X_BYTE                        unsigned char
@@ -1893,16 +1104,20 @@ namespace xcore
 		#define X_UINT128                     __xuint128
 		#define X_INT256                      __xint256
 		#define X_UINT256                     __xuint256
-#ifdef SPU
-		#define X_SIZE                        long unsigned int
+
+#ifdef TARGET_64BIT
+		#define X_SIZE                        unsigned long long
+		#define X_PTR_SIZED_INT               signed long long
+		#define X_ALIGNMENT_DEFAULT           8
 #else
 		#define X_SIZE                        unsigned int
-#endif
 		#define X_PTR_SIZED_INT               int
+		#define X_ALIGNMENT_DEFAULT           4
+#endif
+		
 		#define X_BIG_ENDIAN                  1234
 		#define X_FLOAT                       float
 		#define X_DOUBLE                      double
-		#define X_ALIGNMENT_DEFAULT           4
 		#define X_ALIGNMENT(a)                __attribute__((aligned(a)))
 
 		#define X_ALIGN_BEGIN(a)
@@ -1911,150 +1126,6 @@ namespace xcore
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
 
 		#define X_THREAD_LOCAL                __declspec(thread)
-
-	#elif defined(COMPILER_SN_PSP)
-		#define X_NO_CUSTOM_INT64
-		#define X_NO_CUSTOM_UINT64
-		class __xint128;
-		class __xuint128;
-		class __xint256;
-		class __xuint256;
-
-		#define X_CACHE_LINE_SIZE           32
-		#define X_CHAR_BIT                  8
-		#define X_USE_PRAGMA_ONCE
-		#define X_STD_CALL                  __stdcall
-		#define X_C_DECL
-		#define f_inline                  inline
-		#define f_noinline                __attribute__((noinline))
-		#define X_FORCE_INLINE            __attribute__((always_inline))
-		#define X_BOOL                    signed long
-		#define X_BYTE                    unsigned char
-		#define X_WCHAR                   unsigned short
-		#define X_INT8                    char
-		#define X_INT16                   short
-		#define X_INT32                   int
-		#define X_INT64                   signed long long
-		#define X_UINT64                  unsigned long long
-		#define X_INT128                  __xint128
-		#define X_UINT128                 __xuint128
-		#define X_INT256                  __xint256
-		#define X_UINT256                 __xuint256
-		#define X_SIZE                    unsigned int
-		#define X_PTR_SIZED_INT           int
-		#define X_LITTLE_ENDIAN           4321
-		#define X_FLOAT                   float
-		#define X_DOUBLE		          double
-		#define X_ALIGNMENT_DEFAULT       4
-		#define X_ALIGNMENT(a)            __attribute__((aligned(a)))
-
-		#define X_ALIGN_BEGIN(a)
-		#define X_ALIGN_END(a)            __attribute__((aligned(a)))
-
-		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
-
-		#pragma diag_suppress=817
-		#pragma diag_suppress=68
-		#pragma diag_suppress=382
-		#pragma diag_suppress=613
-		#pragma diag_suppress=178
-		#pragma diag_suppress=187
-		#pragma diag_suppress=47
-		#pragma diag_suppress=1055
-		#pragma diag_suppress=552
-		#pragma diag_suppress=129
-		#pragma diag_suppress=112
-		#pragma diag_suppress=428
-
-	#elif defined(COMPILER_GCC_PSP)
-		#define X_NO_CUSTOM_INT64
-		#define X_NO_CUSTOM_UINT64
-		class __xint128;
-		class __xuint128;
-		class __xint256;
-		class __xuint256;
-
-		#define X_CACHE_LINE_SIZE           32
-		#define X_CHAR_BIT                  8
-		#define X_USE_PRAGMA_ONCE
-		#define X_IEEE_FLOATS
-		#define X_STD_CALL                __stdcall
-		#define X_C_DECL
-		#define f_inline                  inline
-		#define f_noinline
-		#define X_FORCE_INLINE            inline
-		#define X_BOOL                    signed int
-		#define X_BYTE                    unsigned char
-		#define X_WCHAR                   unsigned short
-		#define X_INT8                    char
-		#define X_INT16                   short
-		#define X_INT32                   long
-		#define X_INT64                   signed long long
-		#define X_UINT64                  unsigned long long
-		#define X_INT128                  __xint128
-		#define X_UINT128                 __xuint128
-		#define X_INT256                  __xint256
-		#define X_UINT256                 __xuint256
-		#define X_SIZE                    unsigned int
-		#define X_PTR_SIZED_INT           int
-		#define X_LITTLE_ENDIAN           4321
-		#define X_FLOAT                   float
-		#define X_ALIGNMENT_DEFAULT       4
-		#define X_ALIGNMENT(a)            __attribute__((aligned(a)))
-
-		#define X_ALIGN_BEGIN(a)
-		#define X_ALIGN_END(a)			  __attribute__((aligned(a)))
-
-		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
-
-		#define __GNU_C__
-
-	#elif defined(COMPILER_X360)
-		#define X_NO_CUSTOM_INT64
-		#define X_NO_CUSTOM_UINT64
-		//#define X_NO_CUSTOM_INT128
-		//#define X_NO_CUSTOM_UINT128
-		class __xint128;
-		class __xuint128;
-		class __xint256;
-		class __xuint256;
-
-		//#define X_NO_PARTIAL_TEMPLATE
-		#define X_CACHE_LINE_SIZE          32
-		#define X_CHAR_BIT                 8
-		#define X_IEEE_FLOATS
-		#define USE_PRAGMA_ONCE
-		#define X_STD_CALL                 __stdcall
-		#define X_C_DECL                   __cdecl
-		#define f_inline                   __forceinline
-		#define f_noinline                 __declspec(noinline)
-		#define X_FORCE_INLINE            __forceinline
-		#define X_BOOL                     signed long
-		#define X_BYTE                     unsigned char
-		#define X_WCHAR                    unsigned short
-		#define X_INT8                     char
-		#define X_INT16                    short
-		#define X_INT32                    int
-		#define X_INT64                    signed __int64
-		#define X_UINT64                   unsigned __int64
-		#define X_INT128                   __xint128
-		#define X_UINT128                  __xuint128
-		#define X_INT256                   __xint256
-		#define X_UINT256                  __xuint256
-		#define X_SIZE                     unsigned int
-		#define X_PTR_SIZED_INT            int
-		#define X_BIG_ENDIAN               1234
-		#define X_FLOAT                    float
-		#define X_DOUBLE                   double
-		#define X_ALIGNMENT_DEFAULT        4
-		#define X_ALIGNMENT(a)             __declspec(align(a))
-
-		#define X_ALIGN_BEGIN(a)			   __declspec(align(a))
-		#define X_ALIGN_END(a)
-
-		#define X_OFFSET_OF(type, member)  (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
-
-		#define X_THREAD_LOCAL             __declspec(thread)
 
 	#else
 		#error x_target, error; no compiler selected
@@ -2071,40 +1142,26 @@ namespace xcore
 	enum x_memalign
 	{
 		X_MEMALIGN_PC               = 8,
-		X_MEMALIGN_PSP              = 8,
-		X_MEMALIGN_PS3              = 8,
-		X_MEMALIGN_360              = 8,
-		X_MEMALIGN_WII              = 8,
-		X_MEMALIGN_3DS              = 8,
+		X_MEMALIGN_MACOS            = 8,
 	#if defined(TARGET_PC)
 		X_MEMALIGN			= X_MEMALIGN_PC,
-	#elif defined(TARGET_PSP)
-		X_MEMALIGN			= X_MEMALIGN_PSP,
-	#elif defined(TARGET_PS3)
-		X_MEMALIGN			= X_MEMALIGN_PS3,
-	#elif defined(TARGET_WII)
-		X_MEMALIGN			= X_MEMALIGN_WII,
-	#elif defined(TARGET_360)
-		X_MEMALIGN			= X_MEMALIGN_360,
-	#elif defined(TARGET_3DS)
-		X_MEMALIGN			= X_MEMALIGN_3DS,
+	#elif defined(TARGET_MACOS)
+		X_MEMALIGN			= X_MEMALIGN_MACOS,
 	#else
 		#error x_target, error; need to have X_MEMALIGN defined
 	#endif
 		X__PAD              = 0xffffffff
 	};
 
-
 	/**
 		* Multi-threading configuration
 	*/
 
-	#if defined(TARGET_PC) || defined(TARGET_PS3) || defined(TARGET_360)
+	#if defined(TARGET_PC) || defined(TARGET_MACOS)
 		#define TARGET_MULTI_CORE
 	#else
 		#define TARGET_SINGLE_CORE
 	#endif
-
 
 	/**
 	 *
@@ -2126,10 +1183,6 @@ namespace xcore
 		#ifndef X_ASSERT
 			#define X_ASSERT
 		#endif
-	#endif
-
-	#if !defined(SPU)
-		#define X_FORCE_INLINE_SPU X_FORCE_INLINE
 	#endif
 
 	/**
@@ -2217,12 +1270,14 @@ namespace xcore
 	class xwriter
 	{
 	public:
+		virtual	~xwriter() {}
 		virtual void 	write(xbyte const*, u32) = 0;
 	};
 
 	class xreader
 	{
 	public:
+		virtual	~xreader() {}
 		virtual s32 	read(xbyte*, u32) = 0;
 	};
 

@@ -3,15 +3,15 @@
 * Core custom 256 bit signed integer
 */
 
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 #ifndef X_NO_CUSTOM_INT256
-#include "xbase\x_limits.h"
-#include "xbase\private\x_int64.h"
-#include "xbase\private\x_uint64.h"
-#include "xbase\private\x_int128.h"
-#include "xbase\private\x_uint128.h"
-#include "xbase\private\x_int256.h"
-#include "xbase\private\x_uint256.h"
+#include "xbase/x_limits.h"
+#include "xbase/private/x_int64.h"
+#include "xbase/private/x_uint64.h"
+#include "xbase/private/x_int128.h"
+#include "xbase/private/x_uint128.h"
+#include "xbase/private/x_int256.h"
+#include "xbase/private/x_uint256.h"
 
 namespace xcore {
 

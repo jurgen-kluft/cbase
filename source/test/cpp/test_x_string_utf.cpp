@@ -1,9 +1,9 @@
-#include "xbase\x_allocator.h"
-#include "xbase\x_carray.h"
-#include "xbase\x_va_list.h"
-#include "xbase\x_string_ascii.h"
-#include "xbase\x_string_utf.h"
-#include "xunittest\xunittest.h"
+#include "xbase/x_allocator.h"
+#include "xbase/x_carray.h"
+#include "xbase/x_va_list.h"
+#include "xbase/x_string_ascii.h"
+#include "xbase/x_string_utf.h"
+#include "xunittest/xunittest.h"
 
 using namespace xcore;
 
@@ -33,7 +33,7 @@ UNITTEST_SUITE_BEGIN(xutf)
 		UNITTEST_TEST(strlen_char)
 		{
 			// s32  		strlen		(char const* _str, char const** _end = 0);
-			const uchar8 utf8_str1[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0, 0, 0, 0 };	// frénch
+			const uchar8 utf8_str1[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0, 0, 0, 0 };	// frï¿½nch
 			u32 utf8_str1_len = utf8::size(utf8_str1);
 			CHECK_EQUAL(6, utf8_str1_len);
 		}
@@ -48,7 +48,7 @@ UNITTEST_SUITE_BEGIN(xutf)
 		{
 			const uchar8* str1 = (const uchar8*)"test";
 			CHECK_EQUAL(4, utf8::size(str1));
-			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0 };	// frénch
+			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0 };	// frï¿½nch
 			const uchar8* str = (const uchar8*)str2;
 			uchar32 c;
 			str = utf::read(str, c);
@@ -69,14 +69,14 @@ UNITTEST_SUITE_BEGIN(xutf)
 				CHECK_EQUAL(1, utf::size(ch));
 			}
 
-			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// frénch
+			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// frï¿½nch
 			const uchar8* str = (const uchar8*)str2;
 
 			uchar32 c;
 			utf::read(str, c);
 			utf::read(str, c);
 			utf::read(str, c);
-			CHECK_EQUAL(2, utf::size(c));	// take the é
+			CHECK_EQUAL(2, utf::size(c));	// take the ï¿½
 
 			str = (const uchar8*)str2;
 			for (s32 i=0; i<6; ++i)
