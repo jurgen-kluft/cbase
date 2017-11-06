@@ -254,7 +254,7 @@ namespace xcore
 			ASSERT(mRoot.mTail->used() == false);
 		}
 
-		void*		operator new(unsigned long num_bytes, void* mem)			{ return mem; }
+		void*		operator new(xsize_t num_bytes, void* mem)			{ return mem; }
 		void		operator delete(void* mem, void* )							{ }
 		void		operator delete(void* mem)									{ }						
 

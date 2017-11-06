@@ -10,9 +10,9 @@ using namespace xcore;
 extern xcore::x_iallocator* gTestAllocator;
 
 
-UNITTEST_SUITE_BEGIN(xutf)
+UNITTEST_SUITE_BEGIN(xstring_utf)
 {
-	UNITTEST_FIXTURE(utilities)
+	UNITTEST_FIXTURE(utf8)
 	{
 		UNITTEST_FIXTURE_SETUP()
 		{
@@ -108,5 +108,23 @@ UNITTEST_SUITE_BEGIN(xutf)
 		}
 	}
 
+	UNITTEST_FIXTURE(utf32)
+	{
+		UNITTEST_FIXTURE_SETUP()
+		{
+		}
+
+		UNITTEST_FIXTURE_TEARDOWN()
+		{
+		}
+
+		UNITTEST_TEST(type_size_checks)
+		{
+			CHECK_EQUAL(1, sizeof(uchar));
+			CHECK_EQUAL(1, sizeof(uchar8));
+			CHECK_EQUAL(2, sizeof(uchar16));
+			CHECK_EQUAL(4, sizeof(uchar32));
+		}
+	}
 }
 UNITTEST_SUITE_END

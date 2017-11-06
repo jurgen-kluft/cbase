@@ -7,15 +7,7 @@
 
 #ifdef TARGET_PC
 	#include <math.h>
-#elif defined(TARGET_WII)
-	#include <math.h>
-#elif defined(TARGET_PS3)
-	#include <math.h>
-#elif defined(TARGET_PSP)
-	#include <math.h>
-#elif defined(TARGET_360)
-	#include <math.h>
-#elif defined(TARGET_N3DS)
+#elif defined(TARGET_MACOS)
 	#include <math.h>
 #else
 	#error "Don't know how fmod for this platform"
@@ -1363,7 +1355,7 @@ namespace xcore
 
 	 namespace utf32
 	 {
-		s32 VSPrintf(prune str, prune str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		s32 vsprintf(prune str, prune str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args)
 		{
 			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
 			CharWriterToUtf32Buffer writer(str, str_end);
@@ -1373,7 +1365,7 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32 SPrintf(prune str, prune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		s32 sprintf(prune str, prune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
 			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
 			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
@@ -1384,7 +1376,7 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32 VCPrintf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		s32 vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
 		{
 			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
 			CharWriterCounter writer;
@@ -1394,7 +1386,7 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32 CPrintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		s32 cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
@@ -1405,7 +1397,7 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32		Printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		s32		printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
@@ -1418,7 +1410,7 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		 s32		Printf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		 s32		printf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
 		 {
 			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
 			s32 const cache_size = 128;
@@ -1430,7 +1422,7 @@ namespace xcore
 			return (s32)writer.Count();
 		 }
 
-		 s32		Printf(pcrune str, pcrune str_end)
+		 s32		printf(pcrune str, pcrune str_end)
 		 {
 			 return xconsole::write(str, str_end);
 		 }

@@ -112,13 +112,17 @@ namespace xcore
 		#include "private/x_double_inline_win32.h"
 
     //==============================================================================
-    // INLINE PS3
+    // INLINE OSX
     //==============================================================================
     #elif defined(TARGET_MACOS)
-        #include "private/x_double_inline_ps3.h"
+        #include "private/x_double_inline_osx.h"
 
+	//==============================================================================
+	// UNKNOWN PLATFORM
+	//==============================================================================
 	#else
 		#error "Current platform is not supported!"
+
 	#endif
 
 //==============================================================================

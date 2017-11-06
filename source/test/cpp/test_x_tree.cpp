@@ -1,4 +1,3 @@
-#include "xbase/x_rb.h"
 #include "xbase/private/x_rbtree_sentinel.h"
 #include "xbase/x_allocator.h"
 #include "xbase/x_slice.h"
@@ -24,7 +23,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		}
 
-		struct mynode : public xrbnode
+		struct mynode : public xrbsnode
 		{
 			mynode() : id(0) { clear(); }
 			mynode(uptr i) : id(i) { clear(); }
@@ -33,7 +32,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
 		};
 
-		s32		rb_node_compare(void* aa, xrbnode* bb)
+		s32		rb_node_compare(void* aa, xrbsnode* bb)
 		{
 			uptr aid = (uptr)aa;
 			mynode* b = (mynode*)bb;
@@ -44,7 +43,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 				return 1;
 			return 0;
 		}
-		s32		rb_node_node_compare(xrbnode* aa, xrbnode* bb)
+		s32		rb_node_node_compare(xrbsnode* aa, xrbsnode* bb)
 		{
 			mynode* a = (mynode*)aa;
 			mynode* b = (mynode*)bb;
@@ -56,7 +55,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 			return 0;
 		}
 
-		void	rb_node_remove(xrbnode* to_replace, xrbnode* to_remove)
+		void	rb_node_remove(xrbsnode* to_replace, xrbsnode* to_remove)
 		{
 			mynode* replacer = (mynode*)to_replace;
 			mynode* removed = (mynode*)to_remove;
@@ -68,47 +67,49 @@ UNITTEST_SUITE_BEGIN(xtree)
 	
 		UNITTEST_TEST(constructor1)
 		{
-			xtree tree;
-			tree.init(rb_node_compare, rb_node_remove);
+			xrbstree tree;
+			tree.init(rb_node_compare);
 
 			mynode a(1);
 			mynode b(2);
 			mynode c(3);
 			mynode d(4);
 
+			const char* result = NULL;
+
 			bool inserted;
 			inserted = tree.insert((void*)a.id, &a);
 			CHECK_TRUE(inserted);
-			CHECK_TRUE(tree.test(rb_node_node_compare));
+			CHECK_TRUE(tree.test(result));
 			inserted = tree.insert((void*)b.id, &b);
 			CHECK_TRUE(inserted);
-			CHECK_TRUE(tree.test(rb_node_node_compare));
+			CHECK_TRUE(tree.test(result));
 			inserted = tree.insert((void*)c.id, &c);
 			CHECK_TRUE(inserted);
-			CHECK_TRUE(tree.test(rb_node_node_compare));
+			CHECK_TRUE(tree.test(result));
 			inserted = tree.insert((void*)d.id, &d);
 			CHECK_TRUE(inserted);
-			CHECK_TRUE(tree.test(rb_node_node_compare));
+			CHECK_TRUE(tree.test(result));
 
-			xrbnode* f = NULL;
+			xrbsnode* f = NULL;
 			tree.find((void*)c.id, f);
 			CHECK_EQUAL(&c, f);
-			CHECK_TRUE(tree.test(rb_node_node_compare));
+			CHECK_TRUE(tree.test(result));
 			tree.find((void*)a.id, f);
 			CHECK_EQUAL(&a, f);
-			CHECK_TRUE(tree.test(rb_node_node_compare));
+			CHECK_TRUE(tree.test(result));
 			tree.find((void*)b.id, f);
 			CHECK_EQUAL(&b, f);
-			CHECK_TRUE(tree.test(rb_node_node_compare));
+			CHECK_TRUE(tree.test(result));
 			tree.find((void*)d.id, f);
 			CHECK_EQUAL(&d, f);
-			CHECK_TRUE(tree.test(rb_node_node_compare));
+			CHECK_TRUE(tree.test(result));
 
-			xrbnode* iterator = NULL;
+			xrbsnode* iterator = NULL;
 			s32 i = 0;
 			do
 			{
-				xrbnode* node_to_destroy = tree.clear(iterator);
+				xrbsnode* node_to_destroy = tree.clear(iterator);
 				if (i == 0)
 				{
 					CHECK_TRUE(node_to_destroy == &a);
@@ -138,8 +139,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 		{
 			x_type_allocator<mynode, x_cdtor_placement_new<mynode> > node_allocator(gTestAllocator);
 			
-			xrbtree tree;
-			tree.init(rb_node_compare, rb_node_remove);
+			xrbstree tree;
+			tree.init(rb_node_compare);
 
 			const int max_tracked_allocs = 1000;
 			uptr allocations[max_tracked_allocs];
@@ -162,11 +163,11 @@ UNITTEST_SUITE_BEGIN(xtree)
 					uptr pid = allocations[alloc_idx];
 					mynode _p_(pid);
 
-					xrbnode* f = NULL;
+					xrbsnode* f = NULL;
 					if (tree.remove((void*)pid, f))
 					{
 						CHECK_EQUAL(((mynode*)f)->id, pid);
-						CHECK_TRUE(tree.test(rb_node_node_compare, test_result));
+						CHECK_TRUE(tree.test(test_result));
 						node_allocator.deallocate((mynode*)f);
 					}
 					else
@@ -178,7 +179,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 				allocations[alloc_idx] = node->id;
 				bool inserted = tree.insert((void*)node->id, node);
 				CHECK_TRUE(inserted);
-				CHECK_TRUE(tree.test(rb_node_node_compare, test_result));
+				CHECK_TRUE(tree.test(test_result));
 			}
 
 			for (s32 i = 0; i < max_tracked_allocs; ++i)
@@ -188,7 +189,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 					uptr pid = allocations[i];
 					mynode _p_(pid);
 
-					xrbnode* f = NULL;
+					xrbsnode* f = NULL;
 					if (tree.remove((void*)pid, f))
 					{
 						CHECK_EQUAL(((mynode*)f)->id, pid);
@@ -198,8 +199,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 				}
 			}
 
-			xrbnode* iterator = NULL;
-			xrbnode* node_to_destroy = NULL;
+			xrbsnode* iterator = NULL;
+			xrbsnode* node_to_destroy = NULL;
 			do 
 			{
 				node_to_destroy = tree.clear(iterator);

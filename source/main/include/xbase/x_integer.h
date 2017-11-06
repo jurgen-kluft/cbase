@@ -91,10 +91,15 @@ namespace xcore
 	//==============================================================================
 	#include "xbase/private/x_integer_inline.h"
 
-	#if defined TARGET_MACOS
-		#include "xbase/private/x_integer_inline_ps3.h"
+	#if defined TARGET_PC
+		#include "xbase/private/x_integer_inline_win32.h"
+
+	#elif defined TARGET_MACOS
+		#include "xbase/private/x_integer_inline_osx.h"
+
 	#else
 		#error "Current platform is not supported!"
+
 	#endif
 
 	//==============================================================================

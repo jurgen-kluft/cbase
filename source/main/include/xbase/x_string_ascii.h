@@ -21,6 +21,8 @@ namespace xcore
 
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
 
+		inline prune	pos(prune str, pcrune pos) { return str + (pos - str); }
+
 		pcrune			len(pcrune str);
 		pcrune			len(pcrune str, s32* str_len);
 		pcrune			len(pcrune str, pcrune str_eos, s32* str_len);
@@ -29,8 +31,9 @@ namespace xcore
 
 		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
 
-		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found
-		pcrune			find_one_of(pcrune str, pcrune str_end, pcrune set, pcrune set_end);								/// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
+		pcrune			find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode = CASE_SENSITIVE);
+		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);			/// Return position of first occurrence of <inString> or -1 if not found
+		pcrune			find_one_of(pcrune str, pcrune str_end, pcrune set, pcrune set_end, ECmpMode mode = CASE_SENSITIVE);	/// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 		
 		prune			replace(prune str_begin, pcrune str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end);
 
@@ -48,7 +51,7 @@ namespace xcore
 		s32				parse(pcrune str, pcrune str_end, f64& value);
 
 		bool			is_decimal(pcrune str, pcrune str_end);
-		bool			is_hexadecimal(pcrune str, pcrune str_end, bool with_prefix);
+		bool			is_hexadecimal(pcrune str, pcrune str_end, bool with_prefix=false);
 		bool			is_float(pcrune str, pcrune str_end);
 		bool			is_GUID(pcrune str, pcrune str_end);
 
@@ -56,20 +59,21 @@ namespace xcore
 		prune			to_string(prune str, prune str_end, pcrune str_eos, u32 val, s32 base = 10);
 		prune			to_string(prune str, prune str_end, pcrune str_eos, s64 val, s32 base = 10);
 		prune			to_string(prune str, prune str_end, pcrune str_eos, u64 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, f32 val, s32 num_fractional_digits = 2);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, f64 val, s32 num_fractional_digits = 2);
+		prune			to_string(prune str, prune str_end, pcrune str_eos, f32 val, s32 num_fractional_digits = 4);
+		prune			to_string(prune str, prune str_end, pcrune str_eos, f64 val, s32 num_fractional_digits = 4);
 
 		inline bool		is_space(uchar32 c) { return((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
 		inline bool		is_upper(uchar32 c) { return((c >= 'A') && (c <= 'Z')); }
 		inline bool		is_lower(uchar32 c) { return((c >= 'a') && (c <= 'z')); }
 		inline bool		is_alpha(uchar32 c) { return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
 		inline bool		is_digit(uchar32 c) { return((c >= '0') && (c <= '9')); }
-		inline bool		is_number(uchar32 c) { return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
+		inline bool		is_hexa(uchar32 c) { return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
 
 		inline uchar32	to_upper(uchar32 c) { return((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c; }
 		inline uchar32	to_lower(uchar32 c) { return((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
 		inline u32		to_digit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
 		inline u32		to_number(uchar32 c) { if (is_digit(c)) return to_digit(c); else if (c >= 'A' && c <= 'F') return(c - 'A' + 10); else if (c >= 'a' && c <= 'f') return(c - 'a' + 10); else return(c); }
+
 		inline bool		is_equal(uchar32 a, uchar32 b, ECmpMode mode = CASE_SENSITIVE) { if (mode == CASE_IGNORE) { a = to_lower(a); b = to_lower(b); } return (a == b); }
 
 		bool			is_upper(pcrune str, pcrune str_end);											/// Check if string is all upper case

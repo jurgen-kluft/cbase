@@ -598,6 +598,14 @@ namespace xcore
 
 	namespace ascii
 	{
+		s32	sscanf(pcrune str, pcrune fmt, X_VA_R_ARGS_16)
+		{
+			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+			CharReaderFromAsciiBuffer buf_reader((const uchar*)str, NULL);
+			CharReaderFromAsciiBuffer fmt_reader((const uchar*)fmt, NULL);
+			return VSScanf(&buf_reader, &fmt_reader, vr_args);
+		}
+
 		s32 sscanf(pcrune str, pcrune str_end, pcrune fmt, pcrune fmt_end, X_VA_R_ARGS_16)
 		{
 			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);

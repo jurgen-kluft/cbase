@@ -274,20 +274,33 @@ namespace xcore
 			return found ? found_pos : NULL;
 		}
 
-		pcrune		find(pcrune str, pcrune str_end, uchar32 find_char)
+		pcrune		find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode)
 		{
 			uchar32 c = 0;
-			do 
+			if (mode == CASE_SENSITIVE)
 			{
-				pcrune cur_pos = str;
-				c = read_char(str);
-				if (c == find_char)
-					return cur_pos;
-			} while (str < str_end);
+				do
+				{
+					pcrune cur_pos = str;
+					c = read_char(str);
+					if (c == find_char)
+						return cur_pos;
+				} while (str < str_end);
+			}
+			else
+			{
+				do
+				{
+					pcrune cur_pos = str;
+					c = read_char(str);
+					if (is_equal(c, find_char, mode))
+						return cur_pos;
+				} while (str < str_end);
+			}
 			return NULL;
 		}
 
-		pcrune		find_one_of(pcrune str, pcrune str_end, pcrune charset, pcrune charset_end)
+		pcrune		find_one_of(pcrune str, pcrune str_end, pcrune charset, pcrune charset_end, ECmpMode mode)
 		{
 			pcrune cur_pos = str;
 			pcrune end_pos = str_end;
@@ -349,7 +362,7 @@ namespace xcore
 			return end;
 		}
 
-		static s32	compare(pcrune lstr, pcrune rstr, ECmpMode mode)
+		s32	compare(pcrune lstr, pcrune rstr, ECmpMode mode)
 		{
 			ASSERT(lstr);
 			ASSERT(rstr);
@@ -380,7 +393,7 @@ namespace xcore
 			return 0;
 		}
 
-		static s32	compare(pcrune lstr, pcrune lstr_end, pcrune rstr, pcrune rstr_end, ECmpMode mode)
+		s32	compare(pcrune lstr, pcrune lstr_end, pcrune rstr, pcrune rstr_end, ECmpMode mode)
 		{
 			ASSERT(lstr);
 			ASSERT(rstr);
@@ -618,7 +631,7 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		//------------------------------------------------------------------------------
 
-		prune	to_string(prune str, pcrune str_end, pcrune str_eos, s32 val, s32 base)
+		prune	to_string(prune str, prune str_end, pcrune str_eos, s32 val, s32 base)
 		{
 			rune format_str[] = {'%', 'd'};
 			switch (base)
@@ -632,7 +645,7 @@ namespace xcore
 			return str + len;
 		}
 
-		prune	to_string(prune str, pcrune str_end, pcrune str_eos, u32 val, s32 base)
+		prune	to_string(prune str, prune str_end, pcrune str_eos, u32 val, s32 base)
 		{
 			rune format_str[] = {'%', 'u'};
 			switch (base)
@@ -646,7 +659,7 @@ namespace xcore
 			return str + len;
 		}
 
-		prune	to_string(prune str, pcrune str_end, pcrune str_eos, s64 val, s32 base)
+		prune	to_string(prune str, prune str_end, pcrune str_eos, s64 val, s32 base)
 		{
 			rune format_str[] = {'%', 'd'};
 			switch (base)
@@ -660,7 +673,7 @@ namespace xcore
 			return str + len;
 		}
 
-		prune	to_string(prune str, pcrune str_end, pcrune str_eos, u64 val, s32 base)
+		prune	to_string(prune str, prune str_end, pcrune str_eos, u64 val, s32 base)
 		{
 			rune format_str[] = {'%', 'u'};
 			switch (base)
@@ -674,7 +687,7 @@ namespace xcore
 			return str + len;
 		}
 
-		prune	to_string(prune str, pcrune str_end, pcrune str_eos, f32 val, s32 numFractionalDigits)
+		prune	to_string(prune str, prune str_end, pcrune str_eos, f32 val, s32 numFractionalDigits)
 		{
 			rune format_str[] = {'%', 'f'};
 			pcrune format_str_end = format_str + sizeof(format_str);
@@ -682,7 +695,7 @@ namespace xcore
 			return str + len;
 		}
 
-		prune	to_string(prune str, pcrune str_end, pcrune str_eos, f64 val, s32 numFractionalDigits)
+		prune	to_string(prune str, prune str_end, pcrune str_eos, f64 val, s32 numFractionalDigits)
 		{
 			rune format_str[] = {'%', 'f'};
 			pcrune format_str_end = format_str + sizeof(format_str);

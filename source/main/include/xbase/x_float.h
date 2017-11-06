@@ -121,10 +121,12 @@ namespace xcore
 		#include "private/x_float_inline_win32.h"
 
     //==============================================================================
-    // INLINE PS3
+    // INLINE OSX
     //==============================================================================
     #elif defined TARGET_MACOS
-        #include "private/x_float_inline_ps3.h"
+        #include "private/x_float_inline_osx.h"
+
+	#endif
 
 //==============================================================================
 // END xCore namespace
