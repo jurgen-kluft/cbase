@@ -556,7 +556,7 @@ namespace xcore
 	class CharWriterToUtf32Buffer : public CharWriter
 	{
 	public:
-		inline			CharWriterToUtf32Buffer(uchar32* str, uchar32* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
+		inline			CharWriterToUtf32Buffer(uchar32* str, uchar32 const* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
 		inline			CharWriterToUtf32Buffer(Utf32Buffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd), mCount(0) { }
 
 		virtual u64		Count() const	{ return mCount; }

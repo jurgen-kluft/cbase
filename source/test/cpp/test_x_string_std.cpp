@@ -547,35 +547,35 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 			// ---------------------------------------------------------------------------
 			// Boolean, True/False and Yes/No verification
-			length = ascii::sprintf(buffer, buffer_end, "%b", x_va(true));
+			length = ascii::sprintf(buffer, buffer_end, "%b", NULL, x_va(true));
 			CHECK_EQUAL(4, length);
 			CHECK_TRUE(ascii::compare(buffer, "true")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%B", x_va(true));
+			length = ascii::sprintf(buffer, buffer_end, "%B", NULL, x_va(true));
 			CHECK_EQUAL(4, length);
 			CHECK_TRUE(ascii::compare(buffer, "TRUE")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%b", x_va(false));
+			length = ascii::sprintf(buffer, buffer_end, "%b", NULL, x_va(false));
 			CHECK_EQUAL(5, length);
 			CHECK_TRUE(ascii::compare(buffer, "false")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%#b", x_va(false));
+			length = ascii::sprintf(buffer, buffer_end, "%#b", NULL, x_va(false));
 			CHECK_EQUAL(5, length);
 			CHECK_TRUE(ascii::compare(buffer, "False")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%y", x_va(true));
+			length = ascii::sprintf(buffer, buffer_end, "%y", NULL, x_va(true));
 			CHECK_EQUAL(3, length);
 			CHECK_TRUE(ascii::compare(buffer, "yes")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%y", x_va(false));
+			length = ascii::sprintf(buffer, buffer_end, "%y", NULL, x_va(false));
 			CHECK_EQUAL(2, length);
 			CHECK_TRUE(ascii::compare(buffer, "no")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%Y", x_va(true));
+			length = ascii::sprintf(buffer, buffer_end, "%Y", NULL, x_va(true));
 			CHECK_EQUAL(3, length);
 			CHECK_TRUE(ascii::compare(buffer, "YES")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%#y", x_va(true));
+			length = ascii::sprintf(buffer, buffer_end, "%#y", NULL, x_va(true));
 			CHECK_EQUAL(3, length);
 			CHECK_TRUE(ascii::compare(buffer, "Yes")==0);
 			// ---------------------------------------------------------------------------
@@ -591,7 +591,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			s32 i = 100;
 			const char* str = "hello";
 			const char* fmt = "%d %s";
-			s32 length = ascii::vsprintf(buffer, buffer_end, fmt, x_va_list(x_va(i), x_va(str)));
+			s32 length = ascii::vsprintf(buffer, buffer_end, fmt, NULL, x_va_list(x_va(i), x_va(str)));
 			CHECK_EQUAL(9, length);
 			CHECK_TRUE(ascii::compare(buffer, "100 hello")==0);
 		}
@@ -604,7 +604,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			
 			f32 myfloat;
 			u32 myint;
-			ascii::sscanf(str, format, x_va_r(&myfloat), x_va_r(&myint));
+			ascii::sscanf(str, NULL, format, NULL, x_va_r(&myfloat), x_va_r(&myint));
 
 			CHECK_EQUAL(1.0f, myfloat);
 			CHECK_EQUAL(100, myint);

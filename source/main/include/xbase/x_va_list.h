@@ -103,21 +103,21 @@ namespace xcore
 	public:
 								x_va() : mType(TYPE_EMPTY)							{ }
 								x_va(const x_va& c) : mType(c.mType)				{ *(u64*)mArg = *(u64*)c.mArg; }
-								x_va(s8 inVar) : mType(TYPE_INT8)					{ *(s8*)mArg = inVar; }
-								x_va(u8 inVar) : mType(TYPE_UINT8)					{ *(u8*)mArg = inVar; }
-								x_va(s16 inVar) : mType(TYPE_INT16)					{ *(s16*)mArg = inVar; }
-								x_va(u16 inVar) : mType(TYPE_UINT16)				{ *(u16*)mArg = inVar; }
-								x_va(s32 inVar) : mType(TYPE_INT32)					{ *(s32*)mArg = inVar; }
-								x_va(u32 inVar) : mType(TYPE_UINT32)				{ *(u32*)mArg = inVar; }
-								x_va(s64 inVar) : mType(TYPE_INT64)					{ *(s64*)mArg = inVar; }
-								x_va(u64 inVar) : mType(TYPE_UINT64)				{ *(u64*)mArg = inVar; }
-								x_va(bool inVar) : mType(TYPE_BOOL)					{ *(u32*)mArg = inVar ? 1 : 0; }
-								x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
-								x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
-								x_va(uchar32 inVar) : mType(TYPE_UCHAR)				{ *(uchar32*)mArg = (uchar32)inVar; }
-								x_va(const uchar* inVar) : mType(TYPE_PCTCHAR)		{ *(const uchar**)mArg = inVar; }
-								x_va(const uchar8* inVar) : mType(TYPE_PCUCHAR8)	{ *(const uchar8**)mArg = inVar; }
-								x_va(const uchar32* inVar) : mType(TYPE_PCUCHAR32)	{ *(const uchar32**)mArg = inVar; }
+		explicit				x_va(s8 inVar) : mType(TYPE_INT8)					{ *(s8*)mArg = inVar; }
+		explicit				x_va(u8 inVar) : mType(TYPE_UINT8)					{ *(u8*)mArg = inVar; }
+		explicit				x_va(s16 inVar) : mType(TYPE_INT16)					{ *(s16*)mArg = inVar; }
+		explicit				x_va(u16 inVar) : mType(TYPE_UINT16)				{ *(u16*)mArg = inVar; }
+		explicit				x_va(s32 inVar) : mType(TYPE_INT32)					{ *(s32*)mArg = inVar; }
+		explicit				x_va(u32 inVar) : mType(TYPE_UINT32)				{ *(u32*)mArg = inVar; }
+		explicit				x_va(s64 inVar) : mType(TYPE_INT64)					{ *(s64*)mArg = inVar; }
+		explicit				x_va(u64 inVar) : mType(TYPE_UINT64)				{ *(u64*)mArg = inVar; }
+		explicit				x_va(bool inVar) : mType(TYPE_BOOL)					{ *(u32*)mArg = inVar ? 1 : 0; }
+		explicit				x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
+		explicit				x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
+		explicit				x_va(uchar32 inVar) : mType(TYPE_UCHAR)				{ *(uchar32*)mArg = (uchar32)inVar; }
+		explicit				x_va(const uchar* inVar) : mType(TYPE_PCTCHAR)		{ *(const uchar**)mArg = inVar; }
+		explicit				x_va(const uchar8* inVar) : mType(TYPE_PCUCHAR8)	{ *(const uchar8**)mArg = inVar; }
+		explicit				x_va(const uchar32* inVar) : mType(TYPE_PCUCHAR32)	{ *(const uchar32**)mArg = inVar; }
 
 		EType					type() const										{ return mType; }
 

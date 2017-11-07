@@ -19,6 +19,9 @@ namespace xcore
 		typedef			uchar *					prune;
 		typedef			const uchar*			pcrune;
 
+		inline bool		has_fixed_size_rune() { return true; }
+		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
+
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
 
 		inline prune	pos(prune str, pcrune pos) { return str + (pos - str); }
@@ -94,33 +97,17 @@ namespace xcore
 		uchar32			first_char(pcrune str, pcrune str_end);
 		uchar32			last_char(pcrune str, pcrune str_end);
 		
-		s32				cprintf(pcrune format_str, X_VA_ARGS_16_DEF);
 		s32				cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, X_VA_ARGS_16_DEF);
-		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		s32				vcprintf(pcrune format_str, const x_va_list& args);
 		s32				vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, const x_va_list& args);
+		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
 		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				printf(pcrune format_str, X_VA_ARGS_16_DEF);
+		s32				printf(pcrune str, pcrune str_end);
 		s32				printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		s32				printf(pcrune format_str, const x_va_list& args);
 		s32				printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				printf(pcrune str);
-		s32				printf(pcrune str, pcrune str_end);
-
-		s32				sscanf(pcrune str, pcrune fmt_str, X_VA_R_ARGS_16_DEF);
-		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, X_VA_R_ARGS_16_DEF);
 		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, X_VA_R_ARGS_16_DEF);
-
-		s32				vsscanf(pcrune str, pcrune fmt_str, const x_va_r_list& vr_args);
-		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, const x_va_r_list& vr_args);
 		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, const x_va_r_list& vr_args);
 
 	}; ///< end of ascii namespace

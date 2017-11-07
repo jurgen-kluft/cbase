@@ -109,12 +109,12 @@ namespace xcore
 		uchar const* report_eos = report + 1024;
 		uchar const* fmt = (uchar const*)"*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n";
 		uchar const* fmt_eos = fmt + (4*12);
-		s32 index = ascii::sprintf(report, report_eos, fmt, fmt_eos, exprString, messageString, fileName, lineNumber);
+		s32 index = ascii::sprintf(report, report_eos, fmt, fmt_eos, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
 
 		//
 		// Dump the scope info
 		//
-		x_LogError("Assert", "%s(%d): %s; %s ", x_va_list(fileName, lineNumber, exprString, messageString));
+		x_LogError("Assert", "%s(%d): %s; %s ", x_va_list(x_va(fileName), x_va(lineNumber), x_va(exprString), x_va(messageString)));
 
 		//
 		// Default: Skip this assert

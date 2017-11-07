@@ -8,6 +8,7 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
+#include "xbase/x_va_list.h"
 
 
 namespace xcore
@@ -49,6 +50,11 @@ namespace xcore
 		typedef			uchar8 *				prune;
 		typedef			const uchar8 *			pcrune;
 
+		inline bool		has_fixed_size_rune() { return false; }
+		inline s32		get_fixed_sizeof_rune() { return 1; }
+
+		inline prune	pos(prune str, pcrune pos) { return str + (pos - str); }
+
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
 
 		pcrune			len(pcrune str);
@@ -59,6 +65,7 @@ namespace xcore
 
 		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
 
+		pcrune			find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode = CASE_SENSITIVE);
 		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found
 		pcrune			find_one_of(pcrune str, pcrune str_end, pcrune set, pcrune set_end);								/// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 
@@ -78,7 +85,7 @@ namespace xcore
 		s32				parse(pcrune str, pcrune str_end, f64& value);
 
 		bool			is_decimal(pcrune str, pcrune str_end);
-		bool			is_hexadecimal(pcrune str, pcrune str_end);
+		bool			is_hexadecimal(pcrune str, pcrune str_end, bool with_prefix = false);
 		bool			is_float(pcrune str, pcrune str_end);
 		bool			is_GUID(pcrune str, pcrune str_end);
 
@@ -100,6 +107,7 @@ namespace xcore
 		inline uchar32	to_lower(uchar32 c) { return((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
 		inline u32		to_digit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
 		inline u32		to_number(uchar32 c) { if (is_digit(c)) return to_digit(c); else if (c >= 'A' && c <= 'F') return(c - 'A' + 10); else if (c >= 'a' && c <= 'f') return(c - 'a' + 10); else return(c); }
+		
 		inline bool		is_equal(uchar32 a, uchar32 b, ECmpMode mode = CASE_SENSITIVE) { if (mode == CASE_IGNORE) { a = to_lower(a); b = to_lower(b); } return (a == b); }
 
 		bool			is_upper(pcrune str, pcrune str_end);											/// Check if string is all upper case
@@ -120,31 +128,17 @@ namespace xcore
 		uchar32			first_char(pcrune str, pcrune str_end);
 		uchar32			last_char(pcrune str, pcrune str_end);
 
-		s32				cprintf(pcrune format_str, X_VA_ARGS_16_DEF);
 		s32				cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		prune			sprintf(prune dst_str, prune dst_str_end, pcrune format_str, X_VA_ARGS_16_DEF);
-		prune			sprintf(prune dst_str, prune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		s32				vcprintf(pcrune format_str, const x_va_list& args);
 		s32				vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				vsprintf(prune dst_str, prune dst_str_end, pcrune format_str, const x_va_list& args);
-		s32				vsprintf(prune dst_str, prune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				printf(pcrune format_str, X_VA_ARGS_16_DEF);
+		s32				printf(pcrune str, pcrune str_end);
 		s32				printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		s32				printf(pcrune format_str, const x_va_list& args);
 		s32				printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				printf(pcrune str);
-		s32				printf(pcrune str, pcrune str_end);
-
-		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, X_VA_R_ARGS_16_DEF);
 		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, X_VA_R_ARGS_16_DEF);
-
-		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, const x_va_r_list& vr_args);
 		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, const x_va_r_list& vr_args);
 
 	}; ///< end of utf32 namespace
@@ -155,6 +149,11 @@ namespace xcore
 		typedef			uchar32 *				prune;
 		typedef			const uchar32 *			pcrune;
 
+		inline bool		has_fixed_size_rune() { return true; }
+		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
+
+		inline prune	pos(prune str, pcrune pos) { return str + (pos - str); }
+
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
 
 		pcrune			len(pcrune str);
@@ -165,6 +164,7 @@ namespace xcore
 
 		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
 
+		pcrune			find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode = CASE_SENSITIVE);
 		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found
 		pcrune			find_one_of(pcrune str, pcrune str_end, pcrune set, pcrune set_end);								/// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 
@@ -184,7 +184,7 @@ namespace xcore
 		s32				parse(pcrune str, pcrune str_end, f64& value);
 
 		bool			is_decimal(pcrune str, pcrune str_end);
-		bool			is_hexadecimal(pcrune str, pcrune str_end);
+		bool			is_hexadecimal(pcrune str, pcrune str_end, bool with_prefix = false);
 		bool			is_float(pcrune str, pcrune str_end);
 		bool			is_GUID(pcrune str, pcrune str_end);
 
@@ -206,6 +206,7 @@ namespace xcore
 		inline uchar32	to_lower(uchar32 c) { return((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
 		inline u32		to_digit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
 		inline u32		to_number(uchar32 c) { if (is_digit(c)) return to_digit(c); else if (c >= 'A' && c <= 'F') return(c - 'A' + 10); else if (c >= 'a' && c <= 'f') return(c - 'a' + 10); else return(c); }
+
 		inline bool		is_equal(uchar32 a, uchar32 b, ECmpMode mode = CASE_SENSITIVE) { if (mode == CASE_IGNORE) { a = to_lower(a); b = to_lower(b); } return (a == b); }
 
 		bool			is_upper(pcrune str, pcrune str_end);											/// Check if string is all upper case
@@ -226,31 +227,17 @@ namespace xcore
 		uchar32			first_char(pcrune str, pcrune str_end);
 		uchar32			last_char(pcrune str, pcrune str_end);
 
-		s32				cprintf(pcrune format_str, X_VA_ARGS_16_DEF);
 		s32				cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		prune			sprintf(prune dst_str, prune dst_str_end, pcrune format_str, X_VA_ARGS_16_DEF);
-		prune			sprintf(prune dst_str, prune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		s32				vcprintf(pcrune format_str, const x_va_list& args);
 		s32				vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				vsprintf(prune dst_str, prune dst_str_end, pcrune format_str, const x_va_list& args);
-		s32				vsprintf(prune dst_str, prune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				printf(pcrune format_str, X_VA_ARGS_16_DEF);
+		s32				printf(pcrune str, pcrune str_end);
 		s32				printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-
-		s32				printf(pcrune format_str, const x_va_list& args);
 		s32				printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				printf(pcrune str);
-		s32				printf(pcrune str, pcrune str_end);
-
-		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, X_VA_R_ARGS_16_DEF);
 		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, X_VA_R_ARGS_16_DEF);
-
-		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, const x_va_r_list& vr_args);
 		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, const x_va_r_list& vr_args);
 
 	}; ///< end of utf32 namespace

@@ -1,9 +1,8 @@
-#include "xbase/x_debug.h"
-#include "xbase/x_allocator.h"
-#include "xbase/x_integer.h"
-#include "xbase/x_memory_std.h"
-#include "xbase/x_string_ascii.h"
 #include "xbase/x_string_utf.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_integer.h"
+#include "xbase/x_console.h"
+#include "xbase/x_va_list.h"
 
 
 namespace xcore
@@ -187,8 +186,20 @@ namespace xcore
 
 
 	}	// utf
+};
 
-
+namespace xcore
+{
+	#define __XBASE_GENERIC_STRING_FUNCS__
+	namespace utf8
+	{
+		#include "x_string_funcs.cpp"
+	}
+	
+	namespace utf32
+	{
+		#include "x_string_funcs.cpp"
+	}
 };
 
 /**
