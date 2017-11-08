@@ -30,13 +30,15 @@ namespace xcore
 	{
 		if (handler!=NULL)
 		{
-			xtls<x_asserthandler>::Instance().SetValue(handler);
+			xtls<0, x_asserthandler> slot;
+			slot.set(handler);
 		}
 		else
 		{
 			static x_assert_default sDefaultAssertHandler;
 			handler = &sDefaultAssertHandler;
-			xtls<x_asserthandler>::Instance().SetValue(handler);
+			xtls<0, x_asserthandler> slot;
+			slot.set(handler);
 		}
 		return handler;
 	}
@@ -71,7 +73,10 @@ namespace xcore
 	{
 		// From the TLS, get the debug object
 		// Call HandleAssert() on that object and return
-		x_asserthandler* handler = (x_asserthandler*)xtls<x_asserthandler>::Instance().GetValue();
+		xtls<0, x_asserthandler> slot;
+		x_asserthandler* handler;
+		slot.get(handler);
+
 		if (handler == NULL)
 			handler = sInternalSetAssertHandler(NULL);
 

@@ -119,6 +119,25 @@ namespace xcore
 			return str + l;
 		}
 
+		// Read utf-8 rune backwards (used in string reverse)
+		uchar8  const *	rread(uchar8  const * str, uchar32& out_c)
+		{
+			uchar8 c = str[-1];
+			s32 l = 0;
+			if ((c & 0x80) == 0x00) { l = 1; }
+			else if ((c & 0xe0) == 0xc0) { l = 2; }
+			else if ((c & 0xf0) == 0xe0) { l = 3; }
+			else if ((c & 0xf8) == 0xf0) { l = 4; }
+
+			out_c = 0;
+			for (s32 i = 0; i<l; i++) {
+				c = str[0-i];
+				out_c = out_c << 8;
+				out_c = out_c | c;
+			}
+			return str - l;
+		}
+
 		uchar16 const*	read(uchar16 const* str, uchar32& out_c)
 		{
 			if (is_eos(str))
@@ -191,11 +210,11 @@ namespace xcore
 namespace xcore
 {
 	#define __XBASE_GENERIC_STRING_FUNCS__
+	
 	namespace utf8
 	{
 		#include "x_string_funcs.cpp"
 	}
-	
 	namespace utf32
 	{
 		#include "x_string_funcs.cpp"

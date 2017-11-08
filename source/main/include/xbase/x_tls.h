@@ -7,78 +7,39 @@
 
 namespace xcore
 {
-	// Thread-Local-Storage API
-	extern u32				sTlsAlloc();
-	extern void				sTlsFree(u32 id);
-	extern void				sTlsSetValue(u32 id, void* data);
-	extern void*			sTlsGetValue(u32 id);
-
-
-	template <class T>
-	class xtls
+	//==============================================================================
+	// 
+	// The TLS API
+	//
+	// Note:
+	//    This is a general API and the default instance is NOT thread-safe.
+	//    If an application needs a thread-safe TLS instance then please
+	//    include the xthread package, it has a thread-safe TLS implementation.
+	//==============================================================================
+	class x_TLS
 	{
-	private:
-						xtls(xtls const&) {}
-						~xtls() {}
-
-	protected:
-						xtls()	{}
-
 	public:
-		typedef			xtls<T>		self;
+		virtual				~x_TLS() { }
 
-		static self&	Instance(void);
-		static void		Release(void);
+		virtual s32			max() const = 0;
 
-	public:
-		void			SetValue(T* pvData)
-		{ 
-			sTlsSetValue(mTlsIndex, reinterpret_cast<void*>(pvData)); 
-		}
+		static void			sSet(x_TLS* );
+		static x_TLS*		sGet();
 
-		T const*		GetValue(void) const
-		{ 
-			return reinterpret_cast<T const*>(sTlsGetValue(mTlsIndex));
-		}
-
-		T*				GetValue(void)
-		{ 
-			return reinterpret_cast<T*>(sTlsGetValue(mTlsIndex)); 
-		}
-
-	protected:
-		u32				mTlsIndex;
-		static xtls<T>*	mInstance;
+		virtual	void		i_set(s32 index, void * inData) = 0;
+		virtual	void		i_get(s32 index, void *& outData) = 0;
+		virtual	void		i_get(s32 index, void const *& outData) const = 0;
 	};
 
-	template <class T>
-	xtls<T>*	xtls<T>::mInstance = 0;
-
-	template <class T>
-	xtls<T>& xtls<T>::Instance(void)
+	template<s32 IDX, class T>
+	class xtls
 	{
-		if (mInstance == 0)
-		{
-			static xtls<T> instance;
-			mInstance = &instance;
-			mInstance->mTlsIndex = sTlsAlloc();
-			sTlsSetValue(mInstance->mTlsIndex, 0);
-		}
+	public:
+		void	set(T* inData)					{ x_TLS::sGet()->i_set(IDX, reinterpret_cast<void*>(inData)); }
+		void	get(T *& outData)				{ void * p; x_TLS::sGet()->i_get(IDX, p); outData = (T*)p;}
+		void	get(T const *& outData) const	{ void const * p; x_TLS::sGet()->i_get(IDX, p); outData = (T const*)p; }
 
-		return (*mInstance);
-	}
-
-	template <class T>
-	void xtls<T>::Release(void)
-	{
-		if (mInstance != 0)
-		{
-			sTlsFree(mInstance->mTlsIndex);
-			mInstance->mTlsIndex = -1;
-			mInstance = 0;
-		}
-	}
-
+	};
 }
 
 #endif // __XBASE_THREAD_LOCAL_STORAGE_H__

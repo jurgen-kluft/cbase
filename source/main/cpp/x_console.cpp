@@ -3,21 +3,6 @@
 * Core console
 */
 
-#ifdef SPU
-
-#include "xbase/x_console.h"
-
-// empty function so other test programs will compile..
-namespace xcore
-{
-	void xconsole::addDefault()
-	{
-
-	}
-}
-
-#else
-
 #include "xbase/x_debug.h"
 #include "xbase/x_va_list.h"
 #include "xbase/x_string_ascii.h"
@@ -119,10 +104,10 @@ namespace xcore
 		virtual s32 			write(u32 _value);
 		virtual s32 			write(u64 _value);
 		virtual s32 			write(uchar32 _value);
-		virtual s32 			write(const char* str);
 		virtual s32 			write(const char* str, const char* str_end);
 		virtual s32 			write(const char* fmt, const x_va_list& args);
-		virtual s32 			write(const uchar32* str);
+		virtual s32 			write(const uchar8* str, const uchar8* str_end);
+		virtual s32 			write(const uchar8* fmt, const x_va_list& args);
 		virtual s32 			write(const uchar32* str, const uchar32* str_end);
 		virtual s32 			write(const uchar32* fmt, const x_va_list& args);
 
@@ -182,11 +167,6 @@ namespace xcore
 		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(const char* str)
-	{
-		return 0;
-	}
-
 	s32 				xconsole_null_imp::write(const char* str, const char* str_end)
 	{
 		return 0;
@@ -197,7 +177,12 @@ namespace xcore
 		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(const uchar32* str)
+	s32 				xconsole_null_imp::write(const uchar8* str, const uchar8* str_end)
+	{
+		return 0;
+	}
+
+	s32 				xconsole_null_imp::write(const uchar8* fmt, const x_va_list& args)
 	{
 		return 0;
 	}
@@ -253,11 +238,12 @@ namespace xcore
 		virtual s32 			write(u64 _value);
 		virtual s32 			write(uchar32 _value);
 
-		virtual s32 			write(const char* str);
 		virtual s32 			write(const char* str, const char* str_end);
 		virtual s32 			write(const char* fmt, const x_va_list& args);
 
-		virtual s32 			write(const uchar32* str);
+		virtual s32 			write(const uchar8* str, const uchar8* str_end);
+		virtual s32 			write(const uchar8* fmt, const x_va_list& args);
+
 		virtual s32 			write(const uchar32* str, const uchar32* str_end);
 		virtual s32 			write(const uchar32* fmt, const x_va_list& args);
 
@@ -333,11 +319,6 @@ namespace xcore
 		return mOut32(s, &s[1]);
 	}
 
-	s32 				xconsole_default_imp::write(const char* str)
-	{
-		return mOut((const uchar*)str, ascii::len((const uchar*)str));
-	}
-
 	s32 				xconsole_default_imp::write(const char* str, const char* str_end)
 	{
 		return mOut((const uchar*)str, (const uchar*)str_end);
@@ -350,9 +331,16 @@ namespace xcore
 		return mOut(str, str + len);
 	}
 
-	s32 				xconsole_default_imp::write(const uchar32* str)
+	s32 				xconsole_default_imp::write(const uchar8* str, const uchar8* str_end)
 	{
-		return mOut32(str, utf32::len(str));
+		return mOut8((const uchar8*)str, (const uchar8*)str_end);
+	}
+
+	s32 				xconsole_default_imp::write(const uchar8* fmt, const x_va_list& args)
+	{
+		XCONSOLE_LOCAL_STR_BUF(uchar8, str, 512);
+		s32 len = utf8::vsprintf(str, str_eos, (const uchar8*)fmt, utf8::len((const uchar8*)fmt), args);
+		return mOut8(str, str + len);
 	}
 
 	s32 				xconsole_default_imp::write(const uchar32* str, const uchar32* str_end)
@@ -472,14 +460,6 @@ namespace xcore
 		return r;
 	}
 
-	s32 				xconsole::write(const char* str)
-	{
-		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(str);
-		return r;
-	}
-
 	s32 				xconsole::write(const char* str, const char* str_end)
 	{
 		s32 r = 0;
@@ -506,11 +486,29 @@ namespace xcore
 		return r;
 	}
 
-	s32 				xconsole::write(const uchar32* str)
+	s32 				xconsole::write(const uchar8* str, const uchar8* str_end)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(str);
+		for (xconsole_node::iterator i = sConsoleList.begin(); i.next(); )
+			r = i.imp()->write(str, str_end);
+		return r;
+	}
+
+	s32 				xconsole::write(const uchar8* fmt, const x_va_list& args)
+	{
+		s32 r = 0;
+		for (xconsole_node::iterator i = sConsoleList.begin(); i.next(); )
+			r = i.imp()->write(fmt, args);
+		return r;
+	}
+
+	s32 				xconsole::write(const uchar8* fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
+		const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
+	{
+		x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+		s32 r = 0;
+		for (xconsole_node::iterator i = sConsoleList.begin(); i.next(); )
+			r = i.imp()->write(fmt, args);
 		return r;
 	}
 
@@ -553,5 +551,3 @@ namespace xcore
  *  END xCore namespace
  */
 
-
-#endif // ifndef SPU

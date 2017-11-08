@@ -622,6 +622,24 @@ namespace xcore
 		}
 	}
 
+	namespace utf8
+	{
+		s32 sscanf(const uchar8* str, const uchar8* str_end, const uchar8* fmt, const uchar8* fmt_end, X_VA_R_ARGS_16)
+		{
+			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+			CharReaderFromUtf8Buffer buf_reader((const uchar8*)str, (const uchar8*)str_end);
+			CharReaderFromUtf8Buffer fmt_reader((const uchar8*)fmt, (const uchar8*)fmt_end);
+			return VSScanf(&buf_reader, &fmt_reader, vr_args);
+		}
+
+		s32 vsscanf(const uchar8 *str, const uchar8 *str_end, const uchar8 *fmt, const uchar8 *fmt_end, const x_va_r_list& vr_args)
+		{
+			CharReaderFromUtf8Buffer buf_reader((const uchar8*)str, (const uchar8*)str_end);
+			CharReaderFromUtf8Buffer fmt_reader((const uchar8*)fmt, (const uchar8*)fmt_end);
+			return VSScanf(&buf_reader, &fmt_reader, vr_args);
+		}
+	}
+
 	namespace utf32
 	{
 		s32 sscanf(const uchar32* str, const uchar32* str_end, const uchar32* fmt, const uchar32* fmt_end, X_VA_R_ARGS_16)

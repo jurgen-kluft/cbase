@@ -26,6 +26,8 @@ namespace xcore
 		uchar16 const *	read	(uchar16 const * str, uchar32& out_c);
 		uchar32 const *	read	(uchar32 const * str, uchar32& out_c);
 
+		uchar8  const *	rread	(uchar8  const * str, uchar32& out_c);	// Read utf-8 rune backwards (used in string reverse)
+
 		uchar   *		write	(uchar32 c, uchar   * str);
 		uchar8  *		write	(uchar32 c, uchar8  * str);
 		uchar16 *		write	(uchar32 c, uchar16 * str);

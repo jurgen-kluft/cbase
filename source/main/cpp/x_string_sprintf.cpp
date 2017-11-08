@@ -6,11 +6,11 @@
 #include "xbase/x_console.h"
 
 #ifdef TARGET_PC
-	#include <math.h>
+#include <math.h>
 #elif defined(TARGET_MACOS)
-	#include <math.h>
+#include <math.h>
 #else
-	#error "Don't know how fmod for this platform"
+#error "Don't know how fmod for this platform"
 #endif
 
 // Shared code
@@ -30,42 +30,42 @@ namespace xcore
 	/**
 	 * NUMERIC VALUES
 	 */
-	#define LONGDBL            0x01        // long f64; unimplemented
-	#define LONGINT            0x02        // long integer
-	#define QUADINT            0x04        // quad integer
-	#define SHORTINT           0x08        // short integer
-	#define NUMBERMASK         0x0F
+#define LONGDBL            0x01        // long f64; unimplemented
+#define LONGINT            0x02        // long integer
+#define QUADINT            0x04        // quad integer
+#define SHORTINT           0x08        // short integer
+#define NUMBERMASK         0x0F
 
-	/**
-	 * OTHER FLAGS
-	 */
-	#define ALT                0x10        // alternate form
-	#define HEXPREFIX          0x20        // add 0x or 0X prefix
-	#define LADJUST            0x40        // left adjustment
-	#define ZEROPAD            0x80        // zero (as opposed to blank) pad
+	 /**
+	  * OTHER FLAGS
+	  */
+#define ALT                0x10        // alternate form
+#define HEXPREFIX          0x20        // add 0x or 0X prefix
+#define LADJUST            0x40        // left adjustment
+#define ZEROPAD            0x80        // zero (as opposed to blank) pad
 
-	/**
-	 * TEXT FLAGS
-	 */
-	#define LOWERCASE          0x100       // lower-case, yes/no
-	#define UPPERCASE          0x200       // upper-case, YES/NO
-	#define CAMELCASE          0x400       // camel-case, Yes/No
-	
-	/**
-	 * CONSTANTS
-	 */
-	#define SPF_LONG_MAX    0x7FFFFFFF
-	#define WORKSIZE        128         // space for %c, %[diouxX], %[eEfgG]
-	#define DEFPREC         6           // number of precision for the real numbers
+	  /**
+	   * TEXT FLAGS
+	   */
+#define LOWERCASE          0x100       // lower-case, yes/no
+#define UPPERCASE          0x200       // upper-case, YES/NO
+#define CAMELCASE          0x400       // camel-case, Yes/No
+
+	   /**
+		* CONSTANTS
+		*/
+#define SPF_LONG_MAX    0x7FFFFFFF
+#define WORKSIZE        128         // space for %c, %[diouxX], %[eEfgG]
+#define DEFPREC         6           // number of precision for the real numbers
 
 
-	//==============================================================================
-	// FUNCTIONS
-	//==============================================================================
+		//==============================================================================
+		// FUNCTIONS
+		//==============================================================================
 
-	/**
-	 * pow for f64
-	 */
+		/**
+		 * pow for f64
+		 */
 	static f64 sPow(f64 x, s32 p)
 	{
 		if (p == 0)
@@ -80,7 +80,7 @@ namespace xcore
 		}
 
 		f64 r = 1.0;
-		while(true)
+		while (true)
 		{
 			if (p & 1)
 				r *= x;
@@ -104,7 +104,7 @@ namespace xcore
 	 */
 	static void dtoa(CharWriter* writer, f64 fpnum, char cvt, s32 width, s32 prec)
 	{
-		static const f64 powTable[] = {1,10,10e1,10e2,10e3,10e4,10e5,10e6,10e7,10e8,10e9,10e10,10e11,10e12,10e13,10e14,10e15,10e16,10e17,10e18,10e19,10e20,10e21,10e22,10e23};
+		static const f64 powTable[] = { 1,10,10e1,10e2,10e3,10e4,10e5,10e6,10e7,10e8,10e9,10e10,10e11,10e12,10e13,10e14,10e15,10e16,10e17,10e18,10e19,10e20,10e21,10e22,10e23 };
 
 		ASSERT(writer);
 		ASSERT(prec >= 0);
@@ -112,7 +112,7 @@ namespace xcore
 		char    fwork[WORKSIZE];
 		char*   fw = fwork;
 
-		 // setup integer part
+		// setup integer part
 		char    iwork[WORKSIZE];
 		char*   iworkend = &iwork[sizeof(iwork) - 1];
 		char*   iw = iworkend;
@@ -278,7 +278,7 @@ namespace xcore
 				if (adj > 0)
 				{
 					char* f;
-					for (f = &fwork[fwidth-1]; f >= fwork && adj > 0; --adj, --f)
+					for (f = &fwork[fwidth - 1]; f >= fwork && adj > 0; --adj, --f)
 					{
 						char ch = *f;
 
@@ -403,7 +403,7 @@ namespace xcore
 
 			// convert exponent
 			bool const eneg = exp < 0;
-			if (eneg) exp = - exp;
+			if (eneg) exp = -exp;
 
 			while (exp > 0)
 			{
@@ -465,12 +465,12 @@ namespace xcore
 	 * xdigs    - hexadecimal string array of number 0,1,2,3,4,5,9,A,or a, ..etc
 	 *------------------------------------------------------------------------------
 	 */
-	#define to_digit(c) ((c) - '0')
-	#define is_digit(c) ((u32)to_digit(c) >= 0 && ((u32)to_digit(c) <= 9))
-	#define to_char(n)  ((u32)((n) + '0'))
+#define to_digit(c) ((c) - '0')
+#define is_digit(c) ((u32)to_digit(c) >= 0 && ((u32)to_digit(c) <= 9))
+#define to_char(n)  ((u32)((n) + '0'))
 
 	static
-	void ULtoA(u32 val, CharWriter* writer, s32 base, xbool octzero, char* xdigs)
+		void ULtoA(u32 val, CharWriter* writer, s32 base, xbool octzero, char* xdigs)
 	{
 		uchar32 c;
 		s32   sval;
@@ -514,7 +514,7 @@ namespace xcore
 				writer->Write(c);
 				val >>= 3;
 			} while (val);
-			if (octzero && c != '0') 
+			if (octzero && c != '0')
 				writer->Write(uchar32('0'));
 			break;
 
@@ -537,7 +537,7 @@ namespace xcore
 	 * Same as above but for s64
 	 */
 	static
-	void UQtoA(u64 val, CharWriter* writer, s32 base, xbool octzero, char* xdigs)
+		void UQtoA(u64 val, CharWriter* writer, s32 base, xbool octzero, char* xdigs)
 	{
 		uchar32 c;
 		s64   sval;
@@ -580,7 +580,7 @@ namespace xcore
 				val >>= 3;
 			} while (val);
 
-			if (octzero && c != '0') 
+			if (octzero && c != '0')
 				writer->Write('0');
 
 			break;
@@ -611,7 +611,7 @@ namespace xcore
 		else if (flags & UPPERCASE)
 			i += 2;
 
-		i += (_boolean==0) ? 0 : 1;
+		i += (_boolean == 0) ? 0 : 1;
 
 		s32 len = 0;
 		ascii::pcrune src = (ascii::pcrune)t[i];
@@ -627,10 +627,10 @@ namespace xcore
 	/**
 	 * WriteToBuffer
 	 */
-	typedef void (*WriteBufferDelegate)(CharWriter* writer, uchar* string, s32 size);
+	typedef void(*WriteBufferDelegate)(CharWriter* writer, uchar* string, s32 size);
 
 	static
-	void WriteToBuffer(CharWriter* writer, uchar* str, s32 size)
+		void WriteToBuffer(CharWriter* writer, uchar* str, s32 size)
 	{
 		ASSERT(str);
 		ASSERT(size >= 0);
@@ -640,7 +640,7 @@ namespace xcore
 	/**
 	 * PadToBuffer
 	 */
-	typedef void (*PadBufferDelegate)(CharWriter* writer, s32 howMany, char with);
+	typedef void(*PadBufferDelegate)(CharWriter* writer, s32 howMany, char with);
 
 	static void PadBuffer(CharWriter* writer, s32 howMany, char with)
 	{
@@ -726,7 +726,7 @@ namespace xcore
 		ASSERT(reader != NULL);
 		ASSERT(writer != NULL);
 		ASSERT(buffer != NULL);
-		
+
 		uchar32		ch;             ///< character 
 		s32     	n;              ///< handy integer (short term usage)
 		CharWriter*	cp = NULL;		///< handy char pointer (short term usage)
@@ -742,18 +742,18 @@ namespace xcore
 		uchar   	ox[2];          ///< space for 0x hex-prefix
 
 		/// Initialize variables
-		char* xdigs    = NULL;                   // digits for [xX] conversion
-		u32   ulval    = 0;                      // integer arguments %[diouxX]
-		u64   uqval    = 0;                      // %q integers
+		char* xdigs = NULL;                   // digits for [xX] conversion
+		u32   ulval = 0;                      // integer arguments %[diouxX]
+		u64   uqval = 0;                      // %q integers
 		s32   argindex = 0;
 
 		CharBufferToCharWriter copy_to_writer(writer);
-		
+
 		/// Scan the format for conversions (`%' character).
 		for (;;)
 		{
 			while (true)
-			{	
+			{
 				ch = reader->Read();
 				if ((ch == uchar32('\0')) || (ch == uchar32('%')))	// Find the first "interesting symbol"
 					break;
@@ -771,385 +771,385 @@ namespace xcore
 			flags = 0;
 			dprec = 0;
 			width = 0;
-			prec  = -1;
-			sign  = '\0';
+			prec = -1;
+			sign = '\0';
 
-	rflag:
+		rflag:
 			ch = reader->Read();
 
-	reswitch:
+		reswitch:
 			switch (ch)
 			{
-				case ' ':
+			case ' ':
 
-					// ``If the space and + flags both appear, the space
-					// flag will be ignored.''
-					//  -- ANSI X3J11
-					if (!sign)
-						sign = ' ';
+				// ``If the space and + flags both appear, the space
+				// flag will be ignored.''
+				//  -- ANSI X3J11
+				if (!sign)
+					sign = ' ';
+				goto rflag;
+
+			case '#':
+				flags |= ALT;
+				flags |= CAMELCASE;
+				goto rflag;
+
+			case '*':
+				// ``A negative field width argument is taken as a
+				// - flag followed by a positive field width.''
+				// -- ANSI X3J11
+				// They don't exclude field widths read from args.
+			{
+				const s32 w = (s32)args[argindex++];
+				if ((width = w) >= 0)
 					goto rflag;
+				width = -width;
+			}
+			/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
+			case '-':
+				flags |= LADJUST;
+				goto rflag;
 
-				case '#':
-					flags |= ALT;
-					flags |= CAMELCASE;
-					goto rflag;
+			case '+':
+				sign = '+';
+				goto rflag;
 
-				case '*':
-					 // ``A negative field width argument is taken as a
-					 // - flag followed by a positive field width.''
-					 // -- ANSI X3J11
-					 // They don't exclude field widths read from args.
-					{
-						const s32 w = (s32)args[argindex++];
-						if ((width = w) >= 0)
-							goto rflag;
-						width = -width;
-					}
-					/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
-				case '-':
-					flags |= LADJUST;
-					goto rflag;
-
-				case '+':
-					sign = '+';
-					goto rflag;
-
-				case '.':
-					ch = reader->Read();
-					if (ch == '*')
-					{
-						n = (s32)args[argindex++];
-						prec = n < 0 ? -1 : n;
-						goto rflag;
-					}
-
-					n = 0;
-					while (is_digit(ch))
-					{
-						n = 10 * n + to_digit(ch);
-						ch = reader->Read();
-					}
-
+			case '.':
+				ch = reader->Read();
+				if (ch == '*')
+				{
+					n = (s32)args[argindex++];
 					prec = n < 0 ? -1 : n;
-					goto reswitch;
-
-				case '0':
-					 // ``Note that 0 is taken as a flag, not as the
-					 // beginning of a field width.''
-					 // -- ANSI X3J11
-					flags |= ZEROPAD;
 					goto rflag;
+				}
 
-				case '1': case '2': case '3': case '4':
-				case '5': case '6': case '7': case '8': case '9':
-					n = 0;
-					do
-					{
-						n = 10 * n + to_digit(ch);
-						ch = reader->Read();
-					} while (is_digit(ch));
+				n = 0;
+				while (is_digit(ch))
+				{
+					n = 10 * n + to_digit(ch);
+					ch = reader->Read();
+				}
 
-					width = n;
-					goto reswitch;
+				prec = n < 0 ? -1 : n;
+				goto reswitch;
 
-				case 'L':
-					flags |= LONGDBL;
+			case '0':
+				// ``Note that 0 is taken as a flag, not as the
+				// beginning of a field width.''
+				// -- ANSI X3J11
+				flags |= ZEROPAD;
+				goto rflag;
 
-					/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
-				case 'q':
+			case '1': case '2': case '3': case '4':
+			case '5': case '6': case '7': case '8': case '9':
+				n = 0;
+				do
+				{
+					n = 10 * n + to_digit(ch);
+					ch = reader->Read();
+				} while (is_digit(ch));
+
+				width = n;
+				goto reswitch;
+
+			case 'L':
+				flags |= LONGDBL;
+
+				/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
+			case 'q':
+				flags |= QUADINT;
+				goto rflag;
+
+			case 'h':
+				flags |= SHORTINT;
+				goto rflag;
+
+			case 'l':
+				flags |= LONGINT;
+				goto rflag;
+
+			case 'c':
+				buffer->Write((uchar32)args[argindex++]);
+				size = 1;
+				sign = '\0';
+				break;
+
+			case 'D':
+				flags |= LONGINT;
+				/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
+
+			case 'd':
+			case 'i':
+				if (flags & QUADINT || args[argindex].isInt64() || args[argindex].isUInt64())
+				{
 					flags |= QUADINT;
-					goto rflag;
-
-				case 'h':
-					flags |= SHORTINT;
-					goto rflag;
-
-				case 'l':
-					flags |= LONGINT;
-					goto rflag;
-
-				case 'c':
-					buffer->Write((uchar32)args[argindex++]);
-					size = 1;
-					sign = '\0';
-					break;
-
-				case 'D':
-					flags |= LONGINT;
-					/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
-
-				case 'd':
-				case 'i':
-					if (flags & QUADINT || args[argindex].isInt64() || args[argindex].isUInt64())
+					s64 temp = (s64)args[argindex++];
+					if (temp < 0)
 					{
-						flags |= QUADINT;
-						s64 temp = (s64)args[argindex++];
-						if (temp < 0)
-						{
-							temp = -temp;
-							sign = '-';
-						}
-						uqval = (u64)temp;
+						temp = -temp;
+						sign = '-';
 					}
+					uqval = (u64)temp;
+				}
+				else
+				{
+					s32 temp;
+					if (flags & SHORTINT)
+						temp = (s16)args[argindex++];
 					else
+						temp = (s32)args[argindex++];
+
+					if (temp < 0)
 					{
-						s32 temp;
-						if (flags & SHORTINT)
-							temp = (s16)args[argindex++];
-						else
-							temp = (s32)args[argindex++];
-
-						if (temp < 0)
-						{
-							temp = -temp;
-							sign = '-';
-						}
-						ulval = (u32)(temp);
+						temp = -temp;
+						sign = '-';
 					}
+					ulval = (u32)(temp);
+				}
 
-					base = 10;
-					goto number;
+				base = 10;
+				goto number;
 
-				case 'g':
-				case 'G':
-					if (prec == 0)
-						prec = 1;
-				case 'e':
-				case 'E':
-				case 'f':
-					/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
+			case 'g':
+			case 'G':
+				if (prec == 0)
+					prec = 1;
+			case 'e':
+			case 'E':
+			case 'f':
+				/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
 
-					if (sign == '+')
-					{
-						writer->Write(sign);
-						width--;
-					}
+				if (sign == '+')
+				{
+					writer->Write(sign);
+					width--;
+				}
 
-					if (prec == -1)
-						prec = DEFPREC;
+				if (prec == -1)
+					prec = DEFPREC;
 
-					_double = (f64)args[argindex++];
-					if (flags & LONGDBL)
-					{	// add additional precision when we say long f64
-						prec += 4;
-					}
+				_double = (f64)args[argindex++];
+				if (flags & LONGDBL)
+				{	// add additional precision when we say long f64
+					prec += 4;
+				}
 
-					if (flags & LADJUST)
-						width = -width;
+				if (flags & LADJUST)
+					width = -width;
 
-					// right-adjusting zero padding
-					{
-						dtoa(buffer, _double, (char)ch, width, prec);
+				// right-adjusting zero padding
+				{
+					dtoa(buffer, _double, (char)ch, width, prec);
 
-						CharBufferReverse reverser;
-						buffer->Modify(&reverser);
+					CharBufferReverse reverser;
+					buffer->Modify(&reverser);
 
-						size = (s32)buffer->Count();
-					}
+					size = (s32)buffer->Count();
+				}
 
-					// check whether we have to pad or not
-					if (flags & ZEROPAD)
-					{
-						CharBufferPad padder(CharBufferPad::HEAD, ' ', '0');
-						buffer->Modify(&padder);
-					}
+				// check whether we have to pad or not
+				if (flags & ZEROPAD)
+				{
+					CharBufferPad padder(CharBufferPad::HEAD, ' ', '0');
+					buffer->Modify(&padder);
+				}
 
-					buffer->Iterate(&copy_to_writer);	// Copy 'buffer' to 'writer'
+				buffer->Iterate(&copy_to_writer);	// Copy 'buffer' to 'writer'
 
-					if (flags & LADJUST)
-						PadBuffer(writer, -width - size, ' ');
+				if (flags & LADJUST)
+					PadBuffer(writer, -width - size, ' ');
 
-					continue;
+				continue;
 
-						///////////////////// FLOATING_POINT //////////////////////
-				case 'n':
+				///////////////////// FLOATING_POINT //////////////////////
+			case 'n':
 
-					// not supported
+				// not supported
 
-					// no output
-					continue;
+				// no output
+				continue;
 
 				//////////////////////////////// THIS IS NOT ANSI STANDARD
 				//case 'O':
 				//    flags |= LONGINT;
 				//    /////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
 
-				case 'o':
-					if (flags & QUADINT)
-						uqval = (u64)args[argindex++];
-					else if (flags & SHORTINT)
-						ulval = (u16)args[argindex++];
-					else
-						ulval = (u32)args[argindex++];
-
-					base = 8;
-					goto nosign;
-
-				case 'p':
-					 // "The argument shall be a pointer to void.  The
-					 // value of the pointer is converted to a sequence
-					 // of printable characters, in an implementation-
-					 // defined manner."
-					 // -- ANSI X3J11
-#ifdef TARGET_PC
-					uqval  = (u64)args[argindex++];
-					base   = 16;
-					xdigs  = "0123456789abcdef";
-					flags |= QUADINT;           // | HEXPREFIX; Not prefixes
-					ch     = 'x';
-
-					// make sure that the precision is at 8
-					if (prec < 0)
-						prec = 8;
-#else
+			case 'o':
+				if (flags & QUADINT)
+					uqval = (u64)args[argindex++];
+				else if (flags & SHORTINT)
+					ulval = (u16)args[argindex++];
+				else
 					ulval = (u32)args[argindex++];
-					base  = 16;
-					xdigs = "0123456789abcdef";
-					flags = (flags & ~QUADINT); // | HEXPREFIX; Not prefixes
-					ch    = 'x';
 
-					// make sure that the precision is at 8
-					if (prec < 0)
-						prec = 8;
+				base = 8;
+				goto nosign;
+
+			case 'p':
+				// "The argument shall be a pointer to void.  The
+				// value of the pointer is converted to a sequence
+				// of printable characters, in an implementation-
+				// defined manner."
+				// -- ANSI X3J11
+#ifdef TARGET_PC
+				uqval = (u64)args[argindex++];
+				base = 16;
+				xdigs = "0123456789abcdef";
+				flags |= QUADINT;           // | HEXPREFIX; Not prefixes
+				ch = 'x';
+
+				// make sure that the precision is at 8
+				if (prec < 0)
+					prec = 8;
+#else
+				ulval = (u32)args[argindex++];
+				base = 16;
+				xdigs = "0123456789abcdef";
+				flags = (flags & ~QUADINT); // | HEXPREFIX; Not prefixes
+				ch = 'x';
+
+				// make sure that the precision is at 8
+				if (prec < 0)
+					prec = 8;
 #endif
-					goto nosign;
+				goto nosign;
 
-				case 's':
-					if (args[argindex].isPCUChar32())
+			case 's':
+				if (args[argindex].isPCUChar32())
+				{
+					uchar32 const* src = (uchar32 const*)args[argindex];
+					while (utf::is_eos(src) == false)
 					{
-						uchar32 const* src = (uchar32 const*)args[argindex];
-						while (utf::is_eos(src) == false)
+						uchar32 c;
+						src = utf::read(src, c);
+						buffer->Write(c);
+					}
+				}
+				else if (args[argindex].isPCUChar8())
+				{
+					uchar8 const* src = (uchar8 const*)args[argindex];
+					while (utf::is_eos(src) == false)
+					{
+						uchar32 c;
+						src = utf::read(src, c);
+						buffer->Write(c);
+					}
+				}
+				else if (args[argindex].isPCTChar())
+				{
+					ascii::rune const* src = (ascii::rune const*)args[argindex];
+					while (utf::is_eos(src) == false)
+					{
+						uchar32 c;
+						src = utf::read(src, c);
+						buffer->Write(c);
+					}
+				}
+
+				size = (s32)buffer->Count();
+				sign = '\0';
+				break;
+
+			case 'B':
+				ulval = ((bool)args[argindex++]) ? 1 : 0;
+				size = boolToStr(ulval, buffer, false, ((flags&ALT) != 0) ? CAMELCASE : UPPERCASE);
+				break;
+
+			case 'b':
+				ulval = ((bool)args[argindex++]) ? 1 : 0;
+				size = boolToStr(ulval, buffer, false, ((flags&ALT) != 0) ? CAMELCASE : 0);
+				break;
+
+			case 'Y':
+				ulval = ((bool)args[argindex++]) ? 1 : 0;
+				size = boolToStr(ulval, buffer, true, ((flags&ALT) != 0) ? CAMELCASE : UPPERCASE);
+				break;
+
+			case 'y':
+				ulval = ((bool)args[argindex++]) ? 1 : 0;
+				size = boolToStr(ulval, buffer, true, ((flags&ALT) != 0) ? CAMELCASE : 0);
+				break;
+
+			case 'U':
+				flags |= LONGINT;
+				/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
+
+			case 'u':
+				if (flags & QUADINT)
+					uqval = (u64)args[argindex++];
+				else
+					ulval = (u32)args[argindex++];
+
+				base = 10;
+				goto nosign;
+
+			case 'X': xdigs = "0123456789ABCDEF";
+				goto hex;
+
+			case 'x': xdigs = "0123456789abcdef";
+
+			hex:
+				if (flags & QUADINT || args[argindex].type() == x_va::TYPE_INT64 || args[argindex].type() == x_va::TYPE_UINT64)
+				{
+					flags |= QUADINT;
+					uqval = (u64)args[argindex++];
+				}
+				else
+					ulval = (u32)args[argindex++];
+
+				base = 16;
+
+				// leading 0x/X only if non-zero
+				if (flags & ALT && (flags & QUADINT ? uqval != 0 : ulval != 0))
+					flags |= HEXPREFIX;
+
+				// unsigned conversions
+			nosign:     sign = '\0';
+
+				// ``... diouXx conversions ... if a precision is
+				// specified, the 0 flag will be ignored.''
+				//  -- ANSI X3J11
+
+			number:     if ((dprec = prec) >= 0)
+				flags &= ~ZEROPAD;
+
+						// ``The result of converting a zero value with an
+						// explicit precision of zero is no characters.''
+						// -- ANSI X3J11
+
+						if (flags & QUADINT)
 						{
-							uchar32 c;
-							src = utf::read(src, c);
-							buffer->Write(c);
+							if (uqval != 0 || prec != 0)
+							{
+								UQtoA(uqval, buffer, base, xbool((flags & ALT) != 0), xdigs);
+								CharBufferReverse reverser;
+								buffer->Modify(&reverser);
+								size = (s32)buffer->Count();
+							}
 						}
-					}
-					else if (args[argindex].isPCUChar8())
-					{
-						uchar8 const* src = (uchar8 const*)args[argindex];
-						while (utf::is_eos(src) == false)
+						else
 						{
-							uchar32 c;
-							src = utf::read(src, c);
-							buffer->Write(c);
+							if (ulval != 0 || prec != 0)
+							{
+								ULtoA(ulval, buffer, base, xbool((flags & ALT) != 0), xdigs);
+								CharBufferReverse reverser;
+								buffer->Modify(&reverser);
+								size = (s32)buffer->Count();
+							}
 						}
-					}
-					else if (args[argindex].isPCTChar())
-					{
-						ascii::rune const* src = (ascii::rune const*)args[argindex];
-						while (utf::is_eos(src) == false)
-						{
-							uchar32 c;
-							src = utf::read(src, c);
-							buffer->Write(c);
-						}
-					}
 
-					size = (s32)buffer->Count();
-					sign = '\0';
-					break;
+						break;
 
-				case 'B':
-					ulval = ((bool)args[argindex++]) ? 1 : 0;
-					size = boolToStr(ulval, buffer, false, ((flags&ALT)!=0) ? CAMELCASE : UPPERCASE);
-					break;
+			default:    // "%?" prints ?, unless ? is NUL
+				if (ch == '\0')
+					goto done;
 
-				case 'b':
-					ulval = ((bool)args[argindex++]) ? 1 : 0;
-					size = boolToStr(ulval, buffer, false, ((flags&ALT)!=0) ? CAMELCASE : 0);
-					break;
+				// pretend it was %c with argument ch
+				buffer->Write(ch);
+				size = 1;
+				sign = '\0';
 
-				case 'Y':
-					ulval = ((bool)args[argindex++]) ? 1 : 0;
-					size = boolToStr(ulval, buffer, true, ((flags&ALT)!=0) ? CAMELCASE : UPPERCASE);
-					break;
-
-				case 'y':
-					ulval = ((bool)args[argindex++]) ? 1 : 0;
-					size = boolToStr(ulval, buffer, true, ((flags&ALT)!=0) ? CAMELCASE : 0);
-					break;
-
-				case 'U':
-					flags |= LONGINT;
-					/////////>>>>>>>>>>>>>>>>>> FALLTHROUGH <<<<<<<<<<<<<<//////////
-
-				case 'u':
-					if (flags & QUADINT)
-						uqval = (u64)args[argindex++];
-					else
-						ulval = (u32)args[argindex++];
-
-					base = 10;
-					goto nosign;
-
-				case 'X': xdigs = "0123456789ABCDEF";
-					goto hex;
-
-				case 'x': xdigs = "0123456789abcdef";
-
-		hex:
-					if (flags & QUADINT || args[argindex].type()==x_va::TYPE_INT64 || args[argindex].type()==x_va::TYPE_UINT64)
-					{
-						flags |= QUADINT;
-						uqval = (u64)args[argindex++];
-					}
-					else
-						ulval = (u32)args[argindex++];
-
-					base = 16;
-
-					// leading 0x/X only if non-zero
-					if (flags & ALT && (flags & QUADINT ? uqval != 0 : ulval != 0))
-						flags |= HEXPREFIX;
-
-					// unsigned conversions
-		nosign:     sign = '\0';
-
-					// ``... diouXx conversions ... if a precision is
-					// specified, the 0 flag will be ignored.''
-					//  -- ANSI X3J11
-
-		number:     if ((dprec = prec) >= 0)
-						flags &= ~ZEROPAD;
-
-					// ``The result of converting a zero value with an
-					// explicit precision of zero is no characters.''
-					// -- ANSI X3J11
-
-					if (flags & QUADINT)
-					{
-						if (uqval != 0 || prec != 0)
-						{
-							UQtoA(uqval, buffer, base, xbool((flags & ALT)!=0), xdigs);
-							CharBufferReverse reverser;
-							buffer->Modify(&reverser);
-							size = (s32)buffer->Count();
-						}
-					}
-					else
-					{
-						if (ulval != 0 || prec != 0)
-						{
-							ULtoA(ulval, buffer, base, xbool((flags & ALT)!=0), xdigs);
-							CharBufferReverse reverser;
-							buffer->Modify(&reverser);
-							size = (s32)buffer->Count();
-						}
-					}
-
-					break;
-
-				default:    // "%?" prints ?, unless ? is NUL
-					if (ch == '\0')
-						goto done;
-
-					// pretend it was %c with argument ch
-					buffer->Write(ch);
-					size = 1;
-					sign = '\0';
-
-					break;
+				break;
 			}
 
 			/**
@@ -1164,19 +1164,19 @@ namespace xcore
 			 * floating precision; finally, if LADJUST, pad with blanks.
 			 */
 
-			/**
-			 * Compute actual size, so we know how much to pad.
-			 * size excludes decimal prec; realsz includes it.
-			 */
+			 /**
+			  * Compute actual size, so we know how much to pad.
+			  * size excludes decimal prec; realsz includes it.
+			  */
 			realsz = dprec > size ? dprec : size;
 
 			if (sign)
 				realsz++;
-			else if (flags & HEXPREFIX) 
+			else if (flags & HEXPREFIX)
 				realsz += 2;
 
 			// right-adjusting blank padding
-			if ((flags & (LADJUST|ZEROPAD)) == 0)
+			if ((flags & (LADJUST | ZEROPAD)) == 0)
 				PadBuffer(writer, width - realsz, ' ');
 
 			// prefix
@@ -1195,7 +1195,7 @@ namespace xcore
 			}
 
 			// right-adjusting zero padding
-			if ((flags & (LADJUST|ZEROPAD)) == ZEROPAD)
+			if ((flags & (LADJUST | ZEROPAD)) == ZEROPAD)
 				PadBuffer(writer, width - realsz, '0');
 
 			// leading zeroes from decimal precision
@@ -1215,17 +1215,7 @@ namespace xcore
 
 	namespace ascii
 	{
-		s32 cprintf(pcrune format_str, X_VA_ARGS_16)
-		{
-			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromAsciiBuffer reader(format_str, NULL);
-			CharWriterCounter writer;
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			return (s32)writer.Count();
-		}
-
-		s32 cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		s32		cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 			CharReaderFromAsciiBuffer reader(format_str, format_str_end);
@@ -1235,36 +1225,7 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32 sprintf(prune str, pcrune str_end, pcrune format_str, X_VA_ARGS_16)
-		{
-			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromAsciiBuffer reader(format_str, NULL);
-			CharWriterToAsciiBuffer writer(str, str_end);
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			return (s32)writer.Count();
-		}
-
-		s32 sprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
-		{
-			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromAsciiBuffer reader(format_str, format_str_end);
-			CharWriterToAsciiBuffer writer(str, str_end);
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			return (s32)writer.Count();
-		}
-
-		s32 vcprintf(pcrune format_str, const x_va_list& args)
-		{
-			CharReaderFromAsciiBuffer reader(format_str, NULL);
-			CharWriterCounter writer;
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			return (s32)writer.Count();
-		}
-
-		s32 vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		s32		vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
 		{
 			CharReaderFromAsciiBuffer reader(format_str, format_str_end);
 			CharWriterCounter writer;
@@ -1273,16 +1234,17 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32 vsprintf(prune str, pcrune str_end, pcrune format_str, const x_va_list& args)
+		s32		sprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
-			CharReaderFromAsciiBuffer reader(format_str, NULL);
+			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+			CharReaderFromAsciiBuffer reader(format_str, format_str_end);
 			CharWriterToAsciiBuffer writer(str, str_end);
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
 			return (s32)writer.Count();
 		}
 
-		s32 vsprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		s32		vsprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args)
 		{
 			CharReaderFromAsciiBuffer reader(format_str, format_str_end);
 			CharWriterToAsciiBuffer writer(str, str_end);
@@ -1291,20 +1253,7 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32 printf(pcrune format_str, X_VA_ARGS_16)
-		{
-			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromAsciiBuffer reader(format_str, NULL);
-			s32 const cache_size = 128;
-			ascii::rune cache[cache_size + 1];
-			CharWriterAsAsciiToConsole writer(AsciiBuffer(cache, cache + cache_size));
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			writer.Flush();
-			return (s32)writer.Count();
-		}
-
-		s32 printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		s32		printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 			CharReaderFromAsciiBuffer reader(format_str, format_str_end);
@@ -1317,19 +1266,7 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32 printf(pcrune format_str, const x_va_list& args)
-		{
-			CharReaderFromAsciiBuffer reader(format_str, NULL);
-			s32 const cache_size = 128;
-			ascii::rune cache[cache_size + 1];
-			CharWriterAsAsciiToConsole writer(AsciiBuffer(cache, cache + cache_size));
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			writer.Flush();
-			return (s32)writer.Count();
-		}
-
-		s32 printf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		s32		printf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
 		{
 			CharReaderFromAsciiBuffer reader(format_str, format_str_end);
 			s32 const cache_size = 128;
@@ -1339,12 +1276,6 @@ namespace xcore
 			VSPrintf_internal(&writer, &reader, &buffer, args);
 			writer.Flush();
 			return (s32)writer.Count();
-		}
-
-		s32		printf(pcrune str)
-		{
-			const char* str_end = ascii::len(str);
-			return xconsole::write(str, str_end);
 		}
 
 		s32		printf(pcrune str, pcrune str_end)
@@ -1353,40 +1284,85 @@ namespace xcore
 		}
 	}
 
-	 namespace utf32
-	 {
-		s32 vsprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args)
+	namespace utf8
+	{
+		s32		cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
-			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
-			CharWriterToUtf32Buffer writer(str, str_end);
-			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
-
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			return (s32)writer.Count();
-		}
-
-		s32 sprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
-		{
-			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
-			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
-			CharWriterToUtf32Buffer writer(str, str_end);
-			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
-
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			return (s32)writer.Count();
-		}
-
-		s32 vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
-		{
-			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
+			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+			CharReaderFromUtf8Buffer reader(format_str, format_str_end);
 			CharWriterCounter writer;
-			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
+			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
 
 			VSPrintf_internal(&writer, &reader, &buffer, args);
 			return (s32)writer.Count();
 		}
 
-		s32 cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		s32		vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		{
+			CharReaderFromUtf8Buffer reader(format_str, format_str_end);
+			CharWriterCounter writer;
+			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
+
+			VSPrintf_internal(&writer, &reader, &buffer, args);
+			return (s32)writer.Count();
+		}
+
+		s32		sprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		{
+			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+			CharReaderFromUtf8Buffer reader(format_str, format_str_end);
+			CharWriterToUtf8Buffer writer(str, str_end);
+			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
+
+			VSPrintf_internal(&writer, &reader, &buffer, args);
+			return (s32)writer.Count();
+		}
+
+		s32		vsprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		{
+			CharReaderFromUtf8Buffer reader(format_str, format_str_end);
+			CharWriterToUtf8Buffer writer(str, str_end);
+			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
+
+			VSPrintf_internal(&writer, &reader, &buffer, args);
+			return (s32)writer.Count();
+		}
+
+		s32		printf(pcrune str, pcrune str_end)
+		{
+			return xconsole::write(str, str_end);
+		}
+
+		s32		printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		{
+			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+			CharReaderFromUtf8Buffer reader(format_str, format_str_end);
+			s32 const cache_size = 128;
+			utf8::rune cache[cache_size + 4];
+			CharWriterAsUtf8ToConsole writer(Utf8Buffer(cache, cache + cache_size));
+			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
+			VSPrintf_internal(&writer, &reader, &buffer, args);
+			writer.Flush();
+			return (s32)writer.Count();
+		}
+
+		s32		printf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		{
+			CharReaderFromUtf8Buffer reader(format_str, format_str_end);
+			s32 const cache_size = 128;
+			utf8::rune cache[cache_size + 4];
+			CharWriterAsUtf8ToConsole writer(Utf8Buffer(cache, cache + cache_size));
+			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
+			VSPrintf_internal(&writer, &reader, &buffer, args);
+			writer.Flush();
+			return (s32)writer.Count();
+		}
+	}
+
+
+	namespace utf32
+	{
+		s32		cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
@@ -1395,6 +1371,42 @@ namespace xcore
 
 			VSPrintf_internal(&writer, &reader, &buffer, args);
 			return (s32)writer.Count();
+		}
+
+		s32		vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		{
+			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
+			CharWriterCounter writer;
+			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
+
+			VSPrintf_internal(&writer, &reader, &buffer, args);
+			return (s32)writer.Count();
+		}
+
+		s32		sprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		{
+			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
+			CharWriterToUtf32Buffer writer(str, str_end);
+			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
+
+			VSPrintf_internal(&writer, &reader, &buffer, args);
+			return (s32)writer.Count();
+		}
+
+		s32		vsprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		{
+			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
+			CharWriterToUtf32Buffer writer(str, str_end);
+			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
+
+			VSPrintf_internal(&writer, &reader, &buffer, args);
+			return (s32)writer.Count();
+		}
+
+		s32		printf(pcrune str, pcrune str_end)
+		{
+			return xconsole::write(str, str_end);
 		}
 
 		s32		printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
@@ -1410,8 +1422,8 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		 s32		printf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
-		 {
+		s32		printf(pcrune format_str, pcrune format_str_end, const x_va_list& args)
+		{
 			CharReaderFromUtf32Buffer reader(format_str, format_str_end);
 			s32 const cache_size = 128;
 			utf32::rune cache[cache_size + 1];
@@ -1420,14 +1432,8 @@ namespace xcore
 			VSPrintf_internal(&writer, &reader, &buffer, args);
 			writer.Flush();
 			return (s32)writer.Count();
-		 }
-
-		 s32		printf(pcrune str, pcrune str_end)
-		 {
-			 return xconsole::write(str, str_end);
-		 }
-
-	 }
+		}
+	}
 };
 /**
  *  END xCore namespace

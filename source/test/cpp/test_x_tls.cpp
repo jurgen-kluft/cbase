@@ -16,15 +16,23 @@ UNITTEST_SUITE_BEGIN(xtls)
 			s32		mInteger;
 			f32		mFloat;
 		};
+		OurTlsObject	gInstance;
 
-        UNITTEST_TEST(Instance)
+        UNITTEST_TEST(set)
         {
-			xtls<OurTlsObject>& ourInstance = xtls<OurTlsObject>::Instance();
+			xtls<0, OurTlsObject> slot;
+			gInstance.mInteger = 1;
+			gInstance.mFloat = 2.0f;
+			slot.set(&gInstance);
 		}
 
-		UNITTEST_TEST(Release)
+		UNITTEST_TEST(get)
 		{
-			xtls<OurTlsObject>::Release();
+			xtls<0, OurTlsObject> slot;
+			OurTlsObject const* obj;
+			slot.get(obj);
+			CHECK_EQUAL(1, obj->mInteger);
+			CHECK_EQUAL(2.0f, obj->mFloat);
 		}
 
 	}
