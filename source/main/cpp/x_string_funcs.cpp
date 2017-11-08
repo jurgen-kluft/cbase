@@ -119,9 +119,13 @@ pcrune len(pcrune str)
 	ASSERT(str != NULL);
 	while (true)
 	{
+		pcrune end = str;
 		uchar32 c = read_char(str);
 		if (c == '\0')
+		{
+			str = end;
 			break;
+		}
 	}
 	return str;
 }
@@ -133,9 +137,13 @@ pcrune len(pcrune str, s32* str_len)
 	s32 len = 0;
 	while (true) 
 	{
+		pcrune end = str;
 		uchar32 c = read_char(str);
 		if (c == 0)
+		{
+			str = end;
 			break;
+		}
 		len++;
 	}
 	if (str_len != NULL)
@@ -225,7 +233,7 @@ prune		copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end)
 	return dst;
 }
 		
-pcrune		find(pcrune find_begin, pcrune find_end, pcrune str_begin, pcrune str_end, ECmpMode mode)
+pcrune		find(pcrune str_begin, pcrune str_end, pcrune find_begin, pcrune find_end, ECmpMode mode)
 {
 	if (find_end != NULL && find_begin == find_end)
 		return NULL;

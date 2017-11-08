@@ -265,7 +265,7 @@ namespace xcore
 
 	s32					xconsole_default_imp::write(bool _value)
 	{
-		return write(_value ? "true" : "false");
+		return write(_value ? "true" : "false", NULL);
 	}
 
 	s32 				xconsole_default_imp::write(f64 _value)
@@ -358,7 +358,7 @@ namespace xcore
 
 	s32 				xconsole_default_imp::writeLine()
 	{
-		return write("\n");
+		return write("\n", NULL);
 	}
 
 

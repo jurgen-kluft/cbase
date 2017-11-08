@@ -48,17 +48,20 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		{
 			const char* src = "this is a system string";
 
-			char dst[24];
-			ascii::copy(dst, dst + 24 - 1, src, ascii::len(src));
+			char dst[24 + 1];
+			dst[24] = '\0';
+			ascii::copy(dst, dst + 24, src, ascii::len(src));
 
 			CHECK_EQUAL(23, ascii::size(src));
 			CHECK_EQUAL(0, ascii::compare(dst, ascii::len(dst), src, ascii::len(src)));
 
 			char str2[20];
-			ascii::copy(str2, str2 + sizeof(str2), src, ascii::len(src));
+			str2[20 - 1] = '\0';
+			ascii::copy(str2, str2 + sizeof(str2) - 1, src, ascii::len(src));
 
 			CHECK_EQUAL(19, ascii::size(str2));
 			CHECK_EQUAL(-1, ascii::compare(str2, src));
+
 			CHECK_EQUAL(0, ascii::compare(str2, "this is a system st"));
 		}
 
@@ -67,15 +70,16 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			const char* str1 = "this is a system string";
 
 			CHECK_EQUAL((str1 + 14), ascii::find(str1, ascii::len(str1), 'e'));
-			CHECK_EQUAL((const char*)NULL, ascii::find(str1, ascii::len(str1), 'E'));
+			CHECK_NULL(ascii::find(str1, ascii::len(str1), 'E'));
 			CHECK_EQUAL((str1 + 14), ascii::find(str1, ascii::len(str1), 'E', ascii::CASE_IGNORE));
 
 			const char* str2 = "system";
-			CHECK_EQUAL((str1 + 10), ascii::find(str1, ascii::len(str1), str2, ascii::len(str2)));
+			const char* found_pos = ascii::find(str1, ascii::len(str1), str2, ascii::len(str2));
+			CHECK_EQUAL((str1 + 10), found_pos);
 
 			const char* str3 = "SYSTEM";
-			CHECK_EQUAL((const char*)NULL, ascii::find(str1, ascii::len(str1), str3, ascii::len(str3)));
-			CHECK_EQUAL(str1 + 10, ascii::find(str1, ascii::len(str1), str3, ascii::len(str3), ascii::CASE_IGNORE));
+			CHECK_NULL(ascii::find(str1, ascii::len(str1), str3, ascii::len(str3)));
+			CHECK_EQUAL(str1 + 10, ascii::find(str1, NULL, str3, NULL, ascii::CASE_IGNORE));
 		}
 
 		UNITTEST_TEST(find_one_of)
@@ -83,24 +87,24 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			const char* str1 = "this is a system string";
 
 			const char* set1 = "bcde";
-			CHECK_EQUAL((str1 + 14), ascii::find_one_of(str1, ascii::len(str1), set1, ascii::len(set1)));
+			CHECK_EQUAL((str1 + 14), ascii::find_one_of(str1, NULL, set1, NULL));
 
 			const char* set2 = "BCDE";
-			CHECK_EQUAL((str1 + 14), ascii::find_one_of(str1, ascii::len(str1), set2, ascii::len(set2), ascii::CASE_IGNORE));
+			CHECK_EQUAL((str1 + 14), ascii::find_one_of(str1, NULL, set2, NULL, ascii::CASE_IGNORE));
 		}
 
 		UNITTEST_TEST(replace)
 		{
 			char dst[101];
 			const char* str1 = "this is a system string";
-			ascii::copy(dst, dst + 100, str1, ascii::len(str1));
+			char* dst_end = ascii::copy(dst, dst + 100, str1, ascii::len(str1));
 			const char* str2 = "this is a copied string";
 
 			const char* find_str = "system";
-			const char* pos = ascii::find(str1, ascii::len(str1), find_str, ascii::len(find_str));
+			const char* pos = ascii::find(dst, dst_end, find_str, ascii::len(find_str));
 
 			const char* replace_str = "copied";
-			ascii::replace(ascii::pos(dst, pos), ascii::len(find_str), dst + 100, replace_str, ascii::len(replace_str));
+			ascii::replace(ascii::pos(dst, pos), pos + 6, dst + 100, replace_str, ascii::len(replace_str));
 
 			CHECK_EQUAL(0, ascii::compare(dst, str2));
 		}
@@ -118,24 +122,25 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			CHECK_EQUAL( 0, ascii::compare(str4, ascii::len(str4), str4, ascii::len(str4)));
 			CHECK_EQUAL( 1, ascii::compare(str4, ascii::len(str4), str3, ascii::len(str3)));
 
-			const char* str5 = "A";
+			const char* str5 = "a";
 			const char* str6 = "A";
 			const char* str7 = "b";
 			const char* str8 = "B";
-			CHECK_EQUAL(-1, ascii::compare(str5, str6));
+			CHECK_EQUAL( 1, ascii::compare(str5, str6));
 			CHECK_EQUAL( 0, ascii::compare(str5, str6, ascii::CASE_IGNORE));
-			CHECK_EQUAL(-1, ascii::compare(str7, str8));
+			CHECK_EQUAL( 1, ascii::compare(str7, str8));
 			CHECK_EQUAL( 0, ascii::compare(str7, str8, ascii::CASE_IGNORE));
 		}
 
 		UNITTEST_TEST(concatenate)
 		{
 			char dst[101];
+			dst[100] = '\0';
 			const char* str1 = "this is a ";
 			ascii::copy(dst, dst + 100, str1, ascii::len(str1));
 
 			const char* str2 = "copied string";
-			ascii::concatenate(dst, ascii::len(dst), dst + 100, str2, ascii::len(str2));
+			ascii::concatenate(dst, ascii::len(dst), dst + 100, str2, NULL);
 
 			const char* str3 = "this is a copied string";
 			CHECK_EQUAL(0, ascii::compare(dst, ascii::len(dst), str3, ascii::len(str3)));
@@ -145,13 +150,22 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		{
 			bool value;
 			const char* str = "True";
-			ascii::parse(str, ascii::len(str), value);
+			ascii::parse(str, NULL, value);
 			CHECK_EQUAL(true, value);
 			const char* str2 = "Off";
 			ascii::parse(str2, ascii::len(str2), value);
 			CHECK_EQUAL(false, value);
-			const char* str3 = "false";
+			const char* str3 = "On";
 			ascii::parse(str3, ascii::len(str3), value);
+			CHECK_EQUAL(true, value);
+			const char* str4 = "false";
+			ascii::parse(str4, ascii::len(str4), value);
+			CHECK_EQUAL(false, value);
+			const char* str6 = "Yes";
+			ascii::parse(str6, ascii::len(str6), value);
+			CHECK_EQUAL(true, value);
+			const char* str5 = "No";
+			ascii::parse(str5, ascii::len(str5), value);
 			CHECK_EQUAL(false, value);
 		}
 
@@ -278,10 +292,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			char str_buffer[16 + 1];
 			char * str = &str_buffer[0];
 			char * eos = &str_buffer[16];
+			eos[0] = '\0';
 
 			s32 value = 31415;
 			char * end = ascii::to_string(str, eos, eos, value);
-			CHECK_EQUAL(4, ascii::size(str));
+			CHECK_EQUAL(5, ascii::size(str));
 			CHECK_EQUAL(0, ascii::compare(str, "31415"));
 		}
 
@@ -290,10 +305,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			char str_buffer[16 + 1];
 			char * str = &str_buffer[0];
 			char * eos = &str_buffer[16];
+			eos[0] = '\0';
 
 			u32 value = 31415;
 			char * end = ascii::to_string(str, eos, eos, value);
-			CHECK_EQUAL(4, ascii::size(str));
+			CHECK_EQUAL(5, ascii::size(str));
 			CHECK_EQUAL(0, ascii::compare(str, "31415"));
 		}
 
@@ -302,10 +318,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			char str_buffer[16 + 1];
 			char * str = &str_buffer[0];
 			char * eos = &str_buffer[16];
+			eos[0] = '\0';
 
 			s64 value = 31415;
 			char * end = ascii::to_string(str, eos, eos, value);
-			CHECK_EQUAL(4, ascii::size(str));
+			CHECK_EQUAL(5, ascii::size(str));
 			CHECK_EQUAL(0, ascii::compare(str, "31415"));
 		}
 
@@ -314,10 +331,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			char str_buffer[16 + 1];
 			char * str = &str_buffer[0];
 			char * eos = &str_buffer[16];
+			eos[0] = '\0';
 
 			u64 value = 31415;
 			char * end = ascii::to_string(str, eos, eos, value);
-			CHECK_EQUAL(4, ascii::size(str));
+			CHECK_EQUAL(5, ascii::size(str));
 			CHECK_EQUAL(0, ascii::compare(str, "31415"));
 		}
 
@@ -326,10 +344,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			char str_buffer[16 + 1];
 			char * str = &str_buffer[0];
 			char * eos = &str_buffer[16];
+			eos[0] = '\0';
 
 			f32 value = 3.1415f;
 			char * end = ascii::to_string(str, eos, eos, value, 4);
-			CHECK_EQUAL(4, ascii::size(str));
+			CHECK_EQUAL(6, ascii::size(str));
 			CHECK_EQUAL(0, ascii::compare(str, "3.1415"));
 		}
 
@@ -338,10 +357,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			char str_buffer[16 + 1];
 			char * str = &str_buffer[0];
 			char * eos = &str_buffer[16];
+			eos[0] = '\0';
 
 			f64 value = 3.1415;
 			char * end = ascii::to_string(str, eos, eos, value, 4);
-			CHECK_EQUAL(4, ascii::size(str));
+			CHECK_EQUAL(6, ascii::size(str));
 			CHECK_EQUAL(0, ascii::compare(str, "3.1415"));
 		}
 		

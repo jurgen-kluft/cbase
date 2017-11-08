@@ -22,7 +22,8 @@ namespace xcore
 		inline bool		has_fixed_size_rune() { return true; }
 		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
 
-		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
+		enum EWriteMode { WRITEMODE_ASCII = 0, WRITEMODE_UTF8 = 1, WRITEMODE_UTF32 = 2 };
+		inline EWriteMode get_writemode() { return WRITEMODE_ASCII; }
 
 		inline prune	pos(prune str, pcrune pos) { return str + (pos - str); }
 
@@ -32,7 +33,10 @@ namespace xcore
 
 		s32				size(pcrune str);
 
-		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
+		enum ECopyType { NONE = 0, COPY_AND_WRITE_TERMINATOR = 1, COPY_AND_WRITE_MATCHING_TERMINATOR = 2 };
+		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end, ECopyType type = COPY_AND_WRITE_MATCHING_TERMINATOR);
+
+		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
 
 		pcrune			find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode = CASE_SENSITIVE);
 		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);			/// Return position of first occurrence of <inString> or -1 if not found

@@ -47,7 +47,7 @@ namespace xcore
 				dst16 = next;
 				l += 1;
 			}
-			str16[sizeof(str16) - 1] = 0;
+			str16[maxlen - 1] = 0;
 
 			::OutputDebugStringW((LPCWSTR)str16);
 			::fputws((const wchar_t*)str16, stdout);
@@ -71,7 +71,7 @@ namespace xcore
 				dst16 = next;
 				l += 1;
 			}
-			str16[sizeof(str16) - 1] = 0;
+			str16[maxlen - 1] = 0;
 
 			::OutputDebugStringW((LPCWSTR)str16);
 			::fputws((const wchar_t*)str16, stdout);
@@ -95,7 +95,7 @@ namespace xcore
 				dst16 = next;
 				l += 1;
 			}
-			str16[sizeof(str16) - 1] = 0;
+			str16[maxlen - 1] = 0;
 
 			::OutputDebugStringW((LPCWSTR)str16);
 			::fputws((const wchar_t*)str16, stdout);

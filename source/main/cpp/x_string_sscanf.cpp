@@ -30,6 +30,66 @@ namespace xcore
 		return false;
 	}
 
+	static bool	MatchBoolStr(CharReader* str, bool& boolean)
+	{
+		bool bval = false;
+		const char* bstr = NULL;
+		uchar32 c = str->Peek();
+		if (ascii::is_equal(c, 't', ascii::CASE_IGNORE))
+		{
+			bstr = "true";
+			bval = true;
+		}
+		else if (ascii::is_equal(c, 'f', ascii::CASE_IGNORE))
+		{
+			bstr = "false";
+		}
+		else if (ascii::is_equal(c, 'y', ascii::CASE_IGNORE))
+		{
+			bstr = "yes";
+			bval = true;
+		}
+		else if (ascii::is_equal(c, 'n', ascii::CASE_IGNORE))
+		{
+			bstr = "no";
+		}
+		else if (ascii::is_equal(c, 'o', ascii::CASE_IGNORE))
+		{
+			str->Read();
+			bstr = "yes";
+			bval = true;
+			c = str->Peek();
+			if (ascii::is_equal(c, 'f', ascii::CASE_IGNORE))
+			{
+				bstr = "ff";
+				bval = false;
+			}
+			else if (ascii::is_equal(c, 'n', ascii::CASE_IGNORE))
+			{
+				bstr = "n";
+			}
+		}
+
+		if (bstr != NULL)
+		{
+			while (*bstr != '\0')
+			{
+				uchar32 bc = *bstr++;
+				uchar32 sc = str->Read();
+				if (sc == '\0')
+					return false;
+				if (utf32::is_equal(bc, sc, utf32::CASE_IGNORE) == false)
+					return false;
+			}
+			boolean = bval;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	/**
 	 *------------------------------------------------------------------------------
 	 * Author:
@@ -327,7 +387,6 @@ namespace xcore
 		s32 l = 0;
 		s32 parsing = 0;
 		s32 scanned = 0;
-		//s32 size     = 0;
 		s32 suppress = 0;
 
 		while (fmt->Peek() != '\0')
@@ -415,6 +474,18 @@ namespace xcore
 					scanned++;
 					parsing = 0;
 				} break;
+
+				case 'B':
+				case 'b':
+				case 'Y':
+				case 'y':
+				{
+					x_va_r r = vr_args[i++];
+					bool boolean;
+					if (MatchBoolStr(reader, boolean))
+						r = boolean;
+				} break;
+
 				case 'i':
 				case 'd':
 				{
@@ -589,7 +660,8 @@ namespace xcore
 					parsing = 0;
 					break;
 				}
-				fmt++;
+
+				fmt->Read();
 			}
 		}
 
