@@ -940,10 +940,6 @@ namespace xcore
 				// right-adjusting zero padding
 				{
 					dtoa(buffer, _double, (char)ch, width, prec);
-
-					CharBufferReverse reverser;
-					buffer->Modify(&reverser);
-
 					size = (s32)buffer->Count();
 				}
 

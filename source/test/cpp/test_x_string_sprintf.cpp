@@ -50,7 +50,7 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 			s32 l = ascii::sprintf(str, str_end, fmt, fmt_end, x_va(teststr));
 			CHECK_EQUAL(15, l);
 			const uchar* answer_str = (const uchar*)"the test string";
-			CHECK_EQUAL(0, ascii::compare(answer_str, ascii::len(answer_str), str, str_end));
+			CHECK_EQUAL(0, ascii::compare(answer_str, NULL, str, NULL));
 		}
 	}
 }

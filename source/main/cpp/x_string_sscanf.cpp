@@ -24,6 +24,7 @@ namespace xcore
 					return true;
 				f = foo->Read();
 			}
+			foo->Reset();
 			reader->Skip();
 			c = reader->Peek();
 		}
@@ -136,24 +137,25 @@ namespace xcore
 		// Decode the rest of the string
 		while (true)
 		{
-			c = reader->Read();
+			c = reader->Peek();
 
 			s32  validBase = 0;
 			if ((c >= '0') && (c <= '9'))
 			{
 				validBase = c - '0';
 			}
-			else if ((c >= 'a') && (c <= 'z'))
+			else if (base==16 && (c >= 'a') && (c <= 'f'))
 			{
 				validBase = c - 'a' + 10;
 			}
-			else if ((c >= 'A') && (c <= 'Z'))
+			else if (base == 16 && (c >= 'A') && (c <= 'F'))
 			{
-				validBase = c - 'A' + 10 + 26;
+				validBase = c - 'A' + 10;
 			}
 			else if (c == '_' || c == ':')
 			{
 				// Ignore
+				reader->Skip();
 				continue;
 			}
 			else
@@ -165,6 +167,8 @@ namespace xcore
 				// Any other character is bad news
 				return total;
 			}
+
+			reader->Skip();
 
 			ASSERT(validBase >= 0);
 			ASSERT(validBase < base);
@@ -399,7 +403,8 @@ namespace xcore
 			{
 				if (fmt->Peek() == '%')
 				{
-					fmt->Read();
+					fmt->Skip();
+
 					parsing = 1;
 					//size = INT32_SIZE;
 					suppress = 0;
@@ -428,6 +433,8 @@ namespace xcore
 					break;
 				case 'c':
 				{
+					fmt->Skip();
+
 					uchar32 c = reader->Read();
 					x_va_r  r = vr_args[i++];
 					r = c;
@@ -436,13 +443,13 @@ namespace xcore
 				} break;
 				case 's':
 				{
+					fmt->Skip();
+
 					x_va_r r = vr_args[i++];
 
 					u32 i = 0;
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
-					{
 						reader->Read();
-					}
 
 					uchar* ascii_str = (uchar*)r;
 					AsciiBuffer ascii_str_buffer(ascii_str, ascii_str != NULL ? (ascii_str + r.var()) : ascii_str);
@@ -480,6 +487,8 @@ namespace xcore
 				case 'Y':
 				case 'y':
 				{
+					fmt->Skip();
+
 					x_va_r r = vr_args[i++];
 					bool boolean;
 					if (MatchBoolStr(reader, boolean))
@@ -489,7 +498,12 @@ namespace xcore
 				case 'i':
 				case 'd':
 				{
+					fmt->Skip();
+
 					CharReaderFromAsciiBuffer foo(AsciiBuffer("1234567890-+", 12));
+
+					while (reader->Peek() != 0 && reader->Peek() == ' ')
+						reader->Read();
 
 					s64 n1 = 0;
 					if (SearchUntilOneOf(reader, &foo))
@@ -512,7 +526,12 @@ namespace xcore
 				} break;
 				case 'u':
 				{
+					fmt->Skip();
+
 					CharReaderFromAsciiBuffer foo(AsciiBuffer("1234567890", 10));
+
+					while (reader->Peek() != 0 && reader->Peek() == ' ')
+						reader->Read();
 
 					s64 n2 = 0;
 					if (SearchUntilOneOf(reader, &foo))
@@ -535,7 +554,12 @@ namespace xcore
 				} break;
 				case 'o':
 				{
+					fmt->Skip();
+
 					CharReaderFromAsciiBuffer foo(AsciiBuffer("12345670", 8));
+
+					while (reader->Peek() != 0 && reader->Peek() == ' ')
+						reader->Read();
 
 					s64 n2 = 0;
 					if (SearchUntilOneOf(reader, &foo))
@@ -559,10 +583,18 @@ namespace xcore
 				case 'x':
 				case 'X':
 				{
+					fmt->Skip();
+
 					CharReaderFromAsciiBuffer foo(AsciiBuffer("1234567890xabcdefABCDEF", 23));
 
-					u32 const varsize = vr_args[i].sizeInBytes();
-					w = varsize * 2;
+					while (reader->Peek() != 0 && reader->Peek() == ' ')
+						reader->Read();
+
+					if (w == 0)
+					{
+						u32 const varsize = vr_args[i].sizeInBytes();
+						w = varsize * 2;
+					}
 
 					u64 n2 = 0;
 					if (SearchUntilOneOf(reader, &foo))
@@ -574,7 +606,8 @@ namespace xcore
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
 								str[j] = (uchar)reader->Read();
-							n2 = StrToU64((const uchar*)str, 16);
+							CharReaderFromAsciiBuffer str_reader(str, NULL);
+							n2 = StrToS64(&str_reader, 16);
 						}
 						else if (w == 4)
 						{
@@ -582,8 +615,14 @@ namespace xcore
 							uchar str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
-								str[j] = (uchar)reader->Read();
-							n2 = StrToU64((const uchar*)str, 16);
+							{
+								uchar c = reader->Read();
+								str[j] = c;
+								if (c == '\0')
+									break;
+							}
+							CharReaderFromAsciiBuffer str_reader(str, NULL);
+							n2 = StrToS64(&str_reader, 16);
 						}
 						else if (w == 8)
 						{
@@ -591,8 +630,14 @@ namespace xcore
 							uchar str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
-								str[j] = (uchar)reader->Read();
-							n2 = StrToU64(str, 16);
+							{
+								uchar c = reader->Read();
+								str[j] = c;
+								if (c == '\0')
+									break;
+							}
+							CharReaderFromAsciiBuffer str_reader(str, NULL);
+							n2 = StrToS64(&str_reader, 16);
 						}
 						else // if (w == 16)
 						{
@@ -600,8 +645,14 @@ namespace xcore
 							uchar str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
-								str[j] = (uchar)reader->Read();
-							n2 = StrToU64(str, 16);
+							{
+								uchar c = reader->Read();
+								str[j] = c;
+								if (c == '\0')
+									break;
+							}
+							CharReaderFromAsciiBuffer str_reader(str, NULL);
+							n2 = (u64)StrToS64(&str_reader, 16);
 						}
 					}
 
@@ -624,7 +675,12 @@ namespace xcore
 				case 'e':
 				case 'E':
 				{
+					fmt->Skip();
+
 					CharReaderFromAsciiBuffer foo(AsciiBuffer("1234567890.e+-", 14));
+
+					while (reader->Peek() != 0 && reader->Peek() == ' ')
+						reader->Read();
 
 					f64 n3 = 0;
 					if (SearchUntilOneOf(reader, &foo))
@@ -647,21 +703,23 @@ namespace xcore
 				} break;
 				case 'l':
 				case 'L':
+					fmt->Skip();
 					//size = INT64_SIZE;
 					break;
 				case 'h':
 				case 'n':
+					fmt->Skip();
 					//size = INT16_SIZE;
 					break;
 				case '*':
+					fmt->Skip();
 					suppress = 1;
 					break;
 				default:
 					parsing = 0;
+					fmt->Skip();
 					break;
 				}
-
-				fmt->Read();
 			}
 		}
 

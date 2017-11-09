@@ -643,9 +643,12 @@ namespace xcore
 			s32 n = 0;
 			s32 l = 0;
 			pcrune src = str;
-			for (; src<str_end; n++)
+			for (; src<str_end; )
 			{
 				uchar32 c = read_char(src);
+				
+				if (str_end == NULL && c == '\0') break;
+
 				if (c >= '0' && c <= '9') { n++;  continue; }
 				if (c >= 'A' && c <= 'F') { n++;  continue; }
 				if (c >= 'a' && c <= 'f') { n++;  continue; }
@@ -675,7 +678,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			pcrune format_str_end = format_str + 2 * get_fixed_sizeof_rune();
+			pcrune format_str_end = format_str + 2;
 			s32 len = vsprintf(str, str_eos, (pcrune)format_str, format_str_end, x_va(val));
 			return str + len;
 		}
@@ -689,7 +692,7 @@ namespace xcore
 			case 10: format_str[1] = 'u'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			pcrune format_str_end = format_str + 2 * get_fixed_sizeof_rune();
+			pcrune format_str_end = format_str + 2;
 			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
 			return str + len;
 		}
@@ -703,7 +706,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			pcrune format_str_end = format_str + 2 * get_fixed_sizeof_rune();
+			pcrune format_str_end = format_str + 2;
 			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
 			return str + len;
 		}
@@ -717,23 +720,33 @@ namespace xcore
 			case 10: format_str[1] = 'u'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			pcrune format_str_end = format_str + sizeof(format_str);
+			pcrune format_str_end = format_str + 2;
 			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
 			return str + len;
 		}
 
 		prune	to_string(prune str, prune str_end, pcrune str_eos, f32 val, s32 numFractionalDigits)
 		{
-			rune format_str[] = { '%', 'f', '\0' };
-			pcrune format_str_end = format_str + 2 * get_fixed_sizeof_rune();
+			rune format_str[] = { '%', '.', '0', '2', 'f', '\0' };
+			if (numFractionalDigits != 2 && numFractionalDigits > 0 && numFractionalDigits < 100)
+			{
+				format_str[2] = '0' + numFractionalDigits / 10;
+				format_str[3] = '0' + numFractionalDigits % 10;
+			}
+			pcrune format_str_end = format_str + 5;
 			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
 			return str + len;
 		}
 
 		prune	to_string(prune str, prune str_end, pcrune str_eos, f64 val, s32 numFractionalDigits)
 		{
-			rune format_str[] = { '%', 'f', '\0' };
-			pcrune format_str_end = format_str + 2 * get_fixed_sizeof_rune();
+			rune format_str[] = { '%', '.', '0', '2', 'f', '\0' };
+			if (numFractionalDigits != 2 && numFractionalDigits > 0 && numFractionalDigits < 100)
+			{
+				format_str[2] = '0' + numFractionalDigits / 10;
+				format_str[3] = '0' + numFractionalDigits % 10;
+			}
+			pcrune format_str_end = format_str + 5;
 			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
 			return str + len;
 		}
@@ -799,9 +812,9 @@ namespace xcore
 				while (str < str_end)
 				{
 					uchar32 c = read_char(str);
-					if (is_upper(c) == b)
+					if (is_upper(c) != b)
 						return false;
-					b = false;
+					b = (c == ' ');
 				}
 			}
 			else
@@ -811,9 +824,9 @@ namespace xcore
 					uchar32 c = read_char(str);
 					if (c == '\0')
 						break;
-					if (is_upper(c) == b)
+					if (is_upper(c) != b)
 						return false;
-					b = false;
+					b = (c == ' ');
 				}
 			}
 			return true;

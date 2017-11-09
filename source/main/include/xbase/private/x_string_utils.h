@@ -697,6 +697,7 @@ namespace xcore
 			bool const ok = Write_Prologue(c);
 			if (ok)
 			{
+				mCount += 1;
 				*mPtr++ = (uchar)c;
 				*mPtr = '\0';
 			}

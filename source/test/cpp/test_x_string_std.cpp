@@ -378,8 +378,8 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			CHECK_EQUAL(true, ascii::is_alpha('a'));
 			CHECK_EQUAL(true, ascii::is_alpha('F'));
 			CHECK_EQUAL(true, ascii::is_alpha('f'));
-			CHECK_EQUAL(false, ascii::is_alpha('G'));
-			CHECK_EQUAL(false, ascii::is_alpha('g'));
+			CHECK_EQUAL(true, ascii::is_alpha('G'));
+			CHECK_EQUAL(true, ascii::is_alpha('g'));
 			CHECK_EQUAL(false, ascii::is_alpha('9'));
 			CHECK_EQUAL(false, ascii::is_alpha('9'));
 
@@ -453,9 +453,9 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		UNITTEST_TEST(is_quoted)
 		{
 			const char* str1 = "'this Is A quoted String'";
-			CHECK_EQUAL(true, ascii::is_delimited(str1, ascii::len(str1), '\''));
+			CHECK_EQUAL(true, ascii::is_delimited(str1, ascii::len(str1), '\'', '\''));
 			const char* str2 = "'This Is Not correctly quoted Capitalized\"";
-			CHECK_EQUAL(false, ascii::is_delimited(str2, ascii::len(str2), '\''));
+			CHECK_EQUAL(false, ascii::is_delimited(str2, ascii::len(str2), '\'', '\''));
 		}
 
 		UNITTEST_TEST(to_upper)
@@ -500,8 +500,8 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			CHECK_EQUAL(true, ascii::ends_with(str1, ascii::len(str1), 'g'));
 			CHECK_EQUAL(false, ascii::ends_with(str2, ascii::len(str2), 'g'));
 
-			CHECK_EQUAL(true, ascii::ends_with(str2, ascii::len(str2), end2, ascii::len(end2)));
-			CHECK_EQUAL(false, ascii::ends_with(str1, ascii::len(str1), end2, ascii::len(end2)));
+			CHECK_EQUAL(true, ascii::ends_with(str1, ascii::len(str1), end2, ascii::len(end2)));
+			CHECK_EQUAL(false, ascii::ends_with(str2, ascii::len(str2), end2, ascii::len(end2)));
 		}
 
 		UNITTEST_TEST(first_char)

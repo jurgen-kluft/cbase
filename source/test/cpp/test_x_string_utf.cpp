@@ -73,9 +73,9 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 			const uchar8* str = (const uchar8*)str2;
 
 			uchar32 c;
-			utf::read(str, c);
-			utf::read(str, c);
-			utf::read(str, c);
+			str = utf::read(str, c);
+			str = utf::read(str, c);
+			str = utf::read(str, c);
 			CHECK_EQUAL(2, utf::size(c));	// take the �
 
 			str = (const uchar8*)str2;
@@ -85,7 +85,7 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 				if (i==2)
 				{
 					CHECK_EQUAL(2, utf::size(c));
-					CHECK_EQUAL(0xC3A9, c);
+					CHECK_EQUAL(0xe9, c);
 				}
 				else if (i>2)
 				{
@@ -104,7 +104,7 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 		{
 			CHECK_EQUAL(1, utf::size(uchar32('A')));
 			CHECK_EQUAL(1, utf::size(uchar32('0')));
-			CHECK_EQUAL(2, utf::size(uchar32(0xC3A9)));
+			CHECK_EQUAL(2, utf::size(uchar32(0xe9)));
 		}
 	}
 
