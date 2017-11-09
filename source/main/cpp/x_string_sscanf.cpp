@@ -616,8 +616,8 @@ namespace xcore
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
 							{
-								uchar c = reader->Read();
-								str[j] = c;
+								uchar32 c = reader->Read();
+								str[j] = (uchar)c;
 								if (c == '\0')
 									break;
 							}
@@ -631,8 +631,8 @@ namespace xcore
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
 							{
-								uchar c = reader->Read();
-								str[j] = c;
+								uchar32 c = reader->Read();
+								str[j] = (uchar)c;
 								if (c == '\0')
 									break;
 							}
@@ -646,8 +646,8 @@ namespace xcore
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
 							{
-								uchar c = reader->Read();
-								str[j] = c;
+								uchar32 c = reader->Read();
+								str[j] = (uchar)c;
 								if (c == '\0')
 									break;
 							}

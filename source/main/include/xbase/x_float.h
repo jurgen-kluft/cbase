@@ -123,7 +123,7 @@ namespace xcore
     //==============================================================================
     // INLINE OSX
     //==============================================================================
-    #elif defined TARGET_MACOS
+    #elif defined TARGET_OSX
         #include "private/x_float_inline_osx.h"
 
 	#endif

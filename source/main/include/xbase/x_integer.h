@@ -94,7 +94,7 @@ namespace xcore
 	#if defined TARGET_PC
 		#include "xbase/private/x_integer_inline_win32.h"
 
-	#elif defined TARGET_MACOS
+	#elif defined TARGET_OSX
 		#include "xbase/private/x_integer_inline_osx.h"
 
 	#else

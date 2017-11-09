@@ -123,7 +123,7 @@ namespace xcore
 		uchar8 const*	read(uchar8 const* str, uchar32& out_c)
 		{
 			out_c = *str;
-			s32 const l = sequence_sizeof_utf8(out_c);
+			s32 const l = sequence_sizeof_utf8((uchar8)out_c);
 			switch (l) 
 			{
 			case 1:

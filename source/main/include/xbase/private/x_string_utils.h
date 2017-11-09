@@ -557,7 +557,15 @@ namespace xcore
 		inline			CharWriterAsUtf8ToConsole(Utf8Buffer cache) : mCount(0), mCache(cache), mCursor(cache.mStr) { }
 
 		virtual u64		Count() const { return mCount; }
-		virtual void	Reset() { mCount = 0; mCursor = mCache.mStr; mCursor[0] = '\0'; }
+		virtual void	Reset()
+		{ 
+			mCount = 0; 
+			mCursor = mCache.mStr; 
+			mCursor[0] = '\0';
+			mCursor[1] = '\0';
+			mCursor[2] = '\0';
+			mCursor[3] = '\0';
+		}
 
 		void			Flush()
 		{
@@ -568,10 +576,10 @@ namespace xcore
 
 		virtual bool	Write(uchar32 c)
 		{
-			if (mCursor == mCache.mEnd)
+			if ((mCursor + 5) >= mCache.mEnd)
 				Flush();
-			*mCursor++ = c;
-			*mCursor = '\0';
+			mCursor = utf::write(c, mCursor);
+			utf::write('\0', mCursor);
 			return true;
 		}
 
@@ -786,10 +794,10 @@ namespace xcore
 
 		virtual bool	Write(uchar32 c)
 		{
-			if (mPtr >= mEnd)
+			if ((mPtr+5) >= mEnd)
 				return false;
-			*mPtr++ = c;
-			*mPtr = '\0';
+			mPtr = utf::write(c, mPtr);
+			utf::write('\0', mPtr);
 			return true;
 		}
 
@@ -910,6 +918,9 @@ namespace xcore
 		inline			CharWriterToAsciiBufferWithBuffer() : mWriter(mBuffer, &mBuffer[SIZE])
 		{
 			mBuffer[SIZE] = '\0';
+			mBuffer[SIZE+1] = '\0';
+			mBuffer[SIZE+2] = '\0';
+			mBuffer[SIZE+3] = '\0';
 		}
 
 		virtual u64		Count() const { return mWriter.Count(); }

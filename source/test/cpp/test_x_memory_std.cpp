@@ -186,7 +186,7 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 
 			xcore::u16 r;
 			xcore::u16 const* ptr = xmem_utils::readunaligned16((xcore::u16 const*)&buffer1[1], r);
-			CHECK_EQUAL(2, (xcore::u32)ptr - (xcore::u32)&buffer1[1]);
+			CHECK_EQUAL(2, (xcore::xsize_t)ptr - (xcore::xsize_t)&buffer1[1]);
 			CHECK_EQUAL(0x0708, r);
 		}
 
@@ -196,11 +196,11 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 
 			xcore::u32 r1;
 			xcore::u32 const* ptr1 = xmem_utils::readunaligned24((xcore::u32 const*)&buffer1[1], r1);
-			CHECK_EQUAL(3, (xcore::u32)ptr1 - (xcore::u32)&buffer1[1]);
+			CHECK_EQUAL(3, (xcore::xsize_t)ptr1 - (xcore::xsize_t)&buffer1[1]);
 			CHECK_EQUAL(0x070809, r1);
 			xcore::u32 r2;
 			xcore::u32 const* ptr2 = xmem_utils::readunaligned24((xcore::u32 const*)&buffer1[2], r2);
-			CHECK_EQUAL(3, (xcore::u32)ptr2 - (xcore::u32)&buffer1[2]);
+			CHECK_EQUAL(3, (xcore::xsize_t)ptr2 - (xcore::xsize_t)&buffer1[2]);
 			CHECK_EQUAL(0x08090a, r2);
 		}
 
@@ -210,11 +210,11 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 
 			xcore::u32 r1;
 			xcore::u32 const* ptr1 = xmem_utils::readunaligned32((xcore::u32 const*)&buffer1[1], r1);
-			CHECK_EQUAL(4, (xcore::u32)ptr1 - (xcore::u32)&buffer1[1]);
+			CHECK_EQUAL(4, (xcore::xsize_t)ptr1 - (xcore::xsize_t)&buffer1[1]);
 			CHECK_EQUAL(0x0708090a, r1);
 			xcore::u32 r2;
 			xcore::u32 const* ptr2 = xmem_utils::readunaligned32((xcore::u32 const*)&buffer1[2], r2);
-			CHECK_EQUAL(4, (xcore::u32)ptr2 - (xcore::u32)&buffer1[2]);
+			CHECK_EQUAL(4, (xcore::xsize_t)ptr2 - (xcore::xsize_t)&buffer1[2]);
 			CHECK_EQUAL(0x08090a01, r2);
 		}
 

@@ -7,7 +7,7 @@
 
 #ifdef TARGET_PC
 #include <math.h>
-#elif defined(TARGET_MACOS)
+#elif defined(TARGET_OSX)
 #include <math.h>
 #else
 #error "Don't know how fmod for this platform"
