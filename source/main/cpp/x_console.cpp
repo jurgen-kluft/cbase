@@ -4,6 +4,7 @@
 */
 
 #include "xbase/x_debug.h"
+#include "xbase/x_memory_std.h"
 #include "xbase/x_va_list.h"
 #include "xbase/x_string_ascii.h"
 #include "xbase/x_string_utf.h"
@@ -16,72 +17,72 @@ namespace xcore
 {
 	#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type local_var_name##Buffer[size + 1]; local_var_name##Buffer[size] = '\0'; type* local_var_name = &local_var_name##Buffer[0]; type* local_var_name##_eos = &local_var_name##Buffer[size];
 
-	xconsole_node::xconsole_node()
-		: mNext(NULL)
-		, mPrev(NULL)
-		, mImp(NULL)
+	class xiconsole_store_default : public xiconsole_store
 	{
-	}
-
-	bool					xconsole_node::used() const
-	{
-		return mImp != NULL;
-	}
-
-	void					xconsole_node::reset()
-	{
-		mNext = mPrev = NULL;
-		mImp = NULL;
-	}
-
-	void					xconsole_node::add(xconsole_node* node, xconsole_imp* imp)
-	{
-		ASSERT(node->mNext==NULL && node->mPrev==NULL && node->mImp==NULL); 
-		
-		node->mImp = imp;
-
-		if (mNext!=NULL)
+		enum EConfiguration
 		{
-			mNext->mPrev = node;
-			node->mNext = mNext;
+			MAX_CONSOLES = 16
+		};
+
+		xiconsole*				mFixedNumberOfConsoles[MAX_CONSOLES];
+		s32						mNumberOfConsoles;
+
+	public:
+		xiconsole_store_default()
+			: mNumberOfConsoles(0)
+		{
+			for (s32 i = 0; i < MAX_CONSOLES; ++i)
+				mFixedNumberOfConsoles[i] = NULL;
 		}
 
-		mNext = node;
-		node->mPrev = this;
-	}
+		virtual					~xiconsole_store_default() { }
 
-	void					xconsole_node::remove(xconsole_node* node)
-	{
-		if (node->mPrev!=NULL)
-			node->mPrev->mNext = node->mNext;
-		if (node->mNext!=NULL)
-			node->mNext->mPrev = mPrev;
+		virtual void			add(xiconsole* node)
+		{
+			if (mNumberOfConsoles < MAX_CONSOLES)
+			{
+				mFixedNumberOfConsoles[mNumberOfConsoles++] = node;
+			}
+		}
 
-		node->reset();
-	}
+		virtual void			remove(xiconsole* console)
+		{
+			for (s32 i = 0; i < mNumberOfConsoles; ++i)
+			{
+				if (mFixedNumberOfConsoles[i] == console)
+				{
+					if ((i + 1) < mNumberOfConsoles)
+					{
+						xmem_utils::memmove(&mFixedNumberOfConsoles[i], &mFixedNumberOfConsoles[i + 1], (mNumberOfConsoles - 1 - i) * sizeof(void*));
+					}
+					mNumberOfConsoles -= 1;
+					break;
+				}
+			}
+		}
 
-	xconsole_node::iterator::iterator(xconsole_node const* node)
-		: mNode(node)
-	{
-	}
+		virtual bool			iterate(iterator& iter, xiconsole*& console)
+		{
+			if (iter == 0)
+			{
+				iter = (void**)&mFixedNumberOfConsoles[0];
+			}
+			else
+			{
+				if ((xiconsole**)iter == &mFixedNumberOfConsoles[MAX_CONSOLES - 1])
+				{
+					console = NULL;
+					return false;
+				}
+				++iter;
+			}
+			console = *(xiconsole**)iter;
+			return console != NULL;
+		}
+	};
 
-	bool					xconsole_node::iterator::next()
-	{
-		mNode = mNode->mNext;
-		return mNode!=NULL;
-	}
 
-	xconsole_imp*			xconsole_node::iterator::imp()
-	{
-		return mNode->mImp;
-	}
-
-	xconsole_node::iterator	xconsole_node::begin() const
-	{
-		return iterator(this);
-	}
-
-	class xconsole_null_imp : public xconsole_imp
+	class xconsole_null_imp : public xiconsole
 	{
 	public:
 		xconsole_null_imp()
@@ -205,7 +206,7 @@ namespace xcore
 	static xconsole_null_imp sNullConsole;
 
 
-	class xconsole_default_imp : public xconsole_imp
+	class xiconsole_default : public xiconsole
 	{
 		xconsole::ConsoleOutDelegate mOut;
 		xconsole::ConsoleOut8Delegate mOut8;
@@ -213,7 +214,7 @@ namespace xcore
 		xconsole::ConsoleColorDelegate mColor;
 
 	public:
-								xconsole_default_imp()
+								xiconsole_default()
 								{
 									mOut = xconsole_out::write_uchar;
 									mOut8 = xconsole_out::write_uchar8;
@@ -221,7 +222,7 @@ namespace xcore
 									mColor = xconsole_out::color;
 								}
 
-		virtual					~xconsole_default_imp() { }
+		virtual					~xiconsole_default() { }
 
 		virtual void			initialize();
 		virtual void			shutdown();
@@ -250,67 +251,67 @@ namespace xcore
 		virtual s32 			writeLine();
 	};
 
-	void				xconsole_default_imp::initialize()
+	void				xiconsole_default::initialize()
 	{
 	}
 
-	void				xconsole_default_imp::shutdown()
+	void				xiconsole_default::shutdown()
 	{
 	}
 
-	s32					xconsole_default_imp::setColor(xconsole::EColor color)
+	s32					xiconsole_default::setColor(xconsole::EColor color)
 	{
 		return mColor(color);
 	}
 
-	s32					xconsole_default_imp::write(bool _value)
+	s32					xiconsole_default::write(bool _value)
 	{
 		return write(_value ? "true" : "false", NULL);
 	}
 
-	s32 				xconsole_default_imp::write(f64 _value)
+	s32 				xiconsole_default::write(f64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 256);
 		ascii::to_string(tmp, tmp_eos, tmp_eos, _value, 2);
 		return write(tmpBuffer);
 	}
 
-	s32 				xconsole_default_imp::write(s32 _value)
+	s32 				xiconsole_default::write(s32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 64);
 		ascii::to_string(tmp, tmp_eos, tmp_eos, _value, 2);
 		return write(tmpBuffer);
 	}
 
-	s32 				xconsole_default_imp::write(s64 _value)
+	s32 				xiconsole_default::write(s64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 64);
 		ascii::to_string(tmp, tmp_eos, tmp_eos, _value, 2);
 		return write(tmpBuffer);
 	}
 
-	s32 				xconsole_default_imp::write(f32 _value)
+	s32 				xiconsole_default::write(f32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 256);
 		ascii::to_string(tmp, tmp_eos, tmp_eos, _value, 2);
 		return write(tmpBuffer);
 	}
 
-	s32 				xconsole_default_imp::write(u32 _value)
+	s32 				xiconsole_default::write(u32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 256);
 		ascii::to_string(tmp, tmp_eos, tmp_eos, _value, 2);
 		return write(tmpBuffer);
 	}
 
-	s32 				xconsole_default_imp::write(u64 _value)
+	s32 				xiconsole_default::write(u64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar, tmp, 256);
 		ascii::to_string(tmp, tmp_eos, tmp_eos, _value, 2);
 		return write(tmpBuffer);
 	}
 	
-	s32 				xconsole_default_imp::write(uchar32 _value)
+	s32 				xiconsole_default::write(uchar32 _value)
 	{
 		uchar32 s[3];
 		s[0] = _value;
@@ -319,36 +320,36 @@ namespace xcore
 		return mOut32(s, &s[1]);
 	}
 
-	s32 				xconsole_default_imp::write(const char* str, const char* str_end)
+	s32 				xiconsole_default::write(const char* str, const char* str_end)
 	{
 		return mOut((const uchar*)str, (const uchar*)str_end);
 	}
 
-	s32 				xconsole_default_imp::write(const char* fmt, const x_va_list& args)
+	s32 				xiconsole_default::write(const char* fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar, str, 512);
 		s32 len = ascii::vsprintf(str, str_eos, (const uchar*)fmt, ascii::len((const uchar*)fmt), args);
 		return mOut(str, str + len);
 	}
 
-	s32 				xconsole_default_imp::write(const uchar8* str, const uchar8* str_end)
+	s32 				xiconsole_default::write(const uchar8* str, const uchar8* str_end)
 	{
 		return mOut8((const uchar8*)str, (const uchar8*)str_end);
 	}
 
-	s32 				xconsole_default_imp::write(const uchar8* fmt, const x_va_list& args)
+	s32 				xiconsole_default::write(const uchar8* fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar8, str, 512);
 		s32 len = utf8::vsprintf(str, str_eos, (const uchar8*)fmt, utf8::len((const uchar8*)fmt), args);
 		return mOut8(str, str + len);
 	}
 
-	s32 				xconsole_default_imp::write(const uchar32* str, const uchar32* str_end)
+	s32 				xiconsole_default::write(const uchar32* str, const uchar32* str_end)
 	{
 		return mOut32(str, str_end);
 	}
 
-	s32 				xconsole_default_imp::write(const uchar32* fmt, const x_va_list& args)
+	s32 				xiconsole_default::write(const uchar32* fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(uchar32, str, 1024);
 		s32 len = utf32::vsprintf(str, str_eos, (const uchar32*)fmt, utf32::len(fmt), args);
@@ -356,98 +357,112 @@ namespace xcore
 	}
 
 
-	s32 				xconsole_default_imp::writeLine()
+	s32 				xiconsole_default::writeLine()
 	{
 		return write("\n", NULL);
 	}
 
 
-	static xconsole_default_imp sDefaultConsole;
-	xconsole_node		xconsole::sConsoleList;
+	static xiconsole_default		sDefaultConsole;
+	static xiconsole_store_default	sDefaultConsoleStore;
+	static xiconsole_store*			sConsoleStore = &sDefaultConsoleStore;
 
-	void				xconsole::add(xconsole_imp* imp)
+	void				xconsole::set_console_store(xiconsole_store* store)
 	{
-		sConsoleList.add(&imp->mNode, imp);
+		if (store == NULL)
+			sConsoleStore == &sDefaultConsoleStore;
+		else
+			sConsoleStore = store;
 	}
 
-	void				xconsole::addDefault()
+	void				xconsole::add_default_console()
 	{
-		if (!sDefaultConsole.mNode.used())
-		{
-			return add(&sDefaultConsole);
-		}
-	}
-
-	void				xconsole::remove(xconsole_imp* imp)
-	{
-		sConsoleList.remove(&imp->mNode);
+		sConsoleStore->add(&sDefaultConsole);
 	}
 
 	void				xconsole::setColor(EColor color)
 	{
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			i.imp()->setColor(color);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			console->setColor(color);
 	}
 
 	void				xconsole::restoreColor()
 	{
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			i.imp()->setColor(xconsole::NORMAL);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			console->setColor(xconsole::NORMAL);
 	}
 
 	s32 				xconsole::write(bool _value)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(_value);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(_value);
 		return r;
 	}
 
 	s32 				xconsole::write(f64 _value)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(_value);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(_value);
 		return r;
 	}
 
 	s32 				xconsole::write(s32 _value)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(_value);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(_value);
 		return r;
 	}
 
 	s32 				xconsole::write(s64 _value)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(_value);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(_value);
 		return r;
 	}
 
 	s32 				xconsole::write(f32 _value)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(_value);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(_value);
 		return r;
 	}
 
 	s32 				xconsole::write(u32 _value)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(_value);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(_value);
 		return r;
 	}
 
 	s32 				xconsole::write(u64 _value)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(_value);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(_value);
 		return r;
 	}
 
@@ -455,24 +470,30 @@ namespace xcore
 	s32 				xconsole::write(uchar32 _value)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(_value);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(_value);
 		return r;
 	}
 
 	s32 				xconsole::write(const char* str, const char* str_end)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(str, str_end);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(str, str_end);
 		return r;
 	}
 
 	s32 				xconsole::write(const char* fmt, const x_va_list& args)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(fmt, args);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(fmt, args);
 		return r;
 	}
 
@@ -481,24 +502,30 @@ namespace xcore
 	{
 		x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(fmt, args);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(fmt, args);
 		return r;
 	}
 
 	s32 				xconsole::write(const uchar8* str, const uchar8* str_end)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i = sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(str, str_end);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(str, str_end);
 		return r;
 	}
 
 	s32 				xconsole::write(const uchar8* fmt, const x_va_list& args)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i = sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(fmt, args);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(fmt, args);
 		return r;
 	}
 
@@ -507,24 +534,30 @@ namespace xcore
 	{
 		x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 		s32 r = 0;
-		for (xconsole_node::iterator i = sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(fmt, args);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(fmt, args);
 		return r;
 	}
 
 	s32 				xconsole::write(const uchar32* str, const uchar32* str_end)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(str, str_end);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(str, str_end);
 		return r;
 	}
 
 	s32 				xconsole::write(const uchar32* fmt, const x_va_list& args)
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(fmt, args);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(fmt, args);
 		return r;
 	}
 
@@ -533,8 +566,10 @@ namespace xcore
 	{
 		x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->write(fmt, args);
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->write(fmt, args);
 		return r;
 	}
 
@@ -542,8 +577,10 @@ namespace xcore
 	s32 				xconsole::writeLine()
 	{
 		s32 r = 0;
-		for (xconsole_node::iterator i=sConsoleList.begin(); i.next(); )
-			r = i.imp()->writeLine();
+		xiconsole_store::iterator iter = NULL;
+		xiconsole* console;
+		while (sConsoleStore->iterate(iter, console))
+			r = console->writeLine();
 		return r;
 	}
 };

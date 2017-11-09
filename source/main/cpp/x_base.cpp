@@ -18,7 +18,7 @@ namespace xbase
 #ifdef X_ASSERT
 	void			x_Init()
 	{
-		xcore::xconsole::addDefault();
+		xcore::xconsole::add_default_console();
 		xcore::sSystemAllocator = xcore::gCreateSystemAllocator();
 		xcore::x_asserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
 	}

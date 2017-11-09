@@ -18,44 +18,22 @@
 namespace xcore
 {
 	// Forward declares
-	class xconsole_imp;
+	class xiconsole;
 
-	struct xconsole_node
+	class xiconsole_store
 	{
-								xconsole_node();
+	public:
+		virtual					~xiconsole_store() { }
 		
-		bool					used() const;
-		void					reset();
+		virtual void			add(xiconsole* node) = 0;
+		virtual void			remove(xiconsole* node) = 0;
 
-		void					add(xconsole_node* node, xconsole_imp* imp);
-		void					remove(xconsole_node* node);
-
-		class iterator
-		{
-		public:
-									iterator(xconsole_node const*);
-
-			bool					next();
-			xconsole_imp*			imp();
-
-		private:
-			xconsole_node const*	mNode;
-		};
-
-		iterator				begin() const;
-
-	private:
-		xconsole_node*			mNext;
-		xconsole_node*			mPrev;
-		xconsole_imp*			mImp;
+		typedef	void**			iterator;
+		virtual bool			iterate(iterator& iter, xiconsole*& ) = 0;
 	};
 
 	class xconsole
 	{
-	private:
-
-		static xconsole_node	sConsoleList;
-
 	public:
 		enum EColor
 		{
@@ -84,9 +62,8 @@ namespace xcore
 		typedef s32(*ConsoleOut8Delegate)(const uchar8*, const uchar8*);
 		typedef s32 (*ConsoleOut32Delegate)(const uchar32*, const uchar32*);
 
-		static void				add(xconsole_imp* imp);							///< Returns old implementation
-		static void				addDefault();									///< Attach default (debug, printf) implementation
-		static void				remove(xconsole_imp* imp);						///< Returns old implementation, sets current implementation to NULL
+		static void				set_console_store(xiconsole_store* store);
+		static void				add_default_console();
 
 		static void				setColor(EColor color);
 		static void				restoreColor();
@@ -156,14 +133,13 @@ namespace xcore
 	};
 
 	/// Interface class, has specific (or configurable) implementations for different environments/platforms
-	class xconsole_imp
+	class xiconsole
 	{
 	private:
 		friend class xconsole;
-		xconsole_node			mNode;
 
 	public:
-		virtual					~xconsole_imp() { }
+		virtual					~xiconsole() { }
 
 		virtual void			initialize() = 0;
 		virtual void			shutdown() = 0;
