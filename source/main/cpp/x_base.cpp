@@ -32,7 +32,7 @@ namespace xbase
 #else
 	void			x_Init()
 	{
-		xcore::xconsole::addDefault();
+		xcore::xconsole::add_default_console();
 		xcore::sSystemAllocator = xcore::gCreateSystemAllocator();
 	}
 

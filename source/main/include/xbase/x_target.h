@@ -951,6 +951,10 @@ namespace xcore
 				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2015
+			#elif _MSC_VER == 1911
+				#define COMPILER_WINDOWS_MSVC
+				#define COMPILER_DEFAULT
+				#define COMPILER_VERSION            2017
 			#else
 				#error x_target, error; Unknown _MSVC_VER compiler version
 			#endif

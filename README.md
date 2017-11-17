@@ -3,17 +3,26 @@
 xcore cross platform base library
 
 * xbase
-  * types, console, log, sort, search, low-level string, va-list
-* xos
-  * file, thread, lock, time-date
+  * types, console, log, sort, search, low-level string functions, va-list
 * xcore
-  * utilities, utf16 string, rbtree
-* xcrypt
+  * string, tree, list, vector, dictionary
+* xhash
   * hash, skein, sha, cyphers
 * xalloc
   * allocators (dlmalloc, tlsf, debug, stats)
+  * free-list
+  * small allocator
 * xatomic
   * atomic system types, lock-free containers
-* xactor
+* xlang
   * actor model
-* 
+* xtime
+  * timer, time-date
+* xthread
+  * thread, mutex, event
+  * blocking queue
+* xfile
+  * filepath
+  * dirpath
+  * file
+
