@@ -8,11 +8,7 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase/x_debug.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	class xcstring;
@@ -49,7 +45,19 @@ namespace xcore
 		void		fromString(const char*);
 
 	private:
-		u32			mGuid[4];
+		enum ESizes
+		{
+			SIZE32 = 4,
+			SIZE16 = 8,
+			SIZE8 = 16
+		};
+		union guid_t
+		{
+			u8			ma8[SIZE8];
+			u16			ma16[SIZE16];
+			u32			ma32[SIZE32];
+		};
+		guid_t		mGuid;
 	};
 
 	/**

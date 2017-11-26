@@ -753,7 +753,7 @@ namespace xcore
 			#else
 				#define TARGET_DEV
 			#endif
-		#elif defined(__apple__) && defined(__clang)
+		#elif defined(__APPLE__) && defined(__clang__)
 			#undef TARGET_OSX
 			#define TARGET_OSX
 			#define TARGET_PLATFORM X_PLATFORM_OSX
@@ -779,10 +779,10 @@ namespace xcore
 	#ifdef VALID_TARGET
 		#if !defined(PLATFORM_32BIT) && !defined(PLATFORM_64BIT)
 			// define it by checking sizeof(void*)
-			#if !defined(_M_X64)
-				#define TARGET_32BIT
-			#elif defined(_M_X64)
+			#if defined(_M_X64) || defined(__x86_64__) || defined(__LP64__)
 				#define TARGET_64BIT
+			#elif defined(__i386__)
+				#define TARGET_32BIT
 			#else
 				#error x_target, error; Unknown target architecture type, only 32-bit or 64-bit are supported
 			#endif
