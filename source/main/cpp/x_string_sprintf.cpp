@@ -772,6 +772,7 @@ namespace xcore
 			dprec = 0;
 			width = 0;
 			prec = -1;
+			size = 0;
 			sign = '\0';
 
 		rflag:

@@ -370,7 +370,7 @@ namespace xcore
 	void				xconsole::set_console_store(xiconsole_store* store)
 	{
 		if (store == NULL)
-			sConsoleStore == &sDefaultConsoleStore;
+			sConsoleStore = &sDefaultConsoleStore;
 		else
 			sConsoleStore = store;
 	}

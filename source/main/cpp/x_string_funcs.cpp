@@ -8,45 +8,6 @@
 *==============================================================================
 */
 
-//------------------------------------------------------------------------------
-static inline uchar32	peek_char(pcrune str, s32* len = NULL)
-{
-	if (has_fixed_size_rune())
-	{
-		rune c = *str;
-		if (len != NULL)
-			*len = get_fixed_sizeof_rune();
-		return c;
-	}
-	else
-	{
-		rune c = *str;
-		if ((c & 0x80) == 0x00) 
-		{
-			if (len != NULL)
-				*len = 1;
-			return (uchar32)c;
-		}
-
-		s32 l = 0;
-		if ((c & 0xe0) == 0xc0) { l = 2; }
-		else if ((c & 0xf0) == 0xe0) { l = 3; }
-		else if ((c & 0xf8) == 0xf0) { l = 4; }
-
-		uchar32 c32 = 0;
-		for (s32 i = 0; i<l; i++)
-		{
-			c = str[i];
-			c32 = c32 << 8;
-			c32 = c32 | c;
-		}
-
-		if (len != NULL)
-			*len = l;
-
-		return c32;
-	}
-}
 
 //------------------------------------------------------------------------------
 static uchar32			read_char(prune& str)
@@ -67,48 +28,6 @@ static uchar32			read_char(pcrune& str)
 	return c;
 }
 
-//------------------------------------------------------------------------------
-static u8				sUTF8LC[] = { 0, 0, 0xc0, 0xe0, 0xf0 };
-static s32				WRITEMODE_ASCII = 0;
-static s32				WRITEMODE_UTF8 = 1;
-static s32				write_char(uchar32 c, prune& str, pcrune end, s32 write_mode = WRITEMODE_ASCII)
-{
-	s32 len = 0;
-	if (c <= 0x7f) { len = 1; }
-	else if (c < 0x0800) { len = 2; }
-	else if (c < 0xd800) { len = 3; }
-	else if (c < 0xe000) { len = 0; }
-	else if (c < 0x010000) { len = 3; }
-	else if (c < 0x110000) { len = 4; }
-
-	if (len == 0)
-	{
-		return 0;
-	}
-	if ((str + len) > end)
-	{	
-		return 0;
-	}
-
-	if (len > 1 && write_mode == WRITEMODE_ASCII)
-	{	// Force ASCII character '?'
-		c = (rune)'?';
-		len = 1;
-	}
-
-	if (str != NULL)
-	{
-		u32 const mask = 0x0F0E0C00;
-		switch (len)
-		{
-			case 4: str[3] = (c & 0x3f) | 0x80; c = c >> 6;
-			case 3: str[2] = (c & 0x3f) | 0x80; c = c >> 6;
-			case 2: str[1] = (c & 0x3f) | 0x80; c = c >> 6;
-			case 1: str[0] = (rune)c | (0xFF & (mask >> (len*4)));
-		};
-	}
-	return len;
-}
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -214,7 +133,7 @@ static s32	len_in_chars(pcrune str, pcrune end)
 	return l;
 }
 
-prune		copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end)
+prune		copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end, ETermType type)
 {
 	ASSERT(dest != NULL && dest_end != NULL);
 	ASSERT(src != NULL);
@@ -224,12 +143,24 @@ prune		copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end)
 	while (dst < dest_end)
 	{
 		if (src_end != NULL && src == src_end)
+		{
+			if (type == TERMINATOR_MATCHING && *src_end == '\0')
+				write_char('\0', dst, dest_end);
 			break;
-		uchar32 const c = read_char(src);
-		write_char(c, dst, dest_end);
-		if (src_end == NULL && c == 0)
+		}
+		uchar32 c = read_char(src);
+		if (src_end == NULL && c == '\0')
+		{
+			if (type == TERMINATOR_MATCHING)
+				write_char(c, dst, dest_end);
 			break;
+		}
+		dst = write_char(c, dst, dest_end);
 	}
+
+	if (dst < dest_end && type == TERMINATOR_WRITE)
+		write_char('\0', dst, dest_end);
+
 	return dst;
 }
 		
@@ -440,7 +371,7 @@ prune concatenate(prune front, pcrune front_end, pcrune front_eos, pcrune back, 
 			break;
 		front = wptr;
 		uchar32 c = read_char(back);
-		if (write_char(c, wptr, front_eos, WRITEMODE_ASCII) == 0)
+		if (write_char(c, wptr, front_eos) == 0)
 			break;
 		if (back_end == NULL && c == 0)
 			break;
@@ -515,7 +446,7 @@ s32		parse(pcrune str, pcrune str_end, u64& value, s32 base)
 s32		parse(pcrune str, pcrune str_end, f32& value)
 {
 	rune format_str[] = { '%', 'f', '\0' };
-	pcrune format_str_end = format_str + sizeof(format_str);
+	pcrune format_str_end = format_str + 2;
 	s32 s = sscanf(str, str_end, format_str, format_str_end, x_va_r(&value));
 	return s;
 }
@@ -689,7 +620,7 @@ prune	to_string(prune str, prune str_end, pcrune str_eos, u64 val, s32 base)
 		case 10: format_str[1] = 'u'; break;
 		case 8: format_str[1] = 'o'; break;
 	};
-	pcrune format_str_end = format_str + sizeof(format_str);
+	pcrune format_str_end = format_str + 2;
 	s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
 	return str + len;
 }
@@ -801,7 +732,7 @@ bool		is_delimited(pcrune str, pcrune end, rune delimit_left, rune delimit_right
 			uchar32 char_left = read_char(str);
 			if (char_left == delimit_left)
 			{
-				uchar32 char_right;
+				uchar32 char_right = 0;
 				while (str < end)
 				{
 					char_right = read_char(str);
@@ -815,7 +746,7 @@ bool		is_delimited(pcrune str, pcrune end, rune delimit_left, rune delimit_right
 		uchar32 char_left = read_char(str);
 		if (char_left == delimit_left)
 		{
-			uchar32 char_right;
+			uchar32 char_right = 0;
 			while (true)
 			{
 				uchar32 c = read_char(str);
@@ -845,7 +776,7 @@ prune to_upper(prune str, pcrune str_end)
 		if ((c >= 'a') && (c <= 'z'))
 		{
 			c += ('A' - 'a');
-			write_char(c, p, p + 4, WRITEMODE_ASCII);
+			write_char(c, p, p + 4);
 		} else {
 			read_char(p);
 		}
@@ -869,7 +800,7 @@ prune to_lower(prune str, pcrune str_end)
 		if ((c >= 'A') && (c <= 'Z'))
 		{
 			c = 'a' + (c - 'A');
-			write_char(c, p, str_end, WRITEMODE_ASCII);
+			write_char(c, p, str_end);
 		} else {
 			read_char(p);
 		}

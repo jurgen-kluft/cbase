@@ -108,6 +108,188 @@ namespace xcore
 			return dest + 1;
 		}
 
+		// ==========================================================================================================================
+		char   *		copy(char  const* sstr, char  const* ssend, char * dstr, char * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				char c = *sstr++;
+				*dstr++ = c;
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				*dstr = '\0';
+			return dstr;
+		}
+
+		char   *		copy(uchar8  const* sstr, uchar8  const* ssend, char * dstr, char * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		char   *		copy(uchar16 const* sstr, uchar16 const* ssend, char * dstr, char * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		char   *		copy(uchar32 const* sstr, uchar32 const* ssend, char * dstr, char * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		uchar8 *		copy(char const* sstr, char const* ssend, uchar8 * dstr, uchar8 * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		uchar8 *		copy(uchar8 const* sstr, uchar8 const* ssend, uchar8 * dstr, uchar8 * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		uchar8 *		copy(uchar16 const* sstr, uchar16 const* ssend, uchar8 * dstr, uchar8 * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		uchar8 *		copy(uchar32  const* sstr, uchar32  const* ssend, uchar8 * dstr, uchar8 * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		uchar32 *		copy(char const* sstr, char const* ssend, uchar32 * dstr, uchar32 * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		uchar32 *		copy(uchar8  const* sstr, uchar8  const* ssend, uchar32 * dstr, uchar32 * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		uchar32 *		copy(uchar16 const* sstr, uchar16 const* ssend, uchar32 * dstr, uchar32 * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		uchar32 *		copy(uchar32 const* sstr, uchar32 const* ssend, uchar32 * dstr, uchar32 * dend, ETermType copy_term_type)
+		{
+			while (sstr < ssend && dstr < dend)
+			{
+				uchar32 c;
+				sstr = read(sstr, c);
+				dstr = write(c, dstr);
+				if (dstr >= dend)
+					return dstr;
+			}
+			if (copy_term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+			return dstr;
+		}
+
+		// ==========================================================================================================================
+
 		uchar const*	read(uchar const* str, uchar32& out_c)
 		{
 			if (is_eos(str))
@@ -244,10 +426,104 @@ namespace xcore
 	
 	namespace utf8
 	{
+
+		//------------------------------------------------------------------------------
+		static inline uchar32	peek_char(pcrune str, s32* len = NULL)
+		{
+			rune c = *str;
+			if ((c & 0x80) == 0x00)
+			{
+				if (len != NULL)
+					*len = 1;
+				return (uchar32)c;
+			}
+
+			s32 l = 0;
+			if ((c & 0xe0) == 0xc0) { l = 2; }
+			else if ((c & 0xf0) == 0xe0) { l = 3; }
+			else if ((c & 0xf8) == 0xf0) { l = 4; }
+
+			uchar32 c32 = 0;
+			for (s32 i = 0; i<l; i++)
+			{
+				c = str[i];
+				c32 = c32 << 8;
+				c32 = c32 | c;
+			}
+
+			if (len != NULL)
+				*len = l;
+
+			return c32;
+		}
+
+		//------------------------------------------------------------------------------
+		static u8				sUTF8LC[] = { 0, 0, 0xc0, 0xe0, 0xf0 };
+		static prune			write_char(uchar32 c, prune str, pcrune end)
+		{
+			s32 len = 0;
+			if (c <= 0x7f) { len = 1; }
+			else if (c < 0x0800) { len = 2; }
+			else if (c < 0xd800) { len = 3; }
+			else if (c < 0xe000) { len = 0; }
+			else if (c < 0x010000) { len = 3; }
+			else if (c < 0x110000) { len = 4; }
+
+			if (len == 0)
+			{
+				return str;
+			}
+			if ((str + len) > end)
+			{
+				return str;
+			}
+
+			if (str != NULL)
+			{
+				u32 const mask = 0x0F0E0C00;
+				switch (len)
+				{
+				case 4: str[3] = (c & 0x3f) | 0x80; c = c >> 6;
+				case 3: str[2] = (c & 0x3f) | 0x80; c = c >> 6;
+				case 2: str[1] = (c & 0x3f) | 0x80; c = c >> 6;
+				case 1: str[0] = (rune)c | (0xFF & (mask >> (len * 4)));
+				};
+			}
+			return str + len;
+		}
+
 		#include "x_string_funcs.cpp"
 	}
+
+
+
+
+
 	namespace utf32
 	{
+
+		//------------------------------------------------------------------------------
+		static inline uchar32	peek_char(pcrune str, s32* len = NULL)
+		{
+			rune c = *str;
+			if (len != NULL)
+				*len = 1;
+			return c;
+		}
+
+		//------------------------------------------------------------------------------
+		static prune			write_char(uchar32 c, prune str, pcrune end)
+		{
+			if (str < end)
+			{
+				if (str != NULL)
+				{
+					*str++ = c;
+				}
+			}
+			return str;
+		}
+
 		#include "x_string_funcs.cpp"
 	}
 };

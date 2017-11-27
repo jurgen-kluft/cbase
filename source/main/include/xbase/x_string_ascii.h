@@ -22,9 +22,6 @@ namespace xcore
 		inline bool		has_fixed_size_rune() { return true; }
 		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
 
-		enum EWriteMode { WRITEMODE_ASCII = 0, WRITEMODE_UTF8 = 1, WRITEMODE_UTF32 = 2 };
-		inline EWriteMode get_writemode() { return WRITEMODE_ASCII; }
-
 		inline prune	pos(prune str, pcrune pos) { return str + (pos - str); }
 
 		pcrune			len(pcrune str);

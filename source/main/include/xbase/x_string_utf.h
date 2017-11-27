@@ -33,6 +33,23 @@ namespace xcore
 		uchar16 *		write	(uchar32 c, uchar16 * str);
 		uchar32 *		write	(uchar32 c, uchar32 * str);
 
+		enum ETermType { TERMINATOR_NONE = 0, TERMINATOR_WRITE = 1 };
+
+		char   *		copy	(uchar   const* sstr, uchar   const* ssend, char * dstr, char * dend, ETermType term_type = TERMINATOR_WRITE);
+		char   *		copy	(uchar8  const* sstr, uchar8  const* ssend, char * dstr, char * dend, ETermType term_type = TERMINATOR_WRITE);
+		char   *		copy	(uchar16 const* sstr, uchar16 const* ssend, char * dstr, char * dend, ETermType term_type = TERMINATOR_WRITE);
+		char   *		copy	(uchar32 const* sstr, uchar32 const* ssend, char * dstr, char * dend, ETermType term_type = TERMINATOR_WRITE);
+
+		uchar8 *		copy	(char    const* sstr, char    const* ssend, uchar8 * dstr, uchar8 * dend, ETermType term_type = TERMINATOR_WRITE);
+		uchar8 *		copy	(uchar8  const* sstr, uchar8  const* ssend, uchar8 * dstr, uchar8 * dend, ETermType term_type = TERMINATOR_WRITE);
+		uchar8 *		copy	(uchar16 const* sstr, uchar16 const* ssend, uchar8 * dstr, uchar8 * dend, ETermType term_type = TERMINATOR_WRITE);
+		uchar8 *		copy	(uchar32 const* sstr, uchar32 const* ssend, uchar8 * dstr, uchar8 * dend, ETermType term_type = TERMINATOR_WRITE);
+
+		uchar32 *		copy	(char    const* sstr, char    const* ssend, uchar32 * dstr, uchar32 * dend, ETermType term_type = TERMINATOR_WRITE);
+		uchar32 *		copy	(uchar8  const* sstr, uchar8  const* ssend, uchar32 * dstr, uchar32 * dend, ETermType term_type = TERMINATOR_WRITE);
+		uchar32 *		copy	(uchar16 const* sstr, uchar16 const* ssend, uchar32 * dstr, uchar32 * dend, ETermType term_type = TERMINATOR_WRITE);
+		uchar32 *		copy	(uchar32 const* sstr, uchar32 const* ssend, uchar32 * dstr, uchar32 * dend, ETermType term_type = TERMINATOR_WRITE);
+
 		s32				size	(uchar32 c);
 
 		bool			is_eos	(uchar   const * str);
@@ -65,7 +82,8 @@ namespace xcore
 
 		s32				size(pcrune str);
 
-		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
+		enum ETermType { TERMINATOR_NONE = 0, TERMINATOR_WRITE = 1, TERMINATOR_MATCHING = 2 };
+		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end, ETermType type = TERMINATOR_MATCHING);
 
 		pcrune			find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode = CASE_SENSITIVE);
 		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found
@@ -164,7 +182,8 @@ namespace xcore
 
 		s32				size(pcrune str);
 
-		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end);
+		enum ETermType { TERMINATOR_NONE = 0, TERMINATOR_WRITE = 1, TERMINATOR_MATCHING = 2 };
+		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end, ETermType type = TERMINATOR_MATCHING);
 
 		pcrune			find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode = CASE_SENSITIVE);
 		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found

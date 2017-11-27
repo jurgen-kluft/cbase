@@ -957,7 +957,7 @@ namespace xcore
 		}
 
 	private:
-		uchar			mBuffer[SIZE + 1];
+		uchar			mBuffer[SIZE + 4];
 		CharWriterToAsciiBuffer mWriter;
 	};
 
@@ -1197,57 +1197,64 @@ namespace xcore
 	// ------------------------------------------------------------------------
 	// ------------------------------------------------------------------------
 
-	inline bool StrToBool(const uchar* str)
+	inline bool StrToBool(const uchar* str, const uchar* end)
 	{
-		const uchar* end = ascii::len(str);
+		if (end == NULL)
+			end = ascii::len(str);
 		bool value;
 		ascii::parse(str, end, value);
 		return value;
 	}
 
-	inline f32 StrToF32(const uchar* str)
+	inline f32 StrToF32(const uchar* str, const uchar* end)
 	{
-		const uchar* end = ascii::len(str);
+		if (end == NULL)
+			end = ascii::len(str);
 		f32 value;
 		ascii::parse(str, end, value);
 		return value;
 	}
 
-	inline f64 StrToF64(const uchar* str)
+	inline f64 StrToF64(const uchar* str, const uchar* end)
 	{
-		const uchar* end = ascii::len(str);
+		if (end == NULL)
+			end = ascii::len(str);
 		f64 value;
 		ascii::parse(str, end, value);
 		return value;
 	}
 
-	inline s32 StrToS32(const uchar* str)
+	inline s32 StrToS32(const uchar* str, const uchar* end)
 	{
-		const uchar* end = ascii::len(str);
+		if (end == NULL)
+			end = ascii::len(str);
 		s32 value;
 		ascii::parse(str, end, value);
 		return value;
 	}
 
-	inline u32 StrToU32(const uchar* str)
+	inline u32 StrToU32(const uchar* str, const uchar* end)
 	{
-		const uchar* end = ascii::len(str);
+		if (end == NULL)
+			end = ascii::len(str);
 		s32 value;
 		ascii::parse(str, end, value);
 		return value;
 	}
 
-	inline s64 StrToS64(const uchar* str, s32 base)
+	inline s64 StrToS64(const uchar* str, const uchar* end, s32 base)
 	{
-		const uchar* end = ascii::len(str);
+		if (end == NULL)
+			end = ascii::len(str);
 		s64 value;
 		ascii::parse(str, end, value, base);
 		return value;
 	}
 
-	inline u64 StrToU64(const uchar* str, s32 base)
+	inline u64 StrToU64(const uchar* str, const uchar* end, s32 base)
 	{
-		const uchar* end = ascii::len(str);
+		if (end == NULL)
+			end = ascii::len(str);
 		s64 value;
 		ascii::parse(str, end, value, base);
 		return value;
@@ -1256,57 +1263,64 @@ namespace xcore
 	// ------------------------------------------------------------------------
 	// ------------------------------------------------------------------------
 
-	inline bool StrToBool(const uchar8* str)
+	inline bool StrToBool(const uchar8* str, const uchar8* end)
 	{
-		const uchar8* end = utf8::len(str);
+		if (end == NULL)
+			end = utf8::len(str);
 		bool value;
 		utf8::parse(str, end, value);
 		return value;
 	}
 
-	inline f32 StrToF32(const uchar8* str)
+	inline f32 StrToF32(const uchar8* str, const uchar8* end)
 	{
-		const uchar8* end = utf8::len(str);
+		if (end == NULL)
+			end = utf8::len(str);
 		f32 value;
 		utf8::parse(str, end, value);
 		return value;
 	}
 
-	inline f64 StrToF64(const uchar8* str)
+	inline f64 StrToF64(const uchar8* str, const uchar8* end)
 	{
-		const uchar8* end = utf8::len(str);
+		if (end == NULL)
+			end = utf8::len(str);
 		f64 value;
 		utf8::parse(str, end, value);
 		return value;
 	}
 
-	inline s32 StrToS32(const uchar8* str)
+	inline s32 StrToS32(const uchar8* str, const uchar8* end)
 	{
-		const uchar8* end = utf8::len(str);
+		if (end == NULL)
+			end = utf8::len(str);
 		s32 value;
 		utf8::parse(str, end, value);
 		return value;
 	}
 
-	inline u32 StrToU32(const uchar8* str)
+	inline u32 StrToU32(const uchar8* str, const uchar8* end)
 	{
-		const uchar8* end = utf8::len(str);
+		if (end == NULL)
+			end = utf8::len(str);
 		s32 value;
 		utf8::parse(str, end, value);
 		return value;
 	}
 
-	inline s64 StrToS64(const uchar8* str, s32 base)
+	inline s64 StrToS64(const uchar8* str, const uchar8* end, s32 base)
 	{
-		const uchar8* end = utf8::len(str);
+		if (end == NULL)
+			end = utf8::len(str);
 		s64 value;
 		utf8::parse(str, end, value, base);
 		return value;
 	}
 
-	inline u64 StrToU64(const uchar8* str, s32 base)
+	inline u64 StrToU64(const uchar8* str, const uchar8* end, s32 base)
 	{
-		const uchar8* end = utf8::len(str);
+		if (end == NULL)
+			end = utf8::len(str);
 		s64 value;
 		utf8::parse(str, end, value, base);
 		return value;
@@ -1317,57 +1331,64 @@ namespace xcore
 	// ------------------------------------------------------------------------
 
 
-	inline bool StrToBool(const uchar32* str)
+	inline bool StrToBool(const uchar32* str, const uchar32* end)
 	{
-		const uchar32* end = utf32::len(str);
+		if (end == NULL)
+			end = utf32::len(str);
 		bool value;
 		utf32::parse(str, end, value);
 		return value;
 	}
 
-	inline f32 StrToF32(const uchar32* str)
+	inline f32 StrToF32(const uchar32* str, const uchar32* end)
 	{
-		const uchar32* end = utf32::len(str);
+		if (end == NULL)
+			end = utf32::len(str);
 		f32 value;
 		utf32::parse(str, end, value);
 		return value;
 	}
 
-	inline f64 StrToF64(const uchar32* str)
+	inline f64 StrToF64(const uchar32* str, const uchar32* end)
 	{
-		const uchar32* end = utf32::len(str);
+		if (end == NULL)
+			end = utf32::len(str);
 		f64 value;
 		utf32::parse(str, end, value);
 		return value;
 	}
 
-	inline s32 StrToS32(const uchar32* str)
+	inline s32 StrToS32(const uchar32* str, const uchar32* end)
 	{
-		const uchar32* end = utf32::len(str);
+		if (end == NULL)
+			end = utf32::len(str);
 		s32 value;
 		utf32::parse(str, end, value);
 		return value;
 	}
 
-	inline u32 StrToU32(const uchar32* str)
+	inline u32 StrToU32(const uchar32* str, const uchar32* end)
 	{
-		const uchar32* end = utf32::len(str);
+		if (end == NULL)
+			end = utf32::len(str);
 		u32 value;
 		utf32::parse(str, end, value);
 		return value;
 	}
 
-	inline s64 StrToS64(const uchar32* str, s32 base)
+	inline s64 StrToS64(const uchar32* str, const uchar32* end, s32 base)
 	{
-		const uchar32* end = utf32::len(str);
+		if (end == NULL)
+			end = utf32::len(str);
 		s64 value;
 		utf32::parse(str, end, value, base);
 		return value;
 	}
 
-	inline u64 StrToU64(const uchar32* str, s32 base)
+	inline u64 StrToU64(const uchar32* str, const uchar32* end, s32 base)
 	{
-		const uchar32* end = utf32::len(str);
+		if (end == NULL)
+			end = utf32::len(str);
 		s64 value;
 		utf32::parse(str, end, value, base);
 		return value;

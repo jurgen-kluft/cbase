@@ -229,6 +229,12 @@ namespace xcore
 		#undef TARGET_OSX
 	#endif
 
+	#if defined(PLATFORM_64BIT)
+		#define TARGET_64BIT
+	#elif defined(PLATFORM_32BIT)
+		#define TARGET_32BIT
+	#endif
+
 	/**
 	 *  Mac OS Targets
 	 */
@@ -773,11 +779,11 @@ namespace xcore
 
 	/**
 	 *
-	 *  Make sure we have defined the architecture type, PLATFORM_32BIT or PLATFORM_64BIT
+	 *  Make sure we have defined the architecture type, TARGET_32BIT or TARGET_64BIT
 	 *
 	 */
 	#ifdef VALID_TARGET
-		#if !defined(PLATFORM_32BIT) && !defined(PLATFORM_64BIT)
+		#if !defined(TARGET_32BIT) && !defined(TARGET_64BIT)
 			// define it by checking sizeof(void*)
 			#if !defined(_M_X64)
 				#define TARGET_32BIT

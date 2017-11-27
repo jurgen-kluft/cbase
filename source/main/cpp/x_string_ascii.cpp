@@ -28,41 +28,10 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		static inline uchar32	peek_char(pcrune str, s32* len = NULL)
 		{
-			if (has_fixed_size_rune())
-			{
-				rune c = *str;
-				if (len != NULL)
-					*len = get_fixed_sizeof_rune();
-				return c;
-			}
-			else
-			{
-				rune c = *str;
-				if ((c & 0x80) == 0x00)
-				{
-					if (len != NULL)
-						*len = 1;
-					return (uchar32)c;
-				}
-
-				s32 l = 0;
-				if ((c & 0xe0) == 0xc0) { l = 2; }
-				else if ((c & 0xf0) == 0xe0) { l = 3; }
-				else if ((c & 0xf8) == 0xf0) { l = 4; }
-
-				uchar32 c32 = 0;
-				for (s32 i = 0; i<l; i++)
-				{
-					c = str[i];
-					c32 = c32 << 8;
-					c32 = c32 | c;
-				}
-
-				if (len != NULL)
-					*len = l;
-
-				return c32;
-			}
+			rune c = *str;
+			if (len != NULL)
+				*len = 1;
+			return c;
 		}
 
 		//------------------------------------------------------------------------------
@@ -86,50 +55,13 @@ namespace xcore
 
 		//------------------------------------------------------------------------------
 		static u8				sUTF8LC[] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
-		static prune			write_char(uchar32 c, prune str, pcrune end, EWriteMode write_mode)
+		static prune			write_char(uchar32 c, prune str, pcrune end)
 		{
-			if (sizeof(rune) == 4 && write_mode == WRITEMODE_UTF32)
+			if (str != NULL && str < end)
 			{
-				if (str != NULL)
-					*str++ = c;
-				return str;
-			}
-			else if (sizeof(rune) == 1 && write_mode == WRITEMODE_ASCII)
-			{
-				if (str != NULL && str < end)
-				{
-					if (c > 0x7f)
-						c = '?';
-					*str++ = c;
-				}
-				return str;
-			}
-
-			// UTF8
-
-			s32 len = 0;
-			if (c <= 0x7f) { len = 1; }
-			else if (c < 0x0800) { len = 2; }
-			else if (c < 0xd800) { len = 3; }
-			else if (c < 0xe000) { len = 0; }
-			else if (c < 0x010000) { len = 3; }
-			else if (c < 0x110000) { len = 4; }
-
-			if (str != NULL && len > 0)
-			{
-				if ((str + len) <= end)
-				{
-					u32 const mask = 0x0F0E0C00;
-					switch (len)
-					{
-					case 4: str[3] = (c & 0x3f) | 0x80; c = c >> 6;
-					case 3: str[2] = (c & 0x3f) | 0x80; c = c >> 6;
-					case 2: str[1] = (c & 0x3f) | 0x80; c = c >> 6;
-					case 1: str[0] = (rune)c | (sUTF8LC[len]);
-					};
-
-					str += len;
-				}
+				if (c > 0x7f)
+					c = '?';
+				*str++ = (rune)c;
 			}
 			return str;
 		}
@@ -250,21 +182,21 @@ namespace xcore
 				if (src_end != NULL && src == src_end)
 				{
 					if (type == COPY_AND_WRITE_MATCHING_TERMINATOR && *src_end == '\0')
-						write_char('\0', dst, dest_end, get_writemode());
+						write_char('\0', dst, dest_end);
 					break;
 				}
 				uchar32 const c = read_char(src);
 				if (src_end == NULL && c == '\0')
 				{
 					if (type == COPY_AND_WRITE_MATCHING_TERMINATOR)
-						write_char(c, dst, dest_end, get_writemode());
+						write_char(c, dst, dest_end);
 					break;
 				}
-				dst = write_char(c, dst, dest_end, get_writemode());
+				dst = write_char(c, dst, dest_end);
 			}
 
 			if (dst < dest_end && type == COPY_AND_WRITE_TERMINATOR)
-				write_char('\0', dst, dest_end, get_writemode());
+				write_char('\0', dst, dest_end);
 
 			return dst;
 		}
@@ -470,7 +402,7 @@ namespace xcore
 					break;
 				front = wptr;
 				uchar32 c = read_char(back);
-				prune nwptr = write_char(c, wptr, front_eos, get_writemode());
+				prune nwptr = write_char(c, wptr, front_eos);
 				if (nwptr == wptr)
 					break;
 				wptr = nwptr;
@@ -493,7 +425,6 @@ namespace xcore
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
-			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
 			s32 s = sscanf(str, str_end, format_str, NULL, x_va_r(&value));
@@ -506,7 +437,6 @@ namespace xcore
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
-			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
 			s32 s = sscanf(str, str_end, format_str, NULL, x_va_r(&value));
@@ -519,7 +449,6 @@ namespace xcore
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
-			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
 			s32 s = sscanf(str, str_end, format_str, NULL, x_va_r(&value));
@@ -532,7 +461,6 @@ namespace xcore
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
-			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
 			s32 s = sscanf(str, str_end, format_str, NULL, x_va_r(&value));
@@ -842,7 +770,7 @@ namespace xcore
 					uchar32 char_left = read_char(str);
 					if (char_left == delimit_left)
 					{
-						uchar32 char_right;
+						uchar32 char_right = 0;
 						while (str < end)
 						{
 							char_right = read_char(str);
@@ -856,7 +784,7 @@ namespace xcore
 				uchar32 char_left = read_char(str);
 				if (char_left == delimit_left)
 				{
-					uchar32 char_right;
+					uchar32 char_right = 0;
 					while (true)
 					{
 						uchar32 c = read_char(str);
@@ -886,7 +814,7 @@ namespace xcore
 				if ((c >= 'a') && (c <= 'z'))
 				{
 					c += ('A' - 'a');
-					p = write_char(c, p, p + 4, get_writemode());
+					p = write_char(c, p, p + 4);
 				}
 				else 
 				{
@@ -912,7 +840,7 @@ namespace xcore
 				if ((c >= 'A') && (c <= 'Z'))
 				{
 					c = 'a' + (c - 'A');
-					p = write_char(c, p, str_end, get_writemode());
+					p = write_char(c, p, str_end);
 				}
 				else 
 				{
