@@ -39,7 +39,7 @@ namespace xcore
 	{
 		for (s32 i=0; i<SIZE32; ++i)
 		{
-			if (mGuid.ma32[i] == other.mGuid.ma32[i])
+			if (mGuid.ma32[i] != other.mGuid.ma32[i])
 				return true;
 		}
 		return false;

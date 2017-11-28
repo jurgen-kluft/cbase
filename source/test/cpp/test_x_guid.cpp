@@ -26,7 +26,6 @@ UNITTEST_SUITE_BEGIN(xguid)
 		UNITTEST_TEST(constructor2)
 		{
 			xguid nill;
-			nill.setNull();
 
 			xguid i1(1,2,3,4);
 			CHECK_EQUAL(false, i1.isNull());
