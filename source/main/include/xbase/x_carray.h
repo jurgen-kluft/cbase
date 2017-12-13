@@ -27,8 +27,8 @@ namespace xcore
 		inline u32			max() const								{ return mSize; }
 		inline u32			size() const							{ return mLen; }
 		inline u32			reserved() const						{ return mSize; }
-		inline bool			isempty() const							{ return mLen == 0; }
-		inline bool			isfull() const							{ ASSERT(mLen<=mSize); return mLen == mSize; }
+		inline bool			is_empty() const						{ return mLen == 0; }
+		inline bool			is_full() const							{ ASSERT(mLen<=mSize); return mLen == mSize; }
 
 		inline void			push_back(T const& item)				{ ASSERT(mLen<mSize); mArray[mLen++] = item; }
 		inline bool			pop_back(T & out_item)					{ if (mLen>0) { out_item = mArray[--mLen]; return true; } else return false; }

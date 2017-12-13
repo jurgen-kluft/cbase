@@ -120,6 +120,57 @@ namespace xcore
 xcore::x_iallocator* gTestAllocator = NULL;
 xcore::UnitTestAssertHandler gAssertHandler;
 
+
+
+class xheap
+{
+public:
+	static xcore::x_iallocator* sAllocator;
+
+	void*	allocate(xcore::u32 size, xcore::u32 alignment)
+	{
+		return sAllocator->allocate(size, alignment);
+	}
+	void	deallocate(void* p)
+	{
+		sAllocator->deallocate(p);
+	}
+};
+xcore::x_iallocator*	xheap::sAllocator = NULL;
+
+class test_object
+{
+public:
+	test_object(xcore::s32 a, xcore::f32 b) : mi(a), mf(b) {}
+	~test_object()
+	{
+	}
+
+	xcore::s32 mi;
+	xcore::f32 mf;
+
+	XCORE_CLASS_PLACEMENT_NEW_DELETE
+};
+
+
+template<typename T, typename MEM, typename... Args>
+T*			xnew(Args... args)
+{
+	MEM m;
+	void * mem = m.allocate(sizeof(T), sizeof(void*));
+	T* object = new (mem) T(args...);
+	return object;
+}
+
+template<typename MEM, typename T>
+void		xdelete(T* p)
+{
+	MEM m;
+	p->~T();
+	m.deallocate(p);
+}
+
+
 bool gRunUnitTest(UnitTest::TestReporter& reporter)
 {
 #ifdef SPU
@@ -140,7 +191,11 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	xcore::x_iallocator* systemAllocator = xcore::x_iallocator::get_default();
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
-	
+
+	xheap::sAllocator = systemAllocator;
+	test_object* test = xnew<test_object, xheap>(200, 1000.0f);
+	xdelete<xheap>(test);
+
 	xcore::xconsole::write("Configuration: ");
 	xcore::xconsole::writeLine(TARGET_FULL_DESCR_STR);
 

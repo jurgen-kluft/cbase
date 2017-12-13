@@ -1,7 +1,9 @@
 #include "xbase/x_carray.h"
+#include "xbase/x_buffer.h"
 #include "xunittest/xunittest.h"
 
 using namespace xcore;
+
 
 UNITTEST_SUITE_BEGIN(xcarray)
 {
@@ -11,6 +13,22 @@ UNITTEST_SUITE_BEGIN(xcarray)
 		UNITTEST_FIXTURE_TEARDOWN() {}
 
 		static s32	array_data[64];
+
+		UNITTEST_TEST(test_xbuffer32)
+		{
+			xbuffer32 buf1(1);
+			xbuffer32 buf2(2);
+
+			CHECK_TRUE(buf1 != buf2);
+			CHECK_FALSE(buf1 == buf2);
+
+			CHECK_TRUE(buf1 < buf2);
+			CHECK_TRUE(buf2 > buf1);
+
+			buf1 = buf2;
+			CHECK_TRUE(buf1 == buf2);
+			CHECK_FALSE(buf1 != buf2);
+		}
 
 		UNITTEST_TEST(construct)
 		{
