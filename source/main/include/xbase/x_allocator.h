@@ -20,9 +20,6 @@ namespace xcore
 
 	/**
 	 * This system allocator, will initialize console memory and use malloc/realloc/free
-	 * For WII, you can call this twice, 1st=MEM1 allocator, 2nd=MEM2 allocator
-	 * For N3DS, 1st=HeapMemory, 2nd=DeviceMemory. 
-	 * For N3DS, user may override 's32 gGetHeapMemorySize()' which returns the heap size.
 	 */
 	extern x_iallocator*	gCreateSystemAllocator();
 
@@ -32,7 +29,6 @@ namespace xcore
 	 * the more allocations and deallocations you do with different sizes.
 	 */
 	extern x_iallocator*	gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment);
-
 
 	/// The allocator interface
 	class x_iallocator
