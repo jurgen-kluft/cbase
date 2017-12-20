@@ -101,7 +101,7 @@ namespace xcore
 		s32				cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
 		s32				vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
-		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
+		prune			sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
 		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
 
 		s32				printf(pcrune str, pcrune str_end);

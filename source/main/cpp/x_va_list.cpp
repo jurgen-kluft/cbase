@@ -22,8 +22,11 @@ namespace xcore
 	const x_va	x_va::sEmpty;
 
 
-	void		x_va::convertToTCharStr(char* str, char* end) const
+	void		x_va::convertToChars(xuchars& chars) const
 	{
+		uchar* str = chars.m_str;
+		uchar* end = chars.m_end;
+
 		u32 i = 0;
 		switch (mType)
 		{
@@ -40,42 +43,25 @@ namespace xcore
 		case TYPE_INT64: { s64 v = (*(s64*)mArg); ascii::to_string(str, end, end, v); } break;
 		case TYPE_FLOAT32: { f32 v = (*(f32*)mArg); ascii::to_string(str, end, end, v); } break;
 		case TYPE_FLOAT64: { f64 v = (*(f64*)mArg); ascii::to_string(str, end, end, v); } break;
-		case TYPE_PCTCHAR: { ascii::pcrune sstr = *(ascii::pcrune*)mArg; ascii::pcrune send = *(ascii::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
-		case TYPE_PCUCHAR8: { utf8::pcrune sstr = *(utf8::pcrune*)mArg; utf8::pcrune send = *(utf8::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
-		case TYPE_PCUCHAR32: { utf32::pcrune sstr = *(utf32::pcrune*)mArg; utf32::pcrune send = *(utf32::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
+		case TYPE_PCTCHAR: 
+		{	xcuchars const& ch = *(xcuchars const*)mArg;
+			utf::copy(ch.m_str, ch.m_end, str, end, utf::TERMINATOR_WRITE);
+		} break;
+		case TYPE_PCUCHAR32:
+		{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
+			utf::copy(ch.m_str, ch.m_end, str, end, utf::TERMINATOR_WRITE);
+		} break;
 		default:
 			break; // Fall through
 		};
 	}
 
-	void		x_va::convertToUChar8Str(uchar8* str, uchar8* end) const
-	{
-		u32 i = 0;
-		switch (mType)
-		{
-		case TYPE_BOOL: { bool v = (*(bool*)mArg); utf8::to_string(str, end, end, v); } break;
-		case TYPE_UCHAR: { uchar32 c = (*(uchar32*)mArg); utf::write(c, str); } break;
-		case TYPE_UINT32: { u32 v = (*(u32*)mArg); utf8::to_string(str, end, end, v); } break;
-		case TYPE_INT32: { s32 v = (*(u32*)mArg); utf8::to_string(str, end, end, v); } break;
 
-		case TYPE_UINT8:
-		case TYPE_INT8: { s32 v = (*(s8*)mArg); utf8::to_string(str, end, end, v); } break;
-		case TYPE_UINT16:
-		case TYPE_INT16: { s32 v = (*(s16*)mArg); utf8::to_string(str, end, end, v); } break;
-		case TYPE_UINT64:
-		case TYPE_INT64: { s64 v = (*(s64*)mArg); utf8::to_string(str, end, end, v); } break;
-		case TYPE_FLOAT32: { f32 v = (*(f32*)mArg); utf8::to_string(str, end, end, v); } break;
-		case TYPE_FLOAT64: { f64 v = (*(f64*)mArg); utf8::to_string(str, end, end, v); } break;
-		case TYPE_PCTCHAR: { ascii::pcrune sstr = *(ascii::pcrune*)mArg; ascii::pcrune send = *(ascii::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
-		case TYPE_PCUCHAR8: { utf8::pcrune sstr = *(utf8::pcrune*)mArg; utf8::pcrune send = *(utf8::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
-		case TYPE_PCUCHAR32: { utf32::pcrune sstr = *(utf32::pcrune*)mArg; utf32::pcrune send = *(utf32::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
-		default:
-			break; // Fall through
-		};
-	}
-	
-	void		x_va::convertToUChar32Str(uchar32* str, uchar32* end) const
+	void		x_va::convertToChar32s(xuchar32s& chars) const
 	{
+		uchar32* str = chars.m_str;
+		uchar32* end = chars.m_end;
+
 		u32 i = 0;
 		switch (mType)
 		{
@@ -92,9 +78,14 @@ namespace xcore
 		case TYPE_INT64: { s64 v = (*(s64*)mArg); utf32::to_string(str, end, end, v); } break;
 		case TYPE_FLOAT32: { f32 v = (*(f32*)mArg); utf32::to_string(str, end, end, v); } break;
 		case TYPE_FLOAT64: { f64 v = (*(f64*)mArg); utf32::to_string(str, end, end, v); } break;
-		case TYPE_PCTCHAR: { ascii::pcrune sstr = *(ascii::pcrune*)mArg; ascii::pcrune send = *(ascii::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
-		case TYPE_PCUCHAR8: { utf8::pcrune sstr = *(utf8::pcrune*)mArg; utf8::pcrune send = *(utf8::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
-		case TYPE_PCUCHAR32: { utf32::pcrune sstr = *(utf32::pcrune*)mArg; utf32::pcrune send = *(utf32::pcrune*)mArg2; utf::copy(sstr, send, str, end, utf::TERMINATOR_WRITE); } break;
+		case TYPE_PCTCHAR:
+		{	xcuchars const& ch = *(xcuchars const*)mArg;
+			utf::copy(ch.m_str, ch.m_end, str, end, utf::TERMINATOR_WRITE);
+		} break;
+		case TYPE_PCUCHAR32:
+		{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
+			utf::copy(ch.m_str, ch.m_end, str, end, utf::TERMINATOR_WRITE);
+		} break;
 		default:
 			break; // Fall through
 		};
@@ -150,9 +141,14 @@ namespace xcore
 		case TYPE_INT64: { i = (u32)(*(u64*)mArg); } break;
 		case TYPE_FLOAT32: { i = (u32)(*(f32*)mArg); } break;
 		case TYPE_FLOAT64: { i = (u32)(*(f64*)mArg); } break;
-		case TYPE_PCTCHAR: { ascii::pcrune str = *(ascii::pcrune*)mArg; ascii::pcrune end = *(ascii::pcrune*)mArg2; i = StrToU32(str, end); } break;
-		case TYPE_PCUCHAR8: { utf8::pcrune str = *(utf8::pcrune*)mArg; utf8::pcrune end = *(utf8::pcrune*)mArg2; i = StrToU32(str, end); } break;
-		case TYPE_PCUCHAR32: { utf32::pcrune str = *(utf32::pcrune*)mArg; utf32::pcrune end = *(utf32::pcrune*)mArg2; i = StrToU32(str, end); } break;
+		case TYPE_PCTCHAR: 
+		{	xcuchars const& ch = *(xcuchars const*)mArg;
+			i = StrToU32(ch.m_str, ch.m_end);
+		} break;
+		case TYPE_PCUCHAR32:
+		{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
+			i = StrToU32(ch.m_str, ch.m_end);
+		} break;
 		default:
 			break; // Fall through
 		};
@@ -186,10 +182,16 @@ namespace xcore
 			case TYPE_INT64:	{ i = (u64)(*(u64*)mArg);  } break;
 			case TYPE_FLOAT32:	{ i = (u64)(*(f32*)mArg);  } break;
 			case TYPE_FLOAT64:	{ i = (u64)(*(f64*)mArg);  } break;
-			case TYPE_PCTCHAR: { ascii::pcrune str = *(ascii::pcrune*)mArg; ascii::pcrune end = *(ascii::pcrune*)mArg2; i = StrToS64(str, end, 10); } break;
-			case TYPE_PCUCHAR8: { utf8::pcrune str = *(utf8::pcrune*)mArg; utf8::pcrune end = *(utf8::pcrune*)mArg2; i = StrToS64(str, end, 10); } break;
-			case TYPE_PCUCHAR32: { utf32::pcrune str = *(utf32::pcrune*)mArg; utf32::pcrune end = *(utf32::pcrune*)mArg2; i = StrToS64(str, end, 10); } break;
-			default:			break; // Fall through
+			case TYPE_PCTCHAR:
+			{	xcuchars const& ch = *(xcuchars const*)mArg;
+				i = StrToS64(ch.m_str, ch.m_end, 10);
+			} break;
+			case TYPE_PCUCHAR32:
+			{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
+				i = StrToS64(ch.m_str, ch.m_end, 10);
+			} break;
+			default:
+				break; // Fall through
 		};
 
 		return i;
@@ -216,9 +218,14 @@ namespace xcore
 
 			case TYPE_FLOAT32:	{ i = (f32)(*(f32*)mArg); } break;
 			case TYPE_FLOAT64:	{ i = (f32)(*(f64*)mArg); } break;
-			case TYPE_PCTCHAR: { ascii::pcrune str = *(ascii::pcrune*)mArg; ascii::pcrune end = *(ascii::pcrune*)mArg2; i = StrToF32(str, end); } break;
-			case TYPE_PCUCHAR8: { utf8::pcrune str = *(utf8::pcrune*)mArg; utf8::pcrune end = *(utf8::pcrune*)mArg2; i = StrToF32(str, end); } break;
-			case TYPE_PCUCHAR32: { utf32::pcrune str = *(utf32::pcrune*)mArg; utf32::pcrune end = *(utf32::pcrune*)mArg2; i = StrToF32(str, end); } break;
+			case TYPE_PCTCHAR:
+			{	xcuchars const& ch = *(xcuchars const*)mArg;
+				i = StrToF32(ch.m_str, ch.m_end);
+			} break;
+			case TYPE_PCUCHAR32:
+			{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
+				i = StrToF32(ch.m_str, ch.m_end);
+			} break;
 			default:			break; // Fall through
 		};
 
@@ -246,11 +253,16 @@ namespace xcore
 
 			case TYPE_FLOAT32:	{ i = (f64)(*(f32*)mArg); } break;
 			case TYPE_FLOAT64:	{ i = (f64)(*(f64*)mArg); } break;
-
-			case TYPE_PCTCHAR: { ascii::pcrune str = *(ascii::pcrune*)mArg; ascii::pcrune end = *(ascii::pcrune*)mArg2; i = StrToF64(str, end); } break;
-			case TYPE_PCUCHAR8: { utf8::pcrune str = *(utf8::pcrune*)mArg; utf8::pcrune end = *(utf8::pcrune*)mArg2; i = StrToF64(str, end); } break;
-			case TYPE_PCUCHAR32: { utf32::pcrune str = *(utf32::pcrune*)mArg; utf32::pcrune end = *(utf32::pcrune*)mArg2; i = StrToF64(str, end); } break;
-			default:			break; // Fall through
+			case TYPE_PCTCHAR:
+			{	xcuchars const& ch = *(xcuchars const*)mArg;
+				i = StrToF64(ch.m_str, ch.m_end);
+			} break;
+			case TYPE_PCUCHAR32:
+			{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
+				i = StrToF64(ch.m_str, ch.m_end);
+			} break;
+			default:
+				break; // Fall through
 		};
 
 		return i;
@@ -277,9 +289,14 @@ namespace xcore
 			case TYPE_FLOAT32:	{ i = (u32)(*(f32*)mArg); } break;
 			case TYPE_FLOAT64:	{ i = (u32)(*(f64*)mArg); } break;
 
-			case TYPE_PCTCHAR: { ascii::pcrune str = *(ascii::pcrune*)mArg; ascii::pcrune end = *(ascii::pcrune*)mArg2; i = StrToBool(str, end); } break;
-			case TYPE_PCUCHAR8: { utf8::pcrune str = *(utf8::pcrune*)mArg; utf8::pcrune end = *(utf8::pcrune*)mArg2; i = StrToBool(str, end); } break;
-			case TYPE_PCUCHAR32: { utf32::pcrune str = *(utf32::pcrune*)mArg; utf32::pcrune end = *(utf32::pcrune*)mArg2; i = StrToBool(str, end); } break;
+			case TYPE_PCTCHAR:
+			{	xcuchars const& ch = *(xcuchars const*)mArg;
+				i = StrToBool(ch.m_str, ch.m_end);
+			} break;
+			case TYPE_PCUCHAR32:
+			{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
+				i = StrToBool(ch.m_str, ch.m_end);
+			} break;
 
 			default:			break; // Fall through
 		};
@@ -307,62 +324,50 @@ namespace xcore
 			case TYPE_FLOAT32:	
 			case TYPE_FLOAT64:
 
-			case TYPE_PCTCHAR: { utf::read(*(ascii::rune**)mArg, ch); } break;
-			case TYPE_PCUCHAR8: { utf::read(*(utf8::rune**)mArg, ch); } break;
-			case TYPE_PCUCHAR32: { utf::read(*(utf32::rune**)mArg, ch); } break;
-			default:			break; // Fall through
+			case TYPE_PCTCHAR:
+			{	xcuchars const& chrs = *(xcuchars const*)mArg;
+				utf::read(chrs.m_str, ch);
+			} break;
+			case TYPE_PCUCHAR32:
+			{	xcuchar32s const& chrs = *(xcuchar32s const*)mArg;
+				utf::read(chrs.m_str, ch);
+			} break;
+
+			default:
+				break; // Fall through
 		};
 
 		return ch;
 	}
 
-	const uchar*		x_va::convertToUCharPointer() const
+	xcuchars			x_va::convertToUChars() const
 	{
 		switch (mType)
 		{
 			case TYPE_PCTCHAR:
 				{
-					const uchar* p = *(const uchar**)mArg; 
-					return p;
+					const xcuchars* p = (const xcuchars*)mArg; 
+					return *p;
 				}
-
-			default:			break; // Fall through
+			default:
+				break; // Fall through
 		};
-
-		return (const uchar*)"?";
+		return xcuchars((const uchar*)&mVar, (const uchar*)&mVar);
 	}
 
-	const uchar8*		x_va::convertToUChar8Pointer() const
+	xcuchar32s			x_va::convertToUChar32s() const
 	{
 		switch (mType)
 		{
-			case TYPE_PCUCHAR8:
-			case TYPE_PCTCHAR:
-				{
-					const uchar8* p = *(const uchar8**)mArg; 
-					return p;
-				}
-
-			default:			break; // Fall through
-		};
-
-		return (const uchar8*)"?";
-	}
-
-	const uchar32*		x_va::convertToUChar32Pointer() const
-	{
-		switch (mType)
+		case TYPE_PCUCHAR32:
 		{
-		case TYPE_PCUCHAR8:
-		{
-			const uchar32* p = *(const uchar32**)mArg;
-			return p;
+			const xcuchar32s* p = (const xcuchar32s*)mArg;
+			return *p;
 		}
-
-		default:			break; // Fall through
+		default:
+			break; // Fall through
 		};
-
-		return (const uchar32*)"?\0\0\0";
+		return xcuchar32s((const uchar32*)&mVar, (const uchar32*)&mVar);
 	}
 
 
@@ -544,7 +549,6 @@ namespace xcore
 		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)rhs; break;
 		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)rhs; break;
 		case TYPE_PTCHAR:    utf::write(rhs, ((uchar*)mRef)); break;
-		case TYPE_PUCHAR8:   utf::write(rhs, ((uchar8*)mRef)); break;
 		case TYPE_PUCHAR32:  ((uchar32*)mRef)[0] = rhs; break;
 		default:			break;
 		};
@@ -591,32 +595,6 @@ namespace xcore
 		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs, NULL); break;
 		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs, NULL); break;
 		case TYPE_PTCHAR:	break;
-		case TYPE_PUCHAR8:	break;
-		case TYPE_PUCHAR32:	break;
-		default:			break; // Fall through
-		};
-
-		return *this;
-	}
-
-	x_va_r&					x_va_r::operator=(const uchar8* rhs)
-	{
-		switch (mType)
-		{
-		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs, NULL); break;
-		case TYPE_UCHAR:	*((uchar8*)mRef) = (uchar8)StrToS64(rhs, NULL, 10); break;
-		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs, NULL, 10); break;
-		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs, NULL, 10); break;
-		case TYPE_UINT8:	*((u8 *)mRef) = (u8)StrToS64(rhs, NULL, 10); break;
-		case TYPE_INT8:		*((s8 *)mRef) = (s8)StrToS64(rhs, NULL, 10); break;
-		case TYPE_UINT16:	*((u16*)mRef) = (u16)StrToS64(rhs, NULL, 10); break;
-		case TYPE_INT16:	*((s16*)mRef) = (s16)StrToS64(rhs, NULL, 10); break;
-		case TYPE_UINT64:	*((u64*)mRef) = (u64)StrToS64(rhs, NULL, 10); break;
-		case TYPE_INT64:	*((s64*)mRef) = (s64)StrToS64(rhs, NULL, 10); break;
-		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs, NULL); break;
-		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs, NULL); break;
-		case TYPE_PTCHAR:	break;
-		case TYPE_PUCHAR8:	break;
 		case TYPE_PUCHAR32:	break;
 		default:			break; // Fall through
 		};
@@ -641,7 +619,6 @@ namespace xcore
 		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs, NULL); break;
 		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs, NULL); break;
 		case TYPE_PTCHAR:	break;
-		case TYPE_PUCHAR8:	break;
 		case TYPE_PUCHAR32:	break;
 		default:			break; // Fall through
 		};
@@ -665,9 +642,8 @@ namespace xcore
 		case TYPE_INT64:	*((s64*)mRef) = rhs; break;
 		case TYPE_FLOAT32:	*((f32*)mRef) = rhs; break;
 		case TYPE_FLOAT64:	*((f64*)mRef) = rhs; break;
-		case TYPE_PTCHAR:	rhs.convertToTCharStr((ascii::prune)mRef, (ascii::prune)mRef2); break;
-		case TYPE_PUCHAR8:	rhs.convertToUChar8Str((utf8::prune)mRef, (utf8::prune)mRef2); break;
-		case TYPE_PUCHAR32:	rhs.convertToUChar32Str((utf32::prune)mRef, (utf32::prune)mRef2); break;
+		case TYPE_PTCHAR:	rhs.convertToChars(*(xuchars*)mRef); break;
+		case TYPE_PUCHAR32:	rhs.convertToChar32s(*(xuchar32s*)mRef); break;
 		default:			break; // Fall through
 		};
 

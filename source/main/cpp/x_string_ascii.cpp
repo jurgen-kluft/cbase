@@ -621,8 +621,8 @@ namespace xcore
 			case 8: format_str[1] = 'o'; break;
 			};
 			pcrune format_str_end = format_str + 2;
-			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return str + len;
+			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return end;
 		}
 
 		prune	to_string(prune str, prune str_end, pcrune str_eos, s64 val, s32 base)
@@ -635,8 +635,8 @@ namespace xcore
 			case 8: format_str[1] = 'o'; break;
 			};
 			pcrune format_str_end = format_str + 2;
-			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return str + len;
+			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return end;
 		}
 
 		prune	to_string(prune str, prune str_end, pcrune str_eos, u64 val, s32 base)
@@ -649,8 +649,8 @@ namespace xcore
 			case 8: format_str[1] = 'o'; break;
 			};
 			pcrune format_str_end = format_str + 2;
-			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return str + len;
+			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return end;
 		}
 
 		prune	to_string(prune str, prune str_end, pcrune str_eos, f32 val, s32 numFractionalDigits)
@@ -662,8 +662,8 @@ namespace xcore
 				format_str[3] = '0' + numFractionalDigits % 10;
 			}
 			pcrune format_str_end = format_str + 5;
-			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return str + len;
+			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return end;
 		}
 
 		prune	to_string(prune str, prune str_end, pcrune str_eos, f64 val, s32 numFractionalDigits)
@@ -675,8 +675,8 @@ namespace xcore
 				format_str[3] = '0' + numFractionalDigits % 10;
 			}
 			pcrune format_str_end = format_str + 5;
-			s32 len = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
-			return str + len;
+			prune end = sprintf(str, str_eos, format_str, format_str_end, x_va(val));
+			return end;
 		}
 
 		//------------------------------------------------------------------------------

@@ -1014,18 +1014,9 @@ namespace xcore
 			case 's':
 				if (args[argindex].isPCUChar32())
 				{
-					uchar32 const* src = (uchar32 const*)args[argindex];
-					while (utf::is_eos(src) == false)
-					{
-						uchar32 c;
-						src = utf::read(src, c);
-						buffer->Write(c);
-					}
-				}
-				else if (args[argindex].isPCUChar8())
-				{
-					uchar8 const* src = (uchar8 const*)args[argindex];
-					while (utf::is_eos(src) == false)
+					xcuchar32s chrs = (xcuchar32s)args[argindex];
+					const uchar32* src = chrs.m_str;
+					while (utf::is_eos(src) == false && src < chrs.m_end)
 					{
 						uchar32 c;
 						src = utf::read(src, c);
@@ -1034,8 +1025,9 @@ namespace xcore
 				}
 				else if (args[argindex].isPCTChar())
 				{
-					ascii::rune const* src = (ascii::rune const*)args[argindex];
-					while (utf::is_eos(src) == false)
+					xcuchars chrs = (xcuchars)args[argindex];
+					const uchar* src = chrs.m_str;
+					while (utf::is_eos(src) == false && src < chrs.m_end)
 					{
 						uchar32 c;
 						src = utf::read(src, c);
@@ -1231,14 +1223,14 @@ namespace xcore
 			return (s32)writer.Count();
 		}
 
-		s32		sprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
+		prune 	sprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 			CharReaderFromAsciiBuffer reader(format_str, format_str_end);
 			CharWriterToAsciiBuffer writer(str, str_end);
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
-			return (s32)writer.Count();
+			return str + writer.Count();
 		}
 
 		s32		vsprintf(prune str, pcrune str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args)

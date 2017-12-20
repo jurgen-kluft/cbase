@@ -550,8 +550,8 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			const char* fmt = "%d %s";
 			const char* fmt_end = fmt + 5;
 
-			s32 length = ascii::sprintf(buffer, buffer_end, fmt, fmt_end, x_va(i), x_va(str));
-			CHECK_EQUAL(9, length);
+			ascii::prune end = ascii::sprintf(buffer, buffer_end, fmt, fmt_end, x_va(i), x_va(str));
+			CHECK_EQUAL(9, end - buffer);
 			CHECK_TRUE(ascii::compare(buffer, "100 hello") == 0);
 
 			// Check all format functionality?
@@ -563,40 +563,40 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			char * buffer = &buffer_buffer[0];
 			char * buffer_end = &buffer_buffer[16];
 
-			s32 length;
+			ascii::prune end;
 
 			// ---------------------------------------------------------------------------
 			// Boolean, True/False and Yes/No verification
-			length = ascii::sprintf(buffer, buffer_end, "%b", NULL, x_va(true));
-			CHECK_EQUAL(4, length);
+			end = ascii::sprintf(buffer, buffer_end, "%b", NULL, x_va(true));
+			CHECK_EQUAL(buffer+4, end);
 			CHECK_TRUE(ascii::compare(buffer, "true")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%B", NULL, x_va(true));
-			CHECK_EQUAL(4, length);
+			end = ascii::sprintf(buffer, buffer_end, "%B", NULL, x_va(true));
+			CHECK_EQUAL(buffer + 4, end);
 			CHECK_TRUE(ascii::compare(buffer, "TRUE")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%b", NULL, x_va(false));
-			CHECK_EQUAL(5, length);
+			end = ascii::sprintf(buffer, buffer_end, "%b", NULL, x_va(false));
+			CHECK_EQUAL(buffer + 5, end);
 			CHECK_TRUE(ascii::compare(buffer, "false")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%#b", NULL, x_va(false));
-			CHECK_EQUAL(5, length);
+			end = ascii::sprintf(buffer, buffer_end, "%#b", NULL, x_va(false));
+			CHECK_EQUAL(buffer + 5, end);
 			CHECK_TRUE(ascii::compare(buffer, "False")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%y", NULL, x_va(true));
-			CHECK_EQUAL(3, length);
+			end = ascii::sprintf(buffer, buffer_end, "%y", NULL, x_va(true));
+			CHECK_EQUAL(buffer + 3, end);
 			CHECK_TRUE(ascii::compare(buffer, "yes")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%y", NULL, x_va(false));
-			CHECK_EQUAL(2, length);
+			end = ascii::sprintf(buffer, buffer_end, "%y", NULL, x_va(false));
+			CHECK_EQUAL(buffer + 2, end);
 			CHECK_TRUE(ascii::compare(buffer, "no")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%Y", NULL, x_va(true));
-			CHECK_EQUAL(3, length);
+			end = ascii::sprintf(buffer, buffer_end, "%Y", NULL, x_va(true));
+			CHECK_EQUAL(buffer + 3, end);
 			CHECK_TRUE(ascii::compare(buffer, "YES")==0);
 
-			length = ascii::sprintf(buffer, buffer_end, "%#y", NULL, x_va(true));
-			CHECK_EQUAL(3, length);
+			end = ascii::sprintf(buffer, buffer_end, "%#y", NULL, x_va(true));
+			CHECK_EQUAL(buffer + 3, end);
 			CHECK_TRUE(ascii::compare(buffer, "Yes")==0);
 			// ---------------------------------------------------------------------------
 

@@ -16,8 +16,8 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(test_xbuffer32)
 		{
-			xbuffer32 buf1(1);
-			xbuffer32 buf2(2);
+			xbytes32 buf1(1);
+			xbytes32 buf2(2);
 
 			CHECK_TRUE(buf1 != buf2);
 			CHECK_FALSE(buf1 == buf2);
