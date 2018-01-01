@@ -1097,7 +1097,6 @@ namespace xcore
 			i->Do(buffer);
 		}
 
-	private:
 		const uchar*	mStr;
 		const uchar*	mPtr;
 		const uchar*	mEnd;

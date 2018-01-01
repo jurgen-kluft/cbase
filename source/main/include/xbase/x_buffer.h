@@ -94,7 +94,7 @@ namespace xcore
 			}																	\
 			return 0;															\
 		}																		\
-		name&		operator = (const xbuffer& other) {							\
+		name&		operator = (const xcbuffer& other) {							\
 			u64 i = 0;															\
 			for (; i < size() && i < other.size(); ++i)							\
 				m_data[i] = other.m_data[i];									\
@@ -140,7 +140,9 @@ namespace xcore
 	// Inline functions
 	#include "xbase/private/x_buffer.h"
 
+	XBYTES(xbytes8, 8);
 	XBYTES(xbytes16, 16);
+	XBYTES(xbytes20, 20);
 	XBYTES(xbytes32, 32);
 	XBYTES(xbytes64, 64);
 	XBYTES(xbytes128, 128);
