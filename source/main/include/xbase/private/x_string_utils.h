@@ -1059,8 +1059,8 @@ namespace xcore
 	class CharReaderFromAsciiBuffer : public CharReader
 	{
 	public:
-		inline			CharReaderFromAsciiBuffer(const uchar* str, const uchar* str_end) : mStr(str), mPtr(str), mEnd(str_end) { if (mEnd == NULL) mEnd = ascii::len(mStr); }
-		inline			CharReaderFromAsciiBuffer(AsciiBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd) { if (mEnd == NULL) mEnd = ascii::len(mStr); }
+		inline			CharReaderFromAsciiBuffer(const uchar* str, const uchar* str_end) : mStr(str), mPtr(str), mEnd(str_end) { }
+		inline			CharReaderFromAsciiBuffer(AsciiBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd) { }
 
 		virtual uchar32	Peek()
 		{
@@ -1198,64 +1198,50 @@ namespace xcore
 
 	inline bool StrToBool(const uchar* str, const uchar* end)
 	{
-		if (end == NULL)
-			end = ascii::len(str);
 		bool value;
-		ascii::parse(str, end, value);
+		ascii::parse(xcuchars(str, end), value);
 		return value;
 	}
 
 	inline f32 StrToF32(const uchar* str, const uchar* end)
 	{
-		if (end == NULL)
-			end = ascii::len(str);
 		f32 value;
-		ascii::parse(str, end, value);
+		ascii::parse(xcuchars(str, end), value);
 		return value;
 	}
 
 	inline f64 StrToF64(const uchar* str, const uchar* end)
 	{
-		if (end == NULL)
-			end = ascii::len(str);
 		f64 value;
-		ascii::parse(str, end, value);
+		ascii::parse(xcuchars(str, end), value);
 		return value;
 	}
 
 	inline s32 StrToS32(const uchar* str, const uchar* end)
 	{
-		if (end == NULL)
-			end = ascii::len(str);
 		s32 value;
-		ascii::parse(str, end, value);
+		ascii::parse(xcuchars(str, end), value);
 		return value;
 	}
 
 	inline u32 StrToU32(const uchar* str, const uchar* end)
 	{
-		if (end == NULL)
-			end = ascii::len(str);
 		s32 value;
-		ascii::parse(str, end, value);
+		ascii::parse(xcuchars(str, end), value);
 		return value;
 	}
 
 	inline s64 StrToS64(const uchar* str, const uchar* end, s32 base)
 	{
-		if (end == NULL)
-			end = ascii::len(str);
 		s64 value;
-		ascii::parse(str, end, value, base);
+		ascii::parse(xcuchars(str, end), value, base);
 		return value;
 	}
 
 	inline u64 StrToU64(const uchar* str, const uchar* end, s32 base)
 	{
-		if (end == NULL)
-			end = ascii::len(str);
 		s64 value;
-		ascii::parse(str, end, value, base);
+		ascii::parse(xcuchars(str, end), value, base);
 		return value;
 	}
 

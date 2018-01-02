@@ -953,11 +953,11 @@ namespace xcore
 				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2013
-			#elif _MSC_VER == 1900
+			#elif _MSC_VER >= 1900 && _MSC_VER < 1911
 				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2015
-			#elif _MSC_VER == 1911
+			#elif _MSC_VER >= 1911
 				#define COMPILER_WINDOWS_MSVC
 				#define COMPILER_DEFAULT
 				#define COMPILER_VERSION            2017

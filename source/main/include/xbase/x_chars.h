@@ -570,7 +570,7 @@ namespace xcore
 	{
 		if (i < 0) {
 			i = 0; 
-		} else if (i >= size()) {
+		} else if (i >= (int)size()) {
 			i = size() - 1;
 		}
 		return m_str[i];
@@ -580,7 +580,7 @@ namespace xcore
 	{
 		if (i < 0) {
 			i = 0; 
-		} else if (i >= size()) {
+		} else if (i >= (int)size()) {
 			i = size() - 1;
 		}
 		return m_str[i];

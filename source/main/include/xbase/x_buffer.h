@@ -94,7 +94,7 @@ namespace xcore
 			}																	\
 			return 0;															\
 		}																		\
-		name&		operator = (const xcbuffer& other) {							\
+		name&		operator = (const xcbuffer& other) {						\
 			u64 i = 0;															\
 			for (; i < size() && i < other.size(); ++i)							\
 				m_data[i] = other.m_data[i];									\

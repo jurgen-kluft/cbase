@@ -408,7 +408,7 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		bool is_decimal(xcuchars& str)
 		{
-			pcrune src = str;
+			pcrune src = str.m_str;
 			uchar32 c = peek_char(src);
 			if (c == '-')
 			{
@@ -417,10 +417,10 @@ namespace xcore
 
 			while (true)
 			{
-				if (str_end != NULL && src == str_end)
+				if (str.m_end != NULL && src == str.m_end)
 					break;
 				uchar32 c = read_char(src);
-				if (str_end == NULL && c == '\0')
+				if (str.m_end == NULL && c == '\0')
 					break;
 				if (c < '0' || c > '9')
 					return false;
@@ -434,10 +434,11 @@ namespace xcore
 			uchar32 c = 0;
 			uchar32 p;
 			s32 pos = 0;
-			while (str < str_end)
+			pcrune src = str.m_str;
+			while (src < str.m_end)
 			{
 				p = c;
-				c = read_char(str);
+				c = read_char(src);
 				if (c == 'x') {
 					if (pos == 1 && with_prefix && p == '0') {
 						// Ok, 0x.... prefix
@@ -463,8 +464,8 @@ namespace xcore
 			static pcrune sFloatStr = (pcrune)"Ee.#QNABIF";
 
 			// Does it have any other of the strange characters?
-			pcrune src = str;
-			for (; src<str_end; )
+			pcrune src = str.m_str;
+			for (; src < str.m_end; )
 			{
 				uchar32 c = read_char(src);
 				if (c >= '0' && c <= '9')
@@ -494,12 +495,12 @@ namespace xcore
 			// Does it have only 0-9, a-f, A-F characters
 			s32 n = 0;
 			s32 l = 0;
-			pcrune src = str;
-			for (; src<str_end; )
+			pcrune src = str.m_str;
+			for (; src < str.m_end; )
 			{
 				uchar32 c = read_char(src);
 				
-				if (str_end == NULL && c == '\0') break;
+				if (str.m_end == NULL && c == '\0') break;
 
 				if (c >= '0' && c <= '9') { n++;  continue; }
 				if (c >= 'A' && c <= 'F') { n++;  continue; }
@@ -660,7 +661,6 @@ namespace xcore
 		*/
 		void to_upper(xuchars& _str)
 		{
-			ASSERT(str != NULL);
 			prune p = _str.m_str;
 			while (true)
 			{
@@ -685,7 +685,6 @@ namespace xcore
 		*/
 		void to_lower(xuchars& _str)
 		{
-			ASSERT(str != NULL);
 			prune p = _str.m_str;
 			while (true)
 			{
