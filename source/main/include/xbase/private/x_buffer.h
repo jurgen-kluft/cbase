@@ -3,6 +3,27 @@
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 
+inline xbuffer	xbuffer::alloc(u64 size, x_iallocator* a)
+{
+	void* ptr = a->allocate(size, sizeof(void*));
+	return xbuffer(size, (xbyte*)ptr);
+}
+
+inline void		xbuffer::realloc(xbuffer& buf, u64 size, x_iallocator* a)
+{
+	void* ptr = a->allocate(size, sizeof(void*));
+	xmem_utils::memcpy(ptr, buf.m_data, buf.m_len);
+	a->deallocate(buf.m_data);
+	buf.m_data = ptr;
+	buf.m_len = size;
+}
+
+inline void		xbuffer::dealloc(xbuffer& buf, x_iallocator* a)
+{
+	a->deallocate(buf.m_data);
+	buf.m_data = NULL;
+	buf.m_len = 0;
+}
 
 inline void			xbuffer::reset()
 {

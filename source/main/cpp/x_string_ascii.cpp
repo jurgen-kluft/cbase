@@ -26,210 +26,276 @@ namespace xcore
 		*/
 
 		//------------------------------------------------------------------------------
-		static inline uchar32	peek_char(pcrune str, s32* len = NULL)
+		static inline s32		peek_char(xuchars const& src, uchar32& out_c)
 		{
-			rune c = *str;
-			if (len != NULL)
-				*len = 1;
-			return c;
+			out_c = '\0';
+			if (!src.is_empty())
+			{
+				out_c = src.m_str[0];
+				return 1;
+			}
+			return 0;
+		}
+		static inline s32		peek_char(xcuchars const& src, uchar32& out_c)
+		{
+			out_c = '\0';
+			if (!src.is_empty())
+			{
+				out_c = src.m_str[0];
+				return 1;
+			}
+			return 0;
 		}
 
 		//------------------------------------------------------------------------------
-		static uchar32			read_char(prune& str)
+		static bool				read_char(xuchars& src, uchar32& out_c)
 		{
-			s32 l = 0;
-			uchar32 c = peek_char(str, &l);
-			if (c != 0)
-				str += l;
-			return c;
+			s32 const l = peek_char(src, out_c);
+			src.m_str += l;
+			return l > 0;
 		}
 
 		//------------------------------------------------------------------------------
-		static uchar32			read_char(pcrune& str)
+		static bool				read_char(xcuchars& src, uchar32& out_c)
 		{
-			s32 l = 0;
-			uchar32 c = peek_char(str, &l);
-			str += l;
-			return c;
+			s32 l = peek_char(src, out_c);
+			src.m_str += l;
+			return l > 0;
 		}
 
 		//------------------------------------------------------------------------------
-		static u8				sUTF8LC[] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
-		static prune			write_char(uchar32 c, prune str, pcrune end)
+		static bool				write_char(uchar32 c, xuchars& dst)
 		{
-			if (str != NULL && str < end)
+			if (!dst.is_full())
 			{
 				if (c > 0x7f)
 					c = '?';
-				*str++ = (rune)c;
+				*dst.m_end++ = (uchar)c;
+				return true;
 			}
-			return str;
+			return false;
 		}
 
 		//------------------------------------------------------------------------------
 		//------------------------------------------------------------------------------
 		//------------------------------------------------------------------------------
-
-		static s32 len_in_bytes(uchar32 c)
+		
+		void		copy(runes& _dest, crunes const& _src, ECopyType type)
 		{
-			if ((c & 0xffffff80) == 0x00)
+			crunes src = _src;
+			_dest.m_end = _dest.m_str;
+			while (_dest.m_end < _dest.m_eos)
 			{
-				return 1;
-			}
-
-			s32 l = 0;
-			if ((c & 0xf8000000) == 0xf0000000) { l = 4; }
-			else if ((c & 0xf00000) == 0xe00000) { l = 3; }
-			else if ((c & 0xe000) == 0xc000) { l = 2; }
-			return l;
-		}
-
-		static s32	len_in_chars(pcrune str, pcrune end)
-		{
-			s32 l = 0;
-			if (end != NULL)
-			{
-				while (str < end)
+				if (src.m_end != NULL && src.m_str == src.m_end)
 				{
-					read_char(str);
-					l++;
-				}
-			}
-			else
-			{
-				while (true)
-				{
-					uchar32 c = read_char(str);
-					if (c == '\0')
-						break;
-					l++;
-				}
-			}
-			return l;
-		}
-
-		void		copy(xuchars& _dest, xcuchars& _src, ECopyType type)
-		{
-			s32 len = 0;
-			pcrune src = _src.m_str;
-			pcrune src_end = _src.m_end;
-			prune dest = _dest.m_str;
-			prune dest_end = _dest.m_eos;
-			while (dest < dest_end)
-			{
-				if (src_end != NULL && src == src_end)
-				{
-					if (type == COPY_AND_WRITE_MATCHING_TERMINATOR && *src_end == '\0')
-						write_char('\0', dest, dest_end);
+					if (type == COPY_AND_WRITE_MATCHING_TERMINATOR && *src.m_end == '\0')
+						write_char('\0', _dest);
 					break;
 				}
-				uchar32 const c = read_char(src);
-				if (src_end == NULL && c == '\0')
+				uchar32 c;
+				if (read_char(src, c)==false)
 				{
 					if (type == COPY_AND_WRITE_MATCHING_TERMINATOR)
-						write_char(c, dest, dest_end);
+						write_char(c, _dest);
 					break;
 				}
-				dest = write_char(c, dest, dest_end);
+				write_char(c, _dest);
 			}
-
-			if (dest < dest_end && type == COPY_AND_WRITE_TERMINATOR)
-				write_char('\0', dest, dest_end);
+			if (_dest.m_end < _dest.m_eos && type == COPY_AND_WRITE_TERMINATOR)
+				write_char('\0', _dest);
 		}
 
-		xcuchars		find(xcuchars& _str, xcuchars& _find, ECmpMode mode)
+		void			concatenate(runes& str, crunes const& _concat)
 		{
-			pcrune str_begin = _str.m_str;
-			pcrune str_end = _str.m_end;
-			pcrune find_begin = _find.m_str;
-			pcrune find_end = _find.m_end;
-			if (find_end != NULL && find_begin == find_end)
-				return NULL;
-			if (str_end != NULL && str_begin == str_end)
-				return NULL;
-
-			pcrune str_iter = str_begin;
-			bool found = false;
-			pcrune found_pos = NULL;
+			crunes concat = _concat;
+			uchar32 c;
 			while (true)
 			{
-				if (str_end != NULL && str_iter == str_end)
+				if (!read_char(concat, c))
+					break;
+				if (!write_char(c, str))
+					break;
+			}
+		}
+
+		runes			find(runes const& _str, crunes const& _find, ECmpMode mode)
+		{
+			if (_str.is_empty())
+				return runes();
+			if (_find.is_empty())
+				return runes();
+
+			runes str_iter = _str;
+			
+			bool found = false;
+			runes str_found;
+			while (str_iter.is_empty() == false)
+			{
+				// Remember the current position because here is
+				// where we start to check if the 'find' string
+				// can be found at this particular position.
+				str_found = str_iter;
+
+				uchar32 sc, fc;
+				if (!read_char(str_iter, sc))
 					break;
 
-				found_pos = str_iter;
-				uchar32 sc = read_char(str_iter);
-				if (str_end == NULL && sc == '\0')
-					break;
+				runes str_find = str_iter;
+				crunes find_str = _find;
 
-				pcrune str_find = str_iter;
-				pcrune find_str = find_begin;
-
-				uchar32 fc = read_char(find_str);
-				found = is_equal(sc, fc, mode);
-				while (found)
+				found = true;
+				while (found && read_char(find_str, fc))
 				{
-					if ((find_end != NULL && find_str == find_end) || (find_end == NULL && *find_str == '\0'))
-						break;
-					if ((str_end != NULL && str_find == str_end) || (str_end == NULL && *str_find == '\0'))
+					if (!read_char(str_find, sc))
 					{
 						found = false;
 						break;
 					}
-
-					sc = read_char(str_find);
-					fc = read_char(find_str);
 					found = is_equal(sc, fc, mode);
 				}
 
 				if (found)
+				{
 					break;
+				}
 			}
-			return found ? found_pos : NULL;
+			return found ? str_found : runes();
 		}
 
-		xcuchars	find(xcuchars& _str, uchar32 _c, ECmpMode mode)
+		crunes			find(crunes const& _str, crunes const& _find, ECmpMode mode)
 		{
-			pcrune str = _str.m_str;
-			pcrune str_end = _str.m_end;
-			while (true)
+			if (_str.is_empty())
+				return crunes();
+			if (_find.is_empty())
+				return crunes();
+
+			crunes str_iter = _str;
+
+			bool found = false;
+			crunes str_found;
+			while (str_iter.is_empty() == false)
 			{
-				if (str_end != NULL && str == str_end)
+				// Remember the current position because here is
+				// where we start to check if the 'find' string
+				// can be found at this particular position.
+				str_found = str_iter;
+
+				uchar32 sc, fc;
+				if (!read_char(str_iter, sc))
 					break;
-				pcrune cur_pos = str;
-				uchar32 c = read_char(str);
-				if (str_end == NULL && c == '\0')
+
+				crunes str_find = str_iter;
+				crunes find_str = _find;
+
+				found = true;
+				while (found && read_char(find_str, fc))
+				{
+					if (!read_char(str_find, sc))
+					{
+						found = false;
+						break;
+					}
+					found = is_equal(sc, fc, mode);
+				}
+
+				if (found)
+				{
+					break;
+				}
+			}
+			return found ? str_found : crunes();
+		}
+
+		runes	find(runes const& _str, uchar32 _c, ECmpMode mode)
+		{
+			runes str = _str;
+			uchar32 c;
+			while (!str.is_empty())
+			{
+				runes pos = str;
+				if (!read_char(str, c))
 					break;
 				if (is_equal(c, _c, mode))
-					return xcuchars(cur_pos, str_end);
+					return pos;
 			}
-			return xcuchars();
+			return runes();
 		}
 
-		bool	contains(xcuchars& _str, uchar32 _c, ECmpMode mode)
+		crunes	find(crunes const& _str, uchar32 _c, ECmpMode mode)
 		{
-			xcuchars f = find(_str, _c, mode);
+			crunes str = _str;
+			uchar32 c;
+			while (!str.is_empty())
+			{
+				crunes pos = str;
+				if (!read_char(str, c))
+					break;
+				if (is_equal(c, _c, mode))
+					return pos;
+			}
+			return crunes();
+		}
+
+		bool	contains(crunes const& _str, uchar32 _c, ECmpMode mode)
+		{
+			crunes f = find(_str, _c, mode);
 			return f.is_empty() == false;
 		}
 
-		xcuchars	find_one_of(xcuchars& _str, xcuchars& _set, ECmpMode mode)
+		bool	contains(runes const& _str, uchar32 _c, ECmpMode mode)
 		{
-			pcrune str = _str.m_str;
-			pcrune str_end = _str.m_end;
-			while (true)
-			{
-				if (str_end != NULL && str == str_end)
-					break;
-				pcrune cur_pos = str;
-				uchar32 c = read_char(str);
-				if (str_end == NULL && c == '\0')
-					break;
-				if (contains(_set, c, mode))
-					return xcuchars(cur_pos, str_end);
-			}
-			return xcuchars();
+			runes f = find(_str, _c, mode);
+			return f.is_empty() == false;
 		}
 
-		void	replace(xuchars& _str, xcuchars& _replace)
+		runes	find_one_of(runes const& _str, crunes const& _set, ECmpMode mode)
+		{
+			runes str = _str;
+			uchar32 c;
+			while (!str.is_empty())
+			{
+				// Remember the current position so that if we found
+				// the char in the set we can return this position.
+				runes pos = str;
+
+				// Read next character from 'str'
+				if (!read_char(str, c))
+					break;
+
+				// See if this char can be found in the 'set'
+				crunes found = find(_set, c, mode);
+				if (!found.is_empty())
+					return pos;
+			}
+			// Nothing found, return an empty object
+			return runes();
+		}
+
+		crunes	find_one_of(crunes const& _str, crunes const& _set, ECmpMode mode)
+		{
+			crunes str = _str;
+			uchar32 c;
+			while (!str.is_empty())
+			{
+				// Remember the current position so that if we found
+				// the char in the set we can return this position.
+				crunes pos = str;
+
+				// Read next character from 'str'
+				if (!read_char(str, c))
+					break;
+
+				// See if this char can be found in the 'set'
+				crunes found = find(_set, c, mode);
+				if (!found.is_empty())
+					return pos;
+			}
+			// Nothing found, return an empty object
+			return crunes();
+		}
+
+
+		void	replace(runes& _str, crunes const& _replace)
 		{
 			// The logic here is based on memory copy, we do not consider characters
 			s32 const selected_len = (s32)((xbyte const*)_str.m_end - (xbyte const*)_str.m_str);
@@ -277,71 +343,36 @@ namespace xcore
 			_str.m_end = end;
 		}
 
-
-		s32	compare(xcuchars& _lstr, xcuchars& _rstr, ECmpMode mode)
+		s32	compare(crunes const& _lstr, crunes const& _rstr, ECmpMode mode)
 		{
-			if (_lstr.m_str != _rstr.m_str && _lstr.m_end != _rstr.m_end)
-			{
-				pcrune lstr = _lstr.m_str;
-				pcrune rstr = _rstr.m_str;
-				do
-				{
-					bool const is_lstr_end = (lstr == _lstr.m_end);
-					bool const is_rstr_end = (rstr == _rstr.m_end);
-					if (is_lstr_end && is_rstr_end)
-						break;
-					if (is_lstr_end)
-						return -1;
-					if (is_rstr_end)
-						return 1;
-
-					uchar32 c1 = read_char(lstr);
-					uchar32 c2 = read_char(rstr);
-					if (mode == CASE_IGNORE)
-					{
-						c1 = to_lower(c1);
-						c2 = to_lower(c2);
-					}
-					if (c1 < c2)
-						return -1;
-					if (c1 > c2)
-						return 1;
-				} while (true);
+			crunes lstr = _lstr;
+			crunes rstr = _rstr;
+			uchar32 lc, rc;
+			while (read_char(lstr, lc) && read_char(rstr, rc))
+			{ 
+				if (lc != rc)
+					break;
 			}
+			if (lc < rc)
+				return -1;
+			else if (lc > rc)
+				return 1;
 			return 0;
 		}
 
 		//------------------------------------------------------------------------------
-		void concatenate(xuchars& str, xcuchars& concat)
+		crunes	parse(crunes const& _str, bool& value)
 		{
-			s32 l = 0;
-			prune wptr = str.m_end;
-			pcrune rptr = concat.m_str;
-			pcrune rend = concat.m_end;
-			while (wptr < str.m_eos)
-			{
-				if (rend != NULL && rptr == rend)
-					break;
-				prune front = wptr;
-				uchar32 c = read_char(rptr);
-				prune nwptr = write_char(c, wptr, str.m_eos);
-				if (nwptr == wptr)
-					break;
-				wptr = nwptr;
-			}
-			str.m_end = wptr;
-		}
-
-		xcuchars	parse(xcuchars& str, bool& value)
-		{
-			xcuchars format("%b");
+			crunes str = _str;
+			crunes format("%b");
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
 
-		xcuchars	parse(xcuchars& str, s32& value, s32 base)
+		crunes	parse(crunes const& _str, s32& value, s32 base)
 		{
-			xcuchars format;
+			crunes str = _str;
+			crunes format;
 			switch (base)
 			{
 			case 16: format = "%x"; break;
@@ -352,9 +383,10 @@ namespace xcore
 			return str;
 		}
 
-		xcuchars	parse(xcuchars& str, u32& value, s32 base)
+		crunes	parse(crunes const& _str, u32& value, s32 base)
 		{
-			xcuchars format;
+			crunes str = _str;
+			crunes format;
 			switch (base)
 			{
 			case 16: format = "%x"; break;
@@ -365,9 +397,10 @@ namespace xcore
 			return str;
 		}
 
-		xcuchars	parse(xcuchars& str, s64& value, s32 base)
+		crunes	parse(crunes const& _str, s64& value, s32 base)
 		{
-			xcuchars format;
+			crunes str = _str;
+			crunes format;
 			switch (base)
 			{
 			case 16: format = "%x"; break;
@@ -378,9 +411,10 @@ namespace xcore
 			return str;
 		}
 
-		xcuchars	parse(xcuchars& str, u64& value, s32 base)
+		crunes	parse(crunes& _str, u64& value, s32 base)
 		{
-			xcuchars format;
+			crunes str = _str;
+			crunes format;
 			switch (base)
 			{
 			case 16: format = "%x"; break;
@@ -391,37 +425,35 @@ namespace xcore
 			return str;
 		}
 
-		xcuchars	parse(xcuchars& str, f32& value)
+		crunes	parse(crunes const& _str, f32& value)
 		{
-			xcuchars format("%f");
+			crunes str = _str;
+			crunes format("%f");
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
 
-		xcuchars	parse(xcuchars& str, f64& value)
+		crunes	parse(crunes const& _str, f64& value)
 		{
-			xcuchars format("%f");
+			crunes str = _str;
+			crunes format("%f");
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
 
 		//------------------------------------------------------------------------------
-		bool is_decimal(xcuchars& str)
+		bool is_decimal(crunes const& _str)
 		{
-			pcrune src = str.m_str;
-			uchar32 c = peek_char(src);
-			if (c == '-')
+			crunes str = _str;
+			uchar32 c;
+			while (peek_char(str, c))
 			{
-				read_char(src);
+				if (c != '-')
+					break;
+				read_char(str, c);
 			}
-
-			while (true)
+			while (read_char(str, c))
 			{
-				if (str.m_end != NULL && src == str.m_end)
-					break;
-				uchar32 c = read_char(src);
-				if (str.m_end == NULL && c == '\0')
-					break;
 				if (c < '0' || c > '9')
 					return false;
 			}
@@ -429,28 +461,23 @@ namespace xcore
 		}
 
 		//------------------------------------------------------------------------------
-		bool is_hexadecimal(xcuchars& str, bool with_prefix)
+		bool is_hexadecimal(crunes const& _str, bool with_prefix)
 		{
-			uchar32 c = 0;
-			uchar32 p;
+			crunes str = _str;
+
+			uchar32 p,c;
 			s32 pos = 0;
-			pcrune src = str.m_str;
-			while (src < str.m_end)
-			{
-				p = c;
-				c = read_char(src);
+			while (read_char(str, c)) {
 				if (c == 'x') {
 					if (pos == 1 && with_prefix && p == '0') {
 						// Ok, 0x.... prefix
-					}
-					else {
+					} else {
 						return false;
 					}
-				}
-				else if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+				} else if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
 					// Ok, digit or hex character
-				}
-				else {
+					p = c;
+				} else {
 					return false;
 				}
 				pos++;
@@ -459,49 +486,31 @@ namespace xcore
 		}
 
 		//------------------------------------------------------------------------------
-		bool is_float(xcuchars& str)
+		bool is_float(crunes const& _str)
 		{
-			static pcrune sFloatStr = (pcrune)"Ee.#QNABIF";
-
-			// Does it have any other of the strange characters?
-			pcrune src = str.m_str;
-			for (; src < str.m_end; )
-			{
-				uchar32 c = read_char(src);
+			crunes f32chars("Ee.#QNABIF");
+			crunes str = _str;
+			uchar32 c;
+			while (read_char(str, c)) {
 				if (c >= '0' && c <= '9')
-				{
 					continue;
-				}
-
-				pcrune float_str = sFloatStr;
-				uchar32 f = read_char(float_str);;
-				while (f != c)
-				{
-					f = read_char(float_str);
-					if (f == '\0')
-						break;
-				}
-				// Okay this is not a number
-				if (f == '\0')
+				if (!contains(f32chars, c, CASE_SENSITIVE))
 					return false;
-				src++;
 			}
 			return true;
 		}
 
 		//------------------------------------------------------------------------------
-		bool is_GUID(xcuchars& str)
+		bool is_GUID(crunes const& _str)
 		{
+			crunes f32chars("Ee.#QNABIF");
+			crunes str = _str;
+
 			// Does it have only 0-9, a-f, A-F characters
 			s32 n = 0;
 			s32 l = 0;
-			pcrune src = str.m_str;
-			for (; src < str.m_end; )
-			{
-				uchar32 c = read_char(src);
-				
-				if (str.m_end == NULL && c == '\0') break;
-
+			uchar32 c;
+			while (read_char(str, c)) {
 				if (c >= '0' && c <= '9') { n++;  continue; }
 				if (c >= 'A' && c <= 'F') { n++;  continue; }
 				if (c >= 'a' && c <= 'f') { n++;  continue; }
@@ -512,9 +521,7 @@ namespace xcore
 						return false;
 					continue;
 				}
-				return false;
 			}
-
 			// the length of the string must be 17 characters long (4*8 + 3 ':')
 			return (n == (4 * 8) && l == 3);
 		}
@@ -522,9 +529,9 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		//------------------------------------------------------------------------------
 
-		void	to_string(xuchars& str, s32 val, s32 base)
+		void	to_string(runes& str, s32 val, s32 base)
 		{
-			xcuchars format;
+			crunes format;
 			switch (base)
 			{
 			case 16: format = "%x"; break;
@@ -534,9 +541,9 @@ namespace xcore
 			sprintf(str, format, x_va(val));
 		}
 
-		void	to_string(xuchars& str, u32 val, s32 base)
+		void	to_string(runes& str, u32 val, s32 base)
 		{
-			xcuchars format;
+			crunes format;
 			switch (base)
 			{
 			case 16: format = "%x"; break;
@@ -546,9 +553,11 @@ namespace xcore
 			sprintf(str, format, x_va(val));
 		}
 
-		void	to_string(xuchars& str, s64 val, s32 base)
+		// *cFHbRXV[N]WWWR6FETY+
+
+		void	to_string(runes& str, s64 val, s32 base)
 		{
-			xcuchars format;
+			crunes format;
 			switch (base)
 			{
 			case 16: format = "%x"; break;
@@ -558,9 +567,9 @@ namespace xcore
 			sprintf(str, format, x_va(val));
 		}
 
-		void	to_string(xuchars& str, u64 val, s32 base)
+		void	to_string(runes& str, u64 val, s32 base)
 		{
-			xcuchars format;
+			crunes format;
 			switch (base)
 			{
 			case 16: format = "%x"; break;
@@ -570,7 +579,7 @@ namespace xcore
 			sprintf(str, format, x_va(val));
 		}
 
-		void	to_string(xuchars& str, f32 val, s32 numFractionalDigits)
+		void	to_string(runes& str, f32 val, s32 numFractionalDigits)
 		{
 			rune format_str[] = { '%', '.', '0', '2', 'f', '\0' };
 			if (numFractionalDigits != 2 && numFractionalDigits > 0 && numFractionalDigits < 100)
@@ -578,11 +587,11 @@ namespace xcore
 				format_str[2] = '0' + numFractionalDigits / 10;
 				format_str[3] = '0' + numFractionalDigits % 10;
 			}
-			xcuchars format(format_str);
+			crunes format(format_str);
 			sprintf(str, format, x_va(val));
 		}
 
-		void	to_string(xuchars& str, f64 val, s32 numFractionalDigits)
+		void	to_string(runes& str, f64 val, s32 numFractionalDigits)
 		{
 			rune format_str[] = { '%', '.', '0', '2', 'f', '\0' };
 			if (numFractionalDigits != 2 && numFractionalDigits > 0 && numFractionalDigits < 100)
@@ -590,66 +599,72 @@ namespace xcore
 				format_str[2] = '0' + numFractionalDigits / 10;
 				format_str[3] = '0' + numFractionalDigits % 10;
 			}
-			xcuchars format(format_str);
+			crunes format(format_str);
 			sprintf(str, format, x_va(val));
 		}
 
 		//------------------------------------------------------------------------------
 		//------------------------------------------------------------------------------
 
-		bool		is_upper(xcuchars& _str)
+		bool		is_upper(crunes const& _str)
 		{
-			const uchar* str = _str.m_str;
-			while (str < _str.m_end)
+			crunes str = _str;
+			uchar32 c;
+			while (!str.is_empty())
 			{
-				uchar32 c = read_char(str);
+				if (!read_char(str, c))
+					break;
 				if (is_lower(c))
 					return false;
 			}
 			return true;
 		}
 
-		bool		is_lower(xcuchars& _str)
+		bool		is_lower(crunes& _str)
 		{
-			const uchar* str = _str.m_str;
-			while (str < _str.m_end)
+			crunes str = _str;
+			uchar32 c;
+			while (!str.is_empty())
 			{
-				uchar32 c = read_char(str);
+				if (!read_char(str, c))
+					break;
 				if (is_upper(c))
 					return false;
 			}
 			return true;
 		}
 
-		bool		is_capitalized(xcuchars& _str)
+		bool		is_capitalized(crunes const& _str)
 		{
+			crunes str = _str;
 			bool b = true;
-			const uchar* str = _str.m_str;
-			while (str < _str.m_end)
+			while (!str.is_empty())
 			{
-				uchar32 c = read_char(str);
+				uchar32 c;
+				if (!read_char(str, c))
+					break;
 				if (is_upper(c) != b)
 					return false;
 				b = (c == ' ');
 			}
 			return true;
-
 		}
 
-		bool		is_delimited(xcuchars& _str, rune delimit_left, rune delimit_right)
+		bool		is_delimited(crunes const& _str, rune delimit_left, rune delimit_right)
 		{
-			const uchar* str = _str.m_str;
-			if (str < _str.m_end)
+			crunes str = _str;
+
+			uchar32 c;
+			if (!read_char(str, c))
 			{
-				uchar32 char_left = read_char(str);
-				if (char_left == delimit_left)
+				if (c == delimit_left)
 				{
-					uchar32 char_right = 0;
-					while (str < _str.m_end)
+					while (!str.is_empty())
 					{
-						char_right = read_char(str);
+						if (!read_char(str, c))
+							break;
 					}
-					return char_right == delimit_right;
+					return c == delimit_right;
 				}
 			}
 			return false;
@@ -659,22 +674,20 @@ namespace xcore
 		* Assumption: Letters A-Z and a-z are contiguous in the character set.
 		* This is true for ASCII and UniCode.  (Not so for EBCDIC!)
 		*/
-		void to_upper(xuchars& _str)
+		void to_upper(runes& _str)
 		{
-			prune p = _str.m_str;
-			while (true)
+			runes str = _str;
+			uchar32 c;
+			while (peek_char(str, c))
 			{
-				if (p == _str.m_end)
-					break;
-				uchar32 c = peek_char(p);
 				if ((c >= 'a') && (c <= 'z'))
 				{
 					c += ('A' - 'a');
-					p = write_char(c, p, p + 4);
+					write_char(c, str);
 				}
 				else 
 				{
-					read_char(p);
+					read_char(str, c);
 				}
 			}
 		}
@@ -683,192 +696,110 @@ namespace xcore
 		* Assumption: Letters A-Z and a-z are contiguous in the character set.
 		* This is true for ASCII and UniCode.  (Not so for EBCDIC!)
 		*/
-		void to_lower(xuchars& _str)
+		void to_lower(runes& _str)
 		{
-			prune p = _str.m_str;
-			while (true)
+			runes str = _str;
+			uchar32 c;
+			while (peek_char(str, c))
 			{
-				if (p == _str.m_end)
-					break;
-				uchar32 c = peek_char(p);
 				if ((c >= 'A') && (c <= 'Z'))
 				{
-					c = 'a' + (c - 'A');
-					p = write_char(c, p, _str.m_end);
-				}
-				else 
-				{
-					read_char(p);
-				}
-			}
-		}
-
-		// ------------------------------------------------------------------------------
-		// ------------------------------------------------------------------------------
-
-		bool		starts_with(xcuchars& str, uchar32 start_char)
-		{
-			uchar32 c = read_char(str.m_str);
-			return start_char == c;
-		}
-
-		bool		starts_with(xcuchars& _str, xcuchars& start)
-		{
-			// Match from begin of string
-			const uchar* str = _str.m_str;
-			const uchar* str_end = _str.m_end;
-			const uchar* start_str = start.m_str;
-			const uchar* start_str_end = start.m_end;
-			while (true)
-			{
-				if (start_str == start_str_end)
-					break;
-				uchar32 c1 = read_char(start_str);
-				if (str == str_end)
-					return false;
-				uchar32 c2 = read_char(str);
-				if (c1 != c2)
-					return false;
-			}
-			// If matched all the way to the end of start then success
-			return true;
-		}
-
-		bool		ends_with(xcuchars& _str, uchar32 end_char)
-		{
-			if (_str.m_end != NULL && has_fixed_size_rune())
-			{
-				uchar32 c;
-				c = peek_char(_str.m_end - get_fixed_sizeof_rune());
-				return end_char == c;
-			}
-			else
-			{
-				// Need to fast-forward to the last character
-				const uchar* str = _str.m_str;
-				const uchar* str_end = _str.m_end;
-				
-				uchar32 p, c;
-				c = 0xffffffff;
-				if (str_end != NULL)
-				{
-					while (true)
-					{
-						p = c;
-						if (str_end != NULL && str == str_end)
-							break;
-						c = read_char(str);
-					}
+					c += ('a' - 'A');
+					write_char(c, str);
 				}
 				else
 				{
-					while (true)
-					{
-						p = c;
-						c = read_char(str);
-						if (c == '\0')
-							break;
-					}
+					read_char(str, c);
 				}
-				return end_char == p;
 			}
 		}
 
-		bool		ends_with(xcuchars& _str, xcuchars& _end)
+		// ------------------------------------------------------------------------------
+		// ------------------------------------------------------------------------------
+
+		bool		starts_with(crunes const& _str, uchar32 start_char)
 		{
-			if (has_fixed_size_rune())
+			crunes str = _str;
+			uchar32 c = '\0';
+			if (read_char(str, c))
+				return start_char == c;
+			return false;
+		}
+
+		bool		starts_with(crunes& _str, crunes& _start)
+		{
+			crunes lstr = _str;
+			crunes rstr = _start;
+			uchar32 lc, rc;
+			while (read_char(rstr, rc))
 			{
-				// ASCII and UTF32 only
-				pcrune srcstr = _str.m_str;
-				pcrune srcptr = _str.m_str - get_fixed_sizeof_rune();
-				pcrune endstr = _end.m_str;
-				pcrune endptr = _end.m_end - get_fixed_sizeof_rune();
-				while (true)
-				{
-					uchar32 c1 = peek_char(srcptr);
-					uchar32 c2 = peek_char(endptr);
-					if (c1 != c2)
-						return false;
-					if (srcptr == srcstr)
-						return true;
-					if (endptr == endstr)
-						return true;
-					srcptr -= get_fixed_sizeof_rune();
-					endptr -= get_fixed_sizeof_rune();
-				}
+				if (!read_char(lstr, lc))
+					return false;
+				if (lc != rc)
+					return false;;
 			}
-			else
+			return true;
+		}
+
+		bool		ends_with(crunes const& _str, uchar32 end_char)
+		{
+			crunes str = _str;
+			if (!str.is_empty())
 			{
-				pcrune srcstr = _str.m_str;
-				pcrune srcstr_end = _str.m_str - get_fixed_sizeof_rune();
-				pcrune endstr = _end.m_str;
-				pcrune endstr_end = _end.m_end;
+				if (has_fixed_size_rune())
+					str.m_str = str.m_end - 1;	
 
-				// First count the number of characters in 'endstr'
-				s32 endstr_len = endstr_end - endstr;
-				// Count the number of characters in 'srcstr'
-				s32 srcstr_len = srcstr_end - srcstr;
-
-				// Now we know where to start in 'srcstr'
-				s32 srcstr_start = srcstr_len - endstr_len;
-				if (srcstr_start >= 0)
-				{
-					// Move to start position in srcstr
-					for (s32 i = 0; i < srcstr_start; ++i)
-						read_char(srcstr);
-
-					uchar32 sc = read_char(srcstr);
-					uchar32 ec = read_char(endstr);
-					while (sc == ec)
-					{
-						if (endstr == endstr_end)
-							return true;
-						if (srcstr == srcstr_end)
-							return false;
-						sc = read_char(srcstr);
-						ec = read_char(endstr);
-					}
-				}
+				// Need to fast-forward to the last character
+				uchar32 p = 0xffffffff;
+				uchar32 c = 0xffffffff;
+				while (read_char(str, c))
+					p = c;
+				return end_char == p;
 			}
 			return false;
 		}
 
-		uchar32			first_char(xcuchars& str)
+		bool		ends_with(crunes const& _str, crunes const& _end)
 		{
-			if (str.m_str == str.m_end)
-				return '\0';
-			uchar32 c = peek_char(str.m_str);
-			return c;
+			crunes str = _str;
+			crunes end = _end;
+			if (!str.is_empty() && !end.is_empty())
+			{
+				if (str.size() > end.size())
+					return false;
+
+				if (has_fixed_size_rune())
+					str.m_str = str.m_end - end.size();
+
+				uchar32 c1, c2;
+				while (read_char(str, c1) && read_char(end, c2)) {
+					if (c1 != c2)
+						return false;
+				}
+			}
+			return str.is_empty() && end.is_empty();
 		}
 
-		uchar32			last_char(xcuchars& str)
+		uchar32			first_char(crunes const& str)
 		{
+			uchar32 c;
+			if (peek_char(str, c))
+				return c;
+			return '\0';
+		}
+
+		uchar32			last_char(crunes const& _str)
+		{
+			crunes str = _str;
 			if (has_fixed_size_rune())
 			{
-				if (str.m_end != NULL && str.m_end > str.m_str)
-				{
-					// @ASCII only
-					return peek_char(str.m_end - get_fixed_sizeof_rune());
-				}
-				return '\0';
+				str.m_str = str.m_end - 1;
 			}
-			else
-			{
-				// Fast-forward to end of str, keep track of previous character
-				uchar32 c, pc;
-				pcrune iter = str.m_str;
-				c = 0;
-				while (true)
-				{
-					pc = c;
-					if (str.m_end != NULL && iter == str.m_end)
-						break;
-					c = read_char(iter);
-					if (str.m_end == NULL && c == '\0')
-						break;
-				}
-				return pc;
-			}
+			// Fast-forward to end of str, keep track of previous character
+			uchar32 c, pc = '\0';
+			while (read_char(str, c))
+				pc = c;
+			return pc;
 		}
 	};	///< END ascii namespace
 };	///< END xcore namespace

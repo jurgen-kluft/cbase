@@ -13,6 +13,14 @@
 
 namespace xcore
 {
+	class xuchars;
+	class xuchar8s;
+	class xuchar32s;
+
+	class xcuchars;
+	class xcuchar8s;
+	class xcuchar32s;
+
 	// NOTE:
 	//   UTF string manipulation is the easiest with UTF-32 since it is the only UTF format that
 	//   has a fixed rune size and thus is easier to index directly than UTF-8 or UTF-16.
@@ -21,46 +29,34 @@ namespace xcore
 	// ASCII, UTF-8, UTF-16, UTF-32 conversions
 	namespace utf
 	{
-		uchar   const *	read	(uchar   const * str, uchar32& out_c);
-		uchar8  const *	read	(uchar8  const * str, uchar32& out_c);
-		uchar16 const *	read	(uchar16 const * str, uchar32& out_c);
-		uchar32 const *	read	(uchar32 const * str, uchar32& out_c);
-
-		uchar8  const *	rread	(uchar8  const * str, uchar32& out_c);	// Read utf-8 rune backwards (used in string reverse)
-
-		uchar   *		write	(uchar32 c, uchar   * str);
-		uchar8  *		write	(uchar32 c, uchar8  * str);
-		uchar16 *		write	(uchar32 c, uchar16 * str);
-		uchar32 *		write	(uchar32 c, uchar32 * str);
-
 		enum ETermType { TERMINATOR_NONE = 0, TERMINATOR_WRITE = 1 };
 
-		char   *		copy	(uchar   const* sstr, uchar   const* ssend, char * dstr, char * dend, ETermType term_type = TERMINATOR_WRITE);
-		char   *		copy	(uchar8  const* sstr, uchar8  const* ssend, char * dstr, char * dend, ETermType term_type = TERMINATOR_WRITE);
-		char   *		copy	(uchar16 const* sstr, uchar16 const* ssend, char * dstr, char * dend, ETermType term_type = TERMINATOR_WRITE);
-		char   *		copy	(uchar32 const* sstr, uchar32 const* ssend, char * dstr, char * dend, ETermType term_type = TERMINATOR_WRITE);
+		uchar32			peek(xcuchars const & str);
+		uchar32			peek(xcuchar32s const & str);
 
-		uchar8 *		copy	(char    const* sstr, char    const* ssend, uchar8 * dstr, uchar8 * dend, ETermType term_type = TERMINATOR_WRITE);
-		uchar8 *		copy	(uchar8  const* sstr, uchar8  const* ssend, uchar8 * dstr, uchar8 * dend, ETermType term_type = TERMINATOR_WRITE);
-		uchar8 *		copy	(uchar16 const* sstr, uchar16 const* ssend, uchar8 * dstr, uchar8 * dend, ETermType term_type = TERMINATOR_WRITE);
-		uchar8 *		copy	(uchar32 const* sstr, uchar32 const* ssend, uchar8 * dstr, uchar8 * dend, ETermType term_type = TERMINATOR_WRITE);
+		uchar32			read(xcuchars & str);
+		uchar32			read(xcuchar32s & str);
 
-		uchar32 *		copy	(char    const* sstr, char    const* ssend, uchar32 * dstr, uchar32 * dend, ETermType term_type = TERMINATOR_WRITE);
-		uchar32 *		copy	(uchar8  const* sstr, uchar8  const* ssend, uchar32 * dstr, uchar32 * dend, ETermType term_type = TERMINATOR_WRITE);
-		uchar32 *		copy	(uchar16 const* sstr, uchar16 const* ssend, uchar32 * dstr, uchar32 * dend, ETermType term_type = TERMINATOR_WRITE);
-		uchar32 *		copy	(uchar32 const* sstr, uchar32 const* ssend, uchar32 * dstr, uchar32 * dend, ETermType term_type = TERMINATOR_WRITE);
+		bool			write(uchar32 c, xuchars& str);
+		bool			write(uchar32 c, xuchar32s& str);
 
-		s32				size	(uchar32 c);
+		void			copy(xcuchars   const & sstr, xuchars& dstr, ETermType term_type = TERMINATOR_WRITE);
+		void			copy(xcuchar32s const & sstr, xuchars& dstr, ETermType term_type = TERMINATOR_WRITE);
 
-		bool			is_eos	(uchar   const * str);
-		bool			is_eos	(uchar8  const * str);
-		bool			is_eos	(uchar16 const * str);
-		bool			is_eos	(uchar32 const * str);
+		void			copy(xcuchars   const & sstr, xuchar32s& dstr, ETermType term_type = TERMINATOR_WRITE);
+		void			copy(xcuchar32s const & sstr, xuchar32s& dstr, ETermType term_type = TERMINATOR_WRITE);
 
-		bool			is_crln	(uchar   const * ustr);
-		bool			is_crln	(uchar8  const * ustr);
-		bool			is_crln	(uchar16 const * ustr);
-		bool			is_crln	(uchar32 const * ustr);
+		s32				size(uchar32 c);
+
+		bool			is_eos(xuchars   const& str);
+		bool			is_eos(xuchar32s const& str);
+		bool			is_eos(xcuchars   const& str);
+		bool			is_eos(xcuchar32s const& str);
+
+		bool			is_crln(xuchars   const& str);
+		bool			is_crln(xuchar32s const& str);
+		bool			is_crln(xcuchars   const& str);
+		bool			is_crln(xcuchar32s const& str);
 	};	// utf
 
 	namespace utf8
@@ -68,160 +64,147 @@ namespace xcore
 		typedef			uchar8					rune;
 		typedef			uchar8 *				prune;
 		typedef			const uchar8 *			pcrune;
+		typedef			xuchar8s				runes;
+		typedef			xcuchar8s				crunes;
 
-		inline bool		has_fixed_size_rune() { return false; }
-		inline s32		get_fixed_sizeof_rune() { return 1; }
+		inline bool		has_fixed_size_rune() { return true; }
+		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
 
-		inline prune	pos(prune str, pcrune pos) { return str + (pos - str); }
-
+		enum ECopyType { NONE = 0, COPY_AND_WRITE_TERMINATOR = 1, COPY_AND_WRITE_MATCHING_TERMINATOR = 2 };
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
 
-		pcrune			len(pcrune str);
-		pcrune			len(pcrune str, s32* str_len);
-		pcrune			len(pcrune str, pcrune str_eos, s32* str_len);
+		void			copy(runes& dst, crunes const& src, ECopyType type = COPY_AND_WRITE_MATCHING_TERMINATOR);
+		void			concatenate(runes& dst, crunes& src);		// Concatenate strings, dst = dst + src
 
-		s32				size(pcrune str);
+		runes			find(runes& str, crunes& find, ECmpMode mode = CASE_SENSITIVE);			// Return position of first occurrence of <inString> or -1 if not found
+		runes			find_one_of(runes& str, crunes& set, ECmpMode mode = CASE_SENSITIVE);	// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 
-		enum ETermType { TERMINATOR_NONE = 0, TERMINATOR_WRITE = 1, TERMINATOR_MATCHING = 2 };
-		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end, ETermType type = TERMINATOR_MATCHING);
+		crunes			find(crunes& str, crunes& find, ECmpMode mode = CASE_SENSITIVE);		// Return position of first occurrence of <inString> or -1 if not found
+		crunes			find_one_of(crunes& str, crunes& set, ECmpMode mode = CASE_SENSITIVE);	// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 
-		pcrune			find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode = CASE_SENSITIVE);
-		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found
-		pcrune			find_one_of(pcrune str, pcrune str_end, pcrune set, pcrune set_end);								/// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
+		void			replace(runes& str, crunes& replace);
 
-		prune			replace(prune str_begin, pcrune str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end);
+		s32  			compare(crunes& str1, crunes& str2, ECmpMode mode = CASE_SENSITIVE);
 
-		s32  			compare(pcrune str1, pcrune str2, ECmpMode mode = CASE_SENSITIVE);
-		s32  			compare(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end, ECmpMode mode = CASE_SENSITIVE);
+		crunes			parse(crunes& str, bool& value);
+		crunes			parse(crunes& str, s32& value, s32 base = 10);
+		crunes			parse(crunes& str, u32& value, s32 base = 10);
+		crunes			parse(crunes& str, s64& value, s32 base = 10);
+		crunes			parse(crunes& str, u64& value, s32 base = 10);
+		crunes			parse(crunes& str, f32& value);
+		crunes			parse(crunes& str, f64& value);
 
-		prune			concatenate(prune dst, pcrune dst_end, pcrune dst_eos, pcrune src, pcrune src_end);		// Concatenate strings, dst = dst + src
+		bool			is_decimal(crunes& str);
+		bool			is_hexadecimal(crunes& str, bool with_prefix = false);
+		bool			is_float(crunes& str);
+		bool			is_GUID(crunes& str);
 
-		s32				parse(pcrune str, pcrune str_end, bool& value);
-		s32				parse(pcrune str, pcrune str_end, s32& value, s32 base = 10);
-		s32				parse(pcrune str, pcrune str_end, u32& value, s32 base = 10);
-		s32				parse(pcrune str, pcrune str_end, s64& value, s32 base = 10);
-		s32				parse(pcrune str, pcrune str_end, u64& value, s32 base = 10);
-		s32				parse(pcrune str, pcrune str_end, f32& value);
-		s32				parse(pcrune str, pcrune str_end, f64& value);
-
-		bool			is_decimal(pcrune str, pcrune str_end);
-		bool			is_hexadecimal(pcrune str, pcrune str_end, bool with_prefix = false);
-		bool			is_float(pcrune str, pcrune str_end);
-		bool			is_GUID(pcrune str, pcrune str_end);
-
-		prune			to_string(prune str, prune str_end, pcrune str_eos, s32 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, u32 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, s64 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, u64 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, f32 val, s32 num_fractional_digits = 2);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, f64 val, s32 num_fractional_digits = 2);
+		void			to_string(runes& str, s32 val, s32 base = 10);
+		void			to_string(runes& str, u32 val, s32 base = 10);
+		void			to_string(runes& str, s64 val, s32 base = 10);
+		void			to_string(runes& str, u64 val, s32 base = 10);
+		void			to_string(runes& str, f32 val, s32 num_fractional_digits = 4);
+		void			to_string(runes& str, f64 val, s32 num_fractional_digits = 4);
 
 		inline bool		is_space(uchar32 c) { return((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
 		inline bool		is_upper(uchar32 c) { return((c >= 'A') && (c <= 'Z')); }
 		inline bool		is_lower(uchar32 c) { return((c >= 'a') && (c <= 'z')); }
 		inline bool		is_alpha(uchar32 c) { return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
 		inline bool		is_digit(uchar32 c) { return((c >= '0') && (c <= '9')); }
-		inline bool		is_number(uchar32 c) { return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
+		inline bool		is_hexa(uchar32 c) { return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
 
 		inline uchar32	to_upper(uchar32 c) { return((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c; }
 		inline uchar32	to_lower(uchar32 c) { return((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
 		inline u32		to_digit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
 		inline u32		to_number(uchar32 c) { if (is_digit(c)) return to_digit(c); else if (c >= 'A' && c <= 'F') return(c - 'A' + 10); else if (c >= 'a' && c <= 'f') return(c - 'a' + 10); else return(c); }
-		
+
 		inline bool		is_equal(uchar32 a, uchar32 b, ECmpMode mode = CASE_SENSITIVE) { if (mode == CASE_IGNORE) { a = to_lower(a); b = to_lower(b); } return (a == b); }
 
-		bool			is_upper(pcrune str, pcrune str_end);											/// Check if string is all upper case
-		bool			is_lower(pcrune str, pcrune str_end);											/// Check if string is all lower case
-		bool			is_capitalized(pcrune str, pcrune str_end);										/// Check if string is capitalized ("Shanghai")
-		bool			is_delimited(pcrune str, pcrune str_end, rune delimit_left = '\"', rune delimit_right = '\"');		///< Check if string is enclosed between left and right delimiter
-		inline bool		is_quoted(pcrune str, pcrune str_end, rune quote = '\"') { return is_delimited(str, str_end, quote, quote); }
+		bool			is_upper(crunes& str);											/// Check if string is all upper case
+		bool			is_lower(crunes& str);											/// Check if string is all lower case
+		bool			is_capitalized(crunes& str);										/// Check if string is capitalized ("Shanghai")
+		bool			is_delimited(crunes& str, rune delimit_left = '\"', rune delimit_right = '\"');		///< Check if string is enclosed between left and right delimiter
+		inline bool		is_quoted(crunes& str, rune quote = '\"') { return is_delimited(str, quote, quote); }
 
-		prune			to_upper(prune str, pcrune str_end);
-		prune			to_lower(prune str, pcrune str_end);
+		void			to_upper(runes& str);
+		void			to_lower(runes& str);
 
-		bool			starts_with(pcrune str, pcrune str_end, uchar32 start_char);
-		bool			starts_with(pcrune str, pcrune str_end, pcrune start_str, pcrune start_str_end);
+		bool			starts_with(crunes& str, uchar32 start);
+		bool			starts_with(crunes& str, crunes& start);
 
-		bool			ends_with(pcrune str, pcrune str_end, uchar32 end_char);
-		bool			ends_with(pcrune srcstr, pcrune srcstr_end, pcrune endstr, pcrune endstr_end);
+		bool			ends_with(crunes& str, uchar32 end_char);
+		bool			ends_with(crunes& str, crunes& end);
 
-		uchar32			first_char(pcrune str, pcrune str_end);
-		uchar32			last_char(pcrune str, pcrune str_end);
+		uchar32			first_char(crunes& str);
+		uchar32			last_char(crunes& str);
 
-		s32				cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-		s32				vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		s32				cprintf(crunes& format, X_VA_ARGS_16_DEF);
+		s32				vcprintf(crunes& format, const x_va_list& args);
 
-		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		void			sprintf(runes& dst, crunes& format, X_VA_ARGS_16_DEF);
+		void			vsprintf(runes& dst, crunes& format, const x_va_list& args);
 
-		s32				printf(pcrune str, pcrune str_end);
-		s32				printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-		s32				printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		void			printf(crunes& str);
+		void			printf(crunes& format, X_VA_ARGS_16_DEF);
+		void			printf(crunes& format, const x_va_list& args);
 
-		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, X_VA_R_ARGS_16_DEF);
-		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, const x_va_r_list& vr_args);
-
-	}; ///< end of utf32 namespace
+		void			sscanf(crunes& str, crunes& format, X_VA_R_ARGS_16_DEF);
+		void			vsscanf(crunes& str, crunes& format, const x_va_r_list& vr_args);
+	}; ///< end of utf8 namespace
 
 	namespace utf32
 	{
 		typedef			uchar32					rune;
 		typedef			uchar32 *				prune;
 		typedef			const uchar32 *			pcrune;
+		typedef			xuchar32s				runes;
+		typedef			xcuchar32s				crunes;
 
 		inline bool		has_fixed_size_rune() { return true; }
 		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
 
-		inline prune	pos(prune str, pcrune pos) { return str + (pos - str); }
-
+		enum ECopyType { NONE = 0, COPY_AND_WRITE_TERMINATOR = 1, COPY_AND_WRITE_MATCHING_TERMINATOR = 2 };
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
 
-		pcrune			len(pcrune str);
-		pcrune			len(pcrune str, s32* str_len);
-		pcrune			len(pcrune str, pcrune str_eos, s32* str_len);
+		void			copy(runes& dst, crunes const& src, ECopyType type = COPY_AND_WRITE_MATCHING_TERMINATOR);
+		void			concatenate(runes& dst, crunes& src);		// Concatenate strings, dst = dst + src
 
-		s32				size(pcrune str);
+		runes			find(runes& str, crunes& find, ECmpMode mode = CASE_SENSITIVE);			// Return position of first occurrence of <inString> or -1 if not found
+		runes			find_one_of(runes& str, crunes& set, ECmpMode mode = CASE_SENSITIVE);	// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 
-		enum ETermType { TERMINATOR_NONE = 0, TERMINATOR_WRITE = 1, TERMINATOR_MATCHING = 2 };
-		prune			copy(prune dest, pcrune dest_end, pcrune src, pcrune src_end, ETermType type = TERMINATOR_MATCHING);
+		crunes			find(crunes& str, crunes& find, ECmpMode mode = CASE_SENSITIVE);		// Return position of first occurrence of <inString> or -1 if not found
+		crunes			find_one_of(crunes& str, crunes& set, ECmpMode mode = CASE_SENSITIVE);	// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 
-		pcrune			find(pcrune str, pcrune str_end, uchar32 find_char, ECmpMode mode = CASE_SENSITIVE);
-		pcrune			find(pcrune str, pcrune str_end, pcrune find, pcrune find_end, ECmpMode mode = CASE_SENSITIVE);		/// Return position of first occurrence of <inString> or -1 if not found
-		pcrune			find_one_of(pcrune str, pcrune str_end, pcrune set, pcrune set_end);								/// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
+		void			replace(runes& str, crunes& replace);
 
-		prune			replace(prune str_begin, pcrune str_end, pcrune str_eos, pcrune replace_str, pcrune replace_end);
+		s32  			compare(crunes& str1, crunes& str2, ECmpMode mode = CASE_SENSITIVE);
 
-		s32  			compare(pcrune str1, pcrune str2, ECmpMode mode = CASE_SENSITIVE);
-		s32  			compare(pcrune str1, pcrune str1_end, pcrune str2, pcrune str2_end, ECmpMode mode = CASE_SENSITIVE);
+		crunes			parse(crunes& str, bool& value);
+		crunes			parse(crunes& str, s32& value, s32 base = 10);
+		crunes			parse(crunes& str, u32& value, s32 base = 10);
+		crunes			parse(crunes& str, s64& value, s32 base = 10);
+		crunes			parse(crunes& str, u64& value, s32 base = 10);
+		crunes			parse(crunes& str, f32& value);
+		crunes			parse(crunes& str, f64& value);
 
-		prune			concatenate(prune dst, pcrune dst_end, pcrune dst_eos, pcrune src, pcrune src_end);		// Concatenate strings, dst = dst + src
+		bool			is_decimal(crunes& str);
+		bool			is_hexadecimal(crunes& str, bool with_prefix = false);
+		bool			is_float(crunes& str);
+		bool			is_GUID(crunes& str);
 
-		s32				parse(pcrune str, pcrune str_end, bool& value);
-		s32				parse(pcrune str, pcrune str_end, s32& value, s32 base = 10);
-		s32				parse(pcrune str, pcrune str_end, u32& value, s32 base = 10);
-		s32				parse(pcrune str, pcrune str_end, s64& value, s32 base = 10);
-		s32				parse(pcrune str, pcrune str_end, u64& value, s32 base = 10);
-		s32				parse(pcrune str, pcrune str_end, f32& value);
-		s32				parse(pcrune str, pcrune str_end, f64& value);
-
-		bool			is_decimal(pcrune str, pcrune str_end);
-		bool			is_hexadecimal(pcrune str, pcrune str_end, bool with_prefix = false);
-		bool			is_float(pcrune str, pcrune str_end);
-		bool			is_GUID(pcrune str, pcrune str_end);
-
-		prune			to_string(prune str, prune str_end, pcrune str_eos, s32 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, u32 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, s64 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, u64 val, s32 base = 10);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, f32 val, s32 num_fractional_digits = 2);
-		prune			to_string(prune str, prune str_end, pcrune str_eos, f64 val, s32 num_fractional_digits = 2);
+		void			to_string(runes& str, s32 val, s32 base = 10);
+		void			to_string(runes& str, u32 val, s32 base = 10);
+		void			to_string(runes& str, s64 val, s32 base = 10);
+		void			to_string(runes& str, u64 val, s32 base = 10);
+		void			to_string(runes& str, f32 val, s32 num_fractional_digits = 4);
+		void			to_string(runes& str, f64 val, s32 num_fractional_digits = 4);
 
 		inline bool		is_space(uchar32 c) { return((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
 		inline bool		is_upper(uchar32 c) { return((c >= 'A') && (c <= 'Z')); }
 		inline bool		is_lower(uchar32 c) { return((c >= 'a') && (c <= 'z')); }
 		inline bool		is_alpha(uchar32 c) { return(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
 		inline bool		is_digit(uchar32 c) { return((c >= '0') && (c <= '9')); }
-		inline bool		is_number(uchar32 c) { return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
+		inline bool		is_hexa(uchar32 c) { return(((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
 
 		inline uchar32	to_upper(uchar32 c) { return((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c; }
 		inline uchar32	to_lower(uchar32 c) { return((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
@@ -230,37 +213,36 @@ namespace xcore
 
 		inline bool		is_equal(uchar32 a, uchar32 b, ECmpMode mode = CASE_SENSITIVE) { if (mode == CASE_IGNORE) { a = to_lower(a); b = to_lower(b); } return (a == b); }
 
-		bool			is_upper(pcrune str, pcrune str_end);											/// Check if string is all upper case
-		bool			is_lower(pcrune str, pcrune str_end);											/// Check if string is all lower case
-		bool			is_capitalized(pcrune str, pcrune str_end);										/// Check if string is capitalized ("Shanghai")
-		bool			is_delimited(pcrune str, pcrune str_end, rune delimit_left = '\"', rune delimit_right = '\"');		///< Check if string is enclosed between left and right delimiter
-		inline bool		is_quoted(pcrune str, pcrune str_end, rune quote = '\"') { return is_delimited(str, str_end, quote, quote); }
+		bool			is_upper(crunes& str);											/// Check if string is all upper case
+		bool			is_lower(crunes& str);											/// Check if string is all lower case
+		bool			is_capitalized(crunes& str);										/// Check if string is capitalized ("Shanghai")
+		bool			is_delimited(crunes& str, rune delimit_left = '\"', rune delimit_right = '\"');		///< Check if string is enclosed between left and right delimiter
+		inline bool		is_quoted(crunes& str, rune quote = '\"') { return is_delimited(str, quote, quote); }
 
-		prune			to_upper(prune str, pcrune str_end);
-		prune			to_lower(prune str, pcrune str_end);
+		void			to_upper(runes& str);
+		void			to_lower(runes& str);
 
-		bool			starts_with(pcrune str, pcrune str_end, uchar32 start_char);
-		bool			starts_with(pcrune str, pcrune str_end, pcrune start_str, pcrune start_str_end);
+		bool			starts_with(crunes& str, uchar32 start);
+		bool			starts_with(crunes& str, crunes& start);
 
-		bool			ends_with(pcrune str, pcrune str_end, uchar32 end_char);
-		bool			ends_with(pcrune srcstr, pcrune srcstr_end, pcrune endstr, pcrune endstr_end);
+		bool			ends_with(crunes& str, uchar32 end_char);
+		bool			ends_with(crunes& str, crunes& end);
 
-		uchar32			first_char(pcrune str, pcrune str_end);
-		uchar32			last_char(pcrune str, pcrune str_end);
+		uchar32			first_char(crunes& str);
+		uchar32			last_char(crunes& str);
 
-		s32				cprintf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-		s32				vcprintf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		s32				cprintf(crunes& format, X_VA_ARGS_16_DEF);
+		s32				vcprintf(crunes& format, const x_va_list& args);
 
-		s32				sprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-		s32				vsprintf(prune dst_str, pcrune dst_str_end, pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		void			sprintf(runes& dst, crunes& format, X_VA_ARGS_16_DEF);
+		void			vsprintf(runes& dst, crunes& format, const x_va_list& args);
 
-		s32				printf(pcrune str, pcrune str_end);
-		s32				printf(pcrune format_str, pcrune format_str_end, X_VA_ARGS_16_DEF);
-		s32				printf(pcrune format_str, pcrune format_str_end, const x_va_list& args);
+		void			printf(crunes& str);
+		void			printf(crunes& format, X_VA_ARGS_16_DEF);
+		void			printf(crunes& format, const x_va_list& args);
 
-		s32				sscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, X_VA_R_ARGS_16_DEF);
-		s32				vsscanf(pcrune str, pcrune str_end, pcrune fmt_str, pcrune fmt_str_end, const x_va_r_list& vr_args);
-
+		void			sscanf(crunes& str, crunes& format, X_VA_R_ARGS_16_DEF);
+		void			vsscanf(crunes& str, crunes& format, const x_va_r_list& vr_args);
 	}; ///< end of utf32 namespace
 
 };	// xCore namespace

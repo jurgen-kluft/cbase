@@ -13,7 +13,6 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase/x_chars.h"
 
 
 /**
@@ -21,6 +20,11 @@
  */
 namespace xcore
 {
+	class xuchars;
+	class xcuchars;
+	class xuchar32s;
+	class xcuchar32s;
+
 	//==============================================================================
 	//  FORWARD DECLARES
 	//==============================================================================
@@ -114,10 +118,10 @@ namespace xcore
 		explicit				x_va(bool inVar) : mType(TYPE_BOOL)					{ *(u32*)mArg = inVar ? 1 : 0; }
 		explicit				x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
 		explicit				x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
-		explicit				x_va(uchar32 inVar) : mType(TYPE_UCHAR)				{ *(uchar32*)mArg = (uchar32)inVar; }
-		explicit				x_va(const char* inVar) : mType(TYPE_PCTCHAR)		{ *(xcuchars*)mArg = xcuchars(inVar); }
-		explicit				x_va(xcuchars str) : mType(TYPE_PCTCHAR)			{ *(xcuchars*)mArg = str; }
-		explicit				x_va(xcuchar32s str) : mType(TYPE_PCTCHAR)			{ *(xcuchar32s*)mArg = str; }
+		explicit				x_va(uchar32 inVar);
+		explicit				x_va(const char* inVar);
+		explicit				x_va(xcuchars& str);
+		explicit				x_va(xcuchar32s& str);
 
 		EType					type() const										{ return (EType)mType; }
 
@@ -156,8 +160,8 @@ namespace xcore
 		operator				f64() const											{ return convertToDouble(); }
 		operator				uchar32() const										{ return convertToUChar(); }
 		operator				bool() const										{ return convertToBool(); }
-		operator				xcuchars() const									{ return convertToUChars(); }
-		operator				xcuchar32s() const									{ return convertToUChar32s(); }
+		operator				xcuchars const*() const								{ return convertToUChars(); }
+		operator				xcuchar32s const*() const							{ return convertToUChar32s(); }
 
 		void					convertToChars(xuchars& chars) const;
 		void					convertToChar32s(xuchar32s& chars) const;
@@ -177,8 +181,8 @@ namespace xcore
 		f64						convertToDouble() const;
 		bool					convertToBool() const;
 		uchar32					convertToUChar() const;
-		xcuchars				convertToUChars() const;
-		xcuchar32s				convertToUChar32s() const;
+		xcuchars const*			convertToUChars() const;
+		xcuchar32s const*		convertToUChar32s() const;
 
 		u16						mType;
 		u16						mVar;

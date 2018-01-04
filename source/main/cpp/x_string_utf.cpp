@@ -3,12 +3,199 @@
 #include "xbase/x_integer.h"
 #include "xbase/x_console.h"
 #include "xbase/x_va_list.h"
-
+#include "xbase/x_chars.h"
 
 namespace xcore
 {
 	namespace utf
 	{
+		uchar32			peek(xcuchars const & str)
+		{
+			uchar32 c = '\0';
+			if (!is_eos(str))
+				c = str.m_str[0];
+			return c;
+		}
+
+		uchar32			peek(xcuchar32s const & str)
+		{
+			uchar32 c = '\0';
+			if (!is_eos(str))
+				c = str.m_str[0];
+			return c;
+		}
+
+
+		uchar32			read(xcuchars & str)
+		{
+			uchar32 c = '\0';
+			if (!is_eos(str))
+			{
+				c = str.m_str[0];
+				str.m_str++;
+			}
+			return c;
+		}
+
+		uchar32			read(xcuchar32s & str)
+		{
+			uchar32 c = '\0';
+			if (!is_eos(str))
+			{
+				c = str.m_str[0];
+				str.m_str++;
+			}
+			return c;
+		}
+
+		bool			write(uchar32 c, xuchars& str)
+		{
+			if (!is_eos(str))
+			{
+				if (c > 0x7f) {
+					c = '?';
+				}
+				str.m_str[0] = c;
+				str.m_str++;
+				return true;
+			}
+			return false;
+		}
+
+		bool			write(uchar32 c, xuchar32s& str)
+		{
+			if (!is_eos(str))
+			{
+				str.m_str[0] = c;
+				str.m_str++;
+				return true;
+			}
+			return false;
+		}
+
+		void			copy(xcuchars   const & sstr, xuchars& dstr, ETermType term_type)
+		{
+			xcuchars src = sstr;
+			while (true)
+			{
+				uchar c = read(src);
+				if (c == '\0')
+					break;
+				if (!write(c, dstr))
+					break;
+			}
+			if (term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+		}
+
+		void			copy(xcuchar32s const & sstr, xuchars& dstr, ETermType term_type)
+		{
+			xcuchar32s src = sstr;
+			while (true)
+			{
+				uchar32 c = read(src);
+				if (c == '\0')
+					break;
+				if (!write(c, dstr))
+					break;
+			}
+			if (term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+		}
+
+		void			copy(xcuchars   const & sstr, xuchar32s& dstr, ETermType term_type)
+		{
+			xcuchars src = sstr;
+			while (true)
+			{
+				uchar c = read(src);
+				if (c == '\0')
+					break;
+				if (!write(c, dstr))
+					break;
+			}
+			if (term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+		}
+		
+		void			copy(xcuchar32s const & sstr, xuchar32s& dstr, ETermType term_type)
+		{
+			xcuchar32s src = sstr;
+			while (true)
+			{
+				uchar32 c = read(src);
+				if (c == '\0')
+					break;
+				if (!write(c, dstr))
+					break;
+			}
+			if (term_type == TERMINATOR_WRITE)
+				write('\0', dstr);
+		}
+
+		s32		size(uchar32 c)
+		{
+			s32 len = 0;
+			if (c <= 0x7f) { len = 1; }
+			else if (c < 0x0800) { len = 2; }
+			else if (c < 0xd800) { len = 3; }
+			else if (c < 0xe000) {}
+			else if (c < 0x010000) { len = 3; }
+			else if (c < 0x110000) { len = 4; }
+
+			return len;
+		}
+
+		bool			is_eos(xuchars   const& str)
+		{
+			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+		}
+
+		bool			is_eos(xuchar32s const& str)
+		{
+			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+		}
+
+		bool			is_eos(xcuchars   const& str)
+		{
+			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+		}
+
+		bool			is_eos(xcuchar32s const& str)
+		{
+			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+		}
+
+
+		bool			is_crln(xuchars   const& str)
+		{
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[0] == '\n');
+		}
+
+		bool			is_crln(xuchar32s const& str)
+		{
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[0] == '\n');
+		}
+
+		bool			is_crln(xcuchars   const& str)
+		{
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[0] == '\n');
+		}
+
+		bool			is_crln(xcuchar32s const& str)
+		{
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[0] == '\n');
+		}
+
+
+
+
+
+
+
+
+
+
 		s32		sequence_sizeof_utf8(uchar8 c)
 		{
 			u8 lead = c;
@@ -24,32 +211,8 @@ namespace xcore
 				return 0;
 		}
 
-		s32		size(uchar32 c)
-		{
-			s32 len = 0;
-			if (c <= 0x7f) { len = 1; }
-			else if (c < 0x0800) { len = 2; }
-			else if (c < 0xd800) { len = 3; }
-			else if (c < 0xe000) { }
-			else if (c < 0x010000) { len = 3; }
-			else if (c < 0x110000) { len = 4; }
-
-			return len;
-		}
-
-		uchar*	write(uchar32 rune, uchar* dest)
-		{
-			uchar* dst = dest;
-			if (rune <= 0x7f) {
-				*dst++ = (uchar)rune;
-			} else {
-				*dst++ = '?';
-			}
-			return dst;
-		}
-
 		static u8 sUTF8LC[] = { 0, 0, 0xc0, 0xe0, 0xf0 };
-		uchar8*	write(uchar32 cp, uchar8* dest)
+		uchar8*		write(uchar32 cp, uchar8* dest)
 		{
 			if (cp < 0x80)
 			{	// one octet
@@ -74,232 +237,6 @@ namespace xcore
 				*(dest++) = static_cast<uchar8>((cp & 0x3f) | 0x80);
 			}
 			return dest;
-		}
-
-		uchar16* write(uchar32 rune, uchar16* dest)
-		{
-			s32 len = 0;
-			if (rune < 0xd800) { len = 1; }
-            else if (rune < 0xe000) { len = 0; }
-            else if (rune < 0x010000) { len = 1; }
-            else if (rune < 0x110000) { len = 2; }
-
-			uchar16* dst = dest;
-			if (dst != NULL && len > 0)
-			{
-				if (len == 1) 
-				{
-					*dst++ = (uchar16)rune;
-				}
-				else 
-				{
-					// 20-bit intermediate value
-					u32 const iv = rune - 0x10000;
-					*dst++ = static_cast<uchar16>((iv >> 10) + 0xd800);
-					*dst++ = static_cast<uchar16>((iv & 0x03ff) + 0xdc00);
-				}
-			}
-			return dst;
-		}
-
-		uchar32* write(uchar32 rune, uchar32* dest)
-		{
-			*dest = rune;
-			return dest + 1;
-		}
-
-		// ==========================================================================================================================
-		char   *		copy(char  const* sstr, char  const* ssend, char * dstr, char * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				char c = *sstr++;
-				*dstr++ = c;
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				*dstr = '\0';
-			return dstr;
-		}
-
-		char   *		copy(uchar8  const* sstr, uchar8  const* ssend, char * dstr, char * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		char   *		copy(uchar16 const* sstr, uchar16 const* ssend, char * dstr, char * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		char   *		copy(uchar32 const* sstr, uchar32 const* ssend, char * dstr, char * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		uchar8 *		copy(char const* sstr, char const* ssend, uchar8 * dstr, uchar8 * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		uchar8 *		copy(uchar8 const* sstr, uchar8 const* ssend, uchar8 * dstr, uchar8 * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		uchar8 *		copy(uchar16 const* sstr, uchar16 const* ssend, uchar8 * dstr, uchar8 * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		uchar8 *		copy(uchar32  const* sstr, uchar32  const* ssend, uchar8 * dstr, uchar8 * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		uchar32 *		copy(char const* sstr, char const* ssend, uchar32 * dstr, uchar32 * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		uchar32 *		copy(uchar8  const* sstr, uchar8  const* ssend, uchar32 * dstr, uchar32 * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		uchar32 *		copy(uchar16 const* sstr, uchar16 const* ssend, uchar32 * dstr, uchar32 * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		uchar32 *		copy(uchar32 const* sstr, uchar32 const* ssend, uchar32 * dstr, uchar32 * dend, ETermType copy_term_type)
-		{
-			while (sstr < ssend && dstr < dend)
-			{
-				uchar32 c;
-				sstr = read(sstr, c);
-				dstr = write(c, dstr);
-				if (dstr >= dend)
-					return dstr;
-			}
-			if (copy_term_type == TERMINATOR_WRITE)
-				write('\0', dstr);
-			return dstr;
-		}
-
-		// ==========================================================================================================================
-
-		uchar const*	read(uchar const* str, uchar32& out_c)
-		{
-			if (is_eos(str))
-			{
-				out_c = '\0';
-				return str;
-			}
-			uchar c = *str++;
-			out_c = c;
-			return str;
 		}
 
 		uchar8 const*	read(uchar8 const* str, uchar32& out_c)
@@ -331,91 +268,6 @@ namespace xcore
 			}
 			return ++str;
 		}
-
-		// Read utf-8 rune backwards (used in string reverse)
-		uchar8  const *	rread(uchar8  const * str, uchar32& out_c)
-		{
-			uchar8 c = str[-1];
-			s32 l = 0;
-			if ((c & 0x80) == 0x00) { l = 1; }
-			else if ((c & 0xe0) == 0xc0) { l = 2; }
-			else if ((c & 0xf0) == 0xe0) { l = 3; }
-			else if ((c & 0xf8) == 0xf0) { l = 4; }
-
-			out_c = 0;
-			for (s32 i = 0; i<l; i++) {
-				c = str[0-i];
-				out_c = out_c << 8;
-				out_c = out_c | c;
-			}
-			return str - l;
-		}
-
-		uchar16 const*	read(uchar16 const* str, uchar32& out_c)
-		{
-			if (is_eos(str))
-			{
-				out_c = '\0';
-				return str;
-			}
-			uchar16 c = *str;
-
-			s32 l = 0;
-			if (c < 0xd800) { l = 1; }
-			else if (c < 0xdc00) { l = 2; }
-
-			out_c = 0;
-			for (s32 i = 0; i<l; i++) {
-				c = str[i];
-				out_c = out_c << 16;
-				out_c = out_c | c;
-			}
-			return str + l;
-		}
-
-		uchar32 const *	read(uchar32 const * str, uchar32& out_c)
-		{
-			out_c = *str;
-			return str + 1;
-		}
-
-		bool		is_eos(uchar const* str)
-		{
-			return *str == 0;
-		}
-		bool		is_eos(uchar8 const* str)
-		{
-			return *str == 0;
-		}
-		bool		is_eos(uchar16 const* str)
-		{
-			return *str == 0;
-		}
-		bool		is_eos(uchar32 const* str)
-		{
-			return *str == 0;
-		}
-
-		bool		is_crln(uchar const* ustr)
-		{
-			return ustr[0] == '\r' && ustr[1] == '\n';
-		}
-
-		bool		is_crln(uchar8 const* ustr)
-		{
-			return ustr[0] == '\r' && ustr[1] == '\n';
-		}
-
-		bool		is_crln(uchar16 const* ustr)
-		{
-			return ustr[0] == '\r' && ustr[1] == '\n';
-		}
-
-		bool		is_crln(uchar32 const* ustr)
-		{
-			return ustr[0] == '\r' && ustr[1] == '\n';
-		}
-
 
 	}	// utf
 };

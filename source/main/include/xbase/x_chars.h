@@ -17,12 +17,15 @@ namespace xcore
 	class xuchars
 	{
 	public:
+					xuchars();
 					xuchars(uchar* str);
 					xuchars(uchar* str, uchar* end);
 					xuchars(uchar* str, uchar* end, const xcuchars& other);
 
 		u32			size() const;
+
 		bool		is_empty() const;
+		bool		is_full() const;
 
 		void		reset();
 		void		clear();
@@ -40,6 +43,7 @@ namespace xcore
 		xuchars&	operator = (const xuchars& other);
 		xuchars&	operator = (const xcuchars& other);
 
+		xuchars&	operator += (uchar other);
 		xuchars&	operator += (const char* other);
 		xuchars&	operator += (const xuchars& other);
 		xuchars&	operator += (const xcuchars& other);
@@ -106,90 +110,6 @@ namespace xcore
 		uchar const*m_str;
 		uchar const*m_end;
 	};
-
-
-	// --------------------------------------------------------------------------------------
-	// --------------------------------------------------------------------------------------
-	class xcuchar32s;
-
-	// a mutable range of []uchar32 (UTF-32)
-	class xuchar32s
-	{
-	public:
-					xuchar32s(uchar32* str);
-					xuchar32s(uchar32* str, uchar32* end);
-					xuchar32s(uchar32* str, uchar32* end, const xcuchar32s& other);
-
-		u32			size() const;
-		void		reset();
-		void		clear();
-
-		xcuchar32s	cchars() const;
-
-		void		copy(const xuchar32s& other);
-		void		copy(const xcuchar32s& other);
-
-		s32			compare(const xuchar32s& other) const;
-		s32			compare(const xcuchar32s& other) const;
-
-		xuchar32s&	operator = (const xuchar32s& other);
-		xuchar32s&	operator = (const xcuchar32s& other);
-
-		bool		operator == (const xuchar32s& other) const;
-		bool		operator != (const xuchar32s& other) const;
-		bool		operator <  (const xuchar32s& other) const;
-		bool		operator <= (const xuchar32s& other) const;
-		bool		operator >  (const xuchar32s& other) const;
-		bool		operator >= (const xuchar32s& other) const;
-		
-		bool		operator == (const xcuchar32s& other) const;
-		bool		operator != (const xcuchar32s& other) const;
-		bool		operator <  (const xcuchar32s& other) const;
-		bool		operator <= (const xcuchar32s& other) const;
-		bool		operator >  (const xcuchar32s& other) const;
-		bool		operator >= (const xcuchar32s& other) const;
-
-		uchar32&	operator [] (int i);
-		uchar32		operator [] (int i) const;
-
-		uchar32*	m_str;
-		uchar32*	m_end;
-	};
-
-	// --------------------------------------------------------------------------------------
-	// --------------------------------------------------------------------------------------
-	// a read-only range of []uchar32 (UTF-32)
-	class xcuchar32s
-	{
-	public:
-		inline		xcuchar32s(uchar32 const* str) : m_str(str), m_end(str) { while (*m_end != '\0') ++m_end; }
-		inline		xcuchar32s(uchar32 const* str, uchar32 const* end) : m_str(str), m_end(end) { }
-
-		u32			size() const { return (u32)(u64)(m_end - m_str); }
-
-		s32			compare(const xuchar32s& other) const;
-		s32			compare(const xcuchar32s& other) const;
-
-		bool		operator == (const xuchar32s& other) const;
-		bool		operator != (const xuchar32s& other) const;
-		bool		operator <  (const xuchar32s& other) const;
-		bool		operator <= (const xuchar32s& other) const;
-		bool		operator >  (const xuchar32s& other) const;
-		bool		operator >= (const xuchar32s& other) const;
-
-		bool		operator == (const xcuchar32s& other) const;
-		bool		operator != (const xcuchar32s& other) const;
-		bool		operator <  (const xcuchar32s& other) const;
-		bool		operator <= (const xcuchar32s& other) const;
-		bool		operator >  (const xcuchar32s& other) const;
-		bool		operator >= (const xcuchar32s& other) const;
-
-		uchar32		operator [] (int i) const;
-
-		uchar32 const*m_str;
-		uchar32 const*m_end;
-	};
-
 
 	#define XUCHARS(name, len)													\
 	class name																	\
@@ -283,6 +203,102 @@ namespace xcore
 		uchar *		m_end;														\
 	}
 
+
+	// --------------------------------------------------------------------------------------
+	//  _    _ _______ ______   ____ ___  
+	// | |  | |__   __|  ____| |___ \__ \ 
+	// | |  | |  | |  | |__      __) | ) |
+	// | |  | |  | |  |  __|    |__ < / / 
+	// | |__| |  | |  | |       ___) / /_ 
+	//  \____/   |_|  |_|      |____/____|
+	// --------------------------------------------------------------------------------------
+	class xcuchar32s;
+
+	// a mutable range of []uchar32 (UTF-32)
+	class xuchar32s
+	{
+	public:
+					xuchar32s(uchar32* str);
+					xuchar32s(uchar32* str, uchar32* end);
+					xuchar32s(uchar32* str, uchar32* end, const xcuchar32s& other);
+
+		u32			size() const;
+		void		reset();
+		void		clear();
+
+		xcuchar32s	cchars() const;
+
+		void		copy(const xuchar32s& other);
+		void		copy(const xcuchar32s& other);
+
+		s32			compare(const xuchar32s& other) const;
+		s32			compare(const xcuchar32s& other) const;
+
+		xuchar32s&	operator = (const xuchar32s& other);
+		xuchar32s&	operator = (const xcuchar32s& other);
+
+		bool		operator == (const xuchar32s& other) const;
+		bool		operator != (const xuchar32s& other) const;
+		bool		operator <  (const xuchar32s& other) const;
+		bool		operator <= (const xuchar32s& other) const;
+		bool		operator >  (const xuchar32s& other) const;
+		bool		operator >= (const xuchar32s& other) const;
+		
+		bool		operator == (const xcuchar32s& other) const;
+		bool		operator != (const xcuchar32s& other) const;
+		bool		operator <  (const xcuchar32s& other) const;
+		bool		operator <= (const xcuchar32s& other) const;
+		bool		operator >  (const xcuchar32s& other) const;
+		bool		operator >= (const xcuchar32s& other) const;
+
+		uchar32&	operator [] (int i);
+		uchar32		operator [] (int i) const;
+
+		uchar32*	m_str;
+		uchar32*	m_end;
+	};
+
+	// --------------------------------------------------------------------------------------
+	// a read-only range of []uchar32 (UTF-32)
+	class xcuchar32s
+	{
+	public:
+		inline		xcuchar32s(uchar32 const* str) : m_str(str), m_end(str) { while (*m_end != '\0') ++m_end; }
+		inline		xcuchar32s(uchar32 const* str, uchar32 const* end) : m_str(str), m_end(end) 
+		{ 
+			if (m_end == NULL)
+			{
+				m_end = str;
+				while (*m_end != '\0')
+					++m_end;
+			}
+		}
+
+		u32			size() const { return (u32)(u64)(m_end - m_str); }
+
+		s32			compare(const xuchar32s& other) const;
+		s32			compare(const xcuchar32s& other) const;
+
+		bool		operator == (const xuchar32s& other) const;
+		bool		operator != (const xuchar32s& other) const;
+		bool		operator <  (const xuchar32s& other) const;
+		bool		operator <= (const xuchar32s& other) const;
+		bool		operator >  (const xuchar32s& other) const;
+		bool		operator >= (const xuchar32s& other) const;
+
+		bool		operator == (const xcuchar32s& other) const;
+		bool		operator != (const xcuchar32s& other) const;
+		bool		operator <  (const xcuchar32s& other) const;
+		bool		operator <= (const xcuchar32s& other) const;
+		bool		operator >  (const xcuchar32s& other) const;
+		bool		operator >= (const xcuchar32s& other) const;
+
+		uchar32		operator [] (int i) const;
+
+		uchar32 const*m_str;
+		uchar32 const*m_end;
+	};
+
 	#define XUCHAR32S(name, len)												\
 	class name																	\
 	{																			\
@@ -375,6 +391,8 @@ namespace xcore
 	}
 
 
+	// --------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------
 
 	// Inline functions
 	#include "xbase/private/x_chars.h"
@@ -388,6 +406,15 @@ namespace xcore
 	XUCHARS(xuchars512, 512);
 	XUCHARS(xuchars1024, 1024);
 
+	XUCHARS(xuchar8s8, 8);
+	XUCHARS(xuchar8s16, 16);
+	XUCHARS(xuchar8s32, 32);
+	XUCHARS(xuchar8s64, 64);
+	XUCHARS(xuchar8s128, 128);
+	XUCHARS(xuchar8s256, 256);
+	XUCHARS(xuchar8s512, 512);
+	XUCHARS(xuchar8s1024, 1024);
+
 	XUCHAR32S(xuchar32s16, 16);
 	XUCHAR32S(xuchar32s32, 32);
 	XUCHAR32S(xuchar32s64, 64);
@@ -396,8 +423,16 @@ namespace xcore
 	XUCHAR32S(xuchar32s512, 512);
 	XUCHAR32S(xuchar32s1024, 1024);
 
+
+
 	// --------------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------------
+	inline				xuchars::xuchars()
+		: m_str("")
+		, m_end(m_str)
+		, m_eos(m_str)
+	{
+	}
 	inline				xuchars::xuchars(uchar* str)
 		: m_str(str)
 		, m_end(str)
@@ -428,8 +463,13 @@ namespace xcore
 	}
 
 	inline bool			xuchars::is_empty() const
-	{ 
+	{
 		return m_str == m_end;
+	}
+
+	inline bool			xuchars::is_full() const
+	{
+		return m_end == m_eos;
 	}
 
 	inline void			xuchars::reset()
@@ -487,6 +527,50 @@ namespace xcore
 		return self.compare(other);
 	}
 
+	inline xuchars&		xuchars::operator += (uchar other)
+	{
+		if (m_end < m_eos)
+		{
+			*m_end++ = other;
+			*m_end = '\0';
+		}
+		return *this;
+	}
+
+	inline xuchars&		xuchars::operator += (const char* other)
+	{
+		while (m_end < m_eos && *other != '\0')
+		{
+			*m_end++ = *other++;
+			*m_end = '\0';
+		}
+		if (m_end < m_eos)
+		{
+			*m_end = '\0';
+		}
+		return *this;
+	}
+
+	inline xuchars&		xuchars::operator += (const xuchars& other)
+	{
+		xuchars str(other);
+		while (!str.is_empty() && !is_full())
+		{
+			*m_end++ = str[0];
+		}
+		return *this;
+	}
+
+	inline xuchars&		xuchars::operator += (const xcuchars& other)
+	{
+		xcuchars str(other);
+		while (!str.is_empty() && !is_full())
+		{
+			*m_end++ = str[0];
+		}
+		return *this;
+	}
+	
 	inline xuchars&	xuchars::operator = (const char* _other)
 	{
 		xcuchars other(_other);
@@ -650,18 +734,21 @@ namespace xcore
 		m_end = str;
 		while (*m_end != '\0') 
 			++m_end; 
+		return *this;
 	}
 
 	inline xcuchars& xcuchars::operator = (const xuchars& str)
 	{
 		m_str = str.m_str;
 		m_end = str.m_end;
+		return *this;
 	}
 
 	inline xcuchars& xcuchars::operator = (const xcuchars& str)
 	{
 		m_str = str.m_str;
 		m_end = str.m_end;
+		return *this;
 	}
 
 	inline bool		xcuchars::operator == (const xuchars& other) const

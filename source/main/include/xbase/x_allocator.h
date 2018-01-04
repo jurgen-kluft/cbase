@@ -48,6 +48,28 @@ namespace xcore
 		virtual				~x_iallocator() {}
 	};
 
+	class xallocator
+	{
+		x_iallocator*	m_allocator;
+	public:
+		inline			xallocator(x_iallocator* all) : m_allocator(all) {}
+		void*			allocate(xsize_t size, u32 align) 
+		{
+			return m_allocator->allocate(size, align); 
+		}
+
+		void*			reallocate(void* p, xsize_t size, u32 align)
+		{
+			return m_allocator->reallocate(p, size, align);
+		}
+
+		void			deallocate(void* p)
+		{
+			m_allocator->deallocate(p);
+		}
+	};
+
+
 	#define XCORE_CLASS_PLACEMENT_NEW_DELETE														\
 		void*	operator new(xcore::xsize_t num_bytes, void* mem)			{ return mem; }			\
 		void	operator delete(void* mem, void* )							{ }						\
