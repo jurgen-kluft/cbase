@@ -18,10 +18,10 @@ namespace xcore
 	//----------------------------------------------------------------------------------------------------------------
 	// Custom QuickSort
 
-	extern void xqsort(void *a /*element_array*/,
-		s32 n /*element_count*/,
-		s32 es /*element_size*/,
-		s32 (*cmp)(const void* const, const void* const, u32),
+	extern void xqsort(void *a,	// element_array
+		s32 n,					// element_count
+		s32 es,					// element_size
+		s32 (*cmp)(const void* const le, const void* const re, u32 data),
 		u32 data = 0);
 
 	//==============================================================================

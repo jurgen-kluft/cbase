@@ -48,22 +48,6 @@ namespace xcore
 		}
 
 		//------------------------------------------------------------------------------
-		static bool				read_char(xuchars& src, uchar32& out_c)
-		{
-			s32 const l = peek_char(src, out_c);
-			src.m_str += l;
-			return l > 0;
-		}
-
-		//------------------------------------------------------------------------------
-		static bool				read_char(xcuchars& src, uchar32& out_c)
-		{
-			s32 l = peek_char(src, out_c);
-			src.m_str += l;
-			return l > 0;
-		}
-
-		//------------------------------------------------------------------------------
 		static bool				write_char(uchar32 c, xuchars& dst)
 		{
 			if (!dst.is_full())
@@ -74,6 +58,22 @@ namespace xcore
 				return true;
 			}
 			return false;
+		}
+
+		//------------------------------------------------------------------------------
+		static bool				read_char(runes& src, uchar32& out_c)
+		{
+			s32 const l = peek_char(src, out_c);
+			src.m_str += l;
+			return l > 0;
+		}
+
+		//------------------------------------------------------------------------------
+		static bool				read_char(crunes& src, uchar32& out_c)
+		{
+			s32 l = peek_char(src, out_c);
+			src.m_str += l;
+			return l > 0;
 		}
 
 		//------------------------------------------------------------------------------
@@ -364,7 +364,8 @@ namespace xcore
 		crunes	parse(crunes const& _str, bool& value)
 		{
 			crunes str = _str;
-			crunes format("%b");
+			rune format_str[] = { '%', 'b' };
+			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -372,13 +373,14 @@ namespace xcore
 		crunes	parse(crunes const& _str, s32& value, s32 base)
 		{
 			crunes str = _str;
-			crunes format;
+			rune format_str[] = { '%', 'd' };
 			switch (base)
 			{
-			case 16: format = "%x"; break;
-			case 10: format = "%d"; break;
-			case 8: format = "%o"; break;
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'd'; break;
+			case 8: format_str[1] = 'o'; break;
 			};
+			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -386,13 +388,14 @@ namespace xcore
 		crunes	parse(crunes const& _str, u32& value, s32 base)
 		{
 			crunes str = _str;
-			crunes format;
+			rune format_str[] = { '%', 'd' };
 			switch (base)
 			{
-			case 16: format = "%x"; break;
-			case 10: format = "%d"; break;
-			case 8: format = "%o"; break;
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'd'; break;
+			case 8: format_str[1] = 'o'; break;
 			};
+			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -400,13 +403,14 @@ namespace xcore
 		crunes	parse(crunes const& _str, s64& value, s32 base)
 		{
 			crunes str = _str;
-			crunes format;
+			rune format_str[] = { '%', 'd' };
 			switch (base)
 			{
-			case 16: format = "%x"; break;
-			case 10: format = "%d"; break;
-			case 8: format = "%o"; break;
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'd'; break;
+			case 8: format_str[1] = 'o'; break;
 			};
+			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -414,13 +418,14 @@ namespace xcore
 		crunes	parse(crunes& _str, u64& value, s32 base)
 		{
 			crunes str = _str;
-			crunes format;
+			rune format_str[] = { '%', 'd' };
 			switch (base)
 			{
-			case 16: format = "%x"; break;
-			case 10: format = "%d"; break;
-			case 8: format = "%o"; break;
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'd'; break;
+			case 8: format_str[1] = 'o'; break;
 			};
+			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -428,7 +433,8 @@ namespace xcore
 		crunes	parse(crunes const& _str, f32& value)
 		{
 			crunes str = _str;
-			crunes format("%f");
+			rune format_str[] = { '%', 'f' };
+			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -436,7 +442,8 @@ namespace xcore
 		crunes	parse(crunes const& _str, f64& value)
 		{
 			crunes str = _str;
-			crunes format("%f");
+			rune format_str[] = { '%', 'f' };
+			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -488,7 +495,9 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		bool is_float(crunes const& _str)
 		{
-			crunes f32chars("Ee.#QNABIF");
+			rune f32chars_str[] = { 'E','e','.','#','Q','N','A','B','I','F' };
+			crunes f32chars(f32chars_str);
+
 			crunes str = _str;
 			uchar32 c;
 			while (read_char(str, c)) {
@@ -503,7 +512,9 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		bool is_GUID(crunes const& _str)
 		{
-			crunes f32chars("Ee.#QNABIF");
+			rune f32chars_str[] = { 'E','e','.','#','Q','N','A','B','I','F' };
+			crunes f32chars(f32chars_str);
+
 			crunes str = _str;
 
 			// Does it have only 0-9, a-f, A-F characters
@@ -531,25 +542,27 @@ namespace xcore
 
 		void	to_string(runes& str, s32 val, s32 base)
 		{
-			crunes format;
+			rune format_str[] = { '%', 'd' };
 			switch (base)
 			{
-			case 16: format = "%x"; break;
-			case 10: format = "%d"; break;
-			case 8: format = "%o"; break;
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'd'; break;
+			case 8: format_str[1] = 'o'; break;
 			};
+			crunes format(format_str);
 			sprintf(str, format, x_va(val));
 		}
 
 		void	to_string(runes& str, u32 val, s32 base)
 		{
-			crunes format;
+			rune format_str[] = { '%', 'u' };
 			switch (base)
 			{
-			case 16: format = "%x"; break;
-			case 10: format = "%u"; break;
-			case 8: format = "%o"; break;
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'u'; break;
+			case 8: format_str[1] = 'o'; break;
 			};
+			crunes format(format_str);
 			sprintf(str, format, x_va(val));
 		}
 
@@ -557,25 +570,27 @@ namespace xcore
 
 		void	to_string(runes& str, s64 val, s32 base)
 		{
-			crunes format;
+			rune format_str[] = { '%', 'd' };
 			switch (base)
 			{
-			case 16: format = "%x"; break;
-			case 10: format = "%d"; break;
-			case 8: format = "%o"; break;
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'd'; break;
+			case 8: format_str[1] = 'o'; break;
 			};
+			crunes format(format_str);
 			sprintf(str, format, x_va(val));
 		}
 
 		void	to_string(runes& str, u64 val, s32 base)
 		{
-			crunes format;
+			rune format_str[] = { '%', 'd' };
 			switch (base)
 			{
-			case 16: format = "%x"; break;
-			case 10: format = "%u"; break;
-			case 8: format = "%o"; break;
+			case 16: format_str[1] = 'x'; break;
+			case 10: format_str[1] = 'd'; break;
+			case 8: format_str[1] = 'o'; break;
 			};
+			crunes format(format_str);
 			sprintf(str, format, x_va(val));
 		}
 

@@ -47,12 +47,11 @@ namespace xcore
 
 	//-------------------------------------------------------------------------------
 
-	void xguid::toString( char* str, s32 str_max_len ) const
+	void xguid::toString(xuchars& str)const
 	{ 
 		// high, word2, word1, low
-		const uchar* fmt = (const uchar*)"%08X:%08X:%08X:%08X";
-		const uchar* fmt_end = fmt + 19;
-		ascii::sprintf((uchar*)str, (uchar const*)str + str_max_len, fmt, fmt_end, x_va(mGuid.ma32[0]), x_va(mGuid.ma32[1]), x_va(mGuid.ma32[2]), x_va(mGuid.ma32[3]) );
+		xcuchars fmt("%08X:%08X:%08X:%08X");
+		ascii::sprintf(str, fmt, x_va(mGuid.ma32[0]), x_va(mGuid.ma32[1]), x_va(mGuid.ma32[2]), x_va(mGuid.ma32[3]) );
 	}
 
 
@@ -71,15 +70,14 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	void xguid::fromString( const char* strGuid )
+	void xguid::fromString(xcuchars const& _str)
 	{
 		setNull();
-		if (strGuid == NULL)
-			return;
 
+		xcuchars str = _str;
 		for (s32 i=0, s=0; s<32; i++)
 		{
-			const char c = strGuid[i];
+			char c = *str.m_str++;
 			if (c == '\0')
 				break;
 

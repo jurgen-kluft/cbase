@@ -55,7 +55,7 @@ namespace xcore
 				if (c > 0x7f) {
 					c = '?';
 				}
-				str.m_str[0] = c;
+				str.m_str[0] = (uchar)c;
 				str.m_str++;
 				return true;
 			}
@@ -78,7 +78,7 @@ namespace xcore
 			xcuchars src = sstr;
 			while (true)
 			{
-				uchar c = read(src);
+				uchar32 c = read(src);
 				if (c == '\0')
 					break;
 				if (!write(c, dstr))
@@ -108,7 +108,7 @@ namespace xcore
 			xcuchars src = sstr;
 			while (true)
 			{
-				uchar c = read(src);
+				uchar32 c = read(src);
 				if (c == '\0')
 					break;
 				if (!write(c, dstr))
@@ -169,22 +169,22 @@ namespace xcore
 
 		bool			is_crln(xuchars   const& str)
 		{
-			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[0] == '\n');
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 		bool			is_crln(xuchar32s const& str)
 		{
-			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[0] == '\n');
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 		bool			is_crln(xcuchars   const& str)
 		{
-			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[0] == '\n');
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 		bool			is_crln(xcuchar32s const& str)
 		{
-			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[0] == '\n');
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 
@@ -279,72 +279,6 @@ namespace xcore
 	namespace utf8
 	{
 
-		//------------------------------------------------------------------------------
-		static inline uchar32	peek_char(pcrune str, s32* len = NULL)
-		{
-			rune c = *str;
-			if ((c & 0x80) == 0x00)
-			{
-				if (len != NULL)
-					*len = 1;
-				return (uchar32)c;
-			}
-
-			s32 l = 0;
-			if ((c & 0xe0) == 0xc0) { l = 2; }
-			else if ((c & 0xf0) == 0xe0) { l = 3; }
-			else if ((c & 0xf8) == 0xf0) { l = 4; }
-
-			uchar32 c32 = 0;
-			for (s32 i = 0; i<l; i++)
-			{
-				c = str[i];
-				c32 = c32 << 8;
-				c32 = c32 | c;
-			}
-
-			if (len != NULL)
-				*len = l;
-
-			return c32;
-		}
-
-		//------------------------------------------------------------------------------
-		static u8				sUTF8LC[] = { 0, 0, 0xc0, 0xe0, 0xf0 };
-		static prune			write_char(uchar32 c, prune str, pcrune end)
-		{
-			s32 len = 0;
-			if (c <= 0x7f) { len = 1; }
-			else if (c < 0x0800) { len = 2; }
-			else if (c < 0xd800) { len = 3; }
-			else if (c < 0xe000) { len = 0; }
-			else if (c < 0x010000) { len = 3; }
-			else if (c < 0x110000) { len = 4; }
-
-			if (len == 0)
-			{
-				return str;
-			}
-			if ((str + len) > end)
-			{
-				return str;
-			}
-
-			if (str != NULL)
-			{
-				u32 const mask = 0x0F0E0C00;
-				switch (len)
-				{
-				case 4: str[3] = (c & 0x3f) | 0x80; c = c >> 6;
-				case 3: str[2] = (c & 0x3f) | 0x80; c = c >> 6;
-				case 2: str[1] = (c & 0x3f) | 0x80; c = c >> 6;
-				case 1: str[0] = (rune)c | (0xFF & (mask >> (len * 4)));
-				};
-			}
-			return str + len;
-		}
-
-		#include "x_string_funcs.cpp"
 	}
 
 
@@ -353,27 +287,38 @@ namespace xcore
 
 	namespace utf32
 	{
-
-		//------------------------------------------------------------------------------
-		static inline uchar32	peek_char(pcrune str, s32* len = NULL)
+		static inline s32		peek_char(runes const& src, uchar32& out_c)
 		{
-			rune c = *str;
-			if (len != NULL)
-				*len = 1;
-			return c;
+			out_c = '\0';
+			if (!src.is_empty())
+			{
+				out_c = src.m_str[0];
+				return 1;
+			}
+			return 0;
+		}
+		static inline s32		peek_char(crunes const& src, uchar32& out_c)
+		{
+			out_c = '\0';
+			if (!src.is_empty())
+			{
+				out_c = src.m_str[0];
+				return 1;
+			}
+			return 0;
 		}
 
 		//------------------------------------------------------------------------------
-		static prune			write_char(uchar32 c, prune str, pcrune end)
+		static bool				write_char(uchar32 c, runes& dst)
 		{
-			if (str < end)
+			if (!dst.is_full())
 			{
-				if (str != NULL)
-				{
-					*str++ = c;
-				}
+				if (c > 0x7f)
+					c = '?';
+				*dst.m_end++ = (uchar)c;
+				return true;
 			}
-			return str;
+			return false;
 		}
 
 		#include "x_string_funcs.cpp"

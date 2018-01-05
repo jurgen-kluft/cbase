@@ -61,15 +61,10 @@ namespace xcore
 		}
 	}
 
-	void xqsort(void *a /*element_array*/,
-		s32 n /*element_count*/,
-		s32 es /*element_size*/,
-		s32 (*cmp)(const void* const, const void* const, u32),
-		u32 data)
+	void xqsort(void *a, s32 n, s32 es, s32 (*cmp)(const void* const, const void* const, u32), u32 data)
 	{
 		xbyte *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 		s32 d, r, swaptype, swap_cnt;
-
 	loop:	
 		__xqsort_SWAPINIT(a, es);
 		swap_cnt = 0;

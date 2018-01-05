@@ -62,9 +62,6 @@ namespace xcore
 		bool		operator >  (const xcuchars& other) const;
 		bool		operator >= (const xcuchars& other) const;
 
-		uchar&		operator [] (int i);
-		uchar		operator [] (int i) const;
-
 		uchar*		m_str;
 		uchar*		m_end;
 		uchar*		m_eos;
@@ -104,8 +101,6 @@ namespace xcore
 		bool		operator <= (const xcuchars& other) const;
 		bool		operator >  (const xcuchars& other) const;
 		bool		operator >= (const xcuchars& other) const;
-
-		uchar		operator [] (int i) const;
 
 		uchar const*m_str;
 		uchar const*m_end;
@@ -185,20 +180,6 @@ namespace xcore
 		bool		operator <= (const name& other) const {						\
 			return compare(other) <= 0;											\
 		}																		\
-		uchar&		operator [] (int i) {										\
-			if (i < 0)															\
-				return m_str[0];												\
-			if (i >= (s32)size())												\
-				return m_str[(s32)size() - 1];									\
-			return m_str[i];													\
-		}																		\
-		uchar		operator [] (int i) const {									\
-			if (i < 0)															\
-				return m_str[0];												\
-			if (i >= (s32)size())												\
-				return m_str[(s32)size() - 1];									\
-			return m_str[i];													\
-		}																		\
 		uchar		m_str[len];													\
 		uchar *		m_end;														\
 	}
@@ -218,11 +199,16 @@ namespace xcore
 	class xuchar32s
 	{
 	public:
+					xuchar32s();
 					xuchar32s(uchar32* str);
 					xuchar32s(uchar32* str, uchar32* end);
 					xuchar32s(uchar32* str, uchar32* end, const xcuchar32s& other);
 
 		u32			size() const;
+
+		bool		is_empty() const;
+		bool		is_full() const;
+
 		void		reset();
 		void		clear();
 
@@ -251,11 +237,9 @@ namespace xcore
 		bool		operator >  (const xcuchar32s& other) const;
 		bool		operator >= (const xcuchar32s& other) const;
 
-		uchar32&	operator [] (int i);
-		uchar32		operator [] (int i) const;
-
 		uchar32*	m_str;
 		uchar32*	m_end;
+		uchar32*	m_eos;
 	};
 
 	// --------------------------------------------------------------------------------------
@@ -263,6 +247,7 @@ namespace xcore
 	class xcuchar32s
 	{
 	public:
+		inline		xcuchar32s() : m_str(NULL), m_end(NULL) { }
 		inline		xcuchar32s(uchar32 const* str) : m_str(str), m_end(str) { while (*m_end != '\0') ++m_end; }
 		inline		xcuchar32s(uchar32 const* str, uchar32 const* end) : m_str(str), m_end(end) 
 		{ 
@@ -275,6 +260,8 @@ namespace xcore
 		}
 
 		u32			size() const { return (u32)(u64)(m_end - m_str); }
+
+		bool		is_empty() const;
 
 		s32			compare(const xuchar32s& other) const;
 		s32			compare(const xcuchar32s& other) const;
@@ -292,8 +279,6 @@ namespace xcore
 		bool		operator <= (const xcuchar32s& other) const;
 		bool		operator >  (const xcuchar32s& other) const;
 		bool		operator >= (const xcuchar32s& other) const;
-
-		uchar32		operator [] (int i) const;
 
 		uchar32 const*m_str;
 		uchar32 const*m_end;
@@ -371,20 +356,6 @@ namespace xcore
 		}																		\
 		bool		operator <= (const name& other) const {						\
 			return compare(other) <= 0;											\
-		}																		\
-		uchar32&		operator [] (int i) {									\
-			if (i < 0)															\
-				return m_str[0];												\
-			if (i >= (s32)size())												\
-				return m_str[(s32)size() - 1];									\
-			return m_str[i];													\
-		}																		\
-		uchar32		operator [] (int i) const {									\
-			if (i < 0)															\
-				return m_str[0];												\
-			if (i >= (s32)size())												\
-				return m_str[(s32)size() - 1];									\
-			return m_str[i];													\
 		}																		\
 		uchar32		m_str[len];													\
 		uchar32 *	m_end;														\
@@ -556,7 +527,7 @@ namespace xcore
 		xuchars str(other);
 		while (!str.is_empty() && !is_full())
 		{
-			*m_end++ = str[0];
+			*m_end++ = *str.m_str++;
 		}
 		return *this;
 	}
@@ -566,7 +537,7 @@ namespace xcore
 		xcuchars str(other);
 		while (!str.is_empty() && !is_full())
 		{
-			*m_end++ = str[0];
+			*m_end++ = *str.m_str++;
 		}
 		return *this;
 	}
@@ -650,25 +621,25 @@ namespace xcore
 		return compare(other) >= 0;
 	}
 
-	inline uchar&	xuchars::operator [] (int i)
-	{
-		if (i < 0) {
-			i = 0; 
-		} else if (i >= (int)size()) {
-			i = size() - 1;
-		}
-		return m_str[i];
-	}
+	//inline uchar&	xuchars::operator [] (int i)
+	//{
+	//	if (i < 0) {
+	//		i = 0; 
+	//	} else if (i >= (int)size()) {
+	//		i = size() - 1;
+	//	}
+	//	return m_str[i];
+	//}
 
-	inline uchar	xuchars::operator [] (int i) const
-	{
-		if (i < 0) {
-			i = 0; 
-		} else if (i >= (int)size()) {
-			i = size() - 1;
-		}
-		return m_str[i];
-	}
+	//inline uchar	xuchars::operator [] (int i) const
+	//{
+	//	if (i < 0) {
+	//		i = 0; 
+	//	} else if (i >= (int)size()) {
+	//		i = size() - 1;
+	//	}
+	//	return m_str[i];
+	//}
 
 	// --------------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------------
@@ -809,16 +780,6 @@ namespace xcore
 	inline bool		xcuchars::operator >= (const xcuchars& other) const
 	{
 		return compare(other) >= 0;
-	}
-
-	inline uchar	xcuchars::operator [] (int i) const
-	{
-		if (i < 0)
-			return m_str[i];
-		s32 const max = (int)size() - 1;
-		if (i > max)
-			return m_str[max];
-		return m_str[i];
 	}
 
 }

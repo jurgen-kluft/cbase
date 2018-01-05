@@ -58,9 +58,9 @@ namespace xcore
 		};
 
 		typedef s32(*ConsoleColorDelegate)(xconsole::EColor);
-		typedef s32 (*ConsoleOutDelegate)(const uchar*, const uchar*);
-		typedef s32(*ConsoleOut8Delegate)(const uchar8*, const uchar8*);
-		typedef s32 (*ConsoleOut32Delegate)(const uchar32*, const uchar32*);
+		typedef s32 (*ConsoleOutDelegate)(xcuchars const& str);
+		typedef s32 (*ConsoleOut8Delegate)(xcuchar8s const& str);
+		typedef s32 (*ConsoleOut32Delegate)(xcuchar32s const& str);
 
 		static void				set_console_store(xiconsole_store* store);
 		static void				add_default_console();
@@ -127,9 +127,9 @@ namespace xcore
 	{
 		extern s32				color(xconsole::EColor color);
 
-		extern s32				write_uchar(const uchar* str, const uchar* str_end);
-		extern s32				write_uchar8(const uchar8* str, const uchar8* str_end);
-		extern s32				write_uchar32(const uchar32* str, const uchar32* str_end);
+		extern s32				write_uchar(xcuchars const& str);
+		extern s32				write_uchar8(xcuchar8s const& str);
+		extern s32				write_uchar32(xcuchar32s const& str);
 	};
 
 	/// Interface class, has specific (or configurable) implementations for different environments/platforms

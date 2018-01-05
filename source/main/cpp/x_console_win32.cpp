@@ -54,7 +54,7 @@ namespace xcore
 			return l;
 		}
 
-		s32 write_uchar8(const uchar8* str, const uchar8* str_end)
+		s32 write_uchar8(xcuchar8s const& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen + 4];

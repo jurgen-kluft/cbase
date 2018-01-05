@@ -109,12 +109,9 @@ namespace xcore
 		//
 		// Create the report to print
 		//
-		char report_buffer[1024 + 1];
-		uchar* report = (uchar*)&report_buffer[0];
-		uchar const* report_eos = report + 1024;
-		uchar const* fmt = (uchar const*)"*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n";
-		uchar const* fmt_eos = fmt + (4*12);
-		ascii::sprintf(report, report_eos, fmt, fmt_eos, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
+		xuchars1024 report;
+		xcuchars fmt("*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n");
+		ascii::sprintf(report.chars(), fmt, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
 
 		//
 		// Dump the scope info

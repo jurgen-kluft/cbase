@@ -11,8 +11,8 @@
 
 namespace xcore
 {
-	class xcstring;
-	class xccstring;
+	class xuchars;
+	class xcuchars;
 
 	/**
 	 * Author:
@@ -41,8 +41,8 @@ namespace xcore
 		bool		operator == (const xguid&) const;
 		bool		operator != (const xguid&) const;
 
-		void		toString(char* str, s32 str_max_len) const;     
-		void		fromString(const char*);
+		void		toString(xuchars& str) const;     
+		void		fromString(xcuchars const& str);
 
 	private:
 		enum ESizes
