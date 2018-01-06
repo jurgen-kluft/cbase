@@ -125,7 +125,12 @@ namespace xcore
 
 	template<typename T>
 	void				make(memory mem, array_t<T>& proto, s32 cap, s32 len);
-
+	template<typename T>
+	bool				iterate(array_iter_t<T>& iter, array_t<T>& container);
+	template<typename T>
+	bool				append(array_t<T>& array, T const& element);
+	template<typename T>
+	void				sort(array_t<T>& array);
 
 	// ----------------------------------------------------------------------------------------
 	//   FREELIST
@@ -221,6 +226,9 @@ namespace xcore
 	template<typename K, typename V>
 	void				make(memory mem, map_t<K, V>& proto, s32 cap);
 
+	template<typename K, typename V>
+	bool				iterate(map_iter_t<K, V>& iter, map_t<K, V>& container);
+
 	// ----------------------------------------------------------------------------------------
 	//   QUEUE
 	// ----------------------------------------------------------------------------------------
@@ -295,19 +303,6 @@ namespace xcore
 		xbyte*				mData;
 	};
 
-
-	// ----------------------------------------------------------------------------------------
-	//   FUNCTIONS
-	// ----------------------------------------------------------------------------------------
-	template<typename T>
-	bool				range(array_iter_t<T>& iter, array_t<T>& container);
-	template<typename T>
-	bool				append(array_t<T>& array, T const& element);
-	template<typename T>
-	void				sort(array_t<T>& array);
-
-	template<typename K, typename V>
-	bool				range(map_iter_t<K, V>& iter, map_t<K, V>& container);
 
 	template<typename T>
 	bool				range(queue_iter_t<T>& iter, queue_t<T>& container);

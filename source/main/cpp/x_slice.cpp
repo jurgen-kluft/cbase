@@ -207,56 +207,130 @@ namespace xcore
 
 	count_t		count(s32 value) { return value; }
 
+
 	template<typename T>
 	class range_t
 	{
 	public:
-		inline		range_t(until_t<T> _until);
+		inline		range_t(until_t<T> _until);		
 		inline		range_t(from_t<T> _from, until_t<T> _until);
 		inline		range_t(from_t<T> _from, count_t _count);
+		inline		range_t(range_t<T> const& range) ;
 
-		typedef		range_iter_t<T>		iter_t;
-		iter_t		forward(step_t<T> step = 1) const;
-		iter_t		backward(step_t<T> step = 1) const;
+		s32			index() const	{ return m_index; }
+		T			item() const	{ return m_current; }
+
+		enum EState { STATE_START, STATE_ITER, STATE_END };
+		enum EMode { MODE_INIT, MODE_ITER };
+
+		bool		forward()
+		{
+			switch (iter.m_state) {
+		 	case range_t<T>::STATE_START:
+				m_index = 0;
+				m_current = m_from;
+				m_state = STATE_ITER;
+				break;
+			case range_t<T>::STATE_ITER:
+				iter.m_index += 1;
+				iter.m_current += iter.m_step;
+				if (iter.m_current >= iter.m_to) {
+					iter.m_state = STATE_END;
+				}
+				break;
+			case STATE_END:
+				return false;
+			}
+			return true;
+		}
+
+		bool		backward()
+		{
+			switch (iter.m_state) {
+		 	case range_t<T>::STATE_START:
+				m_index = 0;
+				m_current = m_to - m_step;
+				m_state = STATE_ITER;
+				break;
+			case range_t<T>::STATE_ITER:
+				iter.m_index += 1;
+				iter.m_current -= iter.m_step;
+				if (iter.m_current <= iter.m_from) {
+					iter.m_state = STATE_END;
+				}
+				break;
+			case STATE_END:
+				return false;
+			}
+			return true;
+		}
 
 		T			m_from;
 		T			m_to;
-	};
-
-	template<typename T>
-	class range_iter_t
-	{
-	public:
-		inline		range_iter_t(range_t<T>& range, step_t<T> step) : m_range(range), m_index(0), m_current(range.m_from), m_step(step) {}
-
-		s32			index() const { return m_index; }
-		T			item() const { return m_current; }
-
-		range_t<T>&	m_range;
+		s32			m_state;
 		s32			m_index;
 		T			m_current;
 		T			m_step;
 	};
 
+	
 	template<typename T>
-	bool		range(range_iter_t<T>& iter, range_t<T>& range);
+	inline range_t::range_t(until_t<T> u)
+		: m_state(STATE_START)
+		, m_index(0)
+		, m_step(1)
+	{
+		m_from = 0;
+		m_to = _until.m_until;
+		m_current = m_from;
+	}
 
+	template<typename T>
+	inline range_t::range_t(from_t<T> _from, until_t<T> _until)
+		: m_state(STATE_START)
+		, m_index(0)
+		, m_step(1)
+	{
+		m_from = _from.m_from;
+		m_to = _until.m_until;
+		m_current = m_from;
+	}
+
+	template<typename T>
+	inline range_t::range_t(from_t<T> _from, count_t _count)
+		: m_state(STATE_START)
+		, m_index(0)
+		, m_step(1)
+	{
+		m_from = _from.m_from;
+		m_to = m_from + _count;
+		m_current = m_from;
+	}
+
+	template<typename T>
+	bool		forward(range_t<T>& iter)
+	{
+		return iter.forward();
+	}
+
+	template<typename T>
+	bool		backward(range_t<T>& iter)
+	{
+		return iter.backward();
+	}
 
 	static void test_t(x_iallocator* allocator)
 	{
-		u32	runes[] = { 0, 1, 2, 3 };
-
 		memory mem(allocator);
 
 		array_t<s32> integers;
 		make(mem, integers, 100, 0);
 
-		// 99 -> 0
-		range_t<s32> range_100_0(from(0), count(100));
-		auto iter_99_0 = range_100_0.backward();
-		while (range(iter_99_0, range_100_0))
-			append(integers, iter_99_0.item());
-
+		// New Version: 99 -> 0
+		range_t<s32> iter(from(0), count(100));
+		while (forward(iter)) {
+			append(integers, iter.item());
+		}
 		// 0 -> 99
 		sort(integers);
 
@@ -265,7 +339,7 @@ namespace xcore
 		make(mem, int_to_float, 100);
 
 		auto iter = integers.begin();
-		while (range(iter, integers)) {
+		while (iterate(iter, integers)) {
 			int_to_float[*iter] = f;
 			f += 0.1f;
 		}
