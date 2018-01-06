@@ -111,8 +111,9 @@ namespace xcore
 		s32				len() const;
 		s32				cap() const;
 
-		slice_t<T>		operator () (s32 to) const;
-		slice_t<T>		operator () (s32 from, s32 to) const;
+		// Slice functionality
+		array_t<T>		operator () (s32 to) const;
+		array_t<T>		operator () (s32 from, s32 to) const;
 
 		T &				operator [] (s32 index);
 		T const &		operator [] (s32 index) const;
@@ -126,7 +127,7 @@ namespace xcore
 	template<typename T>
 	void				make(memory mem, array_t<T>& proto, s32 cap, s32 len);
 	template<typename T>
-	bool				iterate(array_iter_t<T>& iter, array_t<T>& container);
+	bool				iterate(array_iter_t<T>& iter);
 	template<typename T>
 	bool				append(array_t<T>& array, T const& element);
 	template<typename T>
@@ -158,6 +159,28 @@ namespace xcore
 	template<typename T>
 	void				make(memory mem, freelist_t<T>& proto, s32 cap);
 
+	template<typename T>
+	class indexed_t
+	{
+	public:
+		inline			indexed_t() : m_free(NULL), m_items(NULL) {}
+
+		u32				size() const;
+		u32				max() const;
+
+		bool			is_empty() const;
+		bool			is_full() const;
+
+		bool			alloc(T*& ptr, u32& index);
+		void			dealloc(u32 index);
+
+	protected:
+		array_t<u32>	m_free;
+		array_t<T>		m_items;
+	};
+
+	template<typename T>
+	void				make(memory mem, indexed_t<T>& proto, s32 cap);
 
 
 	// ----------------------------------------------------------------------------------------
@@ -171,6 +194,16 @@ namespace xcore
 		K				m_key;
 		V				m_value;
 	};
+
+	// 32 bytes
+	class map_node_t
+	{
+	public:
+		// Highest bit indicates if it is another node or an item
+		// Index-0 means NULL
+		u32				m_nodes[8];
+	};
+
 
 	template<typename K, typename V>
 	class map_iter_t
@@ -194,6 +227,7 @@ namespace xcore
 	template<typename K>
 	u32		map_key_hash(K const& key) { return map_key_hasher((xbyte const*)&key, sizeof(u32)); }
 
+
 	template<typename K, typename V>
 	class map_t
 	{
@@ -209,18 +243,18 @@ namespace xcore
 		map_iter_t<K, V> begin();
 
 	protected:
-		void			grow();
-
 		typedef			map_item_t<K, V>	item_t;
+		typedef			map_node_t			node_t;
 
 		K				m_empty_key;
 		V				m_empty_value;
 
-		freelist_t<item_t>	m_items;
+		indexed_t<item_t>	m_items;
+		indexed_t<node_t>	m_nodes;
 
 		memory			m_mem;
 		u32				m_size;
-		array_t<item_t*> m_table;
+		node_t			m_table;	// root node
 	};
 
 	template<typename K, typename V>
@@ -275,6 +309,8 @@ namespace xcore
 
 	template<typename T>
 	void				make(memory mem, queue_t<T>& proto, s32 cap);
+	template<typename T>
+	bool				append(queue_t<T>& array, T const& element);
 
 
 	// ----------------------------------------------------------------------------------------

@@ -217,8 +217,11 @@ namespace xcore
 		inline		range_t(from_t<T> _from, count_t _count);
 		inline		range_t(range_t<T> const& range) ;
 
-		s32			index() const	{ return m_index; }
-		T			item() const	{ return m_current; }
+		s32			index() const				{ return m_index; }
+		T			item() const				{ return m_current; }
+
+		T &			operator * (void)			{ return m_current; }
+		T const&	operator * (void) const		{ return m_current; }
 
 		enum EState { STATE_START, STATE_ITER, STATE_END };
 		enum EMode { MODE_INIT, MODE_ITER };
@@ -226,12 +229,12 @@ namespace xcore
 		bool		forward()
 		{
 			switch (iter.m_state) {
-		 	case range_t<T>::STATE_START:
+		 	case STATE_START:
 				m_index = 0;
 				m_current = m_from;
 				m_state = STATE_ITER;
 				break;
-			case range_t<T>::STATE_ITER:
+			case STATE_ITER:
 				iter.m_index += 1;
 				iter.m_current += iter.m_step;
 				if (iter.m_current >= iter.m_to) {
@@ -323,42 +326,52 @@ namespace xcore
 	{
 		memory mem(allocator);
 
-		array_t<s32> integers;
-		make(mem, integers, 100, 0);
+		array_t<s32> int100;
+		make(mem, int100, 100, 0);
 
 		// New Version: 99 -> 0
-		range_t<s32> iter(from(0), count(100));
-		while (forward(iter)) {
-			append(integers, iter.item());
+		range_t<s32> rng_iter(from(0), count(100));
+		while (forward(rng_iter)) {
+			append(int100, *rng_iter);
 		}
+
 		// 0 -> 99
-		sort(integers);
+		sort(int100);
+
+		// 0 -> 49
+		auto int50 = int100(0, 50);
 
 		f32 f = 0.0f;
 		map_t<s32, f32> int_to_float;
 		make(mem, int_to_float, 100);
 
-		auto iter = integers.begin();
-		while (iterate(iter, integers)) {
-			int_to_float[*iter] = f;
+		auto int100_iter = int100.begin();
+		while (iterate(int100_iter)) {
+			int_to_float[*int100_iter] = f;
 			f += 0.1f;
 		}
 
-		auto int_0_1 = integers(0, 2);
+		// Slice the array into a view of just 2 elements
+		// This will NOT make a copy of the data, only when
+		// you now 'resize' one of them.
+		auto int2 = int100(0, 2);
 
-		s32 int0 = int_0_1[0];
-		s32 int1 = int_0_1[1];
+		s32 int0 = int2[0];
+		s32 int1 = int2[1];
 
-		queue_t<s32> q;
-		make(mem, q, 100);
+		queue_t<s32> q100;
+		make(mem, q100, 100);
 
-		q.push(0);
-		q.push(1);
-		q.push(2);
-		q.push(3);
-		
+		// You can just start the range iterator again
+		while (forward(rng_iter)) {
+			append(q100, *rng_iter);
+		}
+
+		// And again!
 		s32 qi;
-		q.pop(qi);
+		while (forward(rng_iter)) {
+			q100.pop(qi);
+		}
 	}
 
 }
