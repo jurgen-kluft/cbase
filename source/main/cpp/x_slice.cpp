@@ -165,6 +165,11 @@ namespace xcore
 		mData = mData->decref(); 
 	}
 
+	u64		map_key_hasher(xbyte const* data, u32 size)
+	{
+		// xxhash ?
+		return 0;
+	}
 
 
 	// ----------------------------------------------------------------------------------------

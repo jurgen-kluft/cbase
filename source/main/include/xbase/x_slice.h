@@ -270,8 +270,22 @@ namespace xcore
 	public:
 		enum { SIZE = 4 };
 		u32				m_nodes[SIZE];
+
+		u32				get(u8 idx) const { return m_nodes[idx]; }
+
 		void			set(map_node_indexer const& idxr, u32 depth, u32 item);
 		u32				get(map_node_indexer const& idxr, u32 depth) const;
+
+		bool			find(u8& idx) const
+		{
+			while (idx < SIZE)
+			{
+				if (!map_index::is_null(m_nodes[idx]))
+					return true;
+				++idx;
+			}
+			return false;
+		}
 	};
 
 	struct map_node_indexer;
@@ -342,6 +356,9 @@ namespace xcore
 
 	struct map_table_t
 	{
+		u32					get(u32 idx) const {
+			return m_table[idx];
+		}
 		u32					get(map_node_indexer& ni)
 		{
 			u32 idx = ni.root();
@@ -375,6 +392,58 @@ namespace xcore
 		K const&		key() const		{ return m_item->m_key; }
 		V const&		value() const	{ return m_item->m_value; }
 
+		bool			next()
+		{
+			while (m_stack_idx == 0) {
+				if (m_table_index < m_table_size) {
+					// Find next non null entry in the root table
+					u32 ientry = 0;
+					do {
+						++m_table_index;
+						ientry = m_table->get(m_table_index);
+					while (map_index::is_null(ientry) && m_table_index < m_table_size);
+
+					// Push it onto the stack
+					if (map_index::is_item(ientry))
+					{
+						m_stack_entry[m_stack_index++] = ientry;
+					} else if (map_index::is_node(ientry)) {
+						map_node_t* pnode = m_nodes.get(ientry);
+						for (s32 i=0; i<map_node_t::SIZE; ++i) {
+							ientry = pnode->get(i);
+							if (!map_index::is_null(i))) {
+								m_stack_node[m_stack_index++] = ientry;
+							}
+						}
+					}
+				} else {
+					return false;
+				}
+			}
+
+			while (m_stack_idx > 0) {
+				// Get something from the stack.
+				// When we get an entry from the stack 
+				// check if it is a node or an item.
+				u32 ientry = m_stack_node[--m_stack_idx];
+				if (map_index::is_item(ientry)) {
+					m_item = m_items.get(ientry);
+					break;
+				} 
+				else {
+					map_node_t* pnode = m_nodes->get(ientry);
+					for (s32 i=0; i<map_node_t::SIZE; ++i) {
+						ientry = pnode->get(i);
+						if (!map_index::is_null(i))) {
+							m_stack_node[m_stack_index++] = ientry;
+						}
+					}
+				}
+			}
+
+			return true;
+		}
+
 	protected:
 		s32				m_idx;
 		s32				m_max;
@@ -385,7 +454,7 @@ namespace xcore
 		map_items_t*	m_items;
 
 		u32				m_stack_idx;
-		u32				m_stack[32];
+		u32				m_stack_entry[32*map_node_t::SIZE];
 
 		u32				m_table_index;
 		u32				m_table_size;
