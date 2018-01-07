@@ -171,6 +171,8 @@ namespace xcore
 		bool			is_empty() const;
 		bool			is_full() const;
 
+		T*				get_ptr(u32 idx);
+
 		bool			alloc(T*& ptr, u32& index);
 		void			dealloc(u32 index);
 
@@ -186,7 +188,33 @@ namespace xcore
 	// ----------------------------------------------------------------------------------------
 	//   MAP
 	// ----------------------------------------------------------------------------------------
-
+	struct map_index
+	{
+		static bool			is_null(u32 idx)
+		{
+			return (idx & 0x7fffffff) == 0x0;
+		}
+		static bool			is_node(u32 idx)
+		{
+			return (idx & 0x80000000) == 0x80000000;
+		}
+		static bool			is_item(u32 idx)
+		{
+			return !is_null(idx) && !is_node(idx);
+		}
+		static u32			make_node_idx(u32 idx)
+		{
+			return idx | 0x80000000;
+		}
+		static u32			make_item_idx(u32 idx)
+		{
+			return idx & 0x7fffffff;
+		}
+		static u32			get_idx(u32 idx)
+		{
+			return idx & 0x7fffffff;
+		}
+	};
 	template<typename K, typename V>
 	class map_item_t
 	{
@@ -195,13 +223,145 @@ namespace xcore
 		V				m_value;
 	};
 
-	// 32 bytes
+	template<typename K, typename V>
+	class map_items_t
+	{
+	public:
+		typedef			map_item_t<K, V>	item_t;
+		indexed_t<item_t> m_items;
+
+		u32					alloc()
+		{
+			teim_t* ptr;
+			u32 idx;
+			m_items.alloc(ptr, idx);
+			return idx;
+		}
+
+		item_t*				get_item(u32 idx)
+		{
+			item_t* item = m_items.get_ptr(idx);
+			return item;
+		}
+	};
+
+	struct map_nodes_t
+	{
+		typedef				map_node_t			node_t;
+		indexed_t<node_t>	m_nodes;
+
+		u32					alloc()
+		{
+			node_t* ptr;
+			u32 idx;
+			m_nodes.alloc(ptr, idx);
+			return idx;
+		}
+
+		node_t*				get(u32 idx)
+		{
+			node_t* node = m_nodes.get_ptr(idx);
+			return node;
+		}
+	};
+
 	class map_node_t
 	{
 	public:
-		// Highest bit indicates if it is another node or an item
-		// Index-0 means NULL
-		u32				m_nodes[8];
+		enum { SIZE = 4 };
+		u32				m_nodes[SIZE];
+		void			set(map_node_indexer const& idxr, u32 depth, u32 item);
+		u32				get(map_node_indexer const& idxr, u32 depth) const;
+	};
+
+	struct map_node_indexer;
+	struct map_table_t
+	{
+		u32					get(map_node_indexer& ni);
+		void				set(u32 root, u32 idx);
+	
+		// The initial size of the root table does have an impact
+		// on the performance of this map. The larger the table
+		// the better performance however this does use more
+		// memory. Mostly it is sufficient to put the root table
+		// size to around 25% of the maximum amount if items that
+		// you are going to insert.
+		// Initial size MUST be a power-of-2 like 1024, 2048, 8192.
+		// Default is 1024
+		u32					m_table_po2;	// root table size in power-of-2 (1<<x)
+		u32					*m_table;		// root table 
+	};
+
+
+	// Node Indexer can give you the index at every level, from root down-to the last node of
+	// the key that you initialized it with.
+	// Default 
+	struct map_node_indexer
+	{
+		u64				m_key;
+		u32				m_mask;
+		u32				m_rshift;	// root shift
+		u32				m_dshift;	// delta shift
+
+		u32				initialize(u64 key, u64 rshift=10, u64 node_size=map_node_t::SIZE)
+		{
+			m_key = key;
+			m_mask = (1 << node_size) - 1;
+			m_rshift = rshift;
+			m_dshift = node_size;
+			return root();
+		}
+
+		u32				max_depth() const
+		{
+			// e.g.: (64 - 10) / 2 = 17
+			return ((sizeof(m_key) * 8) - m_rshift) / m_dshift;
+		}
+
+		u32				root() const
+		{
+			return (u32)(m_key & ((u64(1) << m_rshift) - 1));
+		}
+
+		u32				get(u32 depth) const
+		{
+			u32 shift = m_rshift + depth * m_dshift;
+			return (u32)((m_key >> shift) & m_mask);
+		}
+	};
+
+	// Iterate down the hierarchy until we find a place to put our item
+	inline u32		map_node_t::get(map_node_indexer const& indxr, u32 depth) const
+	{
+		return 0;
+	}
+
+
+	// Forward declare
+	class map_node_t;
+
+	struct map_table_t
+	{
+		u32					get(map_node_indexer& ni)
+		{
+			u32 idx = ni.root();
+			return m_table[idx];
+		}
+		void				set(u32 root, u32 idx)
+		{
+			m_table[root] = idx;
+		}
+
+		// The initial size of the root table does have an impact
+		// on the performance of this map. The larger the table
+		// the better performance however this does use more
+		// memory. Mostly it is sufficient to put the root table
+		// size to around 25% of the maximum amount if items that
+		// you are going to insert.
+		// Initial size MUST be a power-of-2 like 1024, 2048, 8192.
+		// Default is 1024
+		u32					m_table_po2;	// root table size in power-of-2 (1<<x)
+		u32					*m_table;		// root table 
 	};
 
 
@@ -212,20 +372,30 @@ namespace xcore
 		map_iter_t(array_t<map_item_t<K, V>*>& table) : m_idx(0), m_max(0), m_table(table) {}
 
 		s32				index() const	{ return m_idx; }
-		K const&		key() const		{ return m_table[m_idx].m_key; }
-		V const&		value() const	{ return m_table[m_idx].m_value; }
+		K const&		key() const		{ return m_item->m_key; }
+		V const&		value() const	{ return m_item->m_value; }
 
 	protected:
-		// Iteration variables
 		s32				m_idx;
 		s32				m_max;
-		array_t<map_item_t<K,V>*>& m_table;
+
+		map_item_t*		m_item;
+
+		map_nodes_t*	m_nodes;
+		map_items_t*	m_items;
+
+		u32				m_stack_idx;
+		u32				m_stack[32];
+
+		u32				m_table_index;
+		u32				m_table_size;
+		map_table_t*	m_table;
 	};
 
-	u32		map_key_hasher(xbyte const* data, u32 size);
+	u64		map_key_hasher(xbyte const* data, u32 size);
 
 	template<typename K>
-	u32		map_key_hash(K const& key) { return map_key_hasher((xbyte const*)&key, sizeof(u32)); }
+	u64		map_key_hash(K const& key) { return map_key_hasher((xbyte const*)&key, sizeof(u32)); }
 
 
 	template<typename K, typename V>
@@ -243,18 +413,133 @@ namespace xcore
 		map_iter_t<K, V> begin();
 
 	protected:
-		typedef			map_item_t<K, V>	item_t;
-		typedef			map_node_t			node_t;
+		map_item_t<K, V>* get(K const& key) const
+		{
+			map_node_indexer indxr;
+			indxr.initialize(map_key_hash<K>(key));
+
+			map_node_t* pnode = NULL;
+
+			u32 const ientry = m_table.get(indxr);
+			if (map_index::is_item(ientry))
+			{
+				u32 const iitem = map_index::get_idx(ientry);
+				// We need to put a node here
+				// We also need the hash of the key of this item
+				map_item_t<K, V>* pitem = m_items.get_item(iitem);
+				return pitem;
+			}
+			else if (map_index::is_node(ientry)) {
+				// The entry in the table is a node, ok
+				u32 const inode = map_index::get_idx(ientry);
+				pnode = m_nodes.get(inode);
+			}
+			else if (map_index::is_null(ientry)) {
+				return NULL;
+			}
+
+			u32 depth = 1;
+			while (depth < indxr.max_depth())
+			{
+				u32 const ientry = pnode->get(indxr);
+				if (map_index::is_item(ientry))
+				{
+					u32 const iitem = map_index::get_idx(ientry);
+					// We need to put a node here
+					// We also need the hash of the key of this item
+					map_item_t<K, V>* pitem = m_items.get_item(iitem);
+					return pitem;
+				}
+				else if (map_index::is_node(ientry)) {
+					// The entry is a node, ok
+					u32 const inode = map_index::get_idx(ientry);
+					pnode = m_nodes.get(inode);
+				}
+				else if (map_index::is_null(ientry)) {
+					return NULL;
+				}
+				++depth;
+			}
+		}
+
+		void			add(K const& key, V const& value)
+		{
+			map_node_indexer indxr;
+			indxr.initialize(map_key_hash<K>(key));
+			
+			u32 depth = 0;
+			map_node_t* pnode = NULL;
+			while (depth < 17)
+			{
+				if (depth == 0)
+				{
+					u32 const ientry = m_table.get(indxr);
+					if (map_index::is_item(ientry))
+					{
+						u32 const iitem = map_index::get_idx(ientry);
+						// We need to put a node here
+						// We also need the hash of the key of this item
+						map_item_t<K, V>* pitem = m_items.get_item(iitem);
+						u32 const inode = m_nodes.alloc() | 0x80000000;
+						pnode = m_nodes.get(map_index::get_idx(inode));
+						map_node_indexer indxr2;
+						indxr2.initialize(map_key_hash<K>(pitem->m_key));
+						pnode->set(indxr2, depth + 1, iitem);
+						m_table.set(indxr, inode);
+					} else if (map_index::is_node(ientry)) {
+						// The entry in the table is a node, ok
+						u32 const inode = map_index::get_idx(ientry);
+						pnode = m_nodes.get(inode);
+					} else if (map_index::is_null(ientry)) {
+						// We can put the item here and we are done
+						u32 const iitem = m_items.alloc();
+						map_item_t<K, V>* pitem = m_items.get(iitem);
+						pitem->m_key = key;
+						pitem->m_value = value;
+						m_table.set(indxr, iitem);
+						break;
+					}
+				} else {
+					// We are at depth > 0 and we have a node
+					u32 const ientry = pnode->get(indxr);
+					if (map_index::is_item(ientry))
+					{
+						u32 const iitem = map_index::get_idx(ientry);
+						// We need to put a node here
+						// We also need the hash of the key of this item
+						map_item_t<K, V>* pitem = m_items.get_item(iitem);
+						u32 const inode = m_nodes.alloc() | 0x80000000;
+						pnode2 = m_nodes.get(map_index::get_idx(inode));
+						map_node_indexer indxr2;
+						indxr2.initialize(map_key_hash<K>(pitem->m_key));
+						pnode2->set(indxr2, depth + 1, iitem);
+					} else if (map_index::is_node(ientry)) {
+						// The entry is a node, ok
+						u32 const inode = map_index::get_idx(ientry);
+						pnode = m_nodes.get(inode);
+					} else if (map_index::is_null(ientry)) {
+						// We can put the item here and we are done
+						u32 const iitem = m_items.alloc();
+						map_item_t<K, V>* pitem = m_items.get(iitem);
+						pitem->m_key = key;
+						pitem->m_value = value;
+						pnode->set(indxr, iitem);
+						break;
+					}
+				}
+
+				++depth;
+			}
+		}
 
 		K				m_empty_key;
 		V				m_empty_value;
 
-		indexed_t<item_t>	m_items;
-		indexed_t<node_t>	m_nodes;
-
 		memory			m_mem;
-		u32				m_size;
-		node_t			m_table;	// root node
+
+		map_items_t		m_items;
+		map_nodes_t		m_nodes;
+		map_table_t		m_table;
 	};
 
 	template<typename K, typename V>
