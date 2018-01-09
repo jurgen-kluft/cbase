@@ -167,6 +167,12 @@ namespace xcore
 	}
 
 	template<typename T>
+	inline bool		iterate(range_t<T>& iter)
+	{
+		return iter.forward();
+	}
+
+	template<typename T>
 	inline bool		backward(range_t<T>& iter)
 	{
 		return iter.backward();

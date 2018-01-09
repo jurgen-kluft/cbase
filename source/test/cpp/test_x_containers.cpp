@@ -31,6 +31,10 @@ UNITTEST_SUITE_BEGIN(containers)
 			// 0 -> 99
 			sort(int100);
 
+			// Indexed items
+			indexed_t<s32> indexed_int100;
+			make(mem, indexed_int100, 100);
+
 			// 0 -> 49
 			auto int50 = int100(0, 50);
 
