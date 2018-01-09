@@ -21,8 +21,8 @@ namespace xcore
 	extern void xqsort(void *a,	// element_array
 		s32 n,					// element_count
 		s32 es,					// element_size
-		s32 (*cmp)(const void* const le, const void* const re, u32 data),
-		u32 data = 0);
+		s32 (*cmp)(const void* const le, const void* const re, void* data),
+		void* data = 0);
 
 	//==============================================================================
 	// END xCore namespace

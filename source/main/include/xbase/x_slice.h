@@ -12,6 +12,7 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_integer.h"
 #include "xbase/x_memory_std.h"
+#include "xbase/x_qsort.h"
 
 
 //==============================================================================
@@ -40,19 +41,25 @@ namespace xcore
 	struct slice
 	{
 						slice();
-						slice(x_iallocator* allocator, s32 tosize);
+						slice(x_iallocator* allocator, u32 item_count, u32 item_size);
 						slice(slice_data* data, s32 from, s32 to);
 						slice(slice const& other);
 						~slice();
 
-		static void		alloc(slice& slice, x_iallocator* allocator, s32 tosize);
+		static void		alloc(slice& slice, x_iallocator* allocator, u32 item_count, u32 item_size);
 
-		void			resize(s32 len);
-		s32				length() const;
+		u32				size() const;
+		u32				refcnt() const;
+
+		void			resize(u32 count);
 
 		slice			view(u32 from, u32 to) const;
 
-		void			release();
+		slice			obtain() const;
+		void			release() const;
+
+		void*			get_at(s32 index);
+		void const*		get_at(s32 index) const;
 
 		slice_data*		mData;
 		u32				mFrom;
@@ -64,6 +71,8 @@ namespace xcore
 	{
 	public:
 						slice_t();
+						slice_t(memory mem, s32 size);
+						slice_t(slice_t<T> const& other);
 
 		s32				size() const;
 
@@ -73,11 +82,75 @@ namespace xcore
 		T &				operator [] (s32 index);
 		T const &		operator [] (s32 index) const;
 
-		slice_data*		m_data;
+		slice			m_slice;
+
+	protected:
+						slice_t(slice& slice) : m_slice(data->incref()) {}
 	};
 
 	template<typename T>
+	inline slice_t<T>::slice_t()
+		: m_slice()
+	{
+	}
+
+	template<typename T>
+	inline slice_t<T>::slice_t(memory mem, s32 count)
+		: m_slice(mem.m_allocator, count, sizeof(T))
+	{
+	}
+
+	template<typename T>
+	inline slice_t<T>::slice_t(slice_t<T> const& other)
+		: m_slice(other.m_slice.obtain())
+	{
+	}
+
+	template<typename T>
+	inline s32			slice_t<T>::size() const
+	{
+		return m_slice.size();
+	}
+
+	template<typename T>
+	inline slice_t<T>	slice_t<T>::operator () (s32 to) const
+	{
+		slice_t<T> slice;
+		slice.m_slice = m_slice.view(0, to);
+		return slice;
+	}
+	
+	template<typename T>
+	inline slice_t<T>	slice_t<T>::operator () (s32 from, s32 to) const
+	{
+		slice_t<T> slice;
+		slice.m_slice = m_slice.view(from, to);
+		return slice;
+	}
+
+	template<typename T>
+	inline T &			slice_t<T>::operator [] (s32 index)
+	{
+		T * item = (T *)m_slice.get_at(index);
+		return *item;
+	}
+
+	template<typename T>
+	inline T const &	slice_t<T>::operator [] (s32 index) const
+	{
+		T const* item = (T const*)m_slice.get_at(index);
+		return *item;
+	}
+
+
+	template<typename T>
 	void				make(memory mem, slice_t<T>& proto, s32 size);
+
+	template<typename T>
+	inline void			make(memory mem, slice_t<T>& proto, s32 size)
+	{
+		slice::alloc(proto.m_slice, mem.m_allocator, size, sizeof(T));
+	}
 
 	// ----------------------------------------------------------------------------------------
 	//   ARRAY
@@ -89,18 +162,35 @@ namespace xcore
 	class array_iter_t
 	{
 	public:
-						array_iter_t(array_t<T>& _array) : m_index(0), m_array(_array) {}
+						array_iter_t(array_t<T> const& _array) : m_index(0), m_array(_array) {}
 
-		s32				index() const { return m_index; }
-		T const&		item() const { return m_array[m_index]; }
+		s32				index() const			{ return m_index; }
+		T const&		item() const			{ return m_array[m_index]; }
 
-		T &				operator * (void)		{ return m_array[m_index]; }
 		T const&		operator * (void) const	{ return m_array[m_index]; }
 
+		bool			next()
+		{
+			if (m_index >= m_array.size())
+				return false;
+			++m_index;
+			return true;
+		}
+
 	protected:
-		s32				m_index;
-		array_t<T>&		m_array;
+		u32				m_index;
+		array_t<T> const&	m_array;
 	};
+
+	template<typename T>
+	s32					compare_t(T const& a, T const& b)
+	{
+		if (a < b)
+			return -1;
+		else if (a > b)
+			return 1;
+		return 0;
+	}
 
 	template<typename T>
 	class array_t
@@ -108,10 +198,9 @@ namespace xcore
 	public:
 						array_t() : m_size(0) { }
 
-		s32				len() const;
-		s32				cap() const;
+		inline u32		size() const	{ return m_size; }
+		inline u32		max() const		{ return m_data.size(); }
 
-		// Slice functionality
 		array_t<T>		operator () (s32 to) const;
 		array_t<T>		operator () (s32 from, s32 to) const;
 
@@ -120,9 +209,59 @@ namespace xcore
 
 		array_iter_t<T>	begin() const;
 
+		static s32		compare(const void* const le, const void* const re, void* data)
+		{
+			T const& let = *(T const*)le;
+			T const& ret = *(T const*)re;
+			s32 const c = compare_t<T>(let, ret);
+			return c;
+		}
+
 		u32				m_size;
 		slice_t<T>		m_data;
 	};
+
+	template<typename T>
+	inline array_t<T>		array_t<T>::operator () (s32 to) const
+	{
+		array_t<T> other;
+		other.m_data = m_data(0, to);
+		other.m_size = m_size;
+		if (to < m_size)
+			other.m_size = to;
+		return other;
+	}
+
+	template<typename T>
+	inline array_t<T>		array_t<T>::operator () (s32 from, s32 to) const
+	{
+		array_t<T> other;
+		other.m_data = m_data(from, to);
+		other.m_size = m_size;
+		if ((u32)(to-from) < m_size)
+			other.m_size = (to - from);
+		return other;
+	}
+
+
+	template<typename T>
+	inline T &				array_t<T>::operator [] (s32 index)
+	{
+		return m_data[index];
+	}
+
+	template<typename T>
+	inline T const &		array_t<T>::operator [] (s32 index) const
+	{
+		return m_data[index];
+	}
+
+	template<typename T>
+	inline array_iter_t<T>	array_t<T>::begin() const
+	{
+		return array_iter_t<T>(*this);
+	}
+
 
 	template<typename T>
 	void				make(memory mem, array_t<T>& proto, s32 cap, s32 len);
@@ -132,6 +271,56 @@ namespace xcore
 	bool				append(array_t<T>& array, T const& element);
 	template<typename T>
 	void				sort(array_t<T>& array);
+
+
+	template<typename T>
+	inline void			make(memory mem, array_t<T>& proto, s32 cap, s32 len)
+	{
+		if (len > cap)
+			cap = len;
+
+		make(mem, proto.m_data, cap);
+		proto.m_size = len;
+	}
+
+	template<typename T>
+	inline bool			iterate(array_iter_t<T>& iter)
+	{
+		return iter.next();
+	}
+
+	template<typename T>
+	inline bool			append(array_t<T>& array, T const& element)
+	{
+		// Logic:
+		// Appending inline will only happen when the refcount on the
+		// data is 1, otherwise a new copy will be made.
+		u32 maxsize = array.m_data.size();
+		if (array.m_data.m_slice.refcnt() == 1 && (array.size() < maxsize))
+		{
+			array.m_data[array.m_size] = element;
+			array.m_size += 1;
+		}
+		else {
+			// Make a copy, first see what kind of size we need
+			if (array.size() == maxsize)
+				maxsize += 2 * (maxsize / 3);
+			array.m_data.m_slice.resize(maxsize);
+
+			array.m_data[array.m_size] = element;
+			array.m_size += 1;
+		}
+		return true;
+	}
+	
+	template<typename T>
+	inline void			sort(array_t<T>& array)
+	{
+		xbyte* data = array.m_data.m_slice.mData->mData;
+		u32 n = array.m_size;
+		u32 es = array.m_data.m_slice.mData->mItemSize;
+		xqsort(data, n, es, &array.compare, NULL);
+	}
 
 	// ----------------------------------------------------------------------------------------
 	//   FREELIST
@@ -245,6 +434,29 @@ namespace xcore
 		}
 	};
 
+	struct map_node_indexer;
+
+	class map_node_t
+	{
+	public:
+		enum { SIZE = 4 };
+		u32				m_nodes[SIZE];
+
+		u32				get(u8 idx) const { return m_nodes[idx]; }
+
+	
+		bool			find(u8& idx) const
+		{
+			while (idx < SIZE)
+			{
+				if (!map_index::is_null(m_nodes[idx]))
+					return true;
+				++idx;
+			}
+			return false;
+		}
+	};
+
 	struct map_nodes_t
 	{
 		typedef				map_node_t			node_t;
@@ -265,33 +477,11 @@ namespace xcore
 		}
 	};
 
-	class map_node_t
-	{
-	public:
-		enum { SIZE = 4 };
-		u32				m_nodes[SIZE];
-
-		u32				get(u8 idx) const { return m_nodes[idx]; }
-
-		void			set(map_node_indexer const& idxr, u32 depth, u32 item);
-		u32				get(map_node_indexer const& idxr, u32 depth) const;
-
-		bool			find(u8& idx) const
-		{
-			while (idx < SIZE)
-			{
-				if (!map_index::is_null(m_nodes[idx]))
-					return true;
-				++idx;
-			}
-			return false;
-		}
-	};
-
-	struct map_node_indexer;
 	struct map_table_t
 	{
 		u32					get(map_node_indexer& ni);
+
+		u32					get(u32 idx) const;
 		void				set(u32 root, u32 idx);
 	
 		// The initial size of the root table does have an impact
@@ -317,7 +507,7 @@ namespace xcore
 		u32				m_rshift;	// root shift
 		u32				m_dshift;	// delta shift
 
-		u32				initialize(u64 key, u64 rshift=10, u64 node_size=map_node_t::SIZE)
+		u32				initialize(u64 key, u32 rshift=10, u32 node_size=map_node_t::SIZE)
 		{
 			m_key = key;
 			m_mask = (1 << node_size) - 1;
@@ -344,42 +534,21 @@ namespace xcore
 		}
 	};
 
-	// Iterate down the hierarchy until we find a place to put our item
-	inline u32		map_node_t::get(map_node_indexer const& indxr, u32 depth) const
-	{
-		return 0;
+
+	inline u32			map_table_t::get(u32 idx) const {
+		return m_table[idx];
 	}
 
-
-	// Forward declare
-	class map_node_t;
-
-	struct map_table_t
+	inline u32			map_table_t::get(map_node_indexer& ni)
 	{
-		u32					get(u32 idx) const {
-			return m_table[idx];
-		}
-		u32					get(map_node_indexer& ni)
-		{
-			u32 idx = ni.root();
-			return m_table[idx];
-		}
-		void				set(u32 root, u32 idx)
-		{
-			m_table[root] = idx;
-		}
+		u32 idx = ni.root();
+		return m_table[idx];
+	}
 
-		// The initial size of the root table does have an impact
-		// on the performance of this map. The larger the table
-		// the better performance however this does use more
-		// memory. Mostly it is sufficient to put the root table
-		// size to around 25% of the maximum amount if items that
-		// you are going to insert.
-		// Initial size MUST be a power-of-2 like 1024, 2048, 8192.
-		// Default is 1024
-		u32					m_table_po2;	// root table size in power-of-2 (1<<x)
-		u32					*m_table;		// root table 
-	};
+	inline void			map_table_t::set(u32 root, u32 idx)
+	{
+		m_table[root] = idx;
+	}
 
 
 	template<typename K, typename V>
@@ -394,47 +563,61 @@ namespace xcore
 
 		bool			next()
 		{
-			while (m_stack_idx == 0) {
-				if (m_table_index < m_table_size) {
+			while (m_stack_idx == 0) 
+			{
+				if (m_table_index < m_table_size) 
+				{
 					// Find next non null entry in the root table
 					u32 ientry = 0;
-					do {
+					do
+					{
 						++m_table_index;
 						ientry = m_table->get(m_table_index);
-					while (map_index::is_null(ientry) && m_table_index < m_table_size);
+					} while (map_index::is_null(ientry) && m_table_index < m_table_size);
 
 					// Push it onto the stack
 					if (map_index::is_item(ientry))
 					{
 						m_stack_entry[m_stack_index++] = ientry;
-					} else if (map_index::is_node(ientry)) {
+					}
+					else if (map_index::is_node(ientry)) 
+					{
 						map_node_t* pnode = m_nodes.get(ientry);
-						for (s32 i=0; i<map_node_t::SIZE; ++i) {
+						for (s32 i=0; i<map_node_t::SIZE; ++i) 
+						{
 							ientry = pnode->get(i);
-							if (!map_index::is_null(i))) {
+							if (!map_index::is_null(i)) 
+							{
 								m_stack_node[m_stack_index++] = ientry;
 							}
 						}
 					}
-				} else {
+				} 
+				else 
+				{
 					return false;
 				}
 			}
 
-			while (m_stack_idx > 0) {
+			while (m_stack_idx > 0) 
+			{
 				// Get something from the stack.
 				// When we get an entry from the stack 
 				// check if it is a node or an item.
 				u32 ientry = m_stack_node[--m_stack_idx];
-				if (map_index::is_item(ientry)) {
+				if (map_index::is_item(ientry)) 
+				{
 					m_item = m_items.get(ientry);
 					break;
 				} 
-				else {
+				else 
+				{
 					map_node_t* pnode = m_nodes->get(ientry);
-					for (s32 i=0; i<map_node_t::SIZE; ++i) {
+					for (s32 i=0; i<map_node_t::SIZE; ++i) 
+					{
 						ientry = pnode->get(i);
-						if (!map_index::is_null(i))) {
+						if (!map_index::is_null(i)) 
+						{
 							m_stack_node[m_stack_index++] = ientry;
 						}
 					}
@@ -606,7 +789,7 @@ namespace xcore
 
 		memory			m_mem;
 
-		map_items_t		m_items;
+		map_items_t<K,V> m_items;
 		map_nodes_t		m_nodes;
 		map_table_t		m_table;
 	};
@@ -674,8 +857,8 @@ namespace xcore
 	struct slice_data
 	{
 		slice_data();
-		slice_data(u32 size);
-		slice_data(xbyte* data, u32 size);
+		slice_data(u32 item_count, u32 item_size);
+		slice_data(xbyte* data, u32 item_count, u32 item_size);
 
 		static slice_data	sNull;
 
@@ -685,10 +868,12 @@ namespace xcore
 
 		slice_data*			resize(s32 from, s32 to);
 
-		static slice_data*	alloc(x_iallocator* allocator, s32& tosize);
+		static slice_data*	alloc(x_iallocator* allocator, u32& to_itemcount, u32& to_itemsize);
 
 		mutable s32			mRefCount;
-		s32					mSize;						/// Number of allocated bytes
+		u32					mItemCount;					/// Count of total items
+		u32					mItemSize;					/// Size of one item
+		u32					mDummy;
 		x_iallocator*		mAllocator;
 		xbyte*				mData;
 	};

@@ -12,7 +12,7 @@ namespace xcore
 	// Custom QuickSort
 	namespace __xqsort
 	{
-		static inline xbyte*			sMed3(xbyte*, xbyte*, xbyte*, s32(*)(const void* const, const void* const, u32), u32);
+		static inline xbyte*			sMed3(xbyte*, xbyte*, xbyte*, s32(*)(const void* const, const void* const, void*), void*);
 		static inline void				sSwapFunc(xbyte*, xbyte*, s32, s32);
 
 		#define __xqsort_MIN(a, b)	(a) < (b) ? a : b
@@ -54,14 +54,13 @@ namespace xcore
 
 		#define __xqsort_VecSwap(a, b, n) 	if ((n) > 0) __xqsort::sSwapFunc(a, b, n, swaptype)
 
-		static inline xbyte* sMed3(xbyte* a, xbyte* b, xbyte* c,
-			s32 (*cmp)(const void* const, const void* const, u32), u32 data)
+		static inline xbyte* sMed3(xbyte* a, xbyte* b, xbyte* c, s32 (*cmp)(const void* const, const void* const, void*), void*data)
 		{
 			return cmp(a, b, data) < 0 ? (cmp(b, c, data) < 0 ? b : (cmp(a, c, data) < 0 ? c : a )) : (cmp(b, c, data) > 0 ? b : (cmp(a, c, data) < 0 ? a : c ));
 		}
 	}
 
-	void xqsort(void *a, s32 n, s32 es, s32 (*cmp)(const void* const, const void* const, u32), u32 data)
+	void xqsort(void *a, s32 n, s32 es, s32 (*cmp)(const void* const, const void* const, void*), void* data)
 	{
 		xbyte *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 		s32 d, r, swaptype, swap_cnt;

@@ -10,6 +10,7 @@
 #include "xbase/x_string_ascii.h"
 #include "xbase/x_console.h"
 #include "xbase/x_log.h"
+#include "xbase/x_chars.h"
 
 
 //==============================================================================

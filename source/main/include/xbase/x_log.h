@@ -20,6 +20,19 @@ namespace xcore
 	class x_va_list;
 	class xlog_imp;
 
+	template<typename T>
+	class xuchars_t;
+	template<typename T>
+	class xcuchars_t;
+
+	typedef xuchars_t<char>		xuchars;
+	typedef xuchars_t<uchar8>	xuchar8s;
+	typedef xuchars_t<uchar32>	xuchar32s;
+
+	typedef xcuchars_t<char>	xcuchars;
+	typedef xcuchars_t<uchar8>	xcuchar8s;
+	typedef xcuchars_t<uchar32>	xcuchar32s;
+
 	#define X_LOG
 
 	//==============================================================================
@@ -99,12 +112,10 @@ namespace xcore
 		static void 			write(ELevel inLevel, u64 _value);
 		static void 			write(ELevel inLevel, f32 _value);
 		static void 			write(ELevel inLevel, f64 _value);
-		static void 			write(ELevel inLevel, const char* buffer);
-		static void 			write(ELevel inLevel, const char* buffer, const char* buffer_end);
-		static void 			write(ELevel inLevel, const char* format, const x_va_list& arguments);
-		static void 			write(ELevel inLevel, const uchar32* buffer);
-		static void 			write(ELevel inLevel, const uchar32* buffer, const uchar32* buffer_end);
-		static void 			write(ELevel inLevel, const uchar32* format, const x_va_list& arguments);
+		static void 			write(ELevel inLevel, const xcuchars& str);
+		static void 			write(ELevel inLevel, const xcuchars& format, const x_va_list& arguments);
+		static void 			write(ELevel inLevel, const xcuchar32s& str);
+		static void 			write(ELevel inLevel, const xcuchar32s& format, const x_va_list& arguments);
 
 		static void 			writeLine(ELevel inLevel);
 		static void 			writeLine(ELevel inLevel, bool _value);
@@ -115,12 +126,10 @@ namespace xcore
 		static void 			writeLine(ELevel inLevel, u64 _value);
 		static void 			writeLine(ELevel inLevel, f32 _value);
 		static void 			writeLine(ELevel inLevel, f64 _value);
-		static void 			writeLine(ELevel inLevel, const char* buffer);
-		static void 			writeLine(ELevel inLevel, const char* buffer, const char* buffer_end);
-		static void 			writeLine(ELevel inLevel, const char* format, const x_va_list& arguments);
-		static void 			writeLine(ELevel inLevel, const uchar32* buffer);
-		static void 			writeLine(ELevel inLevel, const uchar32* buffer, const uchar32* buffer_end);
-		static void 			writeLine(ELevel inLevel, const uchar32* format, const x_va_list& arguments);
+		static void 			writeLine(ELevel inLevel, const xcuchars& str);
+		static void 			writeLine(ELevel inLevel, const xcuchars& format, const x_va_list& arguments);
+		static void 			writeLine(ELevel inLevel, const xcuchar32s& str);
+		static void 			writeLine(ELevel inLevel, const xcuchar32s& format, const x_va_list& arguments);
 	};
 
 	/**
@@ -146,12 +155,10 @@ namespace xcore
 		virtual void 			write(u64 _value) = 0;
 		virtual void 			write(f32 _value) = 0;
 		virtual void 			write(f64 _value) = 0;
-		virtual void 			write(const char* buffer) = 0;
-		virtual void 			write(const char* buffer, const char* buffer_end) = 0;
-		virtual void 			write(const char* format, const x_va_list& arguments) = 0;
-		virtual void 			write(const uchar32* buffer) = 0;
-		virtual void 			write(const uchar32* buffer, const uchar32* buffer_end) = 0;
-		virtual void 			write(const uchar32* format, const x_va_list& arguments) = 0;
+		virtual void 			write(const xcuchars& str) = 0;
+		virtual void 			write(const xcuchars& format, const x_va_list& arguments) = 0;
+		virtual void 			write(const xcuchar32s& str) = 0;
+		virtual void 			write(const xcuchar32s& format, const x_va_list& arguments) = 0;
 
 		virtual void 			writeLine() = 0;
 		virtual void 			writeLine(bool _value) = 0;
@@ -162,12 +169,10 @@ namespace xcore
 		virtual void 			writeLine(u64 _value) = 0;
 		virtual void 			writeLine(f32 _value) = 0;
 		virtual void 			writeLine(f64 _value) = 0;
-		virtual void 			writeLine(const char* buffer) = 0;
-		virtual void 			writeLine(const char* buffer, const char* buffer_end) = 0;
-		virtual void 			writeLine(const char* format, const x_va_list& arguments) = 0;
-		virtual void 			writeLine(const uchar32* buffer) = 0;
-		virtual void 			writeLine(const uchar32* buffer, const uchar32* buffer_end) = 0;
-		virtual void 			writeLine(const uchar32* format, const x_va_list& arguments) = 0;
+		virtual void 			writeLine(const xcuchars& str) = 0;
+		virtual void 			writeLine(const xcuchars& format, const x_va_list& arguments) = 0;
+		virtual void 			writeLine(const xcuchar32s& str) = 0;
+		virtual void 			writeLine(const xcuchar32s& format, const x_va_list& arguments) = 0;
 	};
 
 //==============================================================================

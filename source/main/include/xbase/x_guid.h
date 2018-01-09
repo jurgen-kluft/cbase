@@ -11,8 +11,13 @@
 
 namespace xcore
 {
-	class xuchars;
-	class xcuchars;
+	template<typename T>
+	class xuchars_t;
+	template<typename T>
+	class xcuchars_t;
+
+	typedef xuchars_t<char>		xuchars;
+	typedef xcuchars_t<char>	xcuchars;
 
 	/**
 	 * Author:

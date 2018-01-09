@@ -7,23 +7,26 @@ namespace xcore
 	{
 		mAllocator = NULL;
 		mRefCount = 0;
-		mSize = 0;
+		mItemCount = 0;
+		mItemSize = 1;
 		mData = NULL;
 	}
 
-	slice_data::slice_data(u32 size)
+	slice_data::slice_data(u32 item_count, u32 item_size)
 	{
 		mAllocator = NULL;
 		mRefCount = 0;
-		mSize = size;
+		mItemCount = item_count;
+		mItemSize = item_size;
 		mData = NULL;
 	}
 
-	slice_data::slice_data(xbyte* data, u32 size)
+	slice_data::slice_data(xbyte* data, u32 item_count, u32 item_size)
 	{
 		mAllocator = NULL;
 		mRefCount = 0;
-		mSize = size;
+		mItemCount = item_count;
+		mItemSize = item_size;
 		mData = data;
 	}
 
@@ -60,12 +63,13 @@ namespace xcore
 		return this;
 	}
 
-	slice_data*		slice_data::alloc(x_iallocator* allocator, s32& tosize)
+	slice_data*		slice_data::alloc(x_iallocator* allocator, u32& to_itemcount, u32& to_itemsize)
 	{
-		tosize = x_intu::align(tosize, 16);
-		slice_data* data = (slice_data*)allocator->allocate(tosize + sizeof(slice_data), 16);
+		to_itemsize = x_intu::align(to_itemsize, sizeof(void*));
+		slice_data* data = (slice_data*)allocator->allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void*));
 		data->mRefCount = 1;
-		data->mSize = tosize;
+		data->mItemCount = to_itemcount;
+		data->mItemSize = to_itemsize;
 		data->mAllocator = allocator;
 		data->mData = (xbyte*)data + sizeof(slice_data);
 		return data;
@@ -76,14 +80,16 @@ namespace xcore
 		slice_data* data = &sNull;
 		if (mAllocator != NULL)
 		{
-			s32 tosize = x_intu::align(to - from, 16);
-			data = (slice_data*)mAllocator->allocate(tosize + sizeof(slice_data), 16);
+			u32 const to_itemsize = mItemSize;
+			u32 const to_itemcount = to - from;
+			data = (slice_data*)mAllocator->allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void*));
 			data->mAllocator = mAllocator;
 			data->mRefCount = 1;
-			data->mSize = tosize;
+			data->mItemSize = to_itemsize;
+			data->mItemCount = to_itemcount;
 			data->mData = (xbyte*)data + sizeof(slice_data);
-			u32 const size2copy = x_intu::min(tosize, mSize);
-			xmem_utils::memcpy(data->mData, this->mData + from, size2copy);
+			u32 const count2copy = x_intu::min(to_itemcount, mItemCount);
+			xmem_utils::memcpy(data->mData, this->mData + (from * mItemSize), count2copy * mItemSize);
 			decref();
 		}
 		return data;
@@ -113,11 +119,11 @@ namespace xcore
 		mTo = other.mTo;
 	}
 
-	slice::slice(x_iallocator* allocator, s32 size)
+	slice::slice(x_iallocator* allocator, u32 item_count, u32 item_size)
 	{
-		mData = slice_data::alloc(allocator, size);
+		mData = slice_data::alloc(allocator, item_count, item_size);
 		mFrom = 0;
-		mTo = size;
+		mTo = item_count;
 	}
 
 	slice::~slice()
@@ -127,23 +133,28 @@ namespace xcore
 		mTo = 0;
 	}
 
-	void			slice::alloc(slice& slice, x_iallocator* allocator, s32 tosize) 
+	void			slice::alloc(slice& slice, x_iallocator* allocator, u32 item_count, u32 item_size)
 	{ 
-		slice.mData = slice_data::alloc(allocator, tosize); 
+		slice.mData = slice_data::alloc(allocator, item_count, item_size);
 		slice.mFrom = 0; 
-		slice.mTo = tosize; 
+		slice.mTo = item_count; 
 	}
 
-	void			slice::resize(s32 len) 
+	u32				slice::size() const
+	{
+		return mTo - mFrom;
+	}
+
+	u32				slice::refcnt() const
+	{
+		return mData->mRefCount;
+	}
+
+	void			slice::resize(u32 count)
 	{ 
-		mData = mData->resize(mFrom, mFrom + len); 
+		mData = mData->resize(mFrom, mFrom + count); 
 		mFrom = 0; 
-		mTo = len; 
-	}
-
-	s32				slice::length() const 
-	{ 
-		return mTo - mFrom; 
+		mTo = count; 
 	}
 
 	slice			slice::view(u32 from, u32 to) const
@@ -160,223 +171,44 @@ namespace xcore
 		return s;
 	}
 
-	void			slice::release() 
-	{ 
-		mData = mData->decref(); 
+	slice			slice::obtain() const
+	{
+		return slice(mData->incref(), mFrom, mTo);
 	}
+
+	void			slice::release() const
+	{ 
+		mData->decref(); 
+	}
+
+	void*			slice::get_at(s32 index)
+	{
+		if (mData == NULL)
+			return NULL;
+		if (index < 0) index = 0;
+		else if ((u32)index >= mData->mItemCount)
+			index = mData->mItemCount - 1;
+		u32 const data_offset = mData->mItemSize * index;
+		return &mData->mData[data_offset];
+	}
+
+	void const*		slice::get_at(s32 index) const
+	{
+		if (mData == NULL)
+			return NULL;
+		if (index < 0) index = 0;
+		else if ((u32)index >= mData->mItemCount)
+			index = mData->mItemCount - 1;
+		u32 const data_offset = mData->mItemSize * index;
+		return &mData->mData[data_offset];
+	}
+
+	// ----------------------------------------------------------------------------
 
 	u64		map_key_hasher(xbyte const* data, u32 size)
 	{
 		// xxhash ?
 		return 0;
-	}
-
-
-	// ----------------------------------------------------------------------------------------
-	//   TEST FUNCTION
-	// ----------------------------------------------------------------------------------------
-	template<typename T>
-	class range_iter_t;
-
-	template<typename T>
-	struct from_t
-	{
-		from_t(T from) : m_from(from) {}
-		T m_from;
-	};
-	template<typename T>
-	struct until_t
-	{
-		until_t(T until) : m_until(until) {}
-		T m_until;
-	};
-	template<typename T>
-	struct step_t
-	{
-		step_t(T s) : m_step(s) {}
-		T m_step;
-	};
-
-	struct count_t
-	{
-		count_t(s32 c) : m_count(c) {}
-		s32 m_count;
-	};
-
-	template<typename T>
-	from_t<T>	from(T value) { return from_t<T>(value); }
-	template<typename T>
-	until_t<T>	until(T value) { return until_t<T>(value); }
-	template<typename T>
-	step_t<T>	step(T value) { return step_t<T>(value); }
-
-	count_t		count(s32 value) { return value; }
-
-
-	template<typename T>
-	class range_t
-	{
-	public:
-		inline		range_t(until_t<T> _until);		
-		inline		range_t(from_t<T> _from, until_t<T> _until);
-		inline		range_t(from_t<T> _from, count_t _count);
-		inline		range_t(range_t<T> const& range) ;
-
-		s32			index() const				{ return m_index; }
-		T			item() const				{ return m_current; }
-
-		T &			operator * (void)			{ return m_current; }
-		T const&	operator * (void) const		{ return m_current; }
-
-		enum EState { STATE_START, STATE_ITER, STATE_END };
-		enum EMode { MODE_INIT, MODE_ITER };
-
-		bool		forward()
-		{
-			switch (iter.m_state) {
-		 	case STATE_START:
-				m_index = 0;
-				m_current = m_from;
-				m_state = STATE_ITER;
-				break;
-			case STATE_ITER:
-				iter.m_index += 1;
-				iter.m_current += iter.m_step;
-				if (iter.m_current >= iter.m_to) {
-					iter.m_state = STATE_END;
-				}
-				break;
-			case STATE_END:
-				return false;
-			}
-			return true;
-		}
-
-		bool		backward()
-		{
-			switch (iter.m_state) {
-		 	case range_t<T>::STATE_START:
-				m_index = 0;
-				m_current = m_to - m_step;
-				m_state = STATE_ITER;
-				break;
-			case range_t<T>::STATE_ITER:
-				iter.m_index += 1;
-				iter.m_current -= iter.m_step;
-				if (iter.m_current <= iter.m_from) {
-					iter.m_state = STATE_END;
-				}
-				break;
-			case STATE_END:
-				return false;
-			}
-			return true;
-		}
-
-		T			m_from;
-		T			m_to;
-		s32			m_state;
-		s32			m_index;
-		T			m_current;
-		T			m_step;
-	};
-
-	
-	template<typename T>
-	inline range_t::range_t(until_t<T> u)
-		: m_state(STATE_START)
-		, m_index(0)
-		, m_step(1)
-	{
-		m_from = 0;
-		m_to = _until.m_until;
-		m_current = m_from;
-	}
-
-	template<typename T>
-	inline range_t::range_t(from_t<T> _from, until_t<T> _until)
-		: m_state(STATE_START)
-		, m_index(0)
-		, m_step(1)
-	{
-		m_from = _from.m_from;
-		m_to = _until.m_until;
-		m_current = m_from;
-	}
-
-	template<typename T>
-	inline range_t::range_t(from_t<T> _from, count_t _count)
-		: m_state(STATE_START)
-		, m_index(0)
-		, m_step(1)
-	{
-		m_from = _from.m_from;
-		m_to = m_from + _count;
-		m_current = m_from;
-	}
-
-	template<typename T>
-	bool		forward(range_t<T>& iter)
-	{
-		return iter.forward();
-	}
-
-	template<typename T>
-	bool		backward(range_t<T>& iter)
-	{
-		return iter.backward();
-	}
-
-	static void test_t(x_iallocator* allocator)
-	{
-		memory mem(allocator);
-
-		array_t<s32> int100;
-		make(mem, int100, 100, 0);
-
-		// New Version: 99 -> 0
-		range_t<s32> rng_iter(from(0), count(100));
-		while (forward(rng_iter)) {
-			append(int100, *rng_iter);
-		}
-
-		// 0 -> 99
-		sort(int100);
-
-		// 0 -> 49
-		auto int50 = int100(0, 50);
-
-		f32 f = 0.0f;
-		map_t<s32, f32> int_to_float;
-		make(mem, int_to_float, 100);
-
-		auto int100_iter = int100.begin();
-		while (iterate(int100_iter)) {
-			int_to_float[*int100_iter] = f;
-			f += 0.1f;
-		}
-
-		// Slice the array into a view of just 2 elements
-		// This will NOT make a copy of the data, only when
-		// you now 'resize' one of them.
-		auto int2 = int100(0, 2);
-
-		s32 int0 = int2[0];
-		s32 int1 = int2[1];
-
-		queue_t<s32> q100;
-		make(mem, q100, 100);
-
-		// You can just start the range iterator again
-		while (forward(rng_iter)) {
-			append(q100, *rng_iter);
-		}
-
-		// And again!
-		s32 qi;
-		while (forward(rng_iter)) {
-			q100.pop(qi);
-		}
 	}
 
 }

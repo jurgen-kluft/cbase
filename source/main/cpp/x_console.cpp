@@ -98,23 +98,25 @@ namespace xcore
 
 		virtual s32				setColor(xconsole::EColor color);
 
-		virtual s32 			write(bool _value);
-		virtual s32 			write(f64 _value);
-		virtual s32 			write(s32 _value);
-		virtual s32 			write(s64 _value);
-		virtual s32 			write(f32 _value);
+		virtual void 			write(bool _value);
+		virtual void 			write(f64 _value);
+		virtual void 			write(s32 _value);
+		virtual void 			write(s64 _value);
+		virtual void 			write(f32 _value);
 
-		virtual s32 			write(u32 _value);
-		virtual s32 			write(u64 _value);
-		virtual s32 			write(uchar32 _value);
-		virtual s32 			write(const char* str, const char* str_end);
-		virtual s32 			write(const char* fmt, const x_va_list& args);
-		virtual s32 			write(const uchar8* str, const uchar8* str_end);
-		virtual s32 			write(const uchar8* fmt, const x_va_list& args);
-		virtual s32 			write(const uchar32* str, const uchar32* str_end);
-		virtual s32 			write(const uchar32* fmt, const x_va_list& args);
+		virtual void 			write(u32 _value);
+		virtual void 			write(u64 _value);
+		virtual void 			write(uchar32 _value);
+		virtual void 			write(const xcuchars& str);
+		virtual void 			write(const xcuchars& fmt, const x_va_list& args);
 
-		virtual s32 			writeLine();
+		virtual void 			write(const xcuchar8s& str);
+		virtual void 			write(const xcuchar8s& fmt, const x_va_list& args);
+
+		virtual void 			write(const xcuchar32s& str);
+		virtual void 			write(const xcuchar32s& fmt, const x_va_list& args);
+
+		virtual void 			writeLine();
 	};
 
 	void				xconsole_null_imp::initialize()
@@ -130,79 +132,64 @@ namespace xcore
 		return 0;
 	}
 
-	s32					xconsole_null_imp::write(bool _value)
+	void				xconsole_null_imp::write(bool _value)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(f64 _value)
+	void				xconsole_null_imp::write(f64 _value)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(s32 _value)
+	void				xconsole_null_imp::write(s32 _value)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(s64 _value)
+	void				xconsole_null_imp::write(s64 _value)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(f32 _value)
+	void				xconsole_null_imp::write(f32 _value)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(u32 _value)
+	void				xconsole_null_imp::write(u32 _value)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(u64 _value)
+	void				xconsole_null_imp::write(u64 _value)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(uchar32 _value)
+	void				xconsole_null_imp::write(uchar32 _value)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(const char* str, const char* str_end)
+	void				xconsole_null_imp::write(const xcuchars& str)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(const char* fmt, const x_va_list& args)
+	void				xconsole_null_imp::write(const xcuchars& fmt, const x_va_list& args)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(const uchar8* str, const uchar8* str_end)
+	void				xconsole_null_imp::write(const xcuchar8s& str)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(const uchar8* fmt, const x_va_list& args)
+	void				xconsole_null_imp::write(const xcuchar8s& fmt, const x_va_list& args)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(const uchar32* str, const uchar32* str_end)
+	void				xconsole_null_imp::write(const xcuchar32s& str)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::write(const uchar32* fmt, const x_va_list& args)
+	void				xconsole_null_imp::write(const xcuchar32s& fmt, const x_va_list& args)
 	{
-		return 0;
 	}
 
-	s32 				xconsole_null_imp::writeLine()
+	void				xconsole_null_imp::writeLine()
 	{
-		return 0;
 	}
 
 	static xconsole_null_imp sNullConsole;
@@ -218,9 +205,9 @@ namespace xcore
 	public:
 								xiconsole_default()
 								{
-									mOut = xconsole_out::write_uchar;
-									mOut8 = xconsole_out::write_uchar8;
-									mOut32 = xconsole_out::write_uchar32;
+									mOut = xconsole_out::write;
+									mOut8 = xconsole_out::write;
+									mOut32 = xconsole_out::write;
 									mColor = xconsole_out::color;
 								}
 
@@ -231,26 +218,26 @@ namespace xcore
 
 		virtual s32				setColor(xconsole::EColor color);
 	  
-		virtual s32 			write(bool _value);
-		virtual s32 			write(f64 _value);
-		virtual s32 			write(s32 _value);
-		virtual s32 			write(s64 _value);
-		virtual s32 			write(f32 _value);
+		virtual void 			write(bool _value);
+		virtual void 			write(f64 _value);
+		virtual void 			write(s32 _value);
+		virtual void 			write(s64 _value);
+		virtual void 			write(f32 _value);
 
-		virtual s32 			write(u32 _value);
-		virtual s32 			write(u64 _value);
-		virtual s32 			write(uchar32 _value);
+		virtual void			write(u32 _value);
+		virtual void			write(u64 _value);
+		virtual void			write(uchar32 _value);
 
-		virtual s32 			write(const char* str, const char* str_end);
-		virtual s32 			write(const char* fmt, const x_va_list& args);
+		virtual void			write(const xcuchars& str);
+		virtual void			write(const xcuchars& fmt, const x_va_list& args);
 
-		virtual s32 			write(const uchar8* str, const uchar8* str_end);
-		virtual s32 			write(const uchar8* fmt, const x_va_list& args);
+		virtual void			write(const xcuchar8s& str);
+		virtual void			write(const xcuchar8s& fmt, const x_va_list& args);
 
-		virtual s32 			write(const uchar32* str, const uchar32* str_end);
-		virtual s32 			write(const uchar32* fmt, const x_va_list& args);
+		virtual void			write(const xcuchar32s& str);
+		virtual void			write(const xcuchar32s& fmt, const x_va_list& args);
 
-		virtual s32 			writeLine();
+		virtual void			writeLine();
 	};
 
 	void				xiconsole_default::initialize()
@@ -261,109 +248,107 @@ namespace xcore
 	{
 	}
 
-	s32					xiconsole_default::setColor(xconsole::EColor color)
+	s32    xiconsole_default::setColor(xconsole::EColor color)
 	{
 		return mColor(color);
 	}
 
-	s32					xiconsole_default::write(bool _value)
+	void    xiconsole_default::write(bool _value)
 	{
-		return write(_value ? "true" : "false", NULL);
+		write(_value ? xcuchars("true") : xcuchars("false"));
 	}
 
-	s32 				xiconsole_default::write(f64 _value)
+	void    xiconsole_default::write(f64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 256);
 		ascii::to_string(tmp.chars(), _value, 2);
-		return write(tmp.cchars());
+		write(tmp.cchars());
 	}
 
-	s32 				xiconsole_default::write(s32 _value)
+	void    xiconsole_default::write(s32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 64);
 		ascii::to_string(tmp.chars(), _value, 2);
-		return write(tmp.cchars());
+		write(tmp.cchars());
 	}
 
-	s32 				xiconsole_default::write(s64 _value)
+	void    xiconsole_default::write(s64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 64);
 		ascii::to_string(tmp.chars(), _value, 2);
-		return write(tmp.cchars());
+		write(tmp.cchars());
 	}
 
-	s32 				xiconsole_default::write(f32 _value)
+	void    xiconsole_default::write(f32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 256);
 		ascii::to_string(tmp.chars(), _value, 2);
-		return write(tmp.cchars());
+		write(tmp.cchars());
 	}
 
-	s32 				xiconsole_default::write(u32 _value)
+	void    xiconsole_default::write(u32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 256);
 		ascii::to_string(tmp.chars(), _value, 2);
-		return write(tmp.cchars());
+		write(tmp.cchars());
 	}
 
-	s32 				xiconsole_default::write(u64 _value)
+	void    xiconsole_default::write(u64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 256);
 		ascii::to_string(tmp.chars(), _value, 2);
-		return write(tmp.cchars());
+		write(tmp.cchars());
 	}
 	
-	s32 				xiconsole_default::write(uchar32 _value)
+	void    xiconsole_default::write(uchar32 _value)
 	{
 		uchar32 s[3];
 		s[0] = _value;
 		s[1] = '\0';
 		s[2] = '\0';
-		return mOut32(xcuchar32s(s, &s[1]));
+		mOut32(xcuchar32s(s, &s[1]));
 	}
 
-	s32 				xiconsole_default::write(const char* str, const char* str_end)
+	void    xiconsole_default::write(const xcuchars& str)
 	{
-		return mOut(xcuchars(str, str_end));
+		mOut(str);
 	}
 
-	s32 				xiconsole_default::write(const char* fmt, const x_va_list& args)
+	void    xiconsole_default::write(const xcuchars& fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchars, str, 512);
-		ascii::vsprintf(str.chars(), xcuchars(fmt), args);
-		return mOut(str.cchars());
+		ascii::vsprintf(str.chars(), fmt, args);
+		mOut(str.cchars());
 	}
 
-	s32 				xiconsole_default::write(const uchar8* str, const uchar8* str_end)
+	void    xiconsole_default::write(const xcuchar8s& str)
 	{
-		xcuchar8s s(str, str_end);
-		return mOut8(s);
+		mOut8(str);
 	}
 
-	s32 				xiconsole_default::write(const uchar8* fmt, const x_va_list& args)
+	void    xiconsole_default::write(const xcuchar8s& fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchar8s, str, 512);
 		utf8::vsprintf(str.chars(), xcuchar8s(fmt), args);
-		return mOut8(str.cchars());
+		mOut8(str.cchars());
 	}
 
-	s32 				xiconsole_default::write(const uchar32* str, const uchar32* str_end)
+	void    xiconsole_default::write(const xcuchar32s& str)
 	{
-		xcuchar32s s(str, str_end);
-		return mOut32(s);
+		mOut32(str);
 	}
 
-	s32 				xiconsole_default::write(const uchar32* fmt, const x_va_list& args)
+	void    xiconsole_default::write(const xcuchar32s& fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(xuchar32s, str, 1024);
 		utf32::vsprintf(str.chars(), xcuchar32s(fmt), args);
-		return mOut32(str.cchars());
+		mOut32(str.cchars());
 	}
 
 
-	s32 				xiconsole_default::writeLine()
+	void    xiconsole_default::writeLine()
 	{
-		return write("\n", NULL);
+		write(xcuchars("\n"));
 	}
 
 
@@ -400,192 +385,157 @@ namespace xcore
 			console->setColor(xconsole::NORMAL);
 	}
 
-	s32 				xconsole::write(bool _value)
+	void 				xconsole::write(bool _value)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(_value);
-		return r;
+			console->write(_value);
 	}
 
-	s32 				xconsole::write(f64 _value)
+	void    xconsole::write(f64 _value)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(_value);
-		return r;
+			console->write(_value);
 	}
 
-	s32 				xconsole::write(s32 _value)
+	void    xconsole::write(s32 _value)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(_value);
-		return r;
+			console->write(_value);
 	}
 
-	s32 				xconsole::write(s64 _value)
+	void    xconsole::write(s64 _value)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(_value);
-		return r;
+			console->write(_value);
 	}
 
-	s32 				xconsole::write(f32 _value)
+	void    xconsole::write(f32 _value)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(_value);
-		return r;
+			console->write(_value);
 	}
 
-	s32 				xconsole::write(u32 _value)
+	void    xconsole::write(u32 _value)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(_value);
-		return r;
+			console->write(_value);
 	}
 
-	s32 				xconsole::write(u64 _value)
+	void    xconsole::write(u64 _value)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(_value);
-		return r;
+			console->write(_value);
 	}
 
 
-	s32 				xconsole::write(uchar32 _value)
+	void    xconsole::write(uchar32 _value)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(_value);
-		return r;
+			console->write(_value);
 	}
 
-	s32 				xconsole::write(const char* str, const char* str_end)
+	void    xconsole::write(const xcuchars& str)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(str, str_end);
-		return r;
+			console->write(str);
 	}
 
-	s32 				xconsole::write(const char* fmt, const x_va_list& args)
+	void    xconsole::write(const xcuchars& fmt, const x_va_list& args)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(fmt, args);
-		return r;
+			console->write(fmt, args);
 	}
 
-	s32 				xconsole::write(const char* fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+	void    xconsole::write(const xcuchars& fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
 		const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
 	{
 		x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(fmt, args);
-		return r;
+			console->write(fmt, args);
 	}
 
-	s32 				xconsole::write(const uchar8* str, const uchar8* str_end)
+	void    xconsole::write(const xcuchar8s& str)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(str, str_end);
-		return r;
+			console->write(str);
 	}
 
-	s32 				xconsole::write(const uchar8* fmt, const x_va_list& args)
+	void    xconsole::write(const xcuchar8s& fmt, const x_va_list& args)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(fmt, args);
-		return r;
+			console->write(fmt, args);
 	}
 
-	s32 				xconsole::write(const uchar8* fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
+	void    xconsole::write(const xcuchar8s& fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
 		const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
 	{
 		x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(fmt, args);
-		return r;
+			console->write(fmt, args);
 	}
 
-	s32 				xconsole::write(const uchar32* str, const uchar32* str_end)
+	void    xconsole::write(const xcuchar32s& str)
 	{
 		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(str, str_end);
-		return r;
+			console->write(str);
 	}
 
-	s32 				xconsole::write(const uchar32* fmt, const x_va_list& args)
+	void    xconsole::write(const xcuchar32s& fmt, const x_va_list& args)
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(fmt, args);
-		return r;
+			console->write(fmt, args);
 	}
 
-	s32 				xconsole::write(const uchar32* fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, 
+	void    xconsole::write(const xcuchar32s& fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
 		const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
 	{
 		x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->write(fmt, args);
-		return r;
+			console->write(fmt, args);
 	}
 
 
-	s32 				xconsole::writeLine()
+	void    xconsole::writeLine()
 	{
-		s32 r = 0;
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
 		while (sConsoleStore->iterate(iter, console))
-			r = console->writeLine();
-		return r;
+			console->writeLine();
 	}
 };
 /**

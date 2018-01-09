@@ -49,39 +49,39 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 			const uchar8* str1 = (const uchar8*)"test";
 			CHECK_EQUAL(4, utf8::size(str1));
 			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0 };	// fr�nch
-			const uchar8* str = (const uchar8*)str2;
+
+			xcuchar8s str(str2);
 			uchar32 c;
-			str = utf::read(str, c);
-			str = utf::read(str, c);
-			str = utf::read(str, c);
+			c = utf::read(str);
+			c = utf::read(str);
+			c = utf::read(str);
 			CHECK_EQUAL(2, utf::size(c));
 		}
 
 		UNITTEST_TEST(read1_utf8)
 		{
-			const uchar8* str1 = (const uchar8*)"test";
-			const uchar8* str11 = (const uchar8*)"test";
+			xcuchar8s str1((const uchar8*)"test");
+			xcuchars str11((const uchar*)	"test");
 			for (s32 i=0; i<5; ++i)
 			{
-				uchar32 ch;
-				str1 = utf::read(str1, ch);
-				CHECK_EQUAL((uchar32)str11[i], ch);
+				uchar32 ch = utf::read(str1);
+				CHECK_EQUAL((uchar32)str11.m_str[i], ch);
 				CHECK_EQUAL(1, utf::size(ch));
 			}
 
 			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// fr�nch
-			const uchar8* str = (const uchar8*)str2;
 
+			xcuchar8s str(str2);
 			uchar32 c;
-			str = utf::read(str, c);
-			str = utf::read(str, c);
-			str = utf::read(str, c);
+			c = utf::read(str);
+			c = utf::read(str);
+			c = utf::read(str);
 			CHECK_EQUAL(2, utf::size(c));	// take the �
 
-			str = (const uchar8*)str2;
+			str = str2;
 			for (s32 i=0; i<6; ++i)
 			{
-				str = utf::read(str, c);
+				c = utf::read(str);
 				if (i==2)
 				{
 					CHECK_EQUAL(2, utf::size(c));

@@ -22,19 +22,13 @@ UNITTEST_SUITE_BEGIN(xsscanf)
 
 		UNITTEST_TEST(scan_hash128)
 		{
-			const uchar* example = (const uchar*)"00112233445566778899AABBCCDDEEFF";
-			const uchar* example_end = ascii::len(example);
+			xcuchars example = "00112233445566778899AABBCCDDEEFF";
+			xcuchars fmt = "%02x%02x%02x%02x";
 
-			s32 l;
 			u8 d[16];
-
-			const uchar* const fmt = (const uchar*)"%02x%02x%02x%02x";
-			const uchar* const fmt_end = ascii::len(fmt);
-
 			for (s32 i=0; i<16; i+=4)
 			{
-				l = ascii::sscanf(example + i*2, example_end, fmt, fmt_end, x_va_r(&d[i+0]), x_va_r(&d[i+1]), x_va_r(&d[i+2]), x_va_r(&d[i+3]));
-				CHECK_EQUAL(4, l);
+				ascii::sscanf(example, fmt, x_va_r(&d[i+0]), x_va_r(&d[i+1]), x_va_r(&d[i+2]), x_va_r(&d[i+3]));
 			}
 
 			const u8 trusted_vector[] = { 0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff };

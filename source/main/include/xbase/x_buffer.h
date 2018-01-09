@@ -6,6 +6,7 @@
 #endif
 
 #include "xbase/x_allocator.h"
+#include "xbase/x_memory_std.h"
 #include "xbase/x_debug.h"
 
 namespace xcore
@@ -20,8 +21,8 @@ namespace xcore
 	public:
 		inline		xbuffer(u64 len, xbyte* data) : m_len(len), m_data(data) { reset(); }
 
-		xbuffer		alloc(x_iallocator* a);
-		void		realloc(xbuffer& buf, x_iallocator* a);
+		xbuffer		alloc(u64 size, x_iallocator* a);
+		void		realloc(xbuffer& buf, u64 size, x_iallocator* a);
 		void		dealloc(xbuffer& buf, x_iallocator* a);
 
 		u64			size() const					{ return m_len; }

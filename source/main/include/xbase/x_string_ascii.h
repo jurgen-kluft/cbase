@@ -24,15 +24,26 @@ namespace xcore
 		inline bool		has_fixed_size_rune() { return true; }
 		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
 
+		inline pcrune	len(pcrune str, s32* len = NULL) { return NULL; }
+		inline prune	len(prune str, prune end, s32* len = NULL) { return NULL; }
+		inline pcrune	len(pcrune str, pcrune end, s32* len = NULL) { return NULL; }
+
+		inline u32		size(pcrune str) { return 0; }
+		
+		inline u32		size(runes const& str) { return str.size(); }
+		inline u32		size(crunes const& str) { return str.size(); }
+
 		enum ECopyType { NONE = 0, COPY_AND_WRITE_TERMINATOR = 1, COPY_AND_WRITE_MATCHING_TERMINATOR = 2 };
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
 
 		void			copy(runes& dst, crunes const& src, ECopyType type = COPY_AND_WRITE_MATCHING_TERMINATOR);
 		void			concatenate(runes& dst, crunes const& src);		// Concatenate strings, dst = dst + src
 
+		runes			find(runes const& _str, uchar32 _c, ECmpMode mode = CASE_SENSITIVE);
 		runes			find(runes const& str, crunes const& find, ECmpMode mode = CASE_SENSITIVE);			// Return position of first occurrence of <inString> or -1 if not found
 		runes			find_one_of(runes const& str, crunes const& set, ECmpMode mode = CASE_SENSITIVE);	// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 
+		crunes			find(crunes const& _str, uchar32 _c, ECmpMode mode = CASE_SENSITIVE);
 		crunes			find(crunes const& str, crunes const& find, ECmpMode mode = CASE_SENSITIVE);		// Return position of first occurrence of <inString> or -1 if not found
 		crunes			find_one_of(crunes const& str, crunes const& set, ECmpMode mode = CASE_SENSITIVE);	// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 		
@@ -91,7 +102,9 @@ namespace xcore
 
 		uchar32			first_char(crunes const& str);
 		uchar32			last_char(crunes const& str);
-		
+		inline uchar32	first_char(runes const& str) { return first_char(str.cchars()); }
+		inline uchar32	last_char(runes const& str) { return last_char(str.cchars()); }
+
 		s32				cprintf(crunes const& format, X_VA_ARGS_16_DEF);
 		s32				vcprintf(crunes const& format, const x_va_list& args);
 
@@ -102,8 +115,8 @@ namespace xcore
 		void			printf(crunes const& format, X_VA_ARGS_16_DEF);
 		void			printf(crunes const& format, const x_va_list& args);
 
-		void			sscanf(crunes const& str, crunes const& format, X_VA_R_ARGS_16_DEF);
-		void			vsscanf(crunes const& str, crunes const& format, const x_va_r_list& vr_args);
+		void			sscanf(crunes & str, crunes const& format, X_VA_R_ARGS_16_DEF);
+		void			vsscanf(crunes & str, crunes const& format, const x_va_r_list& vr_args);
 
 	}; ///< end of ascii namespace
 

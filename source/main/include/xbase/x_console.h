@@ -68,57 +68,55 @@ namespace xcore
 		static void				setColor(EColor color);
 		static void				restoreColor();
 
-		static s32	 			write(bool _value);
-		static s32	 			write(f64 _value);
-		static s32	 			write(s32 _value);
-		static s32	 			write(s64 _value);
-		static s32	 			write(f32 _value);
-		static s32	 			write(u32 _value);
-		static s32	 			write(u64 _value);
-		static s32	 			write(uchar32 _value);
+		static void	 			write(bool _value);
+		static void	 			write(f64 _value);
+		static void	 			write(s32 _value);
+		static void	 			write(s64 _value);
+		static void	 			write(f32 _value);
+		static void	 			write(u32 _value);
+		static void	 			write(u64 _value);
+		static void	 			write(uchar32 _value);
 
-		static s32	 			write(const char* str, const char* str_end);
-		static s32	 			write(const uchar8* str, const uchar8* str_end);
-		static s32	 			write(const uchar32* str, const uchar32* str_end);
+		static void	 			write(const xcuchars& str);
+		static void	 			write(const xcuchar8s& str);
+		static void	 			write(const xcuchar32s& str);
 	
-		static s32	 			write(const char* fmt, const x_va_list& args);
-		static s32	 			write(const char* fmt, X_VA_ARGS_16_DEF);
+		static void	 			write(const xcuchars& fmt, const x_va_list& args);
+		static void	 			write(const xcuchars& fmt, X_VA_ARGS_16_DEF);
 
-		static s32	 			write(const uchar8* fmt, const x_va_list& args);
-		static s32	 			write(const uchar8* fmt, X_VA_ARGS_16_DEF);
+		static void	 			write(const xcuchar8s& fmt, const x_va_list& args);
+		static void	 			write(const xcuchar8s& fmt, X_VA_ARGS_16_DEF);
 
-		static s32	 			write(const uchar32* fmt, const x_va_list& args);
-		static s32	 			write(const uchar32* fmt, X_VA_ARGS_16_DEF);
+		static void	 			write(const xcuchar32s& fmt, const x_va_list& args);
+		static void	 			write(const xcuchar32s& fmt, X_VA_ARGS_16_DEF);
 
-		static s32 				writeLine();
+		static void 			writeLine();
 
-		inline static s32 		writeLine(bool _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline static s32 		writeLine(f64 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline static s32 		writeLine(s32 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline static s32 		writeLine(s64 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline static s32 		writeLine(f32 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline static s32 		writeLine(u32 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline static s32 		writeLine(u64 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline static s32 		writeLine(uchar32 _value)						{ s32 l = write(_value); l+=writeLine(); return l; }
+		inline static void 		writeLine(bool _value)							{ write(_value); writeLine(); }
+		inline static void 		writeLine(f64 _value)							{ write(_value); writeLine(); }
+		inline static void 		writeLine(s32 _value)							{ write(_value); writeLine(); }
+		inline static void 		writeLine(s64 _value)							{ write(_value); writeLine(); }
+		inline static void 		writeLine(f32 _value)							{ write(_value); writeLine(); }
+		inline static void 		writeLine(u32 _value)							{ write(_value); writeLine(); }
+		inline static void 		writeLine(u64 _value)							{ write(_value); writeLine(); }
+		inline static void 		writeLine(uchar32 _value)						{ write(_value); writeLine(); }
 
-		inline static s32 		writeLine(const char* str, const char* str_end)			{ s32 l = write(str, str_end); l += writeLine(); return l; }
-		inline static s32 		writeLine(const uchar32* str, const uchar32* str_end)	{ s32 l = write(str, str_end); l += writeLine(); return l; }
+		inline static void 		writeLine(const xcuchars& str)					{ write(str); writeLine(); }
+		inline static void 		writeLine(const xcuchar32s& str)				{ write(str); writeLine(); }
 
-		inline static s32 		writeLine(const char* fmt, const x_va_list& args){ s32 l = write(fmt, args); l += writeLine(); return l; }
-		inline static s32 		writeLine(const char* fmt, X_VA_ARGS_16_DEF)
+		inline static void		writeLine(const xcuchars& fmt, const x_va_list& args) { write(fmt, args); writeLine(); }
+		inline static void		writeLine(const xcuchars& fmt, X_VA_ARGS_16_DEF)
 		{
 			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9);
-			s32 l = write(fmt, args); 
-			l += writeLine();
-			return l; 
+			write(fmt, args); 
+			writeLine();
 		}
-		inline static s32 		writeLine(const uchar32* fmt, const x_va_list& args){ s32 l = write(fmt, args); l += writeLine(); return l; }
-		inline static s32 		writeLine(const uchar32* fmt, X_VA_ARGS_16_DEF)
+		inline static void		writeLine(const xcuchar32s& fmt, const x_va_list& args)	{ write(fmt, args); writeLine(); }
+		inline static void		writeLine(const xcuchar32s& fmt, X_VA_ARGS_16_DEF)
 		{
 			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9);
-			s32 l = write(fmt, args); 
-			l += writeLine();
-			return l; 
+			write(fmt, args); 
+			writeLine();
 		}
 	};
 
@@ -127,9 +125,9 @@ namespace xcore
 	{
 		extern s32				color(xconsole::EColor color);
 
-		extern s32				write_uchar(xcuchars const& str);
-		extern s32				write_uchar8(xcuchar8s const& str);
-		extern s32				write_uchar32(xcuchar32s const& str);
+		extern s32				write(xcuchars const& str);
+		extern s32				write(xcuchar8s const& str);
+		extern s32				write(xcuchar32s const& str);
 	};
 
 	/// Interface class, has specific (or configurable) implementations for different environments/platforms
@@ -146,41 +144,41 @@ namespace xcore
 		
 		virtual s32				setColor(xconsole::EColor color) = 0;
 
-		virtual s32 			write(bool _value) = 0;
-		virtual s32 			write(f64 _value) = 0;
-		virtual s32 			write(s32 _value) = 0;
-		virtual s32 			write(s64 _value) = 0;
-		virtual s32 			write(f32 _value) = 0;
-		virtual s32 			write(u32 _value) = 0;
-		virtual s32 			write(u64 _value) = 0;
-		virtual s32 			write(uchar32 _value) = 0;
+		virtual void			write(bool _value) = 0;
+		virtual void			write(f64 _value) = 0;
+		virtual void			write(s32 _value) = 0;
+		virtual void			write(s64 _value) = 0;
+		virtual void			write(f32 _value) = 0;
+		virtual void			write(u32 _value) = 0;
+		virtual void			write(u64 _value) = 0;
+		virtual void			write(uchar32 _value) = 0;
 
-		virtual s32 			write(const char* buffer, const char* buffer_end) = 0;
-		virtual s32 			write(const uchar8* buffer, const uchar8* buffer_end) = 0;
-		virtual s32 			write(const uchar32* buffer, const uchar32* buffer_end) = 0;
+		virtual void			write(const xcuchars& buffer) = 0;
+		virtual void			write(const xcuchar8s& buffer) = 0;
+		virtual void			write(const xcuchar32s& buffer) = 0;
 
-		virtual s32 			write(const char* fmt, const x_va_list& args) = 0;
-		virtual s32 			write(const uchar8* fmt, const x_va_list& args) = 0;
-		virtual s32 			write(const uchar32* fmt, const x_va_list& args) = 0;
+		virtual void			write(const xcuchars& fmt, const x_va_list& args) = 0;
+		virtual void			write(const xcuchar8s& fmt, const x_va_list& args) = 0;
+		virtual void			write(const xcuchar32s& fmt, const x_va_list& args) = 0;
 
-		virtual s32 			writeLine() = 0;
+		virtual void			writeLine() = 0;
 
-		inline s32 				writeLine(bool _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline s32 				writeLine(f64 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline s32 				writeLine(s32 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline s32 				writeLine(s64 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline s32 				writeLine(f32 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline s32 				writeLine(u32 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline s32 				writeLine(u64 _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
-		inline s32 				writeLine(char _value)							{ s32 l = write(_value); l+=writeLine(); return l; }
+		inline void				writeLine(bool _value)							{ write(_value); writeLine(); }
+		inline void				writeLine(f64 _value)							{ write(_value); writeLine(); }
+		inline void				writeLine(s32 _value)							{ write(_value); writeLine(); }
+		inline void				writeLine(s64 _value)							{ write(_value); writeLine(); }
+		inline void				writeLine(f32 _value)							{ write(_value); writeLine(); }
+		inline void				writeLine(u32 _value)							{ write(_value); writeLine(); }
+		inline void				writeLine(u64 _value)							{ write(_value); writeLine(); }
+		inline void				writeLine(char _value)							{ write(_value); writeLine(); }
 
-		inline s32 				writeLine(const char* str, const char* str_end) { s32 l = write(str, str_end); l += writeLine(); return l; }
-		inline s32 				writeLine(const uchar8* str, const uchar8* str_end) { s32 l = write(str, str_end); l += writeLine(); return l; }
-		inline s32 				writeLine(const uchar32* str, const uchar32* str_end)	{ s32 l = write(str, str_end); l+=writeLine(); return l; }
+		inline void				writeLine(const xcuchars&   str) { write(str); writeLine(); }
+		inline void				writeLine(const xcuchar8s&  str) { write(str); writeLine(); }
+		inline void				writeLine(const xcuchar32s& str) { write(str); writeLine(); }
 
-		inline s32 				writeLine(const char* format, const x_va_list& args) { s32 l = write(format, args); l += writeLine(); return l; }
-		inline s32 				writeLine(const uchar8* format, const x_va_list& args) { s32 l = write(format, args); l += writeLine(); return l; }
-		inline s32 				writeLine(const uchar32* format, const x_va_list& args)	{ s32 l = write(format, args); l+=writeLine(); return l; }
+		inline void				writeLine(const xcuchars&   format, const x_va_list& args) { write(format, args); writeLine(); }
+		inline void				writeLine(const xcuchar8s&  format, const x_va_list& args) { write(format, args); writeLine(); }
+		inline void				writeLine(const xcuchar32s& format, const x_va_list& args) { write(format, args); writeLine(); }
 	};
 
 	//==============================================================================

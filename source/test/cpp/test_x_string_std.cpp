@@ -18,114 +18,114 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(len)
 		{
-			const char* src = "this is a system string";
+			xcuchars src = "this is a system string";
 
-			CHECK_EQUAL(src + 23, ascii::len(src));
+			CHECK_EQUAL(src.m_str + 23, ascii::len(src.m_str));
 
 			s32 len;
-			ascii::pcrune src_end_1 = ascii::len(src, &len);
+			ascii::pcrune src_end_1 = ascii::len(src.m_str, &len);
 			CHECK_EQUAL(23, len);
-			CHECK_EQUAL(src + len, src_end_1);
+			CHECK_EQUAL(src.m_str + len, src_end_1);
 
-			ascii::pcrune src_end_2 = ascii::len(src, src + 20, &len);
+			ascii::pcrune src_end_2 = ascii::len(src.m_str, src.m_str + 20, &len);
 			CHECK_EQUAL(20, len);
-			CHECK_EQUAL(src + len, src_end_2);
+			CHECK_EQUAL(src.m_str + len, src_end_2);
 
-			ascii::pcrune src_end_3 = ascii::len(src, src + 30, &len);
+			ascii::pcrune src_end_3 = ascii::len(src.m_str, src.m_str + 30, &len);
 			CHECK_EQUAL(23, len);
-			CHECK_EQUAL(src + len, src_end_3);
+			CHECK_EQUAL(src.m_str + len, src_end_3);
 		}
 
 		UNITTEST_TEST(size)
 		{
 			CHECK_EQUAL(0, ascii::size(""));
 
-			const char* str = "this is a system string";
+			xcuchars str = "this is a system string";
 			CHECK_EQUAL(23, ascii::size(str));
 		}
 
 		UNITTEST_TEST(copy)
-		{
-			const char* src = "this is a system string";
+		{ 
+			xcuchars str("this is a system string");
 
-			char dst[24 + 1];
-			dst[24] = '\0';
-			ascii::copy(dst, dst + 24, src, ascii::len(src));
+			xuchars32 dst;
+			ascii::copy(dst.chars(), str);
 
-			CHECK_EQUAL(23, ascii::size(src));
-			CHECK_EQUAL(0, ascii::compare(dst, ascii::len(dst), src, ascii::len(src)));
+			CHECK_EQUAL(0, dst.compare(str));
+			CHECK_EQUAL(0, ascii::compare(str, dst.cchars()));
+			CHECK_EQUAL(23, ascii::size(str));
 
-			char str2[20];
-			str2[20 - 1] = '\0';
-			ascii::copy(str2, str2 + sizeof(str2) - 1, src, ascii::len(src));
+			xuchars16 str2;
+			ascii::copy(str2.chars(), str);
 
-			CHECK_EQUAL(19, ascii::size(str2));
-			CHECK_EQUAL(-1, ascii::compare(str2, src));
+			CHECK_EQUAL(15, ascii::size(str2.cchars()));
+			CHECK_EQUAL(-1, ascii::compare(str2.cchars(), str));
 
-			CHECK_EQUAL(0, ascii::compare(str2, "this is a system st"));
+			CHECK_EQUAL(0, ascii::compare(str2.cchars(), xcuchars("this is a syste")));
 		}
 
 		UNITTEST_TEST(find)
 		{
-			const char* str1 = "this is a system string";
+			xcuchars str1("this is a system string");
 
-			CHECK_EQUAL((str1 + 14), ascii::find(str1, ascii::len(str1), 'e'));
-			CHECK_NULL(ascii::find(str1, ascii::len(str1), 'E'));
-			CHECK_EQUAL((str1 + 14), ascii::find(str1, ascii::len(str1), 'E', ascii::CASE_IGNORE));
+			xcuchars f1 = ascii::find(str1, 'e');
+			CHECK_EQUAL('e', ascii::first_char(f1));
+			CHECK_TRUE(ascii::find(str1, 'E').is_empty());
+			CHECK_FALSE(ascii::find(str1, 'E', ascii::CASE_IGNORE).is_empty());
 
-			const char* str2 = "system";
-			const char* found_pos = ascii::find(str1, ascii::len(str1), str2, ascii::len(str2));
-			CHECK_EQUAL((str1 + 10), found_pos);
+			xcuchars str2 = "system";
+			xcuchars found = ascii::find(str1, str2);
+			CHECK_TRUE(found == xcuchars("system string"));
 
-			const char* str3 = "SYSTEM";
-			CHECK_NULL(ascii::find(str1, ascii::len(str1), str3, ascii::len(str3)));
-			CHECK_EQUAL(str1 + 10, ascii::find(str1, NULL, str3, NULL, ascii::CASE_IGNORE));
+			xcuchars str3 = "SYSTEM";
+			CHECK_TRUE(ascii::find(str1, str3).is_empty());
+			CHECK_FALSE(ascii::find(str1, str3, ascii::CASE_IGNORE).is_empty());
 		}
 
 		UNITTEST_TEST(find_one_of)
 		{
-			const char* str1 = "this is a system string";
+			xcuchars str1 = "this is a system string";
 
-			const char* set1 = "bcde";
-			CHECK_EQUAL((str1 + 14), ascii::find_one_of(str1, NULL, set1, NULL));
+			xcuchars set1 = "bcde";
+			CHECK_TRUE(ascii::find_one_of(str1, set1) == xcuchars("em string"));
 
-			const char* set2 = "BCDE";
-			CHECK_EQUAL((str1 + 14), ascii::find_one_of(str1, NULL, set2, NULL, ascii::CASE_IGNORE));
+			xcuchars set2 = "BCDE";
+			CHECK_TRUE(ascii::find_one_of(str1, set2, ascii::CASE_IGNORE) == xcuchars("em string"));
 		}
 
 		UNITTEST_TEST(replace)
 		{
-			char dst[101];
-			const char* str1 = "this is a system string";
-			char* dst_end = ascii::copy(dst, dst + 100, str1, ascii::len(str1));
-			const char* str2 = "this is a copied string";
+			xuchars128 dst;
+			xcuchars str1 = "this is a system string";
+			ascii::copy(dst.chars(), str1);
+			xcuchars str2 = "this is a copied string";
 
-			const char* find_str = "system";
-			const char* pos = ascii::find(dst, dst_end, find_str, ascii::len(find_str));
+			xcuchars find_str = "system";
+			xcuchars pos = ascii::find(dst.cchars(), find_str);
 
-			const char* replace_str = "copied";
-			ascii::replace(ascii::pos(dst, pos), pos + 6, dst + 100, replace_str, ascii::len(replace_str));
+			xcuchars replace_str = "copied";
+			ascii::replace(dst.chars(), replace_str);
 
-			CHECK_EQUAL(0, ascii::compare(dst, str2));
+			CHECK_EQUAL(0, ascii::compare(dst.cchars(), str2));
 		}
 
 		UNITTEST_TEST(compare)
 		{
-			const char* str1 = "this is a system string";
-			const char* str2 = "this is a system string";
+			xcuchars str1 = "this is a system string";
+			xcuchars str2 = "this is a system string";
 			CHECK_EQUAL(0, ascii::compare(str1, str2));
 
-			const char* str3 = "a";
-			const char* str4 = "b";
-			CHECK_EQUAL(-1, ascii::compare(str3, ascii::len(str3), str4, ascii::len(str4)));
-			CHECK_EQUAL( 0, ascii::compare(str3, ascii::len(str3), str3, ascii::len(str3)));
-			CHECK_EQUAL( 0, ascii::compare(str4, ascii::len(str4), str4, ascii::len(str4)));
-			CHECK_EQUAL( 1, ascii::compare(str4, ascii::len(str4), str3, ascii::len(str3)));
+			xcuchars str3 = "a";
+			xcuchars str4 = "b";
+			CHECK_EQUAL(-1, ascii::compare(str3, str4));
+			CHECK_EQUAL( 0, ascii::compare(str3, str3));
+			CHECK_EQUAL( 0, ascii::compare(str4, str4));
+			CHECK_EQUAL( 1, ascii::compare(str4, str3));
 
-			const char* str5 = "a";
-			const char* str6 = "A";
-			const char* str7 = "b";
-			const char* str8 = "B";
+			xcuchars str5 = "a";
+			xcuchars str6 = "A";
+			xcuchars str7 = "b";
+			xcuchars str8 = "B";
 			CHECK_EQUAL( 1, ascii::compare(str5, str6));
 			CHECK_EQUAL( 0, ascii::compare(str5, str6, ascii::CASE_IGNORE));
 			CHECK_EQUAL( 1, ascii::compare(str7, str8));
@@ -134,235 +134,210 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(concatenate)
 		{
-			char dst[101];
-			dst[100] = '\0';
-			const char* str1 = "this is a ";
-			ascii::copy(dst, dst + 100, str1, ascii::len(str1));
+			xuchars128 dst;
+			xcuchars str1 = "this is a ";
+			ascii::copy(dst.chars(), str1);
 
-			const char* str2 = "copied string";
-			ascii::concatenate(dst, ascii::len(dst), dst + 100, str2, NULL);
+			xcuchars str2 = "copied string";
+			ascii::concatenate(dst.chars(), str2);
 
-			const char* str3 = "this is a copied string";
-			CHECK_EQUAL(0, ascii::compare(dst, ascii::len(dst), str3, ascii::len(str3)));
+			xcuchars str3 = "this is a copied string";
+			CHECK_EQUAL(0, ascii::compare(dst.cchars(), str3));
 		}
 
 		UNITTEST_TEST(parse_bool)
 		{
 			bool value;
-			const char* str = "True";
-			ascii::parse(str, NULL, value);
+			xcuchars str = "True";
+			ascii::parse(str, value);
 			CHECK_EQUAL(true, value);
-			const char* str2 = "Off";
-			ascii::parse(str2, ascii::len(str2), value);
+			xcuchars str2 = "Off";
+			ascii::parse(str2, value);
 			CHECK_EQUAL(false, value);
-			const char* str3 = "On";
-			ascii::parse(str3, ascii::len(str3), value);
+			xcuchars str3 = "On";
+			ascii::parse(str3, value);
 			CHECK_EQUAL(true, value);
-			const char* str4 = "false";
-			ascii::parse(str4, ascii::len(str4), value);
+			xcuchars str4 = "false";
+			ascii::parse(str4, value);
 			CHECK_EQUAL(false, value);
-			const char* str6 = "Yes";
-			ascii::parse(str6, ascii::len(str6), value);
+			xcuchars str6 = "Yes";
+			ascii::parse(str6, value);
 			CHECK_EQUAL(true, value);
-			const char* str5 = "No";
-			ascii::parse(str5, ascii::len(str5), value);
+			xcuchars str5 = "No";
+			ascii::parse(str5, value);
 			CHECK_EQUAL(false, value);
 		}
 
 		UNITTEST_TEST(parse_s32)
 		{
 			s32 value;
-			const char* str = "1";
-			ascii::parse(str, ascii::len(str), value);
+			xcuchars str = "1";
+			ascii::parse(str, value);
 			CHECK_EQUAL(1, value);
-			const char* str2 = "2";
-			ascii::parse(str2, ascii::len(str2), value);
+			xcuchars str2 = "2";
+			ascii::parse(str2, value);
 			CHECK_EQUAL(2, value);
-			const char* str3 = "256";
-			ascii::parse(str3, ascii::len(str3), value);
+			xcuchars str3 = "256";
+			ascii::parse(str3, value);
 			CHECK_EQUAL(256, value);
 		}
 
 		UNITTEST_TEST(parse_u32)
 		{
 			u32 value;
-			const char* str = "1";
-			ascii::parse(str, ascii::len(str), value);
+			xcuchars str = "1";
+			ascii::parse(str, value);
 			CHECK_EQUAL(1, value);
-			const char* str2 = "2";
-			ascii::parse(str2, ascii::len(str2), value);
+			xcuchars str2 = "2";
+			ascii::parse(str2, value);
 			CHECK_EQUAL(2, value);
-			const char* str3 = "256";
-			ascii::parse(str3, ascii::len(str3), value);
+			xcuchars str3 = "256";
+			ascii::parse(str3, value);
 			CHECK_EQUAL(256, value);
 		}
 
 		UNITTEST_TEST(parse_s64)
 		{
 			s64 value;
-			const char* str = "1";
-			ascii::parse(str, ascii::len(str), value);
+			xcuchars str = "1";
+			ascii::parse(str, value);
 			CHECK_EQUAL(1, value);
-			const char* str2 = "2";
-			ascii::parse(str2, ascii::len(str2), value);
+			xcuchars str2 = "2";
+			ascii::parse(str2, value);
 			CHECK_EQUAL(2, value);
-			const char* str3 = "256";
-			ascii::parse(str3, ascii::len(str3), value);
+			xcuchars str3 = "256";
+			ascii::parse(str3, value);
 			CHECK_EQUAL(256, value);
 		}
 
 		UNITTEST_TEST(parse_u64)
 		{
 			u64 value;
-			const char* str = "1";
-			ascii::parse(str, ascii::len(str), value);
+			xcuchars str = "1";
+			ascii::parse(str, value);
 			CHECK_EQUAL(1, value);
-			const char* str2 = "2";
-			ascii::parse(str2, ascii::len(str2), value);
+			xcuchars str2 = "2";
+			ascii::parse(str2, value);
 			CHECK_EQUAL(2, value);
-			const char* str3 = "256";
-			ascii::parse(str3, ascii::len(str3), value);
+			xcuchars str3 = "256";
+			ascii::parse(str3, value);
 			CHECK_EQUAL(256, value);
 		}
 
 		UNITTEST_TEST(parse_f32)
 		{
 			f32 value;
-			const char* str = "1.1";
-			ascii::parse(str, ascii::len(str), value);
+			xcuchars str = "1.1";
+			ascii::parse(str, value);
 			CHECK_EQUAL(1.1f, value);
-			const char* str2 = "2.5";
-			ascii::parse(str2, ascii::len(str2), value);
+			xcuchars str2 = "2.5";
+			ascii::parse(str2, value);
 			CHECK_EQUAL(2.5f, value);
-			const char* str3 = "-256.33";
-			ascii::parse(str3, ascii::len(str3), value);
+			xcuchars str3 = "-256.33";
+			ascii::parse(str3, value);
 			CHECK_EQUAL(-256.33f, value);
 		}
 
 		UNITTEST_TEST(parse_f64)
 		{
 			f64 value;
-			const char* str = "1.1";
-			ascii::parse(str, ascii::len(str), value);
+			xcuchars str = "1.1";
+			ascii::parse(str, value);
 			CHECK_EQUAL(1.1, value);
-			const char* str2 = "2.5";
-			ascii::parse(str2, ascii::len(str2), value);
+			xcuchars str2 = "2.5";
+			ascii::parse(str2, value);
 			CHECK_EQUAL(2.5, value);
-			const char* str3 = "-256.33";
-			ascii::parse(str3, ascii::len(str3), value);
+			xcuchars str3 = "-256.33";
+			ascii::parse(str3, value);
 			CHECK_EQUAL(-256.33, value);
 		}
 
 		UNITTEST_TEST(is_decimal)
 		{
-			const char* decimal_str = "2017";
-			const char* non_decimal_str = "20a1a";
-			CHECK_EQUAL(true, ascii::is_decimal(decimal_str, ascii::len(decimal_str)));
-			CHECK_EQUAL(false, ascii::is_decimal(non_decimal_str, ascii::len(non_decimal_str)));
+			xcuchars decimal_str = "2017";
+			xcuchars non_decimal_str = "20a1a";
+			CHECK_EQUAL(true, ascii::is_decimal(decimal_str));
+			CHECK_EQUAL(false, ascii::is_decimal(non_decimal_str));
 		}
 
 		UNITTEST_TEST(is_hexadecimal)
 		{
-			const char* hexadecimal_str = "20aabbccddeeff";
-			const char* non_hexadecimal_str = "20aabbccddeeffw";
-			CHECK_EQUAL(true, ascii::is_hexadecimal(hexadecimal_str, ascii::len(hexadecimal_str)));
-			CHECK_EQUAL(false, ascii::is_hexadecimal(non_hexadecimal_str, ascii::len(non_hexadecimal_str)));
-			const char* hexadecimal_with_prefix_str = "0x20aabbccddeeff";
-			CHECK_EQUAL(true, ascii::is_hexadecimal(hexadecimal_with_prefix_str, ascii::len(hexadecimal_with_prefix_str), true));
+			xcuchars hexadecimal_str = "20aabbccddeeff";
+			xcuchars non_hexadecimal_str = "20aabbccddeeffw";
+			CHECK_EQUAL(true, ascii::is_hexadecimal(hexadecimal_str));
+			CHECK_EQUAL(false, ascii::is_hexadecimal(non_hexadecimal_str));
+			xcuchars hexadecimal_with_prefix_str = "0x20aabbccddeeff";
+			CHECK_EQUAL(true, ascii::is_hexadecimal(hexadecimal_with_prefix_str, true));
 		}
 
 		UNITTEST_TEST(is_float)
 		{
-			const char* float_str = "3.1415";
-			const char* non_float_str = "3a.14_15";
-			CHECK_EQUAL(true, ascii::is_float(float_str, ascii::len(float_str)));
-			CHECK_EQUAL(false, ascii::is_float(non_float_str, ascii::len(non_float_str)));
+			xcuchars float_str = "3.1415";
+			xcuchars non_float_str = "3a.14_15";
+			CHECK_EQUAL(true, ascii::is_float(float_str));
+			CHECK_EQUAL(false, ascii::is_float(non_float_str));
 		}
 
 		UNITTEST_TEST(is_GUID)
 		{
-			const char* guid_str = "11335577:22446688:557799BB:88AACCEE";
-			const char* non_guid_str = "335577:446688:7799BB:AACCEE";
-			CHECK_EQUAL(true, ascii::is_GUID(guid_str, ascii::len(guid_str)));
-			CHECK_EQUAL(false, ascii::is_GUID(non_guid_str, ascii::len(non_guid_str)));
+			xcuchars guid_str = "11335577:22446688:557799BB:88AACCEE";
+			xcuchars non_guid_str = "335577:446688:7799BB:AACCEE";
+			CHECK_EQUAL(true, ascii::is_GUID(guid_str));
+			CHECK_EQUAL(false, ascii::is_GUID(non_guid_str));
 		}
 
 		UNITTEST_TEST(tostring_s32)
 		{
-			char str_buffer[16 + 1];
-			char * str = &str_buffer[0];
-			char * eos = &str_buffer[16];
-			eos[0] = '\0';
-
+			xuchars32 str;
 			s32 value = 31415;
-			char * end = ascii::to_string(str, eos, eos, value);
-			CHECK_EQUAL(5, ascii::size(str));
-			CHECK_EQUAL(0, ascii::compare(str, "31415"));
+			ascii::to_string(str.chars(), value);
+			CHECK_EQUAL(5, ascii::size(str.cchars()));
+			CHECK_EQUAL(0, ascii::compare(str.cchars(), "31415"));
 		}
 
 		UNITTEST_TEST(tostring_u32)
 		{
-			char str_buffer[16 + 1];
-			char * str = &str_buffer[0];
-			char * eos = &str_buffer[16];
-			eos[0] = '\0';
-
+			xuchars32 str;
 			u32 value = 31415;
-			char * end = ascii::to_string(str, eos, eos, value);
-			CHECK_EQUAL(5, ascii::size(str));
-			CHECK_EQUAL(0, ascii::compare(str, "31415"));
+			ascii::to_string(str.chars(), value);
+			CHECK_EQUAL(5, ascii::size(str.cchars()));
+			CHECK_EQUAL(0, ascii::compare(str.cchars(), "31415"));
 		}
 
 		UNITTEST_TEST(tostring_s64)
 		{
-			char str_buffer[16 + 1];
-			char * str = &str_buffer[0];
-			char * eos = &str_buffer[16];
-			eos[0] = '\0';
-
+			xuchars32 str;
 			s64 value = 31415;
-			char * end = ascii::to_string(str, eos, eos, value);
-			CHECK_EQUAL(5, ascii::size(str));
-			CHECK_EQUAL(0, ascii::compare(str, "31415"));
+			ascii::to_string(str.chars(), value);
+			CHECK_EQUAL(5, ascii::size(str.cchars()));
+			CHECK_EQUAL(0, ascii::compare(str.cchars(), "31415"));
 		}
 
 		UNITTEST_TEST(tostring_u64)
 		{
-			char str_buffer[16 + 1];
-			char * str = &str_buffer[0];
-			char * eos = &str_buffer[16];
-			eos[0] = '\0';
-
+			xuchars32 str;
 			u64 value = 31415;
-			char * end = ascii::to_string(str, eos, eos, value);
-			CHECK_EQUAL(5, ascii::size(str));
-			CHECK_EQUAL(0, ascii::compare(str, "31415"));
+			ascii::to_string(str.chars(), value);
+			CHECK_EQUAL(5, ascii::size(str.cchars()));
+			CHECK_EQUAL(0, ascii::compare(str.cchars(), "31415"));
 		}
 
 		UNITTEST_TEST(tostring_f32)
 		{
-			char str_buffer[16 + 1];
-			char * str = &str_buffer[0];
-			char * eos = &str_buffer[16];
-			eos[0] = '\0';
-
+			xuchars32 str;
 			f32 value = 3.1415f;
-			char * end = ascii::to_string(str, eos, eos, value, 4);
-			CHECK_EQUAL(6, ascii::size(str));
-			CHECK_EQUAL(0, ascii::compare(str, "3.1415"));
+			ascii::to_string(str.chars(), value, 4);
+			CHECK_EQUAL(6, ascii::size(str.cchars()));
+			CHECK_EQUAL(0, ascii::compare(str.cchars(), "3.1415"));
 		}
 
 		UNITTEST_TEST(tostring_f64)
 		{
-			char str_buffer[16 + 1];
-			char * str = &str_buffer[0];
-			char * eos = &str_buffer[16];
-			eos[0] = '\0';
-
+			xuchars32 str;
 			f64 value = 3.1415;
-			char * end = ascii::to_string(str, eos, eos, value, 4);
-			CHECK_EQUAL(6, ascii::size(str));
-			CHECK_EQUAL(0, ascii::compare(str, "3.1415"));
+			ascii::to_string(str.chars(), value, 4);
+			CHECK_EQUAL(6, ascii::size(str.cchars()));
+			CHECK_EQUAL(0, ascii::compare(str.cchars(), "3.1415"));
 		}
 		
 		UNITTEST_TEST(is)
@@ -420,110 +395,109 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(is_upper)
 		{
-			const char* str = "THIS IS AN UPPERCASE STRING";
-			CHECK_EQUAL(true, ascii::is_upper(str, ascii::len(str)));
-			const char* str2 = "THIS IS UPPERCASE STRING with some lowercase";
-			CHECK_EQUAL(false, ascii::is_upper(str2, ascii::len(str2)));
+			xcuchars str = "THIS IS AN UPPERCASE STRING";
+			CHECK_EQUAL(true, ascii::is_upper(str));
+			xcuchars str2 = "THIS IS UPPERCASE STRING with some lowercase";
+			CHECK_EQUAL(false, ascii::is_upper(str2));
 		}
 
 		UNITTEST_TEST(is_lower)
 		{
-			const char* str1 = "this is a lowercase string";
-			CHECK_EQUAL(true, ascii::is_lower(str1, ascii::len(str1)));
-			const char* str2 = "THIS IS UPPERCASE STRING with some lowercase";
-			CHECK_EQUAL(false, ascii::is_lower(str2, ascii::len(str2)));
+			xcuchars str1 = "this is a lowercase string";
+			CHECK_EQUAL(true, ascii::is_lower(str1));
+			xcuchars str2 = "THIS IS UPPERCASE STRING with some lowercase";
+			CHECK_EQUAL(false, ascii::is_lower(str2));
 		}
 
 		UNITTEST_TEST(is_capitalized)
 		{
-			const char* str1 = "This Is A Capitalized String";
-			CHECK_EQUAL(true, ascii::is_capitalized(str1, ascii::len(str1)));
-			const char* str2 = "This Is Not all Capitalized";
-			CHECK_EQUAL(false, ascii::is_capitalized(str2, ascii::len(str2)));
+			xcuchars str1 = "This Is A Capitalized String";
+			CHECK_EQUAL(true, ascii::is_capitalized(str1));
+			xcuchars str2 = "This Is Not all Capitalized";
+			CHECK_EQUAL(false, ascii::is_capitalized(str2));
 		}
 
 		UNITTEST_TEST(is_delimited)
 		{
-			const char* str1 = "<this Is A delimited String>";
-			CHECK_EQUAL(true, ascii::is_delimited(str1, ascii::len(str1), '<', '>'));
-			const char* str2 = "[This Is Not all Capitalized";
-			CHECK_EQUAL(false, ascii::is_delimited(str2, ascii::len(str2), '[', ']'));
+			xcuchars str1 = "<this Is A delimited String>";
+			CHECK_EQUAL(true, ascii::is_delimited(str1, '<', '>'));
+			xcuchars str2 = "[This Is Not all Capitalized";
+			CHECK_EQUAL(false, ascii::is_delimited(str2, '[', ']'));
 		}
 
 		UNITTEST_TEST(is_quoted)
 		{
-			const char* str1 = "'this Is A quoted String'";
-			CHECK_EQUAL(true, ascii::is_delimited(str1, ascii::len(str1), '\'', '\''));
-			const char* str2 = "'This Is Not correctly quoted Capitalized\"";
-			CHECK_EQUAL(false, ascii::is_delimited(str2, ascii::len(str2), '\'', '\''));
+			xcuchars str1 = "'this Is A quoted String'";
+			CHECK_EQUAL(true, ascii::is_delimited(str1, '\'', '\''));
+			xcuchars str2 = "'This Is Not correctly quoted Capitalized\"";
+			CHECK_EQUAL(false, ascii::is_delimited(str2, '\'', '\''));
 		}
 
 		UNITTEST_TEST(to_upper)
 		{
-			char str[101];
-			const char* str1 = "this is a lower case string";
-			const char* str2 = "THIS IS A LOWER CASE STRING";
-			char* str_end = ascii::copy(str, str + 100, str1, ascii::len(str1));
-			ascii::to_upper(str, str_end);
-			CHECK_EQUAL(0, ascii::compare(str2, str));
+			xuchars128 str;
+			xcuchars str1 = "this is a lower case string";
+			xcuchars str2 = "THIS IS A LOWER CASE STRING";
+			ascii::copy(str.chars(), str1);
+			ascii::to_upper(str.chars());
+			CHECK_EQUAL(0, ascii::compare(str2, str.cchars()));
 		}
 
 		UNITTEST_TEST(to_lower)
 		{
-			char str[101];
-			const char* str1 = "THIS IS AN UPPER CASE STRING";
-			const char* str2 = "this is an upper case string";
-			char* str_end = ascii::copy(str, str + 100, str1, ascii::len(str1));
-			ascii::to_lower(str, str_end);
-			CHECK_EQUAL(0, ascii::compare(str2, str));
+			xuchars128 str;
+			xcuchars str1 = "THIS IS AN UPPER CASE STRING";
+			xcuchars str2 = "this is an upper case string";
+			ascii::copy(str.chars(), str1);
+			ascii::to_lower(str.chars());
+			CHECK_EQUAL(0, ascii::compare(str2, str.cchars()));
 		}
 
 		UNITTEST_TEST(starts_with)
 		{
-			const char* str1 = "a simple string";
-			const char* str2 = "need a longer string";
-			const char* start2 = "need";
+			xcuchars str1 = "a simple string";
+			xcuchars str2 = "need a longer string";
+			xcuchars start2 = "need";
 
-			CHECK_EQUAL(true, ascii::starts_with(str1, ascii::len(str1), 'a'));
-			CHECK_EQUAL(false, ascii::starts_with(str2, ascii::len(str2), 'a'));
+			CHECK_EQUAL(true, ascii::starts_with (str1, 'a'));
+			CHECK_EQUAL(false, ascii::starts_with(str2, 'a'));
 
-			CHECK_EQUAL(false, ascii::starts_with(str1, ascii::len(str1), start2, ascii::len(start2)));
-			CHECK_EQUAL(true, ascii::starts_with(str2, ascii::len(str2), start2, ascii::len(start2)));
+			CHECK_EQUAL(false, ascii::starts_with(str1, start2));
+			CHECK_EQUAL(true, ascii::starts_with (str2, start2));
 		}
 
 		UNITTEST_TEST(ends_with)
 		{
-			const char* str1 = "a simple string";
-			const char* str2 = "need a longer string!";
-			const char* end2 = "string";
+			xcuchars str1 = "a simple string";
+			xcuchars str2 = "need a longer string!";
+			xcuchars end2 = "string";
 
-			CHECK_EQUAL(true, ascii::ends_with(str1, ascii::len(str1), 'g'));
-			CHECK_EQUAL(false, ascii::ends_with(str2, ascii::len(str2), 'g'));
+			CHECK_EQUAL(true, ascii::ends_with (str1, 'g'));
+			CHECK_EQUAL(false, ascii::ends_with(str2, 'g'));
 
-			CHECK_EQUAL(true, ascii::ends_with(str1, ascii::len(str1), end2, ascii::len(end2)));
-			CHECK_EQUAL(false, ascii::ends_with(str2, ascii::len(str2), end2, ascii::len(end2)));
+			CHECK_EQUAL(true,  ascii::ends_with(str1, end2));
+			CHECK_EQUAL(false, ascii::ends_with(str2, end2));
 		}
 
 		UNITTEST_TEST(first_char)
 		{
-			const char* str1 = "a simple string";
-			CHECK_EQUAL('a', ascii::first_char(str1, ascii::len(str1)));
+			xcuchars str1 = "a simple string";
+			CHECK_EQUAL('a', ascii::first_char(str1));
 		}
 
 		UNITTEST_TEST(last_char)
 		{
-			const char* str1 = "a simple string";
-			CHECK_EQUAL('g', ascii::last_char(str1, ascii::len(str1)));
+			xcuchars str1 = "a simple string";
+			CHECK_EQUAL('g', ascii::last_char(str1));
 		}
 
 		UNITTEST_TEST(cprintf)
 		{
 			s32 const i = 100;
-			const char* str = "hello";
+			xcuchars str = "hello";
 
-			const char* fmt = "%d %s";
-			const char* fmt_end = fmt + 5;
-			s32 length = ascii::cprintf(fmt, fmt_end, x_va(i), x_va(str));
+			xcuchars fmt = "%d %s";
+			s32 length = ascii::cprintf(fmt, x_va(i), x_va(str));
 
 			CHECK_EQUAL(9, length);
 		}
@@ -531,100 +505,98 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		UNITTEST_TEST(vcprintf)
 		{
 			s32 i = 100;
-			const char* str = "hello";
-			const char* fmt = "%d %s";
-			const char* fmt_end = fmt + 5;
-			s32 length = ascii::vcprintf(fmt, fmt_end, x_va_list(x_va(i), x_va(str)));
+			xcuchars str = "hello";
+			xcuchars fmt = "%d %s";
+			s32 length = ascii::vcprintf(fmt, x_va_list(x_va(i), x_va(str)));
 			CHECK_EQUAL(9, length);
 		}
 
 		UNITTEST_TEST(sprintf)
 		{
-			char buffer_buffer[16 + 1];
-			char * buffer = &buffer_buffer[0];
-			char * buffer_end = &buffer_buffer[16];
+			xuchars32 buffer;
 
 			s32 i = 100;
 
-			const char* str = "hello";
-			const char* fmt = "%d %s";
-			const char* fmt_end = fmt + 5;
+			xcuchars str = "hello";
+			xcuchars fmt = "%d %s";
 
-			ascii::prune end = ascii::sprintf(buffer, buffer_end, fmt, fmt_end, x_va(i), x_va(str));
-			CHECK_EQUAL(9, end - buffer);
-			CHECK_TRUE(ascii::compare(buffer, "100 hello") == 0);
+			ascii::sprintf(buffer.chars(), fmt, x_va(i), x_va(str));
+			CHECK_EQUAL(9, buffer.size());
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "100 hello") == 0);
 
 			// Check all format functionality?
 		}
 
 		UNITTEST_TEST(sprintf_bool)
 		{
-			char buffer_buffer[16 + 1];
-			char * buffer = &buffer_buffer[0];
-			char * buffer_end = &buffer_buffer[16];
-
-			ascii::prune end;
+			xuchars32 buffer;
 
 			// ---------------------------------------------------------------------------
 			// Boolean, True/False and Yes/No verification
-			end = ascii::sprintf(buffer, buffer_end, "%b", NULL, x_va(true));
-			CHECK_EQUAL(buffer+4, end);
-			CHECK_TRUE(ascii::compare(buffer, "true")==0);
+			buffer.reset();
+			ascii::sprintf(buffer.chars(), "%b", x_va(true));
+			CHECK_EQUAL(buffer.size(), 4);
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "true")==0);
 
-			end = ascii::sprintf(buffer, buffer_end, "%B", NULL, x_va(true));
-			CHECK_EQUAL(buffer + 4, end);
-			CHECK_TRUE(ascii::compare(buffer, "TRUE")==0);
+			buffer.reset();
+			ascii::sprintf(buffer.chars(), "%B", x_va(true));
+			CHECK_EQUAL(buffer.size(), 4);
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "TRUE")==0);
 
-			end = ascii::sprintf(buffer, buffer_end, "%b", NULL, x_va(false));
-			CHECK_EQUAL(buffer + 5, end);
-			CHECK_TRUE(ascii::compare(buffer, "false")==0);
+			buffer.reset();
+			ascii::sprintf(buffer.chars(), "%b", x_va(false));
+			CHECK_EQUAL(buffer.size(), 5);
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "false")==0);
 
-			end = ascii::sprintf(buffer, buffer_end, "%#b", NULL, x_va(false));
-			CHECK_EQUAL(buffer + 5, end);
-			CHECK_TRUE(ascii::compare(buffer, "False")==0);
+			buffer.reset();
+			ascii::sprintf(buffer.chars(), "%#b", x_va(false));
+			CHECK_EQUAL(buffer.size(), 5);
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "False")==0);
 
-			end = ascii::sprintf(buffer, buffer_end, "%y", NULL, x_va(true));
-			CHECK_EQUAL(buffer + 3, end);
-			CHECK_TRUE(ascii::compare(buffer, "yes")==0);
+			buffer.reset();
+			ascii::sprintf(buffer.chars(), "%y", x_va(true));
+			CHECK_EQUAL(buffer.size(), 3);
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "yes")==0);
 
-			end = ascii::sprintf(buffer, buffer_end, "%y", NULL, x_va(false));
-			CHECK_EQUAL(buffer + 2, end);
-			CHECK_TRUE(ascii::compare(buffer, "no")==0);
+			buffer.reset();
+			ascii::sprintf(buffer.chars(), "%y", x_va(false));
+			CHECK_EQUAL(buffer.size(), 2);
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "no")==0);
 
-			end = ascii::sprintf(buffer, buffer_end, "%Y", NULL, x_va(true));
-			CHECK_EQUAL(buffer + 3, end);
-			CHECK_TRUE(ascii::compare(buffer, "YES")==0);
+			buffer.reset();
+			ascii::sprintf(buffer.chars(), "%Y", x_va(true));
+			CHECK_EQUAL(buffer.size(), 3);
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "YES")==0);
 
-			end = ascii::sprintf(buffer, buffer_end, "%#y", NULL, x_va(true));
-			CHECK_EQUAL(buffer + 3, end);
-			CHECK_TRUE(ascii::compare(buffer, "Yes")==0);
+			buffer.reset();
+			ascii::sprintf(buffer.chars(), "%#y", x_va(true));
+			CHECK_EQUAL(buffer.size(), 3);
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "Yes")==0);
 			// ---------------------------------------------------------------------------
 
 		}
 
 		UNITTEST_TEST(vsprintf)
 		{
-			char buffer_buffer[16 + 1];
-			char * buffer = &buffer_buffer[0];
-			char * buffer_end = &buffer_buffer[16];
+			xuchars32 buffer;
 
 			s32 i = 100;
-			const char* str = "hello";
-			const char* fmt = "%d %s";
-			s32 length = ascii::vsprintf(buffer, buffer_end, fmt, NULL, x_va_list(x_va(i), x_va(str)));
-			CHECK_EQUAL(9, length);
-			CHECK_TRUE(ascii::compare(buffer, "100 hello")==0);
+			xcuchars str = "hello";
+			xcuchars fmt = "%d %s";
+			ascii::vsprintf(buffer.chars(), fmt, x_va_list(x_va(i), x_va(str)));
+			CHECK_EQUAL(9, buffer.size());
+			CHECK_TRUE(ascii::compare(buffer.cchars(), "100 hello")==0);
 		}
 
 		UNITTEST_TEST(sscanf)
 		{
 			// Test scanf
-			const char* str = "1.0 100";
-			const char* format = "%f %u";
+			xcuchars str = "1.0 100";
+			xcuchars format = "%f %u";
 			
 			f32 myfloat;
 			u32 myint;
-			ascii::sscanf(str, NULL, format, NULL, x_va_r(&myfloat), x_va_r(&myint));
+			ascii::sscanf(str, format, x_va_r(&myfloat), x_va_r(&myint));
 
 			CHECK_EQUAL(1.0f, myfloat);
 			CHECK_EQUAL(100, myint);

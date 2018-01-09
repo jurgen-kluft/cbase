@@ -73,32 +73,22 @@ namespace xcore
 		xconsole::write(value);
 	}
 
-	void 				xlog_to_console_imp::write(const char* buffer)
+	void 				xlog_to_console_imp::write(const xcuchars& str)
 	{
-		xconsole::write(buffer);
+		xconsole::write(str);
 	}
 
-	void 				xlog_to_console_imp::write(const char* buffer, const char* buffer_end)
-	{
-		xconsole::write(buffer, buffer_end);
-	}
-
-	void 				xlog_to_console_imp::write(const char* format, const x_va_list& arguments)
+	void 				xlog_to_console_imp::write(const xcuchars& format, const x_va_list& arguments)
 	{
 		xconsole::write(format, arguments);
 	}
 
-	void 				xlog_to_console_imp::write(const uchar32* buffer)
+	void 				xlog_to_console_imp::write(const xcuchar32s& str)
 	{
-		xconsole::write(buffer);
+		xconsole::write(str);
 	}
 
-	void 				xlog_to_console_imp::write(const uchar32* buffer, const uchar32* buffer_end)
-	{
-		xconsole::write(buffer, buffer_end);
-	}
-
-	void 				xlog_to_console_imp::write(const uchar32* format, const x_va_list& arguments)
+	void 				xlog_to_console_imp::write(const xcuchar32s& format, const x_va_list& arguments)
 	{
 		xconsole::write(format, arguments);
 	}
@@ -148,32 +138,22 @@ namespace xcore
 		xconsole::writeLine(value);
 	}
 
-	void 				xlog_to_console_imp::writeLine(const char* buffer)
+	void 				xlog_to_console_imp::writeLine(const xcuchars& str)
 	{
-		xconsole::writeLine(buffer);
+		xconsole::writeLine(str);
 	}
 
-	void 				xlog_to_console_imp::writeLine(const char* buffer, const char* buffer_end)
-	{
-		xconsole::writeLine(buffer, buffer_end);
-	}
-
-	void 				xlog_to_console_imp::writeLine(const char* format, const x_va_list& arguments)
+	void 				xlog_to_console_imp::writeLine(const xcuchars& format, const x_va_list& arguments)
 	{
 		xconsole::writeLine(format, arguments);
 	}
 
-	void 				xlog_to_console_imp::writeLine(const uchar32* buffer)
+	void 				xlog_to_console_imp::writeLine(const xcuchar32s& str)
 	{
-		xconsole::writeLine(buffer);
+		xconsole::writeLine(str);
 	}
 
-	void 				xlog_to_console_imp::writeLine(const uchar32* buffer, const uchar32* buffer_end)
-	{
-		xconsole::writeLine(buffer, buffer_end);
-	}
-
-	void 				xlog_to_console_imp::writeLine(const uchar32* format, const x_va_list& arguments)
+	void 				xlog_to_console_imp::writeLine(const xcuchar32s& format, const x_va_list& arguments)
 	{
 		xconsole::writeLine(format, arguments);
 	}

@@ -17,6 +17,7 @@
 
 #include "xbase/x_console.h"
 #include "xbase/x_string_utf.h"
+#include "xbase/x_chars.h"
 
 /**
  * xCore namespace
@@ -30,7 +31,7 @@ namespace xcore
 			return 0;
 		}
 
-		s32 write_uchar(const uchar* str, const uchar* str_end)
+		s32 write(const xcuchars& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen + 4];
@@ -38,13 +39,11 @@ namespace xcore
 			uchar16* end16 = dst16 + maxlen;
 
 			s32 l = 0;
-			const uchar* src = str;
-			while (!utf::is_eos(src) && src < (const uchar*)str_end && dst16 < end16)
+			xcuchars src = str;
+			while (!utf::is_eos(src) && dst16 < end16)
 			{
-				uchar32 c;
-				utf::read(src, c);
-				uchar16* next = utf::write(c, dst16);
-				dst16 = next;
+				uchar32 c = utf::read(src);
+				utf::write(c, dst16, end16);
 				l += 1;
 			}
 			str16[maxlen - 1] = 0;
@@ -54,7 +53,7 @@ namespace xcore
 			return l;
 		}
 
-		s32 write_uchar8(xcuchar8s const& str)
+		s32 write(xcuchar8s const& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen + 4];
@@ -62,13 +61,11 @@ namespace xcore
 			uchar16* end16 = dst16 + maxlen;
 
 			s32 l = 0;
-			const uchar8* src = (const uchar8*)str;
-			while (!utf::is_eos(src) && src < (const uchar8*)str_end && dst16 < end16)
+			xcuchar8s src = str;
+			while (!utf::is_eos(src) && dst16 < end16)
 			{
-				uchar32 c;
-				utf::read(src, c);
-				uchar16* next = utf::write(c, dst16);
-				dst16 = next;
+				uchar32 c = utf::read(src);
+				utf::write(c, dst16, end16);
 				l += 1;
 			}
 			str16[maxlen - 1] = 0;
@@ -78,7 +75,7 @@ namespace xcore
 			return l;
 		}
 
-		s32 write_uchar32(const uchar32* str, const uchar32* str_end)
+		s32 write(const xcuchar32s& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen +4];
@@ -86,13 +83,11 @@ namespace xcore
 			uchar16* end16 = dst16 + maxlen;
 
 			s32 l = 0;
-			const uchar32* src = (const uchar32*)str;
-			while (!utf::is_eos(src) && src < (const uchar32*)str_end && dst16 < end16)
+			xcuchar32s src = str;
+			while (!utf::is_eos(src) && dst16 < end16)
 			{
-				uchar32 c;
-				utf::read(src, c);
-				uchar16* next = utf::write(c, dst16);
-				dst16 = next;
+				uchar32 c = utf::read(src);
+				utf::write(c, dst16, end16);
 				l += 1;
 			}
 			str16[maxlen - 1] = 0;

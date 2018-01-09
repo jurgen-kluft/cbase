@@ -12,9 +12,9 @@ inline xbuffer	xbuffer::alloc(u64 size, x_iallocator* a)
 inline void		xbuffer::realloc(xbuffer& buf, u64 size, x_iallocator* a)
 {
 	void* ptr = a->allocate(size, sizeof(void*));
-	xmem_utils::memcpy(ptr, buf.m_data, buf.m_len);
+	xmem_utils::memcpy(ptr, buf.m_data, (u32)buf.m_len);
 	a->deallocate(buf.m_data);
-	buf.m_data = ptr;
+	buf.m_data = (xbyte*)ptr;
 	buf.m_len = size;
 }
 

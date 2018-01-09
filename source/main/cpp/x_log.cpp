@@ -120,32 +120,22 @@ namespace xcore
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				xlog::write(ELevel inLevel, const char* buffer)
+	void 				xlog::write(ELevel inLevel, const xcuchars& str)
 	{
-		sLogger[inLevel]->write(buffer);
+		sLogger[inLevel]->write(str);
 	}
 
-	void 				xlog::write(ELevel inLevel, const char* buffer, const char* buffer_end)
-	{
-		sLogger[inLevel]->write(buffer, buffer_end);
-	}
-
-	void 				xlog::write(ELevel inLevel, const char* format, const x_va_list& arguments)
+	void 				xlog::write(ELevel inLevel, const xcuchars& format, const x_va_list& arguments)
 	{
 		sLogger[inLevel]->write(format, arguments);
 	}
 
-	void 				xlog::write(ELevel inLevel, const uchar32* buffer)
+	void 				xlog::write(ELevel inLevel, const xcuchar32s& str)
 	{
-		sLogger[inLevel]->write(buffer);
+		sLogger[inLevel]->write(str);
 	}
 
-	void 				xlog::write(ELevel inLevel, const uchar32* buffer, const uchar32* buffer_end)
-	{
-		sLogger[inLevel]->write(buffer, buffer_end);
-	}
-
-	void 				xlog::write(ELevel inLevel, const uchar32* format, const x_va_list& arguments)
+	void 				xlog::write(ELevel inLevel, const xcuchar32s& format, const x_va_list& arguments)
 	{
 		sLogger[inLevel]->write(format, arguments);
 	}
@@ -197,95 +187,65 @@ namespace xcore
 		sLogger[inLevel]->writeLine(_value);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const char* buffer)
+	void 				xlog::writeLine(ELevel inLevel, const xcuchars& str)
 	{
-		sLogger[inLevel]->writeLine(buffer);
+		sLogger[inLevel]->writeLine(str);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const char* buffer, const char* buffer_end)
-	{
-		sLogger[inLevel]->writeLine(buffer, buffer_end);
-	}
-
-	void 				xlog::writeLine(ELevel inLevel, const char* format, const x_va_list& arguments)
+	void 				xlog::writeLine(ELevel inLevel, const xcuchars& format, const x_va_list& arguments)
 	{
 		sLogger[inLevel]->writeLine(format, arguments);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const uchar32* buffer)
+	void 				xlog::writeLine(ELevel inLevel, const xcuchar32s& str)
 	{
-		sLogger[inLevel]->writeLine(buffer);
+		sLogger[inLevel]->writeLine(str);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const uchar32* buffer, const uchar32* buffer_end)
-	{
-		sLogger[inLevel]->writeLine(buffer, buffer_end);
-	}
-
-	void 				xlog::writeLine(ELevel inLevel, const uchar32* format, const x_va_list& arguments)
+	void 				xlog::writeLine(ELevel inLevel, const xcuchar32s& format, const x_va_list& arguments)
 	{
 		sLogger[inLevel]->writeLine(format, arguments);
 	}
 
 
-	void 				xlog_imp::write(const char* buffer)									
+	void 				xlog_imp::write(const xcuchars& str)
 	{ 
-		write(buffer); 
+		write(str);
 	}
 
-	void 				xlog_imp::writeLine(const char* buffer)
-	{
-		writeLine(buffer); 
-	}
-
-	void 				xlog_imp::write(const uchar32* buffer)									
+	void 				xlog_imp::writeLine(const xcuchars& str)
 	{ 
-		write(buffer); 
+		writeLine(str);
 	}
 
-	void 				xlog_imp::writeLine(const uchar32* buffer)
-	{
-		writeLine(buffer); 
-	}
-
-	void 				xlog_imp::write(const char* buffer, const char* buffer_end)
+	void 				xlog_imp::write(const xcuchars& format, const x_va_list& arguments)
 	{ 
-		write(buffer, buffer_end);
+		write(format, arguments); 
 	}
 
-	void 				xlog_imp::writeLine(const char* buffer, const char* buffer_end)
+	void 				xlog_imp::writeLine(const xcuchars& format, const x_va_list& arguments)
 	{ 
-		writeLine(buffer, buffer_end);
+		writeLine(format, arguments); 
 	}
 
-	void 				xlog_imp::write(const char* buffer, const x_va_list& arguments)	
+	void 				xlog_imp::write(const xcuchar32s& str)
 	{ 
-		write(buffer, arguments); 
+		write(str);
 	}
 
-	void 				xlog_imp::writeLine(const char* buffer, const x_va_list& arguments)
+	void 				xlog_imp::writeLine(const xcuchar32s& str)
 	{ 
-		writeLine(buffer, arguments); 
+		writeLine(str);
 	}
 
-	void 				xlog_imp::write(const uchar32* buffer, const uchar32* buffer_end)
+	void 				xlog_imp::write(const xcuchar32s& format, const x_va_list& arguments)
 	{ 
-		write(buffer, buffer_end);
+		write(format, arguments); 
 	}
 
-	void 				xlog_imp::writeLine(const uchar32* buffer, const uchar32* buffer_end)
+	void 				xlog_imp::writeLine(const xcuchar32s& format, const x_va_list& arguments)
 	{ 
-		writeLine(buffer, buffer_end);
-	}
-
-	void 				xlog_imp::write(const uchar32* buffer, const x_va_list& arguments)	
-	{ 
-		write(buffer, arguments); 
-	}
-
-	void 				xlog_imp::writeLine(const uchar32* buffer, const x_va_list& arguments)
-	{ 
-		writeLine(buffer, arguments); 
+		writeLine(format, arguments); 
 	}
 	
 	#ifdef X_LOG

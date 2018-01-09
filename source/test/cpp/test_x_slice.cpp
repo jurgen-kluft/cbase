@@ -17,7 +17,7 @@ UNITTEST_SUITE_BEGIN(xslice)
 		UNITTEST_TEST(slice_100)
 		{
 			slice s;
-			slice::alloc(s, gTestAllocator, 100);
+			slice::alloc(s, gTestAllocator, 100, 4);
 		}
 	}
 }

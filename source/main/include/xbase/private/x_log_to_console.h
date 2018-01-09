@@ -18,6 +18,19 @@
  */
 namespace xcore
 {
+	template<typename T>
+	class xuchars_t;
+	template<typename T>
+	class xcuchars_t;
+
+	typedef xuchars_t<char>		xuchars;
+	typedef xuchars_t<uchar8>	xuchar8s;
+	typedef xuchars_t<uchar32>	xuchar32s;
+
+	typedef xcuchars_t<char>	xcuchars;
+	typedef xcuchars_t<uchar8>	xcuchar8s;
+	typedef xcuchars_t<uchar32>	xcuchar32s;
+
 	class xlog_to_console_imp : public xlog_imp
 	{
 		virtual void			initialize();
@@ -35,12 +48,10 @@ namespace xcore
 		virtual void 			write(u32 value);
 		virtual void 			write(u64 value);
 		virtual void 			write(uchar32 value);
-		virtual void 			write(const char* buffer);
-		virtual void 			write(const char* buffer, const char* buffer_end);
-		virtual void 			write(const char* format, const x_va_list& arguments);
-		virtual void 			write(const uchar32* buffer);
-		virtual void 			write(const uchar32* buffer, const uchar32* buffer_end);
-		virtual void 			write(const uchar32* format, const x_va_list& arguments);
+		virtual void 			write(const xcuchars& str);
+		virtual void 			write(const xcuchars& format, const x_va_list& arguments);
+		virtual void 			write(const xcuchar32s& str);
+		virtual void 			write(const xcuchar32s& format, const x_va_list& arguments);
 
 		virtual void 			writeLine();
 		virtual void 			writeLine(bool value);
@@ -51,12 +62,10 @@ namespace xcore
 		virtual void 			writeLine(u32 value);
 		virtual void 			writeLine(u64 value);
 		virtual void 			writeLine(uchar32 value);
-		virtual void 			writeLine(const char* buffer);
-		virtual void 			writeLine(const char* buffer, const char* buffer_end);
-		virtual void 			writeLine(const char* format, const x_va_list& arguments);
-		virtual void 			writeLine(const uchar32* buffer);
-		virtual void 			writeLine(const uchar32* buffer, const uchar32* buffer_end);
-		virtual void 			writeLine(const uchar32* format, const x_va_list& arguments);
+		virtual void 			writeLine(const xcuchars& str);
+		virtual void 			writeLine(const xcuchars& format, const x_va_list& arguments);
+		virtual void 			writeLine(const xcuchar32s& str);
+		virtual void 			writeLine(const xcuchar32s& format, const x_va_list& arguments);
 	};
 };
 /**

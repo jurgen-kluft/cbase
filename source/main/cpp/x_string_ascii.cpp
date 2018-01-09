@@ -415,7 +415,7 @@ namespace xcore
 			return str;
 		}
 
-		crunes	parse(crunes& _str, u64& value, s32 base)
+		crunes	parse(crunes const& _str, u64& value, s32 base)
 		{
 			crunes str = _str;
 			rune format_str[] = { '%', 'd' };
@@ -635,7 +635,7 @@ namespace xcore
 			return true;
 		}
 
-		bool		is_lower(crunes& _str)
+		bool		is_lower(crunes const& _str)
 		{
 			crunes str = _str;
 			uchar32 c;
@@ -741,7 +741,7 @@ namespace xcore
 			return false;
 		}
 
-		bool		starts_with(crunes& _str, crunes& _start)
+		bool		starts_with(crunes const& _str, crunes const& _start)
 		{
 			crunes lstr = _str;
 			crunes rstr = _start;
@@ -816,6 +816,7 @@ namespace xcore
 				pc = c;
 			return pc;
 		}
+
 	};	///< END ascii namespace
 };	///< END xcore namespace
 
