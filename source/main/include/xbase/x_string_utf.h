@@ -91,11 +91,11 @@ namespace xcore
 		inline bool		has_fixed_size_rune() { return true; }
 		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
 
-		inline pcrune	len(pcrune str, s32* len = NULL) { return NULL; }
-		inline prune	len(prune str, prune end, s32* len = NULL) { return NULL; }
-		inline pcrune	len(pcrune str, pcrune end, s32* len = NULL) { return NULL; }
+		s32				len(prune str, prune end);
+		s32				len(pcrune str, pcrune end);
 
-		inline u32		size(pcrune str) { return 0; }
+		prune			endof(prune str, prune end);
+		pcrune			endof(pcrune str, pcrune end);
 
 		enum ECopyType { NONE = 0, COPY_AND_WRITE_TERMINATOR = 1, COPY_AND_WRITE_MATCHING_TERMINATOR = 2 };
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };
@@ -196,11 +196,11 @@ namespace xcore
 		inline bool		has_fixed_size_rune() { return true; }
 		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
 
-		inline pcrune	len(pcrune str, s32* len = NULL) { return NULL; }
-		inline prune	len(prune str, prune end, s32* len = NULL) { return NULL; }
-		inline pcrune	len(pcrune str, pcrune end, s32* len = NULL) { return NULL; }
+		s32				len(prune str, prune end);
+		s32				len(pcrune str, pcrune end);
 
-		inline u32		size(pcrune str) { return 0; }
+		prune			endof(prune str, prune end);
+		pcrune			endof(pcrune str, pcrune end);
 
 		enum ECopyType { NONE = 0, COPY_AND_WRITE_TERMINATOR = 1, COPY_AND_WRITE_MATCHING_TERMINATOR = 2 };
 		enum ECmpMode { CASE_SENSITIVE, CASE_IGNORE };

@@ -848,7 +848,9 @@ namespace xcore
 				{
 					n = 10 * n + to_digit(ch);
 					ch = reader->Read();
-				} while (is_digit(ch));
+					if (!is_digit(ch))
+						break;
+				} while (true);
 
 				width = n;
 				goto reswitch;
@@ -1014,9 +1016,8 @@ namespace xcore
 			case 's':
 				if (args[argindex].isPCUChar32())
 				{
-					xcuchar32s chrs = *(xcuchar32s const*)args[argindex];
-					xcuchar32s src = chrs;
-					while (utf::is_eos(src) == false && src < chrs.m_end)
+					xcuchar32s src = *(xcuchar32s const*)args[argindex];
+					while (!utf::is_eos(src))
 					{
 						uchar32 c = utf::read(src);
 						buffer->Write(c);
@@ -1024,9 +1025,8 @@ namespace xcore
 				}
 				else if (args[argindex].isPCTChar())
 				{
-					xcuchars chrs = *(xcuchars const*)args[argindex];
-					xcuchars src = chrs;
-					while (utf::is_eos(src) == false && src < chrs.m_end)
+					xcuchars src = *(xcuchars const*)args[argindex];
+					while (!utf::is_eos(src))
 					{
 						uchar32 c = utf::read(src);
 						buffer->Write(c);
@@ -1235,6 +1235,7 @@ namespace xcore
 			CharWriterToAsciiBuffer writer(str.m_end, str.m_eos);
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
+			str.m_end = writer.mPtr;
 		}
 
 		void		printf(crunes const& format, X_VA_ARGS_16)
@@ -1295,6 +1296,7 @@ namespace xcore
 			CharWriterToUtf8Buffer writer(str.m_end, str.m_eos);
 			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
+			str.m_end = writer.mPtr;
 		}
 
 		void		printf(crunes const& format, X_VA_ARGS_16)
@@ -1364,8 +1366,8 @@ namespace xcore
 			CharReaderFromUtf32Buffer reader(format.m_str, format.m_end);
 			CharWriterToUtf32Buffer writer(str.m_str, str.m_end);
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
-
 			VSPrintf_internal(&writer, &reader, &buffer, args);
+			str.m_end = writer.mPtr;
 		}
 
 		void	printf(crunes const& str)

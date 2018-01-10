@@ -24,6 +24,7 @@ namespace xcore
 		xuchars_t(T* str, T* end);
 		xuchars_t(T* str, T* end, T* eos);
 		xuchars_t(T* str, T* end, const xuchars_t<T>& other);
+		xuchars_t(const xuchars_t<T>& other);
 
 		u32			size() const;
 
@@ -32,6 +33,7 @@ namespace xcore
 
 		void		reset();
 		void		clear();
+		void		clone(const xuchars_t<T>& other);
 
 		xcuchars_t<T> cchars() const;
 
@@ -147,10 +149,11 @@ namespace xcore
 		xuchars_t<T>&	chars() { return m_chars; }
 		xcuchars_t<T>	cchars() const { return xcuchars_t<T>(m_chars.m_str, m_chars.m_end); }			
 		void			reset() {
-			m_str[SIZE - 1] = '\0';
 			m_chars.m_str = m_str;
 			m_chars.m_end = m_chars.m_str;
 			*m_chars.m_end = '\0';
+			m_chars.m_eos = &m_str[SIZE - 1];
+			*m_chars.m_eos = '\0';
 		}
 		void		clear() {
 			reset();
@@ -292,6 +295,14 @@ namespace xcore
 	}
 
 	template<typename T>
+	inline	xuchars_t<T>::xuchars_t(const xuchars_t<T>& other)
+		: m_str(other.m_str)
+		, m_end(other.m_end)
+		, m_eos(other.m_eos)
+	{
+	}
+
+	template<typename T>
 	inline u32			xuchars_t<T>::size() const
 	{
 		return (u32)(u64)(m_end - m_str);
@@ -322,6 +333,14 @@ namespace xcore
 		T* str = m_str;
 		while (str < m_end)
 			*str++ = '\0';
+	}
+
+	template<typename T>
+	inline void			xuchars_t<T>::clone(const xuchars_t<T>& other)
+	{
+		m_str = other.m_str;
+		m_end = other.m_end;
+		m_eos = other.m_eos;
 	}
 
 	template<typename T>

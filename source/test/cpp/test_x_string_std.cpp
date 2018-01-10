@@ -20,25 +20,24 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		{
 			xcuchars src = "this is a system string";
 
-			CHECK_EQUAL(src.m_str + 23, ascii::len(src.m_str));
+			CHECK_EQUAL(23, ascii::len(src.m_str, NULL));
 
-			s32 len;
-			ascii::pcrune src_end_1 = ascii::len(src.m_str, &len);
-			CHECK_EQUAL(23, len);
-			CHECK_EQUAL(src.m_str + len, src_end_1);
+			ascii::pcrune src_end_1 = ascii::endof(src.m_str, NULL);
+			CHECK_EQUAL(23, ascii::len(src.m_str, NULL));
+			CHECK_EQUAL(src.m_str + 23, src_end_1);
 
-			ascii::pcrune src_end_2 = ascii::len(src.m_str, src.m_str + 20, &len);
-			CHECK_EQUAL(20, len);
-			CHECK_EQUAL(src.m_str + len, src_end_2);
+			ascii::pcrune src_end_2 = ascii::endof(src.m_str, src.m_str + 20);
+			CHECK_EQUAL(20, ascii::len(src.m_str, src.m_str + 20));
+			CHECK_EQUAL(src.m_str + 20, src_end_2);
 
-			ascii::pcrune src_end_3 = ascii::len(src.m_str, src.m_str + 30, &len);
-			CHECK_EQUAL(23, len);
-			CHECK_EQUAL(src.m_str + len, src_end_3);
+			ascii::pcrune src_end_3 = ascii::endof(src.m_str, src.m_str + 30);
+			CHECK_EQUAL(23, ascii::len(src.m_str, src.m_str + 30));
+			CHECK_EQUAL(src.m_str + 23, src_end_3);
 		}
 
 		UNITTEST_TEST(size)
 		{
-			CHECK_EQUAL(0, ascii::size(""));
+			CHECK_EQUAL(0, ascii::len("", NULL));
 
 			xcuchars str = "this is a system string";
 			CHECK_EQUAL(23, ascii::size(str));
@@ -73,9 +72,9 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			CHECK_TRUE(ascii::find(str1, 'E').is_empty());
 			CHECK_FALSE(ascii::find(str1, 'E', ascii::CASE_IGNORE).is_empty());
 
-			xcuchars str2 = "system";
-			xcuchars found = ascii::find(str1, str2);
-			CHECK_TRUE(found == xcuchars("system string"));
+			xcuchars tofind = "system";
+			xcuchars found = ascii::find(str1, tofind);
+			CHECK_TRUE(found == xcuchars("system"));
 
 			xcuchars str3 = "SYSTEM";
 			CHECK_TRUE(ascii::find(str1, str3).is_empty());
@@ -101,10 +100,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			xcuchars str2 = "this is a copied string";
 
 			xcuchars find_str = "system";
-			xcuchars pos = ascii::find(dst.cchars(), find_str);
+			xcuchars found = ascii::find(dst.cchars(), find_str);
+			CHECK_TRUE(found == xcuchars("system"));
 
 			xcuchars replace_str = "copied";
-			ascii::replace(dst.chars(), replace_str);
+			ascii::replace(dst.chars(), find_str, replace_str);
 
 			CHECK_EQUAL(0, ascii::compare(dst.cchars(), str2));
 		}

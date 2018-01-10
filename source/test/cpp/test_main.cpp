@@ -25,8 +25,10 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
 #ifndef SPU
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xallocator);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbinary_search);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xcarray);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbitfield);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbuffer);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xcarray);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xcontainers);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdouble);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xfloat);

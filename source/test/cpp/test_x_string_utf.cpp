@@ -34,7 +34,7 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 		{
 			// s32  		strlen		(char const* _str, char const** _end = 0);
 			const uchar8 utf8_str1[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0, 0, 0, 0 };	// fr�nch
-			u32 utf8_str1_len = utf8::size(utf8_str1);
+			u32 utf8_str1_len = utf8::len(utf8_str1, NULL);
 			CHECK_EQUAL(6, utf8_str1_len);
 		}
 
@@ -47,7 +47,7 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 		UNITTEST_TEST(numBytes_utf8)
 		{
 			const uchar8* str1 = (const uchar8*)"test";
-			CHECK_EQUAL(4, utf8::size(str1));
+			CHECK_EQUAL(4, utf8::len(str1, NULL));
 			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0 };	// fr�nch
 
 			xcuchar8s str(str2);

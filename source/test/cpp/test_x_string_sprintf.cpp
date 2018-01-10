@@ -27,8 +27,7 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 			xcuchars fmt("%f");
 
 			f64 d = 3.1415;
-			xuchars strc = str.chars();
-			ascii::sprintf(strc, fmt, x_va(d));
+			ascii::sprintf(str.chars(), fmt, x_va(d));
 			xcuchars answer_str("3.141500");
 			CHECK_EQUAL(0, ascii::compare(answer_str, str.cchars()));
 		}

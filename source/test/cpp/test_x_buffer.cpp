@@ -5,14 +5,12 @@
 using namespace xcore;
 
 
-UNITTEST_SUITE_BEGIN(xcbuffer)
+UNITTEST_SUITE_BEGIN(xbuffer)
 {
 	UNITTEST_FIXTURE(main)
 	{
 		UNITTEST_FIXTURE_SETUP() {}
 		UNITTEST_FIXTURE_TEARDOWN() {}
-
-		static s32	array_data[64];
 
 		UNITTEST_TEST(test_xbuffer32)
 		{

@@ -8,7 +8,7 @@ using namespace xcore;
 
 extern xcore::x_iallocator* gTestAllocator;
 
-UNITTEST_SUITE_BEGIN(containers)
+UNITTEST_SUITE_BEGIN(xcontainers)
 {
 	UNITTEST_FIXTURE(main)
 	{
@@ -24,7 +24,7 @@ UNITTEST_SUITE_BEGIN(containers)
 
 			// New Version: 99 -> 0
 			range_t<s32> rng_iter(from(0), count(100));
-			while (forward(rng_iter)) {
+			while (backward(rng_iter)) {
 				append(int100, *rng_iter);
 			}
 
@@ -35,8 +35,13 @@ UNITTEST_SUITE_BEGIN(containers)
 			indexed_t<s32> indexed_int100;
 			make(mem, indexed_int100, 100);
 
-			// 0 -> 49
-			auto int50 = int100(0, 50);
+			// 20 -> 69
+			auto int50 = int100(20, 70);
+			CHECK_EQUAL(50, int50.size());
+			for (u32 i = 0; i < int50.size(); ++i)
+			{
+				CHECK_EQUAL(20 + i, int50[i]);
+			}
 
 			f32 f = 0.0f;
 			map_t<s32, f32> int_to_float;
@@ -50,7 +55,7 @@ UNITTEST_SUITE_BEGIN(containers)
 
 			// Slice the array into a view of just 2 elements
 			// This will NOT make a copy of the data, only when
-			// you now 'resize' one of them.
+			// you now 'append' to one of them.
 			auto int2 = int100(0, 2);
 
 			s32 int0 = int2[0];

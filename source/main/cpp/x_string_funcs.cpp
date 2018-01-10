@@ -19,6 +19,57 @@ static bool				read_char(crunes& src, uchar32& out_c)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+s32		len(prune str, prune end)
+{
+	s32 l = 0;
+	while (end == NULL || str < end)
+	{
+		uchar32 c = utf::read(str);
+		if (c == '\0')
+			break;
+		l++;
+	}
+	return l;
+}
+
+s32		len(pcrune str, pcrune end)
+{
+	s32 l = 0;
+	while (end == NULL || str < end)
+	{
+		uchar32 c = utf::read(str);
+		if (c == '\0')
+			break;
+		l++;
+	}
+	return l;
+}
+
+prune			endof(prune str, prune end)
+{
+	while (end == NULL || str < end)
+	{
+		prune s = str;
+		uchar32 c = utf::read(s);
+		if (c == '\0')
+			break;
+		str = s;
+	}
+	return str;
+}
+
+pcrune			endof(pcrune str, pcrune end)
+{
+	while (end == NULL || str < end)
+	{
+		pcrune s = str;
+		uchar32 c = utf::read(s);
+		if (c == '\0')
+			break;
+		str = s;
+	}
+	return str;
+}
 
 void		copy(runes& _dest, crunes const& _src, ECopyType type)
 {

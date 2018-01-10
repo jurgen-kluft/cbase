@@ -39,29 +39,29 @@ namespace xcore
 			uchar32 c = '\0';
 			if (!is_eos(str))
 			{
-				c = src[0];
+				c = *src++;
 				s32 const l = sequence_sizeof_utf8((uchar8)c);
 				switch (l)
 				{
 				case 1:
 					break;
 				case 2:
-					src++;
 					c = ((c << 6) & 0x7ff) + ((src[0]) & 0x3f);
+					src++;
 					break;
 				case 3:
-					++src;
 					c = ((c << 12) & 0xffff) + (((src[0]) << 6) & 0xfff);
 					++src;
 					c += (src[0]) & 0x3f;
+					++src;
 					break;
 				case 4:
-					++src;
 					c = ((c << 18) & 0x1fffff) + (((src[0]) << 12) & 0x3ffff);
 					++src;
 					c += ((src[0]) << 6) & 0xfff;
 					++src;
 					c += (src[0]) & 0x3f;
+					++src;
 					break;
 				}
 			}
@@ -92,29 +92,29 @@ namespace xcore
 			uchar32 c = '\0';
 			if (!is_eos(str))
 			{
-				c = str[0];
+				c = *str++;
 				s32 const l = sequence_sizeof_utf8((uchar8)c);
 				switch (l)
 				{
 				case 1:
 					break;
 				case 2:
-					str++;
 					c = ((c << 6) & 0x7ff) + ((str[0]) & 0x3f);
+					str++;
 					break;
 				case 3:
-					++str;
 					c = ((c << 12) & 0xffff) + (((str[0]) << 6) & 0xfff);
 					++str;
 					c += (str[0]) & 0x3f;
+					++str;
 					break;
 				case 4:
-					++str;
 					c = ((c << 18) & 0x1fffff) + (((str[0]) << 12) & 0x3ffff);
 					++str;
 					c += ((str[0]) << 6) & 0xfff;
 					++str;
 					c += (str[0]) & 0x3f;
+					++str;
 					break;
 				}
 			}
@@ -496,7 +496,41 @@ namespace xcore
 	
 	namespace utf8
 	{
+		static inline s32		peek_char(runes const& _src, uchar32& out_c)
+		{
+			out_c = '\0';
+			if (!_src.is_empty())
+			{
+				pcrune src = _src.m_str;
+				out_c = utf::read(src);
+				return 1;
+			}
+			return 0;
+		}
+		static inline s32		peek_char(crunes const& _src, uchar32& out_c)
+		{
+			out_c = '\0';
+			if (!_src.is_empty())
+			{
+				pcrune src = _src.m_str;
+				out_c = utf::read(src);
+				return 1;
+			}
+			return 0;
+		}
 
+		//------------------------------------------------------------------------------
+		static bool				write_char(uchar32 c, runes& dst)
+		{
+			if (!dst.is_full())
+			{
+				utf::write(c, dst.m_end);
+				return true;
+			}
+			return false;
+		}
+
+		#include "x_string_funcs.cpp"
 	}
 
 
@@ -520,7 +554,8 @@ namespace xcore
 			out_c = '\0';
 			if (!src.is_empty())
 			{
-				out_c = src.m_str[0];
+				pcrune str = src.m_str;
+				out_c = utf::peek(str);
 				return 1;
 			}
 			return 0;
@@ -531,9 +566,7 @@ namespace xcore
 		{
 			if (!dst.is_full())
 			{
-				if (c > 0x7f)
-					c = '?';
-				*dst.m_end++ = (uchar)c;
+				utf::write(c, dst.m_end);
 				return true;
 			}
 			return false;

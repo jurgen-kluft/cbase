@@ -87,6 +87,7 @@ namespace xcore
 				if (m_current >= m_to)
 				{
 					m_state = STATE_END;
+					return false;
 				}
 				break;
 			case STATE_END:
@@ -107,9 +108,10 @@ namespace xcore
 			case range_t<T>::STATE_ITER:
 				m_index += 1;
 				m_current -= m_step;
-				if (m_current <= m_from)
+				if (m_current < m_from)
 				{
 					m_state = STATE_END;
+					return false;
 				}
 				break;
 			case STATE_END:

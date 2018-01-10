@@ -24,12 +24,12 @@ namespace xcore
 		inline bool		has_fixed_size_rune() { return true; }
 		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
 
-		inline pcrune	len(pcrune str, s32* len = NULL) { return NULL; }
-		inline prune	len(prune str, prune end, s32* len = NULL) { return NULL; }
-		inline pcrune	len(pcrune str, pcrune end, s32* len = NULL) { return NULL; }
+		s32				len(prune str, prune end);
+		s32				len(pcrune str, pcrune end);
 
-		inline u32		size(pcrune str) { return 0; }
-		
+		prune			endof(prune str, prune end);
+		pcrune			endof(pcrune str, pcrune end);
+
 		inline u32		size(runes const& str) { return str.size(); }
 		inline u32		size(crunes const& str) { return str.size(); }
 
@@ -47,7 +47,7 @@ namespace xcore
 		crunes			find(crunes const& str, crunes const& find, ECmpMode mode = CASE_SENSITIVE);		// Return position of first occurrence of <inString> or -1 if not found
 		crunes			find_one_of(crunes const& str, crunes const& set, ECmpMode mode = CASE_SENSITIVE);	// Return position of first occurrence of a character in <inCharSet> after <inPos> or -1 if not found
 		
-		void			replace(runes& str, crunes const& replace);
+		void			replace(runes& str, crunes const& find, crunes const& replace);
 
 		s32  			compare(crunes const& str1, crunes const& str2, ECmpMode mode = CASE_SENSITIVE);
 

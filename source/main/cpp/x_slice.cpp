@@ -65,7 +65,6 @@ namespace xcore
 
 	slice_data*		slice_data::alloc(x_iallocator* allocator, u32& to_itemcount, u32& to_itemsize)
 	{
-		to_itemsize = x_intu::align(to_itemsize, sizeof(void*));
 		slice_data* data = (slice_data*)allocator->allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void*));
 		data->mRefCount = 1;
 		data->mItemCount = to_itemcount;
@@ -185,9 +184,10 @@ namespace xcore
 	{
 		if (mData == NULL)
 			return NULL;
+		index += mFrom;
 		if (index < 0) index = 0;
-		else if ((u32)index >= mData->mItemCount)
-			index = mData->mItemCount - 1;
+		else if ((u32)index >= mTo)
+			index = mTo - 1;
 		u32 const data_offset = mData->mItemSize * index;
 		return &mData->mData[data_offset];
 	}
@@ -196,19 +196,12 @@ namespace xcore
 	{
 		if (mData == NULL)
 			return NULL;
+		index += mFrom;
 		if (index < 0) index = 0;
-		else if ((u32)index >= mData->mItemCount)
-			index = mData->mItemCount - 1;
+		else if ((u32)index >= mTo)
+			index = mTo - 1;
 		u32 const data_offset = mData->mItemSize * index;
 		return &mData->mData[data_offset];
-	}
-
-	// ----------------------------------------------------------------------------
-
-	u64		map_key_hasher(xbyte const* data, u32 size)
-	{
-		// xxhash ?
-		return 0;
 	}
 
 }

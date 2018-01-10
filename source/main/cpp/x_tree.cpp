@@ -570,7 +570,7 @@ namespace xcore
 			s32 rh = tree_validate(tree, rn, result);
 
 			// Invalid binary search tree 
-			if ((ln != NULL && tree->m_compare(ln, root) >= 0) || (rn != NULL && tree->m_compare(rn, root) <= 0))
+			if ((ln != NULL && tree->m_compare(ln->data, root->data) >= 0) || (rn != NULL && tree->m_compare(rn->data, root->data) <= 0))
 			{
 				result = "Binary tree violation";
 				return 0;

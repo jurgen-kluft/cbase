@@ -26,11 +26,12 @@ namespace xcore
 
 	struct memory
 	{
-		memory(x_iallocator* allocator) : m_allocator(allocator) {}
+		inline			memory() : m_allocator(NULL) {}
+		inline			memory(x_iallocator* allocator) : m_allocator(allocator) {}
 
-		void*			alloc(xsize_t size, u32 align);
-		void*			realloc(void* p, xsize_t size, u32 align);
-		void			dealloc(void* p);
+		void*			alloc(xsize_t size, u32 align)				{ return m_allocator->allocate(size, align); }
+		void*			realloc(void* p, xsize_t size, u32 align)	{ return m_allocator->reallocate(p, size, align); }
+		void			dealloc(void* p)							{ return m_allocator->deallocate(p); }
 
 		x_iallocator*	m_allocator;
 	};
@@ -202,8 +203,8 @@ namespace xcore
 		inline u32		size() const	{ return m_size; }
 		inline u32		max() const		{ return m_data.size(); }
 
-		array_t<T>		operator () (s32 to) const;
-		array_t<T>		operator () (s32 from, s32 to) const;
+		array_t<T>		operator () (u32 to) const;
+		array_t<T>		operator () (u32 from, u32 to) const;
 
 		T &				operator [] (s32 index);
 		T const &		operator [] (s32 index) const;
@@ -223,7 +224,7 @@ namespace xcore
 	};
 
 	template<typename T>
-	inline array_t<T>		array_t<T>::operator () (s32 to) const
+	inline array_t<T>		array_t<T>::operator () (u32 to) const
 	{
 		array_t<T> other;
 		other.m_data = m_data(0, to);
@@ -234,13 +235,20 @@ namespace xcore
 	}
 
 	template<typename T>
-	inline array_t<T>		array_t<T>::operator () (s32 from, s32 to) const
+	inline array_t<T>		array_t<T>::operator () (u32 from, u32 to) const
 	{
 		array_t<T> other;
 		other.m_data = m_data(from, to);
 		other.m_size = m_size;
-		if ((u32)(to-from) < m_size)
-			other.m_size = (to - from);
+		if (from >= m_size) {
+			other.m_size = 0;
+		}
+		else if (to > m_size) {
+			other.m_size = m_size - from;
+		}
+		else {
+			other.m_size = to - from;
+		}
 		return other;
 	}
 
@@ -361,7 +369,8 @@ namespace xcore
 		bool			is_empty() const;
 		bool			is_full() const;
 
-		T*				get_ptr(u32 idx);
+		T*				get(u32 idx);
+		T const*		get(u32 idx) const;
 
 		bool			alloc(T*& ptr, u32& index);
 		void			dealloc(u32 index);
@@ -396,7 +405,13 @@ namespace xcore
 	}
 
 	template<typename T>
-	T*				indexed_t<T>::get_ptr(u32 idx)
+	T*				indexed_t<T>::get(u32 idx)
+	{
+		return &m_items[idx];
+	}
+
+	template<typename T>
+	T const*		indexed_t<T>::get(u32 idx) const
 	{
 		return &m_items[idx];
 	}
@@ -406,10 +421,9 @@ namespace xcore
 	{
 		if (is_full())
 			return false;
-		s32 const i = max() - m_size - 1;
-		index = m_free[i];
-		m_items[i] = T();	// Construct
-		ptr = get_ptr(index);
+		index = m_free[m_size];
+		m_items[index] = T();	// Construct
+		ptr = get(index);
 		m_size += 1;
 		return true;
 	}
@@ -418,9 +432,8 @@ namespace xcore
 	void			indexed_t<T>::dealloc(u32 index)
 	{
 		m_size -= 1;
-		s32 const i = max() - m_size - 1;
-		m_free[i] = index;
-		(&m_items[i])->~T();	// Destruct
+		m_free[m_size] = index;
+		(&m_items[index])->~T();	// Destruct
 	}
 
 
@@ -433,7 +446,7 @@ namespace xcore
 	{
 		make(mem, proto.m_free, cap, cap);
 		make(mem, proto.m_items, cap, cap);
-		proto.m_size = cap;
+		proto.m_size = 0;
 
 		range_t<s32> iter(from(0), count(cap));
 		while (iterate(iter)) {
@@ -486,6 +499,8 @@ namespace xcore
 		typedef			map_item_t<K, V>	item_t;
 		indexed_t<item_t> m_items;
 
+		inline u32			size() const { return m_items.size(); }
+
 		u32					alloc()
 		{
 			teim_t* ptr;
@@ -493,12 +508,22 @@ namespace xcore
 			m_items.alloc(ptr, idx);
 			return idx;
 		}
-
-		item_t*				get_item(u32 idx)
+		void				dealloc(u32 idx)
 		{
-			item_t* item = m_items.get_ptr(idx);
+			m_items.dealloc(idx);
+		}
+
+		item_t*				get(u32 idx)
+		{
+			item_t* item = m_items.get(idx);
 			return item;
 		}
+		item_t const*		get(u32 idx) const
+		{
+			item_t const* item = m_items.get(idx);
+			return item;
+		}
+
 	};
 
 	struct map_node_indexer;
@@ -509,8 +534,10 @@ namespace xcore
 		enum { SIZE = 4 };
 		u32				m_nodes[SIZE];
 
-		u32				get(u8 idx) const { return m_nodes[idx]; }
-
+		u32				get(u8 idx) const
+		{
+			return m_nodes[idx]; 
+		}
 	
 		bool			find(u8& idx) const
 		{
@@ -529,6 +556,8 @@ namespace xcore
 		typedef				map_node_t			node_t;
 		indexed_t<node_t>	m_nodes;
 
+		inline u32			size() const { return m_nodes.size(); }
+
 		u32					alloc()
 		{
 			node_t* ptr;
@@ -537,16 +566,22 @@ namespace xcore
 			return idx;
 		}
 
-		node_t*				get(u32 idx)
+		node_t *			get(u32 idx)
 		{
-			node_t* node = m_nodes.get_ptr(idx);
+			node_t * node = m_nodes.get(idx);
+			return node;
+		}
+
+		node_t const*		get(u32 idx) const
+		{
+			node_t const* node = m_nodes.get(idx);
 			return node;
 		}
 	};
 
 	struct map_table_t
 	{
-		u32					get(map_node_indexer& ni);
+		u32					get(map_node_indexer const& ni) const;
 
 		u32					get(u32 idx) const;
 		void				set(u32 root, u32 idx);
@@ -559,7 +594,7 @@ namespace xcore
 		// you are going to insert.
 		// Initial size MUST be a power-of-2 like 1024, 2048, 8192.
 		// Default is 1024
-		u32					m_table_po2;	// root table size in power-of-2 (1<<x)
+		u32					m_table_size;	// root table size in power-of-2 (1<<x)
 		u32					*m_table;		// root table 
 	};
 
@@ -602,13 +637,14 @@ namespace xcore
 	};
 
 
-	inline u32			map_table_t::get(u32 idx) const {
+	inline u32			map_table_t::get(map_node_indexer const& ni) const
+	{
+		u32 idx = ni.root();
 		return m_table[idx];
 	}
 
-	inline u32			map_table_t::get(map_node_indexer& ni)
+	inline u32			map_table_t::get(u32 idx) const 
 	{
-		u32 idx = ni.root();
 		return m_table[idx];
 	}
 
@@ -622,77 +658,23 @@ namespace xcore
 	class map_iter_t
 	{
 	public:
-		map_iter_t(array_t<map_item_t<K, V>*>& table) : m_idx(0), m_max(0), m_table(table) {}
+		inline map_iter_t()
+			: m_idx(0)
+			, m_max(0)
+			, m_item(NULL)
+			, m_nodes(NULL)
+			, m_items(NULL)
+			, m_stack_idx(0)
+			, m_table_index(0)
+			, m_table_size(0)
+			, m_table(NULL)
+		{}
 
 		s32				index() const	{ return m_idx; }
 		K const&		key() const		{ return m_item->m_key; }
 		V const&		value() const	{ return m_item->m_value; }
 
-		bool			next()
-		{
-			while (m_stack_idx == 0) 
-			{
-				if (m_table_index < m_table_size) 
-				{
-					// Find next non null entry in the root table
-					u32 ientry = 0;
-					do
-					{
-						++m_table_index;
-						ientry = m_table->get(m_table_index);
-					} while (map_index::is_null(ientry) && m_table_index < m_table_size);
-
-					// Push it onto the stack
-					if (map_index::is_item(ientry))
-					{
-						m_stack_entry[m_stack_index++] = ientry;
-					}
-					else if (map_index::is_node(ientry)) 
-					{
-						map_node_t* pnode = m_nodes.get(ientry);
-						for (s32 i=0; i<map_node_t::SIZE; ++i) 
-						{
-							ientry = pnode->get(i);
-							if (!map_index::is_null(i)) 
-							{
-								m_stack_node[m_stack_index++] = ientry;
-							}
-						}
-					}
-				} 
-				else 
-				{
-					return false;
-				}
-			}
-
-			while (m_stack_idx > 0) 
-			{
-				// Get something from the stack.
-				// When we get an entry from the stack 
-				// check if it is a node or an item.
-				u32 ientry = m_stack_node[--m_stack_idx];
-				if (map_index::is_item(ientry)) 
-				{
-					m_item = m_items.get(ientry);
-					break;
-				} 
-				else 
-				{
-					map_node_t* pnode = m_nodes->get(ientry);
-					for (s32 i=0; i<map_node_t::SIZE; ++i) 
-					{
-						ientry = pnode->get(i);
-						if (!map_index::is_null(i)) 
-						{
-							m_stack_node[m_stack_index++] = ientry;
-						}
-					}
-				}
-			}
-
-			return true;
-		}
+		bool			next();
 
 	protected:
 		s32				m_idx;
@@ -707,59 +689,272 @@ namespace xcore
 		u32				m_stack_entry[32*map_node_t::SIZE];
 
 		u32				m_table_index;
-		u32				m_table_size;
 		map_table_t*	m_table;
 	};
+
+	template<typename K, typename V>
+	bool			map_iter_t<K,V>::next()
+	{
+		while (m_stack_idx == 0)
+		{
+			if (m_table_index < m_table_size)
+			{
+				// Find next non null entry in the root table
+				u32 ientry = 0;
+				do
+				{
+					++m_table_index;
+					ientry = m_table->get(m_table_index);
+				} while (map_index::is_null(ientry) && m_table_index < m_table_size);
+
+				// Push it onto the stack
+				if (map_index::is_item(ientry))
+				{
+					m_stack_entry[m_stack_index++] = ientry;
+				}
+				else if (map_index::is_node(ientry))
+				{
+					map_node_t* pnode = m_nodes.get(ientry);
+					for (s32 i = 0; i<map_node_t::SIZE; ++i)
+					{
+						ientry = pnode->get(i);
+						if (!map_index::is_null(i))
+						{
+							m_stack_node[m_stack_index++] = ientry;
+						}
+					}
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		while (m_stack_idx > 0)
+		{
+			// Get something from the stack.
+			// When we get an entry from the stack 
+			// check if it is a node or an item.
+			u32 ientry = m_stack_node[--m_stack_idx];
+			if (map_index::is_item(ientry))
+			{
+				m_item = m_items.get(ientry);
+				break;
+			}
+			else
+			{
+				map_node_t* pnode = m_nodes->get(ientry);
+				for (s32 i = 0; i<map_node_t::SIZE; ++i)
+				{
+					ientry = pnode->get(i);
+					if (!map_index::is_null(i))
+					{
+						m_stack_node[m_stack_index++] = ientry;
+					}
+				}
+			}
+		}
+		return true;
+	}
 
 	u64		map_key_hasher(xbyte const* data, u32 size);
 
 	template<typename K>
 	u64		map_key_hash(K const& key) { return map_key_hasher((xbyte const*)&key, sizeof(u32)); }
 
+	template<typename K, typename V>
+	class map_t;
+
+	template<typename K, typename V>
+	struct map_value_t
+	{
+						map_value_t(map_t<K, V>& map);
+
+						operator bool () const;
+						operator V const& () const;
+						operator V & ();
+						operator V ();
+
+		map_t<K, V>&	operator = (const V& value);
+
+		map_item_t<K, V>* m_item;
+		map_t<K, V>&	m_map;
+	};
 
 	template<typename K, typename V>
 	class map_t
 	{
 	public:
+		K				m_empty_key;
+		V				m_empty_value;
+
+		memory			m_mem;
+
+		map_items_t<K, V> m_items;
+		map_nodes_t		m_nodes;
+		map_table_t		m_table;
+
 						map_t();
 
 		s32				len() const;
 		s32				cap() const;
 
-		V &				operator [] (const K& key);
+		map_value_t<K, V> operator [] (const K& key);
 		V const &		operator [] (const K& key) const;
 
 		map_iter_t<K, V> begin();
 
 	protected:
-		map_item_t<K, V>* get(K const& key) const
+		u32				get(K const& key) const;
+		void			add(K const& key, V const& value);
+	};
+
+	template<typename K, typename V>
+	map_t<K, V>::map_t()
+	{
+
+	}
+
+	template<typename K, typename V>
+	s32				map_t<K, V>::len() const
+	{
+		return m_items.size();
+	}
+
+	template<typename K, typename V>
+	s32				map_t<K, V>::cap() const
+	{
+		return 0;
+	}
+
+	template<typename K, typename V>
+	map_value_t<K, V>	map_t<K, V>::operator [] (const K& key)
+	{
+		u32 const iitem = get(key);
+		map_value_t<K, V> value(*this);
+		value.m_item = m_items.get(iitem);
+		return value;
+	}
+
+	template<typename K, typename V>
+	V const &		map_t<K, V>::operator [] (const K& key) const
+	{
+		u32 const iitem = get(key);
+		if (iitem == 0)
+			return m_empty_value;
+		map_item_t<K, V> const * item = m_items.get(iitem);
+		return item->m_value;
+	}
+
+	template<typename K, typename V>
+	map_iter_t<K, V> map_t<K, V>::begin()
+	{
+		map_iter_t<K, V> iter;
+		iter.m_idx = 0;
+		iter.m_max = 0;
+		iter.m_item = NULL;
+		iter.m_nodes = &m_nodes;
+		iter.m_items = &m_items;
+		iter.m_stack_idx = 0;
+		iter.m_table_index = 0;
+		iter.m_table = &m_table;
+	}
+
+	template<typename K, typename V>
+	u32		map_t<K,V>::get(K const& key) const
+	{
+		map_node_indexer indxr;
+		indxr.initialize(map_key_hash<K>(key));
+
+		map_node_t const* pnode = NULL;
+
+		u32 const ientry = m_table.get(indxr);
+		if (map_index::is_item(ientry))
 		{
-			map_node_indexer indxr;
-			indxr.initialize(map_key_hash<K>(key));
+			u32 const iitem = map_index::get_idx(ientry);
+			// We need to put a node here
+			// We also need the hash of the key of this item
+			// map_item_t<K, V> const* pitem = m_items.get(iitem);
+			return iitem;
+		}
+		else if (map_index::is_node(ientry)) {
+			// The entry in the table is a node, ok
+			u32 const inode = map_index::get_idx(ientry);
+			pnode = m_nodes.get(inode);
+		}
+		else if (map_index::is_null(ientry)) {
+			return 0;
+		}
 
-			map_node_t* pnode = NULL;
-
-			u32 const ientry = m_table.get(indxr);
+		u32 depth = 1;
+		while (depth < indxr.max_depth())
+		{
+			u32 const ientry = pnode->get(indxr.get(depth));
 			if (map_index::is_item(ientry))
 			{
 				u32 const iitem = map_index::get_idx(ientry);
 				// We need to put a node here
 				// We also need the hash of the key of this item
-				map_item_t<K, V>* pitem = m_items.get_item(iitem);
-				return pitem;
+				//map_item_t<K, V>* pitem = m_items.get(iitem);
+				return iitem;
 			}
 			else if (map_index::is_node(ientry)) {
-				// The entry in the table is a node, ok
+				// The entry is a node, ok
 				u32 const inode = map_index::get_idx(ientry);
 				pnode = m_nodes.get(inode);
 			}
 			else if (map_index::is_null(ientry)) {
-				return NULL;
+				return 0;
 			}
+			++depth;
+		}
+		return 0;
+	}
 
-			u32 depth = 1;
-			while (depth < indxr.max_depth())
+	template<typename K, typename V>
+	void			map_t<K,V>::add(K const& key, V const& value)
+	{
+		map_node_indexer indxr;
+		indxr.initialize(map_key_hash<K>(key));
+
+		u32 depth = 0;
+		map_node_t* pnode = NULL;
+		while (depth < 17)
+		{
+			if (depth == 0)
 			{
+				u32 const ientry = m_table.get(indxr);
+				if (map_index::is_item(ientry))
+				{
+					u32 const iitem = map_index::get_idx(ientry);
+					// We need to put a node here
+					// We also need the hash of the key of this item
+					map_item_t<K, V>* pitem = m_items.get_item(iitem);
+					u32 const inode = m_nodes.alloc() | 0x80000000;
+					pnode = m_nodes.get(map_index::get_idx(inode));
+					map_node_indexer indxr2;
+					indxr2.initialize(map_key_hash<K>(pitem->m_key));
+					pnode->set(indxr2, depth + 1, iitem);
+					m_table.set(indxr, inode);
+				}
+				else if (map_index::is_node(ientry)) {
+					// The entry in the table is a node, ok
+					u32 const inode = map_index::get_idx(ientry);
+					pnode = m_nodes.get(inode);
+				}
+				else if (map_index::is_null(ientry)) {
+					// We can put the item here and we are done
+					u32 const iitem = m_items.alloc();
+					map_item_t<K, V>* pitem = m_items.get(iitem);
+					pitem->m_key = key;
+					pitem->m_value = value;
+					m_table.set(indxr, iitem);
+					break;
+				}
+			}
+			else {
+				// We are at depth > 0 and we have a node
 				u32 const ientry = pnode->get(indxr);
 				if (map_index::is_item(ientry))
 				{
@@ -767,7 +962,11 @@ namespace xcore
 					// We need to put a node here
 					// We also need the hash of the key of this item
 					map_item_t<K, V>* pitem = m_items.get_item(iitem);
-					return pitem;
+					u32 const inode = m_nodes.alloc() | 0x80000000;
+					pnode2 = m_nodes.get(map_index::get_idx(inode));
+					map_node_indexer indxr2;
+					indxr2.initialize(map_key_hash<K>(pitem->m_key));
+					pnode2->set(indxr2, depth + 1, iitem);
 				}
 				else if (map_index::is_node(ientry)) {
 					// The entry is a node, ok
@@ -775,97 +974,82 @@ namespace xcore
 					pnode = m_nodes.get(inode);
 				}
 				else if (map_index::is_null(ientry)) {
-					return NULL;
+					// We can put the item here and we are done
+					u32 const iitem = m_items.alloc();
+					map_item_t<K, V>* pitem = m_items.get(iitem);
+					pitem->m_key = key;
+					pitem->m_value = value;
+					pnode->set(indxr, iitem);
+					break;
 				}
-				++depth;
 			}
+
+			++depth;
 		}
-
-		void			add(K const& key, V const& value)
-		{
-			map_node_indexer indxr;
-			indxr.initialize(map_key_hash<K>(key));
-			
-			u32 depth = 0;
-			map_node_t* pnode = NULL;
-			while (depth < 17)
-			{
-				if (depth == 0)
-				{
-					u32 const ientry = m_table.get(indxr);
-					if (map_index::is_item(ientry))
-					{
-						u32 const iitem = map_index::get_idx(ientry);
-						// We need to put a node here
-						// We also need the hash of the key of this item
-						map_item_t<K, V>* pitem = m_items.get_item(iitem);
-						u32 const inode = m_nodes.alloc() | 0x80000000;
-						pnode = m_nodes.get(map_index::get_idx(inode));
-						map_node_indexer indxr2;
-						indxr2.initialize(map_key_hash<K>(pitem->m_key));
-						pnode->set(indxr2, depth + 1, iitem);
-						m_table.set(indxr, inode);
-					} else if (map_index::is_node(ientry)) {
-						// The entry in the table is a node, ok
-						u32 const inode = map_index::get_idx(ientry);
-						pnode = m_nodes.get(inode);
-					} else if (map_index::is_null(ientry)) {
-						// We can put the item here and we are done
-						u32 const iitem = m_items.alloc();
-						map_item_t<K, V>* pitem = m_items.get(iitem);
-						pitem->m_key = key;
-						pitem->m_value = value;
-						m_table.set(indxr, iitem);
-						break;
-					}
-				} else {
-					// We are at depth > 0 and we have a node
-					u32 const ientry = pnode->get(indxr);
-					if (map_index::is_item(ientry))
-					{
-						u32 const iitem = map_index::get_idx(ientry);
-						// We need to put a node here
-						// We also need the hash of the key of this item
-						map_item_t<K, V>* pitem = m_items.get_item(iitem);
-						u32 const inode = m_nodes.alloc() | 0x80000000;
-						pnode2 = m_nodes.get(map_index::get_idx(inode));
-						map_node_indexer indxr2;
-						indxr2.initialize(map_key_hash<K>(pitem->m_key));
-						pnode2->set(indxr2, depth + 1, iitem);
-					} else if (map_index::is_node(ientry)) {
-						// The entry is a node, ok
-						u32 const inode = map_index::get_idx(ientry);
-						pnode = m_nodes.get(inode);
-					} else if (map_index::is_null(ientry)) {
-						// We can put the item here and we are done
-						u32 const iitem = m_items.alloc();
-						map_item_t<K, V>* pitem = m_items.get(iitem);
-						pitem->m_key = key;
-						pitem->m_value = value;
-						pnode->set(indxr, iitem);
-						break;
-					}
-				}
-
-				++depth;
-			}
-		}
-
-		K				m_empty_key;
-		V				m_empty_value;
-
-		memory			m_mem;
-
-		map_items_t<K,V> m_items;
-		map_nodes_t		m_nodes;
-		map_table_t		m_table;
-	};
+	}
 
 	template<typename K, typename V>
 	void				make(memory mem, map_t<K, V>& proto, s32 cap);
 
 	template<typename K, typename V>
-	bool				iterate(map_iter_t<K, V>& iter, map_t<K, V>& container);
+	bool				iterate(map_iter_t<K, V>& iter);
+
+
+	template<typename K, typename V>
+	void				make(memory mem, map_t<K, V>& proto, s32 cap)
+	{
+		proto.m_mem = mem;
+		make(mem, proto.m_items.m_items, cap);
+		make(mem, proto.m_nodes.m_nodes, cap);
+		proto.m_table.m_table_size = 1 << 10;
+		proto.m_table.m_table = (u32*)mem.alloc(sizeof(u32) * proto.m_table.m_table_size, sizeof(void*));
+	}
+
+	template<typename K, typename V>
+	bool				iterate(map_iter_t<K, V>& iter)
+	{
+		return iter.next();
+	}
+
+
+	// ----------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------
+	template<typename K, typename V>
+	map_value_t<K, V>::map_value_t(map_t<K, V>& map)
+		: m_map(map)
+		, m_item(NULL)
+	{
+	}
+
+	template<typename K, typename V>
+	map_value_t<K, V>::operator bool() const
+	{
+		return m_item != NULL;
+	}
+
+	template<typename K, typename V>
+	map_value_t<K, V>::operator V const& () const
+	{
+		return m_item->m_value;
+	}
+
+	template<typename K, typename V>
+	map_value_t<K, V>::operator V & ()
+	{
+		return m_item->m_value;
+	}
+
+	template<typename K, typename V>
+	map_value_t<K, V>::operator V ()
+	{
+		return m_item->m_value;
+	}
+
+	template<typename K, typename V>
+	map_t<K, V>&	map_value_t<K, V>::operator = (const V& value)
+	{
+		return m_map;
+	}
 
 	// ----------------------------------------------------------------------------------------
 	//   QUEUE
@@ -878,16 +1062,19 @@ namespace xcore
 	class queue_iter_t
 	{
 	public:
-		queue_iter_t(slice_t<T>& _slice) : m_index(0), m_slice(_slice) {}
+		queue_iter_t(slice_t<T>& _slice, s32 head, s32 tail) : m_head(head), m_tail(tail), m_index(head), m_slice(_slice) { m_size = m_slice.size(); }
 
-		s32				index() const { return m_index; }
-		T const&		item() const { return m_slice[m_index]; }
+		s32				index() const			{ return m_index; }
+		T const&		item() const			{ return m_slice[m_index]; }
 
-		T const&		operator * (void) const { return m_slice[m_index]; }
+		T const&		operator * (void) const	{ return m_slice[m_index]; }
 
-	protected:
+		bool			next();
+
 		s32				m_head;
 		s32				m_tail;
+		s32				m_index;
+		s32				m_size;
 		slice_t<T>&		m_slice;
 	};
 
@@ -897,8 +1084,11 @@ namespace xcore
 	public:
 		inline			queue_t() : m_head(0), m_tail(0) {}
 
-		s32				len() const;
-		s32				cap() const;
+		u32				size() const;
+		u32				max() const;
+
+		bool			is_empty() const;
+		bool			is_full() const;
 
 		bool			push(T const& item);
 		bool			pop(T& item);
@@ -912,10 +1102,93 @@ namespace xcore
 	};
 
 	template<typename T>
+	u32				queue_t<T>::size() const
+	{
+		return m_head - m_tail;
+	}
+
+	template<typename T>
+	u32				queue_t<T>::max() const
+	{
+		return m_data.size();
+	}
+
+	template<typename T>
+	bool			queue_t<T>::is_empty() const
+	{
+		return m_head == m_tail;
+	}
+
+	template<typename T>
+	bool			queue_t<T>::is_full() const
+	{
+		return (m_head > m_tail) && (m_head % size()) == m_tail;
+	}
+
+	template<typename T>
+	bool			queue_t<T>::push(T const& item)
+	{
+		if (is_full())
+			return false;
+		s32 const index = m_head % size();
+		m_data[index] = item;
+		m_head++;
+		return true;
+	}
+
+	template<typename T>
+	bool			queue_t<T>::pop(T& item)
+	{
+		if (is_empty())
+			return false;
+		s32 const index = m_tail % size();
+		item = m_data[index];
+		m_tail += 1;
+		if (m_tail >= size())
+		{
+			m_tail = m_tail % size();
+			m_head = m_head % size();
+		}
+		return true;
+	}
+
+	template<typename T>
+	queue_iter_t<T>	queue_t<T>::begin() const
+	{
+		queue_t<T>::iter_t iter(m_data, m_head, m_tail);
+		return iter;
+	}
+
+
+
+	template<typename T>
 	void				make(memory mem, queue_t<T>& proto, s32 cap);
 	template<typename T>
 	bool				append(queue_t<T>& array, T const& element);
+	template<typename T>
+	bool				iterate(queue_iter_t<T>& iter);
 
+
+
+	template<typename T>
+	inline void			make(memory mem, queue_t<T>& proto, s32 cap)
+	{
+		make(mem, proto.m_data, cap);
+		proto.m_head = 0;
+		proto.m_tail = 0;
+	}
+
+	template<typename T>
+	inline bool			append(queue_t<T>& q, T const& element)
+	{
+		return q.push(element);
+	}
+
+	template<typename T>
+	inline bool			iterate(queue_iter_t<T>& iter)
+	{
+		return iter.next();
+	}
 
 	// ----------------------------------------------------------------------------------------
 	//   SLICE DATA

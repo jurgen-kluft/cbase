@@ -55,6 +55,7 @@ namespace xcore
 				if (c > 0x7f)
 					c = '?';
 				*dst.m_end++ = (uchar)c;
+				*dst.m_end = '\0';
 				return true;
 			}
 			return false;
@@ -79,30 +80,54 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		//------------------------------------------------------------------------------
 		//------------------------------------------------------------------------------
-		
+		s32		len(prune str, prune end)
+		{
+			s32 l = 0;
+			while (*str != '\0' && (end == NULL || str < end))
+			{
+				str++;
+				l++;
+			}
+			return l;
+		}
+
+		s32		len(pcrune str, pcrune end)
+		{
+			s32 l = 0;
+			while (*str != '\0' && (end == NULL || str < end))
+			{
+				str++;
+				l++;
+			}
+			return l;
+		}
+
+		prune			endof(prune str, prune end)
+		{
+			while (*str != '\0' && (end == NULL || str < end))
+				str++;
+			return str;
+		}
+
+		pcrune			endof(pcrune str, pcrune end)
+		{
+			while (*str != '\0' && (end == NULL || str < end))
+				str++;
+			return str;
+		}
+
+
 		void		copy(runes& _dest, crunes const& _src, ECopyType type)
 		{
 			crunes src = _src;
 			_dest.m_end = _dest.m_str;
 			while (_dest.m_end < _dest.m_eos)
 			{
-				if (src.m_end != NULL && src.m_str == src.m_end)
-				{
-					if (type == COPY_AND_WRITE_MATCHING_TERMINATOR && *src.m_end == '\0')
-						write_char('\0', _dest);
-					break;
-				}
 				uchar32 c;
 				if (read_char(src, c)==false)
-				{
-					if (type == COPY_AND_WRITE_MATCHING_TERMINATOR)
-						write_char(c, _dest);
 					break;
-				}
 				write_char(c, _dest);
 			}
-			if (_dest.m_end < _dest.m_eos && type == COPY_AND_WRITE_TERMINATOR)
-				write_char('\0', _dest);
 		}
 
 		void			concatenate(runes& str, crunes const& _concat)
@@ -134,13 +159,11 @@ namespace xcore
 				// Remember the current position because here is
 				// where we start to check if the 'find' string
 				// can be found at this particular position.
-				str_found = str_iter;
+				str_found.clone(str_iter);
 
 				uchar32 sc, fc;
-				if (!read_char(str_iter, sc))
-					break;
 
-				runes str_find = str_iter;
+				runes str_find(str_iter);
 				crunes find_str = _find;
 
 				found = true;
@@ -156,8 +179,12 @@ namespace xcore
 
 				if (found)
 				{
+					str_found.m_end = str_find.m_str;
 					break;
 				}
+
+				if (!read_char(str_iter, sc))
+					break;
 			}
 			return found ? str_found : runes();
 		}
@@ -181,8 +208,6 @@ namespace xcore
 				str_found = str_iter;
 
 				uchar32 sc, fc;
-				if (!read_char(str_iter, sc))
-					break;
 
 				crunes str_find = str_iter;
 				crunes find_str = _find;
@@ -200,8 +225,12 @@ namespace xcore
 
 				if (found)
 				{
+					str_found.m_end = str_find.m_str;
 					break;
 				}
+
+				if (!read_char(str_iter, sc))
+					break;
 			}
 			return found ? str_found : crunes();
 		}
@@ -295,10 +324,15 @@ namespace xcore
 		}
 
 
-		void	replace(runes& _str, crunes const& _replace)
+		void	replace(runes& _str, crunes const& _find, crunes const& _replace)
 		{
+			// search the 'find' string
+			runes found = find(_str, _find);
+			if (found.is_empty())
+				return;
+
 			// The logic here is based on memory copy, we do not consider characters
-			s32 const selected_len = (s32)((xbyte const*)_str.m_end - (xbyte const*)_str.m_str);
+			s32 const selected_len = (s32)((xbyte const*)found.m_end - (xbyte const*)found.m_str);
 			s32 const replace_len = (s32)((xbyte const*)_replace.m_end - (xbyte const*)_replace.m_str);
 
 			prune end = NULL;
@@ -306,37 +340,35 @@ namespace xcore
 			{
 				// Move, expanding
 				s32 move_len = replace_len - selected_len;
-				if (move_len >((xbyte const*)_str.m_eos - (xbyte*)_str.m_end))
-					move_len = (s32)(((xbyte const*)_str.m_eos - (xbyte*)_str.m_end));
+				if (move_len >((xbyte const*)found.m_eos - (xbyte*)found.m_end))
+					move_len = (s32)(((xbyte const*)found.m_eos - (xbyte*)found.m_end));
 
 				// No matter what, push out anything at the end!
-				xbyte * dst = (xbyte*)((xbyte*)_str.m_end + ((xbyte const*)_str.m_eos - (xbyte*)_str.m_end) - 1);
+				xbyte * dst = (xbyte*)((xbyte*)found.m_end + ((xbyte const*)found.m_eos - (xbyte*)found.m_end) - 1);
 				xbyte * src = (xbyte*)((xbyte*)dst - move_len);
-				while (dst > (xbyte*)_str.m_end)
+				while (dst > (xbyte*)found.m_end)
 					*dst-- = *src--;
-
-				end = (prune)((xbyte*)_str.m_str + selected_len + move_len);		// Update str_end
+				end = (prune)((xbyte*)_str.m_end + move_len);		// Update str_end
 			}
 			else if (selected_len > replace_len)
 			{
 				// Move, shrinking
 				s32 move_len = selected_len - replace_len;
-				xbyte* dst = (xbyte*)((xbyte*)_str.m_end - move_len);
-				xbyte* src = (xbyte*)(_str.m_end);
-				while (src < (xbyte const*)_str.m_eos)
+				xbyte* dst = (xbyte*)((xbyte*)found.m_end - move_len);
+				xbyte* src = (xbyte*)(found.m_end);
+				while (src < (xbyte const*)found.m_eos)
 					*dst++ = *src++;
-
-				end = (prune)((xbyte*)_str.m_str + selected_len - move_len);		// Update str_end
+				end = (prune)((xbyte*)_str.m_end - move_len);		// Update str_end
 			}
 			else
 			{
-				end = (prune)(_str.m_str + selected_len);
+				end = (prune)(_str.m_end);
 			}
 
 			// Replace
 			xbyte const* src = (xbyte const*)_replace.m_str;
 			xbyte const* src_end = (xbyte const*)_replace.m_str + replace_len;
-			xbyte* dst = (xbyte*)_str.m_str;
+			xbyte* dst = (xbyte*)found.m_str;
 			while (src < src_end)
 				*dst++ = *src++;
 
@@ -347,10 +379,18 @@ namespace xcore
 		{
 			crunes lstr = _lstr;
 			crunes rstr = _rstr;
-			uchar32 lc, rc;
-			while (read_char(lstr, lc) && read_char(rstr, rc))
+			uchar32 lc=0, rc=0;
+			while (true)
 			{ 
-				if (lc != rc)
+				bool const lok = read_char(lstr, lc);
+				bool const rok = read_char(rstr, rc);
+				if (!lok && !rok)
+					return 0;
+				if (!lok)
+					return -1;
+				if (!rok)
+					return 1;
+				if (!is_equal(lc, rc, mode))
 					break;
 			}
 			if (lc < rc)
@@ -364,7 +404,7 @@ namespace xcore
 		crunes	parse(crunes const& _str, bool& value)
 		{
 			crunes str = _str;
-			rune format_str[] = { '%', 'b' };
+			rune format_str[] = { '%', 'b', '\0' };
 			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
@@ -373,7 +413,7 @@ namespace xcore
 		crunes	parse(crunes const& _str, s32& value, s32 base)
 		{
 			crunes str = _str;
-			rune format_str[] = { '%', 'd' };
+			rune format_str[] = { '%', 'd', '\0' };
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
@@ -388,7 +428,7 @@ namespace xcore
 		crunes	parse(crunes const& _str, u32& value, s32 base)
 		{
 			crunes str = _str;
-			rune format_str[] = { '%', 'd' };
+			rune format_str[] = { '%', 'd', '\0' };
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
@@ -403,7 +443,7 @@ namespace xcore
 		crunes	parse(crunes const& _str, s64& value, s32 base)
 		{
 			crunes str = _str;
-			rune format_str[] = { '%', 'd' };
+			rune format_str[] = { '%', 'd', '\0' };
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
@@ -418,7 +458,7 @@ namespace xcore
 		crunes	parse(crunes const& _str, u64& value, s32 base)
 		{
 			crunes str = _str;
-			rune format_str[] = { '%', 'd' };
+			rune format_str[] = { '%', 'd', '\0' };
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
@@ -433,7 +473,7 @@ namespace xcore
 		crunes	parse(crunes const& _str, f32& value)
 		{
 			crunes str = _str;
-			rune format_str[] = { '%', 'f' };
+			rune format_str[] = { '%', 'f', '\0' };
 			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
@@ -442,7 +482,7 @@ namespace xcore
 		crunes	parse(crunes const& _str, f64& value)
 		{
 			crunes str = _str;
-			rune format_str[] = { '%', 'f' };
+			rune format_str[] = { '%', 'f', '\0' };
 			crunes format(format_str);
 			sscanf(str, format, x_va_r(&value));
 			return str;
@@ -495,7 +535,7 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		bool is_float(crunes const& _str)
 		{
-			rune f32chars_str[] = { 'E','e','.','#','Q','N','A','B','I','F' };
+			rune f32chars_str[] = { 'E','e','.','#','Q','N','A','B','I','F', '\0' };
 			crunes f32chars(f32chars_str);
 
 			crunes str = _str;
@@ -512,7 +552,7 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		bool is_GUID(crunes const& _str)
 		{
-			rune f32chars_str[] = { 'E','e','.','#','Q','N','A','B','I','F' };
+			rune f32chars_str[] = { 'E','e','.','#','Q','N','A','B','I','F', '\0' };
 			crunes f32chars(f32chars_str);
 
 			crunes str = _str;
@@ -542,7 +582,7 @@ namespace xcore
 
 		void	to_string(runes& str, s32 val, s32 base)
 		{
-			rune format_str[] = { '%', 'd' };
+			rune format_str[] = { '%', 'd', '\0' };
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
@@ -555,7 +595,7 @@ namespace xcore
 
 		void	to_string(runes& str, u32 val, s32 base)
 		{
-			rune format_str[] = { '%', 'u' };
+			rune format_str[] = { '%', 'u', '\0' };
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
@@ -570,7 +610,7 @@ namespace xcore
 
 		void	to_string(runes& str, s64 val, s32 base)
 		{
-			rune format_str[] = { '%', 'd' };
+			rune format_str[] = { '%', 'd', '\0' };
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
@@ -583,7 +623,7 @@ namespace xcore
 
 		void	to_string(runes& str, u64 val, s32 base)
 		{
-			rune format_str[] = { '%', 'd' };
+			rune format_str[] = { '%', 'd', '\0' };
 			switch (base)
 			{
 			case 16: format_str[1] = 'x'; break;
@@ -670,7 +710,7 @@ namespace xcore
 			crunes str = _str;
 
 			uchar32 c;
-			if (!read_char(str, c))
+			if (read_char(str, c))
 			{
 				if (c == delimit_left)
 				{
@@ -698,12 +738,8 @@ namespace xcore
 				if ((c >= 'a') && (c <= 'z'))
 				{
 					c += ('A' - 'a');
-					write_char(c, str);
 				}
-				else 
-				{
-					read_char(str, c);
-				}
+				*str.m_str++ = (uchar)c;
 			}
 		}
 
@@ -720,12 +756,8 @@ namespace xcore
 				if ((c >= 'A') && (c <= 'Z'))
 				{
 					c += ('a' - 'A');
-					write_char(c, str);
 				}
-				else
-				{
-					read_char(str, c);
-				}
+				*str.m_str++ = (uchar)c;
 			}
 		}
 
@@ -780,7 +812,7 @@ namespace xcore
 			crunes end = _end;
 			if (!str.is_empty() && !end.is_empty())
 			{
-				if (str.size() > end.size())
+				if (str.size() < end.size())
 					return false;
 
 				if (has_fixed_size_rune())
