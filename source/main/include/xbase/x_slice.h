@@ -360,30 +360,8 @@ namespace xcore
 	}
 
 	// ----------------------------------------------------------------------------------------
-	//   FREELIST
+	//   INDEXED
 	// ----------------------------------------------------------------------------------------
-
-	template<typename T>
-	class freelist_t
-	{
-	public:
-						freelist_t() : m_max_cnt(0), m_free_cnt(0), m_free(NULL), m_items(NULL) {}
-
-		u32				size() const;
-		u32				max() const;
-
-		T*				alloc();
-		void			dealloc(T*);
-
-	protected:
-		u32				m_max_cnt;
-		u32				m_free_cnt;
-		u32*			m_free;
-		T*				m_items;
-	};
-
-	template<typename T>
-	void				make(memory mem, freelist_t<T>& proto, s32 cap);
 
 	template<typename T>
 	class indexed_t
@@ -870,6 +848,7 @@ namespace xcore
 		map_table_t		m_table;
 
 						map_t();
+						~map_t();
 
 		s32				len() const;
 		s32				cap() const;
@@ -889,6 +868,12 @@ namespace xcore
 	map_t<K, V>::map_t()
 	{
 
+	}
+
+	template<typename K, typename V>
+	map_t<K, V>::~map_t()
+	{
+		m_mem.dealloc(m_table.m_table);
 	}
 
 	template<typename K, typename V>
