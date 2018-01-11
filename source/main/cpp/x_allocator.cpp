@@ -44,8 +44,8 @@ namespace xcore
 			xsize_t	mMinSize;
 			u32		mMinAlign;
 
-			xsize_t	min_size(xsize_t size) const		{ return x_intu::max(size, mMinSize); }
-			u32		min_align(u32 align) const			{ return x_intu::max(align, mMinAlign); }
+			xsize_t	min_size(xsize_t size) const		{ return xmax(size, mMinSize); }
+			u32		min_align(u32 align) const			{ return xmax(align, mMinAlign); }
 		};
 
 		static void*	ptr_align(void* ptr, u32 alignment)
@@ -56,9 +56,9 @@ namespace xcore
 		static void		init(root *s, void *mem, xsize_t size, u32 default_minimum_size, u32 default_alignment)
 		{
 			s->mTail         = (node*)mem;
-			s->mMinSize      = x_intu::max( (xcore::u32)sizeof(node), default_minimum_size);
-			s->mMinAlign     = x_intu::max( (xcore::u32)sizeof(node), default_alignment);
-			s->mMinAlign     = x_intu::ceilPower2(s->mMinAlign);
+			s->mMinSize      = xmax( (xcore::u32)sizeof(node), default_minimum_size);
+			s->mMinAlign     = xmax( (xcore::u32)sizeof(node), default_alignment);
+			s->mMinAlign     = xceilpo2(s->mMinAlign);
 
 			s->mTail->mPrev  = NULL;
 			s->mTail->mNext  = NULL;
@@ -99,7 +99,7 @@ namespace xcore
 			node *c1, *c2, *c3;
 
 			size      = s->min_size(size);
-			size      = x_intu::alignUp((s32)size, s->mMinAlign);
+			size      = xalignUp((s32)size, s->mMinAlign);
 
 			alignment = s->min_align(alignment);
 

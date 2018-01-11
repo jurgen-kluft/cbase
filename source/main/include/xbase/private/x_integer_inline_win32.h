@@ -1,7 +1,7 @@
 /**
  * find the number of trailing zeros in 32-bit v
  */
-inline s32        x_intu::countTrailingZeros(s32 inInteger)
+inline s32        xcountTrailingZeros(s32 inInteger)
 {
     if (inInteger == 0)
         return 32;
@@ -19,7 +19,7 @@ inline s32        x_intu::countTrailingZeros(s32 inInteger)
 /**
  * find the number of leading zeros in 32-bit v
  */
-inline s32        x_intu::countLeadingZeros(s32 inInteger)
+inline s32        xcountLeadingZeros(s32 inInteger)
 {
     if (inInteger == 0)
         return 32;
@@ -37,7 +37,7 @@ inline s32        x_intu::countLeadingZeros(s32 inInteger)
 /**
  * Return v but with only the Least Significant Bit "1"
  */
-inline s32        x_intu::leastSignificantOneBit(u32 inInteger)
+inline s32        xleastSignificantOneBit(u32 inInteger)
 {
     return (inInteger^(inInteger&(inInteger-1)));
 }
@@ -45,7 +45,7 @@ inline s32        x_intu::leastSignificantOneBit(u32 inInteger)
 /**
  * Return v but with only the Most Significant Bit "1"
  */
-inline s32        x_intu::mostSignificantOneBit(u32 inInteger)
+inline s32        xmostSignificantOneBit(u32 inInteger)
 {
     inInteger |= (inInteger >> 1);
     inInteger |= (inInteger >> 2);
@@ -58,41 +58,41 @@ inline s32        x_intu::mostSignificantOneBit(u32 inInteger)
 /**
  * Return the bit index of the Least Significant Bit "1"
  */
-inline s32        x_intu::leastSignificantBit(u32 inInteger)
+inline s32        xleastSignificantBit(u32 inInteger)
 {
     if (inInteger==0)
         return -1;
-    s32 c = x_intu::countTrailingZeros(inInteger);
+    s32 c = xcountTrailingZeros(inInteger);
     return c;
 }
 
 /**
  * Return the bit index of the Most Significant Bit "1"
  */
-inline s32        x_intu::mostSignificantBit(u32 inInteger)
+inline s32        xmostSignificantBit(u32 inInteger)
 {
     if (inInteger==0)
         return -1;
-    int c = 31 - x_intu::countLeadingZeros(inInteger);
+    int c = 31 - xcountLeadingZeros(inInteger);
     return c;
 }
 
 /**
  * find the bit position/index of the first bit from low to high
  */
-inline s32        x_intu::findFirstBit(u32 inInteger)
+inline s32        xfindFirstBit(u32 inInteger)
 {
     if (inInteger==0)
         return -1;
-    return x_intu::countTrailingZeros(inInteger);
+    return xcountTrailingZeros(inInteger);
 }
 
 /**
  * find the bit position/index of the first bit from high to low
  */
-inline s32        x_intu::findLastBit(u32 inInteger)
+inline s32       xfindLastBit(u32 inInteger)
 {
     if (inInteger==0)
         return -1;
-    return 31-x_intu::countLeadingZeros(inInteger);
+    return 31-xcountLeadingZeros(inInteger);
 }

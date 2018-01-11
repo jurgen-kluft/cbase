@@ -87,7 +87,7 @@ namespace xcore
 			data->mItemSize = to_itemsize;
 			data->mItemCount = to_itemcount;
 			data->mData = (xbyte*)data + sizeof(slice_data);
-			u32 const count2copy = x_intu::min(to_itemcount, mItemCount);
+			u32 const count2copy = xmin(to_itemcount, mItemCount);
 			xmem_utils::memcpy(data->mData, this->mData + (from * mItemSize), count2copy * mItemSize);
 			decref();
 		}

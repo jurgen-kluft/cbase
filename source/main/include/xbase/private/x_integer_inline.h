@@ -2,7 +2,7 @@
  * Function template, returns the smallest value
  */
 template<class T>
-inline T        x_intu::min(T integerA, T integerB)
+inline T        xmin(T integerA, T integerB)
 {
     return integerA<=integerB ? integerA : integerB;
 }
@@ -11,7 +11,7 @@ inline T        x_intu::min(T integerA, T integerB)
  * specialized template for s32
  */
 template<>
-inline s32		x_intu::min(s32 integerA, s32 integerB)
+inline s32		xmin(s32 integerA, s32 integerB)
 {
 	s32 r = integerB ^ ((integerA ^ integerB) & -(integerA < integerB));
 	return r;
@@ -21,7 +21,7 @@ inline s32		x_intu::min(s32 integerA, s32 integerB)
  * Function template, returns the smallest value
  */
 template<class T>
-inline T        x_intu::max(T integerA, T integerB)
+inline T        xmax(T integerA, T integerB)
 {
     return integerA>=integerB ? integerA : integerB;
 }
@@ -30,7 +30,7 @@ inline T        x_intu::max(T integerA, T integerB)
  * specialized template for s32
  */
 template<>
-inline s32		x_intu::max(s32 integerA, s32 integerB)
+inline s32		xmax(s32 integerA, s32 integerB)
 {
 	s32 r = integerA ^ ((integerA ^ integerB) & -(integerA < integerB));
 	return r;
@@ -40,7 +40,7 @@ inline s32		x_intu::max(s32 integerA, s32 integerB)
  * Function template, returns the clamp value
  */
 template<class T>
-inline T        x_intu::clamp(T integer, T low, T high)
+inline T        xclamp(T integer, T low, T high)
 {
     ASSERTS(low <= high, "Error: low > high");
     return integer<low ? low : (integer>high ? high : integer);
@@ -50,43 +50,43 @@ inline T        x_intu::clamp(T integer, T low, T high)
  * Return the aligned value of integer
  * Same as alignUp
  */
-inline s32        x_intu::align(s32 integer, s32 alignment)
+inline s32       xalign(s32 integer, s32 alignment)
 {
-	ASSERTS(isPowerOf2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
+	ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 	return (integer) & (~(alignment-1));
 }
 
 /**
  * Return the floor based aligned value of integer
  */
-inline s32        x_intu::alignDown(s32 integer, s32 alignment)
+inline s32        xalignDown(s32 integer, s32 alignment)
 {
-	ASSERTS(isPowerOf2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
+	ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 	return (integer) & (~(alignment-1));
 }
 
 /**
  * Return the ceiling based aligned value of integer
  */
-inline s32        x_intu::alignUp(s32 integer, s32 alignment)
+inline s32        xalignUp(s32 integer, s32 alignment)
 {
-	ASSERTS(isPowerOf2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
+	ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 	return ((integer + (alignment-1)) & (~(alignment-1)));
 }
 
 /**
  * Check if integer is aligned
  */
-inline xbool       x_intu::isAligned(s32 integer, s32 alignment)
+inline xbool       xisAligned(s32 integer, s32 alignment)
 {
-	ASSERTS(isPowerOf2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
+	ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 	return integer == ((integer) & (~(alignment-1)));
 }
 
 /**
  * Return the absolute value of integer
  */
-inline s32        x_intu::abs(s32 inInteger)
+inline s32        xabs(s32 inInteger)
 {
     if (inInteger > 0)
         return inInteger;
@@ -99,7 +99,7 @@ inline s32        x_intu::abs(s32 inInteger)
  * inInteger:		Input value to negate if inNegate is false.
  * inDoNotNegate:	Flag indicating we should not negate inInteger.
  */
-inline s32        x_intu::neg(s32 inInteger, bool inDoNotNegate)
+inline s32        xneg(s32 inInteger, bool inDoNotNegate)
 {
 	s32 r = ((s32)inDoNotNegate ^ ((s32)inDoNotNegate - 1)) * inInteger;
 	return r;
@@ -108,7 +108,7 @@ inline s32        x_intu::neg(s32 inInteger, bool inDoNotNegate)
 /**
  * Return the square of integer
  */
-inline s32        x_intu::sqr(s32 inInteger)
+inline s32        xsqr(s32 inInteger)
 {
     return inInteger*inInteger;
 }
@@ -116,7 +116,7 @@ inline s32        x_intu::sqr(s32 inInteger)
 /**
  * Return the unsigned square of integer
  */
-inline u32        x_intu::sqr(u32 inInteger)
+inline u32        xsqr(u32 inInteger)
 {
     return inInteger*inInteger;
 }
@@ -124,7 +124,7 @@ inline u32        x_intu::sqr(u32 inInteger)
 /**
  * Return the modulo of integer using inModuloValue
  */
-inline s32        x_intu::mod(s32 inInteger, s32 inModuloValue)
+inline s32        xmod(s32 inInteger, s32 inModuloValue)
 {
     return inInteger % inModuloValue;
 }
@@ -132,7 +132,7 @@ inline s32        x_intu::mod(s32 inInteger, s32 inModuloValue)
 /**
  * Greatest common denominator (biggest modulo value of both integers)
  */
-inline s32        x_intu::gcd(s32 inIntegerA, s32 inIntegerB)
+inline s32        xgcd(s32 inIntegerA, s32 inIntegerB)
 {
     while (inIntegerB!=0)
     {
@@ -146,7 +146,7 @@ inline s32        x_intu::gcd(s32 inIntegerA, s32 inIntegerB)
 /**
  * Calculate average of A & B without overflow or s64 use
  */
-inline s32        x_intu::average(s32 inIntegerA, s32 inIntegerB)
+inline s32        xaverage(s32 inIntegerA, s32 inIntegerB)
 {
     return (inIntegerA&inIntegerB)+((inIntegerA^inIntegerB)>>1);
 }
@@ -154,7 +154,7 @@ inline s32        x_intu::average(s32 inIntegerA, s32 inIntegerB)
 /**
  * Check if integer is a power-of-two
  */
-inline xbool       x_intu::isPowerOf2(s32 inInteger)
+inline xbool       xispo2(s32 inInteger)
 {
     return (inInteger!=0) && (((inInteger) & (inInteger-1)) == 0);
 }
@@ -162,7 +162,7 @@ inline xbool       x_intu::isPowerOf2(s32 inInteger)
 /**
  * Return the smallest power-of-two larger than integer
  */
-inline u32        x_intu::ceilPower2(u32 inInteger)
+inline u32        xceilpo2(u32 inInteger)
 {
     u32 t = inInteger-1;
     t |= t >> 1;
@@ -177,7 +177,7 @@ inline u32        x_intu::ceilPower2(u32 inInteger)
 /**
  * Return the biggest power-of-two smaller than integer
  */
-inline u32        x_intu::floorPower2(u32 inInteger)
+inline u32        xfloorpo2(u32 inInteger)
 {
     u32 t = inInteger-1;
     t |= t >> 1;
@@ -192,7 +192,7 @@ inline u32        x_intu::floorPower2(u32 inInteger)
 /**
  * Reverse bits in 32 bit word
  */
-inline u32        x_intu::bitReverse(u32 inInteger)
+inline u32        xbitReverse(u32 inInteger)
 {
     u32 n = inInteger;
     n = ((n >>  1) & 0x55555555) | ((n <<  1) & 0xaaaaaaaa) ;
@@ -206,7 +206,7 @@ inline u32        x_intu::bitReverse(u32 inInteger)
 /**
  * count one bits in 32 bit word
  */
-inline s32        x_intu::countBits(u32 inInteger)
+inline s32        xcountBits(u32 inInteger)
 {
     inInteger -= ((inInteger >> 1) & 0x55555555);
     inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
@@ -219,7 +219,7 @@ inline s32        x_intu::countBits(u32 inInteger)
 /**
  * Log2 of an integer
  */
-s32               x_intu::ilog2(s32 inInteger)
+s32               xilog2(s32 inInteger)
 {
     s32 r = 0;
     s32 i = inInteger;
@@ -234,7 +234,7 @@ s32               x_intu::ilog2(s32 inInteger)
 /**
  * Roll all the bits in integer to the left by shift number of bits
  */
-inline u32        x_intu::rol32(u32 inInteger, u32 shift)
+inline u32        xrol32(u32 inInteger, u32 shift)
 {
 	shift = shift & 31;
     return (inInteger << shift) | (inInteger >> (32 - shift));
@@ -243,7 +243,7 @@ inline u32        x_intu::rol32(u32 inInteger, u32 shift)
 /**
  * Roll all the bits in integer to the right by shift number of bits
  */
-inline u32        x_intu::ror32(u32 inInteger, u32 shift)
+inline u32        xror32(u32 inInteger, u32 shift)
 {
 	shift = shift & 31;
     return (inInteger >> shift) | (inInteger << (32 - shift));
@@ -285,7 +285,7 @@ inline u32        x_intu::ror32(u32 inInteger, u32 shift)
  *     x_IsAlign x_AlignLower
  */
 
-template< class T > T x_Align( T addr, s32 alignTo );
+template< class T > T xalign( T addr, s32 alignTo );
 
 /**
  * Author:
@@ -302,7 +302,7 @@ template< class T > T x_Align( T addr, s32 alignTo );
  *     x_Align x_IsAlign
  */
 
-template< class T > T x_AlignLower( T addr, s32 alignTo );
+template< class T > T xalign_floor(T addr, s32 alignTo);
 
 
 /**
@@ -319,7 +319,7 @@ template< class T > T x_AlignLower( T addr, s32 alignTo );
  * See Also:
  *     x_Align x_AlignLower
  */
-template< class T > xbool x_IsAlign( T addr, s32 alignTo );
+template< class T > xbool xaligned( T addr, s32 alignTo );
 
 
 /**
@@ -349,7 +349,7 @@ template< class T > xbool x_IsAlign( T addr, s32 alignTo );
  *     It is a function used to test whether an integer number is a power of two.
  */
 template< class T > 
-inline xbool x_IsPow2(T n) 
+inline xbool xpowof2(T n) 
 { 
 	return xbool( n==1 || ((n&(n-1))==0) ); 
 }
@@ -359,7 +359,7 @@ inline xbool x_IsPow2(T n)
  */
 
 template< class T > inline 
-T x_Align( T addr, s32 alignTo ) 
+T xalign( T addr, s32 alignTo ) 
 {
     return T( ( (((u64)(addr)) + ((alignTo)-1)) & (-(alignTo)) )); 
 }
@@ -367,7 +367,7 @@ T x_Align( T addr, s32 alignTo )
 //------------------------------------------------------------------------------
 
 template< class T > inline 
-T x_AlignLower( T addr, s32 alignTo ) 
+T xalign_floor( T addr, s32 alignTo ) 
 { 
     return T( ( (((u64)(addr))) & (-(alignTo)) )); 
 }
@@ -375,7 +375,7 @@ T x_AlignLower( T addr, s32 alignTo )
 //------------------------------------------------------------------------------
 
 template< class T > inline 
-xbool x_IsAlign( T addr, s32 alignTo ) 
+xbool xaligned( T addr, s32 alignTo ) 
 { 
     return xbool((((u64)addr) & (alignTo-1)) == 0);
 }
@@ -394,10 +394,10 @@ xbool x_IsAlign( T addr, s32 alignTo )
  * (avoids problems with leading zeros)
  * 8-bit constants max value 0x11111111, always fits in unsigned long
  */
-#define HEX__(n) 0x##n##LU
+#define XHEX__(n) 0x##n##LU
 
 /// 8-bit conversion function
-#define B8__(x) ((x&0x0000000FLU)?1:0)      \
+#define XB8__(x) ((x&0x0000000FLU)?1:0)      \
              +((x&0x000000F0LU)?2:0)      \
              +((x&0x00000F00LU)?4:0)      \
              +((x&0x0000F000LU)?8:0)      \
@@ -409,19 +409,19 @@ xbool x_IsAlign( T addr, s32 alignTo )
 /// *** user macros ***
 
 /// for up to 8-bit binary constants
-#undef x_Bin8
-#define x_Bin8(d) ((unsigned char)B8__(HEX__(d)))
+#undef xbin8
+#define xbin8(d) ((u8)XB8__(XHEX__(d)))
 
 /// for up to 16-bit binary constants, MSB first
-#undef x_Bin16
-#define x_Bin16(dmsb,dlsb) (((unsigned short)x_Bin8(dmsb)<<8) + x_Bin8(dlsb))
+#undef xbin16
+#define xbin16(dmsb,dlsb) (((u16)xbin8(dmsb)<<8) + xbin8(dlsb))
 
 /// for up to 32-bit binary constants, MSB first
- #undef x_Bin32
- #define x_Bin32(dmsb,db2,db3,dlsb) (((unsigned long)x_Bin8(dmsb)<<24)		\
-                                + ((unsigned long)x_Bin8(db2)<<16)		\
-								+ ((unsigned long)x_Bin8(db3)<<8)			\
-                                + x_Bin8(dlsb))
+ #undef xbin32
+ #define xbin32(dmsb,db2,db3,dlsb) (((u32)xbin8(dmsb)<<24)		\
+                                + ((u32)xbin8(db2)<<16)		\
+								+ ((u32)xbin8(db3)<<8)			\
+                                + xbin8(dlsb))
 
 ///  DOM-IGNORE-END
 

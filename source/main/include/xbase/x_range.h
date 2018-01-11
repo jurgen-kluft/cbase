@@ -72,6 +72,11 @@ namespace xcore
 		enum EState { STATE_START, STATE_ITER, STATE_END };
 		enum EMode { MODE_INIT, MODE_ITER };
 
+		void		reset()
+		{
+			m_state = STATE_START;
+		}
+
 		bool		forward()
 		{
 			switch (m_state)
