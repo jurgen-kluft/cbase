@@ -72,6 +72,15 @@ UNITTEST_SUITE_BEGIN(xcontainers)
 				f += 1.f;
 			}
 
+			int1000_iter.reset();
+			while (iterate(int1000_iter)) {
+				if (!int_to_float.remove(*int1000_iter))
+				{
+					int_to_float.remove(*int1000_iter);
+					CHECK_TRUE(false);
+				}
+			}
+
 			// Slice the array into a view of just 2 elements
 			// This will NOT make a copy of the data, only when
 			// you now 'append' to one of them.
