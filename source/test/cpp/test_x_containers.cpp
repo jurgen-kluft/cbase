@@ -1,6 +1,11 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_carray.h"
 #include "xbase/x_slice.h"
+#include "xbase/x_slice_t.h"
+#include "xbase/x_indexed_t.h"
+#include "xbase/x_array_t.h"
+#include "xbase/x_map_t.h"
+#include "xbase/x_queue_t.h"
 #include "xbase/x_range.h"
 #include "xunittest/xunittest.h"
 
@@ -17,7 +22,7 @@ UNITTEST_SUITE_BEGIN(xcontainers)
 
 		UNITTEST_TEST(test_array_t)
 		{
-			memory mem(gTestAllocator);
+			xallocator mem(gTestAllocator);
 
 			const s32 N = 1000;
 
