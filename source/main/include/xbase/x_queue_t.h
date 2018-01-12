@@ -41,9 +41,8 @@ namespace xcore
 		}
 
 		s32				index() const			{ return m_index; }
-		T const&		item() const			{ return m_slice[m_index]; }
-
-		T const&		operator * (void) const	{ return m_slice[m_index]; }
+		T const&		item() const			{ return m_slice[m_current]; }
+		T const&		operator * (void) const	{ return m_slice[m_current]; }
 
 		void			reset();
 		bool			iterate();
@@ -55,6 +54,7 @@ namespace xcore
 		s32				m_head;
 		s32				m_tail;
 		s32				m_size;
+		s32				m_current;
 		slice_t<T>&		m_slice;
 	};
 
@@ -139,6 +139,36 @@ namespace xcore
 		return iter;
 	}
 
+	template<typename T>
+	void			queue_iter_t<T>::reset()
+	{
+		m_state = START;
+		m_index = 0;
+		m_size = m_slice.size();
+		m_current = (m_head - m_index) % m_size;
+	}
+
+	template<typename T>
+	bool			queue_iter_t<T>::iterate()
+	{
+		if (m_state == ITERATE) {
+			++m_index;
+			m_current = (m_head - m_index) % m_size;
+		}
+		else if (m_state == END) {
+			return false;
+		}
+		else if (m_state == START) {
+			reset();
+			m_state = ITERATE;
+		}
+
+		if ((m_head - m_current) != m_tail)
+			return true;
+
+		m_state = END;
+		return false;
+	}
 
 
 	template<typename T>

@@ -34,31 +34,8 @@ namespace xcore
 
 		T const&		operator * (void) const	{ return m_array[m_index]; }
 
-		void			reset()
-		{
-			m_state = START;
-		}
-
-		bool			iterate()
-		{
-			if (m_state == ITERATE) {
-				++m_index;
-			} 
-			else if (m_state == END) {
-				return false;
-			}
-			else if (m_state == START) {
-				m_index = 0;
-				m_max = m_array.size();
-				m_state = ITERATE;
-			}
-		
-			if (m_index < m_max)
-				return true;
-
-			m_state = END;
-			return false;
-		}
+		void			reset();
+		bool			iterate();
 
 	protected:
 		enum EState { START, ITERATE, END };
@@ -215,6 +192,33 @@ namespace xcore
 		xqsort(data, n, es, &array.compare, NULL);
 	}
 
+	template<typename T>
+	void			array_iter_t<T>::reset()
+	{
+		m_state = START;
+	}
+
+	template<typename T>
+	bool			array_iter_t<T>::iterate()
+	{
+		if (m_state == ITERATE) {
+			++m_index;
+		}
+		else if (m_state == END) {
+			return false;
+		}
+		else if (m_state == START) {
+			m_index = 0;
+			m_max = m_array.size();
+			m_state = ITERATE;
+		}
+
+		if (m_index < m_max)
+			return true;
+
+		m_state = END;
+		return false;
+	}
 }
 
 #endif
