@@ -18,43 +18,8 @@
 namespace xcore
 {
 	// ----------------------------------------------------------------------------------------
-	//   ARRAY
+	//   ARRAY, array_t<T>
 	// ----------------------------------------------------------------------------------------
-	template<typename T>
-	class array_t;
-
-	template<typename T>
-	class array_iter_t
-	{
-	public:
-						array_iter_t(array_t<T> const& _array) : m_state(START), m_index(0), m_array(_array) {}
-
-		s32				index() const			{ return m_index; }
-		T const&		item() const			{ return m_array[m_index]; }
-
-		T const&		operator * (void) const	{ return m_array[m_index]; }
-
-		void			reset();
-		bool			iterate();
-
-	protected:
-		enum EState { START, ITERATE, END };
-		s32				m_state;
-		u32				m_index;
-		u32				m_max;
-		array_t<T> const&	m_array;
-	};
-
-	template<typename T>
-	s32					compare_t(T const& a, T const& b)
-	{
-		if (a < b)
-			return -1;
-		else if (a > b)
-			return 1;
-		return 0;
-	}
-
 	template<typename T>
 	class array_t
 	{
@@ -72,17 +37,26 @@ namespace xcore
 
 		array_iter_t<T>	begin() const;
 
-		static s32		compare(const void* const le, const void* const re, void* data)
-		{
-			T const& let = *(T const*)le;
-			T const& ret = *(T const*)re;
-			s32 const c = compare_t<T>(let, ret);
-			return c;
-		}
+		static inline s32	compare(const void* const le, const void* const re, void* data);
 
 		u32				m_size;
 		slice_t<T>		m_data;
 	};
+
+	// array_t<T> functions
+	template<typename T>
+	void				make(xallocator mem, array_t<T>& proto, s32 cap, s32 len);
+	template<typename T>
+	bool				iterate(array_iter_t<T>& iter);
+	template<typename T>
+	bool				append(array_t<T>& array, T const& element);
+	template<typename T>
+	void				sort(array_t<T>& array);
+
+
+	// ----------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------
+	// array_t<T> implementations
 
 	template<typename T>
 	inline array_t<T>		array_t<T>::operator () (u32 to) const
@@ -125,22 +99,6 @@ namespace xcore
 	{
 		return m_data[index];
 	}
-
-	template<typename T>
-	inline array_iter_t<T>	array_t<T>::begin() const
-	{
-		return array_iter_t<T>(*this);
-	}
-
-
-	template<typename T>
-	void				make(xallocator mem, array_t<T>& proto, s32 cap, s32 len);
-	template<typename T>
-	bool				iterate(array_iter_t<T>& iter);
-	template<typename T>
-	bool				append(array_t<T>& array, T const& element);
-	template<typename T>
-	void				sort(array_t<T>& array);
 
 
 	template<typename T>
@@ -193,13 +151,60 @@ namespace xcore
 	}
 
 	template<typename T>
-	void			array_iter_t<T>::reset()
+	inline s32			compare_t(T const& a, T const& b)
+	{
+		if (a < b)
+			return -1;
+		else if (a > b)
+			return 1;
+		return 0;
+	}
+
+	template<typename T>
+	inline s32			array_t<T>::compare(const void* const le, const void* const re, void* data)
+	{
+		T const& let = *(T const*)le;
+		T const& ret = *(T const*)re;
+		s32 const c = compare_t<T>(let, ret);
+		return c;
+	}
+
+	template<typename T>
+	class array_iter_t
+	{
+	public:
+						array_iter_t(array_t<T> const& _array) : m_state(START), m_index(0), m_array(_array) {}
+
+		s32				index() const			{ return m_index; }
+		T const&		item() const			{ return m_array[m_index]; }
+
+		T const&		operator * (void) const	{ return m_array[m_index]; }
+
+		void			reset();
+		bool			iterate();
+
+	protected:
+		enum EState { START, ITERATE, END };
+		s32				m_state;
+		u32				m_index;
+		u32				m_max;
+		array_t<T> const&	m_array;
+	};
+
+	template<typename T>
+	inline array_iter_t<T>	array_t<T>::begin() const
+	{
+		return array_iter_t<T>(*this);
+	}
+
+	template<typename T>
+	inline void		array_iter_t<T>::reset()
 	{
 		m_state = START;
 	}
 
 	template<typename T>
-	bool			array_iter_t<T>::iterate()
+	inline bool		array_iter_t<T>::iterate()
 	{
 		if (m_state == ITERATE) {
 			++m_index;
@@ -219,6 +224,7 @@ namespace xcore
 		m_state = END;
 		return false;
 	}
+
 }
 
 #endif
