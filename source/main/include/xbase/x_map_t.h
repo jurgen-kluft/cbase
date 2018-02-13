@@ -54,6 +54,8 @@ namespace xcore
 	public:
 		K				m_key;
 		V				m_value;
+
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
 	template<typename K, typename V>
@@ -143,6 +145,8 @@ namespace xcore
 			}
 			return false;
 		}
+
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
 	struct map_nodes_t

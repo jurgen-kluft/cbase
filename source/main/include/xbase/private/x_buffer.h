@@ -3,22 +3,25 @@
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 
-inline xbuffer	xbuffer::alloc(u64 size, x_iallocator* a)
+inline xbuffer	xbuffer::allocate(u64 size, x_iallocator* a)
 {
 	void* ptr = a->allocate(size, sizeof(void*));
 	return xbuffer(size, (xbyte*)ptr);
 }
 
-inline void		xbuffer::realloc(xbuffer& buf, u64 size, x_iallocator* a)
+inline void		xbuffer::reallocate(xbuffer& buf, u64 size, x_iallocator* a)
 {
 	void* ptr = a->allocate(size, sizeof(void*));
-	xmem_utils::memcpy(ptr, buf.m_data, (u32)buf.m_len);
-	a->deallocate(buf.m_data);
+	if (buf.m_data != NULL && buf.m_len > 0)
+	{
+		xmem_utils::memcpy(ptr, buf.m_data, (u32)buf.m_len);
+		a->deallocate(buf.m_data);
+	}
 	buf.m_data = (xbyte*)ptr;
 	buf.m_len = size;
 }
 
-inline void		xbuffer::dealloc(xbuffer& buf, x_iallocator* a)
+inline void		xbuffer::deallocate(xbuffer& buf, x_iallocator* a)
 {
 	a->deallocate(buf.m_data);
 	buf.m_data = NULL;
@@ -37,41 +40,41 @@ inline void			xbuffer::clear()
 		m_data[i] = 0;
 }
 
-inline xbuffer		xbuffer::buffer() const 
+inline xbuffer		xbuffer::buffer() const
 {
-	return buffer_at(0); 
+	return buffer_at(0);
 }
 
 inline xbuffer		xbuffer::buffer_at(u64 idx) const
-{ 
-	ASSERT(idx < m_len); 
-	return xbuffer(size() - idx, (xbyte*)&m_data[idx]); 
+{
+	ASSERT(idx <= m_len);
+	return xbuffer(size() - idx, (xbyte*)&m_data[idx]);
 }
 
-inline xcbuffer		xbuffer::cbuffer() const 
-{ 
-	return cbuffer_at(0); 
+inline xcbuffer		xbuffer::cbuffer() const
+{
+	return cbuffer_at(0);
 }
 
 inline xcbuffer		xbuffer::cbuffer_at(u64 idx) const
-{ 
-	ASSERT(idx < m_len); 
-	return xcbuffer(size() - idx, (xbyte*)&m_data[idx]); 
+{
+	ASSERT(idx <= m_len);
+	return xcbuffer(size() - idx, (xbyte*)&m_data[idx]);
 }
 
-inline void			xbuffer::write(const xbuffer& other) 
-{ 
-	write_at(0, other.cbuffer()); 
+inline void			xbuffer::write(const xbuffer& other)
+{
+	write_at(0, other.cbuffer());
 }
 
-inline void			xbuffer::write(const xcbuffer& other) 
-{ 
-	write_at(0, other); 
+inline void			xbuffer::write(const xcbuffer& other)
+{
+	write_at(0, other);
 }
 
 inline void			xbuffer::write_at(u64 idx, const xcbuffer& other)
 {
-	ASSERT(idx < m_len);
+	ASSERT(idx <= m_len);
 	xbyte* dst = &m_data[idx];
 	u64 dst_size = m_len - idx;
 	for (u64 i = 0; i < other.size() && i < dst_size; i++)

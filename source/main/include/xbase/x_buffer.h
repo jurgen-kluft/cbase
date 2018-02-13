@@ -19,13 +19,14 @@ namespace xcore
 	class xbuffer
 	{
 	public:
+		static xbuffer	allocate(u64 size, x_iallocator* a);
+		static void		reallocate(xbuffer& buf, u64 size, x_iallocator* a);
+		static void		deallocate(xbuffer& buf, x_iallocator* a);
+
 		inline		xbuffer(u64 len, xbyte* data) : m_len(len), m_data(data) { reset(); }
 
-		xbuffer		alloc(u64 size, x_iallocator* a);
-		void		realloc(xbuffer& buf, u64 size, x_iallocator* a);
-		void		dealloc(xbuffer& buf, x_iallocator* a);
-
 		u64			size() const					{ return m_len; }
+
 		void		reset();
 		void		clear();
 
@@ -50,6 +51,9 @@ namespace xcore
 
 		xbyte&		operator [] (u64 i);
 		xbyte		operator [] (u64 i) const;
+
+	private:
+		inline		xbuffer() : m_len(0), m_data(NULL) { }
 
 		u64			m_len;
 		xbyte*		m_data;
@@ -141,7 +145,6 @@ namespace xcore
 		}																		\
 		xbyte		m_data[len];												\
 	}
-
 
 	// Inline functions
 	#include "xbase/private/x_buffer.h"

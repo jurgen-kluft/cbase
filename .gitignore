@@ -6,6 +6,9 @@ source/test/builddir/
 tags
 
 #except the following files
+!CMakeLists.txt
+!CMakeSettings.json
+
 !*.cpp
 !*.hpp
 !*.c

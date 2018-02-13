@@ -37,9 +37,9 @@ namespace xcore
 		bool			alloc(T*& ptr, u32& index);
 		void			dealloc(u32 index);
 
-		u32				m_size;
-		array_t<u32>	m_free;
-		array_t<T>		m_items;
+		u32				m_size;		// How many items are allocated
+		array_t<u32>	m_free;		// Indices that point to free items
+		array_t<T>		m_items;	// The storage of items
 	};
 
 	template<typename T>
@@ -84,7 +84,7 @@ namespace xcore
 		if (is_full())
 			return false;
 		index = m_free[m_size];
-		m_items[index] = T();	// Construct
+		new (&m_items[index]) T();	// Construct
 		ptr = get(index);
 		m_size += 1;
 		return true;
