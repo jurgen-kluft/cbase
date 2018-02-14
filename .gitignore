@@ -1,13 +1,12 @@
 #ignore all files
 *.*
 vendor/
-source/main/builddir/
-source/test/builddir/
+t2-output/
+target/
 tags
 
 #except the following files
-!CMakeLists.txt
-!CMakeSettings.json
+!tundra.lua
 
 !*.cpp
 !*.hpp
