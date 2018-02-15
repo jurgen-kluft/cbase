@@ -115,11 +115,6 @@ namespace xcore
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				xlog::write(ELevel inLevel, uchar32 _value)
-	{
-		sLogger[inLevel]->write(_value);
-	}
-
 	void 				xlog::write(ELevel inLevel, const xcuchars& str)
 	{
 		sLogger[inLevel]->write(str);
@@ -178,11 +173,6 @@ namespace xcore
 	}
 
 	void 				xlog::writeLine(ELevel inLevel, u64 _value)
-	{
-		sLogger[inLevel]->writeLine(_value);
-	}
-
-	void 				xlog::writeLine(ELevel inLevel, uchar32 _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}

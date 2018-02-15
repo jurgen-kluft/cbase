@@ -75,7 +75,6 @@ namespace xcore
 		static void	 			write(f32 _value);
 		static void	 			write(u32 _value);
 		static void	 			write(u64 _value);
-		static void	 			write(uchar32 _value);
 
 		static void	 			write(const xcuchars& str);
 		static void	 			write(const xcuchar8s& str);
@@ -99,7 +98,6 @@ namespace xcore
 		inline static void 		writeLine(f32 _value)							{ write(_value); writeLine(); }
 		inline static void 		writeLine(u32 _value)							{ write(_value); writeLine(); }
 		inline static void 		writeLine(u64 _value)							{ write(_value); writeLine(); }
-		inline static void 		writeLine(uchar32 _value)						{ write(_value); writeLine(); }
 
 		inline static void 		writeLine(const xcuchars& str)					{ write(str); writeLine(); }
 		inline static void 		writeLine(const xcuchar32s& str)				{ write(str); writeLine(); }
@@ -151,7 +149,6 @@ namespace xcore
 		virtual void			write(f32 _value) = 0;
 		virtual void			write(u32 _value) = 0;
 		virtual void			write(u64 _value) = 0;
-		virtual void			write(uchar32 _value) = 0;
 
 		virtual void			write(const xcuchars& buffer) = 0;
 		virtual void			write(const xcuchar8s& buffer) = 0;
@@ -170,7 +167,6 @@ namespace xcore
 		inline void				writeLine(f32 _value)							{ write(_value); writeLine(); }
 		inline void				writeLine(u32 _value)							{ write(_value); writeLine(); }
 		inline void				writeLine(u64 _value)							{ write(_value); writeLine(); }
-		inline void				writeLine(char _value)							{ write(_value); writeLine(); }
 
 		inline void				writeLine(const xcuchars&   str) { write(str); writeLine(); }
 		inline void				writeLine(const xcuchar8s&  str) { write(str); writeLine(); }

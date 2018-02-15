@@ -68,11 +68,6 @@ namespace xcore
 		xconsole::write(value);
 	}
 
-	void 				xlog_to_console_imp::write(uchar32 value)
-	{
-		xconsole::write(value);
-	}
-
 	void 				xlog_to_console_imp::write(const xcuchars& str)
 	{
 		xconsole::write(str);
@@ -129,11 +124,6 @@ namespace xcore
 	}
 
 	void 				xlog_to_console_imp::writeLine(u64 value)
-	{
-		xconsole::writeLine(value);
-	}
-
-	void 				xlog_to_console_imp::writeLine(uchar32 value)
 	{
 		xconsole::writeLine(value);
 	}

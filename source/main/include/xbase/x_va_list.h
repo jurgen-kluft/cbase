@@ -105,7 +105,6 @@ namespace xcore
 			TYPE_UINT32   = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
 			TYPE_UINT64   = 0x0008 | PROP_INTEGER | PROP_UNSIGNED | SIZE_64,
 			TYPE_BOOL     = 0x0020 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
-			TYPE_UCHAR    = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
 			TYPE_FLOAT32  = 0x0040 | PROP_FLOAT | SIZE_32,
 			TYPE_FLOAT64  = 0x0050 | PROP_FLOAT | SIZE_64,
 			TYPE_PCTCHAR  = 0x0060 | SIZE_PTR,
@@ -126,7 +125,6 @@ namespace xcore
 		explicit				x_va(bool inVar) : mType(TYPE_BOOL)					{ *(u32*)mArg = inVar ? 1 : 0; }
 		explicit				x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
 		explicit				x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
-		explicit				x_va(uchar32 inVar);
 		explicit				x_va(const char* inVar);
 		explicit				x_va(xcuchars& str);
 		explicit				x_va(xcuchar32s& str);
@@ -151,7 +149,6 @@ namespace xcore
 		xbool					isUInt64() const									{ return xbool(mType == TYPE_UINT64); }
 		xbool					isF32() const										{ return xbool(mType == TYPE_FLOAT32); }
 		xbool					isF64() const										{ return xbool(mType == TYPE_FLOAT64); }
-		xbool					isUChar() const										{ return xbool(mType == TYPE_UCHAR); }
 		xbool					isPCTChar() const									{ return xbool(mType == TYPE_PCTCHAR); }
 		xbool					isPCUChar32() const									{ return xbool(mType == TYPE_PCUCHAR32); }
 
@@ -166,7 +163,6 @@ namespace xcore
 		operator				u64() const											{ return convertToUInt64(); }
 		operator				f32() const											{ return convertToFloat(); }
 		operator				f64() const											{ return convertToDouble(); }
-		operator				uchar32() const										{ return convertToUChar(); }
 		operator				bool() const										{ return convertToBool(); }
 		operator				xcuchars const*() const								{ return convertToUChars(); }
 		operator				xcuchar32s const*() const							{ return convertToUChar32s(); }
@@ -188,7 +184,6 @@ namespace xcore
 		f32						convertToFloat() const;
 		f64						convertToDouble() const;
 		bool					convertToBool() const;
-		uchar32					convertToUChar() const;
 		xcuchars const*			convertToUChars() const;
 		xcuchar32s const*		convertToUChar32s() const;
 
@@ -344,7 +339,6 @@ namespace xcore
 		x_va_r&					operator=(u64 rhs);
 		x_va_r&					operator=(f32 rhs);
 		x_va_r&					operator=(f64 rhs);
-		x_va_r&					operator=(uchar32 rhs);
 		x_va_r&					operator=(bool rhs);
 		x_va_r&					operator=(const uchar* rhs);
 		x_va_r&					operator=(const uchar32* rhs);

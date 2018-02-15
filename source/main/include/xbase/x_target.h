@@ -1060,14 +1060,14 @@ namespace xcore
 		#define X_FORCE_INLINE                __attribute__((always_inline))
 		#define X_FORCE_INLINE_SPU			  __attribute__((always_inline))
 
-		#define X_BOOL                        signed long
+		#define X_BOOL                        unsigned int
 		#define X_BYTE                        unsigned char
 		#define X_WCHAR                       unsigned short
 		#define X_INT8                        char
 		#define X_INT16                       short
 		#define X_INT32                       int
-		#define X_INT64                       signed long long
-		#define X_UINT64                      unsigned long long
+		#define X_INT64                       signed long
+		#define X_UINT64                      unsigned long
 		#define X_INT128                      __xint128
 		#define X_UINT128                     __xuint128
 		#define X_INT256                      __xint256
@@ -1076,15 +1076,6 @@ namespace xcore
 		template <bool> struct xCompileTimeAssert; 
 		template<> struct xCompileTimeAssert<true> { enum { OK = 0 }; };
 
-
-		static inline void TestTypeSizes()
-		{
-			xCompileTimeAssert<sizeof(X_INT8) == 1>(); 	
-			xCompileTimeAssert<sizeof(X_INT16) == 2>(); 
-			xCompileTimeAssert<sizeof(X_INT32) == 4>(); 
-			xCompileTimeAssert<sizeof(X_INT64) == 8>(); 
-			xCompileTimeAssert<sizeof(X_UINT64) == 8>(); 
-		}
 
 #ifdef TARGET_64BIT
 		#define X_SIZE                        unsigned long
@@ -1095,6 +1086,23 @@ namespace xcore
 		#define X_PTR_SIZED_INT               int
 		#define X_ALIGNMENT_DEFAULT           4
 #endif
+
+		static inline void TestTypeSizes()
+		{
+			xCompileTimeAssert<sizeof(X_SIZE) == sizeof(void*)>(); 
+			xCompileTimeAssert<sizeof(X_PTR_SIZED_INT) == sizeof(void*)>(); 
+
+			xCompileTimeAssert<sizeof(int) == 4>(); 
+			xCompileTimeAssert<sizeof(short int) == 2>(); 
+			xCompileTimeAssert<sizeof(long int) == 8>(); 
+
+			xCompileTimeAssert<sizeof(X_BOOL) == 4>(); 
+			xCompileTimeAssert<sizeof(X_INT8) == 1>(); 	
+			xCompileTimeAssert<sizeof(X_INT16) == 2>(); 
+			xCompileTimeAssert<sizeof(X_INT32) == 4>(); 
+			xCompileTimeAssert<sizeof(X_INT64) == 8>(); 
+			xCompileTimeAssert<sizeof(X_UINT64) == 8>(); 
+		}
 		
 		#define X_BIG_ENDIAN                  1234
 		#define X_FLOAT                       float
@@ -1230,7 +1238,7 @@ namespace xcore
 	typedef		char			uchar;
 	typedef		u8				uchar8;
 	typedef		u16				uchar16;
-	typedef		unsigned long	uchar32;
+	typedef		u32				uchar32;
 
 	typedef		char*			astr;		// ASCII string
 	typedef		char const*		acstr;		// ASCII string

@@ -7,22 +7,7 @@
 
 UNITTEST_SUITE_LIST(xCoreUnitTest);
 
-
-// SPU-only test list
-
-#ifdef SPU
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsingleton);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xallocator);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbinary_search);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xqsort);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbitfield);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xfloat);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xinteger);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
-#endif
-
-#ifndef SPU
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtypes);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xallocator);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbinary_search);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbitfield);
@@ -44,9 +29,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_ascii);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_utf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtls);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtypes);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xva);
-#endif
 
 #ifndef X_NO_CUSTOM_INT64
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, __xint64);
@@ -79,7 +62,7 @@ namespace xcore
 		xcore::x_iallocator*	mAllocator;
 	public:
 						UnitTestAllocator(xcore::x_iallocator* allocator)	{ mAllocator = allocator; }
-		virtual void*	Allocate(xsize_t size)								{ return mAllocator->allocate((u32)size, 4); }
+		virtual void*	Allocate(xsize_t size)								{ return mAllocator->allocate((u32)size, sizeof(void*)); }
 		virtual void	Deallocate(void* ptr)								{ mAllocator->deallocate(ptr); }
 	};
 
@@ -194,9 +177,9 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
 
-	xheap::sAllocator = systemAllocator;
-	test_object* test = xnew<test_object, xheap>(200, 1000.0f);
-	xdelete<xheap>(test);
+	//xheap::sAllocator = systemAllocator;
+	//test_object* test = xnew<test_object, xheap>(200, 1000.0f);
+	//xdelete<xheap>(test);
 
 	xcore::xconsole::write("Configuration: ");
 	xcore::xconsole::writeLine(TARGET_FULL_DESCR_STR);

@@ -30,6 +30,7 @@ namespace xcore
 						slice_t();
 						slice_t(x_iallocator* mem, s32 size);
 						slice_t(slice_t<T> const& other);
+						~slice_t();
 
 		s32				size() const;
 
@@ -38,6 +39,13 @@ namespace xcore
 
 		T &				operator [] (s32 index);
 		T const &		operator [] (s32 index) const;
+
+		slice_t<T>&		operator = (const slice_t<T>& other)
+		{
+			m_slice.release();
+			m_slice = other.m_slice.obtain();
+			return *this;
+		}
 
 		slice			m_slice;
 	};
@@ -58,6 +66,12 @@ namespace xcore
 	inline slice_t<T>::slice_t(slice_t<T> const& other)
 		: m_slice(other.m_slice.obtain())
 	{
+	}
+
+	template<typename T>
+	inline slice_t<T>::~slice_t()
+	{
+		m_slice.release();
 	}
 
 	template<typename T>

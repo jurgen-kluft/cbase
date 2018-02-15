@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <cstring>
+#include <stdio.h>
 
 #include "xbase/x_memory_std.h"
 #include "xbase/x_integer.h"
@@ -11,16 +12,25 @@
 namespace xcore
 {
 	void * mac_aligned_malloc(size_t size, size_t alignment) 
-	{
+	{		
+		if (alignment < (2 * sizeof(void*)))
+		{
+			alignment = (2 * sizeof(void*));
+		}
+
 		void * p1;	// original block
 		void ** p2;	// aligned block
-		s32 offset = (alignment - 1) + (2 * sizeof(void *));
-		if ((p1 = (void *)malloc(size + offset)) == NULL)
+		s32 const offset = alignment + (2 * sizeof(void *));
+		if ((p1 = malloc(size + offset)) == NULL)
 			return NULL;
-		p2 = (void **)(((size_t)(p1) + offset) & ~(alignment - 1));
+		p2 = (void **)(((uptr)(p1) + offset) & ~(alignment - 1));
 		p2[-1] = p1;
 		p2[-2] = (void*)size;
-		return p2;
+		if (((uptr)p2 & (alignment - 1)) != 0)
+		{
+			printf("ERROR in mac_aligned_malloc\n");
+		}
+		return (void*)p2;
 	}
 
 	void	mac_aligned_free(void* ptr)
@@ -66,7 +76,7 @@ namespace xcore
 
 		virtual void*			allocate(xsize_t size, u32 alignment)
 		{
-			void* ptr = mac_aligned_malloc(alignment, size);
+			void* ptr = mac_aligned_malloc(size, alignment);
 			++mAllocationCount;
 			return ptr;
 		}

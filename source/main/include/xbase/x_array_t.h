@@ -28,6 +28,7 @@ namespace xcore
 	{
 	public:
 						array_t() : m_size(0) { }
+						array_t(const array_t<T>& other) : m_size(other.m_size), m_data(other.m_data) { }
 
 		inline u32		size() const	{ return m_size; }
 		inline u32		max() const		{ return m_data.size(); }

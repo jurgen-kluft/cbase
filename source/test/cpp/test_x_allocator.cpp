@@ -14,6 +14,25 @@ UNITTEST_SUITE_BEGIN(xallocator)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
+        UNITTEST_TEST(test_alignment)
+        {
+			void * ptr = gTestAllocator->allocate(200, 8);
+			CHECK_EQUAL(0, (uptr)ptr & (8-1));
+			gTestAllocator->deallocate(ptr);
+
+			ptr = gTestAllocator->allocate(200, 16);
+			CHECK_EQUAL(0, (uptr)ptr & (16-1));
+			gTestAllocator->deallocate(ptr);
+	
+			ptr = gTestAllocator->allocate(200, 32);
+			CHECK_EQUAL(0, (uptr)ptr & (32-1));
+			gTestAllocator->deallocate(ptr);
+
+			ptr = gTestAllocator->allocate(200, 64);
+			CHECK_EQUAL(0, (uptr)ptr & (64-1));
+			gTestAllocator->deallocate(ptr);
+		}
+
 		struct test_object1
 		{
 			test_object1():mInteger(1),mFloat(2.0){}
@@ -73,7 +92,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			CHECK_TRUE(object3[1].mFloat = 3.0);
 			CHECK_TRUE(object3[2].mInteger = 2);
 			CHECK_TRUE(object3[2].mFloat = 3.0);
-			CHECK_TRUE((uptr)object3%32 == 0);
+			CHECK_EQUAL(0, (uptr)object3%32);
 			delete[] object3;
 		}
 

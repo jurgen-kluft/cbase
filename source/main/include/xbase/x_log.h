@@ -105,7 +105,6 @@ namespace xcore
 		static xlog_imp*		redirect(ELevel inLevel, xlog_imp* inLogger);
 
 		static void 			write(ELevel inLevel, bool _value);
-		static void 			write(ELevel inLevel, uchar32 _value);
 		static void 			write(ELevel inLevel, s32 _value);
 		static void 			write(ELevel inLevel, s64 _value);
 		static void 			write(ELevel inLevel, u32 _value);
@@ -119,7 +118,6 @@ namespace xcore
 
 		static void 			writeLine(ELevel inLevel);
 		static void 			writeLine(ELevel inLevel, bool _value);
-		static void 			writeLine(ELevel inLevel, uchar32 _value);
 		static void 			writeLine(ELevel inLevel, s32 _value);
 		static void 			writeLine(ELevel inLevel, s64 _value);
 		static void 			writeLine(ELevel inLevel, u32 _value);
@@ -148,7 +146,6 @@ namespace xcore
 		virtual                 ~xlog_imp(){};
 
 		virtual void 			write(bool _value) = 0;
-		virtual void 			write(uchar32 _value) = 0;
 		virtual void 			write(s32 _value) = 0;
 		virtual void 			write(s64 _value) = 0;
 		virtual void 			write(u32 _value) = 0;
@@ -162,7 +159,6 @@ namespace xcore
 
 		virtual void 			writeLine() = 0;
 		virtual void 			writeLine(bool _value) = 0;
-		virtual void 			writeLine(uchar32 _value) = 0;
 		virtual void 			writeLine(s32 _value) = 0;
 		virtual void 			writeLine(s64 _value) = 0;
 		virtual void 			writeLine(u32 _value) = 0;

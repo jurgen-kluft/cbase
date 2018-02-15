@@ -27,8 +27,6 @@ namespace xcore
 						slice();
 						slice(xallocator allocator, u32 item_count, u32 item_size);
 						slice(slice_data* data, s32 from, s32 to);
-						slice(slice const& other);
-						~slice();
 
 		static void		alloc(slice& slice, xallocator allocator, u32 item_count, u32 item_size);
 
@@ -40,7 +38,7 @@ namespace xcore
 		slice			view(u32 from, u32 to) const;
 
 		slice			obtain() const;
-		void			release() const;
+		void			release();
 
 		void*			get_at(s32 index);
 		void const*		get_at(s32 index) const;

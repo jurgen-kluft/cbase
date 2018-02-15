@@ -112,25 +112,11 @@ namespace xcore
 		mTo = to;
 	}
 
-	slice::slice(slice const& other)
-	{
-		mData = other.mData->incref();
-		mFrom = other.mFrom;
-		mTo = other.mTo;
-	}
-
 	slice::slice(xallocator allocator, u32 item_count, u32 item_size)
 	{
 		mData = slice_data::alloc(allocator, item_count, item_size);
 		mFrom = 0;
 		mTo = item_count;
-	}
-
-	slice::~slice()
-	{
-		mData->decref();
-		mFrom = 0;
-		mTo = 0;
 	}
 
 	void			slice::alloc(slice& slice, xallocator allocator, u32 item_count, u32 item_size)
@@ -173,12 +159,18 @@ namespace xcore
 
 	slice			slice::obtain() const
 	{
-		return slice(mData->incref(), mFrom, mTo);
+		return slice(mData, mFrom, mTo);
 	}
 
-	void			slice::release() const
-	{ 
-		mData->decref(); 
+	void			slice::release()
+	{
+		if (mData != NULL)
+		{
+			mData->decref();
+		}
+		mData = NULL;
+		mFrom = 0;
+		mTo = 0;
 	}
 
 	void*			slice::get_at(s32 index)

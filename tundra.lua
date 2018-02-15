@@ -57,6 +57,7 @@ Build {
         PROGOPTS = { "-lc++" },
         CXXOPTS = {
           "-std=c++11",
+          "-arch x86_64",
           "-Wno-new-returns-null",
           "-Wno-missing-braces",
           "-Wno-unused-function",

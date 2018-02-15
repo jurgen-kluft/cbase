@@ -22,12 +22,6 @@ namespace xcore
 {
 	const x_va	x_va::sEmpty;
 
-	x_va::x_va(uchar32 inVar) 
-		: mType(TYPE_UCHAR) 
-	{ 
-		*(uchar32*)mArg = (uchar32)inVar; 
-	}
-
 	x_va::x_va(const char* inVar) 
 		: mType(TYPE_PCTCHAR) 
 	{ 
@@ -53,7 +47,6 @@ namespace xcore
 		switch (mType)
 		{
 		case TYPE_BOOL: { bool v = (*(bool*)mArg); ascii::to_string(str, v); } break;
-		case TYPE_UCHAR: { uchar32 c = (*(uchar32*)mArg); utf::write(c, str); } break;
 		case TYPE_UINT32: { u32 v = (*(u32*)mArg); ascii::to_string(str, v); } break;
 		case TYPE_INT32: { s32 v = (*(u32*)mArg); ascii::to_string(str, v); } break;
 
@@ -85,7 +78,6 @@ namespace xcore
 		switch (mType)
 		{
 		case TYPE_BOOL: { bool v = (*(bool*)mArg); utf32::to_string(str, v); } break;
-		case TYPE_UCHAR: { uchar32 c = (*(uchar32*)mArg); utf::write(c, str); } break;
 		case TYPE_UINT32: { u32 v = (*(u32*)mArg); utf32::to_string(str, v); } break;
 		case TYPE_INT32: { s32 v = (*(u32*)mArg); utf32::to_string(str, v); } break;
 
@@ -146,9 +138,6 @@ namespace xcore
 		switch (mType)
 		{
 		case TYPE_BOOL:
-		case TYPE_UCHAR:
-			//case TYPE_UINT:
-			//case TYPE_INT:		{ i = (u32)(*(u32*)mArg); } break;
 		case TYPE_UINT32:
 		case TYPE_INT32: { i = (u32)(*(u32*)mArg); } break;
 
@@ -187,9 +176,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:
-			case TYPE_UCHAR:
-			//case TYPE_UINT:
-			//case TYPE_INT:		{ i = (u64)(*(u32*)mArg);  } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	{ i = (u64)(*(u32*)mArg);  } break;
 
@@ -222,9 +208,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:
-			case TYPE_UCHAR:
-			//case TYPE_UINT:
-			//case TYPE_INT:		{ i = (f32)(*(u32*)mArg); } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	{ i = (f32)(*(u32*)mArg); } break;
 
@@ -257,9 +240,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:
-			case TYPE_UCHAR:
-			//case TYPE_UINT:
-			//case TYPE_INT:		{ i = (f64)(*(u32*)mArg); } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	{ i = (f64)(*(u32*)mArg); } break;
 
@@ -293,9 +273,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:
-			case TYPE_UCHAR:
-			//case TYPE_UINT:
-			//case TYPE_INT:		{ i = (u32)(*(u32*)mArg); } break;
 			case TYPE_UINT32:
 			case TYPE_INT32:	{ i = (u32)(*(u32*)mArg); } break;
 
@@ -321,42 +298,6 @@ namespace xcore
 		};
 
 		return i != 0;
-	}
-
-	uchar32			x_va::convertToUChar() const
-	{
-		uchar32 ch((u32)'?');
-		switch (mType)
-		{
-			case TYPE_BOOL:		{ ch = (*(u32*)mArg)!=0 ? (u32)'y' : (u32)'n'; } break;
-			case TYPE_UINT32:
-			case TYPE_INT32:	
-			case TYPE_UCHAR:	{ ch = (uchar32)(*(uchar*)mArg); } break;
-
-			case TYPE_UINT8:
-			case TYPE_INT8:		{ ch = (u8)(*(u8*)mArg); } break;
-			case TYPE_UINT16:
-			case TYPE_INT16:	{ ch = (u16)(*(u16*)mArg); } break;
-			case TYPE_UINT64:
-			case TYPE_INT64:	{ ch = (u32)(*(u64*)mArg); } break;
-
-			case TYPE_FLOAT32:	
-			case TYPE_FLOAT64:
-
-			case TYPE_PCTCHAR:
-			{	xcuchars const& chrs = *(xcuchars const*)mArg;
-				ch = utf::peek(chrs);
-			} break;
-			case TYPE_PCUCHAR32:
-			{	xcuchar32s const& chrs = *(xcuchar32s const*)mArg;
-				ch = utf::peek(chrs);
-			} break;
-
-			default:
-				break; // Fall through
-		};
-
-		return ch;
 	}
 
 	xcuchars const*		x_va::convertToUChars() const
@@ -428,7 +369,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UCHAR:	*((uchar*)mRef) = uchar((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = rhs; break;
 			case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
@@ -456,7 +396,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UCHAR:	*((uchar*)mRef) = uchar((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = rhs; break;
 			case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
@@ -484,7 +423,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UCHAR:	*((uchar*)mRef) = uchar((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
 			case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
@@ -512,7 +450,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UCHAR:	*((uchar*)mRef) = uchar((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
 			case TYPE_UINT8:	*(( u8*)mRef) = ( u8)rhs; break;
@@ -534,7 +471,6 @@ namespace xcore
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = rhs!=0 ? xTRUE : xFALSE; break;
-			case TYPE_UCHAR:	*((uchar*)mRef) = uchar((u32)'?'); break;
 			case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
 			case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
 			case TYPE_UINT8:	*(( u8*)mRef) = ( u8)rhs; break;
@@ -551,36 +487,11 @@ namespace xcore
 		return *this;
 	}
 
-	x_va_r&					x_va_r::operator=(uchar32 rhs)
-	{
-		switch (mType)
-		{
-		case TYPE_BOOL:		*((xbool*)mRef) = rhs != 0 ? xTRUE : xFALSE; break;
-		case TYPE_UCHAR:	*((uchar*)mRef) = (uchar)rhs; break;
-		case TYPE_UINT32:	*((u32*)mRef) = (u32)rhs; break;
-		case TYPE_INT32:	*((s32*)mRef) = (s32)rhs; break;
-		case TYPE_UINT8:	*((u8*)mRef) = (u8)rhs; break;
-		case TYPE_INT8:		*((s8*)mRef) = (s8)rhs; break;
-		case TYPE_UINT16:	*((u16*)mRef) = (u16)rhs; break;
-		case TYPE_INT16:	*((s16*)mRef) = (s16)rhs; break;
-		case TYPE_UINT64:	*((u64*)mRef) = (u64)rhs; break;
-		case TYPE_INT64:	*((s64*)mRef) = (s64)rhs; break;
-		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)rhs; break;
-		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)rhs; break;
-		case TYPE_PTCHAR:    utf::write(rhs, *((xuchars*)mRef)); break;
-		case TYPE_PUCHAR32:  ((uchar32*)mRef)[0] = rhs; break;
-		default:			break;
-		};
-
-		return *this;
-	}
-
 	x_va_r&					x_va_r::operator=(bool rhs)
 	{
 		switch (mType)
 		{
 			case TYPE_BOOL:		*((xbool*)mRef) = xbool(rhs); break;
-			case TYPE_UCHAR:	*((uchar*)mRef) = '?'; break;
 			case TYPE_UINT32:	*((u32*)mRef) = rhs ? 1 : 0; break;
 			case TYPE_INT32:	*((s32*)mRef) = rhs ? 1 : 0; break;
 			case TYPE_UINT8:	*((u8*)mRef) = rhs ? 1 : 0; break;
@@ -602,7 +513,6 @@ namespace xcore
 		switch (mType)
 		{
 		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs, NULL); break;
-		case TYPE_UCHAR:	*((uchar8*)mRef) = (uchar8)StrToS64(rhs, NULL, 10); break;
 		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs, NULL, 10); break;
 		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs, NULL, 10); break;
 		case TYPE_UINT8:	*((u8 *)mRef) = (u8 )StrToS64(rhs, NULL, 10); break;
@@ -626,7 +536,6 @@ namespace xcore
 		switch (mType)
 		{
 		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs, NULL); break;
-		case TYPE_UCHAR:	*((uchar8*)mRef) = (uchar8)StrToS64(rhs, NULL, 10); break;
 		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs, NULL, 10); break;
 		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs, NULL, 10); break;
 		case TYPE_UINT8:	*((u8 *)mRef) = (u8)StrToS64(rhs, NULL, 10); break;
@@ -650,7 +559,6 @@ namespace xcore
 		switch (mType)
 		{
 		case TYPE_BOOL:		*((bool*)mRef) = rhs; break;
-		case TYPE_UCHAR:	*((uchar8*)mRef) = rhs; break;
 		case TYPE_UINT32:	*((u32*)mRef) = rhs; break;
 		case TYPE_INT32:	*((s32*)mRef) = rhs; break;
 		case TYPE_UINT8:	*((u8 *)mRef) = rhs; break;

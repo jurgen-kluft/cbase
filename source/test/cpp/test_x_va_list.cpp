@@ -78,7 +78,7 @@ UNITTEST_SUITE_BEGIN(xva)
 			CHECK_FALSE(v.isF64());
 			CHECK_TRUE(v.isPCTChar());
 
-			CHECK_TRUE((bool)v);	// ptr != NULL
+			CHECK_FALSE((bool)v);	// "ascii string" != "true"
 		}
 
 	}

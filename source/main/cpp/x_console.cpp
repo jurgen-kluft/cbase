@@ -106,7 +106,7 @@ namespace xcore
 
 		virtual void 			write(u32 _value);
 		virtual void 			write(u64 _value);
-		virtual void 			write(uchar32 _value);
+
 		virtual void 			write(const xcuchars& str);
 		virtual void 			write(const xcuchars& fmt, const x_va_list& args);
 
@@ -157,10 +157,6 @@ namespace xcore
 	}
 
 	void				xconsole_null_imp::write(u64 _value)
-	{
-	}
-
-	void				xconsole_null_imp::write(uchar32 _value)
 	{
 	}
 
@@ -226,7 +222,6 @@ namespace xcore
 
 		virtual void			write(u32 _value);
 		virtual void			write(u64 _value);
-		virtual void			write(uchar32 _value);
 
 		virtual void			write(const xcuchars& str);
 		virtual void			write(const xcuchars& fmt, const x_va_list& args);
@@ -300,15 +295,6 @@ namespace xcore
 		write(tmp.cchars());
 	}
 	
-	void    xiconsole_default::write(uchar32 _value)
-	{
-		uchar32 s[3];
-		s[0] = _value;
-		s[1] = '\0';
-		s[2] = '\0';
-		mOut32(xcuchar32s(s, &s[1]));
-	}
-
 	void    xiconsole_default::write(const xcuchars& str)
 	{
 		mOut(str);
@@ -434,15 +420,6 @@ namespace xcore
 	}
 
 	void    xconsole::write(u64 _value)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(_value);
-	}
-
-
-	void    xconsole::write(uchar32 _value)
 	{
 		xiconsole_store::iterator iter = NULL;
 		xiconsole* console;
