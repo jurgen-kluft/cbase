@@ -1069,7 +1069,7 @@ namespace xcore
 	{
 	public:
 		inline			CharReaderFromAsciiBuffer(const uchar* str, const uchar* str_end) : mStr(str), mPtr(str), mEnd(str_end) { if (mEnd == NULL) mEnd = ascii::endof(mStr, NULL); }
-		inline			CharReaderFromAsciiBuffer(AsciiBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd) { if (mEnd == NULL) mEnd = ascii::endof(mStr, NULL); }
+		inline			CharReaderFromAsciiBuffer(AsciiConstBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd) { if (mEnd == NULL) mEnd = ascii::endof(mStr, NULL); }
 
 		virtual uchar32	Peek()
 		{

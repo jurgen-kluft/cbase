@@ -40,9 +40,6 @@ namespace xcore
 		T const &		operator [] (s32 index) const;
 
 		slice			m_slice;
-
-	protected:
-						slice_t(slice& slice) : m_slice(data->incref()) {}
 	};
 
 	template<typename T>

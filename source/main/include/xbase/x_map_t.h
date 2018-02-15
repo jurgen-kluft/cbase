@@ -271,7 +271,6 @@ namespace xcore
 			, m_items(NULL)
 			, m_stack_idx(0)
 			, m_table_index(0)
-			, m_table_size(0)
 			, m_table(NULL)
 		{}
 
@@ -285,10 +284,10 @@ namespace xcore
 		s32				m_idx;
 		s32				m_max;
 
-		map_item_t*		m_item;
+		map_item_t<K,V>* m_item;
 
 		map_nodes_t*	m_nodes;
-		map_items_t*	m_items;
+		map_items_t<K,V>* m_items;
 
 		u32				m_stack_idx;
 		u32				m_stack_entry[32*map_node_t::SIZE];
@@ -302,7 +301,7 @@ namespace xcore
 	{
 		while (m_stack_idx == 0)
 		{
-			if (m_table_index < m_table_size)
+			if (m_table_index < m_table->m_table_size)
 			{
 				// Find next non null entry in the root table
 				u32 ientry = 0;
@@ -310,22 +309,22 @@ namespace xcore
 				{
 					++m_table_index;
 					ientry = m_table->get(m_table_index);
-				} while (map_index::is_null(ientry) && m_table_index < m_table_size);
+				} while (map_index::is_null(ientry) && m_table_index < m_table->m_table_size);
 
 				// Push it onto the stack
 				if (map_index::is_item(ientry))
 				{
-					m_stack_entry[m_stack_index++] = ientry;
+					m_stack_entry[m_stack_idx++] = ientry;
 				}
 				else if (map_index::is_node(ientry))
 				{
-					map_node_t* pnode = m_nodes.get(ientry);
+					map_node_t* pnode = m_nodes->get(ientry);
 					for (s32 i = 0; i<map_node_t::SIZE; ++i)
 					{
 						ientry = pnode->get(i);
 						if (!map_index::is_null(i))
 						{
-							m_stack_node[m_stack_index++] = ientry;
+							m_stack_entry[m_stack_idx++] = ientry;
 						}
 					}
 				}
@@ -341,10 +340,10 @@ namespace xcore
 			// Get something from the stack.
 			// When we get an entry from the stack 
 			// check if it is a node or an item.
-			u32 ientry = m_stack_node[--m_stack_idx];
+			u32 ientry = m_stack_entry[--m_stack_idx];
 			if (map_index::is_item(ientry))
 			{
-				m_item = m_items.get(ientry);
+				m_item = m_items->get(ientry);
 				break;
 			}
 			else
@@ -355,7 +354,7 @@ namespace xcore
 					ientry = pnode->get(i);
 					if (!map_index::is_null(i))
 					{
-						m_stack_node[m_stack_index++] = ientry;
+						m_stack_entry[m_stack_idx++] = ientry;
 					}
 				}
 			}

@@ -1,9 +1,13 @@
 local GlobExtension = require("tundra.syntax.glob")
 
 Build {
+  ReplaceEnv = {
+    OBJECTROOT = "target",
+  },
   Env = {
     CPPDEFS = {
-      { "TARGET_PC_DEV_DEBUG"; Config = "win64-*-debug-*" }
+      { "TARGET_PC_DEV_DEBUG", "TARGET_PC", "PLATFORM_64BIT"; Config = "win64-*-debug-*" },
+      { "TARGET_MAC_DEV_DEBUG", "TARGET_MAC", "PLATFORM_64BIT"; Config = "macosx-*-debug-*" },
     },
   },
   Units = function ()
@@ -13,39 +17,74 @@ Build {
             Dir = dir,
             Extensions = { ".c", ".cpp", ".s", ".asm" },
             Filters = {
+              { Pattern = "_win32"; Config = "win32-*-*", "x64-*-*" },
+              { Pattern = "_mac"; Config = "macosx-*-*" },
             }
         }
     end
 
-    local lib = StaticLibrary {
+    local xbase_inc = "source/main/include/"
+    local xunittest_inc = "../xunittest/source/main/include/"
+
+    local xbase_lib = StaticLibrary {
       Name = "xbase",
       Config = "*-*-*-static",
       Sources = { SourceGlob("source/main/cpp") },
-      Includes = { "source/main/include/" },
+      Includes = { xbase_inc },
     }
 
-    local test = Program {
-      Name = "xbase_test",
-      Depends = { lib },
+    local xunittest_lib = StaticLibrary {
+      Name = "xunittest",
+      Config = "*-*-*-static",
+      Sources = { SourceGlob("../xunittest/source/main/cpp") },
+      Includes = { xunittest_inc },
+    }
+
+    local unittest = Program {
+      Name = "xbase_unittest",
+      Depends = { xbase_lib, xunittest_lib },
       Sources = { SourceGlob("source/test/cpp") },
-      Includes = { "source/main/include/", "source/test/include/" },
+      Includes = { "source/test/include/", xbase_inc, xunittest_inc },
     }
 
-    Default(lib)
+    Default(unittest)
 
   end,
   Configs = {
-    {
-      Name = "macosx-gcc",
+    Config {
+      Name = "macosx-clang",
+      Env = {
+        PROGOPTS = { "-lc++" },
+        CXXOPTS = {
+          "-std=c++11",
+          "-Wno-new-returns-null",
+          "-Wno-missing-braces",
+          "-Wno-unused-function",
+          "-Wno-unused-variable",
+          "-Wno-unused-result",
+          "-Wno-write-strings",
+          "-Wno-c++11-compat-deprecated-writable-strings",
+          "-Wno-null-dereference",
+          "-Wno-format",
+          "-fno-strict-aliasing",
+          "-fno-omit-frame-pointer",
+        },
+      },
       DefaultOnHost = "macosx",
-      Tools = { "gcc" },
+      Tools = { "clang" },
     },
-    {
+    Config {
+      ReplaceEnv = {
+        OBJECTROOT = "target",
+      },
       Name = "linux-gcc",
       DefaultOnHost = "linux",
       Tools = { "gcc" },
     },
-    {
+    Config {
+      ReplaceEnv = {
+        OBJECTROOT = "target",
+      },
       Name = "win64-msvc",
       DefaultOnHost = "windows",
       Tools = { "msvc-vs2017" },

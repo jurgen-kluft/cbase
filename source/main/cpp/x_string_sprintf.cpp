@@ -7,7 +7,7 @@
 
 #ifdef TARGET_PC
 #include <math.h>
-#elif defined(TARGET_OSX)
+#elif defined(TARGET_MAC)
 #include <math.h>
 #else
 #error "Don't know how fmod for this platform"
@@ -470,7 +470,7 @@ namespace xcore
 #define to_char(n)  ((u32)((n) + '0'))
 
 	static
-		void ULtoA(u32 val, CharWriter* writer, s32 base, xbool octzero, char* xdigs)
+		void ULtoA(u32 val, CharWriter* writer, s32 base, xbool octzero, char const* xdigs)
 	{
 		uchar32 c;
 		s32   sval;
@@ -537,7 +537,7 @@ namespace xcore
 	 * Same as above but for s64
 	 */
 	static
-		void UQtoA(u64 val, CharWriter* writer, s32 base, xbool octzero, char* xdigs)
+		void UQtoA(u64 val, CharWriter* writer, s32 base, xbool octzero, char const* xdigs)
 	{
 		uchar32 c;
 		s64   sval;
@@ -742,7 +742,7 @@ namespace xcore
 		uchar   	ox[2];          ///< space for 0x hex-prefix
 
 		/// Initialize variables
-		char* xdigs = NULL;                   // digits for [xX] conversion
+		char const* xdigs = NULL;                   // digits for [xX] conversion
 		u32   ulval = 0;                      // integer arguments %[diouxX]
 		u64   uqval = 0;                      // %q integers
 		s32   argindex = 0;

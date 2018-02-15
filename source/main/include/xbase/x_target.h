@@ -76,7 +76,7 @@
  *     TARGET_PC         Platform PC
  *     TARGET_PC_EDITOR  Platform PC Editor
  *     TARGET_MFC        MFC
- *     TARGET_OSX      Platform Mac OS
+ *     TARGET_MAC      Platform Mac OS
  *     TARGET_DEVKIT     \on DevKit
  *     TARGET_CLIENT     \on "Debug Station"
  *     TARGET_RETAIL     \on Console
@@ -112,21 +112,21 @@
  *     TARGET_PC_TEST_DEBUG        TARGET_PC TARGET_DEBUG  TARGET_TEST
  *     TARGET_PC_TEST_DEV          TARGET_PC TARGET_DEV    TARGET_TEST
  *     TARGET_PC_TEST_RELEASE      TARGET_PC TARGET_RELEASE TARGET_TEST
- *     TARGET_OSX_DEV_DEBUG      TARGET_OSX TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_OSX_DEV_DEV        TARGET_OSX TARGET_DEVKIT TARGET_DEV
- *     TARGET_OSX_DEV_RELEASE    TARGET_OSX TARGET_DEVKIT TARGET_RELEASE
- *     TARGET_OSX_DEV_FINAL      TARGET_OSX TARGET_DEVKIT TARGET_FINAL
- *     TARGET_OSX_CLIENT_DEBUG   TARGET_OSX TARGET_CLIENT TARGET_DEBUG
- *     TARGET_OSX_CLIENT_DEV     TARGET_OSX TARGET_CLIENT TARGET_DEV
- *     TARGET_OSX_CLIENT_RELEASE TARGET_OSX TARGET_CLIENT TARGET_RELEASE
- *     TARGET_OSX_CLIENT_FINAL   TARGET_OSX TARGET_CLIENT TARGET_FINAL
- *     TARGET_OSX_RETAIL_DEBUG   TARGET_OSX TARGET_RETAIL TARGET_DEBUG
- *     TARGET_OSX_RETAIL_DEV     TARGET_OSX TARGET_RETAIL TARGET_DEV
- *     TARGET_OSX_RETAIL_RELEASE TARGET_OSX TARGET_RETAIL TARGET_RELEASE
- *     TARGET_OSX_RETAIL_FINAL   TARGET_OSX TARGET_RETAIL TARGET_FINAL
- *     TARGET_OSX_TEST_DEBUG     TARGET_OSX TARGET_DEBUG  TARGET_TEST
- *     TARGET_OSX_TEST_DEV       TARGET_OSX TARGET_DEV    TARGET_TEST
- *     TARGET_OSX_TEST_RELEASE   TARGET_OSX TARGET_RELEASE TARGET_TEST
+ *     TARGET_MAC_DEV_DEBUG      TARGET_MAC TARGET_DEVKIT TARGET_DEBUG
+ *     TARGET_MAC_DEV_DEV        TARGET_MAC TARGET_DEVKIT TARGET_DEV
+ *     TARGET_MAC_DEV_RELEASE    TARGET_MAC TARGET_DEVKIT TARGET_RELEASE
+ *     TARGET_MAC_DEV_FINAL      TARGET_MAC TARGET_DEVKIT TARGET_FINAL
+ *     TARGET_MAC_CLIENT_DEBUG   TARGET_MAC TARGET_CLIENT TARGET_DEBUG
+ *     TARGET_MAC_CLIENT_DEV     TARGET_MAC TARGET_CLIENT TARGET_DEV
+ *     TARGET_MAC_CLIENT_RELEASE TARGET_MAC TARGET_CLIENT TARGET_RELEASE
+ *     TARGET_MAC_CLIENT_FINAL   TARGET_MAC TARGET_CLIENT TARGET_FINAL
+ *     TARGET_MAC_RETAIL_DEBUG   TARGET_MAC TARGET_RETAIL TARGET_DEBUG
+ *     TARGET_MAC_RETAIL_DEV     TARGET_MAC TARGET_RETAIL TARGET_DEV
+ *     TARGET_MAC_RETAIL_RELEASE TARGET_MAC TARGET_RETAIL TARGET_RELEASE
+ *     TARGET_MAC_RETAIL_FINAL   TARGET_MAC TARGET_RETAIL TARGET_FINAL
+ *     TARGET_MAC_TEST_DEBUG     TARGET_MAC TARGET_DEBUG  TARGET_TEST
+ *     TARGET_MAC_TEST_DEV       TARGET_MAC TARGET_DEV    TARGET_TEST
+ *     TARGET_MAC_TEST_RELEASE   TARGET_MAC TARGET_RELEASE TARGET_TEST
  *     </table>
  *
  *
@@ -202,13 +202,13 @@ namespace xcore
 	{
 		X_PLATFORM_NONE             = 0,
 		X_PLATFORM_PC               = (1<<0),
-		X_PLATFORM_OSX              = (1<<1),
+		X_PLATFORM_MAC              = (1<<1),
 		X_PLATFORM_ALL              = (1<<15),
 		X_PLATFORM_PAD              = 0xffffffff
 	};
 
 	#undef TARGET_PC
-	#undef TARGET_OSX
+	#undef TARGET_MAC
 
 	/**
 	 *
@@ -218,15 +218,15 @@ namespace xcore
 	 *  without sufficiently qualifying the target.
 	 *
 	 */
-	#if !defined(TARGET_OSX_DEV_DEBUG) && !defined(TARGET_OSX_DEV_DEV) && !defined(TARGET_OSX_DEV_RELEASE) && !defined(TARGET_OSX_DEV_FINAL) \
-		&& !defined(TARGET_OSX_CLIENT_DEBUG) && !defined(TARGET_OSX_CLIENT_DEV) && !defined(TARGET_OSX_CLIENT_RELEASE) && !defined(TARGET_OSX_CLIENT_FINAL) \
-			&& !defined(TARGET_OSX_RETAIL_DEBUG) && !defined(TARGET_OSX_RETAIL_DEV) && !defined(TARGET_OSX_RETAIL_RELEASE) && !defined(TARGET_OSX_RETAIL_FINAL)
-		#ifdef TARGET_OSX
+	#if !defined(TARGET_MAC_DEV_DEBUG) && !defined(TARGET_MAC_DEV_DEV) && !defined(TARGET_MAC_DEV_RELEASE) && !defined(TARGET_MAC_DEV_FINAL) \
+		&& !defined(TARGET_MAC_CLIENT_DEBUG) && !defined(TARGET_MAC_CLIENT_DEV) && !defined(TARGET_MAC_CLIENT_RELEASE) && !defined(TARGET_MAC_CLIENT_FINAL) \
+			&& !defined(TARGET_MAC_RETAIL_DEBUG) && !defined(TARGET_MAC_RETAIL_DEV) && !defined(TARGET_MAC_RETAIL_RELEASE) && !defined(TARGET_MAC_RETAIL_FINAL)
+		#ifdef TARGET_MAC
 			#error x_target, error; Incorrect target specification.
-			#error x_target, error; Use either TARGET_OSX_DEV, TARGET_OSX_CLIENT, or TARGET_OSX_RETAIL.
+			#error x_target, error; Use either TARGET_MAC_DEV, TARGET_MAC_CLIENT, or TARGET_MAC_RETAIL.
 		#endif
 	#else
-		#undef TARGET_OSX
+		#undef TARGET_MAC
 	#endif
 
 	#if defined(PLATFORM_64BIT)
@@ -239,16 +239,16 @@ namespace xcore
 	 *  Mac OS Targets
 	 */
 
-	#ifdef TARGET_OSX_TEST_DEBUG
+	#ifdef TARGET_MAC_TEST_DEBUG
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_DEBUG
 			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -256,47 +256,47 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_TEST_DEV
+	#ifdef TARGET_MAC_TEST_DEV
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_DEV
 			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 		#endif
 	#endif
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_TEST_RELEASE
+	#ifdef TARGET_MAC_TEST_RELEASE
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_RELEASE
 			#define TARGET_TEST
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 		#endif
 	#endif
 
 	//------------------------------------------------------------------------------
 
-	#if defined(TARGET_OSX_DEV_DEBUG) || defined(TARGET_OSX_DEBUG)
+	#if defined(TARGET_MAC_DEV_DEBUG) || defined(TARGET_MAC_DEBUG)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -304,45 +304,45 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#if defined(TARGET_OSX_DEV_DEV) || defined(TARGET_OSX_DEV)
+	#if defined(TARGET_MAC_DEV_DEV) || defined(TARGET_MAC_DEV)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_DEV
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 		#endif
 	#endif
 	
 	//------------------------------------------------------------------------------
 
-	#if defined(TARGET_OSX_DEV_RELEASE) || defined(TARGET_OSX_RELEASE)
+	#if defined(TARGET_MAC_DEV_RELEASE) || defined(TARGET_MAC_RELEASE)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 		#endif
 	#endif
 
 	//------------------------------------------------------------------------------
 
-	#if defined(TARGET_OSX_DEV_FINAL) || defined(TARGET_OSX_FINAL)
+	#if defined(TARGET_MAC_DEV_FINAL) || defined(TARGET_MAC_FINAL)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_DEVKIT
 			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -350,15 +350,15 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_CLIENT_DEBUG
+	#ifdef TARGET_MAC_CLIENT_DEBUG
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_CLIENT
 			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -366,30 +366,30 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_CLIENT_DEV
+	#ifdef TARGET_MAC_CLIENT_DEV
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_CLIENT
 			#define TARGET_DEV
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 		#endif
 	#endif
 	
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_CLIENT_RELEASE
+	#ifdef TARGET_MAC_CLIENT_RELEASE
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_CLIENT
 			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -397,15 +397,15 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_CLIENT_FINAL
+	#ifdef TARGET_MAC_CLIENT_FINAL
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_CLIENT
 			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -413,15 +413,15 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_RETAIL_DEBUG
+	#ifdef TARGET_MAC_RETAIL_DEBUG
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_RETAIL
 			#define TARGET_DEBUG
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -429,30 +429,30 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_RETAIL_DEV
+	#ifdef TARGET_MAC_RETAIL_DEV
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_RETAIL
 			#define TARGET_DEV
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 		#endif
 	#endif
 	
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_RETAIL_RELEASE
+	#ifdef TARGET_MAC_RETAIL_RELEASE
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_RETAIL
 			#define TARGET_RELEASE
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -460,15 +460,15 @@ namespace xcore
 
 	//------------------------------------------------------------------------------
 
-	#ifdef TARGET_OSX_RETAIL_FINAL
+	#ifdef TARGET_MAC_RETAIL_FINAL
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
 		#else
-			#define TARGET_OSX
+			#define TARGET_MAC
 			#define TARGET_64BIT
 			#define TARGET_RETAIL
 			#define TARGET_FINAL
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 			#define X_DEBUG
 		#endif
@@ -760,9 +760,9 @@ namespace xcore
 				#define TARGET_DEV
 			#endif
 		#elif defined(__APPLE__) && defined(__clang__)
-			#undef TARGET_OSX
-			#define TARGET_OSX
-			#define TARGET_PLATFORM X_PLATFORM_OSX
+			#undef TARGET_MAC
+			#define TARGET_MAC
+			#define TARGET_PLATFORM X_PLATFORM_MAC
 			#define VALID_TARGET
 
 			#ifdef _DEBUG
@@ -808,7 +808,7 @@ namespace xcore
 		#undef TARGET_PLATFORM_STR
 	#endif
 
-	#if   defined(TARGET_OSX)
+	#if   defined(TARGET_MAC)
 		#define TARGET_PLATFORM_STR	"MACOS"
 	#elif defined(TARGET_PC)
 		#define TARGET_PLATFORM_STR	"PC"
@@ -967,13 +967,13 @@ namespace xcore
 		#else
 			#error x_target, error; This compiler is not supported for TARGET_PC
 		#endif
-	#elif defined(TARGET_OSX)
+	#elif defined(TARGET_MAC)
 		#ifdef __clang__
 			#define COMPILER_MACOS_CLANG
 			#define COMPILER_DEFAULT
 			#define COMPILER_VERSION            7
 		#else
-			#error x_target, error; This compiler is not supported for TARGET_OSX
+			#error x_target, error; This compiler is not supported for TARGET_MAC
 		#endif
 	#else
 		#error x_target, error; This compiler is not supported for TARGET_UNKNOWN
@@ -989,6 +989,9 @@ namespace xcore
 		class __xuint128;
 		class __xint256;
 		class __xuint256;
+
+		template <bool> struct xCompileTimeAssert; 
+		template<> struct xCompileTimeAssert<true> { enum { OK = 0 }; };
 
 		//#define X_NO_PARTIAL_TEMPLATE
 		#define X_CACHE_LINE_SIZE             32
@@ -1038,51 +1041,6 @@ namespace xcore
 		/// disable useless warnings
 		#pragma warning(disable:4800)
 
-	#elif defined(COMPILER_MACOS_CLANG_)
-		#define X_NO_CUSTOM_INT64
-		#define X_NO_CUSTOM_UINT64
-		class __xint128;
-		class __xuint128;
-		class __xint256;
-		class __xuint256;
-
-		//#define X_NO_PARTIAL_TEMPLATE
-		#define X_CACHE_LINE_SIZE               32
-		#define X_CHAR_BIT                      8
-		#define X_USE_PRAGMA_ONCE
-		#define X_STD_CALL                    __stdcall
-		#define X_C_DECL                      __cdecl
-		#define f_inline                      __forceinline
-		#define f_noinline
-		#define X_FORCE_INLINE                inline
-		#define X_FORCE_INLINE_SPU			  __forceinline
-		#define X_BOOL                        signed long
-		#define X_BYTE                        unsigned char
-		#define X_WCHAR                       unsigned short
-		#define X_INT8                        char
-		#define X_INT16                       short
-		#define X_INT32                       int
-		#define X_INT64                       signed long long
-		#define X_UINT64                      unsigned long long
-		#define X_INT128                      __xint128
-		#define X_UINT128                     __xuint128
-		#define X_INT256                      __xint256
-		#define X_UINT256                     __xuint256
-		#define X_SIZE                        unsigned int
-		#define X_PTR_SIZED_INT               int
-		#define X_BIG_ENDIAN                  1234
-		#define X_FLOAT                       float
-		#define X_DOUBLE                      double
-		#define X_ALIGNMENT_DEFAULT           4
-		#define X_ALIGNMENT(a)                __attribute__((aligned(a)))
-
-		#define X_ALIGN_BEGIN(a)
-		#define X_ALIGN_END(a)				  __attribute__((aligned(a)))
-
-		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
-
-		#define X_THREAD_LOCAL                __declspec(thread)
-
 	#elif defined(COMPILER_MACOS_CLANG)
 		#define X_NO_CUSTOM_INT64
 		#define X_NO_CUSTOM_UINT64
@@ -1115,9 +1073,22 @@ namespace xcore
 		#define X_INT256                      __xint256
 		#define X_UINT256                     __xuint256
 
+		template <bool> struct xCompileTimeAssert; 
+		template<> struct xCompileTimeAssert<true> { enum { OK = 0 }; };
+
+
+		static inline void TestTypeSizes()
+		{
+			xCompileTimeAssert<sizeof(X_INT8) == 1>(); 	
+			xCompileTimeAssert<sizeof(X_INT16) == 2>(); 
+			xCompileTimeAssert<sizeof(X_INT32) == 4>(); 
+			xCompileTimeAssert<sizeof(X_INT64) == 8>(); 
+			xCompileTimeAssert<sizeof(X_UINT64) == 8>(); 
+		}
+
 #ifdef TARGET_64BIT
-		#define X_SIZE                        unsigned long long
-		#define X_PTR_SIZED_INT               signed long long
+		#define X_SIZE                        unsigned long
+		#define X_PTR_SIZED_INT               signed long
 		#define X_ALIGNMENT_DEFAULT           8
 #else
 		#define X_SIZE                        unsigned int
@@ -1155,7 +1126,7 @@ namespace xcore
 		X_MEMALIGN_MACOS            = 8,
 	#if defined(TARGET_PC)
 		X_MEMALIGN			= X_MEMALIGN_PC,
-	#elif defined(TARGET_OSX)
+	#elif defined(TARGET_MAC)
 		X_MEMALIGN			= X_MEMALIGN_MACOS,
 	#else
 		#error x_target, error; need to have X_MEMALIGN defined
@@ -1167,7 +1138,7 @@ namespace xcore
 		* Multi-threading configuration
 	*/
 
-	#if defined(TARGET_PC) || defined(TARGET_OSX)
+	#if defined(TARGET_PC) || defined(TARGET_MAC)
 		#define TARGET_MULTI_CORE
 	#else
 		#define TARGET_SINGLE_CORE

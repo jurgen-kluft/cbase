@@ -500,7 +500,7 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiBuffer("1234567890-+", 12));
+					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("1234567890-+", 12));
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -528,7 +528,7 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiBuffer("1234567890", 10));
+					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("1234567890", 10));
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -556,7 +556,7 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiBuffer("12345670", 8));
+					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("12345670", 8));
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -585,7 +585,7 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiBuffer("1234567890xabcdefABCDEF", 23));
+					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("1234567890xabcdefABCDEF", 23));
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -677,7 +677,7 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiBuffer("1234567890.e+-", 14));
+					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("1234567890.e+-", 14));
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();

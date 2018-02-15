@@ -112,10 +112,10 @@ namespace xcore
 		#include "private/x_double_inline_win32.h"
 
     //==============================================================================
-    // INLINE OSX
+    // INLINE MAC
     //==============================================================================
-    #elif defined(TARGET_OSX)
-        #include "private/x_double_inline_osx.h"
+    #elif defined(TARGET_MAC)
+        #include "private/x_double_inline_mac.h"
 
 	//==============================================================================
 	// UNKNOWN PLATFORM

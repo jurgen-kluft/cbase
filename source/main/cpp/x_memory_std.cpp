@@ -1,29 +1,19 @@
 #include "xbase/x_memory_std.h"
 
-#ifdef TARGET_360
-	#include <Xtl.h>
-#endif
 #ifdef TARGET_PC
 	#include <stdlib.h>
 	#include <memory.h>
 	#include <string.h>
 #endif
-#ifdef TARGET_PS3
-	#include <string.h>
-#endif
-
-#ifdef TARGET_WII
-	#include <revolution/os.h>
-	#include <string.h>
-#endif
-#ifdef TARGET_3DS
-	#include <nn/os.h>
+#ifdef TARGET_MAC
+	#include <stdlib.h>
+	#include <memory.h>
 	#include <string.h>
 #endif
 
 namespace xcore
 {
-#ifdef TARGET_WII
+#ifdef TARGET_MAC
 	/**
 	 * Memory copy
 	 */
@@ -71,107 +61,6 @@ namespace xcore
 	void xmem_utils::memset(void* buf, u32 c, u32 inLength)
 	{
 		::memset(buf, c, inLength);
-	}
-
-	//------------------------------------------------------------------------------
-	void* xmem_utils::memmove(void* inDest, const void* inSrc, u32 inLength)
-	{
-		return ::memmove(inDest, inSrc, inLength);
-	}
-
-	/**
-	 * Compares the first count characters of buf1 and buf2 and
-	 * \returns a value indicating their relationship.
-	 */
-	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength)
-	{
-		return ::memcmp(bufPtr1, bufPtr2, inLength);
-	}
-#endif
-#if defined(TARGET_PS3)
-
-	/**
-	 * Memory copy
-	 */
-	void xmem_utils::memcpy(void *dest, const void *src, u32 count)
-	{
-		::memcpy(dest, src, count);
-	}
-
-	/**
-	 * Sets the first count characters of inDest to the character c.
-	 */
-	void xmem_utils::memset(void* inDest, u32 c, u32 inLength)
-	{
-		::memset(inDest, c, inLength);
-	}
-
-	//------------------------------------------------------------------------------
-	void* xmem_utils::memmove(void* inDest, const void* inSrc, u32 inLength)
-	{
-		return ::memmove(inDest, inSrc, inLength);
-	}
-
-	/**
-	 * Compares the first count characters of buf1 and buf2 and
-	 * \returns a value indicating their relationship.
-	 */
-	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength)
-	{
-		return ::memcmp(bufPtr1, bufPtr2, inLength);
-	}
-#endif
-
-#ifdef TARGET_360
-
-	/*
-	 * Memory copy
-	 */
-	void xmem_utils::memcpy(void *dest, const void *src, u32 count)
-	{
-		::memcpy(dest, src, count);
-	}
-
-	/**
-	 * Sets the first count characters of dest to the character c.
-	 */
-	void xmem_utils::memset(void* buf, u32 c, u32 inLength)
-	{
-		::memset(buf, c, inLength);
-	}
-
-	//------------------------------------------------------------------------------
-	void* xmem_utils::memmove(void* inDest, const void* inSrc, u32 inLength)
-	{
-		return ::memmove(inDest, inSrc, inLength);
-	}
-
-	/**
-	 * Compares the first count characters of buf1 and buf2 and
-	 * \returns a value indicating their relationship.
-	 */
-	s32 xmem_utils::memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength)
-	{
-		return ::memcmp(bufPtr1, bufPtr2, inLength);
-	}
-#endif
-
-#ifdef TARGET_3DS
-
-	/**
-	 * Memory copy
-	 */
-	void xmem_utils::memcpy(void *dest, const void *src, u32 count)
-	{
-		::memcpy(dest, src, count);
-	}
-
-	/**
-	 * Sets the first count characters of inDest to the character c.
-	 */
-	void xmem_utils::memset(void* inDest, u32 c, u32 inLength)
-	{
-		::memset(inDest, c, inLength);
 	}
 
 	//------------------------------------------------------------------------------

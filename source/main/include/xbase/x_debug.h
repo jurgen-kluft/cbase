@@ -90,8 +90,8 @@ namespace xcore
 		#define XBREAK      { __debugbreak(); }
 	#endif
 
-	#if defined(TARGET_OSX) && defined(COMPILER_DEFAULT)
-		#define XBREAK      { __asm__ volatile("tw 31,1,1"); }
+	#if defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
+		#define XBREAK      { __builtin_trap(); }
 	#endif
 
 	#if !defined(XBREAK)
@@ -120,7 +120,7 @@ namespace xcore
 		#define XNOP            { __emit(0x00000000); }
 	#endif
 
-	#if defined(TARGET_OSX) && defined(COMPILER_DEFAULT)
+	#if defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
 		#define XNOP            { __asm nop }
 	#endif
 
@@ -189,8 +189,6 @@ namespace xcore
 	#endif
 
 	#ifdef X_ASSERT
-		template <bool> struct xCompileTimeAssert; 
-		template<> struct xCompileTimeAssert<true> { enum { OK = 0 }; };
 
 		#ifndef SPU
 
@@ -243,7 +241,7 @@ namespace xcore
 			#define ASSERTS(expr,str)           (void(0))
 			#define ASSERTSL(level,expr,str)    (void(0))
 			#define ASSERTL(level,expr)         (void(0))
-		#elif defined(TARGET_OSX) && defined(COMPILER_DEFAULT)
+		#elif defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
 			#define XASSERTCT(expr)              
 			#define XASSERT(expr)               (void(0))
 			#define XASSERTS(expr,str)          (void(0))
