@@ -109,8 +109,8 @@ namespace xcore
 		proto.m_size = 0;
 
 		range_t<s32> iter(from(0), count(cap));
-		while (iterate(iter)) {
-			proto.m_free[*iter] = *iter;
+		for (s32 i : iter) {
+			proto.m_free[i] = i;
 		}
 	}
 

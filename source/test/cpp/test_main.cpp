@@ -21,6 +21,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xguid);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xinteger);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xqsort);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xrange);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsingleton);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xslice);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsprintf);
@@ -177,9 +178,9 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
 
-	//xheap::sAllocator = systemAllocator;
-	//test_object* test = xnew<test_object, xheap>(200, 1000.0f);
-	//xdelete<xheap>(test);
+	xheap::sAllocator = systemAllocator;
+	test_object* test = xnew<test_object, xheap>(200, 1000.0f);
+	xdelete<xheap>(test);
 
 	xcore::xconsole::write("Configuration: ");
 	xcore::xconsole::writeLine(TARGET_FULL_DESCR_STR);

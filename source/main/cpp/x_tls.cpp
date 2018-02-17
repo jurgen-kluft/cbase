@@ -2,6 +2,12 @@
 
 namespace xcore
 {
+	// For xbase what would we like to have per thread?:
+	// - An allocator
+	// - A local string allocator
+	// - Thread Local Storage
+	// - ?
+
 	class x_TLS_NULL : public x_TLS
 	{
 	public:

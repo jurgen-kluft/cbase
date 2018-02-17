@@ -2,6 +2,8 @@
 
 xcore cross platform base library
 
+Note: Tundra now can compile Windows 64-bit (Msvc) and Mac OS 64-bit (Clang)
+
 * xbase
   * types, console, log, sort, search, low-level string functions, va-list
 * xcore

@@ -41,8 +41,9 @@ UNITTEST_SUITE_BEGIN(xcontainers)
 
 			// New Version: 99 -> 0
 			range_t<s32> rng_iter(from(0), count(N));
-			while (backward(rng_iter)) {
-				append(int1000, *rng_iter);
+			for (s32 i : backwards(rng_iter)) 
+			{
+				append(int1000, i);
 			}
 
 			CHECK_EQUAL(N, int1000.size())
@@ -119,16 +120,16 @@ return;
 			make(mem, q100, N);
 
 			// You can just start the range iterator again
-			rng_iter.reset();
-			while (forward(rng_iter)) {
+			for (s32 i : rng_iter)
+			{
 				append(q100, *rng_iter);
 			}
 			CHECK_FALSE(append(q100, 0xFA12E));
 
 			// And again!
 			s32 qi;
-			rng_iter.reset();
-			while (forward(rng_iter)) {
+			for (s32 i : rng_iter) 
+			{
 				q100.pop(qi);
 			}
 			CHECK_FALSE(q100.pop(qi));

@@ -5,29 +5,54 @@
 using namespace xcore;
 
 
-UNITTEST_SUITE_BEGIN(range_t)
+UNITTEST_SUITE_BEGIN(xrange)
 {
 	UNITTEST_FIXTURE(main)
 	{
 		UNITTEST_FIXTURE_SETUP() {}
 		UNITTEST_FIXTURE_TEARDOWN() {}
 
-		UNITTEST_TEST(test_range_simple)
+		UNITTEST_TEST(test_range_c11_s32)
 		{
 			s32 i = 0;
-			range_t<s32> iter(from(0), count(100));
-			while (forward(iter)) {
-				CHECK_EQUAL(i, *iter);
+			range_t<s32> range(from(0), count(100));
+			for (s32 it : range) 
+			{
+				CHECK_EQUAL(i, it);
 				i += 1;
 			}
+			CHECK_EQUAL(100, i);
+			CHECK_EQUAL(range_t<s32>::STATE_START, range.m_state);
 
 			i = 99;
-			while (backward(iter)) {
-				CHECK_EQUAL(i, *iter);
+			for (s32 it : backwards(range))
+			{
+				CHECK_EQUAL(i, it);
+				i -= 1;
+			}
+		}
+
+		UNITTEST_TEST(test_range_c11_f32)
+		{
+			f32 i = 0;
+			range_t<f32> range(from(0.0f), count(100));
+			for (f32 it : range) 
+			{
+				CHECK_EQUAL(i, it);
+				i += 1;
+			}
+			CHECK_EQUAL(100, i);
+			CHECK_EQUAL(range_t<f32>::STATE_START, range.m_state);
+
+			i = 99;
+			for (f32 it : backwards(range))
+			{
+				CHECK_EQUAL(i, it);
 				i -= 1;
 			}
 
 		}
+
 	}
 }
 UNITTEST_SUITE_END
