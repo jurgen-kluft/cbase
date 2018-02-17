@@ -6,6 +6,7 @@
 #endif
 
 #include "xbase/x_debug.h"
+#include "xbase/x_buffer.h"
 
 namespace xcore
 {
@@ -35,6 +36,8 @@ namespace xcore
 		void		clear();
 		void		clone(const xuchars_t<T>& other);
 
+		xbuffer 	buffer() const;
+		xcbuffer 	cbuffer() const;
 		xcuchars_t<T> cchars() const;
 
 		void		copy(const xuchars_t<T>& other);
@@ -86,6 +89,8 @@ namespace xcore
 		u32			size() const;
 		bool		is_empty() const;
 
+		xcbuffer 	buffer() const;
+
 		s32			compare(const T* other) const;
 		s32			compare(const xuchars_t<T>& other) const;
 		s32			compare(const xcuchars_t<T>& other) const;
@@ -128,7 +133,7 @@ namespace xcore
 	class xuchars_buffer_t				
 	{																					
 	public:
-		enum { SIZE = L };
+		enum { SIZE = L+1 };
 		T				m_str[SIZE];
 		xuchars_t<T>	m_chars;
 
@@ -341,6 +346,18 @@ namespace xcore
 		m_str = other.m_str;
 		m_end = other.m_end;
 		m_eos = other.m_eos;
+	}
+
+	template<typename T>
+	inline xbuffer		xuchars_t<T>::buffer() const
+	{
+		return xbuffer((xbyte*)m_end - (xbyte*)m_str, (xbyte*)m_end);
+	}
+
+	template<typename T>
+	inline xcbuffer		xuchars_t<T>::cbuffer() const
+	{
+		return xcbuffer((xbyte const*)m_end - (xbyte const*)m_str, (xbyte const*)m_end);
 	}
 
 	template<typename T>
@@ -566,6 +583,12 @@ namespace xcore
 	inline bool		xcuchars_t<T>::is_empty() const
 	{
 		return m_str == m_end;
+	}
+
+	template<typename T>
+	inline xcbuffer		xcuchars_t<T>::buffer() const
+	{
+		return xcbuffer((xbyte const*)m_end - (xbyte const*)m_str, (xbyte const*)m_end);
 	}
 
 	template<typename T>

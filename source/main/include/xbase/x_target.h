@@ -1104,7 +1104,7 @@ namespace xcore
 			xCompileTimeAssert<sizeof(X_UINT64) == 8>(); 
 		}
 		
-		#define X_BIG_ENDIAN                  1234
+		#define X_LITTLE_ENDIAN               4321
 		#define X_FLOAT                       float
 		#define X_DOUBLE                      double
 		#define X_ALIGNMENT(a)                __attribute__((aligned(a)))

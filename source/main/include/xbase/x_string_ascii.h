@@ -115,8 +115,8 @@ namespace xcore
 		void			printf(crunes const& format, X_VA_ARGS_16_DEF);
 		void			printf(crunes const& format, const x_va_list& args);
 
-		void			sscanf(crunes & str, crunes const& format, X_VA_R_ARGS_16_DEF);
-		void			vsscanf(crunes & str, crunes const& format, const x_va_r_list& vr_args);
+		s32				sscanf(crunes & str, crunes const& format, X_VA_R_ARGS_16_DEF);
+		s32				vsscanf(crunes & str, crunes const& format, const x_va_r_list& vr_args);
 
 	}; ///< end of ascii namespace
 
