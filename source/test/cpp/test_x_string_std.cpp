@@ -57,10 +57,10 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			xuchars16 str2;
 			ascii::copy(str2.chars(), str);
 
-			CHECK_EQUAL(15, ascii::size(str2.cchars()));
+			CHECK_EQUAL(16, ascii::size(str2.cchars()));
 			CHECK_EQUAL(-1, ascii::compare(str2.cchars(), str));
 
-			CHECK_EQUAL(0, ascii::compare(str2.cchars(), xcuchars("this is a syste")));
+			CHECK_EQUAL(0, ascii::compare(str2.cchars(), xcuchars("this is a system")));
 		}
 
 		UNITTEST_TEST(find)

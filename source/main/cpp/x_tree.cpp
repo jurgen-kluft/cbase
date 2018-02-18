@@ -7,9 +7,9 @@ namespace xcore
 {
 	struct xnode_t
 	{
-		void*		data;		// User-defined content 
 		s32			red;		// Color (1=red, 0=black) 
 		xnode_t *	link[2];	// Left (0) and right (1) links 
+		void*		data;		// User-defined content 
 	};
 
 	typedef s32		(*cmp_f) (const void *p1, const void *p2);
@@ -152,6 +152,8 @@ namespace xcore
 			{
 				// No left links, just kill the node and move on
 				save = it->link[1];
+				if (tree->m_item_allocator!=NULL)
+					tree->m_item_allocator->deallocate(it->data);
 				tree->m_node_allocator->deallocate(it);
 			}
 			else 
@@ -378,8 +380,11 @@ namespace xcore
 			// Replace and remove the saved node
 			if (f != NULL) 
 			{
+				void* old_data = f->data;
 				f->data = q->data;
 				p->link[p->link[1] == q] = q->link[q->link[0] == NULL];
+				if (tree->m_item_allocator!=NULL)
+					tree->m_item_allocator->deallocate(old_data);
 				tree->m_node_allocator->deallocate(q);
 			}
 
@@ -593,8 +598,9 @@ namespace xcore
 	}
 
 
-	xtree::xtree(x_iallocator* node_allocator)
+	xtree::xtree(x_iallocator* node_allocator, x_iallocator* item_allocator)
 		: m_node_allocator(node_allocator)
+		, m_item_allocator(item_allocator)
 		, m_compare(&compare_void)
 		, m_root(NULL)
 		, m_size(0)

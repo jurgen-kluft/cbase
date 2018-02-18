@@ -83,7 +83,6 @@ namespace xcore
 
 	};
 
-
 	#define XCORE_CLASS_PLACEMENT_NEW_DELETE														\
 		void*	operator new(xcore::xsize_t num_bytes, void* mem)			{ return mem; }			\
 		void	operator delete(void* mem, void* )							{ }						\
@@ -139,5 +138,6 @@ namespace xcore
 /**
  *  END xCore namespace
  */
+
 
 #endif	///< __XBASE_ALLOCATOR_H__

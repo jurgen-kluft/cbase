@@ -26,7 +26,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 	
 		UNITTEST_TEST(simple_s32_tree)
 		{
-			xtree_t<s32> tree(gTestAllocator);
+			xtree_t<s32> tree(gTestAllocator, gTestAllocator);
 
 			s32 a(1);
 			s32 b(2);
