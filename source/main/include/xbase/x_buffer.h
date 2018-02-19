@@ -19,27 +19,27 @@ namespace xcore
 	class xbuffer
 	{
 	public:
-		static xbuffer	allocate(u64 size, x_iallocator* a);
-		static void		reallocate(xbuffer& buf, u64 size, x_iallocator* a);
+		static xbuffer	allocate(s64 size, x_iallocator* a);
+		static void		reallocate(xbuffer& buf, s64 size, x_iallocator* a);
 		static void		deallocate(xbuffer& buf, x_iallocator* a);
 
-		inline		xbuffer(u64 len, xbyte* data) : m_len(len), m_data(data) { reset(); }
+		inline		xbuffer(s64 len, xbyte* data) : m_len(len), m_data(data) { reset(); }
 
-		u64			size() const					{ return m_len; }
+		s64			size() const					{ return m_len; }
 
 		void		reset();
 		void		clear();
 
 		xbuffer		buffer() const;
-		xbuffer		buffer_at(u64 idx) const;
+		xbuffer		buffer_at(s64 idx) const;
 
 		xcbuffer	cbuffer() const;
-		xcbuffer	cbuffer_at(u64 idx) const;
+		xcbuffer	cbuffer_at(s64 idx) const;
 
 		void		write(const xbuffer& other);
 		void		write(const xcbuffer& other);
 
-		void		write_at(u64 idx, const xcbuffer& other);
+		void		write_at(s64 idx, const xcbuffer& other);
 
 		s32			compare(const xbuffer& other) const;
 
@@ -49,31 +49,33 @@ namespace xcore
 		bool		operator == (const xbuffer& other) const;
 		bool		operator != (const xbuffer& other) const;
 
-		xbyte&		operator [] (u64 i);
-		xbyte		operator [] (u64 i) const;
+		xbyte&		operator [] (s64 i);
+		xbyte		operator [] (s64 i) const;
 
 	private:
 		inline		xbuffer() : m_len(0), m_data(NULL) { }
 
-		u64			m_len;
+		s64			m_len;
 		xbyte*		m_data;
 	};
 
 	class xcbuffer
 	{
 	public:
-		inline		xcbuffer(u64 len, xbyte const* data) : m_len(len), m_data(data) {}
+		inline		xcbuffer() : m_len(0), m_data(NULL) {}
+		inline		xcbuffer(s64 len, xbyte const* data) : m_len(len), m_data(data) {}
 
-		u64			size() const { return m_len; }
+		s64			size() const { return m_len; }
 
 		s32			compare(const xcbuffer& other) const;
 
 		bool		operator == (const xcbuffer& other) const;
 		bool		operator != (const xcbuffer& other) const;
 
-		xbyte		operator [] (u64 i) const;
+		xcbuffer	operator () (s32 from, s32 to) const;
+		xbyte		operator [] (s64 i) const;
 
-		u64			m_len;
+		s64			m_len;
 		xbyte const*m_data;
 	};
 

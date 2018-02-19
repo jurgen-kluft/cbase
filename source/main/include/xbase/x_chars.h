@@ -28,6 +28,7 @@ namespace xcore
 		xuchars_t(const xuchars_t<T>& other);
 
 		u32			size() const;
+		u32			cap() const;
 
 		bool		is_empty() const;
 		bool		is_full() const;
@@ -55,6 +56,8 @@ namespace xcore
 		xuchars_t<T>&	operator += (const char* other);
 		xuchars_t<T>&	operator += (const xuchars_t<T>& other);
 		xuchars_t<T>&	operator += (const xcuchars_t<T>& other);
+
+		T			operator[] (s32 index) const;
 
 		bool		operator == (const xuchars_t<T>& other) const;
 		bool		operator != (const xuchars_t<T>& other) const;
@@ -94,6 +97,8 @@ namespace xcore
 		s32			compare(const T* other) const;
 		s32			compare(const xuchars_t<T>& other) const;
 		s32			compare(const xcuchars_t<T>& other) const;
+
+		T			operator[] (s32 index) const;
 
 		xcuchars_t<T>&	operator = (const T* other);
 		xcuchars_t<T>&	operator = (const xuchars_t<T>& other);
@@ -178,6 +183,9 @@ namespace xcore
 			xcuchars_t<T> other(_other.m_str, _other.m_end);					
 			return self.compare(other);											
 		}																		
+		T			operator[] (s32 index) const {
+			return m_chars[index];
+		}
 		self&		operator = (const T* other) {								
 			T * dst = m_chars.m_str;
 			while (dst < eos() && *other != '\0')
@@ -314,6 +322,12 @@ namespace xcore
 	}
 
 	template<typename T>
+	inline u32			xuchars_t<T>::cap() const
+	{
+		return (u32)(u64)(m_eos - m_str);
+	}
+
+	template<typename T>
 	inline bool			xuchars_t<T>::is_empty() const
 	{
 		return m_str == m_end;
@@ -406,6 +420,17 @@ namespace xcore
 		xcuchars_t<T> self(m_str, m_end);
 		xcuchars_t<T> other(_other.m_str, _other.m_end);
 		return self.compare(other);
+	}
+
+	template<typename T>
+	inline T					xuchars_t<T>::operator[] (s32 index) const
+	{
+		T const* ptr = &m_str[index];
+		if (ptr < m_end)
+		{
+			return *ptr;
+		}
+		return '\0';
 	}
 
 	template<typename T>
@@ -620,6 +645,17 @@ namespace xcore
 				return 1;
 		}
 		return 0;
+	}
+
+	template<typename T>
+	inline T					xcuchars_t<T>::operator[] (s32 index) const
+	{
+		T const* ptr = &m_str[index];
+		if (ptr < m_end)
+		{
+			return *ptr;
+		}
+		return '\0';
 	}
 
 	template<typename T>

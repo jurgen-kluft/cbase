@@ -3,13 +3,13 @@
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 
-inline xbuffer	xbuffer::allocate(u64 size, x_iallocator* a)
+inline xbuffer	xbuffer::allocate(s64 size, x_iallocator* a)
 {
 	void* ptr = a->allocate(size, sizeof(void*));
 	return xbuffer(size, (xbyte*)ptr);
 }
 
-inline void		xbuffer::reallocate(xbuffer& buf, u64 size, x_iallocator* a)
+inline void		xbuffer::reallocate(xbuffer& buf, s64 size, x_iallocator* a)
 {
 	void* ptr = a->allocate(size, sizeof(void*));
 	if (buf.m_data != NULL && buf.m_len > 0)
@@ -45,7 +45,7 @@ inline xbuffer		xbuffer::buffer() const
 	return buffer_at(0);
 }
 
-inline xbuffer		xbuffer::buffer_at(u64 idx) const
+inline xbuffer		xbuffer::buffer_at(s64 idx) const
 {
 	ASSERT(idx <= m_len);
 	return xbuffer(size() - idx, (xbyte*)&m_data[idx]);
@@ -56,7 +56,7 @@ inline xcbuffer		xbuffer::cbuffer() const
 	return cbuffer_at(0);
 }
 
-inline xcbuffer		xbuffer::cbuffer_at(u64 idx) const
+inline xcbuffer		xbuffer::cbuffer_at(s64 idx) const
 {
 	ASSERT(idx <= m_len);
 	return xcbuffer(size() - idx, (xbyte*)&m_data[idx]);
@@ -72,7 +72,7 @@ inline void			xbuffer::write(const xcbuffer& other)
 	write_at(0, other);
 }
 
-inline void			xbuffer::write_at(u64 idx, const xcbuffer& other)
+inline void			xbuffer::write_at(s64 idx, const xcbuffer& other)
 {
 	ASSERT(idx <= m_len);
 	xbyte* dst = &m_data[idx];
@@ -146,13 +146,13 @@ inline bool		xbuffer::operator != (const xbuffer& other) const
 	return false;
 }
 
-inline xbyte&		xbuffer::operator [] (u64 i)
+inline xbyte&		xbuffer::operator [] (s64 i)
 {
 	ASSERT(i >= 0 && i < (s32)size());
 	return m_data[i];
 }
 
-inline xbyte		xbuffer::operator [] (u64 i) const
+inline xbyte		xbuffer::operator [] (s64 i) const
 {
 	ASSERT(i >= 0 && i < (s32)size());
 	return m_data[i];
@@ -205,7 +205,18 @@ inline bool		xcbuffer::operator != (const xcbuffer& other) const
 	return false;
 }
 
-inline xbyte		xcbuffer::operator [] (u64 i) const
+inline xcbuffer		xcbuffer::operator () (s32 from, s32 to) const
+{
+	xcbuffer view;
+	if (from>=0 && from<to && to<m_len)
+	{
+		view.m_data = &m_data[from];
+		view.m_len = to - from;
+	}
+	return view;
+}
+
+inline xbyte		xcbuffer::operator [] (s64 i) const
 {
 	ASSERT(i >= 0 && i < size());
 	return m_data[i];
