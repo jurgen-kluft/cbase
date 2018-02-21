@@ -230,6 +230,44 @@ namespace xcore
 		bool		operator <= (const self& other) const {						
 			return compare(other) <= 0;											
 		}																		
+
+		bool		operator == (const xuchars_t<T>& other) const {						
+			return compare(other) == 0;											
+		}																		
+		bool		operator != (const xuchars_t<T>& other) const {						
+			return compare(other) != 0;											
+		}																		
+		bool		operator > (const xuchars_t<T>& other) const {						
+			return compare(other) == 1;											
+		}																		
+		bool		operator >= (const xuchars_t<T>& other) const {						
+			return compare(other) >= 0;											
+		}																		
+		bool		operator < (const xuchars_t<T>& other) const {						
+			return compare(other) == -1;										
+		}																		
+		bool		operator <= (const xuchars_t<T>& other) const {						
+			return compare(other) <= 0;											
+		}																		
+
+		bool		operator == (const xcuchars_t<T>& other) const {						
+			return compare(other) == 0;											
+		}																		
+		bool		operator != (const xcuchars_t<T>& other) const {						
+			return compare(other) != 0;											
+		}																		
+		bool		operator > (const xcuchars_t<T>& other) const {						
+			return compare(other) == 1;											
+		}																		
+		bool		operator >= (const xcuchars_t<T>& other) const {						
+			return compare(other) >= 0;											
+		}																		
+		bool		operator < (const xcuchars_t<T>& other) const {						
+			return compare(other) == -1;										
+		}																		
+		bool		operator <= (const xcuchars_t<T>& other) const {						
+			return compare(other) <= 0;											
+		}																		
 	};																			
 
 	#define XUCHARS_T(name, type, size) typedef	xuchars_buffer_t<type, size>		name;
@@ -244,6 +282,8 @@ namespace xcore
 	XUCHARS_T(xuchar8s512, uchar8, 512);
 	XUCHARS_T(xuchar8s1024, uchar8, 1024);
 
+	XUCHARS_T(xuchar32s4, uchar32, 4);
+	XUCHARS_T(xuchar32s8, uchar32, 8);
 	XUCHARS_T(xuchar32s16, uchar32, 16);
 	XUCHARS_T(xuchar32s32, uchar32, 32);
 	XUCHARS_T(xuchar32s64, uchar32, 64);
