@@ -71,6 +71,7 @@ namespace xcore
 			}
 		}
 
+		boolean = bval;
 		if (bstr != NULL)
 		{
 			while (*bstr != '\0')
@@ -82,7 +83,6 @@ namespace xcore
 				if (utf32::is_equal(bc, sc, utf32::CASE_IGNORE) == false)
 					return false;
 			}
-			boolean = bval;
 			return true;
 		}
 		else
@@ -488,11 +488,11 @@ namespace xcore
 				case 'y':
 				{
 					fmt->Skip();
-
 					x_va_r r = vr_args[i++];
 					bool boolean;
-					if (MatchBoolStr(reader, boolean))
-						r = boolean;
+					MatchBoolStr(reader, boolean);
+					r = boolean;
+					scanned++;
 				} break;
 
 				case 'i':

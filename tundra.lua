@@ -17,7 +17,7 @@ Build {
             Dir = dir,
             Extensions = { ".c", ".cpp", ".s", ".asm" },
             Filters = {
-              { Pattern = "_win32"; Config = "win32-*-*", "x64-*-*" },
+              { Pattern = "_win32"; Config = "win64-*-*" },
               { Pattern = "_mac"; Config = "macosx-*-*" },
             }
         }
@@ -87,6 +87,10 @@ Build {
         OBJECTROOT = "target",
       },
       Name = "win64-msvc",
+      Env = {
+        PROGOPTS = { "/SUBSYSTEM:CONSOLE" },
+        CXXOPTS = { },
+      },
       DefaultOnHost = "windows",
       Tools = { "msvc-vs2017" },
     },
