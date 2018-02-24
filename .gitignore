@@ -6,7 +6,6 @@ target/
 tags
 
 #except the following files
-!tundra.lua
 
 !*.cpp
 !*.hpp
@@ -17,6 +16,7 @@ tags
 !*.build
 
 !*.go
+!*.lua
 
 !*.cs
 !*.csproj

@@ -87,18 +87,18 @@ namespace xcore
 		inline		name(xbyte b) { reset(b); }									\
 		inline		name(name const& other) { *this = other; }					\
 		inline		name(xbuffer const& other) { *this = other; }				\
-		u64			size() const { return len; }								\
+		s64			size() const { return len; }								\
 		xbuffer		buffer() { return xbuffer(size(), m_data); }				\
 		xcbuffer	cbuffer() const { return xcbuffer(size(), m_data); }		\
 		void		reset(xbyte fill) {											\
-			for (u64 i = 0; i < size(); ++i)									\
+			for (s64 i = 0; i < size(); ++i)									\
 				m_data[i] = fill;												\
 		}																		\
 		void		clear() {													\
 			reset(0);															\
 		}																		\
 		s32			compare(const name& other) const {							\
-			for (u64 i = 0; i < size(); ++i) {									\
+			for (s64 i = 0; i < size(); ++i) {									\
 				if (m_data[i] < other.m_data[i])								\
 					return -1;													\
 				else if (m_data[i] > other.m_data[i])							\
@@ -107,7 +107,7 @@ namespace xcore
 			return 0;															\
 		}																		\
 		name&		operator = (const xcbuffer& other) {						\
-			u64 i = 0;															\
+			s64 i = 0;															\
 			for (; i < size() && i < other.size(); ++i)							\
 				m_data[i] = other.m_data[i];									\
 			for (; i < size(); ++i)												\
@@ -115,7 +115,7 @@ namespace xcore
 			return *this;														\
 		}																		\
 		name&		operator = (const name& other) {							\
-			for (u64 i=0; i < size(); ++i)										\
+			for (s64 i=0; i < size(); ++i)										\
 				m_data[i] = other.m_data[i];									\
 			return *this;														\
 		}																		\
@@ -137,11 +137,11 @@ namespace xcore
 		bool		operator <= (const name& other) const {						\
 			return compare(other) <= 0;											\
 		}																		\
-		xbyte&		operator [] (u64 i) {										\
+		xbyte&		operator [] (s64 i) {										\
 			ASSERT(i >= 0 && i < size());										\
 			return m_data[i];													\
 		}																		\
-		xbyte		operator [] (u64 i) const {									\
+		xbyte		operator [] (s64 i) const {									\
 			ASSERT(i >= 0 && i < size());										\
 			return m_data[i];													\
 		}																		\

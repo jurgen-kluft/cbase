@@ -76,8 +76,8 @@ inline void			xbuffer::write_at(s64 idx, const xcbuffer& other)
 {
 	ASSERT(idx <= m_len);
 	xbyte* dst = &m_data[idx];
-	u64 dst_size = m_len - idx;
-	for (u64 i = 0; i < other.size() && i < dst_size; i++)
+	s64 dst_size = m_len - idx;
+	for (s64 i = 0; i < other.size() && i < dst_size; i++)
 		dst[i] = other[i];
 }
 
@@ -88,7 +88,7 @@ inline s32			xbuffer::compare(const xbuffer& other) const
 		return -1;
 	if (size() > other.size())
 		return 1;
-	for (u64 i = 0; i < size(); ++i)
+	for (s64 i = 0; i < size(); ++i)
 	{
 		if (m_data[i] < other.m_data[i])
 			return -1;
@@ -100,7 +100,7 @@ inline s32			xbuffer::compare(const xbuffer& other) const
 
 inline xbuffer&	xbuffer::operator = (const xbuffer& other)
 {
-	u64 i = 0;
+	s64 i = 0;
 	for (; i < size() && i < other.size(); ++i)
 		m_data[i] = other.m_data[i];
 	for (; i < size(); ++i)
@@ -110,7 +110,7 @@ inline xbuffer&	xbuffer::operator = (const xbuffer& other)
 
 inline xbuffer&	xbuffer::operator = (const xcbuffer& other)
 {
-	u64 i = 0;
+	s64 i = 0;
 	for (; i < size() && i < other.size(); ++i)
 		m_data[i] = other.m_data[i];
 	for (; i < size(); ++i)
@@ -124,7 +124,7 @@ inline bool		xbuffer::operator == (const xbuffer& other) const
 		return false;
 	if (size() > other.size())
 		return false;
-	for (u64 i = 0; i < size(); ++i)
+	for (s64 i = 0; i < size(); ++i)
 	{
 		if (m_data[i] != other.m_data[i])
 			return false;
@@ -138,7 +138,7 @@ inline bool		xbuffer::operator != (const xbuffer& other) const
 		return true;
 	if (size() > other.size())
 		return true;
-	for (u64 i = 0; i < size(); ++i)
+	for (s64 i = 0; i < size(); ++i)
 	{
 		if (m_data[i] != other.m_data[i])
 			return true;
@@ -167,7 +167,7 @@ inline s32			xcbuffer::compare(const xcbuffer& other) const
 		return -1;
 	if (size() > other.size())
 		return 1;
-	for (u64 i = 0; i < size(); ++i)
+	for (s64 i = 0; i < size(); ++i)
 	{
 		if (m_data[i] < other.m_data[i])
 			return -1;
@@ -183,7 +183,7 @@ inline bool		xcbuffer::operator == (const xcbuffer& other) const
 		return false;
 	if (size() > other.size())
 		return false;
-	for (u64 i = 0; i < size(); ++i)
+	for (s64 i = 0; i < size(); ++i)
 	{
 		if (m_data[i] != other.m_data[i])
 			return false;
@@ -197,7 +197,7 @@ inline bool		xcbuffer::operator != (const xcbuffer& other) const
 		return true;
 	if (size() > other.size())
 		return true;
-	for (u64 i = 0; i < size(); ++i)
+	for (s64 i = 0; i < size(); ++i)
 	{
 		if (m_data[i] != other.m_data[i])
 			return true;

@@ -1,7 +1,3 @@
-/**
-* @file Header file x_allocator.h
-*/
-
 #ifndef __XBASE_ALLOCATOR_H__
 #define __XBASE_ALLOCATOR_H__
 #include "xbase/x_target.h"
@@ -48,6 +44,42 @@ namespace xcore
 	protected:
 		virtual				~x_iallocator() {}
 	};
+
+	class xsystemheap
+	{
+	public:
+		void*	allocate(xcore::u32 size, xcore::u32 alignment)
+		{
+			return x_iallocator::get_default()->allocate(size, alignment);
+		}
+		void	deallocate(void* p)
+		{
+			return x_iallocator::get_default()->deallocate(p);
+		}
+	};
+
+	template<typename T, typename MEM, typename... Args>
+	T*			xnew(Args... args)
+	{
+		MEM m;
+		void * mem = m.allocate(sizeof(T), sizeof(void*));
+		T* object = new (mem) T(args...);
+		return object;
+	}
+
+	template<typename MEM, typename T>
+	void		xdelete(T* p)
+	{
+		MEM m;
+		p->~T();
+		m.deallocate(p);
+	}
+
+	// Example:
+	// 	xheap::sAllocator = systemAllocator;
+	// 	test_object* test = xnew<test_object, xsystemheap>(200, 1000.0f);
+	// 	xdelete<xheap>(test);
+
 
 	class xallocator
 	{
