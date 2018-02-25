@@ -58,6 +58,18 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 			CHECK_EQUAL(2, utf::size(c));
 		}
 
+		UNITTEST_TEST(copy_ascii_to_u32)
+		{
+			xcuchars src("test");
+			CHECK_EQUAL('t', src[0]);
+			CHECK_EQUAL('e', src[1]);
+
+			xuchar32s16 dst;
+			utf::copy(src, dst.chars());
+			
+			CHECK_EQUAL('t', dst[0]);
+		}
+
 		UNITTEST_TEST(read1_utf8)
 		{
 			xcuchar8s str1((const uchar8*)"test");

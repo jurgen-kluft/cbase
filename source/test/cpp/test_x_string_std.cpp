@@ -498,8 +498,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 			xcuchars fmt = "%d %s";
 			s32 length = ascii::cprintf(fmt, x_va(i), x_va(str));
-
 			CHECK_EQUAL(9, length);
+
+			xuchars32 buffer;
+			ascii::sprintf(buffer.chars(), fmt, x_va(i), x_va(str));
+			CHECK_EQUAL(0, buffer.compare(xcuchars("100 hello")));
 		}
 
 		UNITTEST_TEST(vcprintf)

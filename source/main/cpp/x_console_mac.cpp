@@ -34,7 +34,7 @@ namespace xcore
 
 			s32 l = 0;
 			xcuchars src = str;
-			while (!utf::is_eos(src) && dst16 < end16)
+			while (!utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);
 				utf::write(c, dst16, end16);
@@ -55,7 +55,7 @@ namespace xcore
 
 			s32 l = 0;
 			xcuchar8s src = str;
-			while (!utf::is_eos(src) && dst16 < end16)
+			while (!utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);
 				utf::write(c, dst16, end16);
@@ -76,7 +76,7 @@ namespace xcore
 
 			s32 l = 0;
 			xcuchar32s src = str;
-			while (!utf::is_eos(src) && dst16 < end16)
+			while (!utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);
 				utf::write(c, dst16, end16);

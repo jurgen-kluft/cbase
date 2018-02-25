@@ -25,10 +25,10 @@ namespace xcore
 		}
 
 
-		uchar32			peek(xcuchars const & str)
+		uchar32		peek(xcuchars const & str)
 		{
 			uchar32 c = '\0';
-			if (!is_eos(str))
+			if (can_read(str))
 				c = str.m_str[0];
 			return c;
 		}
@@ -37,7 +37,7 @@ namespace xcore
 		{
 			uchar8 const* src = str.m_str;
 			uchar32 c = '\0';
-			if (!is_eos(str))
+			if (can_read(str))
 			{
 				c = *src++;
 				s32 const l = sequence_sizeof_utf8((uchar8)c);
@@ -71,7 +71,7 @@ namespace xcore
 		uchar32			peek(xcuchar32s const & str)
 		{
 			uchar32 c = '\0';
-			if (!is_eos(str))
+			if (can_read(str))
 				c = str.m_str[0];
 			return c;
 		}
@@ -192,7 +192,7 @@ namespace xcore
 		uchar32			read(xcuchars & str)
 		{
 			uchar32 c = '\0';
-			if (!is_eos(str))
+			if (can_read(str))
 			{
 				c = str.m_str[0];
 				str.m_str++;
@@ -203,7 +203,7 @@ namespace xcore
 		uchar32			read(xcuchar8s& str)
 		{
 			uchar32 c = '\0';
-			if (!is_eos(str))
+			if (can_read(str))
 			{
 				c = read(str.m_str);
 			}
@@ -213,7 +213,7 @@ namespace xcore
 		uchar32			read(xcuchar32s & str)
 		{
 			uchar32 c = '\0';
-			if (!is_eos(str))
+			if (can_read(str))
 			{
 				c = str.m_str[0];
 				str.m_str++;
@@ -221,13 +221,17 @@ namespace xcore
 			return c;
 		}
 
-		void			write(uchar32 c, uchar*  & str)
+
+		// ####### WRITE ########
+
+
+		void			write(uchar32 c, uchar*  & dest)
 		{
 			if (c > 0x7f) {
 				c = '?';
 			}
-			str[0] = (uchar)c;
-			str++;
+			dest[0] = (uchar)c;
+			dest++;
 		}
 
 		void			write(uchar32 cp, uchar8* & dest)
@@ -280,66 +284,59 @@ namespace xcore
 			}
 		}
 
-		void			write(uchar32 c, uchar32*& str)
+		void			write(uchar32 c, uchar32*& dst)
 		{
-			str[0] = c;
-			str++;
+			dst[0] = c;
+			dst++;
 		}
 
-		bool			write(uchar32 c, xuchars& str)
+		bool			write(uchar32 c, xuchars& dst)
 		{
-			if (!is_eos(str))
+			if (can_write(dst))
 			{
-				if (c > 0x7f) {
-					c = '?';
-				}
-				str.m_str[0] = (uchar)c;
-				str.m_str++;
+				write(c, dst.m_end);
 				return true;
 			}
 			return false;
 		}
 
-		bool			write(uchar32 c, xuchar8s& str)
+		bool			write(uchar32 c, xuchar8s& dst)
 		{
-			if (!is_eos(str))
+			if (can_write(dst))
 			{
-				write(c, str.m_str);
+				write(c, dst.m_end);
 				return true;
 			}
 			return false;
 		}
 
-		bool			write(uchar32 c, xuchar32s& str)
+		bool			write(uchar32 c, xuchar32s& dst)
 		{
-			if (!is_eos(str))
+			if (can_write(dst))
 			{
-				str.m_str[0] = c;
-				str.m_str++;
+				write(c, dst.m_end);
 				return true;
 			}
 			return false;
 		}
 
-		bool			write(uchar32 c, uchar16*& str, uchar16* end)
+		bool			write(uchar32 c, uchar16*& dst, uchar16* end)
 		{
-			if (!is_eos(str) && str < end)
+			if (!is_eos(dst) && dst < end)
 			{
-				write(c, str);
+				write(c, dst);
 				return true;
 			}
 			return false;
 		}
 
 
-		void			copy(xcuchars   const & sstr, xuchars& dstr, ETermType term_type)
+		void			copy(xcuchars const & sstr, xuchars& dstr, ETermType term_type)
 		{
 			xcuchars src = sstr;
-			while (true)
+			while (can_read(src))
 			{
 				uchar32 c = read(src);
-				if (c == '\0')
-					break;
 				if (!write(c, dstr))
 					break;
 			}
@@ -350,11 +347,9 @@ namespace xcore
 		void			copy(xcuchar32s const & sstr, xuchars& dstr, ETermType term_type)
 		{
 			xcuchar32s src = sstr;
-			while (true)
+			while (can_read(src))
 			{
 				uchar32 c = read(src);
-				if (c == '\0')
-					break;
 				if (!write(c, dstr))
 					break;
 			}
@@ -365,11 +360,9 @@ namespace xcore
 		void			copy(xcuchars   const & sstr, xuchar32s& dstr, ETermType term_type)
 		{
 			xcuchars src = sstr;
-			while (true)
+			while (can_read(src))
 			{
 				uchar32 c = read(src);
-				if (c == '\0')
-					break;
 				if (!write(c, dstr))
 					break;
 			}
@@ -425,63 +418,79 @@ namespace xcore
 			return str[0] == '\0';
 		}
 
-		bool			is_eos(xuchars   const& str)
+
+		bool			can_read(xuchars   const& str)
 		{
-			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
-		bool			is_eos(xuchar8s  const& str)
+		bool			can_read(xuchar8s  const& str)
 		{
-			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
-		bool			is_eos(xuchar32s const& str)
+		bool			can_read(xuchar32s const& str)
 		{
-			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
-		bool			is_eos(xcuchars   const& str)
+		bool			can_read(xcuchars   const& str)
 		{
-			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
-		bool			is_eos(xcuchar8s  const& str)
+		bool			can_read(xcuchar8s  const& str)
 		{
-			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
-		bool			is_eos(xcuchar32s const& str)
+		bool			can_read(xcuchar32s const& str)
 		{
-			return str.m_str >= str.m_end || str.m_str[0] == '\0';
+			return str.m_str < str.m_end && str.m_str[0] != '\0';
+		}
+
+		bool			can_write(xuchars   const& str)
+		{
+			return str.m_end < str.m_eos;
+		}
+
+		bool			can_write(xuchar8s  const& str)
+		{
+			return str.m_end < str.m_eos;
+		}
+
+		bool			can_write(xuchar32s const& str)
+		{
+			return str.m_end < str.m_eos;
 		}
 
 
-		bool			is_crln(xuchars   const& str)
-		{
-			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
-		}
-
-		bool			is_crln(xuchar8s  const& str)
-		{
-			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
-		}
-
-		bool			is_crln(xuchar32s const& str)
-		{
-			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
-		}
-
-		bool			is_crln(xcuchars   const& str)
-		{
-			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
-		}
-
-		bool			is_crln(xcuchar8s  const& str)
+		bool			read_is_crln(xuchars   const& str)
 		{
 			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
-		bool			is_crln(xcuchar32s const& str)
+		bool			read_is_crln(xuchar8s  const& str)
+		{
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
+		}
+
+		bool			read_is_crln(xuchar32s const& str)
+		{
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
+		}
+
+		bool			read_is_crln(xcuchars   const& str)
+		{
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
+		}
+
+		bool			read_is_crln(xcuchar8s  const& str)
+		{
+			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
+		}
+
+		bool			read_is_crln(xcuchar32s const& str)
 		{
 			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}

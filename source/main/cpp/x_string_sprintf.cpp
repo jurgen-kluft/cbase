@@ -1017,7 +1017,7 @@ namespace xcore
 				if (args[argindex].isPCUChar32())
 				{
 					xcuchar32s src = *(xcuchar32s const*)args[argindex];
-					while (!utf::is_eos(src))
+					while (!utf::can_read(src))
 					{
 						uchar32 c = utf::read(src);
 						buffer->Write(c);
@@ -1026,7 +1026,7 @@ namespace xcore
 				else if (args[argindex].isPCTChar())
 				{
 					xcuchars src = *(xcuchars const*)args[argindex];
-					while (!utf::is_eos(src))
+					while (!utf::can_read(src))
 					{
 						uchar32 c = utf::read(src);
 						buffer->Write(c);

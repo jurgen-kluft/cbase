@@ -65,19 +65,24 @@ namespace xcore
 		bool			is_eos(uchar8  const* str);
 		bool			is_eos(uchar16 const* str);
 		bool			is_eos(uchar32 const* str);
-		bool			is_eos(xuchars   const& str);
-		bool			is_eos(xuchar8s  const& str);
-		bool			is_eos(xuchar32s const& str);
-		bool			is_eos(xcuchars   const& str);
-		bool			is_eos(xcuchar8s  const& str);
-		bool			is_eos(xcuchar32s const& str);
 
-		bool			is_crln(xuchars   const& str);
-		bool			is_crln(xuchar8s  const& str);
-		bool			is_crln(xuchar32s const& str);
-		bool			is_crln(xcuchars   const& str);
-		bool			is_crln(xcuchar8s  const& str);
-		bool			is_crln(xcuchar32s const& str);
+		bool			can_read(xuchars   const& str);
+		bool			can_read(xuchar8s  const& str);
+		bool			can_read(xuchar32s const& str);
+		bool			can_read(xcuchars   const& str);
+		bool			can_read(xcuchar8s  const& str);
+		bool			can_read(xcuchar32s const& str);
+
+		bool			can_write(xuchars   const& str);
+		bool			can_write(xuchar8s  const& str);
+		bool			can_write(xuchar32s const& str);
+
+		bool			read_is_crln(xuchars   const& str);
+		bool			read_is_crln(xuchar8s  const& str);
+		bool			read_is_crln(xuchar32s const& str);
+		bool			read_is_crln(xcuchars   const& str);
+		bool			read_is_crln(xcuchar8s  const& str);
+		bool			read_is_crln(xcuchar32s const& str);
 	};	// utf
 
 	namespace utf8
