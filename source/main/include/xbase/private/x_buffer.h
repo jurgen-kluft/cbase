@@ -5,13 +5,13 @@
 
 inline xbuffer	xbuffer::allocate(s64 size, x_iallocator* a)
 {
-	void* ptr = a->allocate(size, sizeof(void*));
+	void* ptr = a->allocate((xsize_t)size, sizeof(void*));
 	return xbuffer(size, (xbyte*)ptr);
 }
 
 inline void		xbuffer::reallocate(xbuffer& buf, s64 size, x_iallocator* a)
 {
-	void* ptr = a->allocate(size, sizeof(void*));
+	void* ptr = a->allocate((xsize_t)size, sizeof(void*));
 	if (buf.m_data != NULL && buf.m_len > 0)
 	{
 		xmem_utils::memcpy(ptr, buf.m_data, (u32)buf.m_len);

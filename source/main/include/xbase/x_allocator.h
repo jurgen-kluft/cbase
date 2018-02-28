@@ -75,6 +75,38 @@ namespace xcore
 		m.deallocate(p);
 	}
 
+	class xheap
+	{
+		x_iallocator*	m_allocator;
+	public:
+		inline	xheap(x_iallocator* allocator) : m_allocator(allocator) {}
+
+		void*	allocate(xcore::u32 size, xcore::u32 alignment)
+		{
+			return m_allocator->allocate(size, alignment);
+		}
+		void	deallocate(void* p)
+		{
+			return m_allocator->deallocate(p);
+		}
+	};
+
+	template<typename T, typename... Args>
+	T*			xnew(xheap& heap, Args... args)
+	{
+		void * mem = heap.allocate(sizeof(T), sizeof(void*));
+		T* object = new (mem) T(args...);
+		return object;
+	}
+
+	template<typename T>
+	void		xdelete(xheap& heap, T* p)
+	{
+		p->~T();
+		heap.deallocate(p);
+	}
+
+
 	// Example:
 	// 	xheap::sAllocator = systemAllocator;
 	// 	test_object* test = xnew<test_object, xsystemheap>(200, 1000.0f);
@@ -150,7 +182,7 @@ namespace xcore
 	};
 
 
-	template<typename T, typename C=x_cdtor_default<T> >
+	template<typename T, typename C= x_cdtor_placement_new<T> >
 	class x_type_allocator
 	{
 		x_iallocator*		mAllocator;

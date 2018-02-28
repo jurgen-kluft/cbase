@@ -92,6 +92,9 @@ namespace xcore
 		u32			size() const;
 		bool		is_empty() const;
 
+		T const*	str() const		{ return m_str; }
+		T const*	end() const		{ return m_end; }
+
 		xcbuffer 	buffer() const;
 
 		s32			compare(const T* other) const;
@@ -150,14 +153,28 @@ namespace xcore
 		inline			xuchars_buffer_t(T const* other) { reset(); *this = other; }
 		
 		u32				size() const { return m_chars.size(); }
+		void			rescan()
+		{
+			m_chars.m_str = m_str;
+			m_chars.m_end = m_str;
+			m_chars.m_eos = &m_str[SIZE - 1];
+			while (*m_chars.m_end != '\0')
+			{
+				m_chars.m_end++;
+			}
+		}
 		
-		T *				str() { return m_chars.m_str; }
-		T *				end() { return m_chars.m_end; }
-		T const*		end() const { return m_chars.m_end; }
-		T const*		eos() const { return m_chars.m_eos; }
+		T *				str()			{ return m_chars.m_str; }
+		T *				end()			{ return m_chars.m_end; }
+		T const*		end() const		{ return m_chars.m_end; }
+		T const*		eos() const		{ return m_chars.m_eos; }
 		
-		xuchars_t<T>&	chars() { return m_chars; }
-		xcuchars_t<T>	cchars() const { return xcuchars_t<T>(m_chars.m_str, m_chars.m_end); }			
+		xuchars_t<T>&	chars()			{ return m_chars; }
+		xcuchars_t<T>	cchars() const	{ return xcuchars_t<T>(m_chars.m_str, m_chars.m_end); }			
+
+		xbuffer 		buffer() const	{ return m_chars.buffer(); }
+		xcbuffer 		cbuffer() const { return m_chars.cbuffer(); }
+
 		void			reset() {
 			m_chars.m_str = m_str;
 			m_chars.m_end = m_chars.m_str;
