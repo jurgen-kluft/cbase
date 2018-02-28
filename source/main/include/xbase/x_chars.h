@@ -37,8 +37,6 @@ namespace xcore
 		void		clear();
 		void		clone(const xuchars_t<T>& other);
 
-		xbuffer 	buffer() const;
-		xcbuffer 	cbuffer() const;
 		xcuchars_t<T> cchars() const;
 
 		void		copy(const xuchars_t<T>& other);
@@ -95,8 +93,6 @@ namespace xcore
 		T const*	str() const		{ return m_str; }
 		T const*	end() const		{ return m_end; }
 
-		xcbuffer 	buffer() const;
-
 		s32			compare(const T* other) const;
 		s32			compare(const xuchars_t<T>& other) const;
 		s32			compare(const xcuchars_t<T>& other) const;
@@ -137,189 +133,32 @@ namespace xcore
 	#include "xbase/private/x_chars.h"
 
 	
-	template<typename T, s32 L>
-	class xuchars_buffer_t				
-	{																					
+	template<s32 L>
+	class xucharz : public xuchars_t<T>
+	{
 	public:
 		enum { SIZE = L+1 };
-		T				m_str[SIZE];
-		xuchars_t<T>	m_chars;
+		char			m_str[SIZE];
+		inline			xucharz() : xuchars_t<T>(m_str, m_str, &m_str[SIZE - 1]) {}
+	};
 
-		typedef			xuchars_buffer_t<T, L>			self;
+	template<s32 L>
+	class xuchar8z : public xuchar8s_t<T>
+	{
+	public:
+		enum { SIZE = L+1 };
+		uchar8			m_str[SIZE];
+		inline			xuchar8z() : xuchar8s_t<T>(m_str, m_str, &m_str[SIZE - 1]) {}
+	};
 
-		inline			xuchars_buffer_t() { reset(); }
-		inline			xuchars_buffer_t(self const& other) { reset(); *this = other; }
-		inline			xuchars_buffer_t(xcuchars_t<T> const& other) { reset(); *this = other; }
-		inline			xuchars_buffer_t(T const* other) { reset(); *this = other; }
-		
-		u32				size() const { return m_chars.size(); }
-		void			rescan()
-		{
-			m_chars.m_str = m_str;
-			m_chars.m_end = m_str;
-			m_chars.m_eos = &m_str[SIZE - 1];
-			while (*m_chars.m_end != '\0')
-			{
-				m_chars.m_end++;
-			}
-		}
-		
-		T *				str()			{ return m_chars.m_str; }
-		T *				end()			{ return m_chars.m_end; }
-		T const*		end() const		{ return m_chars.m_end; }
-		T const*		eos() const		{ return m_chars.m_eos; }
-		
-		xuchars_t<T>&	chars()			{ return m_chars; }
-		xcuchars_t<T>	cchars() const	{ return xcuchars_t<T>(m_chars.m_str, m_chars.m_end); }			
-
-		xbuffer 		buffer() const	{ return m_chars.buffer(); }
-		xcbuffer 		cbuffer() const { return m_chars.cbuffer(); }
-
-		void			reset() {
-			m_chars.m_str = m_str;
-			m_chars.m_end = m_chars.m_str;
-			*m_chars.m_end = '\0';
-			m_chars.m_eos = &m_str[SIZE - 1];
-			*m_chars.m_eos = '\0';
-		}
-		void		clear() {
-			reset();
-		}
-		s32			compare(const xuchars_t<T>& _other) const {
-			xcuchars_t<T> self(m_chars.m_str, m_chars.m_end);
-			xcuchars_t<T> other(_other.m_str, _other.m_end);
-			return self.compare(other);
-		}
-		s32			compare(const xcuchars_t<T>& _other) const {
-			xcuchars_t<T> self(m_chars.m_str, m_chars.m_end);
-			xcuchars_t<T> other(_other.m_str, _other.m_end);					
-			return self.compare(other);											
-		}																		
-		s32			compare(const self& _other) const {							
-			xcuchars_t<T> self(m_chars.m_str, m_chars.m_end);
-			xcuchars_t<T> other(_other.m_str, _other.m_end);					
-			return self.compare(other);											
-		}																		
-		T			operator[] (s32 index) const {
-			return m_chars[index];
-		}
-		self&		operator = (const T* other) {								
-			T * dst = m_chars.m_str;
-			while (dst < eos() && *other != '\0')
-				*dst++ = *other++;
-			m_chars.m_end = dst;
-			*m_chars.m_end = '\0';
-			return *this;														
-		}																		
-		self&		operator = (const self& other) {							
-			T const* src = other.m_str;											
-			T * dst = m_chars.m_str;
-			while (dst < eos() && src < other.m_end)							
-				*dst++ = *src++;												
-			m_chars.m_end = dst;
-			*m_chars.m_end = '\0';
-			return *this;														
-		}																		
-		self&		operator = (const xcuchars_t<T>& other) {					
-			T const* src = other.m_str;											
-			T * dst = m_chars.m_str;
-			while (dst < eos() && src < other.m_end)							
-				*dst++ = *src++;												
-			m_chars.m_end = dst;
-			*m_chars.m_end = '\0';
-			return *this;														
-		}																		
-		bool		operator == (const self& other) const {						
-			return compare(other) == 0;											
-		}																		
-		bool		operator != (const self& other) const {						
-			return compare(other) != 0;											
-		}																		
-		bool		operator > (const self& other) const {						
-			return compare(other) == 1;											
-		}																		
-		bool		operator >= (const self& other) const {						
-			return compare(other) >= 0;											
-		}																		
-		bool		operator < (const self& other) const {						
-			return compare(other) == -1;										
-		}																		
-		bool		operator <= (const self& other) const {						
-			return compare(other) <= 0;											
-		}																		
-
-		bool		operator == (const xuchars_t<T>& other) const {						
-			return compare(other) == 0;											
-		}																		
-		bool		operator != (const xuchars_t<T>& other) const {						
-			return compare(other) != 0;											
-		}																		
-		bool		operator > (const xuchars_t<T>& other) const {						
-			return compare(other) == 1;											
-		}																		
-		bool		operator >= (const xuchars_t<T>& other) const {						
-			return compare(other) >= 0;											
-		}																		
-		bool		operator < (const xuchars_t<T>& other) const {						
-			return compare(other) == -1;										
-		}																		
-		bool		operator <= (const xuchars_t<T>& other) const {						
-			return compare(other) <= 0;											
-		}																		
-
-		bool		operator == (const xcuchars_t<T>& other) const {						
-			return compare(other) == 0;											
-		}																		
-		bool		operator != (const xcuchars_t<T>& other) const {						
-			return compare(other) != 0;											
-		}																		
-		bool		operator > (const xcuchars_t<T>& other) const {						
-			return compare(other) == 1;											
-		}																		
-		bool		operator >= (const xcuchars_t<T>& other) const {						
-			return compare(other) >= 0;											
-		}																		
-		bool		operator < (const xcuchars_t<T>& other) const {						
-			return compare(other) == -1;										
-		}																		
-		bool		operator <= (const xcuchars_t<T>& other) const {						
-			return compare(other) <= 0;											
-		}																		
-	};																			
-
-	#define XUCHARS_T(name, type, size) typedef	xuchars_buffer_t<type, size>		name;
-
-	// Predefined 
-	XUCHARS_T(xuchar8s8, uchar8, 8);
-	XUCHARS_T(xuchar8s16, uchar8, 16);
-	XUCHARS_T(xuchar8s32, uchar8, 32);
-	XUCHARS_T(xuchar8s64, uchar8, 64);
-	XUCHARS_T(xuchar8s128, uchar8, 128);
-	XUCHARS_T(xuchar8s256, uchar8, 256);
-	XUCHARS_T(xuchar8s512, uchar8, 512);
-	XUCHARS_T(xuchar8s1024, uchar8, 1024);
-
-	XUCHARS_T(xuchar32s4, uchar32, 4);
-	XUCHARS_T(xuchar32s8, uchar32, 8);
-	XUCHARS_T(xuchar32s16, uchar32, 16);
-	XUCHARS_T(xuchar32s32, uchar32, 32);
-	XUCHARS_T(xuchar32s64, uchar32, 64);
-	XUCHARS_T(xuchar32s128, uchar32, 128);
-	XUCHARS_T(xuchar32s256, uchar32, 256);
-	XUCHARS_T(xuchar32s512, uchar32, 512);
-	XUCHARS_T(xuchar32s1024, uchar32, 1024);
-
-	XUCHARS_T(xuchars8, char, 8);
-	XUCHARS_T(xuchars16, char, 16);
-	XUCHARS_T(xuchars32, char, 32);
-	XUCHARS_T(xuchars64, char, 64);
-	XUCHARS_T(xuchars128, char, 128);
-	XUCHARS_T(xuchars256, char, 256);
-	XUCHARS_T(xuchars512, char, 512);
-	XUCHARS_T(xuchars1024, char, 1024);
-
-
-
+	template<s32 L>
+	class xuchar32z : public xuchar32s_t<T>
+	{
+	public:
+		enum { SIZE = L+1 };
+		uchar32			m_str[SIZE];
+		inline			xuchar32z() : xuchar32s_t<T>(m_str, m_str, &m_str[SIZE - 1]) {}
+	};
 
 	// --------------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------------
