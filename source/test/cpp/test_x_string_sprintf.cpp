@@ -23,23 +23,22 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 
 		UNITTEST_TEST(format_double)
 		{
-			xuchars256 str;
+			xucharz<256> str;
 			xcuchars fmt("%f");
 
 			f64 d = 3.1415;
-			ascii::sprintf(str.chars(), fmt, x_va(d));
+			ascii::sprintf(str, fmt, x_va(d));
 			xcuchars answer_str("3.141500");
-			CHECK_EQUAL(0, ascii::compare(answer_str, str.cchars()));
+			CHECK_EQUAL(0, ascii::compare(answer_str, str));
 		}
 
 		UNITTEST_TEST(format_string)
 		{
-			xuchars256 str;
+			xucharz<256> str;
 			xcuchars fmt("the %s");
 
-			ascii::sprintf(str.chars(), fmt, x_va("test string"));
-	
-			CHECK_EQUAL(0, str.cchars().compare("the test string"));
+			ascii::sprintf(str, fmt, x_va("test string"));
+			CHECK_EQUAL(0, str.compare("the test string"));
 		}
 	}
 }

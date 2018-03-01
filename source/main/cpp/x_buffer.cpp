@@ -21,14 +21,14 @@ namespace xcore
 
 	inline void			write_u8(xbyte * ptr, u8  b) { *ptr = b; }
 	inline void			write_s8(xbyte * ptr, s8  b) { *ptr = b; }
-	inline void			write_u16(xbyte * ptr, u16 b) { for (s32 i = 0; i<sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
-	inline void			write_s16(xbyte * ptr, s16 b) { for (s32 i = 0; i<sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
-	inline void			write_u32(xbyte * ptr, u32 b) { for (s32 i = 0; i<sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
-	inline void			write_s32(xbyte * ptr, s32 b) { for (s32 i = 0; i<sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
-	inline void			write_f32(xbyte * ptr, f32 f) { u32 b = *((u32*)&f); for (s32 i = 0; i<sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
-	inline void			write_u64(xbyte * ptr, u64 b) { for (s32 i = 0; i<sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
-	inline void			write_s64(xbyte * ptr, s64 b) { for (s32 i = 0; i<sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
-	inline void			write_f64(xbyte * ptr, f64 f) { u64 b = *((u64*)&f); for (s32 i = 0; i<sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
+	inline void			write_u16(xbyte * ptr, u16 b) { for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
+	inline void			write_s16(xbyte * ptr, s16 b) { for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
+	inline void			write_u32(xbyte * ptr, u32 b) { for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
+	inline void			write_s32(xbyte * ptr, s32 b) { for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
+	inline void			write_f32(xbyte * ptr, f32 f) { u32 b = *((u32*)&f); for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
+	inline void			write_u64(xbyte * ptr, u64 b) { for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
+	inline void			write_s64(xbyte * ptr, s64 b) { for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
+	inline void			write_f64(xbyte * ptr, f64 f) { u64 b = *((u64*)&f); for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
 
 
 	/// ---------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, 1))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += 1;
 			b = read_u8(ptr) != 0;
 			return 1;
@@ -79,7 +79,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_u8(ptr);
 			return sizeof(b);
@@ -91,7 +91,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_s8(ptr);
 			return sizeof(b);
@@ -103,7 +103,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_u16(ptr);
 			return sizeof(b);
@@ -115,7 +115,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_s16(ptr);
 			return sizeof(b);
@@ -127,7 +127,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_u32(ptr);
 			return sizeof(b);
@@ -139,7 +139,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_s32(ptr);
 			return sizeof(b);
@@ -151,7 +151,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_u64(ptr);
 			return sizeof(b);
@@ -163,7 +163,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_s64(ptr);
 			return sizeof(b);
@@ -175,7 +175,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_f32(ptr);
 			return sizeof(b);
@@ -187,7 +187,7 @@ namespace xcore
 	{
 		if (_can_read(buffer_, cursor_, sizeof(b)))
 		{
-			u8 const* ptr = (u8 const*)buffer_.m_data + cursor_;
+			u8 const* ptr = (u8 const*)buffer_.m_const + cursor_;
 			cursor_ += sizeof(b);
 			b = read_f64(ptr);
 			return sizeof(b);
@@ -201,8 +201,8 @@ namespace xcore
 		{
 			return false;
 		}
-		xcbuffer src(buf.size(), (xbyte const*)buffer_.m_data + cursor_);
-		buf.write(src);
+		xcbuffer src(buf.size(), (xbyte const*)buffer_.m_const + cursor_);
+		buf = src;
 		cursor_ += (u32)buf.size();
 		return true;
 	}
@@ -211,25 +211,25 @@ namespace xcore
 	{
 		if (!_can_read(buffer_, cursor_, size))
 		{
-			buf.m_data = NULL;
+			buf.m_const = NULL;
 			buf.m_len = 0;
 			return false;
 		}
 
-		buf.m_data = (xbyte const*)buffer_.m_data + cursor_;
+		buf.m_const = buffer_.m_const + cursor_;
 		buf.m_len = size;
 
 		cursor_ += size;
 		return true;
 	}
 
-	bool				xbinary_reader::view_string(xcuchars& outstr)
+	bool				xbinary_reader::view_string(u32 size, const char*& out_str, const char*& out_end)
 	{
-		if (buffer_.size() == 0) return false;
-		return false;
+		if (buffer_.size() == 0) 
+			return false;
 
 		u32 strlen = 0;
-		char const* str = (char const*)buffer_.m_data + cursor_;
+		char const* str = (char const*)buffer_.m_const + cursor_;
 		while (cursor_ < buffer_.size())
 		{
 			if (str[strlen] == '\0')
@@ -242,7 +242,8 @@ namespace xcore
 			return false;
 		}
 
-		outstr = xcuchars(str, str + strlen);
+		out_str = str;
+		out_end = str + strlen;
 		cursor_ += strlen;
 		return true;
 	}
@@ -285,7 +286,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, 1))
 		{
-			write_u8((xbyte*)buffer_.m_data + cursor_, b ? 1 : 0);
+			write_u8(buffer_.m_mutable + cursor_, b ? 1 : 0);
 			cursor_ += 1;
 			return 1;
 		}
@@ -296,7 +297,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_u8((xbyte*)buffer_.m_data + cursor_, b);
+			write_u8(buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -307,7 +308,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_u8((xbyte*)buffer_.m_data + cursor_, b);
+			write_u8(buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -318,7 +319,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_u16((xbyte*)buffer_.m_data + cursor_, b);
+			write_u16(buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -329,7 +330,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_s16((xbyte*)buffer_.m_data + cursor_, b);
+			write_s16(buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 		}
 		return sizeof(b);
@@ -339,7 +340,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_u32((xbyte*)buffer_.m_data + cursor_, b);
+			write_u32(buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -350,7 +351,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_s32((xbyte*)buffer_.m_data + cursor_, b);
+			write_s32((xbyte*)buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -361,7 +362,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_u64((xbyte*)buffer_.m_data + cursor_, b);
+			write_u64((xbyte*)buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -372,7 +373,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_s64((xbyte*)buffer_.m_data + cursor_, b);
+			write_s64((xbyte*)buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -383,7 +384,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_f32((xbyte*)buffer_.m_data + cursor_, b);
+			write_f32((xbyte*)buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -394,7 +395,7 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, sizeof(b)))
 		{
-			write_f64((xbyte*)buffer_.m_data + cursor_, b);
+			write_f64((xbyte*)buffer_.m_mutable + cursor_, b);
 			cursor_ += sizeof(b);
 			return sizeof(b);
 		}
@@ -406,9 +407,9 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, (u32)buf.size()))
 		{
-			xbyte* dst = (xbyte*)buffer_.m_data + cursor_;
-			for (u32 i = 0; i<buf.size(); i++)
-				dst[i] = buf[i];
+			xbyte* dst = (xbyte*)buffer_.m_mutable + cursor_;
+			for (u32 i = 0; i < buf.size(); i++)
+				dst[i] = buf.m_const[i];
 			cursor_ += (u32)buf.size();
 			return (u32)buf.size();
 		}
@@ -419,24 +420,27 @@ namespace xcore
 	{
 		if (_can_write(buffer_, cursor_, (u32)buf.size()))
 		{
-			xbyte* dst = (xbyte*)buffer_.m_data + cursor_;
-			for (u32 i = 0; i<buf.size(); i++)
-				dst[i] = buf[i];
+			xbyte* dst = (xbyte*)buffer_.m_mutable + cursor_;
+			xbyte const* src = buf.m_const;
+			for (u32 i = 0; i < buf.size(); i++)
+				*dst++ = *src++;
 			cursor_ += (u32)buf.size();
 			return (u32)buf.size();
 		}
 		return 0;
 	}
 
-	u32					xbinary_writer::write_string(xcuchars const& str)
+	u32					xbinary_writer::write_string(char const* str, char const* end)
 	{
-		if (_can_write(buffer_, cursor_, str.size()))
+		u32 const size = (u32)(end - str);
+		if (_can_write(buffer_, cursor_, size))
 		{
-			char* dststr = (char*)buffer_.m_data + cursor_;
-			xuchars dst(dststr, dststr, (char*)buffer_.m_data + buffer_.m_len - 1);
-			dst.copy(str);
-			cursor_ += str.size();
-			return str.size();
+			char* dststr = (char*)buffer_.m_mutable + cursor_;
+			xuchars dst(dststr, dststr, dststr + size);
+			xcuchars src(str, end);
+			dst = src;
+			cursor_ += size;
+			return size;
 		}
 		return 0;
 	}

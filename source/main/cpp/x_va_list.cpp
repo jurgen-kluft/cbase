@@ -151,11 +151,11 @@ namespace xcore
 		case TYPE_FLOAT64: { i = (u32)(*(f64*)mArg); } break;
 		case TYPE_PCTCHAR: 
 		{	xcuchars const& ch = *(xcuchars const*)mArg;
-			i = StrToU32(ch.m_str, ch.m_end);
+			i = StrToU32(ch.m_const_str, ch.m_const_end);
 		} break;
 		case TYPE_PCUCHAR32:
 		{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
-			i = StrToU32(ch.m_str, ch.m_end);
+			i = StrToU32(ch.m_const_str, ch.m_const_end);
 		} break;
 		default:
 			break; // Fall through
@@ -189,11 +189,11 @@ namespace xcore
 			case TYPE_FLOAT64:	{ i = (u64)(*(f64*)mArg);  } break;
 			case TYPE_PCTCHAR:
 			{	xcuchars const& ch = *(xcuchars const*)mArg;
-				i = StrToS64(ch.m_str, ch.m_end, 10);
+				i = StrToS64(ch.m_const_str, ch.m_const_end, 10);
 			} break;
 			case TYPE_PCUCHAR32:
 			{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
-				i = StrToS64(ch.m_str, ch.m_end, 10);
+				i = StrToS64(ch.m_const_str, ch.m_const_end, 10);
 			} break;
 			default:
 				break; // Fall through
@@ -222,11 +222,11 @@ namespace xcore
 			case TYPE_FLOAT64:	{ i = (f32)(*(f64*)mArg); } break;
 			case TYPE_PCTCHAR:
 			{	xcuchars const& ch = *(xcuchars const*)mArg;
-				i = StrToF32(ch.m_str, ch.m_end);
+				i = StrToF32(ch.m_const_str, ch.m_const_end);
 			} break;
 			case TYPE_PCUCHAR32:
 			{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
-				i = StrToF32(ch.m_str, ch.m_end);
+				i = StrToF32(ch.m_const_str, ch.m_const_end);
 			} break;
 			default:			break; // Fall through
 		};
@@ -254,11 +254,11 @@ namespace xcore
 			case TYPE_FLOAT64:	{ i = (f64)(*(f64*)mArg); } break;
 			case TYPE_PCTCHAR:
 			{	xcuchars const& ch = *(xcuchars const*)mArg;
-				i = StrToF64(ch.m_str, ch.m_end);
+				i = StrToF64(ch.m_const_str, ch.m_const_end);
 			} break;
 			case TYPE_PCUCHAR32:
 			{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
-				i = StrToF64(ch.m_str, ch.m_end);
+				i = StrToF64(ch.m_const_str, ch.m_const_end);
 			} break;
 			default:
 				break; // Fall through
@@ -287,11 +287,11 @@ namespace xcore
 
 			case TYPE_PCTCHAR:
 			{	xcuchars const& ch = *(xcuchars const*)mArg;
-				i = StrToBool(ch.m_str, ch.m_end);
+				i = StrToBool(ch.m_const_str, ch.m_const_end);
 			} break;
 			case TYPE_PCUCHAR32:
 			{	xcuchar32s const& ch = *(xcuchar32s const*)mArg;
-				i = StrToBool(ch.m_str, ch.m_end);
+				i = StrToBool(ch.m_const_str, ch.m_const_end);
 			} break;
 
 			default:			break; // Fall through

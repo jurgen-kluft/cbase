@@ -13,26 +13,10 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
+#include "xbase/x_chars.h"
 
-
-/**
- * xCore namespace
- */
 namespace xcore
 {
-	template<typename T>
-	class xuchars_t;
-	template<typename T>
-	class xcuchars_t;
-
-	typedef xuchars_t<char>		xuchars;
-	typedef xuchars_t<uchar8>	xuchar8s;
-	typedef xuchars_t<uchar32>	xuchar32s;
-
-	typedef xcuchars_t<char>	xcuchars;
-	typedef xcuchars_t<uchar8>	xcuchar8s;
-	typedef xcuchars_t<uchar32>	xcuchar32s;
-
 	//==============================================================================
 	//  FORWARD DECLARES
 	//==============================================================================

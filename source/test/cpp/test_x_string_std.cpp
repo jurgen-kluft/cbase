@@ -20,19 +20,19 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		{
 			xcuchars src = "this is a system string";
 
-			CHECK_EQUAL(23, ascii::len(src.m_str, NULL));
+			CHECK_EQUAL(23, ascii::len(src.str(), NULL));
 
-			ascii::pcrune src_end_1 = ascii::endof(src.m_str, NULL);
-			CHECK_EQUAL(23, ascii::len(src.m_str, NULL));
-			CHECK_EQUAL(src.m_str + 23, src_end_1);
+			ascii::pcrune src_end_1 = ascii::endof(src.str(), NULL);
+			CHECK_EQUAL(23, ascii::len(src.str(), NULL));
+			CHECK_EQUAL(src.str() + 23, src_end_1);
 
-			ascii::pcrune src_end_2 = ascii::endof(src.m_str, src.m_str + 20);
-			CHECK_EQUAL(20, ascii::len(src.m_str, src.m_str + 20));
-			CHECK_EQUAL(src.m_str + 20, src_end_2);
+			ascii::pcrune src_end_2 = ascii::endof(src.str(), src.str() + 20);
+			CHECK_EQUAL(20, ascii::len(src.str(), src.str() + 20));
+			CHECK_EQUAL(src.str() + 20, src_end_2);
 
-			ascii::pcrune src_end_3 = ascii::endof(src.m_str, src.m_str + 30);
-			CHECK_EQUAL(23, ascii::len(src.m_str, src.m_str + 30));
-			CHECK_EQUAL(src.m_str + 23, src_end_3);
+			ascii::pcrune src_end_3 = ascii::endof(src.str(), src.str() + 30);
+			CHECK_EQUAL(23, ascii::len(src.str(), src.str() + 30));
+			CHECK_EQUAL(src.str() + 23, src_end_3);
 		}
 
 		UNITTEST_TEST(size)
@@ -47,20 +47,20 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		{ 
 			xcuchars str("this is a system string");
 
-			xuchars32 dst;
-			ascii::copy(dst.chars(), str);
+			xucharz<32> dst;
+			ascii::copy(dst, str);
 
 			CHECK_EQUAL(0, dst.compare(str));
-			CHECK_EQUAL(0, ascii::compare(str, dst.cchars()));
+			CHECK_EQUAL(0, ascii::compare(str, dst));
 			CHECK_EQUAL(23, ascii::size(str));
 
-			xuchars16 str2;
-			ascii::copy(str2.chars(), str);
+			xucharz<16> str2;
+			ascii::copy(str2, str);
 
-			CHECK_EQUAL(16, ascii::size(str2.cchars()));
-			CHECK_EQUAL(-1, ascii::compare(str2.cchars(), str));
+			CHECK_EQUAL(16, ascii::size(str2));
+			CHECK_EQUAL(-1, ascii::compare(str2, str));
 
-			CHECK_EQUAL(0, ascii::compare(str2.cchars(), xcuchars("this is a system")));
+			CHECK_EQUAL(0, ascii::compare(str2, xcuchars("this is a system")));
 		}
 
 		UNITTEST_TEST(find)
@@ -94,19 +94,19 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(replace)
 		{
-			xuchars128 dst;
+			xucharz<128> dst;
 			xcuchars str1 = "this is a system string";
-			ascii::copy(dst.chars(), str1);
+			ascii::copy(dst, str1);
 			xcuchars str2 = "this is a copied string";
 
 			xcuchars find_str = "system";
-			xcuchars found = ascii::find(dst.cchars(), find_str);
+			xcuchars found = ascii::find(dst, find_str);
 			CHECK_TRUE(found == xcuchars("system"));
 
 			xcuchars replace_str = "copied";
-			ascii::replace(dst.chars(), find_str, replace_str);
+			ascii::replace(dst, find_str, replace_str);
 
-			CHECK_EQUAL(0, ascii::compare(dst.cchars(), str2));
+			CHECK_EQUAL(0, ascii::compare(dst, str2));
 		}
 
 		UNITTEST_TEST(compare)
@@ -134,15 +134,15 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(concatenate)
 		{
-			xuchars128 dst;
+			xucharz<128> dst;
 			xcuchars str1 = "this is a ";
-			ascii::copy(dst.chars(), str1);
+			ascii::copy(dst, str1);
 
 			xcuchars str2 = "copied string";
-			ascii::concatenate(dst.chars(), str2);
+			ascii::concatenate(dst, str2);
 
 			xcuchars str3 = "this is a copied string";
-			CHECK_EQUAL(0, ascii::compare(dst.cchars(), str3));
+			CHECK_EQUAL(0, ascii::compare(dst, str3));
 		}
 
 		UNITTEST_TEST(parse_bool)
@@ -288,56 +288,56 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(tostring_s32)
 		{
-			xuchars32 str;
+			xucharz<32> str;
 			s32 value = 31415;
-			ascii::to_string(str.chars(), value);
-			CHECK_EQUAL(5, ascii::size(str.cchars()));
-			CHECK_EQUAL(0, ascii::compare(str.cchars(), "31415"));
+			ascii::to_string(str, value);
+			CHECK_EQUAL(5, ascii::size(str));
+			CHECK_EQUAL(0, ascii::compare(str, "31415"));
 		}
 
 		UNITTEST_TEST(tostring_u32)
 		{
-			xuchars32 str;
+			xucharz<32> str;
 			u32 value = 31415;
-			ascii::to_string(str.chars(), value);
-			CHECK_EQUAL(5, ascii::size(str.cchars()));
-			CHECK_EQUAL(0, ascii::compare(str.cchars(), "31415"));
+			ascii::to_string(str, value);
+			CHECK_EQUAL(5, ascii::size(str));
+			CHECK_EQUAL(0, ascii::compare(str, "31415"));
 		}
 
 		UNITTEST_TEST(tostring_s64)
 		{
-			xuchars32 str;
+			xucharz<32> str;
 			s64 value = 31415;
-			ascii::to_string(str.chars(), value);
-			CHECK_EQUAL(5, ascii::size(str.cchars()));
-			CHECK_EQUAL(0, ascii::compare(str.cchars(), "31415"));
+			ascii::to_string(str, value);
+			CHECK_EQUAL(5, ascii::size(str));
+			CHECK_EQUAL(0, ascii::compare(str, "31415"));
 		}
 
 		UNITTEST_TEST(tostring_u64)
 		{
-			xuchars32 str;
+			xucharz<32> str;
 			u64 value = 31415;
-			ascii::to_string(str.chars(), value);
-			CHECK_EQUAL(5, ascii::size(str.cchars()));
-			CHECK_EQUAL(0, ascii::compare(str.cchars(), "31415"));
+			ascii::to_string(str, value);
+			CHECK_EQUAL(5, ascii::size(str));
+			CHECK_EQUAL(0, ascii::compare(str, "31415"));
 		}
 
 		UNITTEST_TEST(tostring_f32)
 		{
-			xuchars32 str;
+			xucharz<32> str;
 			f32 value = 3.1415f;
-			ascii::to_string(str.chars(), value, 4);
-			CHECK_EQUAL(6, ascii::size(str.cchars()));
-			CHECK_EQUAL(0, ascii::compare(str.cchars(), "3.1415"));
+			ascii::to_string(str, value, 4);
+			CHECK_EQUAL(6, ascii::size(str));
+			CHECK_EQUAL(0, ascii::compare(str, "3.1415"));
 		}
 
 		UNITTEST_TEST(tostring_f64)
 		{
-			xuchars32 str;
+			xucharz<32> str;
 			f64 value = 3.1415;
-			ascii::to_string(str.chars(), value, 4);
-			CHECK_EQUAL(6, ascii::size(str.cchars()));
-			CHECK_EQUAL(0, ascii::compare(str.cchars(), "3.1415"));
+			ascii::to_string(str, value, 4);
+			CHECK_EQUAL(6, ascii::size(str));
+			CHECK_EQUAL(0, ascii::compare(str, "3.1415"));
 		}
 		
 		UNITTEST_TEST(is)
@@ -435,22 +435,22 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(to_upper)
 		{
-			xuchars128 str;
+			xucharz<128> str;
 			xcuchars str1 = "this is a lower case string";
 			xcuchars str2 = "THIS IS A LOWER CASE STRING";
-			ascii::copy(str.chars(), str1);
-			ascii::to_upper(str.chars());
-			CHECK_EQUAL(0, ascii::compare(str2, str.cchars()));
+			ascii::copy(str, str1);
+			ascii::to_upper(str);
+			CHECK_EQUAL(0, ascii::compare(str2, str));
 		}
 
 		UNITTEST_TEST(to_lower)
 		{
-			xuchars128 str;
+			xucharz<128> str;
 			xcuchars str1 = "THIS IS AN UPPER CASE STRING";
 			xcuchars str2 = "this is an upper case string";
-			ascii::copy(str.chars(), str1);
-			ascii::to_lower(str.chars());
-			CHECK_EQUAL(0, ascii::compare(str2, str.cchars()));
+			ascii::copy(str, str1);
+			ascii::to_lower(str);
+			CHECK_EQUAL(0, ascii::compare(str2, str));
 		}
 
 		UNITTEST_TEST(starts_with)
@@ -466,29 +466,10 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			CHECK_EQUAL(true, ascii::starts_with (str2, start2));
 		}
 
-		UNITTEST_TEST(ends_with)
-		{
-			xcuchars str1 = "a simple string";
-			xcuchars str2 = "need a longer string!";
-			xcuchars end2 = "string";
-
-			CHECK_EQUAL(true, ascii::ends_with (str1, 'g'));
-			CHECK_EQUAL(false, ascii::ends_with(str2, 'g'));
-
-			CHECK_EQUAL(true,  ascii::ends_with(str1, end2));
-			CHECK_EQUAL(false, ascii::ends_with(str2, end2));
-		}
-
 		UNITTEST_TEST(first_char)
 		{
 			xcuchars str1 = "a simple string";
 			CHECK_EQUAL('a', ascii::first_char(str1));
-		}
-
-		UNITTEST_TEST(last_char)
-		{
-			xcuchars str1 = "a simple string";
-			CHECK_EQUAL('g', ascii::last_char(str1));
 		}
 
 		UNITTEST_TEST(cprintf)
@@ -500,8 +481,8 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			s32 length = ascii::cprintf(fmt, x_va(i), x_va(str));
 			CHECK_EQUAL(9, length);
 
-			xuchars32 buffer;
-			ascii::sprintf(buffer.chars(), fmt, x_va(i), x_va(str));
+			xucharz<32> buffer;
+			ascii::sprintf(buffer, fmt, x_va(i), x_va(str));
 			CHECK_EQUAL(0, buffer.compare(xcuchars("100 hello")));
 		}
 
@@ -516,79 +497,79 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(sprintf)
 		{
-			xuchars32 buffer;
+			xucharz<32> buffer;
 
 			s32 i = 100;
 
 			xcuchars str = "hello";
 			xcuchars fmt = "%d %s";
 
-			ascii::sprintf(buffer.chars(), fmt, x_va(i), x_va(str));
+			ascii::sprintf(buffer, fmt, x_va(i), x_va(str));
 			CHECK_EQUAL(9, buffer.size());
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "100 hello") == 0);
+			CHECK_TRUE(ascii::compare(buffer, "100 hello") == 0);
 
 			// Check all format functionality?
 		}
 
 		UNITTEST_TEST(sprintf_bool)
 		{
-			xuchars32 buffer;
+			xucharz<32> buffer;
 
 			// ---------------------------------------------------------------------------
 			// Boolean, True/False and Yes/No verification
 			buffer.reset();
-			ascii::sprintf(buffer.chars(), "%b", x_va(true));
+			ascii::sprintf(buffer, "%b", x_va(true));
 			CHECK_EQUAL(buffer.size(), 4);
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "true")==0);
+			CHECK_TRUE(ascii::compare(buffer, "true")==0);
 
 			buffer.reset();
-			ascii::sprintf(buffer.chars(), "%B", x_va(true));
+			ascii::sprintf(buffer, "%B", x_va(true));
 			CHECK_EQUAL(buffer.size(), 4);
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "TRUE")==0);
+			CHECK_TRUE(ascii::compare(buffer, "TRUE")==0);
 
 			buffer.reset();
-			ascii::sprintf(buffer.chars(), "%b", x_va(false));
+			ascii::sprintf(buffer, "%b", x_va(false));
 			CHECK_EQUAL(buffer.size(), 5);
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "false")==0);
+			CHECK_TRUE(ascii::compare(buffer, "false")==0);
 
 			buffer.reset();
-			ascii::sprintf(buffer.chars(), "%#b", x_va(false));
+			ascii::sprintf(buffer, "%#b", x_va(false));
 			CHECK_EQUAL(buffer.size(), 5);
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "False")==0);
+			CHECK_TRUE(ascii::compare(buffer, "False")==0);
 
 			buffer.reset();
-			ascii::sprintf(buffer.chars(), "%y", x_va(true));
+			ascii::sprintf(buffer, "%y", x_va(true));
 			CHECK_EQUAL(buffer.size(), 3);
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "yes")==0);
+			CHECK_TRUE(ascii::compare(buffer, "yes")==0);
 
 			buffer.reset();
-			ascii::sprintf(buffer.chars(), "%y", x_va(false));
+			ascii::sprintf(buffer, "%y", x_va(false));
 			CHECK_EQUAL(buffer.size(), 2);
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "no")==0);
+			CHECK_TRUE(ascii::compare(buffer, "no")==0);
 
 			buffer.reset();
-			ascii::sprintf(buffer.chars(), "%Y", x_va(true));
+			ascii::sprintf(buffer, "%Y", x_va(true));
 			CHECK_EQUAL(buffer.size(), 3);
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "YES")==0);
+			CHECK_TRUE(ascii::compare(buffer, "YES")==0);
 
 			buffer.reset();
-			ascii::sprintf(buffer.chars(), "%#y", x_va(true));
+			ascii::sprintf(buffer, "%#y", x_va(true));
 			CHECK_EQUAL(buffer.size(), 3);
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "Yes")==0);
+			CHECK_TRUE(ascii::compare(buffer, "Yes")==0);
 			// ---------------------------------------------------------------------------
 
 		}
 
 		UNITTEST_TEST(vsprintf)
 		{
-			xuchars32 buffer;
+			xucharz<32> buffer;
 
 			s32 i = 100;
 			xcuchars str = "hello";
 			xcuchars fmt = "%d %s";
-			ascii::vsprintf(buffer.chars(), fmt, x_va_list(x_va(i), x_va(str)));
+			ascii::vsprintf(buffer, fmt, x_va_list(x_va(i), x_va(str)));
 			CHECK_EQUAL(9, buffer.size());
-			CHECK_TRUE(ascii::compare(buffer.cchars(), "100 hello")==0);
+			CHECK_TRUE(ascii::compare(buffer, "100 hello")==0);
 		}
 
 		UNITTEST_TEST(sscanf)

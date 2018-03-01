@@ -74,10 +74,12 @@ namespace xcore
 	{
 		setNull();
 
-		xcuchars str = _str;
-		for (s32 i=0, s=0; s<32; i++)
+		auto iter = _str.begin();
+		auto iend = _str.end();
+
+		for (s32 i=0, s=0; s<32 && iter<iend; i++)
 		{
-			char c = *str.m_str++;
+			char c = *iter++;
 			if (c == '\0')
 				break;
 

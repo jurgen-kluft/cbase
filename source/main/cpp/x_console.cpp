@@ -17,7 +17,7 @@
 namespace xcore
 {
 //#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type local_var_name##Buffer[size + 1]; local_var_name##Buffer[size] = '\0'; type* local_var_name = &local_var_name##Buffer[0]; type* local_var_name##_eos = &local_var_name##Buffer[size];
-	#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type##size local_var_name;
+	#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type<size> local_var_name;
 
 	class xiconsole_store_default : public xiconsole_store
 	{
@@ -255,44 +255,44 @@ namespace xcore
 
 	void    xiconsole_default::write(f64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 256);
-		ascii::to_string(tmp.chars(), _value, 2);
-		write(tmp.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xucharz, tmp, 256);
+		ascii::to_string(tmp, _value, 2);
+		write(tmp);
 	}
 
 	void    xiconsole_default::write(s32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 64);
-		ascii::to_string(tmp.chars(), _value, 2);
-		write(tmp.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xucharz, tmp, 64);
+		ascii::to_string(tmp, _value, 2);
+		write(tmp);
 	}
 
 	void    xiconsole_default::write(s64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 64);
-		ascii::to_string(tmp.chars(), _value, 2);
-		write(tmp.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xucharz, tmp, 64);
+		ascii::to_string(tmp, _value, 2);
+		write(tmp);
 	}
 
 	void    xiconsole_default::write(f32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 256);
-		ascii::to_string(tmp.chars(), _value, 2);
-		write(tmp.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xucharz, tmp, 256);
+		ascii::to_string(tmp, _value, 2);
+		write(tmp);
 	}
 
 	void    xiconsole_default::write(u32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 256);
-		ascii::to_string(tmp.chars(), _value, 2);
-		write(tmp.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xucharz, tmp, 256);
+		ascii::to_string(tmp, _value, 2);
+		write(tmp);
 	}
 
 	void    xiconsole_default::write(u64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchars, tmp, 256);
-		ascii::to_string(tmp.chars(), _value, 2);
-		write(tmp.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xucharz, tmp, 256);
+		ascii::to_string(tmp, _value, 2);
+		write(tmp);
 	}
 	
 	void    xiconsole_default::write(const xcuchars& str)
@@ -302,9 +302,9 @@ namespace xcore
 
 	void    xiconsole_default::write(const xcuchars& fmt, const x_va_list& args)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchars, str, 512);
-		ascii::vsprintf(str.chars(), fmt, args);
-		mOut(str.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xucharz, str, 512);
+		ascii::vsprintf(str, fmt, args);
+		mOut(str);
 	}
 
 	void    xiconsole_default::write(const xcuchar8s& str)
@@ -314,9 +314,9 @@ namespace xcore
 
 	void    xiconsole_default::write(const xcuchar8s& fmt, const x_va_list& args)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchar8s, str, 512);
-		utf8::vsprintf(str.chars(), xcuchar8s(fmt), args);
-		mOut8(str.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xuchar8z, str, 512);
+		utf8::vsprintf(str, xcuchar8s(fmt), args);
+		mOut8(str);
 	}
 
 	void    xiconsole_default::write(const xcuchar32s& str)
@@ -326,9 +326,9 @@ namespace xcore
 
 	void    xiconsole_default::write(const xcuchar32s& fmt, const x_va_list& args)
 	{
-		XCONSOLE_LOCAL_STR_BUF(xuchar32s, str, 1024);
-		utf32::vsprintf(str.chars(), xcuchar32s(fmt), args);
-		mOut32(str.cchars());
+		XCONSOLE_LOCAL_STR_BUF(xuchar32z, str, 1024);
+		utf32::vsprintf(str, xcuchar32s(fmt), args);
+		mOut32(str);
 	}
 
 

@@ -15,8 +15,10 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 
 		UNITTEST_TEST(test_xbuffer32)
 		{
-			xbytes32 buf1(1);
-			xbytes32 buf2(2);
+			xbytes<32> buf1;
+			xbytes<32> buf2;
+			buf1.reset(1);
+			buf2.reset(2);
 
 			CHECK_TRUE(buf1 != buf2);
 			CHECK_FALSE(buf1 == buf2);
@@ -31,8 +33,7 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 
 		UNITTEST_TEST(test_xbinary_reader)
 		{
-			xbyte data[2048];
-			xbuffer buffer(2048, data);
+			xbytes<2048> buffer;
 
 			xbinary_writer writer(buffer);
 			writer.skip(16);
@@ -50,15 +51,15 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 
 			const char* cctext = "this is the buffer";
 			xcuchars chars(cctext);
-			xcbuffer text(ascii::len(cctext, NULL), (xbyte const*)cctext);
+			xcbuffer text(chars.size(), (xbyte const*)cctext);
 
-			xbytes32 bytes;
+			xbytes<32> bytes;
 			bytes = text;
 			writer.write_data(text);
-			writer.write_data(bytes.buffer());
-			writer.write_string(cctext);
+			writer.write_data(bytes);
+			writer.write_string(cctext, ascii::endof(cctext, NULL));
 
-			xbinary_reader reader(buffer.cbuffer());
+			xbinary_reader reader(buffer);
 			
 			reader.skip(16);
 
@@ -98,12 +99,18 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 			CHECK_EQUAL(8.0, the_f32);
 			CHECK_EQUAL(9.0, the_f64);
 
-			xuchars32 rtext;
-			reader.read_data(rtext.buffer());
-			xcbuffer rview;
-			reader.view_data(ascii::len(cctext, NULL), rview);
-			xcuchars rviewtext;
-			reader.view_string(rviewtext);
+			s32 len = chars.size();
+			xbytes<32> rdata;
+			reader.read_data(rdata(0, len));
+
+			xcbuffer rviewdata;
+			reader.view_data(32, rviewdata);
+			
+			const char* rviewstr;
+			const char* rviewend;
+			reader.view_string(len, rviewstr, rviewend);
+			xcuchars rchars(rviewstr, rviewend);
+			CHECK_TRUE(chars == rchars);
 		}
 	}
 }

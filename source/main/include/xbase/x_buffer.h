@@ -13,37 +13,44 @@ namespace xcore
 {
 	class xbuffer;
 
-	template<typename T>
-	class xcuchars_t;
-	typedef	xcuchars_t<char> xcuchars;
-
 	// --------------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------------
-	class xbuffer
+	class xcbuffer
 	{
 	public:
-		inline		xbuffer() : m_len(0), m_data((xbyte*)&m_len) { }
-		inline		xbuffer(s64 len, xbyte* data) : m_len(len), m_data(data) { reset(0); }
+		inline		xcbuffer() : m_len(0), m_const((xbyte const*)&m_len) { }
+		inline		xcbuffer(s64 len, xbyte const* data) : m_len(len), m_const(data) { }
 
-		s64			size() const { return m_len; }
+		inline s64	size() const									{ return m_len; }
+
+		s32			compare(const xcbuffer& other) const;
+
+		bool		operator == (const xcbuffer& other) const;
+		bool		operator != (const xcbuffer& other) const;
+		bool		operator <  (const xcbuffer& other) const;
+		bool		operator <= (const xcbuffer& other) const;
+		bool		operator >  (const xcbuffer& other) const;
+		bool		operator >= (const xcbuffer& other) const;
+
+		xcbuffer	operator () (s64 from, s64 to) const;
+
+		s64			m_len;
+		xbyte const* m_const;
+	};
+
+	class xbuffer : public xcbuffer
+	{
+	public:
+		inline		xbuffer() : xcbuffer(), m_mutable((xbyte*)&m_len) { }
+		inline		xbuffer(s64 len, xbyte* data) : xcbuffer(len, data), m_mutable(data) { reset(0); }
 
 		void		reset(xbyte fill);
 		void		clear();
 
-		s32			compare(const xbuffer& other) const;
-
-		xbuffer&	operator = (const xbuffer& other);
-
-		bool		operator == (const xbuffer& other) const;
-		bool		operator != (const xbuffer& other) const;
-
-		xbyte&		operator [] (s64 i);
-		xbyte		operator [] (s64 i) const;
-
+		xbuffer&	operator = (const xcbuffer& other);
 		xbuffer		operator () (s64 from, s64 to) const;
 
-		s64			m_len;
-		xbyte*		m_data;
+		xbyte*		m_mutable;
 	};
 
 	template<s64 L>
@@ -51,8 +58,12 @@ namespace xcore
 	{
 		enum {SIZE=L};
 	public:
-		xbyte		m_data[len];
-		inline		name() : xbuffer(len, m_data) {}
+		xbyte		m_data[SIZE];
+
+		inline		xbytes() : xbuffer(SIZE, m_data) {}
+
+		xbytes<L>&	operator = (const xcbuffer& other) { this->xbuffer::operator=(other); return *this; }
+		xbuffer		operator () (s64 from, s64 to) const { return this->xbuffer::operator()(from, to); }
 	};
 
 	// Inline functions
@@ -65,7 +76,7 @@ namespace xcore
 	class xbinary_reader
 	{
 	public:
-		inline				xbinary_reader(xcbuffer& _buffer) : cursor_(0), buffer_(_buffer) {}
+		inline				xbinary_reader(xcbuffer const& _buffer) : cursor_(0), buffer_(_buffer) {}
 
 		u32					get_size() const;
 
@@ -88,7 +99,7 @@ namespace xcore
 
 		bool				read_data(xbuffer& buf);
 		bool				view_data(u32 size, xcbuffer& buf);
-		bool				view_string(xcuchars& str);
+		bool				view_string(u32 size, const char*& str, const char*& end);
 
 	protected:
 		u32					cursor_;
@@ -122,7 +133,7 @@ namespace xcore
 
 		u32					write_data(xbuffer const& cbuf);
 		u32					write_data(xcbuffer const& cbuf);
-		u32					write_string(xcuchars const& str);
+		u32					write_string(char const* str, char const* end);
 
 		xbinary_writer		operator () (s32 length) const;		// For writing something in the future you can remember this place - length
 
@@ -130,6 +141,154 @@ namespace xcore
 		u32					cursor_;
 		xbuffer				buffer_;
 	};
+
+
+	inline s32			xcbuffer::compare(const xcbuffer& other) const
+	{
+		if (size() < other.size())
+			return -1;
+		if (size() > other.size())
+			return 1;
+		for (s64 i = 0; i < size(); ++i)
+		{
+			if (m_const[i] < other.m_const[i])
+				return -1;
+			else if (m_const[i] > other.m_const[i])
+				return 1;
+		}
+		return 0;
+	}
+
+	inline bool		xcbuffer::operator == (const xcbuffer& other) const
+	{
+		if (size() < other.size())
+			return false;
+		if (size() > other.size())
+			return false;
+		for (s64 i = 0; i < size(); ++i)
+		{
+			if (m_const[i] != other.m_const[i])
+				return false;
+		}
+		return true;
+	}
+
+	inline bool		xcbuffer::operator != (const xcbuffer& other) const
+	{
+		if (size() < other.size())
+			return true;
+		if (size() > other.size())
+			return true;
+		for (s64 i = 0; i < size(); ++i)
+		{
+			if (m_const[i] != other.m_const[i])
+				return true;
+		}
+		return false;
+	}
+
+	inline bool		xcbuffer::operator < (const xcbuffer& other) const
+	{
+		if (size() < other.size())
+			return true;
+		if (size() > other.size())
+			return false;
+		for (s64 i = 0; i < size(); ++i)
+		{
+			if (m_const[i] >= other.m_const[i])
+				return false;
+		}
+		return true;
+	}
+
+	inline bool		xcbuffer::operator <= (const xcbuffer& other) const
+	{
+		if (size() < other.size())
+			return true;
+		if (size() > other.size())
+			return false;
+		for (s64 i = 0; i < size(); ++i)
+		{
+			if (m_const[i] > other.m_const[i])
+				return false;
+		}
+		return true;
+	}
+
+	inline bool		xcbuffer::operator > (const xcbuffer& other) const
+	{
+		if (size() < other.size())
+			return false;
+		if (size() > other.size())
+			return true;
+		for (s64 i = 0; i < size(); ++i)
+		{
+			if (m_const[i] <= other.m_const[i])
+				return false;
+		}
+		return true;
+	}
+
+	inline bool		xcbuffer::operator >= (const xcbuffer& other) const
+	{
+		if (size() < other.size())
+			return false;
+		if (size() > other.size())
+			return true;
+		for (s64 i = 0; i < size(); ++i)
+		{
+			if (m_const[i] < other.m_const[i])
+				return false;
+		}
+		return true;
+	}
+
+	inline xcbuffer		xcbuffer::operator () (s64 from, s64 to) const
+	{
+		if (from < 0 || from >= to || from >= size())
+			return xcbuffer();
+		if (to >= size())
+			return xcbuffer();
+		return xcbuffer(to - from, m_const + from);
+	}
+
+
+
+
+
+
+
+
+	inline void			xbuffer::reset(xbyte fill)
+	{
+		for (u32 i = 0; i < size(); ++i)
+			m_mutable[i] = fill;
+	}
+
+	inline void			xbuffer::clear()
+	{
+		for (u32 i = 0; i < size(); ++i)
+			m_mutable[i] = 0;
+	}
+
+	inline xbuffer&	xbuffer::operator = (const xcbuffer& other)
+	{
+		s64 i = 0;
+		for (; i < size() && i < other.size(); ++i)
+			m_mutable[i] = other.m_const[i];
+		for (; i < size(); ++i)
+			m_mutable[i] = 0;
+		return *this;
+	}
+
+	inline xbuffer		xbuffer::operator () (s64 from, s64 to) const
+	{
+		if (from < 0 || from >= to || from >= size())
+			return xbuffer();
+		if (to >= size())
+			return xbuffer();
+		return xbuffer(to - from, m_mutable + from);
+	}
 
 }
 

@@ -20,6 +20,8 @@ namespace xcore
 		typedef			const uchar*			pcrune;
 		typedef			xuchars					runes;
 		typedef			xcuchars				crunes;
+		typedef			xuchars_iterator		runes_iterator;
+		typedef			xuchars_const_iterator	runes_const_iterator;
 
 		inline bool		has_fixed_size_rune() { return true; }
 		inline s32		get_fixed_sizeof_rune() { return sizeof(rune); }
@@ -97,13 +99,8 @@ namespace xcore
 		bool			starts_with(crunes const& str, uchar32 start);
 		bool			starts_with(crunes const& str, crunes const& start);
 
-		bool			ends_with(crunes const& str, uchar32 end_char);
-		bool			ends_with(crunes const& str, crunes const& end);
-
 		uchar32			first_char(crunes const& str);
-		uchar32			last_char(crunes const& str);
-		inline uchar32	first_char(runes const& str) { return first_char(str.cchars()); }
-		inline uchar32	last_char(runes const& str) { return last_char(str.cchars()); }
+		inline uchar32	first_char(runes const& str) { return first_char(str); }
 
 		s32				cprintf(crunes const& format, X_VA_ARGS_16_DEF);
 		s32				vcprintf(crunes const& format, const x_va_list& args);

@@ -29,29 +29,28 @@ namespace xcore
 		uchar32			peek(xcuchar8s const & str);
 		uchar32			peek(xcuchar32s const & str);
 
-		uchar32			read(const uchar*  & str);
-		uchar32			read(const uchar8* & str);
-		uchar32			read(const uchar32*& str);
+		uchar32			read(const uchar*  & str, const uchar* end);
+		uchar32			read(const uchar8* & str, const uchar8* end);
+		uchar32			read(const uchar32*& str, const uchar32* end);
 
-		uchar32			read(uchar*  & str);
-		uchar32			read(uchar8* & str);
-		uchar32			read(uchar16* & str);
-		uchar32			read(uchar32*& str);
+		uchar32			read(uchar*  & str, const uchar* end);
+		uchar32			read(uchar8* & str, const uchar8* end);
+		uchar32			read(uchar32*& str, const uchar32* end);
+
+		uchar32			read(uchar16*& str, const uchar16* end);
 
 		uchar32			read(xcuchars & str);
 		uchar32			read(xcuchar8s & str);
 		uchar32			read(xcuchar32s & str);
 
-		void			write(uchar32 c, uchar*  & str);
-		void			write(uchar32 c, uchar8* & str);
-		void			write(uchar32 c, uchar16* & str);
-		void			write(uchar32 c, uchar32*& str);
+		void			write(uchar32 c, uchar*  & str, const uchar  * end);
+		void			write(uchar32 c, uchar8* & str, const uchar8 * end);
+		void			write(uchar32 c, uchar16*& str, const uchar16* end);
+		void			write(uchar32 c, uchar32*& str, const uchar32* end);
 
-		bool			write(uchar32 c, xuchars& str);
-		bool			write(uchar32 c, xuchar8s& str);
+		bool			write(uchar32 c, xuchars  & str);
+		bool			write(uchar32 c, xuchar8s & str);
 		bool			write(uchar32 c, xuchar32s& str);
-
-		bool			write(uchar32 c, uchar16*& str, uchar16* end);
 
 		void			copy(xcuchars   const & sstr, xuchars& dstr, ETermType term_type = TERMINATOR_WRITE);
 		void			copy(xcuchar32s const & sstr, xuchars& dstr, ETermType term_type = TERMINATOR_WRITE);
@@ -171,8 +170,8 @@ namespace xcore
 
 		uchar32			first_char(crunes const& str);
 		uchar32			last_char(crunes const& str);
-		inline uchar32	first_char(runes const& str) { return first_char(str.cchars()); }
-		inline uchar32	last_char(runes const& str) { return last_char(str.cchars()); }
+		inline uchar32	first_char(runes const& str) { return first_char(str); }
+		inline uchar32	last_char(runes const& str) { return last_char(str); }
 
 		s32				cprintf(crunes const& format, X_VA_ARGS_16_DEF);
 		s32				vcprintf(crunes const& format, const x_va_list& args);
@@ -276,8 +275,8 @@ namespace xcore
 
 		uchar32			first_char(crunes const& str);
 		uchar32			last_char(crunes const& str);
-		inline uchar32	first_char(runes const& str) { return first_char(str.cchars()); }
-		inline uchar32	last_char(runes const& str) { return last_char(str.cchars()); }
+		inline uchar32	first_char(runes const& str) { return first_char(str); }
+		inline uchar32	last_char(runes const& str) { return last_char(str); }
 
 		s32				cprintf(crunes const& format, X_VA_ARGS_16_DEF);
 		s32				vcprintf(crunes const& format, const x_va_list& args);

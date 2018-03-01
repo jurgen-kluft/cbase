@@ -110,9 +110,9 @@ namespace xcore
 		//
 		// Create the report to print
 		//
-		xuchars1024 report;
+		xucharz<1024> report;
 		xcuchars fmt("*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n");
-		ascii::sprintf(report.chars(), fmt, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
+		ascii::sprintf(report, fmt, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
 
 		//
 		// Dump the scope info

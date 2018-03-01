@@ -4,7 +4,7 @@
 static bool				read_char(runes& src, uchar32& out_c)
 {
 	s32 const l = peek_char(src, out_c);
-	src.m_str += l;
+	src.m_const_str += l;
 	return l > 0;
 }
 
@@ -12,7 +12,7 @@ static bool				read_char(runes& src, uchar32& out_c)
 static bool				read_char(crunes& src, uchar32& out_c)
 {
 	s32 l = peek_char(src, out_c);
-	src.m_str += l;
+	src.m_const_str += l;
 	return l > 0;
 }
 
@@ -24,7 +24,7 @@ s32		len(prune str, prune end)
 	s32 l = 0;
 	while (end == NULL || str < end)
 	{
-		uchar32 c = utf::read(str);
+		uchar32 c = utf::read(str, end);
 		if (c == '\0')
 			break;
 		l++;
@@ -35,22 +35,34 @@ s32		len(prune str, prune end)
 s32		len(pcrune str, pcrune end)
 {
 	s32 l = 0;
-	while (end == NULL || str < end)
+	if (end == NULL)
 	{
-		uchar32 c = utf::read(str);
-		if (c == '\0')
-			break;
-		l++;
+		while (true)
+		{
+			uchar32 c = utf::read(str, end);
+			if (c == '\0')
+				break;
+			l++;
+		}
+	}
+	else {
+		while (str < end)
+		{
+			uchar32 c = utf::read(str, end);
+			if (c == '\0')
+				break;
+			l++;
+		}
 	}
 	return l;
 }
 
 prune			endof(prune str, prune end)
 {
-	while (end == NULL || str < end)
+	while (str < end)
 	{
 		prune s = str;
-		uchar32 c = utf::read(s);
+		uchar32 c = utf::read(s, end);
 		if (c == '\0')
 			break;
 		str = s;
@@ -60,10 +72,10 @@ prune			endof(prune str, prune end)
 
 pcrune			endof(pcrune str, pcrune end)
 {
-	while (end == NULL || str < end)
+	while (str < end)
 	{
 		pcrune s = str;
-		uchar32 c = utf::read(s);
+		uchar32 c = utf::read(s, end);
 		if (c == '\0')
 			break;
 		str = s;
@@ -74,12 +86,12 @@ pcrune			endof(pcrune str, pcrune end)
 void		copy(runes& _dest, crunes const& _src, ECopyType type)
 {
 	crunes src = _src;
-	_dest.m_end = _dest.m_str;
-	while (_dest.m_end < _dest.m_eos)
+	_dest.reset();
+	while (_dest.can_write())
 	{
-		if (src.m_end != NULL && src.m_str == src.m_end)
+		if (src.m_const_end != NULL && src.m_const_str == src.m_const_end)
 		{
-			if (type == COPY_AND_WRITE_MATCHING_TERMINATOR && *src.m_end == '\0')
+			if (type == COPY_AND_WRITE_MATCHING_TERMINATOR && *src.m_const_end == '\0')
 				write_char('\0', _dest);
 			break;
 		}
@@ -92,7 +104,7 @@ void		copy(runes& _dest, crunes const& _src, ECopyType type)
 		}
 		write_char(c, _dest);
 	}
-	if (_dest.m_end < _dest.m_eos && type == COPY_AND_WRITE_TERMINATOR)
+	if (_dest.can_write() && type == COPY_AND_WRITE_TERMINATOR)
 		write_char('\0', _dest);
 }
 
@@ -289,8 +301,8 @@ crunes	find_one_of(crunes const& _str, crunes const& _set, ECmpMode mode)
 void	replace(runes& _str, crunes const& _replace)
 {
 	// The logic here is based on memory copy, we do not consider characters
-	s32 const selected_len = (s32)((xbyte const*)_str.m_end - (xbyte const*)_str.m_str);
-	s32 const replace_len = (s32)((xbyte const*)_replace.m_end - (xbyte const*)_replace.m_str);
+	s32 const selected_len = (s32)((xbyte const*)_str.m_end - (xbyte const*)_str.m_const_str);
+	s32 const replace_len = (s32)((xbyte const*)_replace.m_const_end - (xbyte const*)_replace.m_const_str);
 
 	prune end = NULL;
 	if (selected_len < replace_len)
@@ -306,7 +318,7 @@ void	replace(runes& _str, crunes const& _replace)
 		while (dst > (xbyte*)_str.m_end)
 			*dst-- = *src--;
 
-		end = (prune)((xbyte*)_str.m_str + selected_len + move_len);		// Update str_end
+		end = (prune)((xbyte*)_str.m_const_str + selected_len + move_len);		// Update str_end
 	}
 	else if (selected_len > replace_len)
 	{
@@ -317,21 +329,22 @@ void	replace(runes& _str, crunes const& _replace)
 		while (src < (xbyte const*)_str.m_eos)
 			*dst++ = *src++;
 
-		end = (prune)((xbyte*)_str.m_str + selected_len - move_len);		// Update str_end
+		end = (prune)((xbyte*)_str.m_const_str + selected_len - move_len);		// Update str_end
 	}
 	else
 	{
-		end = (prune)(_str.m_str + selected_len);
+		end = (prune)(_str.m_const_str + selected_len);
 	}
 
 	// Replace
-	xbyte const* src = (xbyte const*)_replace.m_str;
-	xbyte const* src_end = (xbyte const*)_replace.m_str + replace_len;
-	xbyte* dst = (xbyte*)_str.m_str;
+	xbyte const* src = (xbyte const*)_replace.m_const_str;
+	xbyte const* src_end = (xbyte const*)_replace.m_const_str + replace_len;
+	xbyte* dst = (xbyte*)_str.m_const_str;
 	while (src < src_end)
 		*dst++ = *src++;
 
 	_str.m_end = end;
+	_str.m_const_end = end;
 }
 
 s32	compare(crunes const& _lstr, crunes const& _rstr, ECmpMode mode)
@@ -756,7 +769,7 @@ bool		ends_with(crunes const& _str, uchar32 end_char)
 	if (!str.is_empty())
 	{
 		if (has_fixed_size_rune())
-			str.m_str = str.m_end - 1;
+			str.m_const_str = str.m_const_end - 1;
 
 		// Need to fast-forward to the last character
 		uchar32 p = 0xffffffff;
@@ -778,7 +791,7 @@ bool		ends_with(crunes const& _str, crunes const& _end)
 			return false;
 
 		if (has_fixed_size_rune())
-			str.m_str = str.m_end - end.size();
+			str.m_const_str = str.m_const_end - end.size();
 
 		uchar32 c1, c2;
 		while (read_char(str, c1) && read_char(end, c2)) {
@@ -802,7 +815,7 @@ uchar32			last_char(crunes const& _str)
 	crunes str = _str;
 	if (has_fixed_size_rune())
 	{
-		str.m_str = str.m_end - 1;
+		str.m_const_str = str.m_const_end - 1;
 	}
 	// Fast-forward to end of str, keep track of previous character
 	uchar32 c, pc = '\0';

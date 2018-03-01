@@ -23,32 +23,32 @@ namespace xcore
 	struct AsciiBuffer
 	{
 		inline			AsciiBuffer(char * str, u32 len) : mStr((uchar*)str), mEnd((uchar*)str + len), mEos((uchar*)str + len) { }
-		inline			AsciiBuffer(char * str, char * end) : mStr((uchar*)str), mEnd((uchar *)end), mEos((uchar *)end) { }
-		inline			AsciiBuffer(char * str, char * end, char * eos) : mStr((uchar *)str), mEnd((uchar *)end), mEos((uchar *)eos) { }
+		inline			AsciiBuffer(char * str, char const * end) : mStr((uchar*)str), mEnd((uchar *)end), mEos((uchar *)end) { }
+		inline			AsciiBuffer(char * str, char const * end, char const * eos) : mStr((uchar *)str), mEnd((uchar *)end), mEos((uchar *)eos) { }
 
 		uchar *			mStr;
-		uchar *			mEnd;
-		uchar *			mEos;
+		uchar const *	mEnd;
+		uchar const *	mEos;
 	};
 
 	struct Utf8Buffer
 	{
 		inline			Utf8Buffer(uchar8 * str, u32 len) : mStr(str), mEnd(str + len), mEos(str + len) { }
-		inline			Utf8Buffer(uchar8 * str, uchar8 * end) : mStr(str), mEnd(end), mEos(end) { }
-		inline			Utf8Buffer(uchar8 * str, uchar8 * end, uchar8 * eos) : mStr(str), mEnd(end), mEos(eos) { }
+		inline			Utf8Buffer(uchar8 * str, uchar8 const * end) : mStr(str), mEnd(end), mEos(end) { }
+		inline			Utf8Buffer(uchar8 * str, uchar8 const * end, uchar8 const * eos) : mStr(str), mEnd(end), mEos(eos) { }
 		uchar8 *		mStr;
-		uchar8 *		mEnd;
-		uchar8 *		mEos;
+		uchar8 const *	mEnd;
+		uchar8 const *	mEos;
 	};
 
 	struct Utf32Buffer
 	{
 		inline			Utf32Buffer(uchar32 * str, u32 len) : mStr(str), mEnd(str + len), mEos(str + len) { }
-		inline			Utf32Buffer(uchar32 * str, uchar32 * end) : mStr(str), mEnd(end), mEos(end) { }
-		inline			Utf32Buffer(uchar32 * str, uchar32 * end, uchar32 * eos) : mStr(str), mEnd(end), mEos(eos) { }
+		inline			Utf32Buffer(uchar32 * str, uchar32 const * end) : mStr(str), mEnd(end), mEos(end) { }
+		inline			Utf32Buffer(uchar32 * str, uchar32 const * end, uchar32 const * eos) : mStr(str), mEnd(end), mEos(eos) { }
 		uchar32 *		mStr;
-		uchar32 *		mEnd;
-		uchar32 *		mEos;
+		uchar32 const *	mEnd;
+		uchar32 const *	mEos;
 	};
 
 	struct AsciiConstBuffer
@@ -137,7 +137,7 @@ namespace xcore
 		{
 			uchar8* ptr = b.mStr;
 			while (ptr < b.mEnd)
-				utf::write(mFill, ptr);
+				utf::write(mFill, ptr, b.mEnd);
 		}
 
 		virtual void		Do(Utf32Buffer b)
@@ -186,11 +186,11 @@ namespace xcore
 				uchar8* ptr = b.mStr + (b.mEnd - b.mStr) - char_len;
 				while (ptr >= b.mStr)
 				{
-					uchar32 c = utf::read(ptr);
+					uchar32 c = utf::read(ptr, b.mEnd);
 					if (c != mFind)
 						break;
 					ptr -= char_len;
-					utf::write(mReplace, ptr);
+					utf::write(mReplace, ptr, b.mEnd);
 				}
 			}
 		}
@@ -237,7 +237,7 @@ namespace xcore
 			uchar8 const* src = b.mStr;
 			while (src < b.mEnd)
 			{
-				uchar32 c = utf::read(src);
+				uchar32 c = utf::read(src, b.mEnd);
 				mWriter->Write(c);
 			}
 		}
@@ -282,7 +282,7 @@ namespace xcore
 			uchar8 const* src = b.mStr;
 			while (src < b.mEnd)
 			{
-				uchar32 c = utf::read(src);
+				uchar32 c = utf::read(src, b.mEnd);
 				if (c == mChar)
 				{
 					mFound = true;
@@ -340,7 +340,7 @@ namespace xcore
 			uchar8 const* src = b.mStr;
 			while (src < b.mEnd)
 			{
-				uchar32 c = utf::read(src);
+				uchar32 c = utf::read(src, b.mEnd);
 				CharBufferContainsChar contains(c);
 				mOneOf->Iterate(&contains);
 				if (contains.Found())
@@ -388,8 +388,8 @@ namespace xcore
 
 		virtual void	Reset()
 		{
-			mStr.m_end = mStr.m_str;
-			while (!mStr.is_full())
+			mStr.reset();
+			while (mStr.can_write())
 				*mStr.m_end++ = ' ';
 			mBegin = mStr.m_end;
 			mEnd = mStr.m_end;
@@ -401,7 +401,7 @@ namespace xcore
 
 		virtual bool	Write(uchar32 c)
 		{
-			if (mBegin > mStr.m_str)
+			if (mBegin > mStr.m_const_str)
 			{
 				mBegin -= 1;
 				*mBegin = c;
@@ -586,9 +586,9 @@ namespace xcore
 		{
 			if ((mCursor + 5) >= mCache.mEnd)
 				Flush();
-			utf::write(c, mCursor);
+			utf::write(c, mCursor, mCache.mEnd);
 			uchar8* end = mCursor;
-			utf::write('\0', end);
+			utf::write('\0', end, mCache.mEnd);
 			return true;
 		}
 
@@ -703,7 +703,7 @@ namespace xcore
 	class CharWriterToAsciiBuffer : public CharWriter
 	{
 	public:
-		inline			CharWriterToAsciiBuffer(uchar* str, uchar * str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
+		inline			CharWriterToAsciiBuffer(char* str, char const * str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
 		inline			CharWriterToAsciiBuffer(AsciiBuffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd), mCount(0) { }
 
 		virtual u64		Count() const { return mCount; }
@@ -761,9 +761,9 @@ namespace xcore
 		}
 
 		u64				mCount;
-		uchar *			mStr;
-		uchar *			mPtr;
-		uchar *			mEnd;
+		char *			mStr;
+		char *			mPtr;
+		char const *	mEnd;
 
 	private:
 		bool			Write_Prologue(uchar32& c) const
@@ -795,7 +795,7 @@ namespace xcore
 	class CharWriterToUtf8Buffer : public CharWriter
 	{
 	public:
-		inline			CharWriterToUtf8Buffer(uchar8* str, uchar8* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
+		inline			CharWriterToUtf8Buffer(uchar8* str, uchar8 const* str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
 		inline			CharWriterToUtf8Buffer(Utf8Buffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd), mCount(0) { }
 
 		virtual u64		Count() const { return mCount; }
@@ -854,13 +854,13 @@ namespace xcore
 		u64				mCount;
 		uchar8*			mStr;
 		uchar8*			mPtr;
-		uchar8*			mEnd;
+		uchar8 const*	mEnd;
 	};
 
 	class CharWriterToUtf32Buffer : public CharWriter
 	{
 	public:
-		inline			CharWriterToUtf32Buffer(uchar32 * str, uchar32 * str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
+		inline			CharWriterToUtf32Buffer(uchar32 * str, uchar32 const * str_end) : mStr(str), mPtr(str), mEnd(str_end), mCount(0) { }
 		inline			CharWriterToUtf32Buffer(Utf32Buffer str) : mStr(str.mStr), mPtr(str.mStr), mEnd(str.mEnd), mCount(0) { }
 
 		virtual u64		Count() const { return mCount; }
@@ -917,7 +917,7 @@ namespace xcore
 		u64				mCount;
 		uchar32 *		mStr;
 		uchar32 *		mPtr;
-		uchar32 *		mEnd;
+		uchar32 const *	mEnd;
 	};
 
 	template<int SIZE>
@@ -1130,7 +1130,7 @@ namespace xcore
 				return c;
 			xcuchar8s s(mPtr, mEnd);
 			c = utf::read(s);
-			mPtr = s.m_str;
+			mPtr = s.m_const_str;
 			return c;
 		}
 
@@ -1141,7 +1141,7 @@ namespace xcore
 				return c;
 			xcuchar8s s(mPtr, mEnd);
 			c = utf::read(s);
-			mPtr = s.m_str;
+			mPtr = s.m_const_str;
 			return c;
 		}
 

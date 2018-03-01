@@ -61,23 +61,23 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 		UNITTEST_TEST(copy_ascii_to_u32)
 		{
 			xcuchars src("test");
-			CHECK_EQUAL('t', src[0]);
-			CHECK_EQUAL('e', src[1]);
+			CHECK_EQUAL('t', src.str()[0]);
+			CHECK_EQUAL('e', src.str()[1]);
 
-			xuchar32s16 dst;
-			utf::copy(src, dst.chars());
+			xuchar32z<16> dst;
+			utf::copy(src, dst);
 			
-			CHECK_EQUAL('t', dst[0]);
+			CHECK_EQUAL('t', dst.str()[0]);
 		}
 
 		UNITTEST_TEST(read1_utf8)
 		{
 			xcuchar8s str1((const uchar8*)"test");
-			xcuchars str11((const uchar*)	"test");
+			xcuchars str11((const uchar*)"test");
 			for (s32 i=0; i<5; ++i)
 			{
 				uchar32 ch = utf::read(str1);
-				CHECK_EQUAL((uchar32)str11.m_str[i], ch);
+				CHECK_EQUAL((uchar32)str11.str()[i], ch);
 				CHECK_EQUAL(1, utf::size(ch));
 			}
 
