@@ -7,14 +7,12 @@ namespace xcore
 {
 	struct xnode_t
 	{
-		s32			red;		// Color (1=red, 0=black) 
-		xnode_t *	link[2];	// Left (0) and right (1) links 
-		void*		data;		// User-defined content 
+		s32				red;		// Color (1=red, 0=black) 
+		xnode_t *		link[2];	// Left (0) and right (1) links 
+		void *			data;		// User-defined content 
 	};
 
 	typedef s32		(*cmp_f) (const void *p1, const void *p2);
-	typedef void *	(*dup_f) (void *p);
-	typedef void	(*rel_f) (void *p);
 
 	struct xiterator_t
 	{
@@ -43,12 +41,12 @@ namespace xcore
 		static xnode_t *	rotate_single(xnode_t *root, s32 dir);
 		static xnode_t *	rotate_double(xnode_t *root, s32 dir);
 
-		static xnode_t *	node_new(xtree *tree, void *data);
-		static void			tree_clear(xtree *tree);
+		static xnode_t *	node_new(xtree *tree, void * data);
+		static bool			tree_clear(xtree *tree, void *& data);
 
-		static bool			tree_find(xtree *tree, void *data);
-		static s32			tree_insert(xtree *tree, void *data);
-		static s32			tree_erase(xtree *tree, void *data);
+		static bool			tree_find(xtree *tree, void * data);
+		static s32			tree_insert(xtree *tree, void * data);
+		static s32			tree_remove(xtree *tree, void * data);
 
 		static xiterator_t *iterator_new(x_iallocator* allocator);
 		static void			iterator_delete(xiterator_t *trav);
@@ -121,7 +119,7 @@ namespace xcore
 	//   be freed using the same tree's rel function. The returned pointer
 	//   must be freed using C's free function
 	// </remarks>
-	xnode_t *	xtree_internal::node_new(xtree *tree, void *data)
+	xnode_t *	xtree_internal::node_new(xtree *tree, void * data)
 	{
 		xnode_t* rn = (xnode_t*)tree->m_node_allocator->allocate(sizeof(xnode_t), sizeof(void*));
 		if (rn == NULL)
@@ -135,39 +133,60 @@ namespace xcore
 	}
 
 	// <summary>
-	//   Releases a valid red black tree
+	//   Releases a valid red black tree iteratively
+	//   You will have to call 'clear' repeatedly until
+	//   you get 'true', this is when the tree is empty.
 	// <summary>
 	// <param name="tree">The tree to release</param>
-	void xtree_internal::tree_clear(xtree *tree)
+	bool xtree_internal::tree_clear(xtree *tree, void *& data)
 	{
-		xnode_t *it = tree->m_root;
-		xnode_t *save;
+		data = NULL;
+		if (tree->m_root == NULL)
+			return true;
 
-		// Rotate away the left links so that
-		// we can treat this like the destruction
-		// of a linked list
-		while (it != NULL) 
+		xnode_t* todelete = tree->m_root;
+		if (tree->m_root->link[0] == NULL)
 		{
-			if (it->link[0] == NULL) 
+			tree->m_root = tree->m_root->link[1];
+		}
+		else if (tree->m_root->link[1] == NULL)
+		{
+			tree->m_root = tree->m_root->link[0];
+		}
+		else 
+		{
+			// We have left and right branches
+			// Take right branch and place it
+			// somewhere down the left branch
+			xnode_t* branch = tree->m_root->link[1];
+			tree->m_root->link[1] = NULL;
+
+			// Find a node in the left branch that does not
+			// have both a left and right branch and place
+			// our branch there.
+			xnode_t* iter = tree->m_root->link[0];
+			while (iter->link[0] != NULL && iter->link[1] != NULL)
 			{
-				// No left links, just kill the node and move on
-				save = it->link[1];
-				if (tree->m_item_allocator!=NULL)
-					tree->m_item_allocator->deallocate(it->data);
-				tree->m_node_allocator->deallocate(it);
+				iter = iter->link[0];
 			}
-			else 
+			if (iter->link[0] == NULL)
 			{
-				// Rotate away the left link and check again 
-				save = it->link[0];
-				it->link[0] = save->link[1];
-				save->link[1] = it;
+				iter->link[0] = branch;
+			}
+			else if (iter->link[1] == NULL)
+			{
+				iter->link[1] = branch;
 			}
 
-			it = save;
+			tree->m_root = tree->m_root->link[0];
 		}
 
-		tree->m_root = NULL;
+		data = todelete->data;
+		tree->m_node_allocator->deallocate(todelete);
+		todelete = NULL;
+		tree->m_size -= 1;
+
+		return false;
 	}
 
 	// <summary>
@@ -180,7 +199,7 @@ namespace xcore
 	//   A pointer to the data value stored in the tree,
 	//   or a null pointer if no data could be found
 	// </returns>
-	bool	xtree_internal::tree_find(xtree *tree, void *data)
+	bool	xtree_internal::tree_find(xtree *tree, void * data)
 	{
 		xnode_t *it = tree->m_root;
 
@@ -209,16 +228,17 @@ namespace xcore
 	//    1 if the value was inserted successfully,
 	//    0 if the insertion failed for any reason
 	// </returns>
-	s32		xtree_internal::tree_insert(xtree *tree, void *data)
+	s32		xtree_internal::tree_insert(xtree *tree, void * data)
 	{
+		s32 result = 0;
 		if (tree->m_root == NULL)
 		{
 			// We have an empty tree; attach the
 			// new node directly to the root
 			tree->m_root = node_new(tree, data);
-
+			result = 1;
 			if (tree->m_root == NULL)
-				return 0;
+				return result;
 		}
 		else 
 		{
@@ -238,10 +258,11 @@ namespace xcore
 				if (q == NULL) 
 				{
 					// Insert a new node at the first null link 
+					result = 1;
 					p->link[dir] = q = node_new(tree, data);
 
 					if (q == NULL)
-						return 0;
+						return result;
 				}
 				else if (is_red(q->link[0]) && is_red(q->link[1]))
 				{
@@ -284,9 +305,11 @@ namespace xcore
 
 		// Make the root black for simplified logic 
 		tree->m_root->red = 0;
-		tree->m_size += 1;
-
-		return 1;
+		if (result == 1)
+		{
+			tree->m_size += 1;
+		}
+		return result;
 	}
 
 
@@ -304,7 +327,7 @@ namespace xcore
 	//    The most common failure reason should be
 	//    that the data was not found in the tree
 	// </remarks>
-	s32 xtree_internal::tree_erase(xtree *tree, void *data)
+	s32 xtree_internal::tree_remove(xtree *tree, void * data)
 	{
 		if (tree->m_root != NULL) 
 		{
@@ -380,11 +403,9 @@ namespace xcore
 			// Replace and remove the saved node
 			if (f != NULL) 
 			{
-				void* old_data = f->data;
+				void const* old_data = f->data;
 				f->data = q->data;
 				p->link[p->link[1] == q] = q->link[q->link[0] == NULL];
-				if (tree->m_item_allocator!=NULL)
-					tree->m_item_allocator->deallocate(old_data);
 				tree->m_node_allocator->deallocate(q);
 			}
 
@@ -598,18 +619,17 @@ namespace xcore
 	}
 
 
-	xtree::xtree(x_iallocator* node_allocator, x_iallocator* item_allocator)
+	xtree::xtree(x_iallocator* node_allocator)
 		: m_node_allocator(node_allocator)
-		, m_item_allocator(item_allocator)
 		, m_compare(&compare_void)
 		, m_root(NULL)
 		, m_size(0)
 	{
 	}
 
-	void			xtree::clear()
+	bool			xtree::clear(void *& data)
 	{
-		xtree_internal::tree_clear(this);
+		return xtree_internal::tree_clear(this, data);
 	}
 
 	bool			xtree::find(void * data)
@@ -622,9 +642,9 @@ namespace xcore
 		return xtree_internal::tree_insert(this, data);
 	}
 
-	s32				xtree::erase(void * data)
+	s32				xtree::remove(void * data)
 	{
-		return xtree_internal::tree_erase(this, data);
+		return xtree_internal::tree_remove(this, data);
 	}
 
 	bool			xtree::validate(const char*& error_str)
