@@ -76,7 +76,7 @@ namespace xcore
 		inline			xcuchars_t(T const* str);
 		inline			xcuchars_t(T const* str, T const* end);
 
-		typedef			xcuchars_t<T, R>					self;
+		typedef			xcuchars_t<T, R>					const_self;
 		typedef			xuchars_const_iterator_t<T, R>		const_iterator;
 
 		u32				size() const;
@@ -88,16 +88,16 @@ namespace xcore
 		const_iterator	end() const;
 
 		s32				compare(const T* other) const;
-		s32				compare(const self& other) const;
+		s32				compare(const const_self& other) const;
 
-		bool			operator == (const self& other) const;
-		bool			operator != (const self& other) const;
-		bool			operator <  (const self& other) const;
-		bool			operator <= (const self& other) const;
-		bool			operator >  (const self& other) const;
-		bool			operator >= (const self& other) const;
+		bool			operator == (const const_self& other) const;
+		bool			operator != (const const_self& other) const;
+		bool			operator <  (const const_self& other) const;
+		bool			operator <= (const const_self& other) const;
+		bool			operator >  (const const_self& other) const;
+		bool			operator >= (const const_self& other) const;
 
-		self			operator() (u32 from, u32 to) const;
+		const_self		operator() (u32 from, u32 to) const;
 
 		T const*		m_const_str;
 		T const*		m_const_end;
@@ -112,6 +112,7 @@ namespace xcore
 	{
 	public:
 		typedef			xuchars_iterator_t<T, R>		self;
+		typedef			xcuchars_t<T, R>				base;
 
 		inline			xuchars_iterator_t(T* str, T const* end) : m_str(str), m_end(end) {}
 
@@ -130,7 +131,7 @@ namespace xcore
 	};
 
 	template<typename T, typename R>
-	class xuchars_t : public xcuchars_t<T,R>
+	class xuchars_t : public xcuchars_t<T, R>
 	{
 	public:
 		xuchars_t();
@@ -328,7 +329,7 @@ namespace xcore
 		while (*m_end != '\0')
 			++m_end;
 		m_eos = m_end;
-		m_const_end = m_end;
+		base::m_const_end = m_end;
 	}
 	template<typename T, typename R>
 	inline				xuchars_t<T, R>::xuchars_t(T* str, T const* end)
@@ -356,9 +357,9 @@ namespace xcore
 	template<typename T, typename R>
 	inline void			xuchars_t<T, R>::reset()
 	{
-		m_end = (T*)m_const_str;
+		m_end = (T*)base::m_const_str;
 		m_end[0] = '\0';
-		m_const_end = m_end;
+		base::m_const_end = m_end;
 	}
 
 	template<typename T, typename R>
@@ -385,14 +386,14 @@ namespace xcore
 			*m_end++ = *src++;
 		if (m_end < m_eos)
 			*m_end = '\0';
-		m_const_end = m_end;
+		base::m_const_end = m_end;
 	}
 
 	template<typename T, typename R>
 	inline void			xuchars_t<T, R>::clone(const xuchars_t<T, R>& other)
 	{
-		m_const_str = other.m_const_str;
-		m_const_end = other.m_const_end;
+		base::m_const_str = other.m_const_str;
+		base::m_const_end = other.m_const_end;
 		m_end = other.m_end;
 		m_eos = other.m_eos;
 	}
@@ -401,25 +402,25 @@ namespace xcore
 	template<typename T, typename R>
 	inline xuchars_iterator_t<T, R>	xuchars_t<T, R>::begin()
 	{
-		return xuchars_iterator_t<T, R>((T*)m_const_str, m_const_end);
+		return xuchars_iterator_t<T, R>((T*)base::m_const_str, base::m_const_end);
 	}
 
 	template<typename T, typename R>
 	inline xuchars_iterator_t<T, R>	xuchars_t<T, R>::end()
 	{
-		return xuchars_iterator_t<T, R>((T*)m_const_end, m_const_end);
+		return xuchars_iterator_t<T, R>((T*)base::m_const_end, base::m_const_end);
 	}
 
 	template<typename T, typename R>
 	inline xuchars_const_iterator_t<T, R>	xuchars_t<T, R>::begin() const
 	{
-		return xuchars_const_iterator_t<T, R>((T*)m_const_str, m_const_end);
+		return xuchars_const_iterator_t<T, R>((T*)base::m_const_str, base::m_const_end);
 	}
 
 	template<typename T, typename R>
 	inline xuchars_const_iterator_t<T, R>	xuchars_t<T, R>::end() const
 	{
-		return xuchars_const_iterator_t<T, R>((T*)m_const_end, m_const_end);
+		return xuchars_const_iterator_t<T, R>((T*)base::m_const_end, base::m_const_end);
 	}
 
 	template<typename T, typename R>
@@ -430,7 +431,7 @@ namespace xcore
 			*m_end++ = other;
 			*m_end = '\0';
 		}
-		m_const_end = m_end;
+		base::m_const_end = m_end;
 		return *this;
 	}
 
@@ -441,7 +442,7 @@ namespace xcore
 		const T* end = other.m_const_end;
 		while (str < end && m_end < m_eos)
 		{
-			*m_end++ = *str.m_str++;
+			*m_end++ = *str++;
 		}
 		if (m_end < m_eos)
 		{
@@ -505,19 +506,19 @@ namespace xcore
 	template<typename T, typename R>
 	inline xuchars_t<T, R>	xuchars_t<T, R>::operator() (u32 from, u32 to) const
 	{
-		T* str = m_end - (m_end - m_const_str);
+		T* str = m_end - (m_end - base::m_const_str);
 		T const* eos = m_eos;
-		if (from <= to && to <= size())
+		if (from <= to && to <= base::size())
 		{
 			return xuchars_t<T, R>(str + from, str + to, m_eos);
 		}
-		else if (from <= size())
+		else if (from <= base::size())
 		{
-			return xuchars_t<T, R>(str + from, m_const_end, m_eos);
+			return xuchars_t<T, R>(str + from, base::m_const_end, m_eos);
 		}
 		else
 		{
-			from = size();
+			from = base::size();
 			return xuchars_t<T,R>(str + from, str + from, m_eos);
 		}
 	}

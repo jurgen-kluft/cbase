@@ -14,31 +14,32 @@ namespace xcore
 	const s32 ITERATE_PREORDER = 1;
 	const s32 ITERATE_SORTORDER = 2;
 	const s32 ITERATE_POSTORDER = 3;
-	const s32 ITERATE_LEVELORDER = 4;
 
-
-	//                            +-+
-	//                            |F|
-	//                         ___+-+___
-	//                       _/         \_
-	//                     _/             \_
-	//                   _/                 \_
-	//                +-+                     +-+
-	//                |B|                     |G|
-	//              _/+-+\_                   +-+
-	//             /       \                     \__
-	//          +-+         +-+                     \+-+
-	//          |A|         |D|                      |I|
-	//          +-+       _/+-+\                  __/+-+
-	//                   /      \                /
-	//                +-+        \+-+         +-+
-	//                |C|         |E|         |H|
-	//                +-+         +-+         +-+
-
-	// preorder: F B A D C E F I H
+	/* Red-Black Tree
+	 Inserted in the following order:
+	 a, b, c, d, e, f, g, h, i
+	                            +-+
+	                            |D|
+	                         ___+-+___
+	                       _/         \_
+	                     _/             \_
+	                   _/                 \_
+	                +-+                     +-+
+	                |B|                     |F|
+	              _/+-+\_                   +-+
+	             /       \               __/   \__
+	          +-+         +-+        +-+/         \+-+
+	          |A|         |C|        |E|           |H|
+	          +-+         +-+        +-+          /+-+\ 
+	                                             /     \ 
+	                                          +-+       +-+
+	                                          |G|       |I|
+	                                          +-+       +-+
+	*/
+	
+	// preorder:  D B A C F E H G I
 	// sortorder: A B C D E F G H I 
-	// postorder: A C E D B H I G F
-	// levelorder: F B G A D I C E H
+	// postorder: A C B E G I H F D
 
 	void		xtree_iterator::init_preorder()
 	{
@@ -61,13 +62,6 @@ namespace xcore
 		m_traversal = ITERATE_POSTORDER;
 	}
 
-	void		xtree_iterator::init_levelorder()
-	{
-		clear();
-		push(m_tree->m_root, TRAVERSE_LEFT);
-		m_traversal = ITERATE_LEVELORDER;
-	}
-
 	bool		xtree_iterator::iterate(void *& data)
 	{
 		switch (m_traversal)
@@ -78,8 +72,6 @@ namespace xcore
 			return sortorder(data);
 		case ITERATE_POSTORDER:
 			return postorder(data);
-		case ITERATE_LEVELORDER:
-			return levelorder(data);
 		}
 		return false;
 	}
@@ -93,16 +85,12 @@ namespace xcore
 		{
 			if (state == TRAVERSE_LEFT)
 			{
+				push(node, TRAVERSE_RIGHT);
 				if (node->get_left() != nullptr)
 				{
-					push(node, TRAVERSE_RIGHT);
 					push(node->get_left(), TRAVERSE_LEFT);
-					break;
 				}
-				else
-				{
-					state = TRAVERSE_RIGHT;
-				}
+				break;
 			}
 
 			if (state == TRAVERSE_RIGHT)
@@ -110,12 +98,7 @@ namespace xcore
 				xnode_t* right = node->get_right();
 				if (right != nullptr)
 				{
-					push(node, VISITED);
 					push(right, TRAVERSE_LEFT);
-				}
-				else
-				{
-					state = VISITED;
 				}
 			}
 			node = pop(state);
@@ -204,19 +187,6 @@ namespace xcore
 
 		if (node == nullptr)
 			return false;
-
-		data = node->data;
-		return true;
-	}
-
-	bool		xtree_iterator::levelorder(void *& data)
-	{
-		xnode_t* node = dequeue();
-		if (node == nullptr)
-			return false;
-
-		enqueue(node->get_left());
-		enqueue(node->get_right());
 
 		data = node->data;
 		return true;

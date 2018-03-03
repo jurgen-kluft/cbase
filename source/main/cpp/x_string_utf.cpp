@@ -159,7 +159,7 @@ namespace xcore
 		uchar32			read(const uchar32*& str, const uchar32* end)
 		{
 			uchar32 c = *str;
-			if (str != '\0' && (end == NULL || str < end))
+			if (c != '\0' && (end == NULL || str < end))
 			{
 				str++;
 			}
@@ -169,7 +169,7 @@ namespace xcore
 		uchar32			read(uchar*& str, const uchar* end)
 		{
 			uchar32 c = *str;
-			if (str != '\0' && (end == NULL || str < end))
+			if (c != '\0' && (end == NULL || str < end))
 			{
 				str++;
 			}
@@ -179,7 +179,7 @@ namespace xcore
 		uchar32			read(uchar8*& str, uchar8 const* end)
 		{
 			uchar32 c = *str;
-			if (str != '\0' && (end == NULL || str < end))
+			if (c != '\0' && (end == NULL || str < end))
 			{
 				const uchar8* cstr = str;
 				c = read(cstr, end);
@@ -190,10 +190,9 @@ namespace xcore
 
 		uchar32			read(uchar32*& str, const uchar32* end)
 		{
-			uchar32 c = '\0';
-			if (!is_eos(str) && (end == NULL || str < end))
+			uchar32 c = *str;
+			if (c != '\0' && (end == NULL || str < end))
 			{
-				c = str[0];
 				str++;
 			}
 			return c;

@@ -45,7 +45,8 @@ namespace xcore
 		uptr			link[2];	// Left (0) and right (1) links 
 	};
 
-
+	class xtree;
+	
 	struct xtree_iterator
 	{
 		enum EConfig { HEIGHT_LIMIT = 64 };		// Tallest allowable tree
@@ -53,7 +54,6 @@ namespace xcore
 		void		init_preorder();
 		void		init_sortorder();
 		void		init_postorder();
-		void		init_levelorder();
 
 		bool		iterate(void *& data);
 
@@ -66,7 +66,6 @@ namespace xcore
 		bool		preorder(void *& data);
 		bool		sortorder(void *& data);
 		bool		postorder(void *& data);
-		bool		levelorder(void *& data);
 
 		xnode_t*	pop(xbyte& state);
 		void		push(xnode_t*, xbyte state);

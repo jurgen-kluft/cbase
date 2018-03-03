@@ -101,7 +101,8 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 
 			s32 len = chars.size();
 			xbytes<32> rdata;
-			reader.read_data(rdata(0, len));
+			xbuffer rdatalen = rdata(0, len);
+			reader.read_data(rdatalen);
 
 			xcbuffer rviewdata;
 			reader.view_data(32, rviewdata);
