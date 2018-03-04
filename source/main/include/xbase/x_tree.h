@@ -52,10 +52,11 @@ namespace xcore
 		enum EConfig { HEIGHT_LIMIT = 64 };		// Tallest allowable tree
 
 		void		init_preorder();
-		void		init_sortorder();
+		void		init_sortorder(s32 dir);
 		void		init_postorder();
 
 		bool		iterate(void *& data);
+		bool		backwards(void *& data);
 
 	protected:
 		friend class xtree;
@@ -66,6 +67,8 @@ namespace xcore
 		bool		preorder(void *& data);
 		bool		sortorder(void *& data);
 		bool		postorder(void *& data);
+
+		bool		sortorder_backwards(void *& data);
 
 		xnode_t*	pop(xbyte& state);
 		void		push(xnode_t*, xbyte state);

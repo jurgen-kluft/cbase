@@ -217,10 +217,52 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 			xtree_iterator iterator;
 			tree.iterate(iterator);
-			iterator.init_sortorder();
+			iterator.init_sortorder(1);
 
 			s32 round = 0;
 			s32 sortorder[] = { a,b,c,d,e,f,g,h,i };
+			void* data;
+			while (iterator.iterate(data))
+			{
+				CHECK_EQUAL(sortorder[round++], *(s32*)data);
+			}
+
+			while (!tree.clear(data))
+			{
+			}
+		}
+
+		UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
+		{
+			xtree tree(gTestAllocator);
+			tree.set_cmp(compare_s32);
+
+			s32 a = 1;
+			s32 b = 2;
+			s32 c = 3;
+			s32 d = 4;
+			s32 e = 5;
+			s32 f = 6;
+			s32 g = 7;
+			s32 h = 8;
+			s32 i = 9;
+
+			CHECK_TRUE(tree.insert(&a));
+			CHECK_TRUE(tree.insert(&b));
+			CHECK_TRUE(tree.insert(&c));
+			CHECK_TRUE(tree.insert(&d));
+			CHECK_TRUE(tree.insert(&e));
+			CHECK_TRUE(tree.insert(&f));
+			CHECK_TRUE(tree.insert(&g));
+			CHECK_TRUE(tree.insert(&h));
+			CHECK_TRUE(tree.insert(&i));
+
+			xtree_iterator iterator;
+			tree.iterate(iterator);
+			iterator.init_sortorder(-1);
+
+			s32 round = 0;
+			s32 sortorder[] = { i,h,g,f,e,d,c,b,a };
 			void* data;
 			while (iterator.iterate(data))
 			{

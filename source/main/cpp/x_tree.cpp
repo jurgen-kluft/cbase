@@ -5,14 +5,13 @@
 
 namespace xcore
 {
-
-
 	const s32 TRAVERSE_LEFT = 0;
 	const s32 TRAVERSE_RIGHT = 1;
 	const s32 VISITED = 2;
 
 	const s32 ITERATE_PREORDER = 1;
-	const s32 ITERATE_SORTORDER = 2;
+	const s32 ITERATE_SORTORDER_FORWARDS = 2;
+	const s32 ITERATE_SORTORDER_BACKWARDS = 42;
 	const s32 ITERATE_POSTORDER = 3;
 
 	/* Red-Black Tree
@@ -48,11 +47,19 @@ namespace xcore
 		m_traversal = ITERATE_PREORDER;
 	}
 
-	void		xtree_iterator::init_sortorder()
+	void		xtree_iterator::init_sortorder(s32 dir)
 	{
 		clear();
-		push(m_tree->m_root, TRAVERSE_LEFT);
-		m_traversal = ITERATE_SORTORDER;
+		if (dir == 1)
+		{
+			push(m_tree->m_root, TRAVERSE_LEFT);
+			m_traversal = ITERATE_SORTORDER_FORWARDS;
+		}
+		else
+		{
+			push(m_tree->m_root, TRAVERSE_RIGHT);
+			m_traversal = ITERATE_SORTORDER_BACKWARDS;
+		}
 	}
 
 	void		xtree_iterator::init_postorder()
@@ -68,8 +75,10 @@ namespace xcore
 		{
 		case ITERATE_PREORDER:
 			return preorder(data);
-		case ITERATE_SORTORDER:
+		case ITERATE_SORTORDER_FORWARDS:
 			return sortorder(data);
+		case ITERATE_SORTORDER_BACKWARDS:
+			return sortorder_backwards(data);
 		case ITERATE_POSTORDER:
 			return postorder(data);
 		}
@@ -121,7 +130,6 @@ namespace xcore
 			if (state == TRAVERSE_LEFT)
 			{
 				push(node, TRAVERSE_RIGHT);
-				// Traverse fully to the left again
 				while (node->get_left() != nullptr)
 				{
 					node = node->get_left();
@@ -135,6 +143,42 @@ namespace xcore
 				{
 					push(node, VISITED);
 					push(right, TRAVERSE_LEFT);
+				}
+				break;
+			}
+			node = pop(state);
+		}
+
+		if (node == nullptr)
+			return false;
+
+		data = node->data;
+		return true;
+	}
+
+		bool		xtree_iterator::sortorder_backwards(void *& data)
+	{
+		xbyte state;
+		xnode_t* node = pop(state);
+
+		while (node != nullptr)
+		{
+			if (state == TRAVERSE_RIGHT)
+			{
+				push(node, TRAVERSE_LEFT);
+				while (node->get_right() != nullptr)
+				{
+					node = node->get_right();
+					push(node, TRAVERSE_LEFT);
+				}
+			}
+			else if (state == TRAVERSE_LEFT)
+			{
+				xnode_t* left = node->get_left();
+				if (left != nullptr)
+				{
+					push(node, VISITED);
+					push(left, TRAVERSE_RIGHT);
 				}
 				break;
 			}
@@ -869,7 +913,7 @@ namespace xcore
 	{
 		xtree_iterator iter;
 		iterate(iter);
-		iter.init_sortorder();
+		iter.init_sortorder(1);
 		return xtree_internal::tree_find(this, data, found, iter);
 	}
 
