@@ -17,77 +17,82 @@ namespace xcore
 {
 	class x_iallocator;
 
-	struct xnode_t
-	{
-		inline			xnode_t() : data(nullptr) { link[0] = link[1] = 0; }
-
-		void *			data;		// User-defined content 
-
-		void			clear() 
-		{
-			data = nullptr; 
-			link[0] = link[1] = 0;
-		}
-
-		xnode_t *		get_left() const { return (xnode_t*)link[0]; }
-		xnode_t *		get_right() const { uptr p = link[1] & ~(uptr)0x1; return (xnode_t*)p; }
-		void			set_left(xnode_t*n) { link[0] = (uptr)n; }
-		void			set_right(xnode_t*n) { uptr p = link[1] & (uptr)0x1; link[1] = p | ((uptr)n); }
-
-		xnode_t *		get_child(s32 child) const { uptr p = link[child] & (uptr)~0x1; return (xnode_t*)p; }
-		void			set_child(s32 child, xnode_t*n) { uptr p = link[child] & (uptr)0x1; link[child] = p | ((uptr)n); }
-
-		bool			is_red() const { uptr p = link[1] & (uptr)0x1; return p == 0; }
-		bool			is_black() const { uptr p = link[1] & (uptr)0x1; return p == 1; }
-		void			set_red() { uptr p = link[1] & (uptr)~0x1; link[1] = p; }
-		void			set_black() { uptr p = link[1] | (uptr)0x1; link[1] = p; }
-	private:
-		uptr			link[2];	// Left (0) and right (1) links 
-	};
-
-	class xtree;
-	
-	struct xtree_iterator
-	{
-		enum EConfig { HEIGHT_LIMIT = 64 };		// Tallest allowable tree
-
-		void		init_preorder();
-		void		init_sortorder(s32 dir);
-		void		init_postorder();
-
-		bool		iterate(void *& data);
-		bool		backwards(void *& data);
-
-	protected:
-		friend class xtree;
-		friend class xtree_internal;
-
-		void		clear();
-
-		bool		preorder(void *& data);
-		bool		sortorder(void *& data);
-		bool		postorder(void *& data);
-
-		bool		sortorder_backwards(void *& data);
-
-		xnode_t*	pop(xbyte& state);
-		void		push(xnode_t*, xbyte state);
-
-		void		enqueue(xnode_t*);
-		xnode_t*	dequeue();
-
-		xtree *		m_tree;						// Paired tree
-		s32			m_traversal;
-		xnode_t *	m_path[HEIGHT_LIMIT];		// Traversal path, node pointer
-		xbyte		m_state[HEIGHT_LIMIT];		// Traversal path, node state
-		u32			m_top;						// 'Top of stack' or 'Head of Queue'
-		u32			m_bottom;					// 'Tail of Queue'
-	};
-
 	class xtree
 	{
 	public:
 						xtree(x_iallocator* node_allocator);
+
+		const static u32 cHEIGHT_LIMIT = 64;		// Tallest allowable tree
+		const static u32 cIN        = 0x00;
+		const static u32 cLEFT      = 0x01;
+		const static u32 cVISIT     = 0x02;
+		const static u32 cRIGHT     = 0x04;
+		const static u32 cOUT       = 0x08;
+		const static u32 cFORWARDS  = 0x00;
+		const static u32 cBACKWARDS = 0x01;
+		const static u32 cDIRECTION = 0x01;
+		const static u32 cPREORDER  = 0x10;
+		const static u32 cSORTORDER = 0x20;
+		const static u32 cPOSTORDER = 0x40;
+		const static u32 cTRAVERSAL = 0xF0;
+
+		struct node
+		{
+			inline			node() : data(nullptr) { link[0] = link[1] = 0; }
+
+			void *			data;		// User-defined content 
+
+			void			clear()
+			{
+				data = nullptr;
+				link[0] = link[1] = 0;
+			}
+
+			node *			get_left() const { return (node*)link[0]; }
+			node *			get_right() const { uptr p = link[1] & ~(uptr)0x1; return (node*)p; }
+			void			set_left(node*n) { link[0] = (uptr)n; }
+			void			set_right(node*n) { uptr p = link[1] & (uptr)0x1; link[1] = p | ((uptr)n); }
+
+			node *			get_child(s32 child) const { uptr p = link[child] & (uptr)~0x1; return (node*)p; }
+			void			set_child(s32 child, node*n) { uptr p = link[child] & (uptr)0x1; link[child] = p | ((uptr)n); }
+
+			bool			is_red() const { uptr p = link[1] & (uptr)0x1; return p == 0; }
+			bool			is_black() const { uptr p = link[1] & (uptr)0x1; return p == 1; }
+			void			set_red() { uptr p = link[1] & (uptr)~0x1; link[1] = p; }
+			void			set_black() { uptr p = link[1] | (uptr)0x1; link[1] = p; }
+		private:
+			uptr			link[2];	// Left (0) and right (1) links 
+		};
+
+		struct iterator
+		{
+			bool		iterate(void *& data);
+
+		protected:
+			friend class xtree;
+			friend class xtree_internal;
+
+			void		clear();
+
+			void		initialize(xtree* tree, u32 flags = cSORTORDER | cFORWARDS);
+
+			bool		preorder(void *& data);
+			bool		sortorder(void *& data);
+			bool		postorder(void *& data);
+
+			bool		sortorder_backwards(void *& data);
+
+			node*		pop(xbyte& state);
+			void		push(node*, xbyte state);
+
+			xtree *		m_tree;							// Paired tree
+			s32			m_traversal;
+			node *		m_it;
+			node *		m_path[cHEIGHT_LIMIT];			// Traversal path, node pointer
+			xbyte		m_state[cHEIGHT_LIMIT];			// Traversal path, node state
+			u32			m_top;							// 'Top of stack'
+		};
+
 
 		u32				size() const			{ return m_size;}
 		bool			clear(void *& data);	// Repeatedly call 'clear' until true is returned
@@ -101,15 +106,15 @@ namespace xcore
 		typedef s32(*compare_f) (void const* p1, void const* p2);
 		void			set_cmp(compare_f func) { m_compare = func; }
 
-		void			iterate(xtree_iterator& iter);
+		void			iterate(iterator& iter, u32 flags = cSORTORDER | cFORWARDS);
 
 	protected:
 		friend class xtree_internal;
-		friend struct xtree_iterator;
+		friend struct iterator;
 
 		x_iallocator*	m_node_allocator;
 		compare_f		m_compare;
-		xnode_t *		m_root;				// Top of the tree
+		node *			m_root;				// Top of the tree
 		u32				m_size;				// Number of items (user-defined)
 	};
 
