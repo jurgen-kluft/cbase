@@ -37,7 +37,6 @@ UNITTEST_SUITE_BEGIN(xtree)
 		UNITTEST_TEST(tree_node)
 		{
 			xtree::node node;
-			node.clear();
 
 			xtree::node* left_ptr = (xtree::node*)((uptr)0 - (uptr)1);
 			node.set_left(left_ptr);
@@ -50,7 +49,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 			CHECK_EQUAL(true, node.is_red());
 
-			node.set_right(left_ptr);
+			node.set_black();
 			CHECK_EQUAL(false, node.is_red());
 			node.set_red();
 			CHECK_EQUAL(true, node.is_red());
@@ -124,6 +123,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
 
+			CHECK_EQUAL(9, tree.size());
+
 			void* found;
 			CHECK_EQUAL(true, tree.find(&a, found));
 			CHECK_EQUAL(true, tree.find(&b, found));
@@ -174,15 +175,16 @@ UNITTEST_SUITE_BEGIN(xtree)
 			CHECK_TRUE(tree.insert(&i));
 
 			xtree::iterator iterator;
-			tree.iterate(iterator, xtree::cPREORDER);
+			tree.iterate(iterator);
 
 			s32 round = 0;
 			s32 preorder[] = { d,b,a,c,f,e,h,g,i };
 			void* data;
-			while (iterator.iterate(data))
+			while (iterator.preorder(xtree::cRight, data))
 			{
 				CHECK_EQUAL(preorder[round++], *(s32*)data);
 			}
+			CHECK_EQUAL(9, round);
 
 			while (!tree.clear(data))
 			{
@@ -215,15 +217,16 @@ UNITTEST_SUITE_BEGIN(xtree)
 			CHECK_TRUE(tree.insert(&i));
 
 			xtree::iterator iterator;
-			tree.iterate(iterator, xtree::cSORTORDER);
+			tree.iterate(iterator);
 
 			s32 round = 0;
 			s32 sortorder[] = { a,b,c,d,e,f,g,h,i };
 			void* data;
-			while (iterator.iterate(data))
+			while (iterator.sortorder(xtree::cRight, data))
 			{
 				CHECK_EQUAL(sortorder[round++], *(s32*)data);
 			}
+			CHECK_EQUAL(9, round);
 
 			while (!tree.clear(data))
 			{
@@ -256,13 +259,12 @@ UNITTEST_SUITE_BEGIN(xtree)
 			CHECK_TRUE(tree.insert(&i));
 
 			xtree::iterator iterator;
-			tree.iterate(iterator, xtree::cSORTORDER | xtree::cBACKWARDS);
+			tree.iterate(iterator);
 
 			s32 round = 0;
 			s32 sortorder[] = { i,h,g,f,e,d,c,b,a };
 			void* data;
-			u32 dir = xtree::cBACKWARDS;
-			while (iterator.iterate(data))
+			while (iterator.sortorder(xtree::cLeft, data))
 			{
 				CHECK_EQUAL(sortorder[round++], *(s32*)data);
 			}
@@ -299,21 +301,68 @@ UNITTEST_SUITE_BEGIN(xtree)
 			CHECK_TRUE(tree.insert(&i));
 
 			xtree::iterator iterator;
-			tree.iterate(iterator, xtree::cPOSTORDER);
+			tree.iterate(iterator);
 
 			s32 round = 0;
 			s32 postorder[] = { a,c,b,e,g,i,h,f,d };
 			
 			void* data;
-			while (iterator.iterate(data))
+			while (iterator.postorder(xtree::cRight, data))
 			{
 				CHECK_EQUAL(postorder[round++], *(s32*)data);
 			}
+			CHECK_EQUAL(9, round);
 
 			while (!tree.clear(data))
 			{
 			}
 		}
+
+		UNITTEST_TEST(void_tree_search)
+		{
+			xtree tree(gTestAllocator);
+			tree.set_cmp(compare_s32);
+
+			s32 a = 1;
+			s32 b = 2;
+			s32 c = 3;
+			s32 d = 4;
+			s32 e = 5;
+			s32 f = 6;
+			s32 g = 7;
+			s32 h = 8;
+			s32 i = 9;
+
+			CHECK_TRUE(tree.insert(&a));
+			CHECK_TRUE(tree.insert(&b));
+			CHECK_TRUE(tree.insert(&c));
+			CHECK_TRUE(tree.insert(&d));
+			CHECK_TRUE(tree.insert(&e));
+			CHECK_TRUE(tree.insert(&f));
+			CHECK_TRUE(tree.insert(&g));
+			CHECK_TRUE(tree.insert(&h));
+			CHECK_TRUE(tree.insert(&i));
+
+			xtree::iterator iterator;
+			tree.iterate(iterator);
+
+			s32 dir = xtree::cLeft;
+			void* data;
+			void* find = &f;
+			while (iterator.traverse(dir, data))
+			{
+				s32 c = compare_s32(find, data);
+				dir = c < 0 ? xtree::cLeft : xtree::cRight;
+				if (c == 0)
+					break;
+			}
+			CHECK_EQUAL(0, compare_s32(data, find));
+
+			while (!tree.clear(data))
+			{
+			}
+		}
+
 
 		UNITTEST_TEST(s32_tree)
 		{

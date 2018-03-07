@@ -6,260 +6,7 @@
 
 namespace xcore
 {
-
-
-	/* Red-Black Tree
-	 Inserted in the following order:
-	 a, b, c, d, e, f, g, h, i
-	                            +-+
-	                            |D|
-	                         ___+-+___
-	                       _/         \_
-	                     _/             \_
-	                   _/                 \_
-	                +-+                     +-+
-	                |B|                     |F|
-	              _/+-+\_                   +-+
-	             /       \               __/   \__
-	          +-+         +-+        +-+/         \+-+
-	          |A|         |C|        |E|           |H|
-	          +-+         +-+        +-+          /+-+\ 
-	                                             /     \ 
-	                                          +-+       +-+
-	                                          |G|       |I|
-	                                          +-+       +-+
-	*/
-	
-	// preorder:  D B A C F E H G I
-	// sortorder: A B C D E F G H I 
-	// postorder: A C B E G I H F D
-
-	void		xtree::iterator::initialize(xtree* tree, u32 flags)
-	{
-		clear();
-		m_tree = tree;
-		m_it = nullptr;
-		switch (flags & cTRAVERSAL)
-		{
-		case cPREORDER:
-			push(m_tree->m_root, cIN);
-			m_traversal = cPREORDER | cFORWARDS;
-			break;
-		case cSORTORDER:
-			if (xbfIsSet(flags, cDIRECTION)==false)
-			{
-				push(m_tree->m_root, cIN);
-				m_traversal = cSORTORDER | cFORWARDS;
-			}
-			else
-			{
-				push(m_tree->m_root, cOUT);
-				m_traversal = cSORTORDER | cBACKWARDS;
-			}
-			break;
-		case cPOSTORDER:
-			push(m_tree->m_root, cIN);
-			m_traversal = cPOSTORDER | cFORWARDS;
-			break;
-		}
-	}
-
-	bool		xtree::iterator::iterate(void *& data)
-	{
-		switch (m_traversal & cTRAVERSAL)
-		{
-		case cPREORDER:
-			return preorder(data);
-		case cSORTORDER:
-			if (xbfIsSet(m_traversal, cDIRECTION) == false)
-			{
-				return sortorder(data);
-			}
-			else
-			{
-				return sortorder_backwards(data);
-			}
-		case cPOSTORDER:
-			return postorder(data);
-		}
-		return false;
-	}
-
-	bool		xtree::iterator::preorder(void *& data)
-	{
-		xbyte state;
-		node* n = pop(state);
-		while (n != nullptr)
-		{
-			if (state == cIN)
-			{
-				push(n, cVISIT);
-			}
-			else if (state == cVISIT)
-			{
-				push(n, cLEFT);
-				break;
-			}
-			else if (state == cLEFT)
-			{
-				push(n, cRIGHT);
-				push(n->get_left(), cIN);
-			}
-			else if (state == cRIGHT)
-			{
-				push(n, cOUT);
-				push(n->get_right(), cIN);
-			}
-			else if (state == cOUT)
-			{
-
-			}
-			n = pop(state);
-		}
-
-		if (n == nullptr)
-			return false;
-
-		data = n->data;
-		return true;
-	}
-
-	bool		xtree::iterator::sortorder(void *& data)
-	{
-		xbyte state;
-		node* n = pop(state);
-		while (n != nullptr)
-		{
-			if (state == cIN)
-			{
-				push(n, cLEFT);
-			} 
-			else if (state == cLEFT)
-			{
-				push(n, cVISIT);
-				push(n->get_left(), cIN);
-			}
-			else if (state == cVISIT)
-			{
-				push(n, cRIGHT);
-				break;
-			}
-			else if (state == cRIGHT)
-			{
-				push(n, cOUT);
-				push(n->get_right(), cIN);
-			}
-			else if (state == cOUT)
-			{
-
-			}
-			n = pop(state);
-		}
-
-		if (n == nullptr)
-			return false;
-
-		data = n->data;
-		return true;
-	}
-
-	bool		xtree::iterator::sortorder_backwards(void *& data)
-	{
-		xbyte state;
-		node* n = pop(state);
-		while (n != nullptr)
-		{
-			if (state == cOUT)
-			{ 
-				push(n, cRIGHT);
-			}
-			else if (state == cRIGHT)
-			{
-				push(n, cVISIT);
-				push(n->get_right(), cRIGHT);
-			}
-			else if (state == cVISIT)
-			{
-				push(n->get_left(), cRIGHT);
-				break;
-			}
-			else if (state == cLEFT)
-			{
-				push(n, cIN);
-				push(n->get_left(), cRIGHT);
-			}
-			else if (state == cIN)
-			{
-
-			}
-			n = pop(state);
-		}
-		if (n == nullptr)
-			return false;
-		data = n->data;
-		return true;
-	}
-
-	bool		xtree::iterator::postorder(void *& data)
-	{
-		xbyte state;
-
-		node* n = pop(state);
-		if (n == nullptr)
-			return false;
-
-		do {
-			if (state == cIN)
-			{
-				push(n, cLEFT);
-			}
-			else if (state == cLEFT)
-			{
-				push(n, cRIGHT);
-				push(n->get_left(), cIN);
-			}
-			else if (state == cRIGHT)
-			{
-				push(n, cVISIT);
-				push(n->get_right(), cIN);
-			}
-			else if (state == cVISIT)
-			{
-				push(n, cOUT);
-				break;
-			}
-			n = pop(state);
-		} while (n != nullptr);
-		if (n == nullptr)
-			return false;
-		data = n->data;
-		return true;
-	}
-
-	void		xtree::iterator::clear()
-	{
-		m_top = 0;
-	}
-
-	xtree::node*	xtree::iterator::pop(xbyte& state)
-	{
-		if (m_top == 0)
-			return nullptr;
-		node* n = m_path[--m_top];
-		state = m_state[m_top];
-		return n;
-	}
-
-	void		xtree::iterator::push(node* n, xbyte state)
-	{
-		if (n != nullptr)
-		{
-			m_state[m_top] = state;
-			m_path[m_top++] = n;
-		}
-	}
-
-	typedef s32		(*cmp_f) (const void *p1, const void *p2);
+	typedef s32(*cmp_f) (const void *p1, const void *p2);
 
 	s32				compare_void(void const* p1, void const* p2)
 	{
@@ -270,96 +17,342 @@ namespace xcore
 		return 0;
 	}
 
+	#define rbnil(t)			(&(t)->m_nill)
+	#define rbfirst(t)			((t)->m_root.get_left())
+	#define rbroot(t)			(&(t)->m_root)
+
+	#define rbsetfirst(t, n)	((t)->m_root.set_left(n))
+
 	class xtree_internal
 	{
 	public:
-		static s32				is_red(xtree::node *root);
+		static inline s32		is_red(xtree * tree, xtree::node * n) { return n != rbnil(tree) && n->is_red(); }
 
-		static xtree::node *	rotate_single(xtree::node *root, s32 dir);
-		static xtree::node *	rotate_double(xtree::node *root, s32 dir);
+		static void				rotate_left(xtree* tree, xtree::node* node);
+		static void				rotate_right(xtree* tree, xtree::node* node);
 
-		static xtree::node *	node_new(xtree *tree, void * data);
+		static xtree::node *	tree_successor(xtree * tree, xtree::node* node);
+
+		static xtree::node *	tree_insert(xtree* tree, void * data);
+		static xtree::node *	tree_find(xtree* tree, void * data);
 		static bool				tree_clear(xtree *tree, void *& data);
-
-		static bool				tree_find(xtree *tree, void * data, void *& found, xtree::iterator& iter);
-		static s32				tree_insert(xtree *tree, void * data);
-		static s32				tree_remove(xtree *tree, void * data);
+		static void				tree_repair(xtree * tree, xtree::node* node);
+		static void *			tree_remove(xtree * tree, xtree::node* node);
 
 		static s32				tree_validate(xtree *tree, xtree::node* root, const char*& result);
 	};
 
-	// <summary>
-	//   Checks the color of a red black node
-	// <summary>
-	// <param name="root">The node to check</param>
-	// <returns>1 for a red node, 0 for a black node</returns>
-	// <remarks>For interator_ree.c internal use only</remarks>
-	s32		xtree_internal::is_red(xtree::node *root)
+
+	void xtree_internal::rotate_left(xtree* tree, xtree::node* node)
 	{
-		return root != NULL && root->is_red();
+		xtree::node * child;
+
+		child = node->get_right();
+		node->set_right(child->get_left());
+
+		if (child->get_left() != rbnil(tree))
+			child->get_left()->set_parent(node);
+
+		child->set_parent(node->get_parent());
+
+		if (node == node->get_parent()->get_left())
+			node->get_parent()->set_left(child);
+		else
+			node->get_parent()->set_right(child);
+
+		child->set_left(node);
+		node->set_parent(child);
 	}
 
-	// <summary>
-	//   Performs a single red black rotation in the specified direction
-	//   This function assumes that all nodes are valid for a rotation
-	// <summary>
-	// <param name="root">The original root to rotate around</param>
-	// <param name="dir">The direction to rotate (0 = left, 1 = right)</param>
-	// <returns>The new root ater rotation</returns>
-	// <remarks>For interator_ree.c internal use only</remarks>
-	xtree::node *	xtree_internal::rotate_single(xtree::node *root, s32 dir)
+	void xtree_internal::rotate_right(xtree* tree, xtree::node* node)
 	{
-		xtree::node *save = root->get_child(!dir);
+		xtree::node * child;
 
-		root->set_child(!dir, save->get_child(dir));
-		save->set_child(dir, root);
+		child = node->get_left();
+		node->set_left(child->get_right());
 
-		root->set_red();
-		save->set_black();
+		if (child->get_right() != rbnil(tree))
+			child->get_right()->set_parent(node);
+		child->set_parent(node->get_parent());
 
-		return save;
+		if (node == node->get_parent()->get_left())
+			node->get_parent()->set_left(child);
+		else
+			node->get_parent()->set_right(child);
+
+		child->set_right(node);
+		node->set_parent(child);
 	}
 
-	// <summary>
-	//    Performs a double red black rotation in the specified direction
-	//    This function assumes that all nodes are valid for a rotation
-	// <summary>
-	// <param name="root">The original root to rotate around</param>
-	// <param name="dir">The direction to rotate (0 = left, 1 = right)</param>
-	// <returns>The new root after rotation</returns>
-	// <remarks>For interator_ree.c internal use only</remarks>
-	xtree::node *	xtree_internal::rotate_double(xtree::node *root, s32 dir)
+	// Returns the successor of node, or nil if there is none.
+	xtree::node *  xtree_internal::tree_successor(xtree * tree, xtree::node* node)
 	{
-		//root->link[!dir] = rotate_single(root->link[!dir], !dir);
-		xtree::node* child = rotate_single(root->get_child(!dir), !dir);
-		root->set_child(!dir, child);
-		return rotate_single(root, dir);
+		xtree::node * succ = succ = node->get_right();
+		if (succ != rbnil(tree)) 
+		{
+			while (succ->get_left() != rbnil(tree))
+				succ = succ->get_left();
+		}
+		else 
+		{
+			// No right child, move up until we find it or hit the root 
+			for (succ = node->get_parent(); node == succ->get_right(); succ = succ->get_parent())
+				node = succ;
+
+			if (succ == rbroot(tree))
+				succ = rbnil(tree);
+		}
+		return(succ);
 	}
 
-	// <summary>
-	//   Creates an initializes a new red black node with a copy of
-	//   the data. This function does not insert the new node into a tree
-	// <summary>
-	// <param name="tree">The red black tree this node is being created for</param>
-	// <param name="data">The data value that will be stored in this node</param>
-	// <returns>A pointer to the new node</returns>
-	// <remarks>
-	//   For interator_ree.c internal use only. The data for this node must
-	//   be freed using the same tree's rel function. The returned pointer
-	//   must be freed using C's free function
-	// </remarks>
-	xtree::node *	xtree_internal::node_new(xtree *tree, void * data)
+
+	// Delete node 'z' from the tree and return its data pointer.
+	void * xtree_internal::tree_remove(xtree * tree, xtree::node * z)
 	{
-		xtree::node* rn = (xtree::node*)tree->m_node_allocator->allocate(sizeof(xtree::node), sizeof(void*));
-		if (rn == NULL)
-			return NULL;
+		xtree::node *x, *y;
 
-		rn->set_red();
-		rn->data = data;
-		rn->set_left(NULL);
-		rn->set_right(NULL);
+		void * data = z->get_data();
 
-		return rn;
+		if (z->get_left() == rbnil(tree) || z->get_right() == rbnil(tree))
+		{
+			y = z;
+		}
+		else
+		{
+			y = tree_successor(tree, z);
+		}
+
+		x = (y->get_left() == rbnil(tree)) ? y->get_right() : y->get_left();
+
+		x->set_parent(y->get_parent());
+		if (x->get_parent() == rbroot(tree))
+		{
+			rbsetfirst(tree, x);
+		}
+		else
+		{
+			if (y == y->get_parent()->get_left())
+				y->get_parent()->set_left(x);
+			else
+				y->get_parent()->set_right(x);
+		}
+		if (y->is_black())
+			tree_repair(tree, x);
+
+		if (y != z)
+		{
+			y->set_left(z->get_left());
+			y->set_right(z->get_right());
+			y->set_parent(z->get_parent());
+			y->set_color(z->get_color());
+			z->get_left()->set_parent(y);
+			z->get_right()->set_parent(y);
+
+			if (z == z->get_parent()->get_left())
+			{
+				z->get_parent()->set_left(y);
+			}
+			else
+			{
+				z->get_parent()->set_right(y);
+			}
+		}
+
+		tree->m_node_allocator->deallocate(z);
+		return (data);
+	}
+
+	// Repair the tree after a node has been deleted by rotating and repainting
+	// colors to restore the 4 properties inherent in red-black trees.
+	void xtree_internal::tree_repair(xtree * tree, xtree::node* node)
+	{
+		xtree::node * sibling;
+
+		while (node->is_black())
+		{
+			if (node == node->get_parent()->get_left())
+			{
+				sibling = node->get_parent()->get_right();
+				if (sibling->is_red())
+				{
+					sibling->set_black();
+					node->get_parent()->set_red();
+					rotate_left(tree, node->get_parent());
+					sibling = node->get_parent()->get_right();
+				}
+				if (sibling->get_right()->is_black() && sibling->get_left()->is_black())
+				{
+					sibling->set_red();
+					node = node->get_parent();
+				}
+				else 
+				{
+					if (sibling->get_right()->is_black())
+					{
+						sibling->get_left()->set_black();
+						sibling->set_red();
+						rotate_right(tree, sibling);
+						sibling = node->get_parent()->get_right();
+					}
+					sibling->set_color(node->get_parent()->get_color());
+					node->get_parent()->set_black();
+					sibling->get_right()->set_black();
+					rotate_left(tree, node->get_parent());
+					break;
+				}
+			}
+			else // if (node == node->get_parent()->get_right())
+			{	
+				sibling = node->get_parent()->get_left();
+				if (sibling->is_red()) 
+				{
+					sibling->set_black();
+					node->get_parent()->set_red();
+					rotate_right(tree, node->get_parent());
+					sibling = node->get_parent()->get_left();
+				}
+				if (sibling->get_right()->is_black() && sibling->get_left()->is_black())
+				{
+					sibling->set_red();
+					node = node->get_parent();
+				}
+				else 
+				{
+					if (sibling->get_left()->is_black())
+					{
+						sibling->get_right()->set_black();
+						sibling->set_red();
+						rotate_left(tree, sibling);
+						sibling = node->get_parent()->get_left();
+					}
+					sibling->set_color(node->get_parent()->get_color());
+					node->get_parent()->set_black();
+					sibling->get_left()->set_black();
+					rotate_right(tree, node->get_parent());
+					break;
+				}
+			}
+		}
+	}
+
+	// Insert data pointer into a redblack tree.
+	// Returns a NULL pointer on success.  If a node matching "data"
+	// already exists, a pointer to the existant node is returned.
+	xtree::node * xtree_internal::tree_insert(xtree* tree, void * data)
+	{
+		xtree::node * node = rbfirst(tree);
+		xtree::node * parent = rbroot(tree);
+
+		// Find correct insertion point.
+		while (node != rbnil(tree))
+		{
+			parent = node;
+			s32 res = tree->m_compare(data, node->get_data());
+			if (res == 0)
+				return(node);
+			node = res < 0 ? node->get_left() : node->get_right();
+		}
+
+		node = (xtree::node*) tree->m_node_allocator->allocate(sizeof(xtree::node), sizeof(void*));
+		node->set_data(data);
+		node->set_right(rbnil(tree));
+		node->set_left(rbnil(tree));
+		node->set_parent(parent);
+		if (parent == rbroot(tree) || tree->m_compare(data, parent->get_data()) < 0)
+			parent->set_left(node);
+		else
+			parent->set_right(node);
+		node->set_red();
+
+		// If the parent node is black we are all set, if it is red we have
+		// the following possible cases to deal with.  We iterate through
+		// the rest of the tree to make sure none of the required properties
+		// is violated.
+		//
+		//	1) The uncle is red.  We repaint both the parent and uncle black
+		//     and repaint the grandparent node red.
+		//
+		//  2) The uncle is black and the new node is the right child of its
+		//     parent, and the parent in turn is the left child of its parent.
+		//     We do a left rotation to switch the roles of the parent and
+		//     child, relying on further iterations to fixup the old parent.
+		//
+		//  3) The uncle is black and the new node is the left child of its
+		//     parent, and the parent in turn is the left child of its parent.
+		//     We switch the colors of the parent and grandparent and perform
+		//     a right rotation around the grandparent.  This makes the former
+		//     parent the parent of the new node and the former grandparent.
+		//
+		// Note that because we use a sentinel for the root node we never
+		// need to worry about replacing the root.
+
+		while (node->get_parent()->is_red())
+		{
+			xtree::node * uncle;
+			if (node->get_parent() == node->get_parent()->get_parent()->get_left())
+			{
+				uncle = node->get_parent()->get_parent()->get_right();
+				if (uncle->is_red()) {
+					node->get_parent()->set_black();
+					uncle->set_black();
+					node->get_parent()->get_parent()->set_red();
+					node = node->get_parent()->get_parent();
+				}
+				else /* if (uncle->color == black) */
+				{
+					if (node == node->get_parent()->get_right())
+					{
+						node = node->get_parent();
+						rotate_left(tree, node);
+					}
+					node->get_parent()->set_black();
+					node->get_parent()->get_parent()->set_red();
+					rotate_right(tree, node->get_parent()->get_parent());
+				}
+			}
+			else
+			{	// if (node->get_parent() == node->get_parent()->get_parent()->get_right()) 
+				uncle = node->get_parent()->get_parent()->get_left();
+				if (uncle->is_red())
+				{
+					node->get_parent()->set_black();
+					uncle->set_black();
+					node->get_parent()->get_parent()->set_red();
+					node = node->get_parent()->get_parent();
+				}
+				else // if (uncle->is_black()) 
+				{
+					if (node == node->get_parent()->get_left())
+					{
+						node = node->get_parent();
+						rotate_right(tree, node);
+					}
+					node->get_parent()->set_black();
+					node->get_parent()->get_parent()->set_red();
+					rotate_left(tree, node->get_parent()->get_parent());
+				}
+			}
+		}
+		rbfirst(tree)->set_black();	// first node is always black
+		return(nullptr);
+	}
+
+	// Look for a node matching key in tree.
+	// Returns a pointer to the node if found, else NULL.
+	xtree::node * xtree_internal::tree_find(xtree * tree, void * key)
+	{
+		xtree::node * node = rbfirst(tree);
+		while (node != rbnil(tree))
+		{
+			s32 c = tree->m_compare(key, node->get_data());
+			if (c == 0)
+			{
+				return(node);
+			}
+			c = (c+1) >> 1;
+			node = node->get_child(c);
+		}
+		return(NULL);
 	}
 
 	// <summary>
@@ -370,457 +363,63 @@ namespace xcore
 	// <param name="tree">The tree to release</param>
 	bool xtree_internal::tree_clear(xtree *tree, void *& data)
 	{
-		data = NULL;
-		if (tree->m_root == NULL)
+		data = nullptr;
+
+		xtree::node * node = rbfirst(tree);
+		if (node == rbnil(tree))
 			return true;
 
-		xtree::node* todelete = tree->m_root;
-		if (tree->m_root->get_left() == NULL)
+		xtree::node* todelete = tree->m_root.get_left();
+		if (node->get_left() == rbnil(tree))
 		{
-			tree->m_root = tree->m_root->get_right();
+			tree->m_root.set_left(node->get_right());
 		}
-		else if (tree->m_root->get_right() == NULL)
+		else if (node->get_right() == rbnil(tree))
 		{
-			tree->m_root = tree->m_root->get_left();
+			tree->m_root.set_left(node->get_left());
 		}
-		else 
+		else
 		{
 			// We have left and right branches
 			// Take right branch and place it
 			// somewhere down the left branch
-			xtree::node* branch = tree->m_root->get_right();
-			tree->m_root->set_right(NULL);
+			xtree::node* branch = node->get_right();
+			node->set_right(rbnil(tree));
 
 			// Find a node in the left branch that does not
 			// have both a left and right branch and place
 			// our branch there.
-			xtree::node* iter = tree->m_root->get_left();
-			while (iter->get_left() != NULL && iter->get_right() != NULL)
+			xtree::node* iter = node->get_left();
+			while (iter->get_left() != rbnil(tree) && iter->get_right() != rbnil(tree))
 			{
 				iter = iter->get_left();
 			}
-			if (iter->get_left() == NULL)
+			if (iter->get_left() == rbnil(tree))
 			{
 				iter->set_left(branch);
 			}
-			else if (iter->get_right() == NULL)
+			else if (iter->get_right() == rbnil(tree))
 			{
 				iter->set_right(branch);
 			}
 
-			tree->m_root = tree->m_root->get_left();
+			tree->m_root.set_left(node->get_left());
 		}
 
-		data = todelete->data;
+		data = todelete->get_data();
 		tree->m_node_allocator->deallocate(todelete);
-		todelete = NULL;
 		tree->m_size -= 1;
+		todelete = nullptr;
 
 		return false;
 	}
 
-	// <summary>
-	//   Search for a copy of the specified
-	//   node data in a red black tree
-	// <summary>
-	// <param name="tree">The tree to search</param>
-	// <param name="data">The data value to search for</param>
-	// <returns>
-	//   A pointer to the data value stored in the tree,
-	//   or a null pointer if no data could be found
-	// </returns>
-	bool	xtree_internal::tree_find(xtree *tree, void * data, void *& found, xtree::iterator& iter)
-	{
-		xtree::node * it = tree->m_root;
-		while (it != NULL)
-		{
-			s32 const cmp = tree->m_compare(it->data, data);
-			if (cmp == 0)
-				break;
-
-			// Depending on the traversal mode we need to push the correct state
-			iter.push(it, 2);
-
-			// If the tree supports duplicates, they should be
-			// chained to the right subtree for this to work
-			it = it->get_child(cmp < 0 ? 1 : 0);
-		}
-		
-		if (it != NULL)
-		{
-			found = it->data;
-		}
-
-		return it != NULL;
-	}
-
-	// <summary>
-	//    Insert a copy of the user-specified
-	//    data into a red black tree
-	// <summary>
-	// <param name="tree">The tree to insert into</param>
-	// <param name="data">The data value to insert</param>
-	// <returns>
-	//    1 if the value was inserted successfully,
-	//    0 if the insertion failed for any reason
-	// </returns>
-	s32		xtree_internal::tree_insert(xtree *tree, void * data)
-	{
-		s32 result = 0;
-		if (tree->m_root == NULL)
-		{
-			// We have an empty tree; attach the
-			// new node directly to the root
-			tree->m_root = node_new(tree, data);
-			result = 1;
-			if (tree->m_root == NULL)
-				return result;
-		}
-		else 
-		{
-			xtree::node head;			// False tree root 
-			xtree::node *g, *t;			// Grandparent & parent 
-			xtree::node *p, *q;			// Iterator & parent 
-			s32 dir = 0, last = 0;
-
-			// Set up our helpers 
-			t = &head;
-			g = p = NULL;
-			q = tree->m_root;
-			t->set_right(tree->m_root);
-
-			// Search down the tree for a place to insert 
-			for (; ; )
-			{
-				if (q == NULL) 
-				{
-					// Insert a new node at the first null link 
-					result = 1;
-					q = node_new(tree, data);
-					p->set_child(dir, q);
-
-					if (q == NULL)
-						return result;
-				}
-				else if (is_red(q->get_left()) && is_red(q->get_right()))
-				{
-					// Simple red violation: color flip 
-					q->set_red();
-					q->get_left()->set_black();
-					q->get_right()->set_black();
-				}
-
-				if (is_red(q) && is_red(p)) 
-				{
-					// Hard red violation: rotations necessary
-					s32 dir2 = t->get_right() == g;
-
-					xtree::node* rotated;
-					if (q == p->get_child(last))
-						rotated = rotate_single(g, !last);
-					else
-						rotated = rotate_double(g, !last);
-
-					t->set_child(dir2, rotated);
-				}
-
-				// Stop working if we inserted a node. This
-				// check also disallows duplicates in the tree
-				dir = tree->m_compare(q->data, data);
-				if (dir == 0)
-					break;
-				dir = 1 - ((dir + 1) >> 1);
-
-				last = dir;
-
-				// Move the helpers down 
-				if (g != NULL)
-					t = g;
-
-				g = p, p = q;
-				q = q->get_child(dir);
-			}
-
-			// Update the root (it may be different) 
-			tree->m_root = head.get_right();
-		}
-
-		// Make the root black for simplified logic 
-		tree->m_root->set_black();
-		if (result == 1)
-		{
-			tree->m_size += 1;
-		}
-		return result;
-	}
-
-
-	// <summary>
-	// 	  Remove a node from a red black tree
-	// 	  that matches the user-specified data
-	// <summary>
-	// <param name="tree">The tree to remove from</param>
-	// <param name="data">The data value to search for</param>
-	// <returns>
-	//    1 if the value was removed successfully,
-	//    0 if the removal failed for any reason
-	// </returns>
-	// <remarks>
-	//    The most common failure reason should be
-	//    that the data was not found in the tree
-	// </remarks>
-	s32 xtree_internal::tree_remove(xtree *tree, void * data)
-	{
-		if (tree->m_root != NULL) 
-		{
-			xtree::node head;			// False tree root
-			xtree::node *q, *p, *g;		// Helpers
-			xtree::node *f = NULL;		// Found item
-			s32 dir = 1;
-
-			// Set up our helpers
-			q = &head;
-			g = p = NULL;
-			q->set_right(tree->m_root);
-
-			// Search and push a red node down
-			// to fix red violations as we go
-			while (q->get_child(dir) != NULL) 
-			{
-				s32 last = dir;
-
-				// Move the helpers down
-				g = p, p = q;
-				q = q->get_child(dir);
-				dir = tree->m_compare(q->data, data) < 0;
-
-				// Save the node with matching data and keep
-				// going; we'll do removal tasks at the end
-				if (tree->m_compare(q->data, data) == 0)
-					f = q;
-
-				/* Push the red node down with rotations and color flips */
-				if (!is_red(q) && !is_red(q->get_child(dir))) 
-				{
-					if (is_red(q->get_child(!dir)))
-					{
-						xtree::node* r = rotate_single(q, dir);
-						p->set_child(last, r);
-						p = r;
-					}
-					else if (!is_red(q->get_child(!dir))) 
-					{
-						xtree::node *s = p->get_child(!last);
-
-						if (s != NULL) 
-						{
-							if (!is_red(s->get_child(!last)) && !is_red(s->get_child(last)))
-							{
-								// Color flip 
-								p->set_black();
-								s->set_red();
-								q->set_red();
-							}
-							else 
-							{
-								s32 dir2 = g->get_right() == p;
-
-								if (is_red(s->get_child(last)))
-								{
-									g->set_child(dir2, rotate_double(p, last));
-								}
-								else if (is_red(s->get_child(!last)))
-								{
-									g->set_child(dir2, rotate_single(p, last));
-								}
-
-								// Ensure correct coloring 
-								q->set_red();
-								g->get_child(dir2)->set_red();
-
-								g->get_child(dir2)->get_left()->set_black();
-								g->get_child(dir2)->get_right()->set_black();
-							}
-						}
-					}
-				}
-			}
-
-			// Replace and remove the saved node
-			if (f != NULL) 
-			{
-				void const* old_data = f->data;
-				f->data = q->data;
-				xtree::node* child1 = q->get_child(q->get_left() == NULL);
-				p->set_child(p->get_right() == q, child1);
-				tree->m_node_allocator->deallocate(q);
-			}
-
-			// Update the root (it may be different)
-			tree->m_root = head.get_right();
-
-			// Make the root black for simplified logic
-			if (tree->m_root != NULL)
-				tree->m_root->set_black();
-
-			tree->m_size -= 1;
-		}
-
-		return 1;
-	}
-
-	// <summary>
-	//   Create a new traversal object
-	// <summary>
-	// <returns>A pointer to the new object</returns>
-	// <remarks>
-	//   The traversal object is not initialized until
-	//   interator_first or interator_last are called.
-	//   The pointer must be released with interator_delete
-	// </remarks>
-	//xiterator_t *	xtree_internal::iterator_new(x_iallocator* allocator)
-	//{
-	//	return (xiterator_t*)malloc(sizeof(xiterator_t));
-	//}
-	//
-	// <summary>
-	//    Release a traversal object
-	// <summary>
-	// <param name="trav">The object to release</param>
-	// <remarks>
-	//    The object must have been created with interator_new
-	// </remarks>
-	//void			xtree_internal::iterator_delete(xiterator_t *trav)
-	//{
-	//	free(trav);
-	//}
-
-	// <summary>
-	//    Initialize a traversal object. The user-specified
-	//    direction determines whether to begin traversal at the
-	//    smallest or largest valued node
-	// <summary>
-	// <param name="trav">The traversal object to initialize</param>
-	// <param name="tree">The tree that the object will be attached to</param>
-	// <param name="dir">
-	//    The direction to traverse (0 = ascending, 1 = descending)
-	// </param>
-	// <returns>A pointer to the smallest or largest data value</returns>
-	// <remarks>For interator_ree.c internal use only</remarks>
-	//void *	xtree_internal::iterator_start(xiterator_t *trav, xtree *tree, s32 dir)
-	//{
-	//	trav->tree = tree;
-	//	trav->it = tree->m_root;
-	//	trav->top = 0;
-	//
-	//	// Save the path for later traversal
-	//	if (trav->it != NULL) 
-	//	{
-	//		while (trav->it->link[dir] != NULL) 
-	//		{
-	//			trav->path[trav->top++] = trav->it;
-	//			trav->it = trav->it->link[dir];
-	//		}
-	//	}
-	//
-	//	return trav->it == NULL ? NULL : trav->it->data;
-	//}
-
-	// <summary>
-	//    Traverse a red black tree in the user-specified direction
-	// <summary>
-	// <param name="trav">The initialized traversal object</param>
-	// <param name="dir">
-	//    The direction to traverse (0 = ascending, 1 = descending)
-	// </param>
-	// <returns>
-	//    A pointer to the next data value in the specified direction
-	// </returns>
-	// <remarks>For interator_ree.c internal use only</remarks>
-	//void *	xtree_internal::iterator_move(xiterator_t *trav, s32 dir)
-	//{
-	//	if (trav->it->link[dir] != NULL) 
-	//	{
-	//		// Continue down this branch
-	//		trav->path[trav->top++] = trav->it;
-	//		trav->it = trav->it->link[dir];
-	//
-	//		while (trav->it->link[!dir] != NULL) 
-	//		{
-	//			trav->path[trav->top++] = trav->it;
-	//			trav->it = trav->it->link[!dir];
-	//		}
-	//	}
-	//	else 
-	//	{
-	//		// Move to the next branch 
-	//		node *last;
-	//
-	//		do 
-	//		{
-	//			if (trav->top == 0) 
-	//			{
-	//				trav->it = NULL;
-	//				break;
-	//			}
-	//
-	//			last = trav->it;
-	//			trav->it = trav->path[--trav->top];
-	//		} while (last == trav->it->link[dir]);
-	//	}
-	//
-	//	return trav->it == NULL ? NULL : trav->it->data;
-	//}
-
-	// <summary>
-	//    Initialize a traversal object to the smallest valued node
-	// <summary>
-	// <param name="trav">The traversal object to initialize</param>
-	// <param name="tree">The tree that the object will be attached to</param>
-	// <returns>A pointer to the smallest data value</returns>
-	//void *	xtree_internal::iterator_first(xiterator_t *trav, xtree *tree)
-	//{
-	//	return iterator_start(trav, tree, 0); // Min value
-	//}
-
-	// <summary>
-	//    Initialize a traversal object to the largest valued node
-	// <summary>
-	// <param name="trav">The traversal object to initialize</param>
-	// <param name="tree">The tree that the object will be attached to</param>
-	// <returns>A pointer to the largest data value</returns>
-	//void *	xtree_internal::iterator_last(xiterator_t *trav, xtree *tree)
-	//{
-	//	return iterator_start(trav, tree, 1); // Max value
-	//}
-
-	// <summary>
-	//    Traverse to the next value in ascending order
-	// <summary>
-	// <param name="trav">The initialized traversal object</param>
-	// <returns>A pointer to the next value in ascending order</returns>
-	//void *	xtree_internal::iterator_next(xiterator_t *trav)
-	//{
-	//	return iterator_move(trav, 1); // Toward larger items 
-	//}
-
-	// <summary>
-	//    Traverse to the next value in descending order
-	// <summary>
-	// <param name="trav">The initialized traversal object</param>
-	// <returns>A pointer to the next value in descending order</returns>
-	//void *	xtree_internal::iterator_prev(xiterator_t *trav)
-	//{
-	//	return iterator_move(trav, 0); // Toward smaller items
-	//}
-
-
 	// Test the integrity of the red-black tree
 	// @return: The depth of the tree
 	// @result: If any error it returns a description of the error in 'result', when no error it will be NULL
-	inline s32 xtree_internal::tree_validate(xtree *tree, xtree::node* root, const char*& result)
+	s32 xtree_internal::tree_validate(xtree *tree, xtree::node* root, const char*& result)
 	{
-		if (root == NULL)
+		if (root == rbnil(tree))
 		{
 			return 1;
 		}
@@ -830,20 +429,20 @@ namespace xcore
 			xtree::node* rn = root->get_right();
 
 			// Consecutive red links
-			if (is_red(root))
+			if (is_red(tree, root))
 			{
-				if (is_red(ln) || is_red(rn))
+				if (is_red(tree, ln) || is_red(tree, rn))
 				{
 					result = "Red violation";
 					return 0;
 				}
 			}
 
-			s32 lh = tree_validate(tree, ln, result);
-			s32 rh = tree_validate(tree, rn, result);
+			s32 const lh = tree_validate(tree, ln, result);
+			s32 const rh = tree_validate(tree, rn, result);
 
 			// Invalid binary search tree 
-			if ((ln != NULL && tree->m_compare(ln->data, root->data) >= 0) || (rn != NULL && tree->m_compare(rn->data, root->data) <= 0))
+			if ((ln != rbnil(tree) && tree->m_compare(ln->get_data(), root->get_data()) >= 0) || (rn != rbnil(tree) && tree->m_compare(rn->get_data(), root->get_data()) <= 0))
 			{
 				result = "Binary tree violation";
 				return 0;
@@ -859,19 +458,32 @@ namespace xcore
 			// Only count black links
 			if (lh != 0 && rh != 0)
 			{
-				return is_red(root) ? lh : lh + 1;
+				return is_red(tree, root) ? lh : lh + 1;
 			}
 			return 0;
 		}
 	}
 
-
 	xtree::xtree(x_iallocator* node_allocator)
 		: m_node_allocator(node_allocator)
 		, m_compare(&compare_void)
-		, m_root(NULL)
 		, m_size(0)
 	{
+		// We use a self-referencing sentinel node called nil to simplify the
+		// code by avoiding the need to check for NULL pointers.
+		m_nill.set_parent(&m_nill);
+		m_nill.set_left(&m_nill);
+		m_nill.set_right(&m_nill);
+		m_nill.set_black();
+		m_nill.set_data(nullptr);
+
+		// Similarly, the fake root node keeps us from having to worry
+		// about splitting the root.
+		m_root.set_parent(&m_nill);
+		m_root.set_left(&m_nill);
+		m_root.set_right(&m_nill);
+		m_root.set_black();
+		m_root.set_data(nullptr);
 	}
 
 	bool			xtree::clear(void *& data)
@@ -881,30 +493,225 @@ namespace xcore
 
 	bool			xtree::find(void * data, void *& found)
 	{
-		xtree::iterator iter;
-		iterate(iter);
-		return xtree_internal::tree_find(this, data, found, iter);
+		xtree::node* node = xtree_internal::tree_find(this, data);
+		if (node == nullptr)
+			return false;
+		found = node->get_data();
+		return true;
 	}
 
-	s32				xtree::insert(void * data)
+	bool			xtree::insert(void * data)
 	{
-		return xtree_internal::tree_insert(this, data);
+		xtree::node* node = xtree_internal::tree_insert(this, data);
+		if (node == nullptr)
+		{
+			m_size++;
+			return true;
+		}
+		return false;
 	}
 
-	s32				xtree::remove(void * data)
+	bool			xtree::remove(void * data)
 	{
-		return xtree_internal::tree_remove(this, data);
+		xtree::node* node = xtree_internal::tree_find(this, data);
+		if (node == nullptr)
+			return false;
+		xtree_internal::tree_remove(this, node);
+		return true;
 	}
 
 	bool			xtree::validate(const char*& error_str)
 	{
-		s32 depth = xtree_internal::tree_validate(this, m_root, error_str);
+		s32 depth = xtree_internal::tree_validate(this, rbfirst(this), error_str);
 		return (error_str == NULL);
 	}
 
-	void			xtree::iterate(xtree::iterator& iter, u32 flags)
+	void			xtree::iterate(xtree::iterator& iter)
 	{
-		iter.initialize(this, flags);
+		iter.m_tree = this;
+		iter.m_it = nullptr;
+	}
+
+
+	bool		xtree::iterator::traverse(s32 d, void *& data)
+	{
+		if (m_it == nullptr)
+		{
+			m_it = rbfirst(m_tree);
+		}
+		else 
+		{
+			if (d == cLeft)
+			{
+				m_it = m_it->get_left();
+			}
+			else
+			{
+				m_it = m_it->get_right();
+			}
+		}
+
+		if (m_it != rbnil(m_tree))
+		{
+			data = m_it->get_data();
+			return true;
+		}
+		return false;
+	}
+
+	bool		xtree::iterator::preorder(s32 dir, void *& data)
+	{
+		if (m_it == rbnil(m_tree))
+			return false;
+
+		if (m_it == nullptr)
+		{
+			m_it = rbfirst(m_tree);
+		}
+		else {
+			xtree::node* next = m_it->get_child(1 - (s32)dir);
+			if (next == rbnil(m_tree))
+			{
+				next = m_it->get_child((s32)dir);
+				if (next == rbnil(m_tree))
+				{
+					do {
+						while (m_it != rbnil(m_tree) && m_it->get_parent_side() == dir)
+						{
+							m_it = m_it->get_parent();
+						}
+						m_it = m_it->get_parent();
+					} while (m_it != rbnil(m_tree) && m_it->get_child((s32)dir) == rbnil(m_tree));
+
+					if (m_it != rbnil(m_tree))
+					{
+						m_it = m_it->get_child((s32)dir);
+					}
+				}
+				else
+				{
+					m_it = next;
+				}
+			}
+			else
+			{
+				m_it = next;
+			}
+		}
+
+		if (m_it != rbnil(m_tree))
+		{
+			data = m_it->get_data();
+			return true;
+		}
+
+		return false;
+	}
+
+	bool		xtree::iterator::sortorder(s32 dir, void *& data)
+	{
+		if (m_it == rbnil(m_tree))
+			return false;
+
+		if (m_it == nullptr)
+		{
+			m_it = rbfirst(m_tree);
+			while (m_it->get_child(1 - (s32)dir) != rbnil(m_tree))
+			{
+				m_it = m_it->get_child(1 - (s32)dir);
+			}
+		}
+		else
+		{
+			xtree::node* next = m_it->get_child((s32)dir);
+			if (next == rbnil(m_tree))
+			{
+				if (m_it->get_parent_side() == dir)
+				{
+					while (m_it != rbnil(m_tree) && m_it->get_parent_side() == dir)
+					{
+						m_it = m_it->get_parent();
+					}
+					if (m_it != rbnil(m_tree))
+					{
+						m_it = m_it->get_parent();
+					}
+				}
+				else
+				{
+					m_it = m_it->get_parent();
+				}
+			}
+			else
+			{
+				do {
+					m_it = next;
+					next = next->get_child(1 - (s32)dir);
+				} while (next != rbnil(m_tree));
+			}
+		}
+
+		if (m_it != rbnil(m_tree) && m_it != rbroot(m_tree))
+		{
+			data = m_it->get_data();
+			return true;
+		}
+
+		return false;
+	}
+
+	bool		xtree::iterator::postorder(s32 dir, void *& data)
+	{
+		if (m_it == rbnil(m_tree))
+			return false;
+
+		if (m_it == nullptr)
+		{
+			m_it = rbfirst(m_tree);
+
+			// Travel on the outside (left - right - left - right ....)
+			xtree::node* branch = m_it->get_child(1 - (s32)dir);
+			while (branch != rbnil(m_tree))
+			{
+				while (branch != rbnil(m_tree))
+				{
+					m_it = branch;
+					branch = branch->get_child(1 - (s32)dir);
+				}
+				branch = m_it->get_child((s32)dir);
+			}
+		}
+		else
+		{
+			if (m_it->get_parent_side() == dir)
+			{
+				m_it = m_it->get_parent();
+			}
+			else
+			{
+				m_it = m_it->get_parent();
+
+				// Travel on the outside (left - right - left - right ....)
+				xtree::node* branch = m_it->get_child((s32)dir);
+				while (branch != rbnil(m_tree))
+				{
+					while (branch != rbnil(m_tree))
+					{
+						m_it = branch;
+						branch = branch->get_child(1 - (s32)dir);
+					}
+					branch = m_it->get_child((s32)dir);
+				}
+			}
+		}
+
+		if (m_it != rbnil(m_tree) && m_it != rbroot(m_tree))
+		{
+			data = m_it->get_data();
+			return true;
+		}
+
+		return false;
 	}
 
 }

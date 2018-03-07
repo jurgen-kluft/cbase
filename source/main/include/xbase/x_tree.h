@@ -22,99 +22,83 @@ namespace xcore
 	public:
 						xtree(x_iallocator* node_allocator);
 
-		const static u32 cHEIGHT_LIMIT = 64;		// Tallest allowable tree
-		const static u32 cIN        = 0x00;
-		const static u32 cLEFT      = 0x01;
-		const static u32 cVISIT     = 0x02;
-		const static u32 cRIGHT     = 0x04;
-		const static u32 cOUT       = 0x08;
-		const static u32 cFORWARDS  = 0x00;
-		const static u32 cBACKWARDS = 0x01;
-		const static u32 cDIRECTION = 0x01;
-		const static u32 cPREORDER  = 0x10;
-		const static u32 cSORTORDER = 0x20;
-		const static u32 cPOSTORDER = 0x40;
-		const static u32 cTRAVERSAL = 0xF0;
+		const static s32 cLeft = 0;
+		const static s32 cRight = 1;
 
 		struct node
 		{
-			inline			node() : data(nullptr) { link[0] = link[1] = 0; }
+			inline			node() : data(0) { parent = link[0] = link[1] = nullptr; }
 
-			void *			data;		// User-defined content 
+			void *			get_data() const { uptr p = data & ~(uptr)0x1; return (void*)p; }
+			void			set_data(void * d) { data = (data & (uptr)0x1) | ((uptr)d & ~(uptr)0x1); }
 
-			void			clear()
+			node *			get_parent() const { return parent; }
+			void			set_parent(node * p) { parent = p; }
+			node *			get_left() const { return link[0]; }
+			node *			get_right() const { return link[1]; }
+			void			set_left(node * c) { link[0] = c; }
+			void			set_right(node * c) { link[1] = c; }
+			node *			get_child(s32 child) const { return link[child&1]; }
+			void			set_child(s32 child, node*n) { link[child&1] = n; }
+
+			bool			is_red() const { uptr p = data & (uptr)0x1; return p == 0; }
+			bool			is_black() const { uptr p = data & (uptr)0x1; return p == 1; }
+			void			set_red() { uptr p = data & (uptr)~0x1; data = p; }
+			void			set_black() { uptr p = data | (uptr)0x1; data = p; }
+			s32				get_color() const { s32 p = (s32)data & (s32)0x1; return p; }
+			void			set_color(s32 c) { uptr p = data & (uptr)~0x1; data = p | ((uptr)c & 0x1); }
+
+			s32				get_parent_side() const
 			{
-				data = nullptr;
-				link[0] = link[1] = 0;
+				node* parent = get_parent();
+				if (parent->get_left() == this)
+					return cLeft;
+				return cRight;
 			}
 
-			node *			get_left() const { return (node*)link[0]; }
-			node *			get_right() const { uptr p = link[1] & ~(uptr)0x1; return (node*)p; }
-			void			set_left(node*n) { link[0] = (uptr)n; }
-			void			set_right(node*n) { uptr p = link[1] & (uptr)0x1; link[1] = p | ((uptr)n); }
-
-			node *			get_child(s32 child) const { uptr p = link[child] & (uptr)~0x1; return (node*)p; }
-			void			set_child(s32 child, node*n) { uptr p = link[child] & (uptr)0x1; link[child] = p | ((uptr)n); }
-
-			bool			is_red() const { uptr p = link[1] & (uptr)0x1; return p == 0; }
-			bool			is_black() const { uptr p = link[1] & (uptr)0x1; return p == 1; }
-			void			set_red() { uptr p = link[1] & (uptr)~0x1; link[1] = p; }
-			void			set_black() { uptr p = link[1] | (uptr)0x1; link[1] = p; }
 		private:
-			uptr			link[2];	// Left (0) and right (1) links 
+			uptr			data;		// User-defined content 
+			node *			parent;		// Parent
+			node *			link[2];	// Left (0) and right (1) links 
 		};
 
 		struct iterator
 		{
-			bool		iterate(void *& data);
+			bool		traverse(s32 d, void *& data);
+			bool		preorder(s32 d, void *& data);
+			bool		sortorder(s32 d, void *& data);
+			bool		postorder(s32 d, void *& data);
 
 		protected:
 			friend class xtree;
-			friend class xtree_internal;
 
-			void		clear();
-
-			void		initialize(xtree* tree, u32 flags = cSORTORDER | cFORWARDS);
-
-			bool		preorder(void *& data);
-			bool		sortorder(void *& data);
-			bool		postorder(void *& data);
-
-			bool		sortorder_backwards(void *& data);
-
-			node*		pop(xbyte& state);
-			void		push(node*, xbyte state);
-
-			xtree *		m_tree;							// Paired tree
-			s32			m_traversal;
+			xtree *		m_tree;
 			node *		m_it;
-			node *		m_path[cHEIGHT_LIMIT];			// Traversal path, node pointer
-			xbyte		m_state[cHEIGHT_LIMIT];			// Traversal path, node state
-			u32			m_top;							// 'Top of stack'
 		};
-
 
 		u32				size() const			{ return m_size;}
 		bool			clear(void *& data);	// Repeatedly call 'clear' until true is returned
 
 		bool			find(void * data, void *& found);
-		s32				insert(void * data);
-		s32				remove(void * data);
+		bool			insert(void * data);
+		bool			remove(void * data);
 
 		bool			validate(const char*& error_str);
 
 		typedef s32(*compare_f) (void const* p1, void const* p2);
 		void			set_cmp(compare_f func) { m_compare = func; }
 
-		void			iterate(iterator& iter, u32 flags = cSORTORDER | cFORWARDS);
+		void			iterate(iterator& iter);
 
 	protected:
 		friend class xtree_internal;
 		friend struct iterator;
+		friend struct search;
 
 		x_iallocator*	m_node_allocator;
 		compare_f		m_compare;
-		node *			m_root;				// Top of the tree
+		node			m_nill;
+		node 			m_root;				// Top of the tree
 		u32				m_size;				// Number of items (user-defined)
 	};
 
