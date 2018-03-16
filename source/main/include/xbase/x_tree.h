@@ -69,6 +69,8 @@ namespace xcore
 			bool		sortorder(s32 d, void *& data);
 			bool		postorder(s32 d, void *& data);
 
+			s32			getdir(s32 compare) const { return (compare + 1) >> 1; }
+
 		protected:
 			friend class xtree;
 
@@ -88,7 +90,7 @@ namespace xcore
 		typedef s32(*compare_f) (void const* p1, void const* p2);
 		void			set_cmp(compare_f func) { m_compare = func; }
 
-		void			iterate(iterator& iter);
+		iterator		iterate();
 
 	protected:
 		friend class xtree_internal;
