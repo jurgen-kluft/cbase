@@ -13,7 +13,7 @@
 //==============================================================================
 // INCLUDES
 //==============================================================================
-#include "xbase/x_chars.h"
+#include "xbase/x_string_utf.h"
 
 namespace xcore
 {
@@ -110,8 +110,8 @@ namespace xcore
 		explicit				x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
 		explicit				x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
 		explicit				x_va(const char* inVar);
-		explicit				x_va(xcuchars& str);
-		explicit				x_va(xcuchar32s& str);
+		explicit				x_va(ascii::crunes& str);
+		explicit				x_va(utf32::crunes& str);
 
 		EType					type() const										{ return (EType)mType; }
 
@@ -148,11 +148,11 @@ namespace xcore
 		operator				f32() const											{ return convertToFloat(); }
 		operator				f64() const											{ return convertToDouble(); }
 		operator				bool() const										{ return convertToBool(); }
-		operator				xcuchars const*() const								{ return convertToUChars(); }
-		operator				xcuchar32s const*() const							{ return convertToUChar32s(); }
+		operator				ascii::crunes const*() const						{ return convertToUChars(); }
+		operator				utf32::crunes const*() const						{ return convertToUChar32s(); }
 
-		void					convertToChars(xuchars& chars) const;
-		void					convertToChar32s(xuchar32s& chars) const;
+		void					convertToChars(ascii::runes& chars) const;
+		void					convertToChar32s(utf32::runes& chars) const;
 
 		static const x_va		sEmpty;
 
@@ -168,8 +168,8 @@ namespace xcore
 		f32						convertToFloat() const;
 		f64						convertToDouble() const;
 		bool					convertToBool() const;
-		xcuchars const*			convertToUChars() const;
-		xcuchar32s const*		convertToUChar32s() const;
+		ascii::crunes const*	convertToUChars() const;
+		utf32::crunes const*	convertToUChar32s() const;
 
 		u16						mType;
 		u16						mVar;
@@ -310,8 +310,8 @@ namespace xcore
 								x_va_r(bool* inRef) : mType(TYPE_BOOL), mVar(0)					{ mRef = (void*)inRef; }
 								x_va_r(f32* inRef) : mType(TYPE_FLOAT32), mVar(0)				{ mRef = (void*)inRef; }
 								x_va_r(f64* inRef) : mType(TYPE_FLOAT64), mVar(0)				{ mRef = (void*)inRef; }
-								x_va_r(xuchars* inRef) : mType(TYPE_PTCHAR), mVar(0)			{ mRef = (void*)inRef; }
-								x_va_r(xuchar32s* inRef) : mType(TYPE_PUCHAR32), mVar(0)		{ mRef = (void*)inRef; }
+								x_va_r(ascii::runes* inRef) : mType(TYPE_PTCHAR), mVar(0)		{ mRef = (void*)inRef; }
+								x_va_r(utf32::runes* inRef) : mType(TYPE_PUCHAR32), mVar(0)		{ mRef = (void*)inRef; }
 
 		x_va_r&					operator=(s8 rhs);
 		x_va_r&					operator=(u8 rhs);

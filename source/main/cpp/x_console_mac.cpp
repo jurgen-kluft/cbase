@@ -25,7 +25,7 @@ namespace xcore
 			return 0;
 		}
 
-		s32 write(const xcuchars& str)
+		s32 write(const ascii::crunes& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen + 4];
@@ -33,7 +33,7 @@ namespace xcore
 			uchar16* end16 = dst16 + maxlen;
 
 			s32 l = 0;
-			xcuchars src = str;
+			ascii::crunes src = str;
 			while (!utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);
@@ -46,7 +46,7 @@ namespace xcore
 			return l;
 		}
 
-		s32 write(xcuchar8s const& str)
+		s32 write(utf8::crunes const& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen + 4];
@@ -54,7 +54,7 @@ namespace xcore
 			uchar16* end16 = dst16 + maxlen;
 
 			s32 l = 0;
-			xcuchar8s src = str;
+			utf8::crunes src = str;
 			while (!utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);
@@ -67,7 +67,7 @@ namespace xcore
 			return l;
 		}
 
-		s32 write(const xcuchar32s& str)
+		s32 write(const utf32::crunes& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen +4];
@@ -75,7 +75,7 @@ namespace xcore
 			uchar16* end16 = dst16 + maxlen;
 
 			s32 l = 0;
-			xcuchar32s src = str;
+			utf32::crunes src = str;
 			while (!utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);

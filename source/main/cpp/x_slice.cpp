@@ -35,20 +35,20 @@ namespace xcore
 
 	slice_data* 	slice_data::incref()
 	{ 
-		if (mAllocator.can_alloc())
+		if (mAllocator!=nullptr)
 			mRefCount++; 
 		return (slice_data*)this; 
 	}
 	slice_data* 	slice_data::incref() const
 	{ 
-		if (mAllocator.can_alloc())
+		if (mAllocator != nullptr)
 			mRefCount++;
 		return (slice_data*)this;
 	}
 
 	slice_data*		slice_data::decref()
 	{
-		if (!mAllocator.can_alloc())
+		if (mAllocator != nullptr)
 			return this;
 
 		s32 const refs = mRefCount;
@@ -56,7 +56,7 @@ namespace xcore
 			return &sNull;
 		if (refs == 1)
 		{
-			mAllocator.deallocate(this);
+			mAllocator->deallocate(this);
 			return &sNull;
 		}
 
@@ -64,9 +64,9 @@ namespace xcore
 		return this;
 	}
 
-	slice_data*		slice_data::alloc(xallocator allocator, u32& to_itemcount, u32& to_itemsize)
+	slice_data*		slice_data::alloc(xalloc* allocator, u32& to_itemcount, u32& to_itemsize)
 	{
-		slice_data* data = (slice_data*)allocator.allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void*));
+		slice_data* data = (slice_data*)allocator->allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void*));
 		data->mRefCount = 1;
 		data->mItemCount = to_itemcount;
 		data->mItemSize = to_itemsize;
@@ -78,11 +78,11 @@ namespace xcore
 	slice_data*	slice_data::resize(s32 from, s32 to)
 	{
 		slice_data* data = &sNull;
-		if (mAllocator.can_alloc())
+		if (mAllocator!=nullptr)
 		{
 			u32 const to_itemsize = mItemSize;
 			u32 const to_itemcount = to - from;
-			data = (slice_data*)mAllocator.allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void*));
+			data = (slice_data*)mAllocator->allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void*));
 			data->mAllocator = mAllocator;
 			data->mRefCount = 1;
 			data->mItemSize = to_itemsize;
@@ -112,14 +112,14 @@ namespace xcore
 		mTo = to;
 	}
 
-	slice::slice(xallocator allocator, u32 item_count, u32 item_size)
+	slice::slice(xalloc* allocator, u32 item_count, u32 item_size)
 	{
 		mData = slice_data::alloc(allocator, item_count, item_size);
 		mFrom = 0;
 		mTo = item_count;
 	}
 
-	void			slice::alloc(slice& slice, xallocator allocator, u32 item_count, u32 item_size)
+	void			slice::alloc(slice& slice, xalloc* allocator, u32 item_count, u32 item_size)
 	{ 
 		slice.mData = slice_data::alloc(allocator, item_count, item_size);
 		slice.mFrom = 0; 

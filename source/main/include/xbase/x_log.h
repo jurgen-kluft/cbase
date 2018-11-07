@@ -97,10 +97,10 @@ namespace xcore
 		static void 			write(ELevel inLevel, u64 _value);
 		static void 			write(ELevel inLevel, f32 _value);
 		static void 			write(ELevel inLevel, f64 _value);
-		static void 			write(ELevel inLevel, const xcuchars& str);
-		static void 			write(ELevel inLevel, const xcuchars& format, const x_va_list& arguments);
-		static void 			write(ELevel inLevel, const xcuchar32s& str);
-		static void 			write(ELevel inLevel, const xcuchar32s& format, const x_va_list& arguments);
+		static void 			write(ELevel inLevel, const ascii::crunes& str);
+		static void 			write(ELevel inLevel, const ascii::crunes& format, const x_va_list& arguments);
+		static void 			write(ELevel inLevel, const utf32::crunes& str);
+		static void 			write(ELevel inLevel, const utf32::crunes& format, const x_va_list& arguments);
 
 		static void 			writeLine(ELevel inLevel);
 		static void 			writeLine(ELevel inLevel, bool _value);
@@ -110,10 +110,10 @@ namespace xcore
 		static void 			writeLine(ELevel inLevel, u64 _value);
 		static void 			writeLine(ELevel inLevel, f32 _value);
 		static void 			writeLine(ELevel inLevel, f64 _value);
-		static void 			writeLine(ELevel inLevel, const xcuchars& str);
-		static void 			writeLine(ELevel inLevel, const xcuchars& format, const x_va_list& arguments);
-		static void 			writeLine(ELevel inLevel, const xcuchar32s& str);
-		static void 			writeLine(ELevel inLevel, const xcuchar32s& format, const x_va_list& arguments);
+		static void 			writeLine(ELevel inLevel, const ascii::crunes& str);
+		static void 			writeLine(ELevel inLevel, const ascii::crunes& format, const x_va_list& arguments);
+		static void 			writeLine(ELevel inLevel, const utf32::crunes& str);
+		static void 			writeLine(ELevel inLevel, const utf32::crunes& format, const x_va_list& arguments);
 	};
 
 	/**
@@ -138,10 +138,10 @@ namespace xcore
 		virtual void 			write(u64 _value) = 0;
 		virtual void 			write(f32 _value) = 0;
 		virtual void 			write(f64 _value) = 0;
-		virtual void 			write(const xcuchars& str) = 0;
-		virtual void 			write(const xcuchars& format, const x_va_list& arguments) = 0;
-		virtual void 			write(const xcuchar32s& str) = 0;
-		virtual void 			write(const xcuchar32s& format, const x_va_list& arguments) = 0;
+		virtual void 			write(const ascii::crunes& str) = 0;
+		virtual void 			write(const ascii::crunes& format, const x_va_list& arguments) = 0;
+		virtual void 			write(const utf32::crunes& str) = 0;
+		virtual void 			write(const utf32::crunes& format, const x_va_list& arguments) = 0;
 
 		virtual void 			writeLine() = 0;
 		virtual void 			writeLine(bool _value) = 0;
@@ -151,10 +151,10 @@ namespace xcore
 		virtual void 			writeLine(u64 _value) = 0;
 		virtual void 			writeLine(f32 _value) = 0;
 		virtual void 			writeLine(f64 _value) = 0;
-		virtual void 			writeLine(const xcuchars& str) = 0;
-		virtual void 			writeLine(const xcuchars& format, const x_va_list& arguments) = 0;
-		virtual void 			writeLine(const xcuchar32s& str) = 0;
-		virtual void 			writeLine(const xcuchar32s& format, const x_va_list& arguments) = 0;
+		virtual void 			writeLine(const ascii::crunes& str) = 0;
+		virtual void 			writeLine(const ascii::crunes& format, const x_va_list& arguments) = 0;
+		virtual void 			writeLine(const utf32::crunes& str) = 0;
+		virtual void 			writeLine(const utf32::crunes& format, const x_va_list& arguments) = 0;
 	};
 
 //==============================================================================

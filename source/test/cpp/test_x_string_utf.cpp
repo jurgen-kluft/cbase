@@ -7,7 +7,7 @@
 
 using namespace xcore;
 
-extern xcore::x_iallocator* gTestAllocator;
+extern xcore::xalloc* gTestAllocator;
 
 
 UNITTEST_SUITE_BEGIN(xstring_utf)
@@ -50,7 +50,7 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 			CHECK_EQUAL(4, utf8::len(str1, NULL));
 			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0 };	// fr�nch
 
-			xcuchar8s str(str2);
+			utf8::crunes str(str2);
 			uchar32 c;
 			c = utf::read(str);
 			c = utf::read(str);
@@ -60,7 +60,7 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 
 		UNITTEST_TEST(copy_ascii_to_u32)
 		{
-			xcuchars src("test");
+			ascii::crunes src("test");
 			CHECK_EQUAL('t', src.str()[0]);
 			CHECK_EQUAL('e', src.str()[1]);
 
@@ -72,8 +72,8 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 
 		UNITTEST_TEST(read1_utf8)
 		{
-			xcuchar8s str1((const uchar8*)"test");
-			xcuchars str11((const uchar*)"test");
+			utf8::crunes str1((const uchar8*)"test");
+			ascii::crunes str11((const uchar*)"test");
 			for (s32 i=0; i<5; ++i)
 			{
 				uchar32 ch = utf::read(str1);
@@ -83,7 +83,7 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 
 			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// fr�nch
 
-			xcuchar8s str(str2);
+			utf8::crunes str(str2);
 			uchar32 c;
 			c = utf::read(str);
 			c = utf::read(str);

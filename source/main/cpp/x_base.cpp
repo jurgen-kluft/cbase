@@ -7,8 +7,8 @@
 
 namespace xcore
 {
-	static x_iallocator*	sSystemAllocator = NULL;
-	x_iallocator*			x_iallocator::get_default()
+	static xalloc*	sSystemAllocator = NULL;
+	xalloc*			xalloc::get_default()
 	{
 		return sSystemAllocator;
 	}
@@ -27,7 +27,7 @@ namespace xbase
 	void			x_Exit()
 	{
 		xcore::x_asserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
-		xcore::sSystemAllocator->release();
+
 		xcore::sSystemAllocator = NULL;
 	}
 #else

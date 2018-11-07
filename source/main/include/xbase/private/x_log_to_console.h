@@ -36,10 +36,10 @@ namespace xcore
 		virtual void 			write(f32 value);
 		virtual void 			write(u32 value);
 		virtual void 			write(u64 value);
-		virtual void 			write(const xcuchars& str);
-		virtual void 			write(const xcuchars& format, const x_va_list& arguments);
-		virtual void 			write(const xcuchar32s& str);
-		virtual void 			write(const xcuchar32s& format, const x_va_list& arguments);
+		virtual void 			write(const ascii::crunes& str);
+		virtual void 			write(const ascii::crunes& format, const x_va_list& arguments);
+		virtual void 			write(const utf32::crunes& str);
+		virtual void 			write(const utf32::crunes& format, const x_va_list& arguments);
 
 		virtual void 			writeLine();
 		virtual void 			writeLine(bool value);
@@ -49,10 +49,10 @@ namespace xcore
 		virtual void 			writeLine(f32 value);
 		virtual void 			writeLine(u32 value);
 		virtual void 			writeLine(u64 value);
-		virtual void 			writeLine(const xcuchars& str);
-		virtual void 			writeLine(const xcuchars& format, const x_va_list& arguments);
-		virtual void 			writeLine(const xcuchar32s& str);
-		virtual void 			writeLine(const xcuchar32s& format, const x_va_list& arguments);
+		virtual void 			writeLine(const ascii::crunes& str);
+		virtual void 			writeLine(const ascii::crunes& format, const x_va_list& arguments);
+		virtual void 			writeLine(const utf32::crunes& str);
+		virtual void 			writeLine(const utf32::crunes& format, const x_va_list& arguments);
 	};
 };
 /**

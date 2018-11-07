@@ -24,18 +24,18 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 		UNITTEST_TEST(format_double)
 		{
 			xucharz<256> str;
-			xcuchars fmt("%f");
+			ascii::crunes fmt("%f");
 
 			f64 d = 3.1415;
 			ascii::sprintf(str, fmt, x_va(d));
-			xcuchars answer_str("3.141500");
+			ascii::crunes answer_str("3.141500");
 			CHECK_EQUAL(0, ascii::compare(answer_str, str));
 		}
 
 		UNITTEST_TEST(format_string)
 		{
 			xucharz<256> str;
-			xcuchars fmt("the %s");
+			ascii::crunes fmt("the %s");
 
 			ascii::sprintf(str, fmt, x_va("test string"));
 			CHECK_EQUAL(0, str.compare("the test string"));

@@ -58,9 +58,9 @@ namespace xcore
 		};
 
 		typedef s32(*ConsoleColorDelegate)(xconsole::EColor);
-		typedef s32 (*ConsoleOutDelegate)(xcuchars const& str);
-		typedef s32 (*ConsoleOut8Delegate)(xcuchar8s const& str);
-		typedef s32 (*ConsoleOut32Delegate)(xcuchar32s const& str);
+		typedef s32 (*ConsoleOutDelegate)(ascii::crunes const& str);
+		typedef s32 (*ConsoleOut8Delegate)(utf8::crunes const& str);
+		typedef s32 (*ConsoleOut32Delegate)(utf32::crunes const& str);
 
 		static void				set_console_store(xiconsole_store* store);
 		static void				add_default_console();
@@ -76,18 +76,18 @@ namespace xcore
 		static void	 			write(u32 _value);
 		static void	 			write(u64 _value);
 
-		static void	 			write(const xcuchars& str);
-		static void	 			write(const xcuchar8s& str);
-		static void	 			write(const xcuchar32s& str);
+		static void	 			write(const ascii::crunes& str);
+		static void	 			write(const utf8::crunes& str);
+		static void	 			write(const utf32::crunes& str);
 	
-		static void	 			write(const xcuchars& fmt, const x_va_list& args);
-		static void	 			write(const xcuchars& fmt, X_VA_ARGS_16_DEF);
+		static void	 			write(const ascii::crunes& fmt, const x_va_list& args);
+		static void	 			write(const ascii::crunes& fmt, X_VA_ARGS_16_DEF);
 
-		static void	 			write(const xcuchar8s& fmt, const x_va_list& args);
-		static void	 			write(const xcuchar8s& fmt, X_VA_ARGS_16_DEF);
+		static void	 			write(const utf8::crunes& fmt, const x_va_list& args);
+		static void	 			write(const utf8::crunes& fmt, X_VA_ARGS_16_DEF);
 
-		static void	 			write(const xcuchar32s& fmt, const x_va_list& args);
-		static void	 			write(const xcuchar32s& fmt, X_VA_ARGS_16_DEF);
+		static void	 			write(const utf32::crunes& fmt, const x_va_list& args);
+		static void	 			write(const utf32::crunes& fmt, X_VA_ARGS_16_DEF);
 
 		static void 			writeLine();
 
@@ -99,18 +99,18 @@ namespace xcore
 		inline static void 		writeLine(u32 _value)							{ write(_value); writeLine(); }
 		inline static void 		writeLine(u64 _value)							{ write(_value); writeLine(); }
 
-		inline static void 		writeLine(const xcuchars& str)					{ write(str); writeLine(); }
-		inline static void 		writeLine(const xcuchar32s& str)				{ write(str); writeLine(); }
+		inline static void 		writeLine(const ascii::crunes& str)					{ write(str); writeLine(); }
+		inline static void 		writeLine(const utf32::crunes& str)				{ write(str); writeLine(); }
 
-		inline static void		writeLine(const xcuchars& fmt, const x_va_list& args) { write(fmt, args); writeLine(); }
-		inline static void		writeLine(const xcuchars& fmt, X_VA_ARGS_16_DEF)
+		inline static void		writeLine(const ascii::crunes& fmt, const x_va_list& args) { write(fmt, args); writeLine(); }
+		inline static void		writeLine(const ascii::crunes& fmt, X_VA_ARGS_16_DEF)
 		{
 			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9);
 			write(fmt, args); 
 			writeLine();
 		}
-		inline static void		writeLine(const xcuchar32s& fmt, const x_va_list& args)	{ write(fmt, args); writeLine(); }
-		inline static void		writeLine(const xcuchar32s& fmt, X_VA_ARGS_16_DEF)
+		inline static void		writeLine(const utf32::crunes& fmt, const x_va_list& args)	{ write(fmt, args); writeLine(); }
+		inline static void		writeLine(const utf32::crunes& fmt, X_VA_ARGS_16_DEF)
 		{
 			x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9);
 			write(fmt, args); 
@@ -123,9 +123,9 @@ namespace xcore
 	{
 		extern s32				color(xconsole::EColor color);
 
-		extern s32				write(xcuchars const& str);
-		extern s32				write(xcuchar8s const& str);
-		extern s32				write(xcuchar32s const& str);
+		extern s32				write(ascii::crunes const& str);
+		extern s32				write(utf8::crunes const& str);
+		extern s32				write(utf32::crunes const& str);
 	};
 
 	/// Interface class, has specific (or configurable) implementations for different environments/platforms
@@ -150,13 +150,13 @@ namespace xcore
 		virtual void			write(u32 _value) = 0;
 		virtual void			write(u64 _value) = 0;
 
-		virtual void			write(const xcuchars& buffer) = 0;
-		virtual void			write(const xcuchar8s& buffer) = 0;
-		virtual void			write(const xcuchar32s& buffer) = 0;
+		virtual void			write(const ascii::crunes& buffer) = 0;
+		virtual void			write(const utf8::crunes& buffer) = 0;
+		virtual void			write(const utf32::crunes& buffer) = 0;
 
-		virtual void			write(const xcuchars& fmt, const x_va_list& args) = 0;
-		virtual void			write(const xcuchar8s& fmt, const x_va_list& args) = 0;
-		virtual void			write(const xcuchar32s& fmt, const x_va_list& args) = 0;
+		virtual void			write(const ascii::crunes& fmt, const x_va_list& args) = 0;
+		virtual void			write(const utf8::crunes& fmt, const x_va_list& args) = 0;
+		virtual void			write(const utf32::crunes& fmt, const x_va_list& args) = 0;
 
 		virtual void			writeLine() = 0;
 
@@ -168,13 +168,13 @@ namespace xcore
 		inline void				writeLine(u32 _value)							{ write(_value); writeLine(); }
 		inline void				writeLine(u64 _value)							{ write(_value); writeLine(); }
 
-		inline void				writeLine(const xcuchars&   str) { write(str); writeLine(); }
-		inline void				writeLine(const xcuchar8s&  str) { write(str); writeLine(); }
-		inline void				writeLine(const xcuchar32s& str) { write(str); writeLine(); }
+		inline void				writeLine(const ascii::crunes&   str) { write(str); writeLine(); }
+		inline void				writeLine(const utf8::crunes&  str) { write(str); writeLine(); }
+		inline void				writeLine(const utf32::crunes& str) { write(str); writeLine(); }
 
-		inline void				writeLine(const xcuchars&   format, const x_va_list& args) { write(format, args); writeLine(); }
-		inline void				writeLine(const xcuchar8s&  format, const x_va_list& args) { write(format, args); writeLine(); }
-		inline void				writeLine(const xcuchar32s& format, const x_va_list& args) { write(format, args); writeLine(); }
+		inline void				writeLine(const ascii::crunes&   format, const x_va_list& args) { write(format, args); writeLine(); }
+		inline void				writeLine(const utf8::crunes&  format, const x_va_list& args) { write(format, args); writeLine(); }
+		inline void				writeLine(const utf32::crunes& format, const x_va_list& args) { write(format, args); writeLine(); }
 	};
 
 	//==============================================================================

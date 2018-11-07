@@ -199,7 +199,7 @@ namespace xcore
 		}
 	}
 
-	class x_allocator_basic : public x_iallocator
+	class x_allocator_basic : public xalloc
 	{
 	public:
 		x_allocator_basic()
@@ -227,18 +227,6 @@ namespace xcore
 			return p;
 		}
 
-		virtual void*			reallocate(void* ptr, xsize_t size, u32 alignment)
-		{
-			void* p = ffa::allocate(&mRoot, size, alignment);
-
-			ffa::node* ptr_node = ffa::node::from_ptr(ptr);
-			x_memcpy(p, ptr, ptr_node->mSize < (u32)size ? ptr_node->mSize : (u32)size);
-
-			ffa::deallocate(&mRoot, ptr);
-
-			return p;
-		}
-
 		virtual void			deallocate(void* ptr)
 		{
 			--mAllocationCount;
@@ -263,7 +251,7 @@ namespace xcore
 		u32			mAllocationCount;
 	};
 
-	x_iallocator*		gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment)
+	xalloc*		gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment)
 	{
 		x_allocator_basic* ba = new (mem_begin) x_allocator_basic();
 		mem_begin = xmem_utils::ptr_add(mem_begin, sizeof(x_allocator_basic));

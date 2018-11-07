@@ -15,31 +15,28 @@
 //==============================================================================
 namespace xcore
 {
-	class x_iallocator;
-
-	class xtree
+	class tree_t
 	{
 	public:
-						xtree(x_iallocator* node_allocator);
+		tree_t();
 
 		const static s32 cLeft = 0;
 		const static s32 cRight = 1;
-
-		struct node
+		struct node_t
 		{
-			inline			node() : data(0) { parent = link[0] = link[1] = nullptr; }
+			inline			node_t() : data(0) { parent = link[0] = link[1] = nullptr; }
 
 			void *			get_data() const { uptr p = data & ~(uptr)0x1; return (void*)p; }
 			void			set_data(void * d) { data = (data & (uptr)0x1) | ((uptr)d & ~(uptr)0x1); }
 
-			node *			get_parent() const { return parent; }
-			void			set_parent(node * p) { parent = p; }
-			node *			get_left() const { return link[0]; }
-			node *			get_right() const { return link[1]; }
-			void			set_left(node * c) { link[0] = c; }
-			void			set_right(node * c) { link[1] = c; }
-			node *			get_child(s32 child) const { return link[child&1]; }
-			void			set_child(s32 child, node*n) { link[child&1] = n; }
+			node_t *		get_parent() const { return parent; }
+			void			set_parent(node_t * p) { parent = p; }
+			node_t *		get_left() const { return link[0]; }
+			node_t *		get_right() const { return link[1]; }
+			void			set_left(node_t * c) { link[0] = c; }
+			void			set_right(node_t * c) { link[1] = c; }
+			node_t *		get_child(s32 child) const { return link[child&1]; }
+			void			set_child(s32 child, node_t*n) { link[child&1] = n; }
 
 			bool			is_red() const { uptr p = data & (uptr)0x1; return p == 0; }
 			bool			is_black() const { uptr p = data & (uptr)0x1; return p == 1; }
@@ -50,7 +47,7 @@ namespace xcore
 
 			s32				get_parent_side() const
 			{
-				node* parent = get_parent();
+				node_t* parent = get_parent();
 				if (parent->get_left() == this)
 					return cLeft;
 				return cRight;
@@ -58,8 +55,8 @@ namespace xcore
 
 		private:
 			uptr			data;		// User-defined content 
-			node *			parent;		// Parent
-			node *			link[2];	// Left (0) and right (1) links 
+			node_t *		parent;		// Parent
+			node_t *		link[2];	// Left (0) and right (1) links 
 		};
 
 		struct iterator
@@ -72,18 +69,18 @@ namespace xcore
 			s32			getdir(s32 compare) const { return (compare + 1) >> 1; }
 
 		protected:
-			friend class xtree;
+			friend class tree_t;
 
-			xtree *		m_tree;
-			node *		m_it;
+			tree_t *	m_tree;
+			node_t *	m_it;
 		};
 
 		u32				size() const			{ return m_size;}
-		bool			clear(void *& data);	// Repeatedly call 'clear' until true is returned
+		bool			clear(void *& data, node_t*& node);	// Repeatedly call 'clear' until true is returned
 
-		bool			find(void * data, void *& found);
-		bool			insert(void * data);
-		bool			remove(void * data);
+		bool			find(void * data, node_t *& found);
+		bool			insert(void * data, node_t * node);
+		bool			remove(void * data, node_t*& removed_node);
 
 		bool			validate(const char*& error_str);
 
@@ -93,47 +90,16 @@ namespace xcore
 		iterator		iterate();
 
 	protected:
-		friend class xtree_internal;
+		friend class tree_internal;
 		friend struct iterator;
 		friend struct search;
 
-		x_iallocator*	m_node_allocator;
 		compare_f		m_compare;
-		node			m_nill;
-		node 			m_root;				// Top of the tree
+		node_t			m_nill;
+		node_t 			m_root;				// Top of the tree
 		u32				m_size;				// Number of items (user-defined)
 	};
 
-	template<typename T>
-	class xtree_t
-	{
-	public:
-		inline			xtree_t(x_iallocator* node_allocator) : m_tree(node_allocator) { m_tree.set_cmp(&compare); }
-		inline			~xtree_t()					{ void* data; while (!m_tree.clear(data)) {} }
-
-		u32				size() const				{ return m_tree.size(); }
-		bool			clear(T *& data)			{ void* p; bool result = m_tree.clear(p); data = (T*)p; return result; }
-
-		bool			find(T * data, T *& found)	{ void * p = (void *)data; void * f;  bool result = m_tree.find(p, f); found = (T*)f; return result; }
-		bool			insert(T * data)			{ return m_tree.insert(data) == 1; }
-		bool			remove(T * data)			{ void * p = (void *)data; return m_tree.remove(p) == 1; }
-
-		bool			validate(const char*& error_str)	{ return m_tree.validate(error_str); }
-
-	protected:
-		static s32		compare(void const* p1, void const* p2)
-		{
-			T const& a = *(T const*)p1;
-			T const& b = *(T const*)p2;
-			if (a < b)
-				return -1;
-			else if (a > b)
-				return 1;
-			return 0;
-		}
-
-		xtree			m_tree;
-	};
 
 }
 

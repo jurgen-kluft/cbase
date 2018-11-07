@@ -1,5 +1,4 @@
-﻿#include "xbase/x_allocator.h"
-#include "xbase/x_tree.h"
+﻿#include "xbase/x_tree.h"
 #include "xbase/x_bit_field.h"
 
 #include <string>
@@ -17,35 +16,35 @@ namespace xcore
 		return 0;
 	}
 
-#define rbnil(t)            (&(t)->m_nill)
-#define rbfirst(t)          ((t)->m_root.get_left())
-#define rbroot(t)           (&(t)->m_root)
+	#define rbnil(t)            (&(t)->m_nill)
+	#define rbfirst(t)          ((t)->m_root.get_left())
+	#define rbroot(t)           (&(t)->m_root)
 
-#define rbsetfirst(t, n)    ((t)->m_root.set_left(n))
+	#define rbsetfirst(t, n)    ((t)->m_root.set_left(n))
 
-	class xtree_internal
+	class tree_internal
 	{
 	public:
-		static inline s32       is_red(xtree* tree, xtree::node* n) { return n != rbnil(tree) && n->is_red(); }
+		static inline s32       is_red(tree_t* tree, tree_t::node_t* n) { return n != rbnil(tree) && n->is_red(); }
 
-		static void             rotate_left(xtree* tree, xtree::node* node);
-		static void             rotate_right(xtree* tree, xtree::node* node);
+		static void             rotate_left(tree_t* tree, tree_t::node_t* node);
+		static void             rotate_right(tree_t* tree, tree_t::node_t* node);
 
-		static xtree::node*     tree_successor(xtree* tree, xtree::node* node);
+		static tree_t::node_t*  tree_successor(tree_t* tree, tree_t::node_t* node);
 
-		static xtree::node*     tree_insert(xtree* tree, void* data);
-		static xtree::node*     tree_find(xtree* tree, void* data);
-		static bool             tree_clear(xtree* tree, void*& data);
-		static void             tree_repair(xtree* tree, xtree::node* node);
-		static void*            tree_remove(xtree* tree, xtree::node* node);
+		static bool             tree_insert(tree_t* tree, void* data, tree_t::node_t* node);
+		static bool             tree_find(tree_t* tree, void* data, tree_t::node_t*& found);
+		static bool             tree_clear(tree_t* tree, void*& removed_data, tree_t::node_t*& removed_node);
+		static void             tree_repair(tree_t* tree, tree_t::node_t* node);
+		static void             tree_remove(tree_t* tree, tree_t::node_t* node);
 
-		static s32              tree_validate(xtree* tree, xtree::node* root, const char*& result);
+		static s32              tree_validate(tree_t* tree, tree_t::node_t* root, const char*& result);
 	};
 
 
-	void xtree_internal::rotate_left(xtree* tree, xtree::node* node)
+	void tree_internal::rotate_left(tree_t* tree, tree_t::node_t* node)
 	{
-		xtree::node* child;
+		tree_t::node_t* child;
 
 		child = node->get_right();
 		node->set_right(child->get_left());
@@ -64,9 +63,9 @@ namespace xcore
 		node->set_parent(child);
 	}
 
-	void xtree_internal::rotate_right(xtree* tree, xtree::node* node)
+	void tree_internal::rotate_right(tree_t* tree, tree_t::node_t* node)
 	{
-		xtree::node* child;
+		tree_t::node_t* child;
 
 		child = node->get_left();
 		node->set_left(child->get_right());
@@ -85,9 +84,9 @@ namespace xcore
 	}
 
 	// Returns the successor of node, or nil if there is none.
-	xtree::node*   xtree_internal::tree_successor(xtree* tree, xtree::node* node)
+	tree_t::node_t*   tree_internal::tree_successor(tree_t* tree, tree_t::node_t* node)
 	{
-		xtree::node* succ = succ = node->get_right();
+		tree_t::node_t* succ = succ = node->get_right();
 		if (succ != rbnil(tree))
 		{
 			while (succ->get_left() != rbnil(tree))
@@ -106,10 +105,10 @@ namespace xcore
 	}
 
 
-	// Delete node 'z' from the tree and return its data pointer.
-	void* xtree_internal::tree_remove(xtree* tree, xtree::node* z)
+	// Remove node 'z' from the tree
+	void tree_internal::tree_remove(tree_t* tree, tree_t::node_t* z)
 	{
-		xtree::node* x, *y;
+		tree_t::node_t* x, *y;
 
 		void* data = z->get_data();
 
@@ -157,16 +156,13 @@ namespace xcore
 				z->get_parent()->set_right(y);
 			}
 		}
-
-		tree->m_node_allocator->deallocate(z);
-		return (data);
 	}
 
 	// Repair the tree after a node has been deleted by rotating and repainting
 	// colors to restore the 4 properties inherent in red-black trees.
-	void xtree_internal::tree_repair(xtree* tree, xtree::node* node)
+	void tree_internal::tree_repair(tree_t* tree, tree_t::node_t* node)
 	{
-		xtree::node* sibling;
+		tree_t::node_t* sibling;
 
 		while (node->is_black())
 		{
@@ -238,10 +234,10 @@ namespace xcore
 	// Insert data pointer into a redblack tree.
 	// Returns a NULL pointer on success.  If a node matching "data"
 	// already exists, a pointer to the existant node is returned.
-	xtree::node* xtree_internal::tree_insert(xtree* tree, void* data)
+	bool tree_internal::tree_insert(tree_t* tree, void* data, tree_t::node_t* node_to_insert)
 	{
-		xtree::node* node = rbfirst(tree);
-		xtree::node* parent = rbroot(tree);
+		tree_t::node_t* node = rbfirst(tree);
+		tree_t::node_t* parent = rbroot(tree);
 
 		// Find correct insertion point.
 		while (node != rbnil(tree))
@@ -249,11 +245,11 @@ namespace xcore
 			parent = node;
 			s32 res = tree->m_compare(data, node->get_data());
 			if (res == 0)
-				return (node);
+				return false;
 			node = res < 0 ? node->get_left() : node->get_right();
 		}
 
-		node = (xtree::node*) tree->m_node_allocator->allocate(sizeof(xtree::node), sizeof(void*));
+		node = node_to_insert;
 		node->set_data(data);
 		node->set_right(rbnil(tree));
 		node->set_left(rbnil(tree));
@@ -288,7 +284,7 @@ namespace xcore
 
 		while (node->get_parent()->is_red())
 		{
-			xtree::node* uncle;
+			tree_t::node_t* uncle;
 			if (node->get_parent() == node->get_parent()->get_parent()->get_left())
 			{
 				uncle = node->get_parent()->get_parent()->get_right();
@@ -336,25 +332,27 @@ namespace xcore
 			}
 		}
 		rbfirst(tree)->set_black(); // first node is always black
-		return (nullptr);
+		return true;
 	}
 
 	// Look for a node matching key in tree.
 	// Returns a pointer to the node if found, else NULL.
-	xtree::node* xtree_internal::tree_find(xtree* tree, void* key)
+	bool tree_internal::tree_find(tree_t* tree, void* key, tree_t::node_t*& found)
 	{
-		xtree::node* node = rbfirst(tree);
+		tree_t::node_t* node = rbfirst(tree);
 		while (node != rbnil(tree))
 		{
 			s32 c = tree->m_compare(key, node->get_data());
 			if (c == 0)
 			{
-				return (node);
+				found = node;
+				return true;
 			}
 			c = (c + 1) >> 1;
 			node = node->get_child(c);
 		}
-		return (NULL);
+		found = (NULL);
+		return false;
 	}
 
 	// <summary>
@@ -363,15 +361,16 @@ namespace xcore
 	//   you get 'true', this is when the tree is empty.
 	// <summary>
 	// <param name="tree">The tree to release</param>
-	bool xtree_internal::tree_clear(xtree* tree, void*& data)
+	bool tree_internal::tree_clear(tree_t* tree, void*& removed_data, tree_t::node_t*& removed_node)
 	{
-		data = nullptr;
+		removed_data = nullptr;
+		removed_node = nullptr;
 
-		xtree::node* node = rbfirst(tree);
+		tree_t::node_t* node = rbfirst(tree);
 		if (node == rbnil(tree))
 			return true;
 
-		xtree::node* todelete = tree->m_root.get_left();
+		tree_t::node_t* todelete = tree->m_root.get_left();
 		if (node->get_left() == rbnil(tree))
 		{
 			tree->m_root.set_left(node->get_right());
@@ -385,13 +384,13 @@ namespace xcore
 			// We have left and right branches
 			// Take right branch and place it
 			// somewhere down the left branch
-			xtree::node* branch = node->get_right();
+			tree_t::node_t* branch = node->get_right();
 			node->set_right(rbnil(tree));
 
 			// Find a node in the left branch that does not
 			// have both a left and right branch and place
 			// our branch there.
-			xtree::node* iter = node->get_left();
+			tree_t::node_t* iter = node->get_left();
 			while (iter->get_left() != rbnil(tree) && iter->get_right() != rbnil(tree))
 			{
 				iter = iter->get_left();
@@ -408,18 +407,17 @@ namespace xcore
 			tree->m_root.set_left(node->get_left());
 		}
 
-		data = todelete->get_data();
-		tree->m_node_allocator->deallocate(todelete);
-		tree->m_size -= 1;
-		todelete = nullptr;
+		removed_data = todelete->get_data();
+		removed_node = todelete;
 
+		tree->m_size -= 1;
 		return false;
 	}
 
 	// Test the integrity of the red-black tree
 	// @return: The depth of the tree
 	// @result: If any error it returns a description of the error in 'result', when no error it will be NULL
-	s32 xtree_internal::tree_validate(xtree* tree, xtree::node* root, const char*& result)
+	s32 tree_internal::tree_validate(tree_t* tree, tree_t::node_t* root, const char*& result)
 	{
 		if (root == rbnil(tree))
 		{
@@ -427,8 +425,8 @@ namespace xcore
 		}
 		else
 		{
-			xtree::node* ln = root->get_left();
-			xtree::node* rn = root->get_right();
+			tree_t::node_t* ln = root->get_left();
+			tree_t::node_t* rn = root->get_right();
 
 			// Consecutive red links
 			if (is_red(tree, root))
@@ -466,9 +464,8 @@ namespace xcore
 		}
 	}
 
-	xtree::xtree(x_iallocator* node_allocator)
-		: m_node_allocator(node_allocator)
-		, m_compare(&compare_void)
+	tree_t::tree_t()
+		: m_compare(&compare_void)
 		, m_size(0)
 	{
 		// We use a self-referencing sentinel node called nil to simplify the
@@ -488,56 +485,51 @@ namespace xcore
 		m_root.set_data(nullptr);
 	}
 
-	bool            xtree::clear(void*& data)
+	bool            tree_t::clear(void*& data, tree_t::node_t*& node)
 	{
-		return xtree_internal::tree_clear(this, data);
+		return tree_internal::tree_clear(this, data, node);
 	}
 
-	bool            xtree::find(void* data, void*& found)
+	bool            tree_t::find(void* data, node_t *& found)
 	{
-		xtree::node* node = xtree_internal::tree_find(this, data);
-		if (node == nullptr)
-			return false;
-		found = node->get_data();
-		return true;
+		return tree_internal::tree_find(this, data, found);
 	}
 
-	bool            xtree::insert(void* data)
+	bool            tree_t::insert(void* data, node_t * node)
 	{
-		xtree::node* node = xtree_internal::tree_insert(this, data);
-		if (node == nullptr)
+		bool const inserted = tree_internal::tree_insert(this, data, node);
+		if (inserted)
 		{
 			m_size++;
-			return true;
 		}
-		return false;
+		return inserted;
 	}
 
-	bool            xtree::remove(void* data)
+	bool            tree_t::remove(void* data, node_t*& removed_node)
 	{
-		xtree::node* node = xtree_internal::tree_find(this, data);
-		if (node == nullptr)
+		tree_internal::tree_find(this, data, removed_node);
+		if (removed_node == nullptr)
 			return false;
-		xtree_internal::tree_remove(this, node);
+		tree_internal::tree_remove(this, removed_node);
 		return true;
 	}
 
-	bool            xtree::validate(const char*& error_str)
+	bool            tree_t::validate(const char*& error_str)
 	{
-		s32 depth = xtree_internal::tree_validate(this, rbfirst(this), error_str);
+		s32 depth = tree_internal::tree_validate(this, rbfirst(this), error_str);
 		return (error_str == NULL);
 	}
 
-	xtree::iterator xtree::iterate()
+	tree_t::iterator tree_t::iterate()
 	{
-		xtree::iterator iter;
+		tree_t::iterator iter;
 		iter.m_tree = this;
 		iter.m_it = nullptr;
 		return iter;
 	}
 
 
-	bool        xtree::iterator::traverse(s32 d, void*& data)
+	bool        tree_t::iterator::traverse(s32 d, void*& data)
 	{
 		if (m_it == nullptr)
 		{
@@ -563,7 +555,7 @@ namespace xcore
 		return false;
 	}
 
-	bool        xtree::iterator::preorder(s32 dir, void*& data)
+	bool        tree_t::iterator::preorder(s32 dir, void*& data)
 	{
 		data = nullptr;
 		if (m_it == rbnil(m_tree))
@@ -575,7 +567,7 @@ namespace xcore
 		}
 		else
 		{
-			xtree::node* next = m_it->get_child(1 - (s32)dir);
+			tree_t::node_t* next = m_it->get_child(1 - (s32)dir);
 			if (next == rbnil(m_tree))
 			{
 				next = m_it->get_child((s32)dir);
@@ -616,7 +608,7 @@ namespace xcore
 		return false;
 	}
 
-	bool        xtree::iterator::sortorder(s32 dir, void*& data)
+	bool        tree_t::iterator::sortorder(s32 dir, void*& data)
 	{
 		data = nullptr;
 		if (m_it == rbnil(m_tree))
@@ -632,7 +624,7 @@ namespace xcore
 		}
 		else
 		{
-			xtree::node* next = m_it->get_child((s32)dir);
+			tree_t::node_t* next = m_it->get_child((s32)dir);
 			if (next == rbnil(m_tree))
 			{
 				if (m_it->get_parent_side() == dir)
@@ -671,7 +663,7 @@ namespace xcore
 		return false;
 	}
 
-	bool        xtree::iterator::postorder(s32 dir, void*& data)
+	bool        tree_t::iterator::postorder(s32 dir, void*& data)
 	{
 		data = nullptr;
 		if (m_it == rbnil(m_tree))
@@ -682,7 +674,7 @@ namespace xcore
 			m_it = rbfirst(m_tree);
 
 			// Travel on the outside (left - right - left - right ....)
-			xtree::node* branch = m_it->get_child(1 - (s32)dir);
+			tree_t::node_t* branch = m_it->get_child(1 - (s32)dir);
 			while (branch != rbnil(m_tree))
 			{
 				while (branch != rbnil(m_tree))
@@ -704,7 +696,7 @@ namespace xcore
 				m_it = m_it->get_parent();
 
 				// Travel on the outside (left - right - left - right ....)
-				xtree::node* branch = m_it->get_child((s32)dir);
+				tree_t::node_t* branch = m_it->get_child((s32)dir);
 				while (branch != rbnil(m_tree))
 				{
 					while (branch != rbnil(m_tree))

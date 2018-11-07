@@ -148,10 +148,10 @@ UNITTEST_SUITE_BEGIN(xguid)
 		{
 			xguid id(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
 
-			xucharz<256> strBuffer;
+			ascii::runez<256> strBuffer;
 			const char* guidStr = "11335577:22446688:557799BB:88AACCEE";
 			id.toString(strBuffer);
-			CHECK_EQUAL(0, ascii::compare(strBuffer, xcuchars(guidStr)));
+			CHECK_EQUAL(0, ascii::compare(strBuffer, ascii::crunes(guidStr)));
 		}
 
 		UNITTEST_TEST(fromString)

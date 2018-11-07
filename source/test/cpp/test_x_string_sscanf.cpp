@@ -22,8 +22,8 @@ UNITTEST_SUITE_BEGIN(xsscanf)
 
 		UNITTEST_TEST(scan_hash128)
 		{
-			xcuchars example = "00112233445566778899AABBCCDDEEFF";
-			xcuchars fmt = "%02x%02x%02x%02x";
+			ascii::crunes example = "00112233445566778899AABBCCDDEEFF";
+			ascii::crunes fmt = "%02x%02x%02x%02x";
 
 			u8 d[16];
 			for (s32 i=0; i<16; i+=4)

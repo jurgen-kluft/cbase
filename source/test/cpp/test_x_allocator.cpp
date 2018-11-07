@@ -5,7 +5,7 @@
 
 using namespace xcore;
 
-extern xcore::x_iallocator* gTestAllocator;
+extern xcore::xalloc* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xallocator)
 {
@@ -59,7 +59,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			test_object2():mInteger(3),mFloat(4.0){}
 			s32	mInteger;
 			f32	mFloat;
-			static x_iallocator* get_allocator() { return gTestAllocator; }
+			static xalloc* get_allocator() { return gTestAllocator; }
 			XCORE_CLASS_NEW_DELETE(get_allocator, 16)
 		};
 
@@ -78,7 +78,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			test_object3():mInteger(2),mFloat(3.0){}
 			s32	mInteger;
 			f32	mFloat;
-			static x_iallocator* get_allocator() { return gTestAllocator; }
+			static xalloc* get_allocator() { return gTestAllocator; }
 			XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator, 32)
 		};
 
@@ -101,7 +101,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			u32 mem_size = 4 * 1024;
 			void* mem_begin = gTestAllocator->allocate(mem_size, 4);
 
-			x_iallocator* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
+			xalloc* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
 			ba->release();
 
 			gTestAllocator->deallocate(mem_begin);
@@ -111,7 +111,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 		{
 			u32 mem_size = 4 * 1024;
 			void* mem_begin = gTestAllocator->allocate(mem_size, 4);
-			x_iallocator* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
+			xalloc* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
 
 			void* mem1 = ba->allocate(12, 16);
 			ba->deallocate(mem1);
@@ -124,7 +124,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 		{
 			u32 mem_size = 4 * 1024;
 			void* mem_begin = gTestAllocator->allocate(mem_size, 4);
-			x_iallocator* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
+			xalloc* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
 
 			void* mem1 = ba->allocate(16, 16);
 			void* mem2 = ba->allocate(32, 32);
@@ -140,7 +140,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 		{
 			u32 mem_size = 4 * 1024;
 			void* mem_begin = gTestAllocator->allocate(mem_size, 4);
-			x_iallocator* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
+			xalloc* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
 
 			void* mem1 = ba->allocate(16, 16);
 			void* mem2 = ba->allocate(32, 32);
@@ -199,7 +199,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 
 			u32 mem_size = 32 * 1024;
 			void* mem_begin = gTestAllocator->allocate(mem_size, 4);
-			x_iallocator* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
+			xalloc* ba = gCreateBasicAllocator(mem_begin, mem_size, 16, 16);
 
 			void* mem[100];
 

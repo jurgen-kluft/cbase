@@ -47,10 +47,11 @@ namespace xcore
 
 	//-------------------------------------------------------------------------------
 
-	void xguid::toString(xuchars& str)const
+	void xguid::toString(ascii::runes& str)const
 	{ 
 		// high, word2, word1, low
-		xcuchars fmt("%08X:%08X:%08X:%08X");
+		ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
+		ascii::crunes fmt(fmtstr, ascii::endof(fmtstr, NULL));
 		ascii::sprintf(str, fmt, x_va(mGuid.ma32[0]), x_va(mGuid.ma32[1]), x_va(mGuid.ma32[2]), x_va(mGuid.ma32[3]) );
 	}
 
@@ -70,16 +71,14 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	void xguid::fromString(xcuchars const& _str)
+	void xguid::fromString(ascii::crunes const& _str)
 	{
 		setNull();
 
-		auto iter = _str.begin();
-		auto iend = _str.end();
-
-		for (s32 i=0, s=0; s<32 && iter<iend; i++)
+		ascii::crunes iter = _str;
+		for (s32 i=0, s=0; s<32; i++)
 		{
-			char c = *iter++;
+			uchar32 c = utf::read(iter);
 			if (c == '\0')
 				break;
 

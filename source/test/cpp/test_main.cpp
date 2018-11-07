@@ -60,18 +60,18 @@ namespace xcore
 
 	class UnitTestAllocator : public UnitTest::Allocator
 	{
-		xcore::x_iallocator*	mAllocator;
+		xcore::xalloc*	mAllocator;
 	public:
-						UnitTestAllocator(xcore::x_iallocator* allocator)	{ mAllocator = allocator; }
+						UnitTestAllocator(xcore::xalloc* allocator)	{ mAllocator = allocator; }
 		virtual void*	Allocate(xsize_t size)								{ return mAllocator->allocate((u32)size, sizeof(void*)); }
 		virtual void	Deallocate(void* ptr)								{ mAllocator->deallocate(ptr); }
 	};
 
-	class TestAllocator : public x_iallocator
+	class TestAllocator : public xalloc
 	{
-		x_iallocator*		mAllocator;
+		xalloc*		mAllocator;
 	public:
-							TestAllocator(x_iallocator* allocator) : mAllocator(allocator) { }
+							TestAllocator(xalloc* allocator) : mAllocator(allocator) { }
 
 		virtual const char*	name() const										{ return "xbase unittest test heap allocator"; }
 
@@ -79,14 +79,6 @@ namespace xcore
 		{
 			UnitTest::IncNumAllocations();
 			return mAllocator->allocate(size, alignment);
-		}
-
-		virtual void*		reallocate(void* mem, xsize_t size, u32 alignment)
-		{
-			if (mem==NULL)
-				return allocate(size, alignment);
-			else 
-				return mAllocator->reallocate(mem, size, alignment);
 		}
 
 		virtual void		deallocate(void* mem)
@@ -103,7 +95,7 @@ namespace xcore
 	};
 }
 
-xcore::x_iallocator* gTestAllocator = NULL;
+xcore::xalloc* gTestAllocator = NULL;
 xcore::UnitTestAssertHandler gAssertHandler;
 
 
@@ -111,7 +103,7 @@ xcore::UnitTestAssertHandler gAssertHandler;
 class xheap
 {
 public:
-	static xcore::x_iallocator* sAllocator;
+	static xcore::xalloc* sAllocator;
 
 	void*	allocate(xcore::u32 size, xcore::u32 alignment)
 	{
@@ -122,7 +114,7 @@ public:
 		sAllocator->deallocate(p);
 	}
 };
-xcore::x_iallocator*	xheap::sAllocator = NULL;
+xcore::xalloc*	xheap::sAllocator = NULL;
 
 class test_object
 {
@@ -174,7 +166,7 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	xcore::x_asserthandler::sRegisterHandler(&gAssertHandler);
 #endif
 
-	xcore::x_iallocator* systemAllocator = xcore::x_iallocator::get_default();
+	xcore::xalloc* systemAllocator = xcore::xalloc::get_default();
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
 

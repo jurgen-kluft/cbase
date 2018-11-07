@@ -731,19 +731,19 @@ namespace xcore
 		s32	sscanf(crunes & str, crunes const& fmt, X_VA_R_ARGS_16)
 		{
 			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromAsciiBuffer buf_reader(str.m_const_str, str.m_const_end);
-			CharReaderFromAsciiBuffer fmt_reader(fmt.m_const_str, fmt.m_const_end);
+			CharReaderFromAsciiBuffer buf_reader(str.m_str, str.m_end);
+			CharReaderFromAsciiBuffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_const_str = buf_reader.mPtr;
+			str.m_str = buf_reader.mPtr;
 			return scanned;
 		}
 
 		s32 vsscanf(crunes & str, crunes const& fmt, const x_va_r_list& vr_args)
 		{
-			CharReaderFromAsciiBuffer buf_reader(str.m_const_str, str.m_const_end);
-			CharReaderFromAsciiBuffer fmt_reader(fmt.m_const_str, fmt.m_const_end);
+			CharReaderFromAsciiBuffer buf_reader(str.m_str, str.m_end);
+			CharReaderFromAsciiBuffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_const_str = buf_reader.mPtr;
+			str.m_str = buf_reader.mPtr;
 			return scanned;
 		}
 	}
@@ -753,19 +753,19 @@ namespace xcore
 		s32 sscanf(crunes & str, crunes const& fmt, X_VA_R_ARGS_16)
 		{
 			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromUtf8Buffer buf_reader(str.m_const_str, str.m_const_end);
-			CharReaderFromUtf8Buffer fmt_reader(fmt.m_const_str, fmt.m_const_end);
+			CharReaderFromUtf8Buffer buf_reader(str.m_str, str.m_end);
+			CharReaderFromUtf8Buffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_const_str = buf_reader.mPtr;
+			str.m_str = buf_reader.mPtr;
 			return scanned;
 		}
 
 		s32 vsscanf(crunes & str, crunes const& fmt, const x_va_r_list& vr_args)
 		{
-			CharReaderFromUtf8Buffer buf_reader(str.m_const_str, str.m_const_end);
-			CharReaderFromUtf8Buffer fmt_reader(fmt.m_const_str, fmt.m_const_end);
+			CharReaderFromUtf8Buffer buf_reader(str.m_str, str.m_end);
+			CharReaderFromUtf8Buffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_const_str = buf_reader.mPtr;
+			str.m_str = buf_reader.mPtr;
 			return scanned;
 		}
 	}
@@ -775,19 +775,19 @@ namespace xcore
 		s32 sscanf(crunes & str, crunes const& fmt, X_VA_R_ARGS_16)
 		{
 			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromUtf32Buffer buf_reader(str.m_const_str, str.m_const_end);
-			CharReaderFromUtf32Buffer fmt_reader(fmt.m_const_str, fmt.m_const_end);
+			CharReaderFromUtf32Buffer buf_reader(str.m_str, str.m_end);
+			CharReaderFromUtf32Buffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_const_str = buf_reader.mPtr;
+			str.m_str = buf_reader.mPtr;
 			return scanned;
 		}
 
 		s32 vsscanf(crunes & str, crunes const& fmt, const x_va_r_list& vr_args)
 		{
-			CharReaderFromUtf32Buffer buf_reader(str.m_const_str, str.m_const_end);
-			CharReaderFromUtf32Buffer fmt_reader(fmt.m_const_str, fmt.m_const_end);
+			CharReaderFromUtf32Buffer buf_reader(str.m_str, str.m_end);
+			CharReaderFromUtf32Buffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_const_str = buf_reader.mPtr;
+			str.m_str = buf_reader.mPtr;
 			return scanned;
 		}
 	}

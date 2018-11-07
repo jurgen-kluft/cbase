@@ -1016,7 +1016,7 @@ namespace xcore
 			case 's':
 				if (args[argindex].isPCUChar32())
 				{
-					xcuchar32s src = *(xcuchar32s const*)args[argindex];
+					utf32::crunes src = *(utf32::crunes const*)args[argindex];
 					while (utf::can_read(src))
 					{
 						uchar32 c = utf::read(src);
@@ -1025,7 +1025,7 @@ namespace xcore
 				}
 				else if (args[argindex].isPCTChar())
 				{
-					xcuchars src = *(xcuchars const*)args[argindex];
+					ascii::crunes src = *(ascii::crunes const*)args[argindex];
 					while (utf::can_read(src))
 					{
 						uchar32 c = utf::read(src);
@@ -1110,7 +1110,8 @@ namespace xcore
 				{
 					if (uqval != 0 || prec != 0)
 					{
-						xuchar32z<128> UQtoAchars;
+						utf32::rune UQtoAcharsBuffer[128];
+						utf32::runes UQtoAchars(&UQtoAcharsBuffer[0], &UQtoAcharsBuffer[0], &UQtoAcharsBuffer[128 - 1]);
 						CharBufferReversedWriter reversedWriter(UQtoAchars);
 						UQtoA(uqval, &reversedWriter, base, xbool((flags & ALT) != 0), xdigs);
 						Utf32ConstBuffer UQtoAbuffer(reversedWriter.mBegin, reversedWriter.mEnd);
@@ -1122,7 +1123,8 @@ namespace xcore
 				{
 					if (ulval != 0 || prec != 0)
 					{
-						xuchar32z<128> UQtoAchars;
+						utf32::rune UQtoAcharsBuffer[128];
+						utf32::runes UQtoAchars(&UQtoAcharsBuffer[0], &UQtoAcharsBuffer[0], &UQtoAcharsBuffer[128 - 1]);
 						CharBufferReversedWriter reversedWriter(UQtoAchars);
 						ULtoA(ulval, &reversedWriter, base, xbool((flags & ALT) != 0), xdigs);
 						Utf32ConstBuffer UQtoAbuffer(reversedWriter.mBegin, reversedWriter.mEnd);
@@ -1216,7 +1218,7 @@ namespace xcore
 
 		s32		vcprintf(crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromAsciiBuffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromAsciiBuffer reader(format.m_str, format.m_end);
 			CharWriterCounter writer;
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
@@ -1231,18 +1233,18 @@ namespace xcore
 
 		void		vsprintf(runes& str, crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromAsciiBuffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromAsciiBuffer reader(format.m_str, format.m_end);
 			CharWriterToAsciiBuffer writer(str.m_end, str.m_eos);
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
 			str.m_end = writer.mPtr;
-			str.m_const_end = writer.mPtr;
+			str.m_end = writer.mPtr;
 		}
 
 		void		printf(crunes const& format, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromAsciiBuffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromAsciiBuffer reader(format.m_str, format.m_end);
 			s32 const cache_size = 128;
 			rune cache[cache_size + 1];
 			CharWriterAsAsciiToConsole writer(AsciiBuffer(cache, cache + cache_size));
@@ -1253,7 +1255,7 @@ namespace xcore
 
 		void		printf(crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromAsciiBuffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromAsciiBuffer reader(format.m_str, format.m_end);
 			s32 const cache_size = 128;
 			rune cache[cache_size + 1];
 			CharWriterAsAsciiToConsole writer(AsciiBuffer(cache, cache + cache_size));
@@ -1278,7 +1280,7 @@ namespace xcore
 
 		s32		vcprintf(crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromUtf8Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf8Buffer reader(format.m_str, format.m_end);
 			CharWriterCounter writer;
 			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
@@ -1293,18 +1295,18 @@ namespace xcore
 
 		void		vsprintf(runes& str, crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromUtf8Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf8Buffer reader(format.m_str, format.m_end);
 			CharWriterToUtf8Buffer writer(str.m_end, str.m_eos);
 			CharWriterToUtf8BufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
 			str.m_end = writer.mPtr;
-			str.m_const_end = writer.mPtr;
+			str.m_end = writer.mPtr;
 		}
 
 		void		printf(crunes const& format, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromUtf8Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf8Buffer reader(format.m_str, format.m_end);
 			s32 const cache_size = 128;
 			rune cache[cache_size + 1];
 			CharWriterAsUtf8ToConsole writer(Utf8Buffer(cache, cache + cache_size));
@@ -1315,7 +1317,7 @@ namespace xcore
 
 		void		printf(crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromUtf8Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf8Buffer reader(format.m_str, format.m_end);
 			s32 const cache_size = 128;
 			rune cache[cache_size + 1];
 			CharWriterAsUtf8ToConsole writer(Utf8Buffer(cache, cache + cache_size));
@@ -1335,7 +1337,7 @@ namespace xcore
 		s32		cprintf(crunes const& format, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromUtf32Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf32Buffer reader(format.m_str, format.m_end);
 			CharWriterCounter writer;
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
 
@@ -1345,7 +1347,7 @@ namespace xcore
 
 		s32		vcprintf(crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromUtf32Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf32Buffer reader(format.m_str, format.m_end);
 			CharWriterCounter writer;
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
 
@@ -1356,7 +1358,7 @@ namespace xcore
 		void	sprintf(runes& str, crunes const& format, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromUtf32Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf32Buffer reader(format.m_str, format.m_end);
 			CharWriterToUtf32Buffer writer(str.m_end, str.m_eos);
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
 
@@ -1365,12 +1367,12 @@ namespace xcore
 
 		void	vsprintf(runes& str, crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromUtf32Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf32Buffer reader(format.m_str, format.m_end);
 			CharWriterToUtf32Buffer writer(str.m_end, str.m_eos);
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
 			str.m_end = writer.mPtr;
-			str.m_const_end = writer.mPtr;
+			str.m_end = writer.mPtr;
 		}
 
 		void	printf(crunes const& str)
@@ -1381,7 +1383,7 @@ namespace xcore
 		void	printf(crunes const& format, X_VA_ARGS_16)
 		{
 			x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromUtf32Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf32Buffer reader(format.m_str, format.m_end);
 			s32 const cache_size = 128;
 			rune cache[cache_size + 1];
 			CharWriterAsUtf32ToConsole writer(Utf32Buffer(cache, cache + cache_size));
@@ -1392,7 +1394,7 @@ namespace xcore
 
 		void	printf(crunes const& format, const x_va_list& args)
 		{
-			CharReaderFromUtf32Buffer reader(format.m_const_str, format.m_const_end);
+			CharReaderFromUtf32Buffer reader(format.m_str, format.m_end);
 			s32 const cache_size = 128;
 			rune cache[cache_size + 1];
 			CharWriterAsUtf32ToConsole writer(Utf32Buffer(cache, cache + cache_size));

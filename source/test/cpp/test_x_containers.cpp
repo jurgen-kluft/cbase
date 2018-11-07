@@ -11,7 +11,7 @@
 
 using namespace xcore;
 
-extern xcore::x_iallocator* gTestAllocator;
+extern xcore::xalloc* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xcontainers)
 {

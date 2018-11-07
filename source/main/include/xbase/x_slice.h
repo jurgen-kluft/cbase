@@ -25,10 +25,10 @@ namespace xcore
 	struct slice
 	{
 						slice();
-						slice(xallocator allocator, u32 item_count, u32 item_size);
+						slice(xalloc* allocator, u32 item_count, u32 item_size);
 						slice(slice_data* data, s32 from, s32 to);
 
-		static void		alloc(slice& slice, xallocator allocator, u32 item_count, u32 item_size);
+		static void		alloc(slice& slice, xalloc* allocator, u32 item_count, u32 item_size);
 
 		u32				size() const;
 		u32				refcnt() const;
@@ -67,13 +67,13 @@ namespace xcore
 
 		slice_data*			resize(s32 from, s32 to);
 
-		static slice_data*	alloc(xallocator allocator, u32& to_itemcount, u32& to_itemsize);
+		static slice_data*	alloc(xalloc* allocator, u32& to_itemcount, u32& to_itemsize);
 
 		mutable s32			mRefCount;
 		u32					mItemCount;					/// Count of total items
 		u32					mItemSize;					/// Size of one item
 		u32					mDummy;
-		xallocator			mAllocator;
+		xalloc*		mAllocator;
 		xbyte*				mData;
 	};
 }

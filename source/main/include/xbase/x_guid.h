@@ -39,8 +39,8 @@ namespace xcore
 		bool		operator == (const xguid&) const;
 		bool		operator != (const xguid&) const;
 
-		void		toString(xuchars& str) const;     
-		void		fromString(xcuchars const& str);
+		void		toString(ascii::runes& str) const;
+		void		fromString(ascii::crunes const& str);
 
 	private:
 		enum ESizes

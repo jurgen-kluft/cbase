@@ -47,7 +47,7 @@ namespace xcore
 		return new_ptr;
 	}
 
-	class x_allocator_macos_system : public x_iallocator
+	class x_allocator_macos_system : public xalloc
 	{
 	public:
 		x_allocator_macos_system()
@@ -105,7 +105,7 @@ namespace xcore
 		u64						mAllocationCount;
 	};
 
-	x_iallocator*		gCreateSystemAllocator()
+	xalloc*		gCreateSystemAllocator()
 	{
 		static x_allocator_macos_system sSystemAllocator;
 		if (!sSystemAllocator.isInitialized())

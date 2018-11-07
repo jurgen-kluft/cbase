@@ -9,7 +9,7 @@
 
 namespace xcore
 {
-	class x_allocator_win32_system : public x_iallocator
+	class x_allocator_win32_system : public xalloc
 	{
 	public:
 		x_allocator_win32_system()
@@ -87,7 +87,7 @@ namespace xcore
 		u64						mAllocationCount;
 	};
 
-	x_iallocator*		gCreateSystemAllocator()
+	xalloc*		gCreateSystemAllocator()
 	{
 		static x_allocator_win32_system sSystemAllocator;
 		if (!sSystemAllocator.isInitialized())

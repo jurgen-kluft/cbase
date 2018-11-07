@@ -5,7 +5,7 @@
 
 using namespace xcore;
 
-extern xcore::x_iallocator* gTestAllocator;
+extern xcore::xalloc* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xsingleton)
 {
@@ -15,7 +15,7 @@ UNITTEST_SUITE_BEGIN(xsingleton)
 	public:
 					test_singleton1() : mInteger(22) {}
 		
-		static x_iallocator*	singleton_allocator()
+		static xalloc*	singleton_allocator()
 		{
 			return gTestAllocator;
 		}

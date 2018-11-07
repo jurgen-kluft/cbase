@@ -6,7 +6,7 @@
 
 using namespace xcore;
 
-extern xcore::x_iallocator* gTestAllocator;
+extern xcore::xalloc* gTestAllocator;
 
 
 s32				compare_s32(void const* p1, void const* p2)

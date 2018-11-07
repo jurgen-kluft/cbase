@@ -12,37 +12,34 @@
  */
 namespace xcore
 {
-	class x_iallocator;
-	class x_iallocator_visitor;
+	class xalloc;
+	class xalloc_visitor;
 
 	/**
 	 * This system allocator, will initialize console memory and use malloc/realloc/free
 	 */
-	extern x_iallocator*	gCreateSystemAllocator();
+	extern xalloc*	gCreateSystemAllocator();
 
 	/**
 	 * This will create a basic first fit allocator.
 	 * Be aware that the behavior (fragmentation, performance) of this allocator gets worse
 	 * the more allocations and deallocations you do with different sizes.
 	 */
-	extern x_iallocator*	gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment);
+	extern xalloc*	gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment);
 
 	/// The allocator interface
-	class x_iallocator
+	class xalloc
 	{
 	public:
-		static x_iallocator* get_default();
+		static xalloc*		get_default();
 		
-		virtual const char*	name() const = 0;								///< The name of the allocator
-
 		virtual void*		allocate(xsize_t size, u32 align) = 0;			///< Allocate memory with alignment
-		virtual void*		reallocate(void* p, xsize_t size, u32 align) = 0;///< Reallocate memory
 		virtual void		deallocate(void* p) = 0;						///< Deallocate/Free memory
 
-		virtual void		release() = 0;									///< Release/Destruct this allocator
+		virtual void		release() = 0;
 
 	protected:
-		virtual				~x_iallocator() {}
+		virtual				~xalloc() {}
 	};
 
 	class xsystemheap
@@ -50,11 +47,11 @@ namespace xcore
 	public:
 		void*	allocate(xcore::u32 size, xcore::u32 alignment)
 		{
-			return x_iallocator::get_default()->allocate(size, alignment);
+			return xalloc::get_default()->allocate(size, alignment);
 		}
 		void	deallocate(void* p)
 		{
-			return x_iallocator::get_default()->deallocate(p);
+			return xalloc::get_default()->deallocate(p);
 		}
 	};
 
@@ -77,9 +74,9 @@ namespace xcore
 
 	class xheap
 	{
-		x_iallocator*	m_allocator;
+		xalloc*		m_allocator;
 	public:
-		inline	xheap(x_iallocator* allocator) : m_allocator(allocator) {}
+		inline	xheap(xalloc* allocator) : m_allocator(allocator) {}
 
 		void*	allocate(xcore::u32 size, xcore::u32 alignment)
 		{
@@ -115,22 +112,17 @@ namespace xcore
 
 	class xallocator
 	{
-		x_iallocator*	m_allocator;
+		xalloc*			m_allocator;
 
 	public:
 		inline			xallocator() : m_allocator(NULL) {}
-		inline			xallocator(x_iallocator* all) : m_allocator(all) {}
+		inline			xallocator(xalloc* all) : m_allocator(all) {}
 
 		bool			can_alloc() const { return m_allocator != NULL; }
 
 		void*			allocate(xsize_t size, u32 align) 
 		{
 			return m_allocator->allocate(size, align); 
-		}
-
-		void*			reallocate(void* p, xsize_t size, u32 align)
-		{
-			return m_allocator->reallocate(p, size, align);
 		}
 
 		void			deallocate(void* p)
@@ -185,9 +177,9 @@ namespace xcore
 	template<typename T, typename C= x_cdtor_placement_new<T> >
 	class x_type_allocator
 	{
-		x_iallocator*		mAllocator;
+		xalloc*				mAllocator;
 	public:
-							x_type_allocator(x_iallocator* heap) : mAllocator(heap) { }
+							x_type_allocator(xalloc* heap) : mAllocator(heap) { }
 							~x_type_allocator()								{ release(); }
 
 		T*					allocate(u32 align=sizeof(void*))				{ void* mem = mAllocator->allocate(sizeof(T), align); C c; T* obj = c.construct(mem); return obj; }

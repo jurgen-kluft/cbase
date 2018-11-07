@@ -26,37 +26,37 @@ namespace xcore
 		*/
 
 		//------------------------------------------------------------------------------
-		static inline s32		peek_char(xuchars const& src, uchar32& out_c)
+		static inline s32		peek_char(ascii::runes const& src, uchar32& out_c)
 		{
 			out_c = '\0';
 			if (!src.is_empty())
 			{
-				out_c = src.m_const_str[0];
+				out_c = src.m_str[0];
 				return 1;
 			}
 			return 0;
 		}
-		static inline s32		peek_char(xcuchars const& src, uchar32& out_c)
+		static inline s32		peek_char(ascii::crunes const& src, uchar32& out_c)
 		{
 			out_c = '\0';
 			if (!src.is_empty())
 			{
-				out_c = src.m_const_str[0];
+				out_c = src.m_str[0];
 				return 1;
 			}
 			return 0;
 		}
 
 		//------------------------------------------------------------------------------
-		static bool				write_char(uchar32 c, xuchars& dst)
+		static bool				write_char(uchar32 c, ascii::runes& dst)
 		{
-			if (dst.can_write())
+			if (utf::can_write(dst))
 			{
 				if (c > 0x7f)
 					c = '?';
 				*dst.m_end++ = (uchar)c;
 				*dst.m_end = '\0';
-				dst.m_const_end = dst.m_end;
+				dst.m_end = dst.m_end;
 				return true;
 			}
 			return false;
@@ -66,7 +66,7 @@ namespace xcore
 		static bool				read_char(runes& src, uchar32& out_c)
 		{
 			s32 const l = peek_char(src, out_c);
-			src.m_const_str += l;
+			src.m_str += l;
 			return l > 0;
 		}
 
@@ -74,7 +74,7 @@ namespace xcore
 		static bool				read_char(crunes& src, uchar32& out_c)
 		{
 			s32 l = peek_char(src, out_c);
-			src.m_const_str += l;
+			src.m_str += l;
 			return l > 0;
 		}
 
@@ -121,8 +121,7 @@ namespace xcore
 		void		copy(runes& _dest, crunes const& _src, ECopyType type)
 		{
 			crunes src = _src;
-			_dest.reset();
-			while (_dest.can_write())
+			while (utf::can_write(_dest))
 			{
 				uchar32 c;
 				if (read_char(src, c)==false)
@@ -160,7 +159,7 @@ namespace xcore
 				// Remember the current position because here is
 				// where we start to check if the 'find' string
 				// can be found at this particular position.
-				str_found.clone(str_iter);
+				str_found = str_iter;
 
 				uchar32 sc, fc;
 
@@ -180,7 +179,7 @@ namespace xcore
 
 				if (found)
 				{
-					str_found = str_found(0, _find.size());
+					str_found = select(str_found, 0, _find.size());
 					break;
 				}
 
@@ -226,7 +225,7 @@ namespace xcore
 
 				if (found)
 				{
-					str_found = str_found(0, _find.size());
+					str_found = select(str_found, 0, _find.size());
 					break;
 				}
 
@@ -333,8 +332,8 @@ namespace xcore
 				return;
 
 			// The logic here is based on memory copy, we do not consider characters
-			s32 const selected_len = (s32)((xbyte const*)found.m_end - (xbyte const*)found.m_const_str);
-			s32 const replace_len = (s32)((xbyte const*)_replace.m_const_end - (xbyte const*)_replace.m_const_str);
+			s32 const selected_len = (s32)((xbyte const*)found.m_end - (xbyte const*)found.m_str);
+			s32 const replace_len = (s32)((xbyte const*)_replace.m_end - (xbyte const*)_replace.m_str);
 
 			prune end = NULL;
 			if (selected_len < replace_len)
@@ -367,14 +366,14 @@ namespace xcore
 			}
 
 			// Replace
-			xbyte const* src = (xbyte const*)_replace.m_const_str;
-			xbyte const* src_end = (xbyte const*)_replace.m_const_str + replace_len;
-			xbyte* dst = (xbyte*)found.m_const_str;
+			xbyte const* src = (xbyte const*)_replace.m_str;
+			xbyte const* src_end = (xbyte const*)_replace.m_str + replace_len;
+			xbyte* dst = (xbyte*)found.m_str;
 			while (src < src_end)
 				*dst++ = *src++;
 
 			_str.m_end = end;
-			_str.m_const_end = end;
+			_str.m_end = end;
 		}
 
 		s32	compare(crunes const& _lstr, crunes const& _rstr, ECmpMode mode)
@@ -407,7 +406,7 @@ namespace xcore
 		{
 			crunes str = _str;
 			rune format_str[] = { '%', 'b', '\0' };
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -422,7 +421,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -437,7 +436,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -452,7 +451,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -467,7 +466,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -476,7 +475,7 @@ namespace xcore
 		{
 			crunes str = _str;
 			rune format_str[] = { '%', 'f', '\0' };
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -485,7 +484,7 @@ namespace xcore
 		{
 			crunes str = _str;
 			rune format_str[] = { '%', 'f', '\0' };
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sscanf(str, format, x_va_r(&value));
 			return str;
 		}
@@ -538,7 +537,7 @@ namespace xcore
 		bool is_float(crunes const& _str)
 		{
 			rune f32chars_str[] = { 'E','e','.','#','Q','N','A','B','I','F', '\0' };
-			crunes f32chars(f32chars_str);
+			crunes f32chars(f32chars_str, f32chars_str + 10);
 
 			crunes str = _str;
 			uchar32 c;
@@ -555,7 +554,7 @@ namespace xcore
 		bool is_GUID(crunes const& _str)
 		{
 			rune f32chars_str[] = { 'E','e','.','#','Q','N','A','B','I','F', '\0' };
-			crunes f32chars(f32chars_str);
+			crunes f32chars(f32chars_str, f32chars_str + 10);
 
 			crunes str = _str;
 
@@ -591,7 +590,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sprintf(str, format, x_va(val));
 		}
 
@@ -604,7 +603,7 @@ namespace xcore
 			case 10: format_str[1] = 'u'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sprintf(str, format, x_va(val));
 		}
 
@@ -619,7 +618,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sprintf(str, format, x_va(val));
 		}
 
@@ -632,7 +631,7 @@ namespace xcore
 			case 10: format_str[1] = 'd'; break;
 			case 8: format_str[1] = 'o'; break;
 			};
-			crunes format(format_str);
+			crunes format(format_str, format_str + 2);
 			sprintf(str, format, x_va(val));
 		}
 
@@ -644,7 +643,7 @@ namespace xcore
 				format_str[2] = '0' + numFractionalDigits / 10;
 				format_str[3] = '0' + numFractionalDigits % 10;
 			}
-			crunes format(format_str);
+			crunes format(format_str, format_str + 5);
 			sprintf(str, format, x_va(val));
 		}
 
@@ -656,7 +655,7 @@ namespace xcore
 				format_str[2] = '0' + numFractionalDigits / 10;
 				format_str[3] = '0' + numFractionalDigits % 10;
 			}
-			crunes format(format_str);
+			crunes format(format_str, format_str + 5);
 			sprintf(str, format, x_va(val));
 		}
 
@@ -733,16 +732,16 @@ namespace xcore
 		*/
 		void to_upper(runes& _str)
 		{
-			runes_iterator iter = _str.begin();
-			runes_iterator end = _str.end();
-			while (iter < end)
+			crunes reader(_str);
+			runes writer(_str);
+			while (utf::can_read(reader))
 			{
-				uchar32 c = *iter;
+				uchar32 c = utf::read(reader);
 				if ((c >= 'a') && (c <= 'z'))
 				{
 					c += ('A' - 'a');
 				}
-				iter++ = (uchar)c;
+				utf::write(c, writer);
 			}
 		}
 
@@ -752,16 +751,16 @@ namespace xcore
 		*/
 		void to_lower(runes& _str)
 		{
-			runes_iterator iter = _str.begin();
-			runes_iterator end = _str.end();
-			while (iter < end)
+			crunes reader(_str);
+			runes writer(_str);
+			while (utf::can_read(reader))
 			{
-				uchar32 c = *iter;
+				uchar32 c = utf::read(reader);
 				if ((c >= 'A') && (c <= 'Z'))
 				{
 					c += ('a' - 'A');
 				}
-				iter++ = (uchar)c;
+				utf::write(c, writer);
 			}
 		}
 
@@ -770,11 +769,10 @@ namespace xcore
 
 		bool		starts_with(crunes const& _str, uchar32 start_char)
 		{
-			runes_const_iterator iter = _str.begin();
-			runes_const_iterator end = _str.end();
-			if (iter < end)
+			crunes reader(_str);
+			if (utf::can_read(reader))
 			{
-				uchar32 c = *iter;
+				uchar32 c = utf::read(reader);
 				return c == start_char;
 			}
 			return false;
@@ -782,14 +780,12 @@ namespace xcore
 
 		bool		starts_with(crunes const& _str, crunes const& _start)
 		{
-			runes_const_iterator liter = _str.begin();
-			runes_const_iterator lend = _str.end();
-			runes_const_iterator riter = _start.begin();
-			runes_const_iterator rend = _start.end();
-			while (liter < lend && riter < rend)
+			crunes str(_str);
+			crunes start(_start);
+			while (utf::can_read(str) && utf::can_read(start))
 			{
-				uchar32 lc = *liter++;
-				uchar32 rc = *riter++;
+				uchar32 lc = utf::read(str);
+				uchar32 rc = utf::read(start);
 				if (lc != rc)
 					return false;;
 			}
@@ -802,6 +798,16 @@ namespace xcore
 			if (peek_char(str, c))
 				return c;
 			return '\0';
+		}
+
+		runes		select(runes const& str, u32 from, u32 to)
+		{
+			return runes(str.m_str + from, str.m_str + to, str.m_eos);
+		}
+
+		crunes		select(crunes const& str, u32 from, u32 to)
+		{
+			return crunes(str.m_str + from, str.m_str + to);
 		}
 
 	};	///< END ascii namespace

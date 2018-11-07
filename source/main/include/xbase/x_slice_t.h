@@ -18,7 +18,6 @@
 //==============================================================================
 namespace xcore
 {
-
 	//==============================================================================
 	// Slice
 	// A reference counted slice owning a memory block with a view/window (from,to).
@@ -28,14 +27,14 @@ namespace xcore
 	{
 	public:
 						slice_t();
-						slice_t(x_iallocator* mem, s32 size);
 						slice_t(slice_t<T> const& other);
+						slice_t(xalloc* mem, s32 size);
 						~slice_t();
 
 		s32				size() const;
 
-		slice_t			operator () (s32 to) const;
-		slice_t			operator () (s32 from, s32 to) const;
+		slice_t<T>		operator () (s32 to) const;
+		slice_t<T>		operator () (s32 from, s32 to) const;
 
 		T &				operator [] (s32 index);
 		T const &		operator [] (s32 index) const;
@@ -57,7 +56,7 @@ namespace xcore
 	}
 
 	template<typename T>
-	inline slice_t<T>::slice_t(x_iallocator* mem, s32 count)
+	inline slice_t<T>::slice_t(xalloc* mem, s32 count)
 		: m_slice(mem, count, sizeof(T))
 	{
 	}

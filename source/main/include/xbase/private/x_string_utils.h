@@ -376,21 +376,24 @@ namespace xcore
 	class CharBufferReversedWriter : public CharWriter
 	{
 	public:
-		xuchar32s		mStr;
+		utf32::runes	mStr;
 		uchar32*		mBegin;
 		uchar32*		mEnd;
 
 		inline			CharBufferReversedWriter() {}
 
-		inline			CharBufferReversedWriter(xuchar32s str) : mStr(str) { Reset(); }
+		inline			CharBufferReversedWriter(utf32::runes str) : mStr(str) { Reset(); }
 
 		virtual u64		Count() const { return 0; }
 
 		virtual void	Reset()
 		{
-			mStr.reset();
-			while (mStr.can_write())
+			mStr.m_end = mStr.m_str;
+			*mStr.m_end = '\0';
+
+			while (utf::can_write(mStr))
 				*mStr.m_end++ = ' ';
+
 			mBegin = mStr.m_end;
 			mEnd = mStr.m_end;
 		}
@@ -401,7 +404,7 @@ namespace xcore
 
 		virtual bool	Write(uchar32 c)
 		{
-			if (mBegin > mStr.m_const_str)
+			if (mBegin > mStr.m_str)
 			{
 				mBegin -= 1;
 				*mBegin = c;
@@ -805,7 +808,7 @@ namespace xcore
 		{
 			if ((mPtr + 5) >= mEnd)
 				return false;
-			xuchar8s str(mStr, mPtr, mEnd);
+			utf8::runes str(mStr, mPtr, mEnd);
 			utf::write(c, str);
 			mPtr = str.m_end;
 			utf::write('\0', str);
@@ -1128,9 +1131,9 @@ namespace xcore
 			uchar32 c = '\0';
 			if (mPtr >= mEnd)
 				return c;
-			xcuchar8s s(mPtr, mEnd);
+			utf8::crunes s(mPtr, mEnd);
 			c = utf::read(s);
-			mPtr = s.m_const_str;
+			mPtr = s.m_str;
 			return c;
 		}
 
@@ -1139,9 +1142,9 @@ namespace xcore
 			uchar32 c = '\0';
 			if (mPtr >= mEnd)
 				return c;
-			xcuchar8s s(mPtr, mEnd);
+			utf8::crunes s(mPtr, mEnd);
 			c = utf::read(s);
-			mPtr = s.m_const_str;
+			mPtr = s.m_str;
 			return c;
 		}
 
@@ -1224,49 +1227,49 @@ namespace xcore
 	inline bool StrToBool(const uchar* str, const uchar* end)
 	{
 		bool value;
-		ascii::parse(xcuchars(str, end), value);
+		ascii::parse(ascii::crunes(str, end), value);
 		return value;
 	}
 
 	inline f32 StrToF32(const uchar* str, const uchar* end)
 	{
 		f32 value;
-		ascii::parse(xcuchars(str, end), value);
+		ascii::parse(ascii::crunes(str, end), value);
 		return value;
 	}
 
 	inline f64 StrToF64(const uchar* str, const uchar* end)
 	{
 		f64 value;
-		ascii::parse(xcuchars(str, end), value);
+		ascii::parse(ascii::crunes(str, end), value);
 		return value;
 	}
 
 	inline s32 StrToS32(const uchar* str, const uchar* end)
 	{
 		s32 value;
-		ascii::parse(xcuchars(str, end), value);
+		ascii::parse(ascii::crunes(str, end), value);
 		return value;
 	}
 
 	inline u32 StrToU32(const uchar* str, const uchar* end)
 	{
 		s32 value;
-		ascii::parse(xcuchars(str, end), value);
+		ascii::parse(ascii::crunes(str, end), value);
 		return value;
 	}
 
 	inline s64 StrToS64(const uchar* str, const uchar* end, s32 base)
 	{
 		s64 value;
-		ascii::parse(xcuchars(str, end), value, base);
+		ascii::parse(ascii::crunes(str, end), value, base);
 		return value;
 	}
 
 	inline u64 StrToU64(const uchar* str, const uchar* end, s32 base)
 	{
 		s64 value;
-		ascii::parse(xcuchars(str, end), value, base);
+		ascii::parse(ascii::crunes(str, end), value, base);
 		return value;
 	}
 
@@ -1278,49 +1281,49 @@ namespace xcore
 	inline bool StrToBool(const uchar8* str, const uchar8* end)
 	{
 		bool value;
-		utf8::parse(xcuchar8s(str, end), value);
+		utf8::parse(utf8::crunes(str, end), value);
 		return value;
 	}
 
 	inline f32 StrToF32(const uchar8* str, const uchar8* end)
 	{
 		f32 value;
-		utf8::parse(xcuchar8s(str, end), value);
+		utf8::parse(utf8::crunes(str, end), value);
 		return value;
 	}
 
 	inline f64 StrToF64(const uchar8* str, const uchar8* end)
 	{
 		f64 value;
-		utf8::parse(xcuchar8s(str, end), value);
+		utf8::parse(utf8::crunes(str, end), value);
 		return value;
 	}
 
 	inline s32 StrToS32(const uchar8* str, const uchar8* end)
 	{
 		s32 value;
-		utf8::parse(xcuchar8s(str, end), value);
+		utf8::parse(utf8::crunes(str, end), value);
 		return value;
 	}
 
 	inline u32 StrToU32(const uchar8* str, const uchar8* end)
 	{
 		s32 value;
-		utf8::parse(xcuchar8s(str, end), value);
+		utf8::parse(utf8::crunes(str, end), value);
 		return value;
 	}
 
 	inline s64 StrToS64(const uchar8* str, const uchar8* end, s32 base)
 	{
 		s64 value;
-		utf8::parse(xcuchar8s(str, end), value, base);
+		utf8::parse(utf8::crunes(str, end), value, base);
 		return value;
 	}
 
 	inline u64 StrToU64(const uchar8* str, const uchar8* end, s32 base)
 	{
 		s64 value;
-		utf8::parse(xcuchar8s(str, end), value, base);
+		utf8::parse(utf8::crunes(str, end), value, base);
 		return value;
 	}
 
@@ -1333,7 +1336,7 @@ namespace xcore
 
 	inline bool StrToBool(const uchar32* str, const uchar32* end)
 	{
-		xcuchar32s s(str, end);
+		utf32::crunes s(str, end);
 		bool value;
 		utf32::parse(s, value);
 		return value;
@@ -1341,7 +1344,7 @@ namespace xcore
 
 	inline f32 StrToF32(const uchar32* str, const uchar32* end)
 	{
-		xcuchar32s s(str, end);
+		utf32::crunes s(str, end);
 		f32 value;
 		utf32::parse(s, value);
 		return value;
@@ -1349,7 +1352,7 @@ namespace xcore
 
 	inline f64 StrToF64(const uchar32* str, const uchar32* end)
 	{
-		xcuchar32s s(str, end);
+		utf32::crunes s(str, end);
 		f64 value;
 		utf32::parse(s, value);
 		return value;
@@ -1357,7 +1360,7 @@ namespace xcore
 
 	inline s32 StrToS32(const uchar32* str, const uchar32* end)
 	{
-		xcuchar32s s(str, end);
+		utf32::crunes s(str, end);
 		s32 value;
 		utf32::parse(s, value);
 		return value;
@@ -1365,7 +1368,7 @@ namespace xcore
 
 	inline u32 StrToU32(const uchar32* str, const uchar32* end)
 	{
-		xcuchar32s s(str, end);
+		utf32::crunes s(str, end);
 		u32 value;
 		utf32::parse(s, value);
 		return value;
@@ -1373,7 +1376,7 @@ namespace xcore
 
 	inline s64 StrToS64(const uchar32* str, const uchar32* end, s32 base)
 	{
-		xcuchar32s s(str, end);
+		utf32::crunes s(str, end);
 		s64 value;
 		utf32::parse(s, value, base);
 		return value;
@@ -1381,7 +1384,7 @@ namespace xcore
 
 	inline u64 StrToU64(const uchar32* str, const uchar32* end, s32 base)
 	{
-		xcuchar32s s(str, end);
+		utf32::crunes s(str, end);
 		s64 value;
 		utf32::parse(s, value, base);
 		return value;

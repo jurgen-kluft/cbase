@@ -37,7 +37,7 @@ namespace xcore
 		virtual u32				to_idx(void const* p) const = 0;		///< Convert object pointer to index
 	};
 
-	class x_iidx_allocator : public x_iallocator, public x_indexer
+	class x_iidx_allocator : public xalloc, public x_indexer
 	{
 	public:
 		virtual void			init() = 0;								///< Initialize all resources

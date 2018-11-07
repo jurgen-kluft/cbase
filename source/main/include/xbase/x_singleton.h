@@ -89,7 +89,7 @@ namespace xcore
 		template <class T>
 		static void singleton_create(T*& ptr)
 		{
-			x_iallocator* allocator = T::singleton_allocator();
+			xalloc* allocator = T::singleton_allocator();
 			u32 alignment = T::singleton_alignment();
 			void* mem = allocator->allocate(sizeof(T), alignment);
 			ptr = new (mem) T();
@@ -99,7 +99,7 @@ namespace xcore
 		static void singleton_destroy(T*& ptr)
 		{
 			ptr->~T();
-			x_iallocator* allocator = T::singleton_allocator();
+			xalloc* allocator = T::singleton_allocator();
 			allocator->deallocate(ptr);
 			ptr = NULL;
 		}
@@ -123,7 +123,7 @@ namespace xcore
 	*
 	* For class T using xheap_instantiation it is required that T has
 	* 2 static functions:
-	* - static x_iallocator* singleton_allocator();
+	* - static xalloc* singleton_allocator();
 	* - static u32           singleton_alignment();
 	*
 	* @code

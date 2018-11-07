@@ -34,8 +34,8 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 		UNITTEST_TEST(test_xbinary_reader)
 		{
 			xbytes<2048> buffer;
+			xbinary_writer writer = buffer.writer();
 
-			xbinary_writer writer(buffer);
 			writer.skip(16);
 			writer.write(false);
 			writer.write((u8)1);
@@ -50,16 +50,16 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 			writer.write((f64)9.0);
 
 			const char* cctext = "this is the buffer";
-			xcuchars chars(cctext);
+			ascii::crunes chars(cctext);
 			xcbuffer text(chars.size(), (xbyte const*)cctext);
 
 			xbytes<32> bytes;
-			bytes = text;
+			bytes.writer().write_data(text);
 			writer.write_data(text);
 			writer.write_data(bytes);
 			writer.write_string(cctext, ascii::endof(cctext, NULL));
 
-			xbinary_reader reader(buffer);
+			xbinary_reader reader= (buffer.reader());
 			
 			reader.skip(16);
 
@@ -110,7 +110,7 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 			const char* rviewstr;
 			const char* rviewend;
 			reader.view_string(len, rviewstr, rviewend);
-			xcuchars rchars(rviewstr, rviewend);
+			ascii::crunes rchars(rviewstr, rviewend);
 			CHECK_TRUE(chars == rchars);
 		}
 	}

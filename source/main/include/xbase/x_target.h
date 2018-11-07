@@ -1,189 +1,170 @@
- /**
- * Author:
- *     Virtuos Games
- * Summary:
- *     This file assists with cross platform development by
- *     providing a standard set of platform definitions with
- *     anticipated variations.
- * Description:
- *     This file assists with cross platform development by
- *     providing a standard set of platform definitions with
- *     anticipated variations. The selection of a platform and
- *     variation is based on a key macro definition.
- *
- *     The target macro is provided in different ways depending on
- *     the development environment. But usually it is provided by
- *     the user when he sets the build configuration in the
- *     development environment.
- *
- *     <table>
- *     Target Macro                \Description                           MFC Safe?
- *     --------------------------  -------------------------------------  ----------
- *     none                        Assumes TARGET_PC_EDITOR                    Y
- *     TARGET_PC_EDITOR_DEBUG      Editors                                     Y
- *     TARGET_PC_EDITOR_RELEASE    Editors                                     Y
- *     TARGET_PC_TOOL_DEBUG        Tools, command line, etc                    Y
- *     TARGET_PC_TOOL_RELEASE      Tools, command line, etc                    Y
- *     TARGET_PC_DEV_DEBUG         Windows PC DevKit Debug                     N
- *     TARGET_PC_DEV_RELEASE       Windows PC DevKit Release                   N
- *     TARGET_PC_DEV_FINAL         Windows PC DevKit Final                     N
- *     TARGET_PC_CLIENT_DEBUG      Windows PC "Debug Station" Debug            N
- *     TARGET_PC_CLIENT_RELEASE    Windows PC "Debug Station" Release          N
- *     TARGET_PC_CLIENT_FINAL      Windows PC "Debug Station" Final            N
- *     TARGET_PC_RETAIL_DEBUG      Windows PC Console Debug                    N
- *     TARGET_PC_RETAIL_RELEASE    Windows PC Console Release                  N
- *     TARGET_PC_RETAIL_FINAL      Windows PC Console Final                    N
- *     TARGET_PC_PROFILE_DEBUG     Windows PC Profile Debug                    N
- *     TARGET_PC_PROFILE_RELEASE   Windows PC Profile Release                  N
- *     TARGET_PC_TEST_DEBUG        Windows PC Test Debug                       N
- *     TARGET_PC_TEST_RELEASE      Windows PC Test Release                     N
- *     -------------------------------------------------------------------------
- *     TARGET_MAC_EDITOR_DEBUG     Editors                                     N
- *     TARGET_MAC_EDITOR_RELEASE   Editors                                     N
- *     TARGET_MAC_TOOL_DEBUG       Tools, command line, etc                    N
- *     TARGET_MAC_TOOL_RELEASE     Tools, command line, etc                    N
- *     TARGET_MAC_DEV_DEBUG        Windows PC DevKit Debug                     N
- *     TARGET_MAC_DEV_RELEASE      Windows PC DevKit Release                   N
- *     TARGET_MAC_DEV_FINAL        Windows PC DevKit Final                     N
- *     TARGET_MAC_CLIENT_DEBUG     Windows PC "Debug Station" Debug            N
- *     TARGET_MAC_CLIENT_RELEASE   Windows PC "Debug Station" Release          N
- *     TARGET_MAC_CLIENT_FINAL     Windows PC "Debug Station" Final            N
- *     TARGET_MAC_RETAIL_DEBUG     Windows PC Console Debug                    N
- *     TARGET_MAC_RETAIL_RELEASE   Windows PC Console Release                  N
- *     TARGET_MAC_RETAIL_FINAL     Windows PC Console Final                    N
- *     TARGET_MAC_PROFILE_DEBUG    Windows PC Profile Debug                    N
- *     TARGET_MAC_PROFILE_RELEASE  Windows PC Profile Release                  N
- *     TARGET_MAC_TEST_DEBUG       Windows PC Test Debug                       N
- *     TARGET_MAC_TEST_RELEASE     Windows PC Test Release                     N
- *     -------------------------------------------------------------------------
- *     </table>
- *
- *     Targets which are "MFC safe" (and have _MFC in the macro)
- *     will disable the x_files version of operators new and delete.
- *     Graphic engines prepared for MFC configurations should not
- *     provide a main() function.
- *
- *     When present, each of the primary target macros in the list
- *     above will, in turn, cause other secondary macros to be
- *     defined. These Secondary macros are set automatically for the
- *     user.
- *
- *
- *
- *     <table>
- *     Secondary Macro   \Description
- *     ----------------  --------------------------------------
- *     TARGET_PC         Platform PC
- *     TARGET_PC_EDITOR  Platform PC Editor
- *     TARGET_MFC        MFC
- *     TARGET_MAC      Platform Mac OS
- *     TARGET_DEVKIT     \on DevKit
- *     TARGET_CLIENT     \on "Debug Station"
- *     TARGET_RETAIL     \on Console
- *     TARGET_DEBUG      Debug
- *     TARGET_DEV        Development, optimized Debug
- *     TARGET_RELEASE    Release, including some Debug stuff
- *     TARGET_FINAL      Final, optimized codes, excluding all the Debug stuff
- *     TARGET_TEST       Test (UnitTest, exceptions are enabled)
- *     </table>
- *
- *     <table>
- *     Target Macro                Secondary Macros
- *     --------------------------  ---------------------------
- *     none                        TARGET_PC TARGET_DEBUG   TARGET_EDITOR TARGET_MFC
- *     TARGET_PC_EDITOR_DEBUG      TARGET_PC TARGET_DEBUG   TARGET_EDITOR TARGET_MFC
- *     TARGET_PC_EDITOR_RELEASE    TARGET_PC TARGET_RELEASE TARGET_EDITOR TARGET_MFC
- *     TARGET_PC_DEBUG             == TARGET_PC_DEV_DEBUG
- *     TARGET_PC_DEV               == TARGET_PC_DEV_DEV
- *     TARGET_PC_RELEASE           == TARGET_PC_DEV_RELEASE
- *     TARGET_PC_FINAL             == TARGET_PC_DEV_FINAL
- *     TARGET_PC_DEV_DEBUG         TARGET_PC TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_PC_DEV_DEV           TARGET_PC TARGET_DEVKIT TARGET_DEV
- *     TARGET_PC_DEV_RELEASE       TARGET_PC TARGET_DEVKIT TARGET_RELEASE
- *     TARGET_PC_DEV_FINAL         TARGET_PC TARGET_DEVKIT TARGET_FINAL
- *     TARGET_PC_CLIENT_DEBUG      TARGET_PC TARGET_CLIENT TARGET_DEBUG
- *     TARGET_PC_CLIENT_DEV        TARGET_PC TARGET_CLIENT TARGET_DEV
- *     TARGET_PC_CLIENT_RELEASE    TARGET_PC TARGET_CLIENT TARGET_RELEASE
- *     TARGET_PC_CLIENT_FINAL      TARGET_PC TARGET_CLIENT TARGET_FINAL
- *     TARGET_PC_RETAIL_DEBUG      TARGET_PC TARGET_RETAIL TARGET_DEBUG
- *     TARGET_PC_RETAIL_DEV        TARGET_PC TARGET_RETAIL TARGET_DEV
- *     TARGET_PC_RETAIL_RELEASE    TARGET_PC TARGET_RETAIL TARGET_RELEASE
- *     TARGET_PC_RETAIL_FINAL      TARGET_PC TARGET_RETAIL TARGET_FINAL
- *     TARGET_PC_TEST_DEBUG        TARGET_PC TARGET_DEBUG  TARGET_TEST
- *     TARGET_PC_TEST_DEV          TARGET_PC TARGET_DEV    TARGET_TEST
- *     TARGET_PC_TEST_RELEASE      TARGET_PC TARGET_RELEASE TARGET_TEST
- *     TARGET_MAC_DEV_DEBUG      TARGET_MAC TARGET_DEVKIT TARGET_DEBUG
- *     TARGET_MAC_DEV_DEV        TARGET_MAC TARGET_DEVKIT TARGET_DEV
- *     TARGET_MAC_DEV_RELEASE    TARGET_MAC TARGET_DEVKIT TARGET_RELEASE
- *     TARGET_MAC_DEV_FINAL      TARGET_MAC TARGET_DEVKIT TARGET_FINAL
- *     TARGET_MAC_CLIENT_DEBUG   TARGET_MAC TARGET_CLIENT TARGET_DEBUG
- *     TARGET_MAC_CLIENT_DEV     TARGET_MAC TARGET_CLIENT TARGET_DEV
- *     TARGET_MAC_CLIENT_RELEASE TARGET_MAC TARGET_CLIENT TARGET_RELEASE
- *     TARGET_MAC_CLIENT_FINAL   TARGET_MAC TARGET_CLIENT TARGET_FINAL
- *     TARGET_MAC_RETAIL_DEBUG   TARGET_MAC TARGET_RETAIL TARGET_DEBUG
- *     TARGET_MAC_RETAIL_DEV     TARGET_MAC TARGET_RETAIL TARGET_DEV
- *     TARGET_MAC_RETAIL_RELEASE TARGET_MAC TARGET_RETAIL TARGET_RELEASE
- *     TARGET_MAC_RETAIL_FINAL   TARGET_MAC TARGET_RETAIL TARGET_FINAL
- *     TARGET_MAC_TEST_DEBUG     TARGET_MAC TARGET_DEBUG  TARGET_TEST
- *     TARGET_MAC_TEST_DEV       TARGET_MAC TARGET_DEV    TARGET_TEST
- *     TARGET_MAC_TEST_RELEASE   TARGET_MAC TARGET_RELEASE TARGET_TEST
- *     </table>
- *
- *
- *     A platform defines the high-level hardware but there is still one variable
- *     that we must specify and that is 32-bit or 64-bit. This has mainly an impact
- *     on sizeof(void*), for 32-bit this results in 4, meaning a pointer will occupy
- *     4 bytes on a 32-bit system. On a 64-bit system this will be 8 bytes.
- *
- *     <table>
- *     Dat Size Macro     \Description              \Version   Platform
- *     -----------------  ------------------------  ---------  ---------
- *     X_32BIT            32-bit hardware systems   <2005		PC,PS2,PSP,PS3,XBOX,XBOX360,NDS,N3DS,WII
- *     X_64BIT            64-bit hardware systems   >2008       PC,XBOXONE,PS4,SWITCH
- *     </table>
- *
- *     Finally the user needs to define in the configuration which
- *     kind of build is he trying to do. X_DEBUG could be use even
- *     if the compiler is set in optimization.
- *
- *     <table>
- *     Target Macro   \Description
- *     -------------  -------------------------------------------
- *     none           Ignores debugging features such asserts.
- *     X_DEBUG        Activates debugging features such asserts.
- *     </table>
- *
- *     The target macro is provided in different ways depending on
- *     the compiler.
- *
- *     <table>
- *     Compiler Macro     \Description              \Version   Platform
- *     -----------------  ------------------------  ---------  ---------
- *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2005       PC
- *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2008       PC
- *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2010       PC
- *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2015       PC
- *     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2017       PC
- *     COMPILER_WINDOWS_CLANG     CLang                     7.0        PC
- * 
- *     COMPILER_MACOS_CLANG       CLang                     7.0        MacOS
- * 
- *     </table>
- *
- *     Other Macros provided to the user automatically are:
- *
- *     <table>
- *     Target Macro      \Description
- *     ----------------  ---------------------------
- *     X_ALIGNMENT       alignment definition.
- *     X_BIG_ENDIAN      Endianness of the hardware
- *     X_LITTLE_ENDIAN   Endianness of the hardware
- *     </table>
- *
- *     Finally there is a convenient platform enumeration that can
- *     be use with logical operations. ex: (PLATFORM_PC | PLATFORM_360)
- * ---------------------------------------------------------------------------------
- */
+// Author:
+//     Virtuos Games
+// Summary:
+//     This file assists with cross platform development by
+//     providing a standard set of platform definitions with
+//     anticipated variations.
+// Description:
+//     This file assists with cross platform development by
+//     providing a standard set of platform definitions with
+//     anticipated variations. The selection of a platform and
+//     variation is based on a key macro definition.
+//     The target macro is provided in different ways depending on
+//     the development environment. But usually it is provided by
+//     the user when he sets the build configuration in the
+//     development environment.
+//     <table>
+//     Target Macro                \Description                           MFC Safe?
+//     --------------------------  -------------------------------------  ----------
+//     none                        Assumes TARGET_PC_EDITOR                    Y
+//     TARGET_PC_EDITOR_DEBUG      Editors                                     Y
+//     TARGET_PC_EDITOR_RELEASE    Editors                                     Y
+//     TARGET_PC_TOOL_DEBUG        Tools, command line, etc                    Y
+//     TARGET_PC_TOOL_RELEASE      Tools, command line, etc                    Y
+//     TARGET_PC_DEV_DEBUG         Windows PC DevKit Debug                     N
+//     TARGET_PC_DEV_RELEASE       Windows PC DevKit Release                   N
+//     TARGET_PC_DEV_FINAL         Windows PC DevKit Final                     N
+//     TARGET_PC_CLIENT_DEBUG      Windows PC "Debug Station" Debug            N
+//     TARGET_PC_CLIENT_RELEASE    Windows PC "Debug Station" Release          N
+//     TARGET_PC_CLIENT_FINAL      Windows PC "Debug Station" Final            N
+//     TARGET_PC_RETAIL_DEBUG      Windows PC Console Debug                    N
+//     TARGET_PC_RETAIL_RELEASE    Windows PC Console Release                  N
+//     TARGET_PC_RETAIL_FINAL      Windows PC Console Final                    N
+//     TARGET_PC_PROFILE_DEBUG     Windows PC Profile Debug                    N
+//     TARGET_PC_PROFILE_RELEASE   Windows PC Profile Release                  N
+//     TARGET_PC_TEST_DEBUG        Windows PC Test Debug                       N
+//     TARGET_PC_TEST_RELEASE      Windows PC Test Release                     N
+//     -------------------------------------------------------------------------
+//     TARGET_MAC_EDITOR_DEBUG     Editors                                     N
+//     TARGET_MAC_EDITOR_RELEASE   Editors                                     N
+//     TARGET_MAC_TOOL_DEBUG       Tools, command line, etc                    N
+//     TARGET_MAC_TOOL_RELEASE     Tools, command line, etc                    N
+//     TARGET_MAC_DEV_DEBUG        Windows PC DevKit Debug                     N
+//     TARGET_MAC_DEV_RELEASE      Windows PC DevKit Release                   N
+//     TARGET_MAC_DEV_FINAL        Windows PC DevKit Final                     N
+//     TARGET_MAC_CLIENT_DEBUG     Windows PC "Debug Station" Debug            N
+//     TARGET_MAC_CLIENT_RELEASE   Windows PC "Debug Station" Release          N
+//     TARGET_MAC_CLIENT_FINAL     Windows PC "Debug Station" Final            N
+//     TARGET_MAC_RETAIL_DEBUG     Windows PC Console Debug                    N
+//     TARGET_MAC_RETAIL_RELEASE   Windows PC Console Release                  N
+//     TARGET_MAC_RETAIL_FINAL     Windows PC Console Final                    N
+//     TARGET_MAC_PROFILE_DEBUG    Windows PC Profile Debug                    N
+//     TARGET_MAC_PROFILE_RELEASE  Windows PC Profile Release                  N
+//     TARGET_MAC_TEST_DEBUG       Windows PC Test Debug                       N
+//     TARGET_MAC_TEST_RELEASE     Windows PC Test Release                     N
+//     -------------------------------------------------------------------------
+//     </table>
+//     Targets which are "MFC safe" (and have _MFC in the macro)
+//     will disable the x_files version of operators new and delete.
+//     Graphic engines prepared for MFC configurations should not
+//     provide a main() function.
+//     When present, each of the primary target macros in the list
+//     above will, in turn, cause other secondary macros to be
+//     defined. These Secondary macros are set automatically for the
+//     user.
+//     <table>
+//     Secondary Macro   \Description
+//     ----------------  --------------------------------------
+//     TARGET_PC         Platform PC
+//     TARGET_PC_EDITOR  Platform PC Editor
+//     TARGET_MFC        MFC
+//     TARGET_MAC      Platform Mac OS
+//     TARGET_DEVKIT     \on DevKit
+//     TARGET_CLIENT     \on "Debug Station"
+//     TARGET_RETAIL     \on Console
+//     TARGET_DEBUG      Debug
+//     TARGET_DEV        Development, optimized Debug
+//     TARGET_RELEASE    Release, including some Debug stuff
+//     TARGET_FINAL      Final, optimized codes, excluding all the Debug stuff
+//     TARGET_TEST       Test (UnitTest, exceptions are enabled)
+//     </table>
+//     <table>
+//     Target Macro                Secondary Macros
+//     --------------------------  ---------------------------
+//     none                        TARGET_PC TARGET_DEBUG   TARGET_EDITOR TARGET_MFC
+//     TARGET_PC_EDITOR_DEBUG      TARGET_PC TARGET_DEBUG   TARGET_EDITOR TARGET_MFC
+//     TARGET_PC_EDITOR_RELEASE    TARGET_PC TARGET_RELEASE TARGET_EDITOR TARGET_MFC
+//     TARGET_PC_DEBUG             == TARGET_PC_DEV_DEBUG
+//     TARGET_PC_DEV               == TARGET_PC_DEV_DEV
+//     TARGET_PC_RELEASE           == TARGET_PC_DEV_RELEASE
+//     TARGET_PC_FINAL             == TARGET_PC_DEV_FINAL
+//     TARGET_PC_DEV_DEBUG         TARGET_PC TARGET_DEVKIT TARGET_DEBUG
+//     TARGET_PC_DEV_DEV           TARGET_PC TARGET_DEVKIT TARGET_DEV
+//     TARGET_PC_DEV_RELEASE       TARGET_PC TARGET_DEVKIT TARGET_RELEASE
+//     TARGET_PC_DEV_FINAL         TARGET_PC TARGET_DEVKIT TARGET_FINAL
+//     TARGET_PC_CLIENT_DEBUG      TARGET_PC TARGET_CLIENT TARGET_DEBUG
+//     TARGET_PC_CLIENT_DEV        TARGET_PC TARGET_CLIENT TARGET_DEV
+//     TARGET_PC_CLIENT_RELEASE    TARGET_PC TARGET_CLIENT TARGET_RELEASE
+//     TARGET_PC_CLIENT_FINAL      TARGET_PC TARGET_CLIENT TARGET_FINAL
+//     TARGET_PC_RETAIL_DEBUG      TARGET_PC TARGET_RETAIL TARGET_DEBUG
+//     TARGET_PC_RETAIL_DEV        TARGET_PC TARGET_RETAIL TARGET_DEV
+//     TARGET_PC_RETAIL_RELEASE    TARGET_PC TARGET_RETAIL TARGET_RELEASE
+//     TARGET_PC_RETAIL_FINAL      TARGET_PC TARGET_RETAIL TARGET_FINAL
+//     TARGET_PC_TEST_DEBUG        TARGET_PC TARGET_DEBUG  TARGET_TEST
+//     TARGET_PC_TEST_DEV          TARGET_PC TARGET_DEV    TARGET_TEST
+//     TARGET_PC_TEST_RELEASE      TARGET_PC TARGET_RELEASE TARGET_TEST
+//     TARGET_MAC_DEV_DEBUG      TARGET_MAC TARGET_DEVKIT TARGET_DEBUG
+//     TARGET_MAC_DEV_DEV        TARGET_MAC TARGET_DEVKIT TARGET_DEV
+//     TARGET_MAC_DEV_RELEASE    TARGET_MAC TARGET_DEVKIT TARGET_RELEASE
+//     TARGET_MAC_DEV_FINAL      TARGET_MAC TARGET_DEVKIT TARGET_FINAL
+//     TARGET_MAC_CLIENT_DEBUG   TARGET_MAC TARGET_CLIENT TARGET_DEBUG
+//     TARGET_MAC_CLIENT_DEV     TARGET_MAC TARGET_CLIENT TARGET_DEV
+//     TARGET_MAC_CLIENT_RELEASE TARGET_MAC TARGET_CLIENT TARGET_RELEASE
+//     TARGET_MAC_CLIENT_FINAL   TARGET_MAC TARGET_CLIENT TARGET_FINAL
+//     TARGET_MAC_RETAIL_DEBUG   TARGET_MAC TARGET_RETAIL TARGET_DEBUG
+//     TARGET_MAC_RETAIL_DEV     TARGET_MAC TARGET_RETAIL TARGET_DEV
+//     TARGET_MAC_RETAIL_RELEASE TARGET_MAC TARGET_RETAIL TARGET_RELEASE
+//     TARGET_MAC_RETAIL_FINAL   TARGET_MAC TARGET_RETAIL TARGET_FINAL
+//     TARGET_MAC_TEST_DEBUG     TARGET_MAC TARGET_DEBUG  TARGET_TEST
+//     TARGET_MAC_TEST_DEV       TARGET_MAC TARGET_DEV    TARGET_TEST
+//     TARGET_MAC_TEST_RELEASE   TARGET_MAC TARGET_RELEASE TARGET_TEST
+//     </table>
+//     A platform defines the high-level hardware but there is still one variable
+//     that we must specify and that is 32-bit or 64-bit. This has mainly an impact
+//     on sizeof(void*), for 32-bit this results in 4, meaning a pointer will occupy
+//     4 bytes on a 32-bit system. On a 64-bit system this will be 8 bytes.
+//     <table>
+//     Dat Size Macro     \Description              \Version   Platform
+//     -----------------  ------------------------  ---------  ---------
+//     X_32BIT            32-bit hardware systems   <2005		PC,PS2,PSP,PS3,XBOX,XBOX360,NDS,N3DS,WII
+//     X_64BIT            64-bit hardware systems   >2008       PC,XBOXONE,PS4,SWITCH
+//     </table>
+//     Finally the user needs to define in the configuration which
+//     kind of build is he trying to do. X_DEBUG could be use even
+//     if the compiler is set in optimization.
+//     <table>
+//     Target Macro   \Description
+//     -------------  -------------------------------------------
+//     none           Ignores debugging features such asserts.
+//     X_DEBUG        Activates debugging features such asserts.
+//     </table>
+//     The target macro is provided in different ways depending on
+//     the compiler.
+//     <table>
+//     Compiler Macro     \Description              \Version   Platform
+//     -----------------  ------------------------  ---------  ---------
+//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2005       PC
+//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2008       PC
+//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2010       PC
+//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2015       PC
+//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2017       PC
+//     COMPILER_WINDOWS_CLANG     CLang                     7.0        PC
+// 
+//     COMPILER_MACOS_CLANG       CLang                     7.0        MacOS
+// 
+//     </table>
+//     Other Macros provided to the user automatically are:
+//     <table>
+//     Target Macro      \Description
+//     ----------------  ---------------------------
+//     X_ALIGNMENT       alignment definition.
+//     X_BIG_ENDIAN      Endianness of the hardware
+//     X_LITTLE_ENDIAN   Endianness of the hardware
+//     </table>
+//     Finally there is a convenient platform enumeration that can
+//     be use with logical operations. ex: (PLATFORM_PC | PLATFORM_360)
+// ---------------------------------------------------------------------------------
+// 
 
 #ifndef __XBASE_TARGET_H__
 #define __XBASE_TARGET_H__
@@ -193,11 +174,7 @@
  */
 namespace xcore
 {
-	/**
-	 *
-	 * Hardware enumeration
-	 *
-	 */
+	// Hardware enumeration
 	enum x_platform
 	{
 		X_PLATFORM_NONE             = 0,
@@ -210,14 +187,14 @@ namespace xcore
 	#undef TARGET_PC
 	#undef TARGET_MAC
 
-	/**
-	 *
-	 *  Check for ambiguous or insufficiently qualified target specification.
-	 *
-	 *  *** IF YOU GOT AN ERROR HERE ***, then you specified a target platform
-	 *  without sufficiently qualifying the target.
-	 *
-	 */
+	//
+	//
+	//  Check for ambiguous or insufficiently qualified target specification.
+	//
+	// >>> IF YOU GOT AN ERROR HERE <<<, then you specified a target platform
+	//  without sufficiently qualifying the target.
+	//
+	///
 	#if !defined(TARGET_MAC_DEV_DEBUG) && !defined(TARGET_MAC_DEV_DEV) && !defined(TARGET_MAC_DEV_RELEASE) && !defined(TARGET_MAC_DEV_FINAL) \
 		&& !defined(TARGET_MAC_CLIENT_DEBUG) && !defined(TARGET_MAC_CLIENT_DEV) && !defined(TARGET_MAC_CLIENT_RELEASE) && !defined(TARGET_MAC_CLIENT_FINAL) \
 			&& !defined(TARGET_MAC_RETAIL_DEBUG) && !defined(TARGET_MAC_RETAIL_DEV) && !defined(TARGET_MAC_RETAIL_RELEASE) && !defined(TARGET_MAC_RETAIL_FINAL)
@@ -235,9 +212,9 @@ namespace xcore
 		#define TARGET_32BIT
 	#endif
 
-	/**
-	 *  Mac OS Targets
-	 */
+	//
+	// Mac OS Targets
+	//
 
 	#ifdef TARGET_MAC_TEST_DEBUG
 		#ifdef VALID_TARGET
@@ -475,10 +452,9 @@ namespace xcore
 	#endif
 
 
-	/**
-	 *  PC Targets
-	 */
-
+	//
+	// PC Targets
+	//
 	#if defined(TARGET_PC_TEST_DEBUG)
 		#ifdef VALID_TARGET
 			#define MULTIPLE_TARGETS
@@ -738,13 +714,10 @@ namespace xcore
 		#endif
 	#endif
 
-	/**
-	 *
-	 *  Make sure we found a proper target specification.  If you get a compilation
-	 *  error here, then your compilation environment is not specifying one of the
-	 *  target macros.
-	 *
-	 */
+	//  Make sure we found a proper target specification.  If you get a compilation
+	//  error here, then your compilation environment is not specifying one of the
+	//  target macros.
+	//
 
 	#ifndef VALID_TARGET
 		#ifdef _MSC_VER                         // and we are using the Microsoft compiler...
@@ -777,33 +750,27 @@ namespace xcore
 		#endif
 	#endif
 
-	/**
-	 *
-	 *  Make sure we have defined the architecture type, TARGET_32BIT or TARGET_64BIT
-	 *
-	 */
+	//
+	//  Make sure we have defined the architecture type, TARGET_32BIT or TARGET_64BIT
+	//
 	#ifdef VALID_TARGET
 		#if !defined(TARGET_32BIT) && !defined(TARGET_64BIT)
 			// define it by checking sizeof(void*)
 			#if defined(_M_X64) || defined(__x86_64__) || defined(__LP64__)
 				#define TARGET_64BIT
-			#elif defined(__i386__)
-				#define TARGET_32BIT
-			#else
+	 		#elif defined(__i386__)
+	 			#define TARGET_32BIT
+	 		#else
 				#error x_target, error; Unknown target architecture type, only 32-bit or 64-bit are supported
 			#endif
 		#endif
 	#endif
 
-	/**
-	 *
-	 *  generate string containing the target description
-	 *
-	 *  TARGET_PC + TARGET_DEBUG +
-	 *
-	 *
-	 *
-	 */
+
+	 //  generate string containing the target description
+	 //
+	 //  TARGET_PC + TARGET_DEBUG +
+
 	#ifdef TARGET_PLATFORM_STR
 		#undef TARGET_PLATFORM_STR
 	#endif
@@ -894,14 +861,11 @@ namespace xcore
 	#define	TARGET_FULL_DESCR_STR		TARGET_PLATFORM_STR TARGET_HW_STR TARGET_EDITOR_STR TARGET_CONFIG_FULL_STR TARGET_BIT_STR
 
 
-
-	/**
-	 *
-	 *  Make sure we did not somehow get multiple target platform specifications.
-	 *  *** IF YOU GOT AN ERROR HERE ***, then you have defined more than one of
-	 *  the target specification macros.
-	 *
-	 */
+	 //
+	 //  Make sure we did not somehow get multiple target platform specifications.
+	 //  *** IF YOU GOT AN ERROR HERE ***, then you have defined more than one of
+	 //  the target specification macros.
+	 //
 
 	#ifdef MULTIPLE_TARGETS
 		#pragma message(TARGET_FULL_DESCR_STR)
@@ -909,11 +873,9 @@ namespace xcore
 		#error x_target, error; The compilation environment must define only one of the macros listed in x_targets.h
 	#endif
 
-	/**
-	 *
-	 *  Compiler Designation
-	 *
-	 */
+	 //
+	 //  Compiler Designation
+	 //
 
 	#undef COMPILER_WINDOWS_MSVC
 	#undef COMPILER_MACOS_CLANG
@@ -923,16 +885,16 @@ namespace xcore
 
 	#ifdef TARGET_PC
 		#ifdef _MSC_VER
-			/**
-			 * 1200      == VC++ 6.0
-			 * 1200-1202 == VC++ 4
-			 * 1300      == VC++ 7.0
-			 * 1400      == VC++ 8.0
-			 * 1500      == VC++ 9.0
-			 * 1600      == VC++ 10.0 (Visual Studio 2010)
-			 * 1700      == VC++ 11.0 (Visual Studio 2012)
-			 * 1800      == VC++ 12.0 (Visual Studio 2013)
-			 */
+
+			 // 1200      == VC++ 6.0
+			 // 1200-1202 == VC++ 4
+			 // 1300      == VC++ 7.0
+			 // 1400      == VC++ 8.0
+			 // 1500      == VC++ 9.0
+			 // 1600      == VC++ 10.0 (Visual Studio 2010)
+			 // 1700      == VC++ 11.0 (Visual Studio 2012)
+			 // 1800      == VC++ 12.0 (Visual Studio 2013)
+
 			#if _MSC_VER < 1400
 			#elif _MSC_VER == 1400
 				#define COMPILER_WINDOWS_MSVC
@@ -1142,9 +1104,9 @@ namespace xcore
 		X__PAD              = 0xffffffff
 	};
 
-	/**
-		* Multi-threading configuration
-	*/
+
+	// Multi-threading configuration
+
 
 	#if defined(TARGET_PC) || defined(TARGET_MAC)
 		#define TARGET_MULTI_CORE
@@ -1152,19 +1114,18 @@ namespace xcore
 		#define TARGET_SINGLE_CORE
 	#endif
 
-	/**
-	 *
-	 *  Memory manager configuration
-	 *
-	 */
+
+	 //
+	 //  Memory manager configuration
+	 //
+
 	#if defined(TARGET_MULTI_CORE)
 		#define TARGET_MULTITHREADED_MEMORY_MANAGER
 	#endif
-	/**
-	 *
-	 *  handle configuration specific options
-	 *
-	 */
+
+	 //
+	 //  handle configuration specific options
+	 //
 
 	#if !defined(X_DEBUG)
 		#undef X_ASSERT
@@ -1174,11 +1135,10 @@ namespace xcore
 		#endif
 	#endif
 
-	/**
-	 *
-	 * 64 bit constant support
-	 *
-	 */
+	 //
+	 // 64 bit constant support
+	 //
+
 	#ifndef X_CONSTANT_64
 		/// Assume compiler needs/accepts standard prefix for int64 types (long long)
 		#define    X_CONSTANT_64(x)            x##LL
@@ -1189,11 +1149,11 @@ namespace xcore
 		#define    X_CONSTANT_U64(x)            x##ULL
 	#endif
 
-	/**
-	 *
-	 * unsigned 32 bit constant support
-	 *
-	 */
+
+	 //
+	 // unsigned 32 bit constant support
+	 //
+
 	#ifndef X_CONSTANT_S32
 		#define X_CONSTANT_S32(x)		        x##L
 	#endif
