@@ -99,10 +99,10 @@ namespace xcore
 	}
 
 	template<typename T>
-	void				make(xallocator mem, indexed_t<T>& proto, s32 cap);
+	void				make(xalloc* mem, indexed_t<T>& proto, s32 cap);
 
 	template<typename T>
-	void				make(xallocator mem, indexed_t<T>& proto, s32 cap)
+	void				make(xalloc* mem, indexed_t<T>& proto, s32 cap)
 	{
 		make(mem, proto.m_free, cap, cap);
 		make(mem, proto.m_items, cap, cap);

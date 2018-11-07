@@ -110,35 +110,6 @@ namespace xcore
 	// 	xdelete<xheap>(test);
 
 
-	class xallocator
-	{
-		xalloc*			m_allocator;
-
-	public:
-		inline			xallocator() : m_allocator(NULL) {}
-		inline			xallocator(xalloc* all) : m_allocator(all) {}
-
-		bool			can_alloc() const { return m_allocator != NULL; }
-
-		void*			allocate(xsize_t size, u32 align) 
-		{
-			return m_allocator->allocate(size, align); 
-		}
-
-		void			deallocate(void* p)
-		{
-			m_allocator->deallocate(p);
-		}
-
-		void*			allocate_and_clear(xsize_t size, u32 align, u32 clr)
-		{
-			void* mem = m_allocator->allocate(size, align);
-			xmem_utils::memset(mem, clr, (u32)size);
-			return mem;
-		}
-
-	};
-
 	#define XCORE_CLASS_PLACEMENT_NEW_DELETE														\
 		void*	operator new(xcore::xsize_t num_bytes, void* mem)			{ return mem; }			\
 		void	operator delete(void* mem, void* )							{ }						\

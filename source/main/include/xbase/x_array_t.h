@@ -49,7 +49,7 @@ namespace xcore
 
 	// array_t<T> functions
 	template<typename T>
-	void				make(xallocator mem, array_t<T>& proto, s32 cap, s32 len);
+	void				make(xalloc* mem, array_t<T>& proto, s32 cap, s32 len);
 	template<typename T>
 	bool				iterate(array_iter_t<T>& iter);
 	template<typename T>
@@ -106,7 +106,7 @@ namespace xcore
 
 
 	template<typename T>
-	inline void			make(xallocator mem, array_t<T>& proto, s32 cap, s32 len)
+	inline void			make(xalloc* mem, array_t<T>& proto, s32 cap, s32 len)
 	{
 		if (len > cap)
 			cap = len;

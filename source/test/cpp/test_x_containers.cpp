@@ -22,8 +22,6 @@ UNITTEST_SUITE_BEGIN(xcontainers)
 
 		UNITTEST_TEST(test_array_t)
 		{
-			xallocator mem(gTestAllocator);
-
 			slice_t<s32> ss32(gTestAllocator, 100);
 			CHECK_EQUAL(1, ss32.m_slice.refcnt())
 			slice_t<s32> ss32_2 = ss32(10,20);
@@ -33,7 +31,7 @@ UNITTEST_SUITE_BEGIN(xcontainers)
 			const s32 N = 1000;
 
 			array_t<s32> int1000;
-			make(mem, int1000, N, 0);
+			make(gTestAllocator, int1000, N, 0);
 
 			CHECK_EQUAL(0, int1000.size())
 			CHECK_EQUAL(N, int1000.max())
@@ -117,7 +115,7 @@ return;
 			s32 int1 = int2[1];
 
 			queue_t<s32> q100;
-			make(mem, q100, N);
+			make(gTestAllocator, q100, N);
 
 			// You can just start the range iterator again
 			for (s32 i : rng_iter)

@@ -198,17 +198,17 @@ namespace xcore
 			return c;
 		}
 
-		uchar32			read(ascii::runes & str)
+		uchar32			read(ascii::crunes& str)
 		{
 			return read(str.m_str, str.m_end);
 		}
 
-		uchar32			read(utf8::runes& str)
+		uchar32			read(utf8::crunes& str)
 		{
 			return read(str.m_str, str.m_end);
 		}
 
-		uchar32			read(utf32::runes& str)
+		uchar32			read(utf32::crunes& str)
 		{
 			return read(str.m_str, str.m_end);
 		}

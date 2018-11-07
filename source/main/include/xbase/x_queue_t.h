@@ -172,7 +172,7 @@ namespace xcore
 
 
 	template<typename T>
-	void				make(xallocator mem, queue_t<T>& proto, s32 cap);
+	void				make(xalloc* mem, queue_t<T>& proto, s32 cap);
 	template<typename T>
 	bool				append(queue_t<T>& array, T const& element);
 	template<typename T>
@@ -181,7 +181,7 @@ namespace xcore
 
 
 	template<typename T>
-	inline void			make(xallocator mem, queue_t<T>& proto, s32 cap)
+	inline void			make(xalloc* mem, queue_t<T>& proto, s32 cap)
 	{
 		make(mem, proto.m_data, cap);
 		proto.m_head = 0;

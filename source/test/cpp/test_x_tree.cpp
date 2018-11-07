@@ -20,7 +20,7 @@ s32				compare_s32(void const* p1, void const* p2)
 	return 0;
 }
 
-UNITTEST_SUITE_BEGIN(tree_t)
+UNITTEST_SUITE_BEGIN(xtree)
 {
 	UNITTEST_FIXTURE(main)
 	{

@@ -111,10 +111,10 @@ namespace xcore
 
 
 	template<typename T>
-	void				make(xallocator mem, slice_t<T>& proto, s32 size);
+	void				make(xalloc* mem, slice_t<T>& proto, s32 size);
 
 	template<typename T>
-	inline void			make(xallocator mem, slice_t<T>& proto, s32 size)
+	inline void			make(xalloc* mem, slice_t<T>& proto, s32 size)
 	{
 		slice::alloc(proto.m_slice, mem, size, sizeof(T));
 	}
