@@ -1,4 +1,5 @@
 #include "xbase/x_string_ascii.h"
+#include "xbase/x_string_utf.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_integer.h"
 #include "xbase/x_console.h"

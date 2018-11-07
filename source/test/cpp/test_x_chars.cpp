@@ -12,10 +12,10 @@ UNITTEST_SUITE_BEGIN(xchars)
 		UNITTEST_FIXTURE_SETUP() {}
 		UNITTEST_FIXTURE_TEARDOWN() {}
 
-		UNITTEST_TEST(test_xucharz_128)
+		UNITTEST_TEST(test_runez_128)
 		{
-			xucharz<128> cz;
-			cz = "This is a test string";
+			ascii::runez<128> cz;
+			ascii::copy(cz, ascii::crunes("This is a test string"));
 		}
 	}
 }

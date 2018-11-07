@@ -23,7 +23,7 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 
 		UNITTEST_TEST(format_double)
 		{
-			xucharz<256> str;
+			ascii::runez<256> str;
 			ascii::crunes fmt("%f");
 
 			f64 d = 3.1415;
@@ -34,11 +34,11 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 
 		UNITTEST_TEST(format_string)
 		{
-			xucharz<256> str;
+			ascii::runez<256> str;
 			ascii::crunes fmt("the %s");
 
 			ascii::sprintf(str, fmt, x_va("test string"));
-			CHECK_EQUAL(0, str.compare("the test string"));
+			CHECK_EQUAL(0, ascii::compare(str, "the test string"));
 		}
 	}
 }

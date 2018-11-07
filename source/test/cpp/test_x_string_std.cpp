@@ -20,19 +20,19 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		{
 			ascii::crunes src = "this is a system string";
 
-			CHECK_EQUAL(23, ascii::len(src.str(), NULL));
+			CHECK_EQUAL(23, ascii::len(src.m_str, NULL));
 
-			ascii::pcrune src_end_1 = ascii::endof(src.str(), NULL);
-			CHECK_EQUAL(23, ascii::len(src.str(), NULL));
-			CHECK_EQUAL(src.str() + 23, src_end_1);
+			ascii::pcrune src_end_1 = ascii::endof(src.m_str, NULL);
+			CHECK_EQUAL(23, ascii::len(src.m_str, NULL));
+			CHECK_EQUAL(src.m_str + 23, src_end_1);
 
-			ascii::pcrune src_end_2 = ascii::endof(src.str(), src.str() + 20);
-			CHECK_EQUAL(20, ascii::len(src.str(), src.str() + 20));
-			CHECK_EQUAL(src.str() + 20, src_end_2);
+			ascii::pcrune src_end_2 = ascii::endof(src.m_str, src.m_str + 20);
+			CHECK_EQUAL(20, ascii::len(src.m_str, src.m_str + 20));
+			CHECK_EQUAL(src.m_str + 20, src_end_2);
 
-			ascii::pcrune src_end_3 = ascii::endof(src.str(), src.str() + 30);
-			CHECK_EQUAL(23, ascii::len(src.str(), src.str() + 30));
-			CHECK_EQUAL(src.str() + 23, src_end_3);
+			ascii::pcrune src_end_3 = ascii::endof(src.m_str, src.m_str + 30);
+			CHECK_EQUAL(23, ascii::len(src.m_str, src.m_str + 30));
+			CHECK_EQUAL(src.m_str + 23, src_end_3);
 		}
 
 		UNITTEST_TEST(size)
@@ -47,14 +47,14 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 		{ 
 			ascii::crunes str("this is a system string");
 
-			xucharz<32> dst;
+			ascii::runez<32> dst;
 			ascii::copy(dst, str);
 
-			CHECK_EQUAL(0, dst.compare(str));
+			CHECK_EQUAL(0, ascii::compare(str, dst));
 			CHECK_EQUAL(0, ascii::compare(str, dst));
 			CHECK_EQUAL(23, ascii::size(str));
 
-			xucharz<16> str2;
+			ascii::runez<16> str2;
 			ascii::copy(str2, str);
 
 			CHECK_EQUAL(16, ascii::size(str2));
@@ -94,7 +94,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(replace)
 		{
-			xucharz<128> dst;
+			ascii::runez<128> dst;
 			ascii::crunes str1 = "this is a system string";
 			ascii::copy(dst, str1);
 			ascii::crunes str2 = "this is a copied string";
@@ -134,7 +134,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(concatenate)
 		{
-			xucharz<128> dst;
+			ascii::runez<128> dst;
 			ascii::crunes str1 = "this is a ";
 			ascii::copy(dst, str1);
 
@@ -288,7 +288,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(tostring_s32)
 		{
-			xucharz<32> str;
+			ascii::runez<32> str;
 			s32 value = 31415;
 			ascii::to_string(str, value);
 			CHECK_EQUAL(5, ascii::size(str));
@@ -297,7 +297,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(tostring_u32)
 		{
-			xucharz<32> str;
+			ascii::runez<32> str;
 			u32 value = 31415;
 			ascii::to_string(str, value);
 			CHECK_EQUAL(5, ascii::size(str));
@@ -306,7 +306,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(tostring_s64)
 		{
-			xucharz<32> str;
+			ascii::runez<32> str;
 			s64 value = 31415;
 			ascii::to_string(str, value);
 			CHECK_EQUAL(5, ascii::size(str));
@@ -315,7 +315,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(tostring_u64)
 		{
-			xucharz<32> str;
+			ascii::runez<32> str;
 			u64 value = 31415;
 			ascii::to_string(str, value);
 			CHECK_EQUAL(5, ascii::size(str));
@@ -324,7 +324,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(tostring_f32)
 		{
-			xucharz<32> str;
+			ascii::runez<32> str;
 			f32 value = 3.1415f;
 			ascii::to_string(str, value, 4);
 			CHECK_EQUAL(6, ascii::size(str));
@@ -333,7 +333,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(tostring_f64)
 		{
-			xucharz<32> str;
+			ascii::runez<32> str;
 			f64 value = 3.1415;
 			ascii::to_string(str, value, 4);
 			CHECK_EQUAL(6, ascii::size(str));
@@ -435,7 +435,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(to_upper)
 		{
-			xucharz<128> str;
+			ascii::runez<128> str;
 			ascii::crunes str1 = "this is a lower case string";
 			ascii::crunes str2 = "THIS IS A LOWER CASE STRING";
 			ascii::copy(str, str1);
@@ -445,7 +445,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(to_lower)
 		{
-			xucharz<128> str;
+			ascii::runez<128> str;
 			ascii::crunes str1 = "THIS IS AN UPPER CASE STRING";
 			ascii::crunes str2 = "this is an upper case string";
 			ascii::copy(str, str1);
@@ -481,9 +481,9 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			s32 length = ascii::cprintf(fmt, x_va(i), x_va(str));
 			CHECK_EQUAL(9, length);
 
-			xucharz<32> buffer;
+			ascii::runez<32> buffer;
 			ascii::sprintf(buffer, fmt, x_va(i), x_va(str));
-			CHECK_EQUAL(0, buffer.compare(ascii::crunes("100 hello")));
+			CHECK_EQUAL(0, ascii::compare(buffer, ascii::crunes("100 hello")));
 		}
 
 		UNITTEST_TEST(vcprintf)
@@ -497,7 +497,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(sprintf)
 		{
-			xucharz<32> buffer;
+			ascii::runez<32> buffer;
 
 			s32 i = 100;
 
@@ -513,7 +513,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(sprintf_bool)
 		{
-			xucharz<32> buffer;
+			ascii::runez<32> buffer;
 
 			// ---------------------------------------------------------------------------
 			// Boolean, True/False and Yes/No verification
@@ -562,7 +562,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 		UNITTEST_TEST(vsprintf)
 		{
-			xucharz<32> buffer;
+			ascii::runez<32> buffer;
 
 			s32 i = 100;
 			ascii::crunes str = "hello";

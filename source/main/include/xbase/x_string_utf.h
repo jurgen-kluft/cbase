@@ -49,9 +49,9 @@ namespace xcore
 		{
 		public:
 			enum { SIZE = L + 1 };
-			char			m_str[SIZE];
-
+			rune			m_str[SIZE];
 			inline			runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
+			void			reset() { m_end = m_str; m_str[0] = '\0'; }
 		};
 	}
 
@@ -84,6 +84,14 @@ namespace xcore
 			pcrune			m_str;
 			pcrune 			m_end;
 		};
+		template<s32 L>
+		class runez : public runes
+		{
+		public:
+			enum { SIZE = L + 1 };
+			rune			m_str[SIZE];
+			inline			runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
+		};
 	}
 
 	namespace utf16
@@ -115,6 +123,14 @@ namespace xcore
 			pcrune			m_str;
 			pcrune 			m_end;
 		};
+		template<s32 L>
+		class runez : public runes
+		{
+		public:
+			enum { SIZE = L + 1 };
+			rune			m_str[SIZE];
+			inline			runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
+		};
 	}
 
 	namespace utf32
@@ -145,6 +161,14 @@ namespace xcore
 			crunes &		operator = (crunes const& other) { m_str = other.m_str; m_end = other.m_end; return *this; }
 			pcrune			m_str;
 			pcrune			m_end;
+		};
+		template<s32 L>
+		class runez : public runes
+		{
+		public:
+			enum { SIZE = L + 1 };
+			rune			m_str[SIZE];
+			inline			runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
 		};
 	}
 }
@@ -473,6 +497,10 @@ namespace xcore
 		inline uchar32	first_char(runes const& str) { return first_char(str); }
 		inline uchar32	last_char(runes const& str) { return last_char(str); }
 	}; ///< end of utf32 namespace
+
+
+	inline bool		operator == (ascii::runes const& r1, ascii::runes const& r2) { return ascii::compare(r1, r2) == 0; }
+	inline bool		operator == (ascii::crunes const& r1, ascii::crunes const& r2) { return ascii::compare(r1, r2) == 0; }
 
 };	// xCore namespace
 

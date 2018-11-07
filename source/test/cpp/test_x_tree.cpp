@@ -20,7 +20,7 @@ s32				compare_s32(void const* p1, void const* p2)
 	return 0;
 }
 
-UNITTEST_SUITE_BEGIN(xtree)
+UNITTEST_SUITE_BEGIN(tree_t)
 {
 	UNITTEST_FIXTURE(main)
 	{
@@ -36,14 +36,14 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		UNITTEST_TEST(tree_node)
 		{
-			xtree::node node;
+			tree_t::node_t node;
 
-			xtree::node* left_ptr = (xtree::node*)((uptr)0 - (uptr)1);
+			tree_t::node_t* left_ptr = (tree_t::node_t*)((uptr)0 - (uptr)1);
 			node.set_left(left_ptr);
 			
 			CHECK_EQUAL(left_ptr, node.get_left());
 
-			xtree::node* right_ptr = (xtree::node*)((uptr)0 - (uptr)2);
+			tree_t::node_t* right_ptr = (tree_t::node_t*)((uptr)0 - (uptr)2);
 			node.set_right(right_ptr);
 			CHECK_EQUAL(right_ptr, node.get_right());
 
@@ -58,8 +58,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 			CHECK_EQUAL(true, node.is_black());
 
-			left_ptr = (xtree::node*)0x100;
-			right_ptr = (xtree::node*)0x200;
+			left_ptr = (tree_t::node_t*)0x100;
+			right_ptr = (tree_t::node_t*)0x200;
 			node.set_left(left_ptr);
 			node.set_right(right_ptr);
 			CHECK_EQUAL(left_ptr, node.get_child(0));
@@ -78,7 +78,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		UNITTEST_TEST(void_tree)
 		{
-			xtree tree(gTestAllocator);
+			tree_t tree;
 
 			s32 a = 1;
 			s32 b = 2;
@@ -89,43 +89,52 @@ UNITTEST_SUITE_BEGIN(xtree)
 			s32 g = 7;
 			s32 h = 8;
 			s32 i = 9;
+			tree_t::node_t na;
+			tree_t::node_t nb;
+			tree_t::node_t nc;
+			tree_t::node_t nd;
+			tree_t::node_t ne;
+			tree_t::node_t nf;
+			tree_t::node_t ng;
+			tree_t::node_t nh;
+			tree_t::node_t ni;
 
 			const char* result = NULL;
 
 			bool inserted;
-			inserted = tree.insert(&a);
+			inserted = tree.insert(&a, &na);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&b);
+			inserted = tree.insert(&b, &nb);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&b);				// Duplicate insert should fail
+			inserted = tree.insert(&b, &nb);				// Duplicate insert should fail
 			CHECK_FALSE(inserted);
-			inserted = tree.insert(&c);
+			inserted = tree.insert(&c, &nc);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&d);
+			inserted = tree.insert(&d, &nd);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&e);
+			inserted = tree.insert(&e, &ne);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&f);
+			inserted = tree.insert(&f, &nf);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&g);
+			inserted = tree.insert(&g, &ng);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&h);
+			inserted = tree.insert(&h, &nh);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&i);
+			inserted = tree.insert(&i, &ni);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
 
 			CHECK_EQUAL(9, tree.size());
 
-			void* found;
+			tree_t::node_t* found;
 			CHECK_EQUAL(true, tree.find(&a, found));
 			CHECK_EQUAL(true, tree.find(&b, found));
 			CHECK_EQUAL(true, tree.find(&c, found));
@@ -141,8 +150,9 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 			CHECK_EQUAL(9, tree.size());
 
-			void * data;
-			while (!tree.clear(data))
+			void* data;
+			tree_t::node_t* node;
+			while (!tree.clear(data, node))
 			{
 			}
 
@@ -151,7 +161,7 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		UNITTEST_TEST(void_tree_iterate_preorder)
 		{
-			xtree tree(gTestAllocator);
+			tree_t tree;
 			tree.set_cmp(compare_s32);
 
 			s32 a = 1;
@@ -163,36 +173,46 @@ UNITTEST_SUITE_BEGIN(xtree)
 			s32 g = 7;
 			s32 h = 8;
 			s32 i = 9;
+			tree_t::node_t na;
+			tree_t::node_t nb;
+			tree_t::node_t nc;
+			tree_t::node_t nd;
+			tree_t::node_t ne;
+			tree_t::node_t nf;
+			tree_t::node_t ng;
+			tree_t::node_t nh;
+			tree_t::node_t ni;
 
-			CHECK_TRUE(tree.insert(&a));
-			CHECK_TRUE(tree.insert(&b));
-			CHECK_TRUE(tree.insert(&c));
-			CHECK_TRUE(tree.insert(&d));
-			CHECK_TRUE(tree.insert(&e));
-			CHECK_TRUE(tree.insert(&f));
-			CHECK_TRUE(tree.insert(&g));
-			CHECK_TRUE(tree.insert(&h));
-			CHECK_TRUE(tree.insert(&i));
+			CHECK_TRUE(tree.insert(&a, &na));
+			CHECK_TRUE(tree.insert(&b, &nb));
+			CHECK_TRUE(tree.insert(&c, &nc));
+			CHECK_TRUE(tree.insert(&d, &nd));
+			CHECK_TRUE(tree.insert(&e, &ne));
+			CHECK_TRUE(tree.insert(&f, &nf));
+			CHECK_TRUE(tree.insert(&g, &ng));
+			CHECK_TRUE(tree.insert(&h, &nh));
+			CHECK_TRUE(tree.insert(&i, &ni));
 
-			xtree::iterator iterator = tree.iterate();
+			tree_t::iterator iterator = tree.iterate();
 
 			s32 round = 0;
 			s32 preorder[] = { d,b,a,c,f,e,h,g,i };
 			void* data;
-			while (iterator.preorder(xtree::cRight, data))
+			while (iterator.preorder(tree_t::cRight, data))
 			{
 				CHECK_EQUAL(preorder[round++], *(s32*)data);
 			}
 			CHECK_EQUAL(9, round);
 
-			while (!tree.clear(data))
+			tree_t::node_t* node;
+			while (!tree.clear(data, node))
 			{
 			}
 		}
 
 		UNITTEST_TEST(void_tree_iterate_sortorder)
 		{
-			xtree tree(gTestAllocator);
+			tree_t tree;
 			tree.set_cmp(compare_s32);
 
 			s32 a = 1;
@@ -205,35 +225,46 @@ UNITTEST_SUITE_BEGIN(xtree)
 			s32 h = 8;
 			s32 i = 9;
 
-			CHECK_TRUE(tree.insert(&a));
-			CHECK_TRUE(tree.insert(&b));
-			CHECK_TRUE(tree.insert(&c));
-			CHECK_TRUE(tree.insert(&d));
-			CHECK_TRUE(tree.insert(&e));
-			CHECK_TRUE(tree.insert(&f));
-			CHECK_TRUE(tree.insert(&g));
-			CHECK_TRUE(tree.insert(&h));
-			CHECK_TRUE(tree.insert(&i));
+			tree_t::node_t na;
+			tree_t::node_t nb;
+			tree_t::node_t nc;
+			tree_t::node_t nd;
+			tree_t::node_t ne;
+			tree_t::node_t nf;
+			tree_t::node_t ng;
+			tree_t::node_t nh;
+			tree_t::node_t ni;
 
-			xtree::iterator iterator = tree.iterate();
+			CHECK_TRUE(tree.insert(&a, &na));
+			CHECK_TRUE(tree.insert(&b, &nb));
+			CHECK_TRUE(tree.insert(&c, &nc));
+			CHECK_TRUE(tree.insert(&d, &nd));
+			CHECK_TRUE(tree.insert(&e, &ne));
+			CHECK_TRUE(tree.insert(&f, &nf));
+			CHECK_TRUE(tree.insert(&g, &ng));
+			CHECK_TRUE(tree.insert(&h, &nh));
+			CHECK_TRUE(tree.insert(&i, &ni));
+
+			tree_t::iterator iterator = tree.iterate();
 
 			s32 round = 0;
 			s32 sortorder[] = { a,b,c,d,e,f,g,h,i };
 			void* data;
-			while (iterator.sortorder(xtree::cRight, data))
+			while (iterator.sortorder(tree_t::cRight, data))
 			{
 				CHECK_EQUAL(sortorder[round++], *(s32*)data);
 			}
 			CHECK_EQUAL(9, round);
 
-			while (!tree.clear(data))
+			tree_t::node_t* node;
+			while (!tree.clear(data, node))
 			{
 			}
 		}
 
 		UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
 		{
-			xtree tree(gTestAllocator);
+			tree_t tree;
 			tree.set_cmp(compare_s32);
 
 			s32 a = 1;
@@ -246,35 +277,46 @@ UNITTEST_SUITE_BEGIN(xtree)
 			s32 h = 8;
 			s32 i = 9;
 
-			CHECK_TRUE(tree.insert(&a));
-			CHECK_TRUE(tree.insert(&b));
-			CHECK_TRUE(tree.insert(&c));
-			CHECK_TRUE(tree.insert(&d));
-			CHECK_TRUE(tree.insert(&e));
-			CHECK_TRUE(tree.insert(&f));
-			CHECK_TRUE(tree.insert(&g));
-			CHECK_TRUE(tree.insert(&h));
-			CHECK_TRUE(tree.insert(&i));
+			tree_t::node_t na;
+			tree_t::node_t nb;
+			tree_t::node_t nc;
+			tree_t::node_t nd;
+			tree_t::node_t ne;
+			tree_t::node_t nf;
+			tree_t::node_t ng;
+			tree_t::node_t nh;
+			tree_t::node_t ni;
 
-			xtree::iterator iterator = tree.iterate();
+			CHECK_TRUE(tree.insert(&a, &na));
+			CHECK_TRUE(tree.insert(&b, &nb));
+			CHECK_TRUE(tree.insert(&c, &nc));
+			CHECK_TRUE(tree.insert(&d, &nd));
+			CHECK_TRUE(tree.insert(&e, &ne));
+			CHECK_TRUE(tree.insert(&f, &nf));
+			CHECK_TRUE(tree.insert(&g, &ng));
+			CHECK_TRUE(tree.insert(&h, &nh));
+			CHECK_TRUE(tree.insert(&i, &ni));
+
+			tree_t::iterator iterator = tree.iterate();
 
 			s32 round = 0;
 			s32 sortorder[] = { i,h,g,f,e,d,c,b,a };
 			void* data;
-			while (iterator.sortorder(xtree::cLeft, data))
+			while (iterator.sortorder(tree_t::cLeft, data))
 			{
 				CHECK_EQUAL(sortorder[round++], *(s32*)data);
 			}
 			CHECK_EQUAL(9, round);
 
-			while (!tree.clear(data))
+			tree_t::node_t* node;
+			while (!tree.clear(data, node))
 			{
 			}
 		}
 
 		UNITTEST_TEST(void_tree_iterate_postorder)
 		{
-			xtree tree(gTestAllocator);
+			tree_t tree;
 			tree.set_cmp(compare_s32);
 
 			s32 a = 1;
@@ -287,36 +329,47 @@ UNITTEST_SUITE_BEGIN(xtree)
 			s32 h = 8;
 			s32 i = 9;
 
-			CHECK_TRUE(tree.insert(&a));
-			CHECK_TRUE(tree.insert(&b));
-			CHECK_TRUE(tree.insert(&c));
-			CHECK_TRUE(tree.insert(&d));
-			CHECK_TRUE(tree.insert(&e));
-			CHECK_TRUE(tree.insert(&f));
-			CHECK_TRUE(tree.insert(&g));
-			CHECK_TRUE(tree.insert(&h));
-			CHECK_TRUE(tree.insert(&i));
+			tree_t::node_t na;
+			tree_t::node_t nb;
+			tree_t::node_t nc;
+			tree_t::node_t nd;
+			tree_t::node_t ne;
+			tree_t::node_t nf;
+			tree_t::node_t ng;
+			tree_t::node_t nh;
+			tree_t::node_t ni;
 
-			xtree::iterator iterator = tree.iterate();
+			CHECK_TRUE(tree.insert(&a, &na));
+			CHECK_TRUE(tree.insert(&b, &nb));
+			CHECK_TRUE(tree.insert(&c, &nc));
+			CHECK_TRUE(tree.insert(&d, &nd));
+			CHECK_TRUE(tree.insert(&e, &ne));
+			CHECK_TRUE(tree.insert(&f, &nf));
+			CHECK_TRUE(tree.insert(&g, &ng));
+			CHECK_TRUE(tree.insert(&h, &nh));
+			CHECK_TRUE(tree.insert(&i, &ni));
+
+			tree_t::iterator iterator = tree.iterate();
 
 			s32 round = 0;
 			s32 postorder[] = { a,c,b,e,g,i,h,f,d };
 			
 			void* data;
-			while (iterator.postorder(xtree::cRight, data))
+			while (iterator.postorder(tree_t::cRight, data))
 			{
 				CHECK_EQUAL(postorder[round++], *(s32*)data);
 			}
 			CHECK_EQUAL(9, round);
 
-			while (!tree.clear(data))
+			tree_t::node_t* node;
+			while (!tree.clear(data, node))
 			{
 			}
 		}
 
 		UNITTEST_TEST(void_tree_search)
 		{
-			xtree tree(gTestAllocator);
+			tree_t tree;
 			tree.set_cmp(compare_s32);
 
 			s32 a = 1;
@@ -329,19 +382,29 @@ UNITTEST_SUITE_BEGIN(xtree)
 			s32 h = 8;
 			s32 i = 9;
 
-			CHECK_TRUE(tree.insert(&a));
-			CHECK_TRUE(tree.insert(&b));
-			CHECK_TRUE(tree.insert(&c));
-			CHECK_TRUE(tree.insert(&d));
-			CHECK_TRUE(tree.insert(&e));
-			CHECK_TRUE(tree.insert(&f));
-			CHECK_TRUE(tree.insert(&g));
-			CHECK_TRUE(tree.insert(&h));
-			CHECK_TRUE(tree.insert(&i));
+			tree_t::node_t na;
+			tree_t::node_t nb;
+			tree_t::node_t nc;
+			tree_t::node_t nd;
+			tree_t::node_t ne;
+			tree_t::node_t nf;
+			tree_t::node_t ng;
+			tree_t::node_t nh;
+			tree_t::node_t ni;
 
-			xtree::iterator iterator = tree.iterate();
+			CHECK_TRUE(tree.insert(&a, &na));
+			CHECK_TRUE(tree.insert(&b, &nb));
+			CHECK_TRUE(tree.insert(&c, &nc));
+			CHECK_TRUE(tree.insert(&d, &nd));
+			CHECK_TRUE(tree.insert(&e, &ne));
+			CHECK_TRUE(tree.insert(&f, &nf));
+			CHECK_TRUE(tree.insert(&g, &ng));
+			CHECK_TRUE(tree.insert(&h, &nh));
+			CHECK_TRUE(tree.insert(&i, &ni));
 
-			s32 dir = xtree::cLeft;
+			tree_t::iterator iterator = tree.iterate();
+
+			s32 dir = tree_t::cLeft;
 			void* data;
 			void* find = &f;
 			while (iterator.traverse(dir, data))
@@ -353,7 +416,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 			}
 			CHECK_EQUAL(0, compare_s32(data, find));
 
-			while (!tree.clear(data))
+			tree_t::node_t* node;
+			while (!tree.clear(data, node))
 			{
 			}
 		}
@@ -361,44 +425,55 @@ UNITTEST_SUITE_BEGIN(xtree)
 
 		UNITTEST_TEST(s32_tree)
 		{
-			xtree_t<s32> tree(gTestAllocator);
+			tree_t tree;
 
 			s32 a(1);
 			s32 b(2);
 			s32 c(3);
 			s32 d(4);
 
+			tree_t::node_t na;
+			tree_t::node_t nb;
+			tree_t::node_t nc;
+			tree_t::node_t nd;
+			tree_t::node_t ne;
+			tree_t::node_t nf;
+			tree_t::node_t ng;
+			tree_t::node_t nh;
+			tree_t::node_t ni;
+
 			const char* result = NULL;
 
 			bool inserted;
-			inserted = tree.insert(&a);
+			inserted = tree.insert(&a, &na);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&b);
+			inserted = tree.insert(&b, &nb);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&b);				// Duplicate insert should fail
+			inserted = tree.insert(&b, &nb);	// Duplicate insert should fail
 			CHECK_FALSE(inserted);
-			inserted = tree.insert(&c);
+			inserted = tree.insert(&c, &nc);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
-			inserted = tree.insert(&d);
+			inserted = tree.insert(&d, &nd);
 			CHECK_TRUE(inserted);
 			CHECK_TRUE(tree.validate(result));
 
 			CHECK_EQUAL(4, tree.size());
 
-			s32* found;
-			CHECK_EQUAL(true, tree.find(&a, found));
-			CHECK_EQUAL(true, tree.find(&b, found));
-			CHECK_EQUAL(true, tree.find(&c, found));
-			CHECK_EQUAL(true, tree.find(&d, found));
+			tree_t::node_t* found_node;
+			CHECK_EQUAL(true, tree.find(&a, found_node));
+			CHECK_EQUAL(true, tree.find(&b, found_node));
+			CHECK_EQUAL(true, tree.find(&c, found_node));
+			CHECK_EQUAL(true, tree.find(&d, found_node));
 
 			s32 e(5);
-			CHECK_FALSE(tree.find(&e, found));
+			CHECK_FALSE(tree.find(&e, found_node));
 
-			s32 * data;
-			while (!tree.clear(data))
+			void * data;
+			tree_t::node_t* node;
+			while (!tree.clear(data, node))
 			{
 			}
 
