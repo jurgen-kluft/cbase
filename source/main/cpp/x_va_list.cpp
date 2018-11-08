@@ -5,15 +5,13 @@
 
 #include "xbase/x_debug.h"
 #include "xbase/x_va_list.h"
-#include "xbase/x_string_utf.h"
-#include "xbase/x_string_ascii.h"
-#include "xbase/x_chars.h"
+#include "xbase/x_runes.h"
 
 
 /**
 * string utilities
 */
-#include "xbase/private/x_string_utils.h"
+#include "xbase/private/x_printf.h"
 
 /**
  * xCore namespace

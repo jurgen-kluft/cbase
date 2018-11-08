@@ -11,7 +11,7 @@
 #endif
 
 
-#include "xbase/x_chars.h"
+#include "xbase/x_runes.h"
 
 namespace xcore
 {

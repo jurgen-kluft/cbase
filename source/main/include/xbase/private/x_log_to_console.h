@@ -12,7 +12,7 @@
 #endif
 
 #include "xbase/x_log.h"
-#include "xbase/x_chars.h"
+#include "xbase/x_runes.h"
 
 /**
  * xCore namespace

@@ -4,12 +4,11 @@
 */
 
 #include "xbase/x_debug.h"
-#include "xbase/x_memory_std.h"
+#include "xbase/x_memory.h"
 #include "xbase/x_va_list.h"
-#include "xbase/x_string_ascii.h"
-#include "xbase/x_string_utf.h"
 #include "xbase/x_console.h"
-#include "xbase/x_chars.h"
+#include "xbase/x_runes.h"
+#include "xbase/x_printf.h"
 
 /**
  * xCore namespace

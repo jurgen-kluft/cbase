@@ -5,7 +5,7 @@
 #pragma once 
 #endif
 
-#include "xbase/x_memory_std.h"
+#include "xbase/x_memory.h"
 
 /**
  * xCore namespace

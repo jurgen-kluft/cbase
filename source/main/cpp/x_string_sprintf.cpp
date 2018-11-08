@@ -1,9 +1,9 @@
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_double.h"
-#include "xbase/x_string_ascii.h"
-#include "xbase/x_string_utf.h"
 #include "xbase/x_console.h"
+#include "xbase/x_runes.h"
+#include "xbase/x_printf.h"
 
 #ifdef TARGET_PC
 #include <math.h>
@@ -14,7 +14,7 @@
 #endif
 
 // Shared code
-#include "xbase/private/x_string_utils.h"
+#include "xbase/private/x_printf.h"
 
 /**
  * xCore namespace

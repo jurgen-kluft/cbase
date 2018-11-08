@@ -1,7 +1,7 @@
 #include "xbase/x_target.h"
 #include "xbase/x_base.h"
 #include "xbase/x_buffer.h"
-#include "xbase/x_string_utf.h"
+#include "xbase/x_runes.h"
 
 namespace xcore
 {

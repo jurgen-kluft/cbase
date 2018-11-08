@@ -1,11 +1,11 @@
 #include "xbase/x_target.h"
-#include "xbase/x_string_ascii.h"
+#include "xbase/x_runes.h"
 #include "xbase/x_va_list.h"
 
 #ifndef SPU
 
 // Shared code
-#include "xbase/private/x_string_utils.h"
+#include "xbase/private/x_printf.h"
 
 /**
  * xCore namespace

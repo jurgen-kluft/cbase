@@ -1,6 +1,6 @@
 #include "xbase/x_carray.h"
 #include "xbase/x_buffer.h"
-#include "xbase/x_string_ascii.h"
+#include "xbase/x_runes.h"
 #include "xunittest/xunittest.h"
 
 using namespace xcore;

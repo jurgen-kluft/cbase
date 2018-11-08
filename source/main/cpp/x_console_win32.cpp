@@ -16,8 +16,8 @@
 #include <stdio.h>
 
 #include "xbase/x_console.h"
-#include "xbase/x_string_utf.h"
-#include "xbase/x_chars.h"
+#include "xbase/x_runes.h"
+#include "xbase/x_runes.h"
 
 /**
  * xCore namespace

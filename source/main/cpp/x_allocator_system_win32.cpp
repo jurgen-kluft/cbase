@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "xbase/x_memory_std.h"
+#include "xbase/x_memory.h"
 #include "xbase/x_integer.h"
 #include "xbase/x_allocator.h"
 

@@ -109,7 +109,6 @@ namespace xcore
 		return *item;
 	}
 
-
 	template<typename T>
 	void				make(xalloc* mem, slice_t<T>& proto, s32 size);
 

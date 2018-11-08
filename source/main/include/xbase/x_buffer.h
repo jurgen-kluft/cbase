@@ -6,7 +6,7 @@
 #endif
 
 #include "xbase/x_allocator.h"
-#include "xbase/x_memory_std.h"
+#include "xbase/x_memory.h"
 #include "xbase/x_debug.h"
 
 namespace xcore
@@ -88,9 +88,6 @@ namespace xcore
 		inline			xbytes() : xbuffer(SIZE, m_data) {}
 		xbuffer			buffer() const { return xbuffer(*this); }
 	};
-
-	// Inline functions
-	#include "xbase/private/x_buffer.h"
 
 	//
 	// Helper classes for reading and writing to buffers

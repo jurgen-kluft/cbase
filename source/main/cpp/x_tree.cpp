@@ -537,7 +537,7 @@ namespace xcore
 		}
 		else
 		{
-			if (d == cLeft)
+			if (d == LEFT)
 			{
 				m_it = m_it->get_left();
 			}

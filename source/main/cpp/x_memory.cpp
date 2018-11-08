@@ -1,4 +1,4 @@
-#include "xbase/x_memory_std.h"
+#include "xbase/x_memory.h"
 
 #ifdef TARGET_PC
 	#include <stdlib.h>
