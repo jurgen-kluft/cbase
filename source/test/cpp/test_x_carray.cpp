@@ -61,7 +61,6 @@ UNITTEST_SUITE_BEGIN(xcarray)
 			CHECK_EQUAL(1, a.size());
 			CHECK_EQUAL(5, a.reserved());
 
-			s32 value;
 			CHECK_TRUE(a.pop_back(&value));
 			CHECK_EQUAL(1, value);
 

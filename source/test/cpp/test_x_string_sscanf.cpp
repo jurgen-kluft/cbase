@@ -1,4 +1,5 @@
 #include "xbase/x_runes.h"
+#include "xbase/x_printf.h"
 
 #if defined(TARGET_PS3)
 	#include <math.h>
