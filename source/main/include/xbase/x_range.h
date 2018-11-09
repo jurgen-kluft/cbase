@@ -70,110 +70,40 @@ namespace xcore
 		T &			operator * (void) { return m_current; }
 		T const&	operator * (void) const { return m_current; }
 
-		bool		operator == (range_t<T> const& range) { return m_state == range.m_state; }
-		bool		operator != (range_t<T> const& range) { return m_state != range.m_state; }
+		bool		operator == (range_t<T> const& range) const { return m_current == range.m_current; }
+		bool		operator != (range_t<T> const& range) const { return m_current != range.m_current; }
 
-		range_t<T>&	operator ++ () 
+		range_t<T>&	operator ++ () { iterate(); return *this; }
+
+		void		reset()
 		{
-			iterate();
-			return *this;
-		}
-
-		range_t<T>	operator ++ (s32) 
-		{
-			range_t<T> cr(*this);
-			iterate();
-			return cr;
-		}
-
-
-		enum EState 
-		{ 
-			STATE_START   = 0x001, 
-			STATE_ITER    = 0x002, 
-			STATE_END     = 0x000,
-			STATE_MASK    = 0x00F,
-			DIR_FORWARDS  = 0x000, 
-			DIR_BACKWARDS = 0x100,
-			DIR_MASK      = 0xF00
-		};
-
-		void		reset(s32 direction)
-		{
-			m_state = STATE_START | (direction & DIR_MASK);
+			m_index = 0;
+			m_current = m_from;
 		}
 
 		range_t<T>	begin() const 
 		{
 			range_t<T> range(*this);
-			range.reset(m_state);
-			range.iterate();
+			range.reset();
 			return range;
 		}
 
 		range_t<T>	end() const 
 		{
-			return range_t<T>();
+			range_t<T> e(*this);
+			e.m_current = m_to;
+			return e;
 		}
 
-		bool		iterate()
+		inline bool	iterate()
 		{
-			switch (m_state & STATE_MASK)
-			{
-			case STATE_START:
-				if ((m_state & DIR_MASK) == DIR_FORWARDS)
-				{
-					m_index = 0;
-					m_current = m_from;
-					m_state = STATE_ITER | DIR_FORWARDS;
-				} 
-				else if ((m_state & DIR_MASK) == DIR_BACKWARDS)
-				{
-					m_index = 0;
-					m_current = m_to - m_step;
-					m_state = STATE_ITER | DIR_BACKWARDS;
-				}
-				else 
-				{
-					m_state = STATE_END;
-				}
-				break;
-			case STATE_ITER:
-				if ((m_state & DIR_MASK) == DIR_FORWARDS)
-				{
-					m_index += 1;
-					m_current += m_step;
-					if (m_current >= m_to)
-					{
-						m_state = STATE_END;
-						return false;
-					}
-				}
-				else if ((m_state & DIR_MASK) == DIR_BACKWARDS)
-				{
-					m_index += 1;
-					m_current -= m_step;
-					if (m_current < m_from)
-					{
-						m_state = STATE_END;
-						return false;
-					}
-				}
-				else 
-				{
-					m_state = STATE_END;
-					return false;
-				}
-				break;
-			case STATE_END:
-				return false;
-			}
-			return true;
+			m_index += 1;
+			m_current += m_step;
+			return (m_current >= m_to);
 		}
 
 		T			m_from;
 		T			m_to;
-		s32			m_state;
 		s32			m_index;
 		T			m_current;
 		T			m_step;
@@ -181,8 +111,7 @@ namespace xcore
 
 	template<typename T>
 	inline range_t<T>::range_t()
-		: m_state(STATE_END)
-		, m_index(0)
+		: m_index(0)
 		, m_step(0)
 	{
 		m_from = 0;
@@ -192,8 +121,7 @@ namespace xcore
 
 	template<typename T>
 	inline range_t<T>::range_t(until_t<T> _until)
-		: m_state(STATE_START | DIR_FORWARDS)
-		, m_index(0)
+		: m_index(0)
 		, m_step(1)
 	{
 		m_from = 0;
@@ -203,8 +131,7 @@ namespace xcore
 
 	template<typename T>
 	inline range_t<T>::range_t(from_t<T> _from, until_t<T> _until)
-		: m_state(STATE_START | DIR_FORWARDS)
-		, m_index(0)
+		: m_index(0)
 		, m_step(1)
 	{
 		m_from = _from.m_from;
@@ -214,8 +141,7 @@ namespace xcore
 
 	template<typename T>
 	inline range_t<T>::range_t(from_t<T> _from, count_t _count)
-		: m_state(STATE_START | DIR_FORWARDS)
-		, m_index(0)
+		: m_index(0)
 		, m_step(1)
 	{
 		m_from = _from.m_from;
@@ -227,7 +153,6 @@ namespace xcore
 	inline range_t<T>::range_t(range_t<T> const& range)
 		: m_from(range.m_from)
 		, m_to(range.m_to)
-		, m_state(range.m_state)
 		, m_index(range.m_index)
 		, m_current(range.m_current)
 		, m_step(range.m_step)
@@ -238,7 +163,13 @@ namespace xcore
 	inline 	range_t<T>	forwards(range_t<T> const& iter)
 	{
 		range_t<T> range(iter);
-		range.reset(range_t<T>::DIR_FORWARDS);
+		if (range.m_step < 0)
+		{
+			range.m_step = -range.m_step;
+			range.m_from = iter.m_to;
+			range.m_to = iter.m_from;
+		}
+		range.reset();
 		return range;
 	}
 
@@ -246,7 +177,13 @@ namespace xcore
 	inline range_t<T>	backwards(range_t<T> const& iter)
 	{
 		range_t<T> range(iter);
-		range.reset(range_t<T>::DIR_BACKWARDS);
+		if (range.m_step > 0)
+		{
+			range.m_step = -range.m_step;
+			range.m_from = iter.m_to;
+			range.m_to = iter.m_from;
+		}
+		range.reset();
 		return range;
 	}
 };

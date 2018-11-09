@@ -58,10 +58,11 @@ namespace xcore
 		explicit				__xuint128(u32 value);
 		explicit				__xuint128(const s64& value);
 		explicit				__xuint128(const u64& value);
-								__xuint128(const u64& high, const u64& low);
-								__xuint128(const u128& value);
-								__xuint128(const s128& value);
-								__xuint128(u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0);
+		explicit				__xuint128(const u64& high, const u64& low);
+		explicit				__xuint128(const s128& value);
+		explicit				__xuint128(u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0);
+								__xuint128(const __xuint128& value);
+
 		/** 
 		 *  Assignment operators
 		 */

@@ -20,13 +20,13 @@ namespace xcore
 	{
 	public:
 		inline				xcarray() : mLength(0), mArraySize(0), mElementSize(0), mArray(0)		{ }
-		inline				xcarray(void* _array, u32 element_size, u32 array_size) : mLength(0), mArraySize(array_size), mElementSize(element_size), mArray((xbyte*)_array)	{ }
+		inline				xcarray(void* _array, s32 element_size, s32 array_size) : mLength(0), mArraySize(array_size), mElementSize(element_size), mArray((xbyte*)_array)	{ }
 
 		inline void			clear()									{ mLength = 0; }
 
-		inline u32			max() const								{ return mArraySize; }
-		inline u32			size() const							{ return mLength; }
-		inline u32			reserved() const						{ return mArraySize; }
+		inline s32			max() const								{ return mArraySize; }
+		inline s32			size() const							{ return mLength; }
+		inline s32			reserved() const						{ return mArraySize; }
 		inline bool			is_empty() const						{ return mLength == 0; }
 		inline bool			is_full() const							{ ASSERT(mLength <= mArraySize); return mLength == mArraySize; }
 
@@ -42,18 +42,18 @@ namespace xcore
 
 		inline xcarray		operator() (s32 from, s32 to) const		{ ASSERT(from<mArraySize && to<mArraySize); xcarray c(&mArray[from], mElementSize, to-from);  return c; }
 
-		void				swap(u32 a, u32 b);
-		void				remove(u32 i);
-		void				swap_remove(u32 i);
+		void				swap(s32 a, s32 b);
+		void				remove(s32 i);
+		void				swap_remove(s32 i);
 
 	private:
-		u32					mLength;
-		u32					mArraySize;
-		u32					mElementSize;
+		s32					mLength;
+		s32					mArraySize;
+		s32					mElementSize;
 		xbyte*				mArray;
 	};
 
-	inline void			xcarray::swap(u32 index_a, u32 index_b)
+	inline void			xcarray::swap(s32 index_a, s32 index_b)
 	{
 		ASSERT (index_a < mLength && index_b < mLength);
 		xbyte* srca = &mArray[index_a];
@@ -66,18 +66,18 @@ namespace xcore
 		}
 	}
 
-	inline void			xcarray::remove(u32 index)
+	inline void			xcarray::remove(s32 index)
 	{
 		if (index < mLength)
 		{
 			s32 const s = index + 1;
-			for (u32 i = s; i < mLength; ++i)
+			for (s32 i = s; i < mLength; ++i)
 				x_memcpy(&mArray[i-1], &mArray[i], mElementSize);
 			mLength--;
 		}
 	}
 
-	inline void			xcarray::swap_remove(u32 index)
+	inline void			xcarray::swap_remove(s32 index)
 	{
 		if (mLength > 0)
 		{

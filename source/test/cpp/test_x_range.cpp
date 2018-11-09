@@ -22,7 +22,7 @@ UNITTEST_SUITE_BEGIN(xrange)
 				i += 1;
 			}
 			CHECK_EQUAL(100, i);
-			CHECK_EQUAL(range_t<s32>::STATE_START, range.m_state);
+			CHECK_TRUE(range.end() == range);
 
 			i = 99;
 			for (s32 it : backwards(range))
@@ -42,7 +42,7 @@ UNITTEST_SUITE_BEGIN(xrange)
 				i += 1;
 			}
 			CHECK_EQUAL(100, i);
-			CHECK_EQUAL(range_t<f32>::STATE_START, range.m_state);
+			CHECK_TRUE(range.end() == range);
 
 			i = 99;
 			for (f32 it : backwards(range))
