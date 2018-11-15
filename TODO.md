@@ -6,29 +6,30 @@
 
 ~~Split of containers into xcore/xgenerics~~
 
-# Finalize
-  * per thread: (move this to xthread package)
-  * local storage API
-  * debug/assert system
-  * local allocator
-  * heap allocator
-  * random generator
-  * temporary string allocator
+Simplify the whole string usage, currently we have code to handle ascii/utf8/utf16/utf32. Can we just use utf32 and remove all other code except the conversion from/to. Console, Log, printf/sprintf, sscanf etc.. should all just use a standard low-level string container that is utf32. It doesn't matter if there is dynamic allocation.
 
+Also implement accessors for:
+- CurrentThreadGetLS()
+- CurrentThreadGetAssertSystem()
+- CurrentThreadGetAllocator()
+- CurrentThreadGetAllocator_Local()
+- CurrentThreadGetAllocator_Heap()
+- CurrentThreadGetAllocator_String()
+- CurrentThreadGetRandomGenerator()
+- CurrentThreadGetLogger()
+  
 # xcore (typeless/raw containers)
 * ~~list~~
 * ~~array~~
 * ~~stack~~
 * ~~queue~~
-* pqueue
-* map
+* ~~tree~~
 
 # xgenerics
 * list<T>
-* vector<T>
+* array<T>
 * stack<T>
 * queue<T>
-* pqueue<T>
 * map<K,V>
 
 # xstring
