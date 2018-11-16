@@ -12,12 +12,12 @@ namespace xbase
 	void			x_Init()
 	{
 		xcore::xconsole::init_default_console();
-		xcore::x_asserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
+		xcore::xasserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
 	}
 
 	void			x_Exit()
 	{
-		xcore::x_asserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
+		xcore::xasserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
 	}
 #else
 	void			x_Init()

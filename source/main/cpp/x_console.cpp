@@ -263,6 +263,7 @@ namespace xcore
 	}
 
 	extern xconsole::xout*	gGetDefaultConsoleOut();
+	xconsole*		console = NULL;
 
 	void					xconsole::init_default_console()
 	{
