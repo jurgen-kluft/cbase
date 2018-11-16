@@ -25,7 +25,6 @@ namespace xcore
 				return 0;
 		}
 
-
 		uchar32		peek(ascii::crunes const & str)
 		{
 			uchar32 c = '\0';

@@ -3,35 +3,35 @@
 namespace xcore
 {
 	// For xbase what would we like to have per thread?:
-	// - An allocator
-	// - A local string allocator
-	// - Thread Local Storage
-	// - ?
+	// - A global heap allocator (in a multi-threaded environment this one should be thread-safe)
+	// - A stack allocator (local to a function call)
+	// - A local thread allocator (local to the thread)
+	// - A random generator
 
-	class x_TLS_NULL : public x_TLS
+	class xTLS_SingleThread : public xTLS
 	{
 	public:
-		virtual			~x_TLS_NULL() { }
+		virtual			~xTLS_SingleThread() { }
 
 		virtual s32		max() const { return 32; }
 
 	protected:
-		virtual	void	i_set(s32 index, void * pvData) { mSlots[index] = pvData; }
-		virtual	void	i_get(s32 index, void *& pvData) { pvData = mSlots[index]; }
-		virtual	void	i_get(s32 index, void const*& pvData) const { pvData = mSlots[index]; }
+		virtual	void	set(s32 slot, void * pvData) { mSlots[slot] = pvData; }
+		virtual	void	get(s32 slot, void *& pvData) { pvData = mSlots[slot]; }
+		virtual	void	get(s32 slot, void const*& pvData) const { pvData = mSlots[slot]; }
 
 		void*			mSlots[32];
 	};
 
-	static x_TLS_NULL	sNonThreadSafeInstance;
-	static x_TLS*		sInstance = &sNonThreadSafeInstance;
+	static xTLS_SingleThread	sNonThreadSafeInstance;
+	static xTLS*				sInstance = &sNonThreadSafeInstance;
 
-	void			x_TLS::sSet(x_TLS* instance)
+	void			xTLS::sSet(xTLS* instance)
 	{
 		sInstance = instance;
 	}
 
-	x_TLS*			x_TLS::sGet()
+	xTLS*			xTLS::sGet()
 	{
 		return sInstance;
 	}

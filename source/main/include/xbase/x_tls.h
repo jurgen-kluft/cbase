@@ -16,28 +16,28 @@ namespace xcore
 	//    If an application needs a thread-safe TLS instance then please
 	//    include the xthread package, it has a thread-safe TLS implementation.
 	//==============================================================================
-	class x_TLS
+	class xTLS
 	{
 	public:
-		virtual				~x_TLS() { }
+		virtual				~xTLS() { }
 
 		virtual s32			max() const = 0;
 
-		static void			sSet(x_TLS* );
-		static x_TLS*		sGet();
+		virtual	void		set(s32 slot, void * inData) = 0;
+		virtual	void		get(s32 slot, void *& outData) = 0;
+		virtual	void		get(s32 slot, void const *& outData) const = 0;
 
-		virtual	void		i_set(s32 index, void * inData) = 0;
-		virtual	void		i_get(s32 index, void *& outData) = 0;
-		virtual	void		i_get(s32 index, void const *& outData) const = 0;
+		static void			sSet(xTLS* );
+		static xTLS*		sGet();
 	};
 
-	template<s32 IDX, class T>
+	template<s32 SLOT, class T>
 	class xtls
 	{
 	public:
-		void	set(T* inData)					{ x_TLS::sGet()->i_set(IDX, reinterpret_cast<void*>(inData)); }
-		void	get(T *& outData)				{ void * p; x_TLS::sGet()->i_get(IDX, p); outData = (T*)p;}
-		void	get(T const *& outData) const	{ void const * p; x_TLS::sGet()->i_get(IDX, p); outData = (T const*)p; }
+		void	set(T* inData)					{ xTLS::sGet()->set(SLOT, reinterpret_cast<void*>(inData)); }
+		void	get(T *& outData)				{ void * p; xTLS::sGet()->get(SLOT, p); outData = (T*)p;}
+		void	get(T const *& outData) const	{ void const * p; xTLS::sGet()->get(SLOT, p); outData = (T const*)p; }
 
 	};
 }

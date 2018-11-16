@@ -10,87 +10,16 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	//#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type local_var_name##Buffer[size + 1]; local_var_name##Buffer[size] = '\0'; type* local_var_name = &local_var_name##Buffer[0]; type* local_var_name##_eos = &local_var_name##Buffer[size];
 	#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type local_var_name##Buffer[size]; type##s local_var_name(local_var_name##Buffer, local_var_name##Buffer, &local_var_name##Buffer[size-1]);
 
-	class xiconsole_store_default : public xiconsole_store
-	{
-		enum EConfiguration
-		{
-			MAX_CONSOLES = 16
-		};
-
-		xiconsole*				mFixedNumberOfConsoles[MAX_CONSOLES];
-		s32						mNumberOfConsoles;
-
-	public:
-		xiconsole_store_default()
-			: mNumberOfConsoles(0)
-		{
-			for (s32 i = 0; i < MAX_CONSOLES; ++i)
-				mFixedNumberOfConsoles[i] = NULL;
-		}
-
-		virtual					~xiconsole_store_default() { }
-
-		virtual void			add(xiconsole* node)
-		{
-			if (mNumberOfConsoles < MAX_CONSOLES)
-			{
-				mFixedNumberOfConsoles[mNumberOfConsoles++] = node;
-			}
-		}
-
-		virtual void			remove(xiconsole* console)
-		{
-			for (s32 i = 0; i < mNumberOfConsoles; ++i)
-			{
-				if (mFixedNumberOfConsoles[i] == console)
-				{
-					if ((i + 1) < mNumberOfConsoles)
-					{
-						xmem_utils::memmove(&mFixedNumberOfConsoles[i], &mFixedNumberOfConsoles[i + 1], (mNumberOfConsoles - 1 - i) * sizeof(void*));
-					}
-					mNumberOfConsoles -= 1;
-					break;
-				}
-			}
-		}
-
-		virtual bool			iterate(iterator& iter, xiconsole*& console)
-		{
-			if (iter == 0)
-			{
-				iter = (void**)&mFixedNumberOfConsoles[0];
-			}
-			else
-			{
-				if ((xiconsole**)iter == &mFixedNumberOfConsoles[MAX_CONSOLES - 1])
-				{
-					console = NULL;
-					return false;
-				}
-				++iter;
-			}
-			console = *(xiconsole**)iter;
-			return console != NULL;
-		}
-	};
-
-
-	class xconsole_null_imp : public xiconsole
+	class xconsole_null : public xconsole
 	{
 	public:
-		xconsole_null_imp()
-		{
-		}
-
-		virtual					~xconsole_null_imp() { }
+								xconsole_null() { }
+		virtual					~xconsole_null() { }
 
 		virtual void			initialize();
 		virtual void			shutdown();
@@ -118,95 +47,87 @@ namespace xcore
 		virtual void 			writeLine();
 	};
 
-	void				xconsole_null_imp::initialize()
+	void				xconsole_null::initialize()
 	{
 	}
 
-	void				xconsole_null_imp::shutdown()
+	void				xconsole_null::shutdown()
 	{
 	}
 
-	s32					xconsole_null_imp::setColor(xconsole::EColor color)
+	s32					xconsole_null::setColor(xconsole::EColor color)
 	{
 		return 0;
 	}
 
-	void				xconsole_null_imp::write(bool _value)
+	void				xconsole_null::write(bool _value)
 	{
 	}
 
-	void				xconsole_null_imp::write(f64 _value)
+	void				xconsole_null::write(f64 _value)
 	{
 	}
 
-	void				xconsole_null_imp::write(s32 _value)
+	void				xconsole_null::write(s32 _value)
 	{
 	}
 
-	void				xconsole_null_imp::write(s64 _value)
+	void				xconsole_null::write(s64 _value)
 	{
 	}
 
-	void				xconsole_null_imp::write(f32 _value)
+	void				xconsole_null::write(f32 _value)
 	{
 	}
 
-	void				xconsole_null_imp::write(u32 _value)
+	void				xconsole_null::write(u32 _value)
 	{
 	}
 
-	void				xconsole_null_imp::write(u64 _value)
+	void				xconsole_null::write(u64 _value)
 	{
 	}
 
-	void				xconsole_null_imp::write(const ascii::crunes& str)
+	void				xconsole_null::write(const ascii::crunes& str)
 	{
 	}
 
-	void				xconsole_null_imp::write(const ascii::crunes& fmt, const x_va_list& args)
+	void				xconsole_null::write(const ascii::crunes& fmt, const x_va_list& args)
 	{
 	}
 
-	void				xconsole_null_imp::write(const utf8::crunes& str)
+	void				xconsole_null::write(const utf8::crunes& str)
 	{
 	}
 
-	void				xconsole_null_imp::write(const utf8::crunes& fmt, const x_va_list& args)
+	void				xconsole_null::write(const utf8::crunes& fmt, const x_va_list& args)
 	{
 	}
 
-	void				xconsole_null_imp::write(const utf32::crunes& str)
+	void				xconsole_null::write(const utf32::crunes& str)
 	{
 	}
 
-	void				xconsole_null_imp::write(const utf32::crunes& fmt, const x_va_list& args)
+	void				xconsole_null::write(const utf32::crunes& fmt, const x_va_list& args)
 	{
 	}
 
-	void				xconsole_null_imp::writeLine()
+	void				xconsole_null::writeLine()
 	{
 	}
 
-	static xconsole_null_imp sNullConsole;
+	static xconsole_null 		sNullConsole;
 
-
-	class xiconsole_default : public xiconsole
+	class xconsole_default : public xconsole
 	{
-		xconsole::ConsoleOutDelegate mOut;
-		xconsole::ConsoleOut8Delegate mOut8;
-		xconsole::ConsoleOut32Delegate mOut32;
-		xconsole::ConsoleColorDelegate mColor;
-
+		xconsole::xout*			mOut;
 	public:
-								xiconsole_default()
+								xconsole_default(xconsole::xout* _out)
+									: mOut(_out)
 								{
-									mOut = xconsole_out::write;
-									mOut8 = xconsole_out::write;
-									mOut32 = xconsole_out::write;
-									mColor = xconsole_out::color;
 								}
 
-		virtual					~xiconsole_default() { }
+		virtual					~xconsole_default() { }
 
 		virtual void			initialize();
 		virtual void			shutdown();
@@ -234,290 +155,121 @@ namespace xcore
 		virtual void			writeLine();
 	};
 
-	void				xiconsole_default::initialize()
+	void				xconsole_default::initialize()
 	{
 	}
 
-	void				xiconsole_default::shutdown()
+	void				xconsole_default::shutdown()
 	{
 	}
 
-	s32    xiconsole_default::setColor(xconsole::EColor color)
+	s32    xconsole_default::setColor(xconsole::EColor color)
 	{
-		return mColor(color);
+		return mOut->color(color);
 	}
 
-	void    xiconsole_default::write(bool _value)
+	void    xconsole_default::write(bool _value)
 	{
 		ascii::pcrune truestr = "true";
 		ascii::pcrune falsestr = "false";
 		write(_value ? ascii::crunes(truestr, truestr+4) : ascii::crunes(falsestr, falsestr+5));
 	}
 
-	void    xiconsole_default::write(f64 _value)
+	void    xconsole_default::write(f64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 256);
 		ascii::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
-	void    xiconsole_default::write(s32 _value)
+	void    xconsole_default::write(s32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 64);
 		ascii::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
-	void    xiconsole_default::write(s64 _value)
+	void    xconsole_default::write(s64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 64);
 		ascii::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
-	void    xiconsole_default::write(f32 _value)
+	void    xconsole_default::write(f32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 256);
 		ascii::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
-	void    xiconsole_default::write(u32 _value)
+	void    xconsole_default::write(u32 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 256);
 		ascii::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
-	void    xiconsole_default::write(u64 _value)
+	void    xconsole_default::write(u64 _value)
 	{
 		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 256);
 		ascii::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 	
-	void    xiconsole_default::write(const ascii::crunes& str)
+	void    xconsole_default::write(const ascii::crunes& str)
 	{
-		mOut(str);
+		mOut->write(str);
 	}
 
-	void    xiconsole_default::write(const ascii::crunes& fmt, const x_va_list& args)
+	void    xconsole_default::write(const ascii::crunes& fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(ascii::rune, str, 512);
 		ascii::vsprintf(str, fmt, args);
-		mOut(str);
+		mOut->write(str);
 	}
 
-	void    xiconsole_default::write(const utf8::crunes& str)
+	void    xconsole_default::write(const utf8::crunes& str)
 	{
-		mOut8(str);
+		mOut->write(str);
 	}
 
-	void    xiconsole_default::write(const utf8::crunes& fmt, const x_va_list& args)
+	void    xconsole_default::write(const utf8::crunes& fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(utf8::rune, str, 512);
 		utf8::vsprintf(str, utf8::crunes(fmt), args);
 		utf8::crunes outstr(str);
-		mOut8(outstr);
+		mOut->write(outstr);
 	}
 
-	void    xiconsole_default::write(const utf32::crunes& str)
+	void    xconsole_default::write(const utf32::crunes& str)
 	{
-		mOut32(str);
+		mOut->write(str);
 	}
 
-	void    xiconsole_default::write(const utf32::crunes& fmt, const x_va_list& args)
+	void    xconsole_default::write(const utf32::crunes& fmt, const x_va_list& args)
 	{
 		XCONSOLE_LOCAL_STR_BUF(utf32::rune, str, 1024);
 		utf32::vsprintf(str, utf32::crunes(fmt), args);
 		utf32::crunes outstr(str);
-		mOut32(outstr);
+		mOut->write(outstr);
 	}
 
 
-	void    xiconsole_default::writeLine()
+	void    xconsole_default::writeLine()
 	{
 		ascii::pcrune line = "\n";
 		write(ascii::crunes(line, line + 1));
 	}
 
+	extern xconsole::xout*	gGetDefaultConsoleOut();
 
-	static xiconsole_default		sDefaultConsole;
-	static xiconsole_store_default	sDefaultConsoleStore;
-	static xiconsole_store*			sConsoleStore = &sDefaultConsoleStore;
-
-	void				xconsole::set_console_store(xiconsole_store* store)
+	void					xconsole::init_default_console()
 	{
-		if (store == NULL)
-			sConsoleStore = &sDefaultConsoleStore;
-		else
-			sConsoleStore = store;
+		static xconsole_default sDefaultConsole(gGetDefaultConsoleOut());
+		console = &sDefaultConsole;
 	}
 
-	void				xconsole::add_default_console()
-	{
-		sConsoleStore->add(&sDefaultConsole);
-	}
-
-	void				xconsole::setColor(EColor color)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->setColor(color);
-	}
-
-	void				xconsole::restoreColor()
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->setColor(xconsole::NORMAL);
-	}
-
-	void 				xconsole::write(bool _value)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(_value);
-	}
-
-	void    xconsole::write(f64 _value)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(_value);
-	}
-
-	void    xconsole::write(s32 _value)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(_value);
-	}
-
-	void    xconsole::write(s64 _value)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(_value);
-	}
-
-	void    xconsole::write(f32 _value)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(_value);
-	}
-
-	void    xconsole::write(u32 _value)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(_value);
-	}
-
-	void    xconsole::write(u64 _value)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(_value);
-	}
-
-	void    xconsole::write(const ascii::crunes& str)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(str);
-	}
-
-	void    xconsole::write(const ascii::crunes& fmt, const x_va_list& args)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(fmt, args);
-	}
-
-	void    xconsole::write(const ascii::crunes& fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
-		const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
-	{
-		x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(fmt, args);
-	}
-
-	void    xconsole::write(const utf8::crunes& str)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(str);
-	}
-
-	void    xconsole::write(const utf8::crunes& fmt, const x_va_list& args)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(fmt, args);
-	}
-
-	void    xconsole::write(const utf8::crunes& fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
-		const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
-	{
-		x_va_list args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(fmt, args);
-	}
-
-	void    xconsole::write(const utf32::crunes& str)
-	{
-		s32 r = 0;
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(str);
-	}
-
-	void    xconsole::write(const utf32::crunes& fmt, const x_va_list& args)
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(fmt, args);
-	}
-
-	void    xconsole::write(const utf32::crunes& fmt, const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8,
-		const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16)
-	{
-		x_va_list args(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16);
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->write(fmt, args);
-	}
-
-
-	void    xconsole::writeLine()
-	{
-		xiconsole_store::iterator iter = NULL;
-		xiconsole* console;
-		while (sConsoleStore->iterate(iter, console))
-			console->writeLine();
-	}
 };
 /**
  *  END xCore namespace

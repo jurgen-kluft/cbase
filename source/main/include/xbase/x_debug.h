@@ -18,18 +18,18 @@ namespace xcore
 	//==============================================================================
 	// The debug API
 	//==============================================================================
-	class x_asserthandler
+	class xasserthandler
 	{
 	public:
-		virtual	~x_asserthandler() {}
+		virtual	~xasserthandler() {}
 
 		enum EDebugFlags
 		{
 			XDB_FLAG_IGNORE = 1<<1,
 		};
-		virtual xbool	HandleAssert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) = 0;
+		virtual xbool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) = 0;
 
-		static void		sRegisterHandler(x_asserthandler* handler);
+		static void		sRegisterHandler(xasserthandler* handler);
 	};
 
 	//------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ namespace xcore
 	//     ASSERTS XVERIFY
 	//------------------------------------------------------------------------------
 #ifdef X_ASSERT
-	extern xbool		x_AssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
+	extern xbool		xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
 #endif
 
 
@@ -192,15 +192,15 @@ namespace xcore
 
 		#ifndef SPU
 
-		#define XVERIFY(expr)                do { static xcore::u32 sAssertFlags = 0; if (!((expr)!=0) && xcore::x_AssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL))  XBREAK; } while (0)
-		#define XVERIFYS(expr,str)           do { static xcore::u32 sAssertFlags = 0; if (!((expr)!=0) && xcore::x_AssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str))  XBREAK; } while (0)
-		#define XBOUNDS(v,l,h)               do { static xcore::u32 sAssertFlags = 0; if (!((v)>=(l) && (v)<=(h)) && xcore::x_AssertHandler(sAssertFlags, __FILE__, __LINE__, #v ">=" #l " && " #v "<=" #h, NULL))  XBREAK; } while (0)
+		#define XVERIFY(expr)                do { static xcore::u32 sAssertFlags = 0; if (!((expr)!=0) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL))  XBREAK; } while (0)
+		#define XVERIFYS(expr,str)           do { static xcore::u32 sAssertFlags = 0; if (!((expr)!=0) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str))  XBREAK; } while (0)
+		#define XBOUNDS(v,l,h)               do { static xcore::u32 sAssertFlags = 0; if (!((v)>=(l) && (v)<=(h)) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #v ">=" #l " && " #v "<=" #h, NULL))  XBREAK; } while (0)
 
 		#define XASSERTCT(expr)              do { } while(xcore::xCompileTimeAssert<(expr)!=0>::OK);
-		#define XASSERTSL(level,expr,str)    do { static xcore::u32 sAssertFlags = 0; if (xcore::x_ChooseDebugLevel(level) && ((expr)==false) && xcore::x_AssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str ))  XBREAK; } while (0)
-		#define XASSERTL(level,expr)         do { static xcore::u32 sAssertFlags = 0; if (xcore::x_ChooseDebugLevel(level) && ((expr)==false) && xcore::x_AssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL))  XBREAK; } while (0)
-		#define XASSERT(expr)                do { static xcore::u32 sAssertFlags = 0; if (!((expr)!=0) && xcore::x_AssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL))  XBREAK; } while (0)
-		#define XASSERTS(expr,str)           do { static xcore::u32 sAssertFlags = 0; if (!((expr)!=0) && xcore::x_AssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str))  XBREAK; } while (0)
+		#define XASSERTSL(level,expr,str)    do { static xcore::u32 sAssertFlags = 0; if (xcore::xChooseDebugLevel(level) && ((expr)==false) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str ))  XBREAK; } while (0)
+		#define XASSERTL(level,expr)         do { static xcore::u32 sAssertFlags = 0; if (xcore::xChooseDebugLevel(level) && ((expr)==false) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL))  XBREAK; } while (0)
+		#define XASSERT(expr)                do { static xcore::u32 sAssertFlags = 0; if (!((expr)!=0) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL))  XBREAK; } while (0)
+		#define XASSERTS(expr,str)           do { static xcore::u32 sAssertFlags = 0; if (!((expr)!=0) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str))  XBREAK; } while (0)
 		
 		#define ASSERTCT(expr)               XASSERTCT(expr)
 		#define ASSERTSL(level,expr,str)     XASSERTSL(level,expr,str)

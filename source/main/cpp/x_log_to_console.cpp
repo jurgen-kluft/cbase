@@ -35,117 +35,117 @@ namespace xcore
 
 	void 				xlog_to_console_imp::write(bool value)
 	{
-		xconsole::write(value);
+		console->write(value);
 	}
 
 	void 				xlog_to_console_imp::write(f64 value)
 	{
-		xconsole::write(value);
+		console->write(value);
 	}
 
 	void 				xlog_to_console_imp::write(s32 value)
 	{
-		xconsole::write(value);
+		console->write(value);
 	}
 
 	void 				xlog_to_console_imp::write(s64 value)
 	{
-		xconsole::write(value);
+		console->write(value);
 	}
 
 	void 				xlog_to_console_imp::write(f32 value)
 	{
-		xconsole::write(value);
+		console->write(value);
 	}
 
 	void 				xlog_to_console_imp::write(u32 value)
 	{
-		xconsole::write(value);
+		console->write(value);
 	}
 
 	void 				xlog_to_console_imp::write(u64 value)
 	{
-		xconsole::write(value);
+		console->write(value);
 	}
 
 	void 				xlog_to_console_imp::write(const ascii::crunes& str)
 	{
-		xconsole::write(str);
+		console->write(str);
 	}
 
 	void 				xlog_to_console_imp::write(const ascii::crunes& format, const x_va_list& arguments)
 	{
-		xconsole::write(format, arguments);
+		console->write(format, arguments);
 	}
 
 	void 				xlog_to_console_imp::write(const utf32::crunes& str)
 	{
-		xconsole::write(str);
+		console->write(str);
 	}
 
 	void 				xlog_to_console_imp::write(const utf32::crunes& format, const x_va_list& arguments)
 	{
-		xconsole::write(format, arguments);
+		console->write(format, arguments);
 	}
 
 	void 				xlog_to_console_imp::writeLine()
 	{
-		xconsole::writeLine();
+		console->writeLine();
 	}
 
 	void 				xlog_to_console_imp::writeLine(bool value)
 	{
-		xconsole::writeLine(value);
+		console->writeLine(value);
 	}
 
 	void 				xlog_to_console_imp::writeLine(f64 value)
 	{
-		xconsole::writeLine(value);
+		console->writeLine(value);
 	}
 
 	void 				xlog_to_console_imp::writeLine(s32 value)
 	{
-		xconsole::writeLine(value);
+		console->writeLine(value);
 	}
 
 	void 				xlog_to_console_imp::writeLine(s64 value)
 	{
-		xconsole::writeLine(value);
+		console->writeLine(value);
 	}
 
 	void 				xlog_to_console_imp::writeLine(f32 value)
 	{
-		xconsole::writeLine(value);
+		console->writeLine(value);
 	}
 
 	void 				xlog_to_console_imp::writeLine(u32 value)
 	{
-		xconsole::writeLine(value);
+		console->writeLine(value);
 	}
 
 	void 				xlog_to_console_imp::writeLine(u64 value)
 	{
-		xconsole::writeLine(value);
+		console->writeLine(value);
 	}
 
 	void 				xlog_to_console_imp::writeLine(const ascii::crunes& str)
 	{
-		xconsole::writeLine(str);
+		console->writeLine(str);
 	}
 
 	void 				xlog_to_console_imp::writeLine(const ascii::crunes& format, const x_va_list& arguments)
 	{
-		xconsole::writeLine(format, arguments);
+		console->writeLine(format, arguments);
 	}
 
 	void 				xlog_to_console_imp::writeLine(const utf32::crunes& str)
 	{
-		xconsole::writeLine(str);
+		console->writeLine(str);
 	}
 
 	void 				xlog_to_console_imp::writeLine(const utf32::crunes& format, const x_va_list& arguments)
 	{
-		xconsole::writeLine(format, arguments);
+		console->writeLine(format, arguments);
 	}
 };
 /**

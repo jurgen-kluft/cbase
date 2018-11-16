@@ -21,30 +21,30 @@ namespace xcore
 	//==============================================================================
 	// Default input func
 	//==============================================================================
-	class x_assert_default : public x_asserthandler
+	class xassert_default : public xasserthandler
 	{
 	public:
-		xbool	HandleAssert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
+		xbool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
 	};
 
-	static x_asserthandler* sInternalSetAssertHandler(x_asserthandler* handler)
+	static xasserthandler* sInternalSetAssertHandler(xasserthandler* handler)
 	{
 		if (handler!=NULL)
 		{
-			xtls<0, x_asserthandler> slot;
+			xtls<0, xasserthandler> slot;
 			slot.set(handler);
 		}
 		else
 		{
-			static x_assert_default sDefaultAssertHandler;
+			static xassert_default sDefaultAssertHandler;
 			handler = &sDefaultAssertHandler;
-			xtls<0, x_asserthandler> slot;
+			xtls<0, xasserthandler> slot;
 			slot.set(handler);
 		}
 		return handler;
 	}
 
-	void	x_asserthandler::sRegisterHandler(x_asserthandler* handler)
+	void	xasserthandler::sRegisterHandler(xasserthandler* handler)
 	{
 		sInternalSetAssertHandler(handler);
 	}
@@ -70,27 +70,27 @@ namespace xcore
 	//     x_SetAssertHandler
 	//------------------------------------------------------------------------------
 
-	xbool x_AssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+	xbool xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
 	{
 		// From the TLS, get the debug object
-		// Call HandleAssert() on that object and return
-		xtls<0, x_asserthandler> slot;
-		x_asserthandler* handler;
+		// Call handle_assert() on that object and return
+		xtls<0, xasserthandler> slot;
+		xasserthandler* handler;
 		slot.get(handler);
 
 		if (handler == NULL)
 			handler = sInternalSetAssertHandler(NULL);
 
-		return handler->HandleAssert(flags, fileName, lineNumber, exprString, messageString);
+		return handler->handle_assert(flags, fileName, lineNumber, exprString, messageString);
 	}
 
 
-	xbool x_assert_default::HandleAssert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+	xbool xassert_default::handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
 	{
 		//
 		// handle flags
 		//
-		if(xbfIsSet(flags, x_asserthandler::XDB_FLAG_IGNORE)) 
+		if(xbfIsSet(flags, xasserthandler::XDB_FLAG_IGNORE)) 
 		{
 			return xFALSE;
 		}
@@ -98,7 +98,7 @@ namespace xcore
 		//
 		// next time ignore it
 		//
-		flags |= x_asserthandler::XDB_FLAG_IGNORE;
+		flags |= xasserthandler::XDB_FLAG_IGNORE;
 
 		//
 		// Survive NULL entries

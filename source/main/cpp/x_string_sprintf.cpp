@@ -1266,7 +1266,7 @@ namespace xcore
 
 		void		printf(crunes const& str)
 		{
-			xconsole::write(str);
+			console->write(str);
 		}
 	}
 
@@ -1328,7 +1328,7 @@ namespace xcore
 
 		void		printf(crunes const& str)
 		{
-			xconsole::write(str);
+			console->write(str);
 		}
 	}
 
@@ -1377,7 +1377,7 @@ namespace xcore
 
 		void	printf(crunes const& str)
 		{
-			return xconsole::write(str);
+			return console->write(str);
 		}
 
 		void	printf(crunes const& format, X_VA_ARGS_16)

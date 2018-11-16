@@ -24,14 +24,15 @@
  */
 namespace xcore
 {
-	namespace xconsole_out
+	class xconsole_out_win32 : public xconsole::xout
 	{
-		s32 color(xconsole::EColor color)
+	public:
+		virtual s32 color(xconsole::EColor color)
 		{
 			return 0;
 		}
 
-		s32 write(const ascii::crunes& str)
+		virtual s32 write(const ascii::crunes& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen + 4];
@@ -53,7 +54,7 @@ namespace xcore
 			return l;
 		}
 
-		s32 write(utf8::crunes const& str)
+		virtual s32 write(utf8::crunes const& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen + 4];
@@ -75,7 +76,7 @@ namespace xcore
 			return l;
 		}
 
-		s32 write(const utf32::crunes& str)
+		virtual s32 write(const utf32::crunes& str)
 		{
 			const s32 maxlen = 1020;
 			uchar16 str16[maxlen +4];
@@ -96,8 +97,13 @@ namespace xcore
 			::fputws((const wchar_t*)str16, stdout);
 			return l;
 		}
-
 	};
+
+	xconsole::xout*		gGetDefaultConsoleOut()
+	{
+		static xconsole_out_win32 sConsoleOut;
+		return &sConsoleOut;
+	}
 
 };
 /**

@@ -92,6 +92,7 @@ namespace xcore
 		{
 			range_t<T> e(*this);
 			e.m_current = m_to;
+			e.m_index = -1;
 			return e;
 		}
 

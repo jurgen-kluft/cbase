@@ -7,31 +7,13 @@
 
 #include "xbase/x_memory.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
-	class xalloc;
-	class xalloc_visitor;
-
-	/**
-	 * This system allocator, will initialize console memory and use malloc/realloc/free
-	 */
-	extern xalloc*	gCreateSystemAllocator();
-
-	/**
-	 * This will create a basic first fit allocator.
-	 * Be aware that the behavior (fragmentation, performance) of this allocator gets worse
-	 * the more allocations and deallocations you do with different sizes.
-	 */
-	extern xalloc*	gCreateBasicAllocator(void* mem_begin, xsize_t mem_size, u32 default_minimum_size, u32 default_alignment);
-
 	/// The allocator interface
 	class xalloc
 	{
 	public:
-		static xalloc*		get_default();
+		static xalloc*		get_system();
 		
 		virtual void*		allocate(xsize_t size, u32 align) = 0;			///< Allocate memory with alignment
 		virtual void		deallocate(void* p) = 0;						///< Deallocate/Free memory
@@ -47,11 +29,11 @@ namespace xcore
 	public:
 		void*	allocate(xcore::u32 size, xcore::u32 alignment)
 		{
-			return xalloc::get_default()->allocate(size, alignment);
+			return xalloc::get_system()->allocate(size, alignment);
 		}
 		void	deallocate(void* p)
 		{
-			return xalloc::get_default()->deallocate(p);
+			return xalloc::get_system()->deallocate(p);
 		}
 	};
 
@@ -105,9 +87,9 @@ namespace xcore
 
 
 	// Example:
-	// 	xheap::sAllocator = systemAllocator;
-	// 	test_object* test = xnew<test_object, xsystemheap>(200, 1000.0f);
-	// 	xdelete<xheap>(test);
+	// 	xheap heap(systemAllocator);
+	// 	test_object* test = xnew<test_object>(heap, 200, 1000.0f);
+	// 	xdelete<>(heap, test);
 
 
 	#define XCORE_CLASS_PLACEMENT_NEW_DELETE														\
@@ -144,27 +126,6 @@ namespace xcore
 		inline void			destruct(T* obj) const							{ obj->~T(); }
 	};
 
-
-	template<typename T, typename C= x_cdtor_placement_new<T> >
-	class x_type_allocator
-	{
-		xalloc*				mAllocator;
-	public:
-							x_type_allocator(xalloc* heap) : mAllocator(heap) { }
-							~x_type_allocator()								{ release(); }
-
-		T*					allocate(u32 align=sizeof(void*))				{ void* mem = mAllocator->allocate(sizeof(T), align); C c; T* obj = c.construct(mem); return obj; }
-		void				deallocate(T* p)								{ C c; c.destruct(p); mAllocator->deallocate(p); }
-
-		void				release()										{ mAllocator = NULL; }
-	};
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
-/**
- *  END xCore namespace
- */
-
 
 #endif	///< __XBASE_ALLOCATOR_H__

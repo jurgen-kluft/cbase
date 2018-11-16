@@ -502,7 +502,7 @@ namespace xcore
 
 		void			Flush()
 		{
-			xconsole::write(mCache.mStr);
+			console->write(mCache.mStr);
 			mCursor = mCache.mStr;
 			mCursor[0] = '\0';
 		}
@@ -579,7 +579,7 @@ namespace xcore
 
 		void			Flush()
 		{
-			xconsole::write(mCache.mStr);
+			console->write(mCache.mStr);
 			mCursor = mCache.mStr;
 			*mCursor = '\0';
 		}
@@ -646,7 +646,7 @@ namespace xcore
 
 		void			Flush()
 		{
-			xconsole::write(mCache.mStr);
+			console->write(mCache.mStr);
 			mCursor = mCache.mStr;
 			*mCursor = '\0';
 		}
