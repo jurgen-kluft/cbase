@@ -24,34 +24,19 @@ namespace xcore
 		virtual				~xalloc() {}
 	};
 
-	class xsystemheap
-	{
-	public:
-		void*	allocate(xcore::u32 size, xcore::u32 alignment)
-		{
-			return xalloc::get_system()->allocate(size, alignment);
-		}
-		void	deallocate(void* p)
-		{
-			return xalloc::get_system()->deallocate(p);
-		}
-	};
-
-	template<typename T, typename MEM, typename... Args>
+	template<typename T, typename... Args>
 	T*			xnew(Args... args)
 	{
-		MEM m;
-		void * mem = m.allocate(sizeof(T), sizeof(void*));
+		void * mem = xalloc::get_system()->allocate(sizeof(T), sizeof(void*));
 		T* object = new (mem) T(args...);
 		return object;
 	}
 
-	template<typename MEM, typename T>
+	template<typename T>
 	void		xdelete(T* p)
 	{
-		MEM m;
 		p->~T();
-		m.deallocate(p);
+		xalloc::get_system()->deallocate(p);
 	}
 
 	class xheap
@@ -68,22 +53,22 @@ namespace xcore
 		{
 			return m_allocator->deallocate(p);
 		}
+
+		template<typename T, typename... Args>
+		T*			construct(Args... args)
+		{
+			void * mem = allocate(sizeof(T), sizeof(void*));
+			T* object = new (mem) T(args...);
+			return object;
+		}
+
+		template<typename T>
+		void		destruct(T* p)
+		{
+			p->~T();
+			deallocate(p);
+		}
 	};
-
-	template<typename T, typename... Args>
-	T*			xnew(xheap& heap, Args... args)
-	{
-		void * mem = heap.allocate(sizeof(T), sizeof(void*));
-		T* object = new (mem) T(args...);
-		return object;
-	}
-
-	template<typename T>
-	void		xdelete(xheap& heap, T* p)
-	{
-		p->~T();
-		heap.deallocate(p);
-	}
 
 
 	// Example:

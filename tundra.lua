@@ -25,6 +25,12 @@ Build {
 				}
 			}
 		end
+		local xentry_library = StaticLibrary {
+			Name = "xentry",
+			Config = "*-*-*-*",
+			Sources = { SourceGlob("../xentry/source/main/cpp") },
+			Includes = { "..//xentry/source/main/include" },
+		}
 		local xbase_library = StaticLibrary {
 			Name = "xbase",
 			Config = "*-*-*-*",
@@ -37,18 +43,12 @@ Build {
 			Sources = { SourceGlob("../xunittest/source/main/cpp") },
 			Includes = { "..//xunittest/source/main/include" },
 		}
-		local xentry_library = StaticLibrary {
-			Name = "xentry",
-			Config = "*-*-*-*",
-			Sources = { SourceGlob("../xentry/source/main/cpp") },
-			Includes = { "..//xentry/source/main/include" },
-		}
 		local unittest = Program {
 			Name = "xbase_test",
 			Config = "*-*-*-test",
 			Sources = { SourceGlob("source/test/cpp") },
 			Includes = { "source/main/include","source/test/include","..//xunittest/source/main/include","..//xentry/source/main/include","..//xbase/source/main/include" },
-			Depends = { xbase_library,xunittest_library,xentry_library },
+			Depends = { xentry_library,xbase_library,xunittest_library },
 		}
 		Default(unittest)
 	end,

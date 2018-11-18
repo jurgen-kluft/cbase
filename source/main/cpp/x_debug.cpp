@@ -13,9 +13,6 @@
 #include "xbase/x_printf.h"
 
 
-//==============================================================================
-// xCore namespace 
-//==============================================================================
 namespace xcore
 {
 	//==============================================================================
@@ -29,18 +26,12 @@ namespace xcore
 
 	static xasserthandler* sInternalSetAssertHandler(xasserthandler* handler)
 	{
-		if (handler!=NULL)
-		{
-			xtls<0, xasserthandler> slot;
-			slot.set(handler);
-		}
-		else
+		if (handler==NULL)
 		{
 			static xassert_default sDefaultAssertHandler;
 			handler = &sDefaultAssertHandler;
-			xtls<0, xasserthandler> slot;
-			slot.set(handler);
 		}
+		xtls::set<xtls::ASSERT_HANDLER, xasserthandler>(handler);
 		return handler;
 	}
 
@@ -74,9 +65,7 @@ namespace xcore
 	{
 		// From the TLS, get the debug object
 		// Call handle_assert() on that object and return
-		xtls<0, xasserthandler> slot;
-		xasserthandler* handler;
-		slot.get(handler);
+		xasserthandler* handler = xtls::get<xtls::ASSERT_HANDLER, xasserthandler>();
 
 		if (handler == NULL)
 			handler = sInternalSetAssertHandler(NULL);
@@ -128,9 +117,6 @@ namespace xcore
 		return xFALSE;
 	}
 
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
 
 #endif

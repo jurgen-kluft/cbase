@@ -39,7 +39,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, __xint64);
 namespace xcore
 {
 	// Our own assert handler
-	class UnitTestAssertHandler : public xcore::x_asserthandler
+	class UnitTestAssertHandler : public xcore::xasserthandler
 	{
 	public:
 		UnitTestAssertHandler()
@@ -47,7 +47,7 @@ namespace xcore
 			NumberOfAsserts = 0;
 		}
 
-		virtual xcore::xbool	HandleAssert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+		virtual xcore::xbool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
 		{
 			UnitTest::reportAssert(exprString, fileName, lineNumber);
 			NumberOfAsserts++;
@@ -116,7 +116,7 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	xcore::x_asserthandler::sRegisterHandler(&gAssertHandler);
 #endif
 
-	xcore::xalloc* systemAllocator = xcore::xalloc::get_default();
+	xcore::xalloc* systemAllocator = xcore::xalloc::get_system();
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
 

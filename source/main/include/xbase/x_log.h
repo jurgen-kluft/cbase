@@ -1,8 +1,3 @@
-/**
-* @file Head file xlog.h
-* Logging
-*/
-
 #ifndef __XBASE_LOG_H__
 #define __XBASE_LOG_H__
 #include "xbase/x_target.h"
@@ -10,23 +5,19 @@
 #pragma once
 #endif
 
-
 #include "xbase/x_runes.h"
 
 namespace xcore
 {
 	// Forward declares
 	class x_va_list;
-	class xlog_imp;
+	class xlogger;
 
 	#define X_LOG
 
 	//==============================================================================
 	//  LOG
 	//==============================================================================
-	//
-	//==============================================================================
-
 	#ifdef X_LOG
 
 		struct x_log_info
@@ -40,7 +31,7 @@ namespace xcore
 
 		///< In a multi-threaded environment the user needs to call this to set a delegate that can
 		///< return a x_log_info per thread. The default one only works in a single threaded environment.
-		extern void				x_SetGetLogInfo(x_log_info::_delegate* Function);
+		void				x_SetGetLogInfo(x_log_info::_delegate* Function);
 
 				void		__x_LogMessage		(const char* channel, const char* message);
 				void		__x_LogWarning		(const char* channel, const char* message);
@@ -73,14 +64,14 @@ namespace xcore
 	public:
 		enum ELevel
 		{
-			LOG_INFO		= 0,
-			LOG_WARNING		= 1,
-			LOG_ERROR		= 2,
-			LOG_EXCEPTION	= 3,
-			LOG_COUNT,
+			INFO		= 0,
+			WARNING		= 1,
+			ERROR		= 2,
+			EXCEPTION	= 3,
+			COUNT,
 		};
 	private:
-		static xlog_imp*		sLogger[LOG_COUNT];
+		static xlogger*			sLogger[COUNT];
 
 	public:
 		static void				init();
@@ -88,7 +79,7 @@ namespace xcore
 		static void				flush();
 		static void				clear();
 
-		static xlog_imp*		redirect(ELevel inLevel, xlog_imp* inLogger);
+		static xlogger*			redirect(ELevel inLevel, xlogger* inLogger);
 
 		static void 			write(ELevel inLevel, bool _value);
 		static void 			write(ELevel inLevel, s32 _value);
@@ -119,7 +110,7 @@ namespace xcore
 	/**
 	 * Interface class, has specific implementations for different environments/platforms
 	 */
-	class xlog_imp
+	class xlogger
 	{
 		friend class xlog;
 
@@ -129,7 +120,7 @@ namespace xcore
 		virtual void			clear() = 0;
 
 	public:
-		virtual                 ~xlog_imp(){};
+		virtual                 ~xlogger(){};
 
 		virtual void 			write(bool _value) = 0;
 		virtual void 			write(s32 _value) = 0;
@@ -157,13 +148,7 @@ namespace xcore
 		virtual void 			writeLine(const utf32::crunes& format, const x_va_list& arguments) = 0;
 	};
 
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
-/**
- *  END xCore namespace
- */
 
 #include "private/x_log_to_console.h"
 

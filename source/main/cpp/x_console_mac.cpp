@@ -18,7 +18,7 @@
  */
 namespace xcore
 {
-	class xconsole_out_macos : pubic xconsole::xout
+	class xconsole_out_macos : public xconsole::xout
 	{
 	public:
 		virtual s32 color(xconsole::EColor color)

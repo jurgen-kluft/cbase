@@ -1,10 +1,3 @@
-/**
-* @file x_log_to_console.cpp
-* xCore logging to xconsole
-*/
-
-#ifndef SPU
-
 #include "xbase/x_debug.h"
 #include "xbase/x_runes.h"
 #include "xbase/x_log.h"
@@ -148,9 +141,3 @@ namespace xcore
 		console->writeLine(format, arguments);
 	}
 };
-/**
- *  END xCore namespace
- */
-
-
-#endif

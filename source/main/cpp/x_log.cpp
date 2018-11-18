@@ -30,7 +30,7 @@ namespace xcore
 	}
 
 	xlog_to_console_imp	sLogDefaultToConsole;
-	xlog_imp*			xlog::sLogger[xlog::LOG_COUNT] = 
+	xlogger*			xlog::sLogger[xlog::COUNT] = 
 	{
 		&sLogDefaultToConsole,
 		&sLogDefaultToConsole,
@@ -38,9 +38,9 @@ namespace xcore
 		&sLogDefaultToConsole
 	};
 
-	xlog_imp*			xlog::redirect(ELevel inLevel, xlog_imp* inLogger)
+	xlogger*			xlog::redirect(ELevel inLevel, xlogger* inLogger)
 	{
-		xlog_imp* old = xlog::sLogger[inLevel];
+		xlogger* old = xlog::sLogger[inLevel];
 		xlog::sLogger[inLevel] = inLogger;
 		if (old == &sLogDefaultToConsole)
 			return NULL;
@@ -49,19 +49,19 @@ namespace xcore
 
 	void				xlog::init()
 	{
-		for (s32 i=0; i<LOG_COUNT; ++i)
+		for (s32 i=0; i<COUNT; ++i)
 			sLogger[i] = &sLogDefaultToConsole;
 	}
 
 	void				xlog::flush()
 	{
-		for (s32 i=0; i<LOG_COUNT; ++i)
+		for (s32 i=0; i<COUNT; ++i)
 			sLogger[i]->flush();
 	}
 
 	void				xlog::shutdown()
 	{
-		for (s32 i=0; i<LOG_COUNT; ++i)
+		for (s32 i=0; i<COUNT; ++i)
 		{
 			if (sLogger[i]!=NULL)
 				sLogger[i] = &sLogDefaultToConsole;
@@ -70,7 +70,7 @@ namespace xcore
 
 	void				xlog::clear()
 	{
-		for (s32 i=0; i<LOG_COUNT; ++i)
+		for (s32 i=0; i<COUNT; ++i)
 			if (sLogger[i]!=NULL)
 				sLogger[i]->clear();
 	}
@@ -198,42 +198,42 @@ namespace xcore
 	}
 
 
-	void 				xlog_imp::write(const ascii::crunes& str)
+	void 				xlogger::write(const ascii::crunes& str)
 	{ 
 		write(str);
 	}
 
-	void 				xlog_imp::writeLine(const ascii::crunes& str)
+	void 				xlogger::writeLine(const ascii::crunes& str)
 	{ 
 		writeLine(str);
 	}
 
-	void 				xlog_imp::write(const ascii::crunes& format, const x_va_list& arguments)
+	void 				xlogger::write(const ascii::crunes& format, const x_va_list& arguments)
 	{ 
 		write(format, arguments); 
 	}
 
-	void 				xlog_imp::writeLine(const ascii::crunes& format, const x_va_list& arguments)
+	void 				xlogger::writeLine(const ascii::crunes& format, const x_va_list& arguments)
 	{ 
 		writeLine(format, arguments); 
 	}
 
-	void 				xlog_imp::write(const utf32::crunes& str)
+	void 				xlogger::write(const utf32::crunes& str)
 	{ 
 		write(str);
 	}
 
-	void 				xlog_imp::writeLine(const utf32::crunes& str)
+	void 				xlogger::writeLine(const utf32::crunes& str)
 	{ 
 		writeLine(str);
 	}
 
-	void 				xlog_imp::write(const utf32::crunes& format, const x_va_list& arguments)
+	void 				xlogger::write(const utf32::crunes& format, const x_va_list& arguments)
 	{ 
 		write(format, arguments); 
 	}
 
-	void 				xlog_imp::writeLine(const utf32::crunes& format, const x_va_list& arguments)
+	void 				xlogger::writeLine(const utf32::crunes& format, const x_va_list& arguments)
 	{ 
 		writeLine(format, arguments); 
 	}
@@ -279,11 +279,11 @@ namespace xcore
 
 		ascii::crunes msgformatrunes(msgFormat, ascii::endof(msgFormat, NULL));
 
-		xlog::writeLine(xlog::LOG_INFO, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
+		xlog::writeLine(xlog::INFO, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
 		if (args.length() > 0)
-			xlog::writeLine(xlog::LOG_INFO, msgformatrunes, args);
+			xlog::writeLine(xlog::INFO, msgformatrunes, args);
 		else
-			xlog::writeLine(xlog::LOG_INFO, msgformatrunes);
+			xlog::writeLine(xlog::INFO, msgformatrunes);
 	}
 
 	void __x_LogMessage(const char* channel, const char* message)
@@ -322,11 +322,11 @@ namespace xcore
 
 		ascii::crunes msgformatrunes(msgFormat, ascii::endof(msgFormat, NULL));
 
-		xlog::writeLine(xlog::LOG_WARNING, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
+		xlog::writeLine(xlog::WARNING, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
 		if (args.length() > 0)
-			xlog::writeLine(xlog::LOG_WARNING, msgformatrunes, args);
+			xlog::writeLine(xlog::WARNING, msgformatrunes, args);
 		else
-			xlog::writeLine(xlog::LOG_WARNING, msgformatrunes);
+			xlog::writeLine(xlog::WARNING, msgformatrunes);
 	}
 
 	void __x_LogWarning(const char* channel, const char* message)
@@ -365,11 +365,11 @@ namespace xcore
 
 		ascii::crunes msgformatrunes(msgFormat, ascii::endof(msgFormat, NULL));
 
-		xlog::writeLine(xlog::LOG_ERROR, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
+		xlog::writeLine(xlog::ERROR, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
 		if (args.length() > 0)
-			xlog::writeLine(xlog::LOG_ERROR, msgformatrunes, args);
+			xlog::writeLine(xlog::ERROR, msgformatrunes, args);
 		else
-			xlog::writeLine(xlog::LOG_ERROR, msgformatrunes);
+			xlog::writeLine(xlog::ERROR, msgformatrunes);
 	}
 
 	void __x_LogError(const char* channel, const char* message)

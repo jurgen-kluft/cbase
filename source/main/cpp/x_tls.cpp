@@ -8,30 +8,30 @@ namespace xcore
 	// - A local thread allocator (local to the thread)
 	// - A random generator
 
-	class xTLS_SingleThread : public xTLS
+	class xtls_SingleThread : public xtls
 	{
 	public:
-		virtual			~xTLS_SingleThread() { }
+		virtual			~xtls_SingleThread() { }
 
 		virtual s32		max() const { return 32; }
 
 	protected:
-		virtual	void	set(s32 slot, void * pvData) { mSlots[slot] = pvData; }
-		virtual	void	get(s32 slot, void *& pvData) { pvData = mSlots[slot]; }
-		virtual	void	get(s32 slot, void const*& pvData) const { pvData = mSlots[slot]; }
+		virtual	void	vset(s32 slot, void * pvData) { mSlots[slot] = pvData; }
+		virtual	void	vget(s32 slot, void *& pvData) { pvData = mSlots[slot]; }
+		virtual	void	vget(s32 slot, void const*& pvData) const { pvData = mSlots[slot]; }
 
 		void*			mSlots[32];
 	};
 
-	static xTLS_SingleThread	sNonThreadSafeInstance;
-	static xTLS*				sInstance = &sNonThreadSafeInstance;
+	static xtls_SingleThread	sNonThreadSafeInstance;
+	static xtls*				sInstance = &sNonThreadSafeInstance;
 
-	void			xTLS::sSet(xTLS* instance)
+	void			xtls::sSet(xtls* instance)
 	{
 		sInstance = instance;
 	}
 
-	xTLS*			xTLS::sGet()
+	xtls*			xtls::sGet()
 	{
 		return sInstance;
 	}

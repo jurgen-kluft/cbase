@@ -272,7 +272,5 @@ namespace xcore
 	}
 
 };
-/**
- *  END xCore namespace
- */
+
 

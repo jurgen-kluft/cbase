@@ -20,17 +20,15 @@ UNITTEST_SUITE_BEGIN(xtls)
 
         UNITTEST_TEST(set)
         {
-			xtls<0, OurTlsObject> slot;
 			gInstance.mInteger = 1;
 			gInstance.mFloat = 2.0f;
-			slot.set(&gInstance);
+			xtls::set<0, OurTlsObject>(&gInstance);
 		}
 
 		UNITTEST_TEST(get)
 		{
-			xtls<0, OurTlsObject> slot;
 			OurTlsObject const* obj;
-			slot.get(obj);
+			xtls::get<0, OurTlsObject>(obj);
 			CHECK_EQUAL(1, obj->mInteger);
 			CHECK_EQUAL(2.0f, obj->mFloat);
 		}
