@@ -6,7 +6,7 @@ target/
 tags
 
 #except the following files
-
+!.gitignore
 !*.cpp
 !*.hpp
 !*.c
