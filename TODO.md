@@ -17,6 +17,7 @@ Simplify the whole string usage, currently we have code to handle ascii/utf8/utf
 - ~~stack~~
 - ~~queue~~
 - ~~tree~~
+- <https://code.google.com/archive/p/cpp-btree/>
 
 ## xgenerics
 
@@ -25,6 +26,7 @@ Simplify the whole string usage, currently we have code to handle ascii/utf8/utf
 - ``stack<T>``
 - ``queue<T>``
 - ``map<K,V>``
+- <https://code.google.com/archive/p/cpp-btree/>
 
 ## xstring
 
@@ -96,10 +98,18 @@ trim down to the bare minimum, remove the ugly opt library.
 
 ## xtext
 
-- support for localization manager (with compression ?)
 - text reader/writer
 - parsing/tokenizer
-  <https://github.com/Sakrac/struse>
+  - <https://github.com/Sakrac/struse>
+  - XML
+  - JSON
+  - Custom
 
+## xlocal
 
-​
+Location to support many languages easily in your apps.
+
+​- localization based on IDs
+- compression of strings
+
+## end
