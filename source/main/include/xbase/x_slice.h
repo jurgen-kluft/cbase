@@ -40,8 +40,14 @@ namespace xcore
 		slice			obtain() const;
 		void			release();
 
+		slice			construct(s32 _item_count, s32 _item_size) const;
+
 		void*			get_at(s32 index);
 		void const*		get_at(s32 index) const;
+
+		void*			begin();
+		void const*		begin() const;
+		void const*		end() const;
 
 		slice_data*		mData;
 		u32				mFrom;
@@ -73,7 +79,7 @@ namespace xcore
 		u32					mItemCount;					/// Count of total items
 		u32					mItemSize;					/// Size of one item
 		u32					mDummy;
-		xalloc*		mAllocator;
+		xalloc*				mAllocator;
 		xbyte*				mData;
 	};
 }

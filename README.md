@@ -1,30 +1,24 @@
 # xbase
 
-xcore cross platform base library
+Cross platform base library
 
-Note: Tundra now can compile Windows 64-bit (Msvc) and Mac OS 64-bit (Clang)
-
-* xbase
-  * types, console, log, sort, search, low-level string functions, va-list
-* xcore
-  * string, tree, list, vector, dictionary
-* xhash
-  * hash, skein, sha, cyphers
-* xalloc
-  * allocators (dlmalloc, tlsf, debug, stats)
-  * free-list
-  * small allocator
-* xatomic
-  * atomic system types, lock-free containers
-* xlang
-  * actor model
-* xtime
-  * timer, time-date
-* xthread
-  * thread, mutex, event
-  * blocking queue
-* xfile
-  * filepath
-  * dirpath
-  * file
-
+- xbase
+  - types (s8/u8 .. s64/u64, f32/f64, uchar/../uchar32)
+  - allocator
+  - binary search
+  - bitfield
+  - buffer
+  - console
+  - debug (assert)
+  - endian
+  - integer
+  - limits
+  - log
+  - printf/sprintf
+  - random (interface)
+  - singleton
+  - slice
+  - sort
+  - tls
+  - low-level string functions
+  - va-list

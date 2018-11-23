@@ -173,14 +173,24 @@ namespace xcore
 		mTo = 0;
 	}
 
+	slice			slice::construct(s32 _item_count, s32 _item_size) const
+	{
+		if (mData != NULL)
+		{
+			return slice(mData->mAllocator, _item_count, _item_size);
+		}
+		return slice();
+	}
+
 	void*			slice::get_at(s32 index)
 	{
 		if (mData == NULL)
 			return NULL;
 		index += mFrom;
-		if (index < 0) index = 0;
+		if (index < 0)
+			return NULL;
 		else if ((u32)index >= mTo)
-			index = mTo - 1;
+			return NULL;
 		u32 const data_offset = mData->mItemSize * index;
 		return &mData->mData[data_offset];
 	}
@@ -190,11 +200,27 @@ namespace xcore
 		if (mData == NULL)
 			return NULL;
 		index += mFrom;
-		if (index < 0) index = 0;
+		if (index < 0) 
+			return NULL;
 		else if ((u32)index >= mTo)
-			index = mTo - 1;
+			return NULL;
 		u32 const data_offset = mData->mItemSize * index;
 		return &mData->mData[data_offset];
+	}
+
+	void*			slice::begin()
+	{
+		return get_at(mFrom);
+	}
+
+	void const*		slice::begin() const
+	{
+		return get_at(mFrom);
+	}
+
+	void const*		slice::end() const
+	{
+		return get_at(mTo);
 	}
 
 }
