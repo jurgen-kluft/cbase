@@ -35,23 +35,26 @@ namespace xcore
 
 		void			resize(u32 count);
 
-		slice			view(u32 from, u32 to) const;
+		slice			view(s32 from, s32 to) const;
+		bool			split(s32 mid, slice& left, slice& right) const;
 
 		slice			obtain() const;
 		void			release();
 
-		slice			construct(s32 _item_count, s32 _item_size) const;
+		slice			construct(u32 _item_count, u32 _item_size) const;
 
 		void*			get_at(s32 index);
 		void const*		get_at(s32 index) const;
 
-		void*			begin();
+		void *			begin();
 		void const*		begin() const;
+		void *			end();
 		void const*		end() const;
+		void const*		eos() const;
 
 		slice_data*		mData;
-		u32				mFrom;
-		u32				mTo;
+		s32				mFrom;
+		s32				mTo;
 	};
 
 

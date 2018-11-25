@@ -810,7 +810,6 @@ namespace xcore
 			utf8::runes str(mStr, mPtr, mEnd);
 			utf::write(c, str);
 			mPtr = str.m_end;
-			utf::write('\0', str);
 			return true;
 		}
 
@@ -873,7 +872,6 @@ namespace xcore
 			if (mPtr >= mEnd)
 				return false;
 			*mPtr++ = c;
-			*mPtr = '\0';
 			return true;
 		}
 

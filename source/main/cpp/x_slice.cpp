@@ -143,7 +143,7 @@ namespace xcore
 		mTo = count; 
 	}
 
-	slice			slice::view(u32 from, u32 to) const
+	slice			slice::view(s32 from, s32 to) const
 	{
 		slice s;
 		if ((mFrom + from) < mTo && (mFrom + to) <= mTo)
@@ -155,6 +155,23 @@ namespace xcore
 		}
 		s.mData = &slice_data::sNull;
 		return s;
+	}
+
+	bool			slice::split(s32 mid, slice& left, slice& right) const
+	{
+		if ((mFrom + mid) <= mTo)
+		{
+			left.mData = mData->incref();
+			left.mFrom = mFrom;
+			left.mTo = mFrom + mid;
+
+			right.mData = mData->incref();
+			right.mFrom = mFrom + mid;
+			right.mTo = mTo;
+
+			return true;
+		}
+		return false;
 	}
 
 	slice			slice::obtain() const
@@ -173,7 +190,7 @@ namespace xcore
 		mTo = 0;
 	}
 
-	slice			slice::construct(s32 _item_count, s32 _item_size) const
+	slice			slice::construct(u32 _item_count, u32 _item_size) const
 	{
 		if (mData != NULL)
 		{
@@ -208,19 +225,30 @@ namespace xcore
 		return &mData->mData[data_offset];
 	}
 
-	void*			slice::begin()
+	void *			slice::begin()
 	{
 		return get_at(mFrom);
 	}
 
-	void const*		slice::begin() const
+	void const *	slice::begin() const
 	{
 		return get_at(mFrom);
 	}
 
-	void const*		slice::end() const
+	void *			slice::end()
 	{
 		return get_at(mTo);
+	}
+
+	void const *	slice::end() const
+	{
+		return get_at(mTo);
+	}
+
+	void const *	slice::eos() const
+	{
+		void const* eos = &mData->mData[mData->mItemCount * mData->mItemSize];
+		return eos;
 	}
 
 }
