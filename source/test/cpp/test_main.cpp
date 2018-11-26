@@ -101,19 +101,10 @@ xcore::UnitTestAssertHandler gAssertHandler;
 
 bool gRunUnitTest(UnitTest::TestReporter& reporter)
 {
-#ifdef SPU
-	xcore::s32 progSize;
-	xcore::s32 stackSize;
-
-	::getProgramAndStackSizeForSPU(&progSize, &stackSize);
-
-	xcore::gSetSPUConfig(progSize, stackSize);
-#endif
-
 	xbase::x_Init();
 
 #ifdef TARGET_DEBUG
-	xcore::x_asserthandler::sRegisterHandler(&gAssertHandler);
+	xcore::xasserthandler::sRegisterHandler(&gAssertHandler);
 #endif
 
 	xcore::xalloc* systemAllocator = xcore::xalloc::get_system();

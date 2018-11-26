@@ -84,6 +84,9 @@ namespace xcore
 
 		virtual void			writeLine() = 0;
 
+		inline void				write(const char* c_str)						{ ascii::crunes runes(c_str); write(runes); }
+		inline void				writeLine(const char* c_str)					{ ascii::crunes runes(c_str); write(runes); writeLine(); }
+
 		inline void				writeLine(bool _value)							{ write(_value); writeLine(); }
 		inline void				writeLine(f64 _value)							{ write(_value); writeLine(); }
 		inline void				writeLine(s32 _value)							{ write(_value); writeLine(); }

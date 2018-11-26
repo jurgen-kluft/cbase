@@ -36,8 +36,6 @@ slice_data::slice_data(xbyte *data, s32 item_count, s32 item_size)
 	mData = data;
 }
 
-slice_data sNull;
-
 slice_data *slice_data::incref()
 {
 	if (mAllocator != nullptr)
@@ -53,7 +51,7 @@ slice_data *slice_data::incref() const
 
 slice_data *slice_data::decref()
 {
-	if (mAllocator != nullptr)
+	if (mAllocator == nullptr)
 		return this;
 
 	s32 const refs = mRefCount;
@@ -156,7 +154,7 @@ slice_data slice_data::sNull;
 
 slice::slice()
 {
-	mData = NULL;
+	mData = &slice_data::sNull;
 	mFrom = 0;
 	mTo = 0;
 }
@@ -184,11 +182,7 @@ void slice::alloc(slice &slice, xalloc *allocator, s32 item_count, s32 item_size
 
 slice slice::construct(s32 _item_count, s32 _item_size) const
 {
-	if (mData != NULL)
-	{
-		return slice(mData->mAllocator, _item_count, _item_size);
-	}
-	return slice();
+	return slice(mData->mAllocator, _item_count, _item_size);
 }
 
 s32 slice::size() const
@@ -208,11 +202,8 @@ slice slice::obtain() const
 
 void slice::release()
 {
-	if (mData != NULL)
-	{
-		mData->decref();
-	}
-	mData = NULL;
+	mData->decref();
+	mData = &slice_data::sNull;
 	mFrom = 0;
 	mTo = 0;
 }
@@ -295,26 +286,26 @@ void const *slice::eos() const
 
 void *slice::at(s32 index)
 {
-	if (mData == NULL)
-		return NULL;
+	if (mData == &slice_data::sNull)
+		return nullptr;
 	index += mFrom;
 	if (index < 0)
-		return NULL;
-	else if ((u32)index >= mTo)
-		return NULL;
+		return nullptr;
+	else if (index > mTo)
+		return nullptr;
 	u32 const data_offset = mData->mItemSize * index;
 	return &mData->mData[data_offset];
 }
 
 void const *slice::at(s32 index) const
 {
-	if (mData == NULL)
-		return NULL;
+	if (mData == &slice_data::sNull)
+		return nullptr;
 	index += mFrom;
 	if (index < 0)
-		return NULL;
-	else if ((u32)index >= mTo)
-		return NULL;
+		return nullptr;
+	else if (index > mTo)
+		return nullptr;
 	u32 const data_offset = mData->mItemSize * index;
 	return &mData->mData[data_offset];
 }

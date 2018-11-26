@@ -43,10 +43,8 @@ namespace xcore
 		static void	set(T* inData)					{ sGet()->vset(SLOT, reinterpret_cast<void*>(inData)); }
 
 		template<s32 SLOT, class T>
-		static void	get(T *& outData)				{ void * p; sGet()->vget(SLOT, p); outData = (T*)p;}
+		static void	get(T *& outData)				{ void * p= nullptr; sGet()->vget(SLOT, p); outData = (T*)p;}
 
-		template<s32 SLOT, class T>
-		static void	get(T const *& outData) 		{ void const * p; sGet()->vget(SLOT, p); outData = (T const*)p; }
 
 	};
 

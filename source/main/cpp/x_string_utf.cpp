@@ -434,77 +434,98 @@ namespace xcore
 
 		bool			can_read(ascii::runes const& str)
 		{
+			if (str.m_end == nullptr)
+				return str.m_str[0] != '\0';
 			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
 		bool			can_read(utf8::runes const& str)
 		{
+			if (str.m_end == nullptr)
+				return str.m_str[0] != '\0';
 			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
 		bool			can_read(utf32::runes const& str)
 		{
+			if (str.m_end == nullptr)
+				return str.m_str[0] != '\0';
 			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
 		bool			can_read(ascii::crunes const& str)
 		{
+			if (str.m_end == nullptr)
+				return str.m_str[0] != '\0';
 			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
 		bool			can_read(utf8::crunes  const& str)
 		{
+			if (str.m_end == nullptr)
+				return str.m_str[0] != '\0';
 			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
 		bool			can_read(utf32::crunes const& str)
 		{
+			if (str.m_end == nullptr)
+				return str.m_str[0] != '\0';
 			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
 		bool			can_write(ascii::runes const& str)
 		{
+			ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
 			return str.m_end < str.m_eos;
 		}
 
 		bool			can_write(utf8::runes const& str)
 		{
+			ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
 			return str.m_end < str.m_eos;
 		}
 
 		bool			can_write(utf32::runes const& str)
 		{
+			ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
 			return str.m_end < str.m_eos;
 		}
 
 
 		bool			read_is_crln(ascii::runes const& str)
 		{
+			ASSERT(str.m_end != nullptr);
 			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 		bool			read_is_crln(utf8::runes  const& str)
 		{
+			ASSERT(str.m_end != nullptr);
 			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 		bool			read_is_crln(utf32::runes const& str)
 		{
+			ASSERT(str.m_end != nullptr);
 			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 		bool			read_is_crln(ascii::crunes const& str)
 		{
+			ASSERT(str.m_end != nullptr);
 			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 		bool			read_is_crln(utf8::crunes const& str)
 		{
+			ASSERT(str.m_end != nullptr);
 			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 
 		bool			read_is_crln(utf32::crunes const& str)
 		{
+			ASSERT(str.m_end != nullptr);
 			return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
 		}
 

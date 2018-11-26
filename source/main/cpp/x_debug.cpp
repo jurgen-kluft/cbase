@@ -5,7 +5,6 @@
 #ifdef X_ASSERT
 
 #include "xbase/x_tls.h"
-#include "xbase/x_bit_field.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_console.h"
 #include "xbase/x_log.h"
@@ -65,7 +64,8 @@ namespace xcore
 	{
 		// From the TLS, get the debug object
 		// Call handle_assert() on that object and return
-		xasserthandler* handler = xtls::get<xtls::ASSERT_HANDLER, xasserthandler>();
+		xasserthandler* handler;
+		xtls::get<xtls::ASSERT_HANDLER, xasserthandler>(handler);
 
 		if (handler == NULL)
 			handler = sInternalSetAssertHandler(NULL);
@@ -79,7 +79,7 @@ namespace xcore
 		//
 		// handle flags
 		//
-		if(xbfIsSet(flags, xasserthandler::XDB_FLAG_IGNORE)) 
+		if ((flags & xasserthandler::XDB_FLAG_IGNORE) != 0) 
 		{
 			return xFALSE;
 		}

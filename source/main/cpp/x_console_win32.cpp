@@ -41,13 +41,13 @@ namespace xcore
 
 			s32 l = 0;
 			ascii::crunes src = str;
-			while (!utf::can_read(src) && dst16 < end16)
+			while (utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);
 				utf::write(c, dst16, end16);
 				l += 1;
 			}
-			str16[maxlen - 1] = 0;
+			str16[l] = 0;
 
 			::OutputDebugStringW((LPCWSTR)str16);
 			::fputws((const wchar_t*)str16, stdout);
@@ -63,13 +63,13 @@ namespace xcore
 
 			s32 l = 0;
 			utf8::crunes src = str;
-			while (!utf::can_read(src) && dst16 < end16)
+			while (utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);
 				utf::write(c, dst16, end16);
 				l += 1;
 			}
-			str16[maxlen - 1] = 0;
+			str16[l] = 0;
 
 			::OutputDebugStringW((LPCWSTR)str16);
 			::fputws((const wchar_t*)str16, stdout);
@@ -85,13 +85,13 @@ namespace xcore
 
 			s32 l = 0;
 			utf32::crunes src = str;
-			while (!utf::can_read(src) && dst16 < end16)
+			while (utf::can_read(src) && dst16 < end16)
 			{
 				uchar32 c = utf::read(src);
 				utf::write(c, dst16, end16);
 				l += 1;
 			}
-			str16[maxlen - 1] = 0;
+			str16[l] = 0;
 
 			::OutputDebugStringW((LPCWSTR)str16);
 			::fputws((const wchar_t*)str16, stdout);
