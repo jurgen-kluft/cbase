@@ -59,6 +59,7 @@ slice_data *slice_data::decref()
 		return &sNull;
 	if (refs == 1)
 	{
+		mAllocator->deallocate(this->mData);
 		mAllocator->deallocate(this);
 		return &sNull;
 	}
@@ -67,33 +68,42 @@ slice_data *slice_data::decref()
 	return this;
 }
 
-slice_data *slice_data::resize(s32 from, s32 to)
+slice_data *slice_data::copy(s32 from, s32 to)
 {
-	slice_data *data = &sNull;
+	slice_data * data = &sNull;
 	if (mAllocator != nullptr)
 	{
-		s32 const to_itemsize = mItemSize;
-		s32 const to_itemcount = to - from;
-		data = (slice_data *)mAllocator->allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void *));
+		data = (slice_data *)mAllocator->allocate(sizeof(slice_data), sizeof(void *));
 		data->mAllocator = mAllocator;
 		data->mRefCount = 1;
-		data->mItemSize = to_itemsize;
-		data->mItemCount = to_itemcount;
-		data->mData = (xbyte *)data + sizeof(slice_data);
-		s32 const count2copy = xmin(to_itemcount, mItemCount);
-		xmem_utils::memcpy(data->mData, this->mData + (from * mItemSize), count2copy * mItemSize);
-		decref();
+		data->mItemCount = to-from;
+		data->mItemSize = mItemSize;
+		data->mData = (xbyte*)mAllocator->allocate(data->mItemSize * data->mItemCount, sizeof(void *));
 	}
 	return data;
+}
+
+slice_data *slice_data::resize(s32 from, s32 to)
+{
+	if (mAllocator != nullptr)
+	{
+		if (to > mItemCount)
+		{
+			s32 const to_itemcount = to;
+			xbyte* data = (xbyte *)mAllocator->allocate((to_itemcount * mItemSize), sizeof(void *));
+			xmem_utils::memcpy(data, mData, to_itemcount * mItemSize);
+			mItemCount = to_itemcount;
+		}
+	}
+	return this;
 }
 
 void slice_data::insert(s32 at, s32 count)
 {
 	if (mAllocator != nullptr)
 	{
-		s32 const to_itemsize = mItemSize;
 		s32 const to_itemcount = mItemCount + count;
-		xbyte* data = (xbyte*)mAllocator->allocate((to_itemcount * to_itemsize), sizeof(void *));
+		xbyte* data = (xbyte*)mAllocator->allocate((to_itemcount * mItemSize), sizeof(void *));
 		s32 const head2copy = at * mItemSize;
 		s32 const gap2skip = count * mItemSize;
 		s32 const tail2copy = (mItemCount - at) * mItemSize;
@@ -137,12 +147,12 @@ void slice_data::remove(s32 at, s32 count)
 
 slice_data *slice_data::alloc(xalloc *allocator, s32 &to_itemcount, s32 &to_itemsize)
 {
-	slice_data *data = (slice_data *)allocator->allocate((to_itemcount * to_itemsize) + sizeof(slice_data), sizeof(void *));
+	slice_data *data = (slice_data *)allocator->allocate(sizeof(slice_data), sizeof(void *));
+	data->mData = (xbyte *)allocator->allocate((to_itemcount * to_itemsize), sizeof(void *));
 	data->mRefCount = 1;
 	data->mItemCount = to_itemcount;
 	data->mItemSize = to_itemsize;
 	data->mAllocator = allocator;
-	data->mData = (xbyte *)data + sizeof(slice_data);
 	return data;
 }
 

@@ -75,7 +75,11 @@ namespace xcore
 		slice_data* 		incref() const;
 		slice_data*			decref();
 
-		slice_data*			resize(s32 from, s32 to);
+		// This function makes a new 'slice_data' with content copied from this
+		slice_data*			copy(s32 from, s32 to);
+
+		// These functions do not 'reallocate' this
+		void				resize(s32 from, s32 to);
 		void				insert(s32 at, s32 count);
 		void				remove(s32 at, s32 count);
 
