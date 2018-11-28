@@ -53,6 +53,13 @@ namespace xcore
 			inline			runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
 			void			reset() { m_end = m_str; m_str[0] = '\0'; }
 		};
+
+		class alloc
+		{
+		public:
+			virtual runes  allocate(s32 len, s32 cap) = 0;
+			virtual void   deallocate(runes& slice) = 0;
+		};		
 	}
 
 	namespace utf8
@@ -92,6 +99,13 @@ namespace xcore
 			rune			m_str[SIZE];
 			inline			runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
 		};
+
+		class alloc
+		{
+		public:
+			virtual runes  allocate(s32 len, s32 cap) = 0;
+			virtual void   deallocate(runes& slice) = 0;
+		};		
 	}
 
 	namespace utf16
@@ -131,6 +145,13 @@ namespace xcore
 			rune			m_str[SIZE];
 			inline			runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
 		};
+
+		class alloc
+		{
+		public:
+			virtual runes  allocate(s32 len, s32 cap) = 0;
+			virtual void   deallocate(runes& slice) = 0;
+		};		
 	}
 
 	namespace utf32
@@ -170,6 +191,13 @@ namespace xcore
 			rune			m_str[SIZE];
 			inline			runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
 		};
+
+		class alloc
+		{
+		public:
+			virtual runes  allocate(s32 len, s32 cap) = 0;
+			virtual void   deallocate(runes& slice) = 0;
+		};		
 	}
 }
 
