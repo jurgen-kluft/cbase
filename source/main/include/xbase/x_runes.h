@@ -76,7 +76,7 @@ namespace xcore
                 SIZE = L + 1
             };
             rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
+            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
             void reset()
             {
                 m_end    = m_str;
@@ -153,7 +153,7 @@ namespace xcore
                 SIZE = L + 1
             };
             rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
+            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
         };
 
         class alloc
@@ -228,7 +228,7 @@ namespace xcore
                 SIZE = L + 1
             };
             rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
+            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
         };
 
         class alloc
@@ -304,7 +304,7 @@ namespace xcore
                 SIZE = L + 1
             };
             rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) {}
+            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
         };
 
         class alloc
@@ -659,8 +659,28 @@ namespace xcore
             CASE_IGNORE
         };
 
-        void copy(runes& dst, crunes const& src, ECopyType type = COPY_AND_WRITE_MATCHING_TERMINATOR);
-        void concatenate(runes& dst, crunes const& src);
+        runes selectUntil(const runes& inStr, rune inFind);
+        runes selectUntil(const runes& inStr, const runes& inFind);
+        runes selectUntilLast(const runes& inStr, rune inFind);
+        runes selectUntilIncluded(const runes& inStr, rune inFind);
+        runes selectUntilIncluded(const runes& inStr, const runes& inFind);
+        runes selectUntilIncludedLast(const runes& inStr, rune inFind);
+        runes selectUntilIncludedLast(const runes& inStr, const runes& inFind);
+
+        runes rselectUntil(const runes& inStr, rune inFind);
+
+        runes selectAfter(const runes& inStr, rune inFind);
+        runes selectAfter(const runes& inStr, const runes& inFind);
+
+        runes selectBetween(const runes& inStr, rune inLeft, rune inRight);
+        runes selectNextBetween(const runes& inStr, const runes& inSelection, rune inLeft, rune inRight);
+
+        runes rselectBetween(const runes& inStr, rune inLeft, rune inRight);
+        runes rselectNextBetween(const runes& inStr, const runes& inSelection, rune inLeft, rune inRight);
+
+        runes selectUntilEndIncluded(const runes& inStr, const runes& inSelection);
+
+        runes selectOverlap(const runes& inLeft, const runes& inRight, runes& inRemainder);
 
         runes find(runes const& _str, uchar32 _c, ECmpMode mode = CASE_SENSITIVE);
         runes find(runes const& str, crunes const& find, ECmpMode mode = CASE_SENSITIVE);
@@ -672,6 +692,10 @@ namespace xcore
 
         void replace(runes& str, crunes const& find, crunes const& replace);
         void replace(runes& str, uchar32 find, uchar32 replace);
+
+        void remove(runes& str, runes const& remove);
+        void keep(runes& str, runes const& keep);
+        void insert(runes& str, crunes const& insert);
 
         s32 compare(crunes const& str1, crunes const& str2, ECmpMode mode = CASE_SENSITIVE);
 
@@ -763,7 +787,11 @@ namespace xcore
         void trimDelimiters(runes&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side of xstring
 
         void copy(const crunes& src, runes& dst);
-        void concatenate(runes& str, const crunes& c);
+        void copy(const crunes& src, runes& dst, alloc* allocator, s32 size_alignment);
+
+        void concatenate(runes& str, const crunes& concat);
+        void concatenate(runes& str, const crunes& concat, alloc* allocator, s32 size_alignment);
+        void concatenate(runes& str, const crunes& concat1, const crunes& concat2, alloc* allocator, s32 size_alignment);
 
     }; // namespace utf16
     namespace utf32
