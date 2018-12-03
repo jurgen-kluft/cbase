@@ -193,7 +193,20 @@ namespace xcore
                 m_eos = other.m_eos;
                 return *this;
             }
-            prune  m_str;
+
+			bool operator==(runes const& other) const 
+			{ 
+				pcrune s1 = other.m_str;
+				pcrune s2 = m_str;
+				while (s1 < other.m_end && s2 < m_end)
+				{
+					if (*s1++ != *s2++)
+						return false;
+				}
+				return (s1 == other.m_end && s2 == m_end);
+			}
+
+			prune  m_str;
             prune  m_end;
             pcrune m_eos;
         };
@@ -229,6 +242,15 @@ namespace xcore
             };
             rune m_str[SIZE];
             inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
+			inline runez(const char* str) : runes(m_str, m_str, &m_str[SIZE - 1]) 
+			{ 
+				m_str[SIZE - 1] = 0; 
+				while (*str != '\0' && m_str < m_eos)
+				{
+					*m_end++ = *str;
+				}
+				*m_end = '\0';
+			}
         };
 
         class alloc
@@ -283,7 +305,7 @@ namespace xcore
             bool is_empty() const { return m_str == m_end; }
             void clear()
             {
-                m_str = "\0\0\0\0";
+                m_str = (pcrune)"\0\0\0\0";
                 m_end = m_str;
             }
 
@@ -659,24 +681,26 @@ namespace xcore
             CASE_IGNORE
         };
 
-        runes selectUntil(const runes& inStr, rune inFind);
-        runes selectUntil(const runes& inStr, const runes& inFind);
-        runes selectUntilLast(const runes& inStr, rune inFind);
-        runes selectUntilIncluded(const runes& inStr, rune inFind);
-        runes selectUntilIncluded(const runes& inStr, const runes& inFind);
-        runes selectUntilIncludedLast(const runes& inStr, rune inFind);
-        runes selectUntilIncludedLast(const runes& inStr, const runes& inFind);
+        runes findSelectUntil(const runes& inStr, rune inFind);
+        runes findSelectUntil(const runes& inStr, const runes& inFind);
+        runes findLastSelectUntil(const runes& inStr, rune inFind);
+		runes findSelectUntilIncluded(const runes& inStr, rune inFind);
+		runes findSelectUntilIncluded(const runes& inStr, const runes& inFind);
+        runes findLastSelectUntilIncluded(const runes& inStr, rune inFind);
+        runes findLastSelectUntilIncluded(const runes& inStr, const runes& inFind);
 
-        runes rselectUntil(const runes& inStr, rune inFind);
+        runes findLastSelectUntil(const runes& inStr, rune inFind);
 
-        runes selectAfter(const runes& inStr, rune inFind);
-        runes selectAfter(const runes& inStr, const runes& inFind);
+        runes findSelectAfter(const runes& inStr, rune inFind);
+        runes findSelectAfter(const runes& inStr, const runes& inFind);
+
+	    runes findLastSelectAfter(const runes& inStr, rune inFind);
 
         runes selectBetween(const runes& inStr, rune inLeft, rune inRight);
         runes selectNextBetween(const runes& inStr, const runes& inSelection, rune inLeft, rune inRight);
 
-        runes rselectBetween(const runes& inStr, rune inLeft, rune inRight);
-        runes rselectNextBetween(const runes& inStr, const runes& inSelection, rune inLeft, rune inRight);
+        runes selectBetweenLast(const runes& inStr, rune inLeft, rune inRight);
+        runes selectPreviousBetween(const runes& inStr, const runes& inSelection, rune inLeft, rune inRight);
 
         runes selectUntilEndIncluded(const runes& inStr, const runes& inSelection);
 
