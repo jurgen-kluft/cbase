@@ -27,7 +27,7 @@ UNITTEST_SUITE_BEGIN(xtls)
 
 		UNITTEST_TEST(get)
 		{
-			OurTlsObject const* obj;
+			OurTlsObject * obj;
 			xtls::get<0, OurTlsObject>(obj);
 			CHECK_EQUAL(1, obj->mInteger);
 			CHECK_EQUAL(2.0f, obj->mFloat);

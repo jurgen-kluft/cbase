@@ -29,7 +29,7 @@ namespace xcore
 	}; ///< end of ascii namespace
 
 
-	namespace utf8
+	namespace utf16
 	{
 		struct runes;
 		struct crunes;

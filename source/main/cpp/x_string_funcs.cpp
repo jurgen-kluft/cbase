@@ -83,44 +83,22 @@ pcrune			endof(pcrune str, pcrune end)
 	return str;
 }
 
-void		copy(runes& _dest, crunes const& _src, ECopyType type)
+runes findSelectUntil(runes const& _str, uchar32 _c, bool inCaseSensitive)
 {
-	crunes src = _src;
-	while (utf::can_write(_dest))
-	{
-		if (src.m_end != NULL && src.m_str == src.m_end)
-		{
-			if (type == COPY_AND_WRITE_MATCHING_TERMINATOR && *src.m_end == '\0')
-				write_char('\0', _dest);
-			break;
-		}
-		uchar32 c;
-		if (read_char(src, c) == false)
-		{
-			if (type == COPY_AND_WRITE_MATCHING_TERMINATOR)
-				write_char(c, _dest);
-			break;
-		}
-		write_char(c, _dest);
-	}
-	if (utf::can_write(_dest) && type == COPY_AND_WRITE_TERMINATOR)
-		write_char('\0', _dest);
-}
-
-void			concatenate(runes& str, crunes const& _concat)
-{
-	crunes concat = _concat;
+	runes   str = _str;
 	uchar32 c;
-	while (true)
+	while (!str.is_empty())
 	{
-		if (!read_char(concat, c))
+		runes pos = str;
+		if (!read_char(str, c))
 			break;
-		if (!write_char(c, str))
-			break;
+		if (is_equal(c, _c, mode))
+			return runes(_str.m_str, pos.m_str, _str.m_eos);
 	}
+	return runes();
 }
 
-runes			find(runes const& _str, crunes const& _find, ECmpMode mode)
+runes findSelectUntil(runes const& _str, crunes const& _find, bool inCaseSensitive)
 {
 	if (_str.is_empty())
 		return runes();
@@ -164,93 +142,7 @@ runes			find(runes const& _str, crunes const& _find, ECmpMode mode)
 	return found ? str_found : runes();
 }
 
-crunes			find(crunes const& _str, crunes const& _find, ECmpMode mode)
-{
-	if (_str.is_empty())
-		return crunes();
-	if (_find.is_empty())
-		return crunes();
-
-	crunes str_iter = _str;
-
-	bool found = false;
-	crunes str_found;
-	while (str_iter.is_empty() == false)
-	{
-		// Remember the current position because here is
-		// where we start to check if the 'find' string
-		// can be found at this particular position.
-		str_found = str_iter;
-
-		uchar32 sc, fc;
-		if (!read_char(str_iter, sc))
-			break;
-
-		crunes str_find = str_iter;
-		crunes find_str = _find;
-
-		found = true;
-		while (found && read_char(find_str, fc))
-		{
-			if (!read_char(str_find, sc))
-			{
-				found = false;
-				break;
-			}
-			found = is_equal(sc, fc, mode);
-		}
-
-		if (found)
-		{
-			break;
-		}
-	}
-	return found ? str_found : crunes();
-}
-
-runes	find(runes const& _str, uchar32 _c, ECmpMode mode)
-{
-	runes str = _str;
-	uchar32 c;
-	while (!str.is_empty())
-	{
-		runes pos = str;
-		if (!read_char(str, c))
-			break;
-		if (is_equal(c, _c, mode))
-			return pos;
-	}
-	return runes();
-}
-
-crunes	find(crunes const& _str, uchar32 _c, ECmpMode mode)
-{
-	crunes str = _str;
-	uchar32 c;
-	while (!str.is_empty())
-	{
-		crunes pos = str;
-		if (!read_char(str, c))
-			break;
-		if (is_equal(c, _c, mode))
-			return pos;
-	}
-	return crunes();
-}
-
-bool	contains(crunes const& _str, uchar32 _c, ECmpMode mode)
-{
-	crunes f = find(_str, _c, mode);
-	return f.is_empty() == false;
-}
-
-bool	contains(runes const& _str, uchar32 _c, ECmpMode mode)
-{
-	runes f = find(_str, _c, mode);
-	return f.is_empty() == false;
-}
-
-runes	find_one_of(runes const& _str, crunes const& _set, ECmpMode mode)
+runes find_one_of(runes const& _str, crunes const& _set, bool inCaseSensitive)
 {
 	runes str = _str;
 	uchar32 c;
@@ -273,34 +165,15 @@ runes	find_one_of(runes const& _str, crunes const& _set, ECmpMode mode)
 	return runes();
 }
 
-crunes	find_one_of(crunes const& _str, crunes const& _set, ECmpMode mode)
+void findReplace(runes& _str, crunes const& _find, crunes const& _replace, bool inCaseSensitive)
 {
-	crunes str = _str;
-	uchar32 c;
-	while (!str.is_empty())
-	{
-		// Remember the current position so that if we found
-		// the char in the set we can return this position.
-		crunes pos = str;
+	// Find
+	runes selected = find(_str, _find, inCaseSensitive);
+	if (selected.is_empty())
+		return;
 
-		// Read next character from 'str'
-		if (!read_char(str, c))
-			break;
-
-		// See if this char can be found in the 'set'
-		crunes found = find(_set, c, mode);
-		if (!found.is_empty())
-			return pos;
-	}
-	// Nothing found, return an empty object
-	return crunes();
-}
-
-
-void	replace(runes& _str, crunes const& _replace)
-{
 	// The logic here is based on memory copy, we do not consider characters
-	s32 const selected_len = (s32)((xbyte const*)_str.m_end - (xbyte const*)_str.m_str);
+	s32 const selected_len = (s32)((xbyte const*)selected.m_end - (xbyte const*)selected.m_str);
 	s32 const replace_len = (s32)((xbyte const*)_replace.m_end - (xbyte const*)_replace.m_str);
 
 	prune end = NULL;
@@ -342,7 +215,6 @@ void	replace(runes& _str, crunes const& _replace)
 	while (src < src_end)
 		*dst++ = *src++;
 
-	_str.m_end = end;
 	_str.m_end = end;
 }
 
@@ -823,5 +695,43 @@ uchar32			last_char(crunes const& _str)
 	return pc;
 }
 
+
+
+void copy(runes& _dest, crunes const& _src, ECopyType type)
+{
+	crunes src = _src;
+	while (utf::can_write(_dest))
+	{
+		if (src.m_end != NULL && src.m_str == src.m_end)
+		{
+			if (type == COPY_AND_WRITE_MATCHING_TERMINATOR && *src.m_end == '\0')
+				write_char('\0', _dest);
+			break;
+		}
+		uchar32 c;
+		if (read_char(src, c) == false)
+		{
+			if (type == COPY_AND_WRITE_MATCHING_TERMINATOR)
+				write_char(c, _dest);
+			break;
+		}
+		write_char(c, _dest);
+	}
+	if (utf::can_write(_dest) && type == COPY_AND_WRITE_TERMINATOR)
+		write_char('\0', _dest);
+}
+
+void concatenate(runes& str, crunes const& _concat)
+{
+	crunes  concat = _concat;
+	uchar32 c;
+	while (true)
+	{
+		if (!read_char(concat, c))
+			break;
+		if (!write_char(c, str))
+			break;
+	}
+}
 
 #endif

@@ -83,7 +83,7 @@ slice_data *slice_data::copy(s32 from, s32 to)
 	return data;
 }
 
-slice_data *slice_data::resize(s32 from, s32 to)
+void slice_data::resize(s32 from, s32 to)
 {
 	if (mAllocator != nullptr)
 	{
@@ -95,7 +95,6 @@ slice_data *slice_data::resize(s32 from, s32 to)
 			mItemCount = to_itemcount;
 		}
 	}
-	return this;
 }
 
 void slice_data::insert(s32 at, s32 count)
@@ -220,7 +219,7 @@ void slice::release()
 
 void slice::resize(s32 count)
 {
-	mData = mData->resize(mFrom, mFrom + count);
+	mData->resize(mFrom, mFrom + count);
 	mFrom = 0;
 	mTo = count;
 }
