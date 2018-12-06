@@ -13,8 +13,7 @@ inline T        xmin(T integerA, T integerB)
 template<>
 inline s32		xmin(s32 integerA, s32 integerB)
 {
-	s32 r = integerB ^ ((integerA ^ integerB) & -(integerA < integerB));
-	return r;
+    return integerA<=integerB ? integerA : integerB;
 }
 
 /**

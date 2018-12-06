@@ -20,7 +20,7 @@ namespace xcore
 		typedef const char* pcrune;
 		struct runes
 		{
-			inline runes() : m_str(NULL), m_end(NULL), m_eos(NULL) {}
+			inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
 			inline runes(prune _str, prune _end, pcrune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
 			inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 			s32  size() const { return (s32)(m_end - m_str); }
@@ -47,8 +47,8 @@ namespace xcore
 		};
 		struct crunes
 		{
-			inline crunes() : m_str(NULL), m_end(NULL) {}
-			inline crunes(pcrune _str) : m_str(_str), m_end(NULL) {}
+			inline crunes() : m_str(nullptr), m_end(nullptr) {}
+			inline crunes(pcrune _str) : m_str(_str), m_end(nullptr) {}
 			inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
 			inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
 			inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
@@ -100,7 +100,7 @@ namespace xcore
 		typedef const uchar8* pcrune;
 		struct runes
 		{
-			inline runes() : m_str(NULL), m_end(NULL), m_eos(NULL) {}
+			inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
 			inline runes(prune _str, prune _end, pcrune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
 			inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 			s32  size() const { return (s32)(m_end - m_str); }
@@ -127,7 +127,7 @@ namespace xcore
 		};
 		struct crunes
 		{
-			inline crunes() : m_str(NULL), m_end(NULL) {}
+			inline crunes() : m_str(nullptr), m_end(nullptr) {}
 			inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
 			inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
 			inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
@@ -173,7 +173,7 @@ namespace xcore
 		typedef const uchar16* pcrune;
 		struct runes
 		{
-			inline runes() : m_str(NULL), m_end(NULL), m_eos(NULL) {}
+			inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
 			inline runes(prune _str, prune _end, pcrune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
 			inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 
@@ -215,7 +215,7 @@ namespace xcore
 		};
 		struct crunes
 		{
-			inline crunes() : m_str(NULL), m_end(NULL) {}
+			inline crunes() : m_str(nullptr), m_end(nullptr) {}
 			inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
 			inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
 			inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
@@ -271,7 +271,7 @@ namespace xcore
 		typedef const uchar32* pcrune;
 		struct runes
 		{
-			inline runes() : m_str(NULL), m_end(NULL), m_eos(NULL) {}
+			inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
 			inline runes(prune _str, prune _end, pcrune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
 			inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 
@@ -300,7 +300,7 @@ namespace xcore
 		};
 		struct crunes
 		{
-			inline crunes() : m_str(NULL), m_end(NULL) {}
+			inline crunes() : m_str(nullptr), m_end(nullptr) {}
 			inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
 			inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
 			inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
@@ -752,7 +752,7 @@ namespace xcore
 		void to_string(runes& str, u64 val, s32 base = 10);
 		void to_string(runes& str, f32 val, s32 num_fractional_digits = 4);
 		void to_string(runes& str, f64 val, s32 num_fractional_digits = 4);
-
+		
 		inline bool is_space(uchar32 c) { return ((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
 		inline bool is_upper(uchar32 c) { return ((c >= 'A') && (c <= 'Z')); }
 		inline bool is_lower(uchar32 c) { return ((c >= 'a') && (c <= 'z')); }
@@ -833,6 +833,7 @@ namespace xcore
 		void copy(const crunes& src, runes& dst, alloc* allocator, s32 size_alignment);
 
 		void concatenate(runes& str, const crunes& concat);
+		void concatenate(runes& str, const crunes& concat1, const crunes& concat2);
 		void concatenate(runes& str, const crunes& concat, alloc* allocator, s32 size_alignment);
 		void concatenate(runes& str, const crunes& concat1, const crunes& concat2, alloc* allocator, s32 size_alignment);
 
