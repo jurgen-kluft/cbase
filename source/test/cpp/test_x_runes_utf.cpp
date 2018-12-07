@@ -34,34 +34,6 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 			CHECK_EQUAL(4, sizeof(utf32::rune));
 		}
 
-		UNITTEST_TEST(strlen_char)
-		{
-			// s32  		strlen		(char const* _str, char const** _end = 0);
-			const uchar8 utf8_str1[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0, 0, 0, 0 };	// fr�nch
-			u32 utf8_str1_len = utf8::len(utf8_str1, NULL);
-			CHECK_EQUAL(6, utf8_str1_len);
-		}
-
-		UNITTEST_TEST(strlen_ustr16)
-		{
-			//s32  		strlen		(ustr16 const* _str, ustr16 const** _end = 0);
-
-		}
-
-		UNITTEST_TEST(numBytes_utf8)
-		{
-			const uchar8* str1 = (const uchar8*)"test";
-			CHECK_EQUAL(4, utf8::len(str1, NULL));
-			const uchar8 str2[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0 };	// fr�nch
-
-			utf8::crunes str(str2, utf8::endof(str2, NULL));
-			uchar32 c;
-			c = utf::read(str);
-			c = utf::read(str);
-			c = utf::read(str);
-			CHECK_EQUAL(2, utf::size(c));
-		}
-
 		UNITTEST_TEST(copy_ascii_to_utf32)
 		{
 			ascii::crunes src("test");

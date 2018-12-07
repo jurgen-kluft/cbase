@@ -54,28 +54,6 @@ namespace xcore
 			return l;
 		}
 
-		virtual s32 write(utf8::crunes const& str)
-		{
-			const s32 maxlen = 1020;
-			uchar16 str16[maxlen + 4];
-			uchar16* dst16 = (uchar16*)str16;
-			uchar16* end16 = dst16 + maxlen;
-
-			s32 l = 0;
-			utf8::crunes src = str;
-			while (utf::can_read(src) && dst16 < end16)
-			{
-				uchar32 c = utf::read(src);
-				utf::write(c, dst16, end16);
-				l += 1;
-			}
-			str16[l] = 0;
-
-			::OutputDebugStringW((LPCWSTR)str16);
-			::fputws((const wchar_t*)str16, stdout);
-			return l;
-		}
-
 		virtual s32 write(const utf32::crunes& str)
 		{
 			const s32 maxlen = 1020;

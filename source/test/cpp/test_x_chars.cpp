@@ -15,7 +15,7 @@ UNITTEST_SUITE_BEGIN(xchars)
 		UNITTEST_TEST(test_runez_128)
 		{
 			ascii::runez<128> cz;
-			ascii::copy(cz, ascii::crunes("This is a test string"));
+			ascii::copy(ascii::crunes("This is a test string"), cz);
 		}
 	}
 }

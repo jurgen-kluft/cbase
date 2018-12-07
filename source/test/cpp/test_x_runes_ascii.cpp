@@ -49,14 +49,14 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			ascii::crunes str("this is a system string");
 
 			ascii::runez<32> dst;
-			ascii::copy(dst, str);
+			ascii::copy(str, dst);
 
 			CHECK_EQUAL(0, ascii::compare(str, dst));
 			CHECK_EQUAL(0, ascii::compare(str, dst));
 			CHECK_EQUAL(23, ascii::size(str));
 
 			ascii::runez<16> str2;
-			ascii::copy(str2, str);
+			ascii::copy(str, str2);
 
 			CHECK_EQUAL(16, ascii::size(str2));
 			CHECK_EQUAL(-1, ascii::compare(str2, str));
@@ -71,7 +71,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			ascii::crunes f1 = ascii::find(str1, 'e');
 			CHECK_EQUAL('e', ascii::first_char(f1));
 			CHECK_TRUE(ascii::find(str1, 'E').is_empty());
-			CHECK_FALSE(ascii::find(str1, 'E', ascii::CASE_IGNORE).is_empty());
+			CHECK_FALSE(ascii::find(str1, 'E', false).is_empty());
 
 			ascii::crunes tofind = "system";
 			ascii::crunes found = ascii::find(str1, tofind);
@@ -79,7 +79,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
 			ascii::crunes str3 = "SYSTEM";
 			CHECK_TRUE(ascii::find(str1, str3).is_empty());
-			CHECK_FALSE(ascii::find(str1, str3, ascii::CASE_IGNORE).is_empty());
+			CHECK_FALSE(ascii::find(str1, str3, false).is_empty());
 		}
 
 		UNITTEST_TEST(find_one_of)
@@ -87,17 +87,17 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			ascii::crunes str1 = "this is a system string";
 
 			ascii::crunes set1 = "bcde";
-			CHECK_TRUE(ascii::find_one_of(str1, set1) == ascii::crunes("em string"));
+			CHECK_TRUE(ascii::findOneOf(str1, set1) == ascii::crunes("em string"));
 
 			ascii::crunes set2 = "BCDE";
-			CHECK_TRUE(ascii::find_one_of(str1, set2, ascii::CASE_IGNORE) == ascii::crunes("em string"));
+			CHECK_TRUE(ascii::findOneOf(str1, set2, false) == ascii::crunes("em string"));
 		}
 
 		UNITTEST_TEST(replace)
 		{
 			ascii::runez<128> dst;
 			ascii::crunes str1 = "this is a system string";
-			ascii::copy(dst, str1);
+			ascii::copy(str1, dst);
 			ascii::crunes str2 = "this is a copied string";
 
 			ascii::crunes find_str = "system";
@@ -105,7 +105,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			CHECK_TRUE(found == ascii::crunes("system"));
 
 			ascii::crunes replace_str = "copied";
-			ascii::replace(dst, find_str, replace_str);
+			ascii::findReplace(dst, find_str, replace_str);
 
 			CHECK_EQUAL(0, ascii::compare(dst, str2));
 		}
@@ -128,16 +128,16 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			ascii::crunes str7 = "b";
 			ascii::crunes str8 = "B";
 			CHECK_EQUAL( 1, ascii::compare(str5, str6));
-			CHECK_EQUAL( 0, ascii::compare(str5, str6, ascii::CASE_IGNORE));
+			CHECK_EQUAL( 0, ascii::compare(str5, str6, false));
 			CHECK_EQUAL( 1, ascii::compare(str7, str8));
-			CHECK_EQUAL( 0, ascii::compare(str7, str8, ascii::CASE_IGNORE));
+			CHECK_EQUAL( 0, ascii::compare(str7, str8, false));
 		}
 
 		UNITTEST_TEST(concatenate)
 		{
 			ascii::runez<128> dst;
 			ascii::crunes str1 = "this is a ";
-			ascii::copy(dst, str1);
+			ascii::copy(str1, dst);
 
 			ascii::crunes str2 = "copied string";
 			ascii::concatenate(dst, str2);
@@ -369,12 +369,12 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			CHECK_EQUAL(false, ascii::is_hexa('g'));
 			CHECK_EQUAL(false, ascii::is_hexa('H'));
 
-			CHECK_EQUAL(true, ascii::is_equal('a', 'A', ascii::CASE_IGNORE));
-			CHECK_EQUAL(true, ascii::is_equal('a', 'a', ascii::CASE_IGNORE));
-			CHECK_EQUAL(false, ascii::is_equal('a', 'B', ascii::CASE_IGNORE));
-			CHECK_EQUAL(true, ascii::is_equal('z', 'Z', ascii::CASE_IGNORE));
-			CHECK_EQUAL(false, ascii::is_equal('=', '+', ascii::CASE_IGNORE));
-			CHECK_EQUAL(true, ascii::is_equal('?', '?', ascii::CASE_IGNORE));
+			CHECK_EQUAL(true, ascii::is_equalfold('a', 'A' ));
+			CHECK_EQUAL(true, ascii::is_equalfold('a', 'a' ));
+			CHECK_EQUAL(false, ascii::is_equalfold('a', 'B'));
+			CHECK_EQUAL(true, ascii::is_equalfold('z', 'Z' ));
+			CHECK_EQUAL(false, ascii::is_equalfold('=', '+'));
+			CHECK_EQUAL(true, ascii::is_equalfold('?', '?' ));
 		}
 
 		UNITTEST_TEST(to)
@@ -439,7 +439,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			ascii::runez<128> str;
 			ascii::crunes str1 = "this is a lower case string";
 			ascii::crunes str2 = "THIS IS A LOWER CASE STRING";
-			ascii::copy(str, str1);
+			ascii::copy(str1, str);
 			ascii::to_upper(str);
 			CHECK_EQUAL(0, ascii::compare(str2, str));
 		}
@@ -449,7 +449,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			ascii::runez<128> str;
 			ascii::crunes str1 = "THIS IS AN UPPER CASE STRING";
 			ascii::crunes str2 = "this is an upper case string";
-			ascii::copy(str, str1);
+			ascii::copy(str1, str);
 			ascii::to_lower(str);
 			CHECK_EQUAL(0, ascii::compare(str2, str));
 		}

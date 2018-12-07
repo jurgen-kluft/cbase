@@ -53,7 +53,6 @@ namespace xcore
 		public:
 			virtual s32				color(xconsole::EColor color) = 0;
 			virtual s32				write(ascii::crunes const& str) = 0;
-			virtual s32				write(utf8::crunes const& str) = 0;
 			virtual s32				write(utf32::crunes const& str) = 0;
 		};
 
@@ -75,17 +74,11 @@ namespace xcore
 		virtual void			write(u64 _value) = 0;
 
 		virtual void			write(const ascii::crunes& buffer) = 0;
-		virtual void			write(const utf8::crunes& buffer) = 0;
-		virtual void			write(const utf32::crunes& buffer) = 0;
-
 		virtual void			write(const ascii::crunes& fmt, const x_va_list& args) = 0;
-		virtual void			write(const utf8::crunes& fmt, const x_va_list& args) = 0;
+		virtual void			write(const utf32::crunes& buffer) = 0;
 		virtual void			write(const utf32::crunes& fmt, const x_va_list& args) = 0;
 
 		virtual void			writeLine() = 0;
-
-		inline void				write(const char* c_str)						{ ascii::crunes runes(c_str); write(runes); }
-		inline void				writeLine(const char* c_str)					{ ascii::crunes runes(c_str); write(runes); writeLine(); }
 
 		inline void				writeLine(bool _value)							{ write(_value); writeLine(); }
 		inline void				writeLine(f64 _value)							{ write(_value); writeLine(); }
@@ -96,21 +89,11 @@ namespace xcore
 		inline void				writeLine(u64 _value)							{ write(_value); writeLine(); }
 
 		inline void				writeLine(const ascii::crunes& str)				{ write(str); writeLine(); }
-		inline void				writeLine(const utf8::crunes&  str)				{ write(str); writeLine(); }
-		inline void				writeLine(const utf32::crunes& str)				{ write(str); writeLine(); }
-
 		inline void				writeLine(const ascii::crunes& format, const x_va_list& args) { write(format, args); writeLine(); }
-		inline void				writeLine(const utf8::crunes&  format, const x_va_list& args) { write(format, args); writeLine(); }
+		inline void				writeLine(const utf32::crunes& str)				{ write(str); writeLine(); }
 		inline void				writeLine(const utf32::crunes& format, const x_va_list& args) { write(format, args); writeLine(); }
 	};
 
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
-/**
- *  END xCore namespace
- */
 
 #endif	///< __XBASE_CONSOLE_H__

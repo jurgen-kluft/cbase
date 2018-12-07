@@ -58,7 +58,7 @@ namespace xcore
 		case TYPE_FLOAT64: { f64 v = (*(f64*)mArg); ascii::to_string(str, v); } break;
 		case TYPE_PCTCHAR: 
 		{	ascii::crunes const& ch = *(ascii::crunes const*)mArg;
-			ascii::copy(str, ch, ascii::COPY_AND_WRITE_TERMINATOR);
+			ascii::copy(ch, str);
 		} break;
 		case TYPE_PCUCHAR32:
 		{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
@@ -149,7 +149,7 @@ namespace xcore
 		case TYPE_FLOAT64: { i = (u32)(*(f64*)mArg); } break;
 		case TYPE_PCTCHAR: 
 		{	ascii::crunes const& ch = *(ascii::crunes const*)mArg;
-			i = StrToU32(ch.m_str, ch.m_end);
+			ascii::parse(ch, i);
 		} break;
 		case TYPE_PCUCHAR32:
 		{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
@@ -187,8 +187,8 @@ namespace xcore
 			case TYPE_FLOAT64:	{ i = (u64)(*(f64*)mArg);  } break;
 			case TYPE_PCTCHAR:
 			{	ascii::crunes const& ch = *(ascii::crunes const*)mArg;
-				i = StrToS64(ch.m_str, ch.m_end, 10);
-			} break;
+				ascii::parse(ch, i);
+				} break;
 			case TYPE_PCUCHAR32:
 			{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
 				i = StrToS64(ch.m_str, ch.m_end, 10);
@@ -220,7 +220,7 @@ namespace xcore
 			case TYPE_FLOAT64:	{ i = (f32)(*(f64*)mArg); } break;
 			case TYPE_PCTCHAR:
 			{	ascii::crunes const& ch = *(ascii::crunes const*)mArg;
-				i = StrToF32(ch.m_str, ch.m_end);
+				ascii::parse(ch, i);
 			} break;
 			case TYPE_PCUCHAR32:
 			{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
@@ -252,7 +252,7 @@ namespace xcore
 			case TYPE_FLOAT64:	{ i = (f64)(*(f64*)mArg); } break;
 			case TYPE_PCTCHAR:
 			{	ascii::crunes const& ch = *(ascii::crunes const*)mArg;
-				i = StrToF64(ch.m_str, ch.m_end);
+				ascii::parse(ch, i);
 			} break;
 			case TYPE_PCUCHAR32:
 			{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
@@ -285,7 +285,7 @@ namespace xcore
 
 			case TYPE_PCTCHAR:
 			{	ascii::crunes const& ch = *(ascii::crunes const*)mArg;
-				i = StrToBool(ch.m_str, ch.m_end);
+				ascii::parse(ch, i);
 			} break;
 			case TYPE_PCUCHAR32:
 			{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
@@ -506,21 +506,53 @@ namespace xcore
 		return *this;
 	}
 
+	static inline bool StrToBool(const uchar* str)
+	{
+		bool v;
+		ascii::crunes s(str, nullptr);
+		ascii::parse(s, v);
+		return v;
+	}
+
+	static inline s64 StrToS64(const uchar* str)
+	{
+		s64 v;
+		ascii::crunes s(str, nullptr);
+		ascii::parse(s, v);
+		return v;
+	}
+
+	static inline f32 StrToF32(const uchar* str)
+	{
+		f32 v;
+		ascii::crunes s(str, nullptr);
+		ascii::parse(s, v);
+		return v;
+	}
+
+	static inline f64 StrToF64(const uchar* str)
+	{
+		f64 v;
+		ascii::crunes s(str, nullptr);
+		ascii::parse(s, v);
+		return v;
+	}
+
 	x_va_r&					x_va_r::operator=(const uchar* rhs)
 	{
 		switch (mType)
 		{
-		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs, NULL); break;
-		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs, NULL, 10); break;
-		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs, NULL, 10); break;
-		case TYPE_UINT8:	*((u8 *)mRef) = (u8 )StrToS64(rhs, NULL, 10); break;
-		case TYPE_INT8:		*((s8 *)mRef) = (s8 )StrToS64(rhs, NULL, 10); break;
-		case TYPE_UINT16:	*((u16*)mRef) = (u16)StrToS64(rhs, NULL, 10); break;
-		case TYPE_INT16:	*((s16*)mRef) = (s16)StrToS64(rhs, NULL, 10); break;
-		case TYPE_UINT64:	*((u64*)mRef) = (u64)StrToS64(rhs, NULL, 10); break;
-		case TYPE_INT64:	*((s64*)mRef) = (s64)StrToS64(rhs, NULL, 10); break;
-		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs, NULL); break;
-		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs, NULL); break;
+		case TYPE_BOOL:		*((bool*)mRef) = StrToBool(rhs); break;
+		case TYPE_UINT32:	*((u32*)mRef) = (u32)StrToS64(rhs); break;
+		case TYPE_INT32:	*((s32*)mRef) = (s32)StrToS64(rhs); break;
+		case TYPE_UINT8:	*((u8 *)mRef) = (u8 )StrToS64(rhs); break;
+		case TYPE_INT8:		*((s8 *)mRef) = (s8 )StrToS64(rhs); break;
+		case TYPE_UINT16:	*((u16*)mRef) = (u16)StrToS64(rhs); break;
+		case TYPE_INT16:	*((s16*)mRef) = (s16)StrToS64(rhs); break;
+		case TYPE_UINT64:	*((u64*)mRef) = (u64)StrToS64(rhs); break;
+		case TYPE_INT64:	*((s64*)mRef) = (s64)StrToS64(rhs); break;
+		case TYPE_FLOAT32:	*((f32*)mRef) = (f32)StrToF32(rhs); break;
+		case TYPE_FLOAT64:	*((f64*)mRef) = (f64)StrToF64(rhs); break;
 		case TYPE_PTCHAR:	break;
 		case TYPE_PUCHAR32:	break;
 		default:			break; // Fall through

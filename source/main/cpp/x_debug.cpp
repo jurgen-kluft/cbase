@@ -99,12 +99,11 @@ namespace xcore
 		//
 		// Create the report to print
 		//
-		ascii::rune reportBuffer[1024];
-		reportBuffer[1024 - 1] = '\0';
-		ascii::runes report(reportBuffer, reportBuffer, &reportBuffer[1024 - 1]);
-		ascii::pcrune fmtstr = "*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n";
-		ascii::crunes fmt(fmtstr, ascii::endof(fmtstr, NULL));
-		ascii::sprintf(report, fmt, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
+		// utf32::runez<1024> report;
+		// utf32::runez<64> fmtstr;
+		// ascii::crunes fmtascii("*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n");
+		// utf::copy(fmtascii, fmtstr);
+		// utf32::sprintf(report, fmtstr, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
 
 		//
 		// Dump the scope info

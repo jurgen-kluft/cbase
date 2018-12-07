@@ -1,19 +1,9 @@
-/**
-* @file xlog.cpp
-* Logging
-*/
-
-#ifndef SPU
-
 #include "xbase/x_log.h"
 #include "xbase/x_va_list.h"
 #include "xbase/x_runes.h"
 
 #include "xbase/private/x_log_to_console.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	static x_log_info	x_ST_LogInfo;	///< Single-Thread log info
@@ -408,9 +398,4 @@ namespace xcore
 
 	#endif
 };
-/**
- *  END xCore namespace
- */
 
-
-#endif

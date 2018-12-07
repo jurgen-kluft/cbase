@@ -37,10 +37,6 @@ namespace xcore
 
 		virtual void 			write(const ascii::crunes& str);
 		virtual void 			write(const ascii::crunes& fmt, const x_va_list& args);
-
-		virtual void 			write(const utf8::crunes& str);
-		virtual void 			write(const utf8::crunes& fmt, const x_va_list& args);
-
 		virtual void 			write(const utf32::crunes& str);
 		virtual void 			write(const utf32::crunes& fmt, const x_va_list& args);
 
@@ -96,14 +92,6 @@ namespace xcore
 	{
 	}
 
-	void				xconsole_null::write(const utf8::crunes& str)
-	{
-	}
-
-	void				xconsole_null::write(const utf8::crunes& fmt, const x_va_list& args)
-	{
-	}
-
 	void				xconsole_null::write(const utf32::crunes& str)
 	{
 	}
@@ -145,10 +133,6 @@ namespace xcore
 
 		virtual void			write(const ascii::crunes& str);
 		virtual void			write(const ascii::crunes& fmt, const x_va_list& args);
-
-		virtual void			write(const utf8::crunes& str);
-		virtual void			write(const utf8::crunes& fmt, const x_va_list& args);
-
 		virtual void			write(const utf32::crunes& str);
 		virtual void			write(const utf32::crunes& fmt, const x_va_list& args);
 
@@ -170,53 +154,53 @@ namespace xcore
 
 	void    xconsole_default::write(bool _value)
 	{
-		ascii::pcrune truestr = "true";
-		ascii::pcrune falsestr = "false";
-		write(_value ? ascii::crunes(truestr, truestr+4) : ascii::crunes(falsestr, falsestr+5));
+		utf32::rune true32[] = { 't', 'r', 'u', 'e', 0 };
+		utf32::rune false32[] = { 't', 'r', 'u', 'e', 0 };
+		write(_value ? utf32::crunes(true32, true32+4) : utf32::crunes(false32, false32+5));
 	}
 
 	void    xconsole_default::write(f64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 256);
-		ascii::to_string(tmp, _value, 2);
+		XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 256);
+		utf32::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
 	void    xconsole_default::write(s32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 64);
-		ascii::to_string(tmp, _value, 2);
+		XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 64);
+		utf32::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
 	void    xconsole_default::write(s64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 64);
-		ascii::to_string(tmp, _value, 2);
+		XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 64);
+		utf32::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
 	void    xconsole_default::write(f32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 256);
-		ascii::to_string(tmp, _value, 2);
+		XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 256);
+		utf32::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
 	void    xconsole_default::write(u32 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 256);
-		ascii::to_string(tmp, _value, 2);
+		XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 256);
+		utf32::to_string(tmp, _value, 2);
 		write(tmp);
 	}
 
 	void    xconsole_default::write(u64 _value)
 	{
-		XCONSOLE_LOCAL_STR_BUF(ascii::rune, tmp, 256);
-		ascii::to_string(tmp, _value, 2);
+		XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 256);
+		utf32::to_string(tmp, _value, 2);
 		write(tmp);
 	}
-	
+
 	void    xconsole_default::write(const ascii::crunes& str)
 	{
 		mOut->write(str);
@@ -224,21 +208,9 @@ namespace xcore
 
 	void    xconsole_default::write(const ascii::crunes& fmt, const x_va_list& args)
 	{
-		XCONSOLE_LOCAL_STR_BUF(ascii::rune, str, 512);
-		ascii::vsprintf(str, fmt, args);
-		mOut->write(str);
-	}
-
-	void    xconsole_default::write(const utf8::crunes& str)
-	{
-		mOut->write(str);
-	}
-
-	void    xconsole_default::write(const utf8::crunes& fmt, const x_va_list& args)
-	{
-		XCONSOLE_LOCAL_STR_BUF(utf8::rune, str, 512);
-		utf8::vsprintf(str, utf8::crunes(fmt), args);
-		utf8::crunes outstr(str);
+		XCONSOLE_LOCAL_STR_BUF(ascii::rune, str, 1024);
+		ascii::vsprintf(str, ascii::crunes(fmt), args);
+		ascii::crunes outstr(str);
 		mOut->write(outstr);
 	}
 
@@ -258,8 +230,8 @@ namespace xcore
 
 	void    xconsole_default::writeLine()
 	{
-		ascii::pcrune line = "\n";
-		write(ascii::crunes(line, line + 1));
+		utf32::rune line32[] = { '\n', 0 };
+		write(utf32::crunes(line32, line32 + 1));
 	}
 
 	extern xconsole::xout*	gGetDefaultConsoleOut();

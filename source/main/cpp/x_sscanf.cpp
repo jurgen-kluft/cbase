@@ -7,9 +7,6 @@
 // Shared code
 #include "xbase/private/x_printf.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	static bool SearchUntilOneOf(CharReader* reader, CharReader* foo)
@@ -36,36 +33,36 @@ namespace xcore
 		bool bval = false;
 		const char* bstr = NULL;
 		uchar32 c = str->Peek();
-		if (ascii::is_equal(c, 't', ascii::CASE_IGNORE))
+		if (utf32::is_equalfold(c, 't'))
 		{
 			bstr = "true";
 			bval = true;
 		}
-		else if (ascii::is_equal(c, 'f', ascii::CASE_IGNORE))
+		else if (utf32::is_equalfold(c, 'f'))
 		{
 			bstr = "false";
 		}
-		else if (ascii::is_equal(c, 'y', ascii::CASE_IGNORE))
+		else if (utf32::is_equalfold(c, 'y'))
 		{
 			bstr = "yes";
 			bval = true;
 		}
-		else if (ascii::is_equal(c, 'n', ascii::CASE_IGNORE))
+		else if (utf32::is_equalfold(c, 'n'))
 		{
 			bstr = "no";
 		}
-		else if (ascii::is_equal(c, 'o', ascii::CASE_IGNORE))
+		else if (utf32::is_equalfold(c, 'o'))
 		{
 			str->Read();
 			bstr = "yes";
 			bval = true;
 			c = str->Peek();
-			if (ascii::is_equal(c, 'f', ascii::CASE_IGNORE))
+			if (utf32::is_equalfold(c, 'f'))
 			{
 				bstr = "ff";
 				bval = false;
 			}
-			else if (ascii::is_equal(c, 'n', ascii::CASE_IGNORE))
+			else if (utf32::is_equalfold(c, 'n'))
 			{
 				bstr = "n";
 			}
@@ -80,7 +77,7 @@ namespace xcore
 				uchar32 sc = str->Read();
 				if (sc == '\0')
 					return false;
-				if (utf32::is_equal(bc, sc, utf32::CASE_IGNORE) == false)
+				if (utf32::is_equalfold(bc, sc) == false)
 					return false;
 			}
 			return true;
@@ -500,7 +497,8 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("1234567890-+", 12));
+					utf32::rune decimalChars[] = {'1','2','3','4','5','6','7','8','9','0','-','+', 0};
+					CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 12);
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -528,7 +526,8 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("1234567890", 10));
+					utf32::rune decimalChars[] = {'1','2','3','4','5','6','7','8','9','0', 0};
+					CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 10);
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -556,7 +555,8 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("12345670", 8));
+					utf32::rune decimalChars[] = {'1','2','3','4','5','6','7','0', 0};
+					CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 8);
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -585,7 +585,8 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("1234567890xabcdefABCDEF", 23));
+					utf32::rune decimalChars[] = {'1','2','3','4','5','6','7','8','9','0','x','a','b','c','d','e','f','A','B','C','D','E','F', 0};
+					CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 23);
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -602,17 +603,17 @@ namespace xcore
 						if (w == 2)
 						{
 							u32 const strl = 2;
-							uchar str[strl + 1];
+							uchar32 str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
 								str[j] = (uchar)reader->Read();
-							CharReaderFromAsciiBuffer str_reader(str, NULL);
+							CharReaderFromUtf32Buffer str_reader(str, NULL);
 							n2 = StrToS64(&str_reader, 16);
 						}
 						else if (w == 4)
 						{
 							u32 const strl = 4;
-							uchar str[strl + 1];
+							uchar32 str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
 							{
@@ -621,13 +622,13 @@ namespace xcore
 								if (c == '\0')
 									break;
 							}
-							CharReaderFromAsciiBuffer str_reader(str, NULL);
+							CharReaderFromUtf32Buffer str_reader(str, NULL);
 							n2 = StrToS64(&str_reader, 16);
 						}
 						else if (w == 8)
 						{
 							u32 const strl = 8;
-							uchar str[strl + 1];
+							uchar32 str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
 							{
@@ -636,13 +637,13 @@ namespace xcore
 								if (c == '\0')
 									break;
 							}
-							CharReaderFromAsciiBuffer str_reader(str, NULL);
+							CharReaderFromUtf32Buffer str_reader(str, NULL);
 							n2 = StrToS64(&str_reader, 16);
 						}
 						else // if (w == 16)
 						{
 							u32 const strl = 16;
-							uchar str[strl + 1];
+							uchar32 str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
 							{
@@ -651,7 +652,7 @@ namespace xcore
 								if (c == '\0')
 									break;
 							}
-							CharReaderFromAsciiBuffer str_reader(str, NULL);
+							CharReaderFromUtf32Buffer str_reader(str, NULL);
 							n2 = (u64)StrToS64(&str_reader, 16);
 						}
 					}
@@ -677,7 +678,8 @@ namespace xcore
 				{
 					fmt->Skip();
 
-					CharReaderFromAsciiBuffer foo(AsciiConstBuffer("1234567890.e+-", 14));
+					utf32::rune decimalChars[] = {'1','2','3','4','5','6','7','8','9','0','.','e','+','-', 0};
+					CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 14);
 
 					while (reader->Peek() != 0 && reader->Peek() == ' ')
 						reader->Read();
@@ -728,33 +730,11 @@ namespace xcore
 
 	namespace ascii
 	{
-		s32	sscanf(crunes & str, crunes const& fmt, X_VA_R_ARGS_16)
-		{
-			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromAsciiBuffer buf_reader(str.m_str, str.m_end);
-			CharReaderFromAsciiBuffer fmt_reader(fmt.m_str, fmt.m_end);
-			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_str = buf_reader.mPtr;
-			return scanned;
-		}
-
-		s32 vsscanf(crunes & str, crunes const& fmt, const x_va_r_list& vr_args)
-		{
-			CharReaderFromAsciiBuffer buf_reader(str.m_str, str.m_end);
-			CharReaderFromAsciiBuffer fmt_reader(fmt.m_str, fmt.m_end);
-			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_str = buf_reader.mPtr;
-			return scanned;
-		}
-	}
-
-	namespace utf8
-	{
 		s32 sscanf(crunes & str, crunes const& fmt, X_VA_R_ARGS_16)
 		{
 			x_va_r_list vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-			CharReaderFromUtf8Buffer buf_reader(str.m_str, str.m_end);
-			CharReaderFromUtf8Buffer fmt_reader(fmt.m_str, fmt.m_end);
+			CharReaderFromAsciiBuffer buf_reader(str.m_str, str.m_end);
+			CharReaderFromAsciiBuffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
 			str.m_str = buf_reader.mPtr;
 			return scanned;
@@ -762,8 +742,8 @@ namespace xcore
 
 		s32 vsscanf(crunes & str, crunes const& fmt, const x_va_r_list& vr_args)
 		{
-			CharReaderFromUtf8Buffer buf_reader(str.m_str, str.m_end);
-			CharReaderFromUtf8Buffer fmt_reader(fmt.m_str, fmt.m_end);
+			CharReaderFromAsciiBuffer buf_reader(str.m_str, str.m_end);
+			CharReaderFromAsciiBuffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
 			str.m_str = buf_reader.mPtr;
 			return scanned;
