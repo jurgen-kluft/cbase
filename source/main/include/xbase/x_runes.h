@@ -48,8 +48,8 @@ namespace xcore
 		struct crunes
 		{
 			inline crunes() : m_str(nullptr), m_end(nullptr) {}
-			inline crunes(pcrune _str) : m_str(_str), m_end(nullptr) {}
-			inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
+			inline crunes(pcrune _str) : m_str(_str), m_end(_str) { while (*m_end != '\0') ++m_end; }
+			inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) { if (m_end==nullptr) { m_end = m_str; while (*m_end != '\0') ++m_end; }}
 			inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
 			inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
 			s32  size() const { return (s32)(m_end - m_str); }
@@ -427,37 +427,50 @@ namespace xcore
 
 	namespace ascii
 	{
-		inline s32 len(pcrune str, pcrune end)
-		{
-			return s32(end - str);
-		}
-
 		inline s32 size(crunes const& _str)
 		{
 			return _str.size();
 		}
 
-		inline prune endof(prune str, pcrune _end)
+		inline prune endof(prune str, pcrune eos)
 		{
-			prune end = str;
-			if (_end == nullptr)
+			if (eos == nullptr)
 			{
+				prune end = str;
 				while (*end != '\0')
 					end++;
-			} else {
-				end += (_end - str);
+				return end;
 			}
-			return end;
+			else
+			{
+				prune end = str;
+				while (*end != '\0' && end < eos)
+					end++;
+				return end;
+			}
 		}
-		inline pcrune endof(pcrune str, pcrune end)
+		inline pcrune endof(pcrune str, pcrune eos)
 		{
-			if (end == nullptr)
+			if (eos == nullptr)
 			{
-				end = str;
+				pcrune end = str;
 				while (*end != '\0')
 					end++;
+				return end;
 			}
-			return end;
+			else
+			{
+				pcrune end = str;
+				while (*end != '\0' && end < eos)
+					end++;
+				return end;
+			}
+		}
+
+		inline s32 len(pcrune str, pcrune end)
+		{
+			end = endof(str, end);
+			return s32(end - str);
 		}
 
         crunes find(crunes const& _str, uchar32 _c, bool inCaseSensitive = true);

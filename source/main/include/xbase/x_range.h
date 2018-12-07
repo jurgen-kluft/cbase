@@ -73,7 +73,7 @@ namespace xcore
 		bool		operator == (range_t<T> const& range) const { return m_current == range.m_current; }
 		bool		operator != (range_t<T> const& range) const { return m_current != range.m_current; }
 
-		range_t<T>&	operator ++ () { iterate(); return *this; }
+		range_t<T>&	operator ++ () { m_index += 1; m_current += m_step; return *this; }
 
 		void		reset()
 		{
@@ -92,7 +92,6 @@ namespace xcore
 		{
 			range_t<T> e(*this);
 			e.m_current = m_to;
-			e.m_index = -1;
 			return e;
 		}
 

@@ -1234,8 +1234,8 @@ namespace xcore
 			CharReaderFromAsciiBuffer reader(format.m_str, format.m_end);
 			CharWriterToAsciiBuffer writer(str.m_end, str.m_eos);
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-
 			VSPrintf_internal(&writer, &reader, &buffer, args);
+			str.m_end = writer.mPtr;
 		}
 
 		void	vsprintf(runes& str, crunes const& format, const x_va_list& args)
@@ -1244,7 +1244,6 @@ namespace xcore
 			CharWriterToAsciiBuffer writer(str.m_end, str.m_eos);
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
-			str.m_end = writer.mPtr;
 			str.m_end = writer.mPtr;
 		}
 
@@ -1309,8 +1308,8 @@ namespace xcore
 			CharReaderFromUtf32Buffer reader(format.m_str, format.m_end);
 			CharWriterToUtf32Buffer writer(str.m_end, str.m_eos);
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
-
 			VSPrintf_internal(&writer, &reader, &buffer, args);
+			str.m_end = writer.mPtr;
 		}
 
 		void	vsprintf(runes& str, crunes const& format, const x_va_list& args)
@@ -1319,7 +1318,6 @@ namespace xcore
 			CharWriterToUtf32Buffer writer(str.m_end, str.m_eos);
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
-			str.m_end = writer.mPtr;
 			str.m_end = writer.mPtr;
 		}
 

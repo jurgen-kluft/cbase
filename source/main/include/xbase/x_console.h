@@ -78,6 +78,8 @@ namespace xcore
 		virtual void			write(const utf32::crunes& buffer) = 0;
 		virtual void			write(const utf32::crunes& fmt, const x_va_list& args) = 0;
 
+		inline void				write(const char* str)							{ ascii::crunes r(str, nullptr); write(r); }
+
 		virtual void			writeLine() = 0;
 
 		inline void				writeLine(bool _value)							{ write(_value); writeLine(); }
@@ -87,6 +89,8 @@ namespace xcore
 		inline void				writeLine(f32 _value)							{ write(_value); writeLine(); }
 		inline void				writeLine(u32 _value)							{ write(_value); writeLine(); }
 		inline void				writeLine(u64 _value)							{ write(_value); writeLine(); }
+
+		inline void				writeLine(const char* str)						{ ascii::crunes r(str, nullptr); writeLine(r); }
 
 		inline void				writeLine(const ascii::crunes& str)				{ write(str); writeLine(); }
 		inline void				writeLine(const ascii::crunes& format, const x_va_list& args) { write(format, args); writeLine(); }

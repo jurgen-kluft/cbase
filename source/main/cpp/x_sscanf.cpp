@@ -606,7 +606,7 @@ namespace xcore
 							uchar32 str[strl + 1];
 							str[strl] = '\0';
 							for (s32 j = 0; j < strl; ++j)
-								str[j] = (uchar)reader->Read();
+								str[j] = reader->Read();
 							CharReaderFromUtf32Buffer str_reader(str, NULL);
 							n2 = StrToS64(&str_reader, 16);
 						}
@@ -618,7 +618,7 @@ namespace xcore
 							for (s32 j = 0; j < strl; ++j)
 							{
 								uchar32 c = reader->Read();
-								str[j] = (uchar)c;
+								str[j] = c;
 								if (c == '\0')
 									break;
 							}
@@ -633,7 +633,7 @@ namespace xcore
 							for (s32 j = 0; j < strl; ++j)
 							{
 								uchar32 c = reader->Read();
-								str[j] = (uchar)c;
+								str[j] = c;
 								if (c == '\0')
 									break;
 							}
@@ -648,7 +648,7 @@ namespace xcore
 							for (s32 j = 0; j < strl; ++j)
 							{
 								uchar32 c = reader->Read();
-								str[j] = (uchar)c;
+								str[j] = c;
 								if (c == '\0')
 									break;
 							}

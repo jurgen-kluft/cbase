@@ -30,17 +30,17 @@ namespace xcore
 		inline bool			is_empty() const						{ return mLength == 0; }
 		inline bool			is_full() const							{ ASSERT(mLength <= mArraySize); return mLength == mArraySize; }
 
-		inline void			push_back(void const* item)				{ ASSERT(mLength<mArraySize); x_memcpy(&mArray[mLength++], item, mElementSize); }
+		inline void			push_back(void const* item)				{ ASSERT(mLength<mArraySize); x_memcpy(&mArray[mLength * mElementSize], item, mElementSize); mLength += 1; }
 		inline bool			pop_back(void * out_item)				{ if (mLength > 0) { --mLength; x_memcpy(out_item, &mArray[mLength], mElementSize); return true; } else { return false; } }
 
 		inline xbyte*		begin() const							{ return mArray; }
 		inline xbyte*		next(xbyte* current) const				{ return current + mElementSize; }
-		inline xbyte*		end() const								{ return &mArray[mLength]; }
+		inline xbyte*		end() const								{ return &mArray[mLength * mElementSize]; }
 
-		inline void*		operator [] (s32 index)					{ ASSERT(index<(s32)mLength); return &mArray[index]; }
-		inline void const*	operator [] (s32 index) const			{ ASSERT(index<(s32)mLength); return &mArray[index]; }
+		inline void*		operator [] (s32 index)					{ ASSERT(index<(s32)mLength); return &mArray[index * mElementSize]; }
+		inline void const*	operator [] (s32 index) const			{ ASSERT(index<(s32)mLength); return &mArray[index * mElementSize]; }
 
-		inline xcarray		operator() (s32 from, s32 to) const		{ ASSERT(from<mArraySize && to<mArraySize); xcarray c(&mArray[from], mElementSize, to-from);  return c; }
+		inline xcarray		operator() (s32 from, s32 to) const		{ ASSERT(from<to && from<mArraySize && to<mArraySize); xcarray c(&mArray[from* mElementSize], mElementSize, to-from);  return c; }
 
 		void				swap(s32 a, s32 b);
 		void				remove(s32 i);
@@ -56,8 +56,8 @@ namespace xcore
 	inline void			xcarray::swap(s32 index_a, s32 index_b)
 	{
 		ASSERT (index_a < mLength && index_b < mLength);
-		xbyte* srca = &mArray[index_a];
-		xbyte* srcb = &mArray[index_b];
+		xbyte* srca = &mArray[index_a * mElementSize];
+		xbyte* srcb = &mArray[index_b * mElementSize];
 		for (s32 i = 0; i < mElementSize; ++i)
 		{
 			xbyte tmp = srca[i];
@@ -72,7 +72,7 @@ namespace xcore
 		{
 			s32 const s = index + 1;
 			for (s32 i = s; i < mLength; ++i)
-				x_memcpy(&mArray[i-1], &mArray[i], mElementSize);
+				x_memcpy(&mArray[(i-1) * mElementSize], &mArray[i * mElementSize], mElementSize);
 			mLength--;
 		}
 	}
@@ -84,7 +84,7 @@ namespace xcore
 			mLength -= 1;
 			if (index < mLength)
 			{
-				x_memcpy(&mArray[index], &mArray[mLength], mElementSize);
+				x_memcpy(&mArray[index * mElementSize], &mArray[mLength * mElementSize], mElementSize);
 			}
 		}
 	}

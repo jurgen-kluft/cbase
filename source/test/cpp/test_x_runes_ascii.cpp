@@ -87,10 +87,14 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 			ascii::crunes str1 = "this is a system string";
 
 			ascii::crunes set1 = "bcde";
-			CHECK_TRUE(ascii::findOneOf(str1, set1) == ascii::crunes("em string"));
+			ascii::crunes found = ascii::findOneOf(str1, set1);
+			found.m_end = str1.m_end;
+			CHECK_TRUE(found == ascii::crunes("em string"));
 
 			ascii::crunes set2 = "BCDE";
-			CHECK_TRUE(ascii::findOneOf(str1, set2, false) == ascii::crunes("em string"));
+			found = ascii::findOneOf(str1, set2, false);
+			found.m_end = str1.m_end;
+			CHECK_TRUE(found == ascii::crunes("em string"));
 		}
 
 		UNITTEST_TEST(replace)

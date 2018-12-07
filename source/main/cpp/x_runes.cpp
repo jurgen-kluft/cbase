@@ -625,13 +625,13 @@ namespace xcore
 		bool contains(runes const& _str, uchar32 _c, bool _casesensitive = true)
 		{
 			runes pos = find(_str, _c, _casesensitive);
-			return pos.is_empty();
+			return !pos.is_empty();
 		}
 
 		bool contains(crunes const& _str, uchar32 _c, bool _casesensitive = true)
 		{
 			crunes pos = find(_str, _c, _casesensitive);
-			return pos.is_empty();
+			return !pos.is_empty();
 		}
 
 		crunes find(crunes const& _str, crunes const& _find, bool _casesensitive)
@@ -930,7 +930,7 @@ namespace xcore
 			{
 				uchar32 lc = *lstr++;
 				uchar32 rc = *rstr++;
-				if (_casesensitive)
+				if (!_casesensitive)
 				{
 					lc = utf32::to_lower(lc);
 					rc = utf32::to_lower(rc);
@@ -1088,7 +1088,7 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		bool is_float(crunes const& _str)
 		{
-			rune   f32chars_str[] = {'E', 'e', '.', '#', 'Q', 'N', 'A', 'B', 'I', 'F'};
+			rune   f32chars_str[] = {'E', 'e', '.', '#', 'Q', 'N', 'A', 'B', 'I', 'F', 0};
 			crunes f32chars(f32chars_str, endof(f32chars_str, NULL));
 
 			pcrune  str = _str.m_str;
@@ -1106,7 +1106,7 @@ namespace xcore
 		//------------------------------------------------------------------------------
 		bool is_GUID(crunes const& _str)
 		{
-			rune   f32chars_str[] = {'E', 'e', '.', '#', 'Q', 'N', 'A', 'B', 'I', 'F'};
+			rune   f32chars_str[] = {'E', 'e', '.', '#', 'Q', 'N', 'A', 'B', 'I', 'F', 0};
 			crunes f32charslen(f32chars_str, endof(f32chars_str, NULL));
 
 			pcrune str = _str.m_str;
@@ -1269,7 +1269,7 @@ namespace xcore
 
 		bool is_delimited(crunes const& _str, uchar32 delimit_left, uchar32 delimit_right)
 		{
-			uchar32 first = last_char(_str);
+			uchar32 first = first_char(_str);
 			if (first == delimit_left)
 			{
 				uchar32 last = last_char(_str);
@@ -1425,10 +1425,12 @@ namespace xcore
 			str.m_end = dst;
 		}
 
-		void replaceSelection(runes& str, crunes const& selection, crunes const& replace)
+		void replaceSelection(runes& _str, crunes const& _selection, crunes const& replace)
 		{
+			runes str = transpose(_str, _selection);
+
 			// The logic here is based on memory copy, we do not consider characters
-			s32 const selected_len = (s32)((xbyte const*)selection.m_end - (xbyte const*)selection.m_str);
+			s32 const selected_len = (s32)((xbyte const*)str.m_end - (xbyte const*)str.m_str);
 			s32 const replace_len  = (s32)((xbyte const*)replace.m_end - (xbyte const*)replace.m_str);
 
 			prune end = NULL;
@@ -1445,7 +1447,7 @@ namespace xcore
 				while (dst > (xbyte*)str.m_end)
 					*dst-- = *src--;
 
-				end = (prune)((xbyte*)str.m_str + selected_len + move_len); // Update str_end
+				end = (prune)((xbyte*)_str.m_end + move_len); // Update str_end
 			}
 			else if (selected_len > replace_len)
 			{
@@ -1456,11 +1458,11 @@ namespace xcore
 				while (src < (xbyte const*)str.m_eos)
 					*dst++ = *src++;
 
-				end = (prune)((xbyte*)str.m_str + selected_len - move_len); // Update str_end
+				end = (prune)((xbyte*)_str.m_end - move_len); // Update str_end
 			}
 			else
 			{
-				end = (prune)(str.m_str + selected_len);
+				end = (prune)(_str.m_end);
 			}
 
 			// Replace
@@ -1470,7 +1472,7 @@ namespace xcore
 			while (src < src_end)
 				*dst++ = *src++;
 
-			str.m_end = end;
+			_str.m_end = end;
 		}
 
 		static inline bool isIn(runes const& str, crunes const& selection) { return (selection.m_str >= str.m_str && selection.m_str < str.m_end && selection.m_end <= str.m_end); }
@@ -1775,13 +1777,13 @@ namespace xcore
 		bool contains(runes const& _str, uchar32 _c, bool _casesensitive = true)
 		{
 			runes pos = find(_str, _c, _casesensitive);
-			return pos.is_empty();
+			return !pos.is_empty();
 		}
 
 		bool contains(crunes const& _str, uchar32 _c, bool _casesensitive = true)
 		{
 			crunes pos = find(_str, _c, _casesensitive);
-			return pos.is_empty();
+			return !pos.is_empty();
 		}
 
 		crunes find(crunes const& _str, crunes const& _find, bool _casesensitive)
@@ -2079,7 +2081,7 @@ namespace xcore
 			{
 				uchar32 lc = *lstr++;
 				uchar32 rc = *rstr++;
-				if (_casesensitive)
+				if (!_casesensitive)
 				{
 					lc = to_lower(lc);
 					rc = to_lower(rc);
@@ -2417,7 +2419,7 @@ namespace xcore
 
 		bool is_delimited(crunes const& _str, uchar32 delimit_left, uchar32 delimit_right)
 		{
-			uchar32 first = last_char(_str);
+			uchar32 first = first_char(_str);
 			if (first == delimit_left)
 			{
 				uchar32 last = last_char(_str);

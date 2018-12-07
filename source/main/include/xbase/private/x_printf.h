@@ -791,7 +791,11 @@ namespace xcore
 			, mEnd(str_end) 
 		{ 
 			if (mEnd == NULL) 
-				mEnd = utf32::endof(mStr, NULL);
+			{
+				mEnd = mStr;
+				while (*mEnd != '\0')
+					++mEnd;
+			}
 		}
 
 		virtual uchar32	Peek()
