@@ -1,3 +1,6 @@
+#ifndef __X_BASE_TARGET_H__
+#define __X_BASE_TARGET_H__
+
 // Author:
 //     Virtuos Games
 // Summary:
@@ -166,12 +169,6 @@
 // ---------------------------------------------------------------------------------
 // 
 
-#ifndef __XBASE_TARGET_H__
-#define __XBASE_TARGET_H__
-
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	// Hardware enumeration
