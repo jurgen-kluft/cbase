@@ -331,6 +331,15 @@ namespace xcore
 			};
 			rune m_str[SIZE];
 			inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
+			inline runez(const char* str) : runes(m_str, m_str, &m_str[SIZE - 1])
+			{
+				m_str[SIZE - 1] = 0;
+				while (*str != '\0' && m_str < m_eos)
+				{
+					*m_end++ = *str;
+				}
+				*m_end = '\0';
+			}
 		};
 
 		class alloc
@@ -661,6 +670,8 @@ namespace xcore
 		runes selectUntilEndExcludeSelection(const runes& inStr, const runes& inSelection);
 		runes selectUntilEndIncludeSelection(const runes& inStr, const runes& inSelection);
 
+		runes selectOverlap(const runes& inStr, const runes& inSelection, runes& outRemainder);
+
 		s32 compare(crunes const& str1, crunes const& str2, bool inCaseSensitive = true);
 
 		crunes parse(crunes const& str, bool& value);
@@ -766,6 +777,8 @@ namespace xcore
 		void concatenate(runes& str, const crunes& concat);
 		void concatenate(runes& str, const crunes& concat, alloc* allocator, s32 size_alignment);
 		void concatenate(runes& str, const crunes& concat1, const crunes& concat2, alloc* allocator, s32 size_alignment);
+
+		inline bool operator == (const runes& lhs, const runes& rhs) { return compare(lhs, rhs) == 0; }
 
 	}; // namespace utf32
 

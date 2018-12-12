@@ -110,8 +110,8 @@ namespace xcore
 		explicit				x_va(f32 inVar) : mType(TYPE_FLOAT32)				{ *(f32*)mArg = inVar; }
 		explicit				x_va(f64 inVar) : mType(TYPE_FLOAT64)				{ *(f64*)mArg = inVar; }
 		explicit				x_va(const char* inVar);
-		explicit				x_va(ascii::crunes& str);
-		explicit				x_va(utf32::crunes& str);
+		explicit				x_va(ascii::crunes const& str);
+		explicit				x_va(utf32::crunes const& str);
 
 		EType					type() const										{ return (EType)mType; }
 

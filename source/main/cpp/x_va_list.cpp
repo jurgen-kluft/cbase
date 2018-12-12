@@ -26,13 +26,13 @@ namespace xcore
 		*(ascii::crunes*)mArg = ascii::crunes(inVar, ascii::endof(inVar, NULL));
 	}
 
-	x_va::x_va(ascii::crunes& str)
+	x_va::x_va(ascii::crunes const& str)
 		: mType(TYPE_PCTCHAR) 
 	{
 		*(ascii::crunes*)mArg = str;
 	}
 
-	x_va::x_va(utf32::crunes& str)
+	x_va::x_va(utf32::crunes const& str)
 		: mType(TYPE_PCTCHAR) 
 	{ 
 		*(utf32::crunes*)mArg = str;
