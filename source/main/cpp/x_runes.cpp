@@ -350,7 +350,46 @@ namespace xcore
 			return false;
 		}
 
-		void copy(ascii::crunes const& sstr, ascii::runes& dstr, ETermType term_type)
+		// const char* -> ascii / utf16 / utf32
+		void copy(char const* sstr, ascii::runes& dstr, bool write_terminator)
+		{
+			while (*sstr != '\0')
+			{
+				uchar32 c = *sstr++;
+				if (!write(c, dstr))
+					break;
+			}
+			if (write_terminator)
+				write('\0', dstr);
+		}
+
+		void copy(char const* sstr, utf16::runes& dstr, bool write_terminator)
+		{
+			while (*sstr != '\0')
+			{
+				uchar32 c = *sstr++;
+				if (!write(c, dstr))
+					break;
+			}
+			if (write_terminator)
+				write('\0', dstr);
+		}
+
+		void copy(char const* sstr, utf32::runes& dstr, bool write_terminator)
+		{
+			while (*sstr != '\0')
+			{
+				uchar32 c = *sstr++;
+				if (!write(c, dstr))
+					break;
+			}
+			if (write_terminator)
+				write('\0', dstr);
+		}
+
+		// -> ASCII
+
+		void copy(ascii::crunes const& sstr, ascii::runes& dstr, bool write_terminator)
 		{
 			ascii::crunes src = sstr;
 			while (can_read(src))
@@ -359,11 +398,24 @@ namespace xcore
 				if (!write(c, dstr))
 					break;
 			}
-			if (term_type == TERMINATOR_WRITE)
+			if (write_terminator)
 				write('\0', dstr);
 		}
 
-		void copy(utf32::crunes const& sstr, ascii::runes& dstr, ETermType term_type)
+		void copy(utf16::crunes const& sstr, ascii::runes& dstr, bool write_terminator)
+		{
+			utf16::crunes src = sstr;
+			while (can_read(src))
+			{
+				uchar32 c = read(src);
+				if (!write(c, dstr))
+					break;
+			}
+			if (write_terminator)
+				write('\0', dstr);
+		}
+
+		void copy(utf32::crunes const& sstr, ascii::runes& dstr, bool write_terminator)
 		{
 			utf32::crunes src = sstr;
 			while (can_read(src))
@@ -372,11 +424,13 @@ namespace xcore
 				if (!write(c, dstr))
 					break;
 			}
-			if (term_type == TERMINATOR_WRITE)
+			if (write_terminator)
 				write('\0', dstr);
 		}
 
-		void copy(ascii::crunes const& sstr, utf32::runes& dstr, ETermType term_type)
+		// -> UTF-16
+
+		void copy(ascii::crunes const& sstr, utf16::runes& dstr, bool write_terminator)
 		{
 			ascii::crunes src = sstr;
 			while (can_read(src))
@@ -385,11 +439,67 @@ namespace xcore
 				if (!write(c, dstr))
 					break;
 			}
-			if (term_type == TERMINATOR_WRITE)
+			if (write_terminator)
 				write('\0', dstr);
 		}
 
-		void copy(utf32::crunes const& sstr, utf32::runes& dstr, ETermType term_type)
+		void copy(utf16::crunes const& sstr, utf16::runes& dstr, bool write_terminator)
+		{
+			utf16::crunes src = sstr;
+			while (can_read(src))
+			{
+				uchar32 c = read(src);
+				if (!write(c, dstr))
+					break;
+			}
+			if (write_terminator)
+				write('\0', dstr);
+		}
+
+		void copy(utf32::crunes const& sstr, utf16::runes& dstr, bool write_terminator)
+		{
+			utf32::crunes src = sstr;
+			while (can_read(src))
+			{
+				uchar32 c = read(src);
+				if (!write(c, dstr))
+					break;
+			}
+			if (write_terminator)
+				write('\0', dstr);
+		}
+
+		// -> UTF-32
+
+		void copy(ascii::crunes const& sstr, utf32::runes& dstr, bool write_terminator)
+		{
+			ascii::crunes src = sstr;
+			while (can_read(src))
+			{
+				uchar32 c = read(src);
+				if (!write(c, dstr))
+					break;
+			}
+			if (write_terminator)
+				write('\0', dstr);
+		}
+
+		void copy(utf16::crunes const& sstr, utf32::runes& dstr, bool write_terminator)
+		{
+			utf16::crunes src = sstr;
+			while (true)
+			{
+				uchar32 c = read(src);
+				if (c == '\0')
+					break;
+				if (!write(c, dstr))
+					break;
+			}
+			if (write_terminator)
+				write('\0', dstr);
+		}
+
+		void copy(utf32::crunes const& sstr, utf32::runes& dstr, bool write_terminator)
 		{
 			utf32::crunes src = sstr;
 			while (true)
@@ -400,7 +510,7 @@ namespace xcore
 				if (!write(c, dstr))
 					break;
 			}
-			if (term_type == TERMINATOR_WRITE)
+			if (write_terminator)
 				write('\0', dstr);
 		}
 

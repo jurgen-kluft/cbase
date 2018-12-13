@@ -228,7 +228,23 @@ namespace xcore
         struct crunes
         {
             inline crunes() : m_str(nullptr), m_end(nullptr) {}
-            inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
+
+            inline crunes(pcrune _str) : m_str(_str), m_end(_str)
+            {
+                while (*m_end != '\0')
+                    ++m_end;
+            }
+
+			inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end)
+            {
+                if (m_end == nullptr)
+                {
+                    m_end = m_str;
+                    while (*m_end != '\0')
+                        ++m_end;
+                }
+            }
+
             inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
             inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
             s32  size() const { return (s32)(m_end - m_str); }
@@ -290,7 +306,8 @@ namespace xcore
             s32  size() const { return (s32)(m_end - m_str); }
             s32  cap() const { return (s32)(m_eos - m_str); }
             bool is_empty() const { return m_str == m_end; }
-            void clear()
+            
+			void clear()
             {
                 if (m_str != nullptr)
                 {
@@ -306,6 +323,7 @@ namespace xcore
                 m_eos = other.m_eos;
                 return *this;
             }
+
             prune  m_str;
             prune  m_end;
             pcrune m_eos;
@@ -319,7 +337,8 @@ namespace xcore
 
             s32  size() const { return (s32)(m_end - m_str); }
             bool is_empty() const { return m_str == m_end; }
-            void clear()
+            
+			void clear()
             {
                 m_str = (pcrune) "\0\0\0\0";
                 m_end = m_str;
@@ -331,7 +350,8 @@ namespace xcore
                 m_end = other.m_end;
                 return *this;
             }
-            pcrune m_str;
+            
+			pcrune m_str;
             pcrune m_end;
         };
         template <s32 L> class runez : public runes
@@ -343,6 +363,15 @@ namespace xcore
             };
             rune m_str[SIZE];
             inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
+            inline runez(const char* str) : runes(m_str, m_str, &m_str[SIZE - 1])
+            {
+                m_str[SIZE - 1] = 0;
+                while (*str != '\0' && m_str < m_eos)
+                {
+                    *m_end++ = *str;
+                }
+                *m_end = '\0';
+            }
         };
 
         class alloc
@@ -364,12 +393,6 @@ namespace xcore
     // ASCII, UTF-8, UTF-16, UTF-32 conversions
     namespace utf
     {
-        enum ETermType
-        {
-            TERMINATOR_NONE  = 0,
-            TERMINATOR_WRITE = 1
-        };
-
         uchar32 peek(ascii::crunes const& str);
         uchar32 peek(utf8::crunes const& str);
         uchar32 peek(utf16::crunes const& str);
@@ -400,11 +423,21 @@ namespace xcore
         bool write(uchar32 c, utf16::runes& str);
         bool write(uchar32 c, utf32::runes& str);
 
-        void copy(ascii::crunes const& sstr, ascii::runes& dstr, ETermType term_type = TERMINATOR_WRITE);
-        void copy(utf32::crunes const& sstr, ascii::runes& dstr, ETermType term_type = TERMINATOR_WRITE);
+        void copy(char const* sstr, ascii::runes& dstr, bool write_terminator = true);
+        void copy(char const* sstr, utf16::runes& dstr, bool write_terminator = true);
+        void copy(char const* sstr, utf32::runes& dstr, bool write_terminator = true);
 
-        void copy(ascii::crunes const& sstr, utf32::runes& dstr, ETermType term_type = TERMINATOR_WRITE);
-        void copy(utf32::crunes const& sstr, utf32::runes& dstr, ETermType term_type = TERMINATOR_WRITE);
+        void copy(ascii::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
+        void copy(utf16::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
+        void copy(utf32::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
+
+        void copy(ascii::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
+        void copy(utf16::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
+        void copy(utf32::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
+
+        void copy(ascii::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
+        void copy(utf16::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
+        void copy(utf32::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
 
         s32 size(uchar32 c);
 
