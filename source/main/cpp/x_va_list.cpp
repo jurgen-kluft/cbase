@@ -62,7 +62,7 @@ namespace xcore
 		} break;
 		case TYPE_PCUCHAR32:
 		{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
-			utf::copy(ch, str, utf::TERMINATOR_WRITE);
+			utf::copy(ch, str);
 		} break;
 		default:
 			break; // Fall through
@@ -89,11 +89,11 @@ namespace xcore
 		case TYPE_FLOAT64: { f64 v = (*(f64*)mArg); utf32::to_string(str, v); } break;
 		case TYPE_PCTCHAR:
 		{	ascii::crunes const& ch = *(ascii::crunes const*)mArg;
-			utf::copy(ch, str, utf::TERMINATOR_WRITE);
+			utf::copy(ch, str);
 		} break;
 		case TYPE_PCUCHAR32:
 		{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
-			utf::copy(ch, str, utf::TERMINATOR_WRITE);
+			utf::copy(ch, str);
 		} break;
 		default:
 			break; // Fall through

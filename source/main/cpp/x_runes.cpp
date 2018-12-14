@@ -207,6 +207,8 @@ namespace xcore
 
 		uchar32 read(utf8::crunes& str) { return read(str.m_str, str.m_end); }
 
+		uchar32 read(utf16::crunes& str) { return read(str.m_str, str.m_end); }
+
 		uchar32 read(utf32::crunes& str) { return read(str.m_str, str.m_end); }
 
 		// ####### WRITE ########
@@ -319,6 +321,17 @@ namespace xcore
 		}
 
 		bool write(uchar32 c, utf8::runes& dst)
+		{
+			if (can_write(dst))
+			{
+				write(c, dst.m_end, dst.m_eos);
+				dst.m_end = dst.m_end;
+				return true;
+			}
+			return false;
+		}
+
+		bool write(uchar32 c, utf16::runes& dst)
 		{
 			if (can_write(dst))
 			{
@@ -566,6 +579,13 @@ namespace xcore
 			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
+		bool can_read(utf16::runes const& str)
+		{
+			if (str.m_end == nullptr)
+				return str.m_str[0] != '\0';
+			return str.m_str < str.m_end && str.m_str[0] != '\0';
+		}
+
 		bool can_read(utf32::runes const& str)
 		{
 			if (str.m_end == nullptr)
@@ -587,6 +607,13 @@ namespace xcore
 			return str.m_str < str.m_end && str.m_str[0] != '\0';
 		}
 
+		bool can_read(utf16::crunes const& str)
+		{
+			if (str.m_end == nullptr)
+				return str.m_str[0] != '\0';
+			return str.m_str < str.m_end && str.m_str[0] != '\0';
+		}
+
 		bool can_read(utf32::crunes const& str)
 		{
 			if (str.m_end == nullptr)
@@ -601,6 +628,12 @@ namespace xcore
 		}
 
 		bool can_write(utf8::runes const& str)
+		{
+			ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
+			return str.m_end < str.m_eos;
+		}
+
+		bool can_write(utf16::runes const& str)
 		{
 			ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
 			return str.m_end < str.m_eos;
