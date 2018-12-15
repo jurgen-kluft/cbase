@@ -1,8 +1,6 @@
 #ifndef __X_BASE_TARGET_H__
 #define __X_BASE_TARGET_H__
 
-// Author:
-//     Virtuos Games
 // Summary:
 //     This file assists with cross platform development by
 //     providing a standard set of platform definitions with

@@ -25,7 +25,6 @@ namespace xcore
 
 	/**
 	* @class xlocal_static_instantiation
-	* @author Virtuos
 	* @date <2011-02-16T17:57:45-0400>
 	* @version 2.2.0 
 	*
@@ -65,7 +64,6 @@ namespace xcore
 	
 	/**
 	* @class xheap_instantiation
-	* @author Virtuos
 	* @date <2011-02-16T17:57:45-0400>
 	* @version 2.2.0
 	*
@@ -107,7 +105,6 @@ namespace xcore
 
 	/**
 	* @class xsingleton
-	* @author Virtuos
 	* @date <2011-02-16T17:57:45-0400>
 	* @version 2.2.0 
 	*

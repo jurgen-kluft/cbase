@@ -250,8 +250,6 @@ inline u32        xror32(u32 inInteger, u32 shift)
 
 /**
  *  MACROS
- *  Author:
- *     Virtuos Games
  *  Summary:
  *     convert from constant binary to u32 Example: X_Bin8( 111 ) == 7
  *  Description:
@@ -270,8 +268,6 @@ inline u32        xror32(u32 inInteger, u32 shift)
 
 
 /**
- * Author:
- *     Virtuos Games
  * Summary:
  *     This function is design to convert a number to an align power of 2.
  * Arguments:
@@ -287,8 +283,6 @@ inline u32        xror32(u32 inInteger, u32 shift)
 template< class T > T xalign( T addr, s32 alignTo );
 
 /**
- * Author:
- *     Virtuos Games
  * Summary:
  *     This function is design to convert a number to an align power of 2.
  * Arguments:
@@ -305,8 +299,6 @@ template< class T > T xalign_floor(T addr, s32 alignTo);
 
 
 /**
- * Author:
- *     Virtuos Games
  * Summary:
  *     This macro checks whether a number is align to a power of 2.
  * Arguments:
@@ -322,8 +314,6 @@ template< class T > xbool xaligned( T addr, s32 alignTo );
 
 
 /**
- * Author:
- *     Virtuos Games
  * Summary:
  *     This macro is used to turn a bit on.
  * Arguments:
@@ -338,8 +328,6 @@ template< class T > xbool xaligned( T addr, s32 alignTo );
 
  /** Summary:
  *     It is a function used to test whether an integer number is a power of two.
- * Author:
- *     Virtuos Games
  * Arguments:
  *     N    - Test if a number is a power of two.
  * Returns:

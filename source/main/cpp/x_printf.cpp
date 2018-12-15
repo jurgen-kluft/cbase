@@ -652,8 +652,6 @@ namespace xcore
 
 	/**
 	 *------------------------------------------------------------------------------
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     write a string formatted output into a buffer.
 	 * Arguments:

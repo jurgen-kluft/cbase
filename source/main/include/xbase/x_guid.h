@@ -13,8 +13,6 @@
 namespace xcore
 {
 	/**
-	 * Author:
-	 *     Virtuos
 	 * Note: For a generator, take a look here http://cvs.ossp.org/dir?d=ossp-pkg/uuid
 	 * Description:
 	 *     This class described a 128bit guid. The guid is not created here, this is
@@ -58,20 +56,8 @@ namespace xcore
 		guid_t		mGuid;
 	};
 
-	/**
-	 * INCLUDE THE INLINE FUNCTIONS
-	 */
 	#include "private/x_guid_inline.h"
 
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
-/**
- *  END xCore namespace
- */
 
-//==============================================================================
-// END
-//==============================================================================
 #endif

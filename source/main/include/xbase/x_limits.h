@@ -11,15 +11,8 @@
 #include "xbase/x_debug.h"
 
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
-	/**
-	 *  MACROS  
-	 */
-
 	#define X_U8_MIN                      (0)
 	#define X_U8_MAX                      (255)                               
 
@@ -58,8 +51,6 @@ namespace xcore
 
 
 	/**
-	 * Author:
-	 *     Virtuos Games
 	 * Description:
 	 *     class xlimits is a template class, which use the C++ class template specialization. 
 	 *     The idea of C++ class template specialization is similar to function template
@@ -186,12 +177,6 @@ namespace xcore
 		static xtype maximum() { return X_F64_MAX; }
 	};
 
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
-/**
- *  END xCore namespace
- */
 
 #endif ///< END __XBASE_LIMITS_H__

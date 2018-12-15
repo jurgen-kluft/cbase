@@ -90,8 +90,6 @@ namespace xcore
 
 	/**
 	 *------------------------------------------------------------------------------
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     atod64          - Converts a string value to integer base from a particular
 	 * Arguments:

@@ -36,8 +36,6 @@ namespace xcore
 
 
 	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
 	// Summary:
 	//     Main assert handler.
 	// Arguments:
@@ -73,8 +71,6 @@ namespace xcore
 	#endif
 
 	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
 	// Summary:
 	//     Stop the program with a break point.
 	// Description:
@@ -105,8 +101,6 @@ namespace xcore
 	#endif
 
 	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
 	// Summary:
 	//     Sets a XNOP operation in the code assembly.
 	// Description:

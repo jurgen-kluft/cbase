@@ -59,8 +59,6 @@ namespace xcore
 
 	/**
      *------------------------------------------------------------------------------
-	 * Author:
-	 *     Virtuos
 	 * Arguments:
 	 *     strGuid - use this string to generate new GUID
 	 * Returns:

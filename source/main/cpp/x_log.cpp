@@ -240,8 +240,6 @@ namespace xcore
 
     /**
      *------------------------------------------------------------------------------
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     Output log message.
 	 * Arguments:
@@ -283,8 +281,6 @@ namespace xcore
 
 	/**
      *------------------------------------------------------------------------------
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     Output log warning.
 	 * Arguments:
@@ -326,8 +322,6 @@ namespace xcore
 
     /**
      *------------------------------------------------------------------------------
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     Output log error.
 	 * Arguments:
@@ -376,8 +370,6 @@ namespace xcore
 
     /**
      *------------------------------------------------------------------------------
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     Log flush into debug local.
 	 * Arguments:

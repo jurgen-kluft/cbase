@@ -9,7 +9,6 @@ namespace xcore
 {
 	/**
 	* @class xnoncopyable
-	* @author Virtuos
 	* @date <2011-10-14T13:36:00-0800>
 	* @version 1.0.0
 	*

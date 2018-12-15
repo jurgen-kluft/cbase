@@ -10,14 +10,9 @@
 //==============================================================================
 #include "xbase/x_debug.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	/**
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     Function swaps the endian of a given atomic type. There is one function per type.
 	 * Arguments:
@@ -67,8 +62,6 @@ namespace xcore
 	namespace x_endian = x_endian_swap;
 
 	/**
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     This macro returns the number/variable converted into intels endian.
 	 * Description:
@@ -84,8 +77,6 @@ namespace xcore
 	#endif
 
 	/**
-	 * Author:
-	 *     Virtuos Games
 	 * Summary:
 	 *     This macro returns the number/variable converted into network endian.
 	 * Description:
@@ -101,12 +92,6 @@ namespace xcore
 	#endif
 
 
-//==============================================================================
-// END xCore namespace
-//==============================================================================
 };
-/**
- *  END xCore namespace
- */
 
 #endif ///< END __XBASE_ENDIAN_H__

@@ -41,8 +41,6 @@ namespace xcore
 	
 
 	//------------------------------------------------------------------------------
-	// Author:
-	//     Virtuos Games
 	// Summary:
 	//     PRIVATE XBASE FUNCTION. IGNORE IGNORE.
 	// Arguments:
