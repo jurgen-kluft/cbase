@@ -2,22 +2,22 @@
 
 ## xcode
 
-~~Support Tundra build system~~
+~~Support Tundra build system~~ DONE
 
 ## xbase
 
-~~Split of containers into xcore/xgenerics~~
+~~Split of containers into xcore/xgenerics~~ DONE
 
 Simplify the whole string usage, currently we have code to handle ascii/utf8/utf16/utf32. Can we just use utf32 and remove all other code except the conversion from/to. Console, Log, printf/sprintf, sscanf etc.. should all just use a standard low-level string container that is utf32. It doesn't matter if there is dynamic allocation.
   
 ## xcore (typeless/raw containers)
 
-- ~~list~~
-- ~~array~~
-- ~~stack~~
-- ~~queue~~
-- ~~tree~~
-- <https://code.google.com/archive/p/cpp-btree/>
+- ~~list~~ DONE
+- ~~array~~ DONE
+- ~~stack~~ DONE
+- ~~queue~~ DONE
+- ~~tree~~ DONE
+- custom trie-tree map
 
 ## xgenerics
 
@@ -26,11 +26,11 @@ Simplify the whole string usage, currently we have code to handle ascii/utf8/utf
 - ``stack<T>``
 - ``queue<T>``
 - ``map<K,V>``
-- <https://code.google.com/archive/p/cpp-btree/>
+- custom trie-tree map
 
 ## xstring
 
-string class (utf32)
+string class (utf32) (Alpha version)
 
 ## xallocator
 
@@ -46,13 +46,18 @@ Just a simple interface here and a couple of hash candidates. This is just hashi
 
 ## xmerkle
 
-Utilities to constract, update use merkle trees.
+Utilities to construct, update use merkle trees.
 
 ## xcrypto (AES)
+
+AES-256
 
 ## xrandom
 
 A couple of random number generators
+
+- mersenne twister
+- and ?
 
 ## xtime
 
@@ -64,8 +69,7 @@ We need to redesign this a bit by limiting the feature set, design can consider 
 
 - xfile, xdir
 - xfileinfo, xdirinfo
-- xfilepath
-- xdirpath
+- xfilepath, xdirpath
 
 ## xmemory
 
@@ -107,9 +111,11 @@ trim down to the bare minimum, remove the ugly opt library.
 
 ## xlocal
 
-Location to support many languages easily in your apps.
+Localization to support many languages easily in an app.
 
-​- localization based on IDs
-- compression of strings
+1. localization
+2. string compression
 
 ## end
+
+that's it...
