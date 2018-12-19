@@ -47,13 +47,13 @@ namespace xcore
         };
         struct crunes
         {
-            inline crunes() : m_str(nullptr), m_end(nullptr) {}
-            inline crunes(pcrune _str) : m_str(_str), m_end(_str)
+            inline crunes() : m_str(nullptr), m_cur(nullptr), m_end(nullptr) {}
+            inline crunes(pcrune _str) : m_str(_str), m_cur(_str), m_end(_str)
             {
                 while (*m_end != '\0')
                     ++m_end;
             }
-            inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end)
+            inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_cur(_str), m_end(_end)
             {
                 if (m_end == nullptr)
                 {
@@ -62,22 +62,30 @@ namespace xcore
                         ++m_end;
                 }
             }
-            inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
-            inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
+            inline crunes(runes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
+            inline crunes(crunes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
             s32  size() const { return (s32)(m_end - m_str); }
+			bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
             bool is_empty() const { return m_str == m_end; }
+            void reset()
+            {
+				m_cur = m_str;
+			}
             void clear()
             {
                 m_str = "";
+				m_cur = m_str;
                 m_end = m_str;
             }
             crunes& operator=(crunes const& other)
             {
                 m_str = other.m_str;
+                m_cur = other.m_cur;
                 m_end = other.m_end;
                 return *this;
             }
             pcrune m_str;
+			pcrune m_cur;
             pcrune m_end;
         };
 
@@ -227,15 +235,13 @@ namespace xcore
         };
         struct crunes
         {
-            inline crunes() : m_str(nullptr), m_end(nullptr) {}
-
-            inline crunes(pcrune _str) : m_str(_str), m_end(_str)
+            inline crunes() : m_str(nullptr), m_cur(nullptr), m_end(nullptr) {}
+            inline crunes(pcrune _str) : m_str(_str), m_cur(_str), m_end(_str)
             {
                 while (*m_end != '\0')
                     ++m_end;
             }
-
-			inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end)
+            inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_cur(_str), m_end(_end)
             {
                 if (m_end == nullptr)
                 {
@@ -244,24 +250,25 @@ namespace xcore
                         ++m_end;
                 }
             }
-
-            inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
-            inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
+            inline crunes(runes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
+            inline crunes(crunes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
             s32  size() const { return (s32)(m_end - m_str); }
             bool is_empty() const { return m_str == m_end; }
             void clear()
             {
-                m_str = (pcrune) "\0\0\0\0";
+                m_str = (pcrune)"\0\0\0\0";
+				m_cur = m_str;
                 m_end = m_str;
             }
-
             crunes& operator=(crunes const& other)
             {
                 m_str = other.m_str;
+                m_cur = other.m_cur;
                 m_end = other.m_end;
                 return *this;
             }
             pcrune m_str;
+			pcrune m_cur;
             pcrune m_end;
         };
         template <s32 L> class runez : public runes
@@ -330,28 +337,45 @@ namespace xcore
         };
         struct crunes
         {
-            inline crunes() : m_str(nullptr), m_end(nullptr) {}
-            inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
-            inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
-            inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
-
-            s32  size() const { return (s32)(m_end - m_str); }
-            bool is_empty() const { return m_str == m_end; }
-            
-			void clear()
+            inline crunes() : m_str(nullptr), m_cur(nullptr), m_end(nullptr) {}
+            inline crunes(pcrune _str) : m_str(_str), m_cur(_str), m_end(_str)
             {
-                m_str = (pcrune) "\0\0\0\0";
+                while (*m_end != '\0')
+                    ++m_end;
+            }
+            inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_cur(_str), m_end(_end)
+            {
+                if (m_end == nullptr)
+                {
+                    m_end = m_str;
+                    while (*m_end != '\0')
+                        ++m_end;
+                }
+            }
+            inline crunes(runes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
+            inline crunes(crunes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
+            s32  size() const { return (s32)(m_end - m_str); }
+			bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
+            bool is_empty() const { return m_str == m_end; }
+            void reset()
+            {
+				m_cur = m_str;
+            }
+            void clear()
+            {
+                m_str = (pcrune)"\0\0\0\0";
+				m_cur = m_str;
                 m_end = m_str;
             }
-
             crunes& operator=(crunes const& other)
             {
                 m_str = other.m_str;
+                m_cur = other.m_cur;
                 m_end = other.m_end;
                 return *this;
             }
-            
-			pcrune m_str;
+            pcrune m_str;
+			pcrune m_cur;
             pcrune m_end;
         };
         template <s32 L> class runez : public runes
