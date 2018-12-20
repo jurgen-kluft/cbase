@@ -26,6 +26,11 @@ namespace xcore
             s32  size() const { return (s32)(m_end - m_str); }
             s32  cap() const { return (s32)(m_eos - m_str); }
             bool is_empty() const { return m_str == m_end; }
+			bool is_valid() const { return m_str != nullptr && m_end < m_eos; }
+            void reset()
+            {
+				m_end = m_str;
+			}
             void clear()
             {
                 if (m_str != nullptr)
@@ -64,7 +69,7 @@ namespace xcore
             }
             inline crunes(runes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
             inline crunes(crunes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
-            s32  size() const { return (s32)(m_end - m_str); }
+            s64  size() const { return (s64)(m_end - m_str); }
 			bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
             bool is_empty() const { return m_str == m_end; }
             void reset()
@@ -313,7 +318,12 @@ namespace xcore
             s32  size() const { return (s32)(m_end - m_str); }
             s32  cap() const { return (s32)(m_eos - m_str); }
             bool is_empty() const { return m_str == m_end; }
+			bool is_valid() const { return m_str != nullptr && m_end < m_eos; }
             
+            void reset()
+            {
+				m_end = m_str;
+			}
 			void clear()
             {
                 if (m_str != nullptr)
@@ -496,7 +506,7 @@ namespace xcore
 
     namespace ascii
     {
-        inline s32 size(crunes const& _str) { return _str.size(); }
+        inline s64 size(crunes const& _str) { return _str.size(); }
 
         inline prune endof(prune str, pcrune eos)
         {
