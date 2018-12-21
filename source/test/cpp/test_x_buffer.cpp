@@ -61,8 +61,6 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 
 			xbinary_reader reader= (buffer.reader());
 			
-			CHECK_EQUAL(16, reader.skip(16));
-
 			bool the_bool;
 			u8  the_u8 ;
 			s8  the_s8 ;
@@ -75,17 +73,18 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 			f32 the_f32;
 			f64 the_f64;
 
-			reader.read(the_bool);
-			reader.read(the_u8);
-			reader.read(the_s8);
-			reader.read(the_u16);
-			reader.read(the_s16);
-			reader.read(the_u32);
-			reader.read(the_s32);
-			reader.read(the_u64);
-			reader.read(the_s64);
-			reader.read(the_f32);
-			reader.read(the_f64);
+			CHECK_EQUAL(16,reader.skip(16));
+			CHECK_EQUAL(1, reader.read(the_bool));
+			CHECK_EQUAL(1, reader.read(the_u8));
+			CHECK_EQUAL(1, reader.read(the_s8));
+			CHECK_EQUAL(2, reader.read(the_u16));
+			CHECK_EQUAL(2, reader.read(the_s16));
+			CHECK_EQUAL(4, reader.read(the_u32));
+			CHECK_EQUAL(4, reader.read(the_s32));
+			CHECK_EQUAL(8, reader.read(the_u64));
+			CHECK_EQUAL(8, reader.read(the_s64));
+			CHECK_EQUAL(4, reader.read(the_f32));
+			CHECK_EQUAL(8, reader.read(the_f64));
 
 			CHECK_EQUAL(false, the_bool);
 			CHECK_EQUAL(1, the_u8);
