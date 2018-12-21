@@ -13,9 +13,6 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_runes.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	class xconsole_out_macos : public xconsole::xout
@@ -97,8 +94,5 @@ namespace xcore
 	}
 
 };
-/**
- *  END xCore namespace
- */
 
 #endif

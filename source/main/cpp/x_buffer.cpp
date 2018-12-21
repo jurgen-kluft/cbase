@@ -65,12 +65,14 @@ namespace xcore
 		cursor_ = 0;
 	}
 
-	void				xbinary_reader::skip(s32 c)
+	u32				xbinary_reader::skip(s32 c)
 	{
 		if (_can_read(len_, cursor_, c))
 		{
 			cursor_ += c;
+			return (u32)c;
 		}
+		return 0;
 	}
 
 	u32					xbinary_reader::read(bool& b)
@@ -297,12 +299,14 @@ namespace xcore
 		cursor_ = 0;
 	}
 
-	void				xbinary_writer::skip(s32 c)
+	u32				xbinary_writer::skip(s32 c)
 	{
 		if (_can_write(len_, cursor_, c))
 		{
 			cursor_ += c;
+			return (u32)c;
 		}
+		return 0;
 	}
 
 	u32					xbinary_writer::write(bool b)

@@ -106,7 +106,7 @@ namespace xcore
 		bool                can_read(u32 number_of_bytes) const;        // check if we still can read n number of bytes
 
 		void                reset();
-		void                skip(s32);
+		u32                 skip(s32);
 
 		u32                 read(bool&);
 		u32                 read(u8&);
@@ -134,8 +134,8 @@ namespace xcore
 	class xbinary_writer
 	{
 	public:
-		inline              xbinary_writer() : cursor_(0), buffer_() { }
-		inline              xbinary_writer(xbyte* _buffer, u32 _len) : cursor_(0), buffer_(_buffer) { }
+		inline              xbinary_writer() : len_(0), cursor_(0), buffer_() { }
+		inline              xbinary_writer(xbyte* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) { }
 
 		u32                 size() const;
 		u32                 len() const;
@@ -146,7 +146,7 @@ namespace xcore
 		bool                can_write(u32 num_bytes = 0) const;
 
 		void                reset();
-		void                skip(s32);
+		u32                 skip(s32);
 
 		u32                 write(bool);
 		u32                 write(u8);

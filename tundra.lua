@@ -6,10 +6,10 @@ Build {
 	Env = {
 		CPPDEFS = {
 			{ "TARGET_PC", "PLATFORM_64BIT"; Config = "win64-*-*-*" },
-			{ "TARGET_MAC", "PLATFORM_64BIT"; Config = "macosx-*-*-*" },
-			{ "TARGET_DEV_DEBUG"; Config = "*-*-debug-*" },
-			{ "TARGET_DEV_RELEASE"; Config = "*-*-release-*" },
-			{ "TARGET_TEST"; Config = "*-*-*-test" },
+			{ "TARGET_MAC_DEV_DEBUG", "TARGET_MAC", "PLATFORM_64BIT"; Config = "macosx-*-debug-dev" },
+			{ "TARGET_MAC_DEV_RELEASE", "TARGET_MAC", "PLATFORM_64BIT"; Config = "macosx-*-release-dev" },
+			{ "TARGET_MAC_TEST_DEBUG", "TARGET_MAC", "PLATFORM_64BIT"; Config = "macosx-*-debug-test" },
+			{ "TARGET_MAC_TEST_RELEASE", "TARGET_MAC", "PLATFORM_64BIT"; Config = "macosx-*-release-test" },
 		},
 	},
 	Units = function ()
@@ -29,26 +29,26 @@ Build {
 			Name = "xentry",
 			Config = "*-*-*-*",
 			Sources = { SourceGlob("../xentry/source/main/cpp") },
-			Includes = { "..//xentry/source/main/include" },
+			Includes = { "../xentry/source/main/include" },
 		}
 		local xbase_library = StaticLibrary {
 			Name = "xbase",
 			Config = "*-*-*-*",
 			Sources = { SourceGlob("source/main/cpp") },
-			Includes = { "..//xbase/source/main/include","..//xunittest/source/main/include" },
+			Includes = { "../xbase/source/main/include","../xunittest/source/main/include" },
 		}
 		local xunittest_library = StaticLibrary {
 			Name = "xunittest",
 			Config = "*-*-*-test",
 			Sources = { SourceGlob("../xunittest/source/main/cpp") },
-			Includes = { "..//xunittest/source/main/include" },
+			Includes = { "../xunittest/source/main/include" },
 		}
 		local unittest = Program {
 			Name = "xbase_test",
 			Config = "*-*-*-test",
 			Sources = { SourceGlob("source/test/cpp") },
-			Includes = { "source/main/include","source/test/include","..//xunittest/source/main/include","..//xentry/source/main/include","..//xbase/source/main/include" },
-			Depends = { xentry_library,xbase_library,xunittest_library },
+			Includes = { "source/main/include","source/test/include","../xunittest/source/main/include","../xentry/source/main/include","../xbase/source/main/include" },
+			Depends = { xbase_library,xunittest_library },
 		}
 		Default(unittest)
 	end,

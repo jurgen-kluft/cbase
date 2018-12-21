@@ -36,18 +36,18 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 			xbytes<2048> buffer;
 			xbinary_writer writer = buffer.writer();
 
-			writer.skip(16);
-			writer.write(false);
-			writer.write((u8)1);
-			writer.write(( s8)1);
-			writer.write((u16)2);
-			writer.write((s16)3);
-			writer.write((u32)4);
-			writer.write((s32)5);
-			writer.write((u64)6);
-			writer.write((s64)7);
-			writer.write((f32)8.0);
-			writer.write((f64)9.0);
+			CHECK_EQUAL(16, writer.skip(16));
+			CHECK_EQUAL(1, writer.write(false));
+			CHECK_EQUAL(1, writer.write((u8)1));
+			CHECK_EQUAL(1, writer.write(( s8)1));
+			CHECK_EQUAL(2, writer.write((u16)2));
+			CHECK_EQUAL(2, writer.write((s16)3));
+			CHECK_EQUAL(4, writer.write((u32)4));
+			CHECK_EQUAL(4, writer.write((s32)5));
+			CHECK_EQUAL(8, writer.write((u64)6));
+			CHECK_EQUAL(8, writer.write((s64)7));
+			CHECK_EQUAL(4, writer.write((f32)8.0));
+			CHECK_EQUAL(8, writer.write((f64)9.0));
 
 			const char* cctext = "this is the buffer";
 			ascii::crunes chars(cctext);
@@ -61,7 +61,7 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 
 			xbinary_reader reader= (buffer.reader());
 			
-			reader.skip(16);
+			CHECK_EQUAL(16, reader.skip(16));
 
 			bool the_bool;
 			u8  the_u8 ;

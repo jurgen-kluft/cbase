@@ -704,13 +704,7 @@ namespace xcore
 				pcrune pos = str;
 				uchar32 c = *str++;
 
-				bool equal;
-				switch (_casesensitive)
-				{
-					case true: equal = is_equal(c, _c); break;
-					case false: equal = is_equalfold(c, _c); break;
-				}
-
+				bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
 				if (equal)
 				{
 					return crunes(pos, pos+1);
@@ -739,12 +733,7 @@ namespace xcore
 				pcrune pos = str;
 				uchar32 c = *--str;
 
-				bool equal;
-				switch (_casesensitive)
-				{
-					case true: equal = is_equal(c, _c); break;
-					case false: equal = is_equalfold(c, _c); break;
-				}
+				bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
 				if (equal)
 				{
 					return crunes(pos, pos+1);
@@ -1856,13 +1845,7 @@ namespace xcore
 				pcrune pos = str;
 				uchar32 c = *str++;
 
-				bool equal;
-				switch (_casesensitive)
-				{
-					case true: equal = is_equal(c, _c); break;
-					case false: equal = is_equalfold(c, _c); break;
-				}
-
+				bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
 				if (equal)
 				{
 					return crunes(pos, pos+1);
@@ -1891,12 +1874,7 @@ namespace xcore
 				pcrune pos = str;
 				uchar32 c = *--str;
 
-				bool equal;
-				switch (_casesensitive)
-				{
-					case true: equal = is_equal(c, _c); break;
-					case false: equal = is_equalfold(c, _c); break;
-				}
+				bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
 				if (equal)
 				{
 					return crunes(pos, pos+1);
