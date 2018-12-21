@@ -42,6 +42,7 @@ namespace xcore
 
 	template< class T > T	xmin(T integerA, T integerB);			///< Return the smallest value
 	template< class T > T	xmax(T integerA, T integerB);			///< Return the biggest value
+	template< class T > void xsort(T& integerA, T& integerB);		///< Return integerA = smallest value, integerB = biggest value 
 	template< class T > T	xsign(T integerA)		               { if (integerA > 0) return 1; else if (integerA < 0) return -1; else return 0; }
 	template< class T > T	xclamp(T integerA, T low, T high);		///< Return the clamp value
 

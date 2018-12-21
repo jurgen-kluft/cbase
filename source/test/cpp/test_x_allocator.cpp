@@ -80,9 +80,10 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			f32	mFloat;
 			static xalloc* get_allocator() { return gTestAllocator; }
 			XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator, 32)
+			XCORE_CLASS_PLACEMENT_NEW_DELETE
 		};
 
-		UNITTEST_TEST(_XCORE_CLASS_ARRAY_NEW_DELETE)
+		UNITTEST_TEST(test_placement_new)
 		{
 			test_object3* object3 = new test_object3[3];
 			CHECK_NOT_NULL(object3);
@@ -96,8 +97,42 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			delete[] object3;
 		}
 
+		struct test_object4
+		{
+			test_object4():mInteger(2),mFloat(3.0){}
+			s32	mInteger;
+			f32	mFloat;
+			static xalloc* get_allocator() { return gTestAllocator; }
+			XCORE_CLASS_PLACEMENT_NEW_DELETE
+		};
 
+		UNITTEST_TEST(test_xheap)
+		{
+			xheap heap(gTestAllocator);
+			test_object4* obj = heap.construct<test_object4>();
+			heap.destruct<>(obj);
+		}
 
+		UNITTEST_TEST(test_xnew_xdelete_custom_xalloc)
+		{
+			test_object4* obj = xnew<test_object4>(gTestAllocator);
+			xdelete<>(gTestAllocator, obj);
+		}
+
+		UNITTEST_TEST(test_xalloc_storage)
+		{
+			xbyte store[256];
+			xalloc_storage sa(&store[0], &store[256]);
+			test_object4* obj = xnew<test_object4>(sa.allocator());
+			xdelete<>(sa.allocator(), obj);
+		}
+
+		UNITTEST_TEST(test_xalloc_buffer)
+		{
+			xalloc_buffer<256> ba;
+			test_object4* obj = xnew<test_object4>(ba.allocator());
+			xdelete<>(ba.allocator(), obj);
+		}
 	}
 }
 UNITTEST_SUITE_END

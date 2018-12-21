@@ -1205,7 +1205,41 @@ namespace xcore
 	typedef		uchar32 const*	ucstr32;	// UTF-32 string
 
 	//==============================================================================
+	// Binary notation
+	// Examples: 
+	//             BU8(1000, 0001)
+	//             BU16(0000,1000,0000,0001)
+	//             BU32(0000,0000,0000,0000,0000,1000,0000,0001)
+	#define XB_0000    0
+	#define XB_0001    1
+	#define XB_0010    2
+	#define XB_0011    3
+	#define XB_0100    4
+	#define XB_0101    5
+	#define XB_0110    6
+	#define XB_0111    7
+	#define XB_1000    8
+	#define XB_1001    9
+	#define XB_1010    a
+	#define XB_1011    b
+	#define XB_1100    c
+	#define XB_1101    d
+	#define XB_1110    e
+	#define XB_1111    f
 
+	#define X_B2H(bits)   XB_##bits
+	#define XB2H(bits)    X_B2H(bits)
+	#define X_HEX(n)      0x##n
+	#define XHEX(n)       X_HEX(n)
+	#define X_CCAT(a,b)   a##b
+	#define XCCAT(a,b)    X_CCAT(a,b)
+
+	#define BU8(a,b)                 XHEX( XCCAT(XB2H(a),XB2H(b)) )
+	#define BU16(a,b,c,d)            XHEX( XCCAT(XCCAT(XB2H(a),XB2H(b)),XCCAT(XB2H(c),XB2H(d))) )
+	#define BU32(a,b,c,d,e,f,g,h)    XHEX( XCCAT(XCCAT(XCCAT(XB2H(a),XB2H(b)),XCCAT(XB2H(c),XB2H(d))),XCCAT(XCCAT(XB2H(e),XB2H(f)),XCCAT(XB2H(g),XB2H(h)))) )
+
+
+	//==============================================================================
 	#define					XCAST(to, from)		((to)(from))
 
 	//==============================================================================

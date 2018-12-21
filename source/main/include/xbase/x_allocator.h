@@ -31,12 +31,26 @@ namespace xcore
 		T* object = new (mem) T(args...);
 		return object;
 	}
+	template<typename T, typename... Args>
+	T*			xnew(xalloc* a, Args... args)
+	{
+		void * mem = a->allocate(sizeof(T), sizeof(void*));
+		T* object = new (mem) T(args...);
+		return object;
+	}
 
 	template<typename T>
 	void		xdelete(T* p)
 	{
 		p->~T();
 		xalloc::get_system()->deallocate(p);
+	}
+
+	template<typename T>
+	void		xdelete(xalloc* a, T* p)
+	{
+		p->~T();
+		a->deallocate(p);
 	}
 
 	class xheap
@@ -70,6 +84,58 @@ namespace xcore
 		}
 	};
 
+	class xalloc_storage : public xalloc
+	{
+		static inline xbyte* align_ptr(xbyte* ptr, uptr align) { return (xbyte*)(((uptr)ptr + (align-1)) & ~(align-1)); }
+
+		xbyte*			m_base;
+		xbyte*			m_ptr;
+		xbyte*			m_end;
+		s32				m_cnt;
+	public:
+		inline			xalloc_storage(xbyte* store, xbyte* end) : m_base(store), m_ptr(store), m_end(end), m_cnt(0) {}
+
+		xalloc*			allocator() { return this; }
+
+		virtual void*	allocate(xsize_t size, u32 align)
+		{
+			if (m_ptr < m_end && align_ptr(m_ptr+size, align) <= m_end)
+			{
+				xbyte* storage = m_ptr;
+				m_ptr = align_ptr(m_ptr + size, sizeof(void*));
+				m_cnt += 1;
+				return storage;
+			}
+			return nullptr;
+		}
+
+		virtual void	deallocate(void* p)
+		{
+			if (p != nullptr)
+			{
+				ASSERT(m_cnt > 0);
+				m_cnt -= 1;
+				if (m_cnt == 0)
+					m_ptr = m_base;
+			}
+		}
+
+		virtual void	release() { m_base=nullptr; m_ptr=nullptr; m_end=nullptr; }
+	};
+
+	// Example:
+	// 	xalloc_buffer<1024> alloca;
+	// 	test_object* test = xnew<test_object>(heap, 200, 1000.0f);
+	// 	xdelete<>(heap, test);
+
+	template<u32 L>
+	class xalloc_buffer : public xalloc_storage
+	{
+		enum {SIZE = L};
+		xbyte m_buffer[SIZE];
+	public:
+		xalloc_buffer() : xalloc_storage(&m_buffer[0], &m_buffer[SIZE]) {}
+	};
 
 	// Example:
 	// 	xheap heap(systemAllocator);

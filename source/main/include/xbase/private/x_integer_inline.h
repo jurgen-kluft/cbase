@@ -36,6 +36,34 @@ inline s32		xmax(s32 integerA, s32 integerB)
 }
 
 /**
+ * Function template, integerA = smallest value, integerB = biggest value
+ */
+template<class T>
+inline void        xsort(T& integerA, T& integerB)
+{
+    if (integerA>integerB)
+	{
+		T t = integerA;	
+		integerA = integerB;
+		integerA = t;
+	}
+}
+
+/**
+ * specialized template for s32
+ */
+template<>
+inline void		xsort(s32& X, s32& Y)
+{
+    if (X>Y)
+	{
+		X = X ^ Y;
+		Y = Y ^ X;
+		X = X ^ Y;
+	}
+}
+
+/**
  * Function template, returns the clamp value
  */
 template<class T>

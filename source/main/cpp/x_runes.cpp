@@ -1636,7 +1636,7 @@ namespace xcore
 
 		void replaceSelection(runes& str, crunes const& selection, crunes const& replace, alloc* allocator, s32 size_alignment)
 		{
-			s32 const diff = replace.size() - selection.size();
+			s64 const diff = replace.size() - selection.size();
 			if (diff > 0)
 			{
 				// Do we need to allocate additional space for @str ?
@@ -1751,7 +1751,7 @@ namespace xcore
 
 		void concatenate(runes& str, const crunes& concat, alloc* allocator, s32 size_alignment)
 		{
-			s32 const required = str.size() + concat.size();
+			s64 const required = str.size() + concat.size();
 			if (required > str.cap())
 			{
 				resize(str, required, allocator, size_alignment);
@@ -1761,7 +1761,7 @@ namespace xcore
 
 		void concatenate(runes& str, const crunes& concat1, const crunes& concat2, alloc* allocator, s32 size_alignment)
 		{
-			s32 const required = str.size() + concat1.size() + concat2.size();
+			s64 const required = str.size() + concat1.size() + concat2.size();
 			if (required > str.cap())
 			{
 				resize(str, required, allocator, size_alignment);

@@ -173,7 +173,7 @@ namespace xcore
 
 		u16						mType;
 		u16						mVar;
-		u64						mArg[2];
+		uptr					mArg[3];
 	};
 
 
