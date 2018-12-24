@@ -136,6 +136,7 @@ namespace xcore
 	public:
 		inline              xbinary_writer() : len_(0), cursor_(0), buffer_() { }
 		inline              xbinary_writer(xbyte* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) { }
+		inline              xbinary_writer(xbuffer const& _buffer) : len_(_buffer.size()), cursor_(0), buffer_(_buffer.m_mutable) { }
 
 		u32                 size() const;
 		u32                 len() const;
