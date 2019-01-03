@@ -285,11 +285,15 @@ namespace xcore
 
 			case TYPE_PCTCHAR:
 			{	ascii::crunes const& ch = *(ascii::crunes const*)mArg;
-				ascii::parse(ch, i);
+				bool b = false;
+				ascii::parse(ch, b);
+				i = b ? 1 : 0;
 			} break;
 			case TYPE_PCUCHAR32:
 			{	utf32::crunes const& ch = *(utf32::crunes const*)mArg;
-				i = StrToBool(ch.m_str, ch.m_end);
+				bool b = false;
+				utf32::parse(ch, b);
+				i = b ? 1 : 0;
 			} break;
 
 			default:			break; // Fall through
