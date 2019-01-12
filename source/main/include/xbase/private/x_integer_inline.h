@@ -244,6 +244,26 @@ inline s32        xcountBits(u32 inInteger)
 }
 
 /**
+ * count one bits in 64 bit word
+ */
+inline s32        xcountBits(u64 i)
+{
+    u32 high = (u64(i) >> 32) & 0xffffffff;
+    high -= ((high >> 1) & 0x55555555);
+    high = (((high >> 2) & 0x33333333) + (high & 0x33333333));
+    high = (((high >> 4) + high) & 0x0f0f0f0f);
+    high += (high >> 8);
+    high += (high >> 16);
+    u32 low = i & 0xffffffff;
+    low -= ((low >> 1) & 0x55555555);
+    low = (((low >> 2) & 0x33333333) + (low & 0x33333333));
+    low = (((low >> 4) + low) & 0x0f0f0f0f);
+    low += (low >> 8);
+    low += (low >> 16);
+    return (low & 0x0000003f) + (high & 0x0000003f);
+}
+
+/**
  * Log2 of an integer
  */
 s32               xilog2(s32 inInteger)
