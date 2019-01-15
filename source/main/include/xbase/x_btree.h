@@ -15,17 +15,16 @@ namespace xcore
     class keydexer
     {
         u64 m_mask;
-        s32 m_msb;
 		s8 m_vars[2];
         s32 m_levels;
 
     public:
-        inline keydexer() : m_mask(0), m_msb(0), m_levels(0)
+        inline keydexer() : m_mask(0), m_levels(0)
 		{
 			init_from_index(0xffffffff);
 		}
 
-        inline keydexer(u32 max_index) : m_mask(0), m_msb(0), m_levels(0)
+        inline keydexer(u32 max_index) : m_mask(0), m_levels(0)
 		{
 			init_from_index(max_index);
 		}
