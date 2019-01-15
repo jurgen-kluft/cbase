@@ -9,14 +9,14 @@
 
 namespace xcore
 {
-	/// The allocator interface
+	// The allocator interface
 	class xalloc
 	{
 	public:
 		static xalloc*		get_system();
 		
-		virtual void*		allocate(xsize_t size, u32 align) = 0;			///< Allocate memory with alignment
-		virtual void		deallocate(void* p) = 0;						///< Deallocate/Free memory
+		virtual void*		allocate(xsize_t size, u32 align) = 0;			// Allocate memory with alignment
+		virtual void		deallocate(void* p) = 0;						// Deallocate/Free memory
 
 		virtual void		release() = 0;
 
@@ -24,8 +24,8 @@ namespace xcore
 		virtual				~xalloc() {}
 	};
 
-	/// The fixed-size allocator interface
-	class xfxsa
+	// The fixed-size allocator interface
+	class xfsalloc
 	{
 	public:
 		virtual void*		allocate() = 0;
@@ -34,10 +34,10 @@ namespace xcore
 		virtual void		release() = 0;
 
 	protected:
-		virtual				~xfxsa() {}
+		virtual				~xfsalloc() {}
 	};
 
-	/// The indexer interface, 'pointer to index' and 'index to pointer'
+	// The dexer interface, 'pointer to index' and 'index to pointer'
 	class xdexer
 	{
 	public:
@@ -45,13 +45,13 @@ namespace xcore
 		virtual u32			ptr2idx(void* ptr) const = 0;
 	};
 
-	class xdexedfxsa : public xdexer, public xfxsa
+	class xfsallocdexed : public xfsalloc, public xdexer
 	{
 	public:
 		virtual void	release() = 0;
 
 	protected:
-		virtual			~xdexedfxsa() {}
+		virtual			~xfsallocdexed() {}
 	};
 
 	template<typename T, typename... Args>
@@ -111,6 +111,38 @@ namespace xcore
 		{
 			p->~T();
 			deallocate(p);
+		}
+	};
+
+	class xpool
+	{
+		xfsalloc*	m_fsalloc;
+
+	public:
+		inline	xpool(xfsalloc* fsalloc) : m_fsalloc(fsalloc) {}
+
+		void*	allocate()
+		{
+			return m_fsalloc->allocate();
+		}
+		void	deallocate(void* p)
+		{
+			return m_fsalloc->deallocate(p);
+		}
+
+		template<typename T, typename... Args>
+		T*			construct(Args... args)
+		{
+			void * mem = m_fsalloc->allocate();
+			T* object = new (mem) T(args...);
+			return object;
+		}
+
+		template<typename T>
+		void		destruct(T* p)
+		{
+			p->~T();
+			m_fsalloc->deallocate(p);
 		}
 	};
 

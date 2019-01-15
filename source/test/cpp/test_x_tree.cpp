@@ -10,7 +10,7 @@ extern xcore::xalloc* gTestAllocator;
 
 namespace xcore
 {
-    class xnode_array : public xdexedfxsa
+    class xnode_array : public xfsallocdexed
     {
         enum
         {
@@ -90,7 +90,7 @@ namespace xcore
         u64 key;
     };
 
-    class xvalue_array : public xdexedfxsa, public indexed::keyvalue
+    class xvalue_array : public xfsallocdexed, public xbtree32::keyvalue
     {
         enum
         {
@@ -177,7 +177,7 @@ namespace xcore
     };
 }
 
-UNITTEST_SUITE_BEGIN(xtree)
+UNITTEST_SUITE_BEGIN(xbtree)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -200,9 +200,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(init)
         {
-            keydexer         indexer;
-            indexed::btree_t tree;
-            tree.init(indexer, nodes, values);
+            xbtree32 tree;
+            tree.init(nodes, values);
 
             nodes->reset();
             values->reset();
@@ -210,10 +209,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(add)
         {
-            keydexer indexer;
-            indexer.initialize(0xFF, true);
-            indexed::btree_t tree;
-            tree.init(indexer, nodes, values);
+            xbtree32 tree;
+			tree.init_from_mask(nodes, values, 0xFF, true);
 
             value_t* v1 = (value_t*)values->allocate();
             v1->f       = 1.0f;
@@ -238,9 +235,9 @@ UNITTEST_SUITE_BEGIN(xtree)
         UNITTEST_TEST(add_many)
         {
             u32 const        value_count = 1024;
-            keydexer         indexer(value_count);
-            indexed::btree_t tree;
-            tree.init(indexer, nodes, values);
+
+			xbtree32 tree;
+            tree.init_from_index(nodes, values, value_count);
 
             for (u32 i = 0; i < value_count; ++i)
             {
@@ -264,9 +261,9 @@ UNITTEST_SUITE_BEGIN(xtree)
         UNITTEST_TEST(find_many)
         {
             u32 const        value_count = 1024;
-            keydexer         indexer(value_count);
-            indexed::btree_t tree;
-            tree.init(indexer, nodes, values);
+            
+            xbtree32 tree;
+            tree.init_from_index(nodes, values, value_count);
 
             for (u32 i = 0; i < value_count; ++i)
             {
@@ -305,9 +302,9 @@ UNITTEST_SUITE_BEGIN(xtree)
 		UNITTEST_TEST(remove)
         {
             u32 const        value_count = 1024;
-            keydexer         indexer(value_count);
-            indexed::btree_t tree;
-            tree.init(indexer, nodes, values);
+
+            xbtree32 tree;
+            tree.init_from_index(nodes, values, value_count);
 
             for (u32 i = 0; i < value_count; ++i)
             {
