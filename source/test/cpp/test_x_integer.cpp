@@ -220,22 +220,40 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			CHECK_EQUAL(0, xilog2(c));
 		}
 
-		UNITTEST_TEST(CountTrailingZeros)
+		UNITTEST_TEST(CountTrailingZeros32)
 		{
-			s32 a = 13, b = 64, c = 0, d = -1;
+			u32 a = 13, b = 64, c = 0, d = -1;
 			CHECK_EQUAL(0, xcountTrailingZeros(a));
 			CHECK_EQUAL(6, xcountTrailingZeros(b));
 			CHECK_EQUAL(32, xcountTrailingZeros(c));
 			CHECK_EQUAL(0, xcountTrailingZeros(d));
 		}
-
-		UNITTEST_TEST(CountLeadingZeros)
+		UNITTEST_TEST(CountTrailingZeros64)
 		{
-			s32 a = 13, b = 64, c = 0, d = -1;
+			u64 a = 13, b = 64, c = 0, d = -1, e = 0xffff000000000000UL;
+			CHECK_EQUAL( 0, xcountTrailingZeros(a));
+			CHECK_EQUAL( 6, xcountTrailingZeros(b));
+			CHECK_EQUAL(64, xcountTrailingZeros(c));
+			CHECK_EQUAL( 0, xcountTrailingZeros(d));
+			CHECK_EQUAL(48, xcountTrailingZeros(e));
+		}
+
+		UNITTEST_TEST(CountLeadingZeros32)
+		{
+			u32 a = 13, b = 64, c = 0, d = -1;
 			CHECK_EQUAL(28, xcountLeadingZeros(a));
 			CHECK_EQUAL(25, xcountLeadingZeros(b));
 			CHECK_EQUAL(32, xcountLeadingZeros(c));
+			CHECK_EQUAL( 0, xcountLeadingZeros(d));
+		}
+		UNITTEST_TEST(CountLeadingZeros64)
+		{
+			u64 a = 13, b = 64, c = 0, d = -1, e = 0x0000ffff00000000UL;
+			CHECK_EQUAL(32+28, xcountLeadingZeros(a));
+			CHECK_EQUAL(32+25, xcountLeadingZeros(b));
+			CHECK_EQUAL(32+32, xcountLeadingZeros(c));
 			CHECK_EQUAL(0, xcountLeadingZeros(d));
+			CHECK_EQUAL(16, xcountLeadingZeros(e));
 		}
 
 		UNITTEST_TEST(LeastSignificantOneBit)

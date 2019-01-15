@@ -24,6 +24,36 @@ namespace xcore
 		virtual				~xalloc() {}
 	};
 
+	/// The fixed-size allocator interface
+	class xfxsa
+	{
+	public:
+		virtual void*		allocate() = 0;
+		virtual void		deallocate(void*) = 0;
+
+		virtual void		release() = 0;
+
+	protected:
+		virtual				~xfxsa() {}
+	};
+
+	/// The indexer interface, 'pointer to index' and 'index to pointer'
+	class xdexer
+	{
+	public:
+		virtual void*		idx2ptr(u32 index) const = 0;
+		virtual u32			ptr2idx(void* ptr) const = 0;
+	};
+
+	class xdexedfxsa : public xdexer, public xfxsa
+	{
+	public:
+		virtual void	release() = 0;
+
+	protected:
+		virtual			~xdexedfxsa() {}
+	};
+
 	template<typename T, typename... Args>
 	T*			xnew(Args... args)
 	{
