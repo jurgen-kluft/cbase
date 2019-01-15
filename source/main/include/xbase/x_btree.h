@@ -98,7 +98,10 @@ namespace xcore
             virtual void set_key(void* value, u64 key) const = 0;
         };
 
-        void init(key_indexer const* idxr, xfsalloc* node_allocator, keyvalue* kv);
+        void init(xfsalloc* node_allocator, keyvalue* kv);
+        void init(xfsalloc* node_allocator, keyvalue* kv, key_indexer const* idxr);
+	    void init_from_index(xfsalloc* node_allocator, keyvalue* kv, u32 max_index);
+	    void init_from_mask(xfsalloc* node_allocator, keyvalue* kv, u64 mask, bool sorted);
 
         bool add(u64 key, void* value);
         bool rem(u64 key, void*& value);
@@ -107,8 +110,8 @@ namespace xcore
         bool lower_bound(u64 key, void*& value) const;
         bool upper_bound(u64 key, void*& value) const;
 
-    private:
         struct node_t;
+    private:
         struct history_t;
         key_indexer const* m_idxr;
         key_indexer_data   m_idxr_data;
