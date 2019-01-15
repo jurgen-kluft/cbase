@@ -10,6 +10,29 @@ extern xcore::xalloc* gTestAllocator;
 
 namespace xcore
 {
+    class xfixedsizealloc : public xfsalloc
+    {
+        u32            m_alloc_size;
+        s32            m_count;
+        xcore::xalloc* m_allocator;
+
+    public:
+        inline xnode_alloc(u32 alloc_size) : m_alloc_size(alloc_size) {}
+        s32 count() const { return m_count; }
+
+        virtual void* allocate()
+        {
+            m_count++;
+            return m_allocator->allocate(sizeof(m_alloc_size), sizeof(void*));
+        }
+        virtual void deallocate(void* p)
+        {
+            --m_count;
+            return m_allocator->deallocate(p);
+        }
+        virtual void release() {}
+    };
+
     class xnode_array : public xfsallocdexed
     {
         enum
@@ -63,7 +86,7 @@ namespace xcore
 
         virtual void deallocate(void* p)
         {
-			x_memset(p, 0xDA, sizeof(node));
+            x_memset(p, 0xDA, sizeof(node));
             node* n = (node*)p;
             n->next = m_head;
             m_head  = n;
@@ -143,7 +166,7 @@ namespace xcore
 
         virtual void deallocate(void* p)
         {
-			x_memset(p, 0xDA, sizeof(node));
+            x_memset(p, 0xDA, sizeof(node));
             node* n = (node*)p;
             n->next = m_head;
             m_head  = n;
@@ -175,11 +198,11 @@ namespace xcore
 
         virtual void release() {}
     };
-}
+} // namespace xcore
 
 UNITTEST_SUITE_BEGIN(xbtree)
 {
-    UNITTEST_FIXTURE(main)
+    UNITTEST_FIXTURE(btree32)
     {
         xcore::xnode_array*  nodes  = nullptr;
         xcore::xvalue_array* values = nullptr;
@@ -210,7 +233,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
         UNITTEST_TEST(add)
         {
             xbtree32 tree;
-			tree.init_from_mask(nodes, values, 0xFF, true);
+            tree.init_from_mask(nodes, values, 0xFF, true);
 
             value_t* v1 = (value_t*)values->allocate();
             v1->f       = 1.0f;
@@ -234,9 +257,9 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         UNITTEST_TEST(add_many)
         {
-            u32 const        value_count = 1024;
+            u32 const value_count = 1024;
 
-			xbtree32 tree;
+            xbtree32 tree;
             tree.init_from_index(nodes, values, value_count);
 
             for (u32 i = 0; i < value_count; ++i)
@@ -260,8 +283,8 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         UNITTEST_TEST(find_many)
         {
-            u32 const        value_count = 1024;
-            
+            u32 const value_count = 1024;
+
             xbtree32 tree;
             tree.init_from_index(nodes, values, value_count);
 
@@ -299,9 +322,9 @@ UNITTEST_SUITE_BEGIN(xbtree)
             values->reset();
         }
 
-		UNITTEST_TEST(remove)
+        UNITTEST_TEST(remove)
         {
-            u32 const        value_count = 1024;
+            u32 const value_count = 1024;
 
             xbtree32 tree;
             tree.init_from_index(nodes, values, value_count);
@@ -321,7 +344,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
             CHECK_EQUAL(256 + 64 + 16 + 4 + 1, nodes->count());
             CHECK_EQUAL(value_count, (u32)values->count());
 
-			// Remove them
+            // Remove them
             for (u32 i = 0; i < value_count; ++i)
             {
                 u32 vi;
@@ -331,15 +354,83 @@ UNITTEST_SUITE_BEGIN(xbtree)
                 if (v != nullptr)
                 {
                     CHECK_EQUAL(i, v->key);
-					values->deallocate(v);
+                    values->deallocate(v);
                 }
             }
-            
-			CHECK_EQUAL(1, nodes->count());
+
+            CHECK_EQUAL(1, nodes->count());
             CHECK_EQUAL(0, (u32)values->count());
 
             nodes->reset();
             values->reset();
+        }
+    }
+
+    UNITTEST_FIXTURE(btree)
+    {
+        static xfixedsizealloc nodes(gTestAllocator);
+
+        class myvalue
+        {
+        public:
+            u64 m_key;
+            f32 m_value;
+        }
+
+        class myvalue_kv : public xbtree::keyvalue
+        {
+        public:
+            virtual u64 get_key(void* value) const
+            {
+                myvalue* v = (myvalue*)value;
+                return v->m_key;
+            }
+
+            virtual void set_key(void* value, u64 key) const
+            {
+                myvalue* v = (myvalue*)value;
+                v->m_key   = key;
+            }
+        };
+
+        static myvalue_kv values;
+
+        UNITTEST_FIXTURE_SETUP() {}
+        UNITTEST_FIXTURE_TEARDOWN() {}
+
+        UNITTEST_TEST(init)
+        {
+            xbtree tree;
+            tree.init(nodes, &values);
+
+            nodes->reset();
+            values->reset();
+        }
+
+        UNITTEST_TEST(add)
+        {
+            xbtree tree;
+            tree.init_from_mask(nodes, values, 0xFF, true);
+
+            xheap      heap(gTestAllocator);
+            myvalue_t* v1 = heap.construct<myvalue>();
+            v1->f         = 1.0f;
+            v1->key       = 0;
+            myvalue_t* v2 = heap.construct<myvalue>();
+            v2->f         = 2.0f;
+            v2->key       = 0;
+
+            CHECK_TRUE(tree.add(1, v1));
+            CHECK_TRUE(tree.add(2, v2));
+            CHECK_EQUAL(1, v1->key);
+            CHECK_EQUAL(2, v2->key);
+
+            CHECK_EQUAL(4, nodes->count());
+
+            CHECK_TRUE(tree.rem(v1->key, v1));
+            heap.destruct(v1);
+            CHECK_TRUE(tree.rem(v1->key, v2));
+            heap.destruct(v2);
         }
     }
 }
