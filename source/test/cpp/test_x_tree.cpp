@@ -63,6 +63,7 @@ namespace xcore
 
         virtual void deallocate(void* p)
         {
+			x_memset(p, 0xDA, sizeof(node));
             node* n = (node*)p;
             n->next = m_head;
             m_head  = n;
@@ -142,6 +143,7 @@ namespace xcore
 
         virtual void deallocate(void* p)
         {
+			x_memset(p, 0xDA, sizeof(node));
             node* n = (node*)p;
             n->next = m_head;
             m_head  = n;
@@ -296,6 +298,49 @@ UNITTEST_SUITE_BEGIN(xtree)
                     CHECK_EQUAL(i, v->key);
                 }
             }
+            nodes->reset();
+            values->reset();
+        }
+
+		UNITTEST_TEST(remove)
+        {
+            u32 const        value_count = 1024;
+            keydexer         indexer(value_count);
+            indexed::btree_t tree;
+            tree.init(indexer, nodes, values);
+
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                value_t* v = (value_t*)values->allocate();
+                v->f       = 1.0f;
+                v->key     = value_count + i;
+                CHECK_TRUE(tree.add(i, values->ptr2idx(v)));
+            }
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                value_t* v = (value_t*)values->idx2ptr(i);
+                CHECK_EQUAL(i, v->key);
+            }
+            CHECK_EQUAL(256 + 64 + 16 + 4 + 1, nodes->count());
+            CHECK_EQUAL(value_count, (u32)values->count());
+
+			// Remove them
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                u32 vi;
+                CHECK_TRUE(tree.rem(i, vi));
+                value_t* v = (value_t*)values->idx2ptr(vi);
+                CHECK_NOT_NULL(v);
+                if (v != nullptr)
+                {
+                    CHECK_EQUAL(i, v->key);
+					values->deallocate(v);
+                }
+            }
+            
+			CHECK_EQUAL(1, nodes->count());
+            CHECK_EQUAL(0, (u32)values->count());
+
             nodes->reset();
             values->reset();
         }

@@ -284,12 +284,16 @@ namespace xcore
         {
             struct utils
             {
-                static bool node_has_single_child(indexed::node* node, s32& index)
+                static bool set_child_null_and_check(indexed::node* node, s32& in_out_index)
                 {
-                    s32 c = is_null(node->m_nodes[0]) ? 0 : 0x0100;
-                    for (s32 i = 1; i < 4; ++i)
-                        c += is_null(node->m_nodes[i]) ? 0 : (0x0100 + i);
-                    index = c & 0xFF;
+					node->m_nodes[in_out_index] = Null;
+					in_out_index = (in_out_index+1)&0x3;
+                    s32 c = is_null(node->m_nodes[in_out_index]) ? 0 : (0x0100 + in_out_index);
+					in_out_index = (in_out_index+1)&0x3;
+                    c += is_null(node->m_nodes[in_out_index]) ? 0 : (0x0100 + in_out_index);
+					in_out_index = (in_out_index+1)&0x3;
+                    c += is_null(node->m_nodes[in_out_index]) ? 0 : (0x0100 + in_out_index);
+                    in_out_index = c & 0xFF;
                     return (c & 0xFF00) == 0x0100;
                 }
             };
@@ -302,7 +306,6 @@ namespace xcore
             {
                 s32 childIndex = m_idxr.get_index(key, level);
                 u32 nodeIndex  = node->m_nodes[childIndex];
-
                 if (is_null(nodeIndex))
                 {
                     break;
@@ -312,22 +315,19 @@ namespace xcore
                     u64 const nodeKey = m_kv->get_key(nodeIndex);
                     if (m_idxr.keys_equal(nodeKey, key))
                     {
-                        // We should track parent and grand-parent
                         // Remove this leaf from node, if this results in node
                         // having no more children then this node should also be
                         // removed etc...
+						value = as_index(nodeIndex);
 
-                        // Null out the leaf from this node
-                        node->m_nodes[childIndex] = Null;
-
-                        // After removing the child from the current node check if this
+                        // Null out the leaf from this node and check if this
                         // node has only 1 child left, if so we should 'unchain' it.
-                        if (utils::node_has_single_child(node, childIndex))
+                        if (utils::set_child_null_and_check(node, childIndex))
                         {
-                            nodeIndex = node->m_nodes[childIndex];
+							// childIndex contains the index of the only child left
                             if (parent != nullptr)
                             {
-                                parent->m_nodes[parentChildIndex] = nodeIndex;
+                                parent->m_nodes[parentChildIndex] = node->m_nodes[childIndex];
                                 m_node_alloc->deallocate(node);
                             }
                         }
@@ -340,7 +340,6 @@ namespace xcore
                 {
                     parent           = node;
                     parentChildIndex = childIndex;
-
                     node = (indexed::node*)m_node_alloc->idx2ptr(as_index(nodeIndex));
                 }
 
