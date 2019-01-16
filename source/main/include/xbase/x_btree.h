@@ -31,7 +31,8 @@ namespace xcore
     // Move this to xallocator
     // gCreateVMemBasedAllocator(a, vmem, sizeof(myleaf) (32?), 1*xGB, 64*xKB);
     // Maximum number of myleaf allocations = (2048 - 1) * 16384 = 33.538.048 = ~32 Million nodes
-    xfsallocdexed* gCreateVMemBasedDexAllocator(xalloc* a, xvirtual_memory* vmem, u32 alloc_size, u64 addr_range, u32 page_size);
+    xfsallocdexed* gCreateVMemBasedDexAllocator(xalloc* a, xvirtual_memory* vmem, u32 alloc_size, u64 addr_range,
+                                                u32 page_size);
 
     //
     // A btree_t is a BST that is unbalanced and where branches grow/shrink when adding
@@ -69,8 +70,8 @@ namespace xcore
 
         void init(xfsallocdexed* node_allocator, keyvalue* kv);
         void init(xfsallocdexed* node_allocator, keyvalue* kv, key_indexer const* indexer);
-	    void init_from_index(xfsallocdexed* node_allocator, keyvalue* kv, u32 max_index);
-	    void init_from_mask(xfsallocdexed* node_allocator, keyvalue* kv, u64 mask, bool sorted);
+        void init_from_index(xfsallocdexed* node_allocator, keyvalue* kv, u32 max_index);
+        void init_from_mask(xfsallocdexed* node_allocator, keyvalue* kv, u64 mask, bool sorted);
 
         bool add(u64 key, u32 value);
         bool rem(u64 key, u32& value);
@@ -85,7 +86,7 @@ namespace xcore
         u32                m_root;
         key_indexer_data   m_idxr_data;
         key_indexer const* m_idxr;
-        xfsallocdexed*        m_node_alloc;
+        xfsallocdexed*     m_node_alloc;
         keyvalue*          m_kv;
     };
 
@@ -100,8 +101,8 @@ namespace xcore
 
         void init(xfsalloc* node_allocator, keyvalue* kv);
         void init(xfsalloc* node_allocator, keyvalue* kv, key_indexer const* idxr);
-	    void init_from_index(xfsalloc* node_allocator, keyvalue* kv, u32 max_index);
-	    void init_from_mask(xfsalloc* node_allocator, keyvalue* kv, u64 mask, bool sorted);
+        void init_from_index(xfsalloc* node_allocator, keyvalue* kv, u32 max_index);
+        void init_from_mask(xfsalloc* node_allocator, keyvalue* kv, u64 mask, bool sorted);
 
         bool add(u64 key, void* value);
         bool rem(u64 key, void*& value);
@@ -111,6 +112,7 @@ namespace xcore
         bool upper_bound(u64 key, void*& value) const;
 
         struct node_t;
+
     private:
         struct history_t;
         key_indexer const* m_idxr;
@@ -124,30 +126,30 @@ namespace xcore
     // map<K,V>
     // set<V>
 
-    template <typename T> class xmap
+    template <typename K, typename V> class xmap
     {
     public:
-        xmap(xalloc* a)
-            : m_allocator(a)
-        {
-        }
-        bool insert(u64 key, T const& value);
-        bool remove(u64 key, T& value);
-        bool find(u64 key, T& value) const;
+        typedef u64 (*hashfunc)(K const& key);
+
+        xmap(xalloc* a) : m_allocator(a) {}
+        xmap(xalloc* a, hashfunc hashfn) : m_hash(hashfn), m_allocator(a) {}
+
+        bool insert(K const& key, V const& value);
+        bool remove(K const& key, V& value);
+        bool find(K const& key, V& value) const;
 
     private:
         struct value_t
         {
-            inline value_t(u64 key, const T& value)
-                : m_key(key)
-                , m_value(value)
-            {
-            }
-            u64 m_key;
-            T   m_value;
+            inline value_t(const K& key, const T& value) : m_hash(0), m_key(key), m_value(value) {}
+            u64 m_hash;
+            K   m_key;
+            V   m_value;
         };
-        xalloc*          m_allocator;
-        xbtree          m_tree;
+        hashfunc  m_hash;
+        xalloc*   m_allocator;
+        xfsalloc* m_node_allocator;
+        xbtree    m_tree;
     };
 
     template <typename T> class xhashset
@@ -165,13 +167,14 @@ namespace xcore
     private:
         struct value_t
         {
-            u64 m_key;
+            u64 m_hash;
             T   m_value;
         };
-        hashfunc m_hash;
-        xalloc*  m_allocator;
-        xbtree  m_tree;
+        hashfunc  m_hash;
+        xalloc*   m_allocator;
+        xfsalloc* m_node_allocator;
+        xbtree    m_tree;
     };
-};
+}; // namespace xcore
 
 #endif // __X_ALLOCATOR_BTREE_H__
