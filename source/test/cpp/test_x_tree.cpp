@@ -12,13 +12,26 @@ namespace xcore
 {
     class xfixedsizealloc : public xfsalloc
     {
-        u32            m_alloc_size;
-        s32            m_count;
-        xcore::xalloc* m_allocator;
+        u32     m_alloc_size;
+        s32     m_count;
+        xalloc* m_allocator;
 
     public:
-        inline xnode_alloc(u32 alloc_size) : m_alloc_size(alloc_size) {}
+        inline xfixedsizealloc()
+            : m_alloc_size(0)
+            , m_count(0)
+            , m_allocator(nullptr)
+        {
+        }
+
         s32 count() const { return m_count; }
+
+        void init(u32 alloc_size, xalloc* a)
+        {
+            m_alloc_size = alloc_size;
+            m_count      = 0;
+            m_allocator  = a;
+        }
 
         virtual void* allocate()
         {
@@ -368,14 +381,16 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
     UNITTEST_FIXTURE(btree)
     {
-        static xfixedsizealloc nodes(gTestAllocator);
-
         class myvalue
         {
         public:
             u64 m_key;
             f32 m_value;
-        }
+
+            XCORE_CLASS_PLACEMENT_NEW_DELETE
+        };
+
+        static xfixedsizealloc nodes;
 
         class myvalue_kv : public xbtree::keyvalue
         {
@@ -395,42 +410,46 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         static myvalue_kv values;
 
-        UNITTEST_FIXTURE_SETUP() {}
+        UNITTEST_FIXTURE_SETUP() { nodes.init(sizeof(myvalue), gTestAllocator); }
+
         UNITTEST_FIXTURE_TEARDOWN() {}
 
         UNITTEST_TEST(init)
         {
             xbtree tree;
-            tree.init(nodes, &values);
-
-            nodes->reset();
-            values->reset();
+            tree.init(&nodes, &values);
+            tree.clear();
         }
 
         UNITTEST_TEST(add)
         {
             xbtree tree;
-            tree.init_from_mask(nodes, values, 0xFF, true);
+            tree.init_from_mask(&nodes, &values, 0xFF, true);
 
-            xheap      heap(gTestAllocator);
-            myvalue_t* v1 = heap.construct<myvalue>();
-            v1->f         = 1.0f;
-            v1->key       = 0;
-            myvalue_t* v2 = heap.construct<myvalue>();
-            v2->f         = 2.0f;
-            v2->key       = 0;
+            xheap    heap(gTestAllocator);
+            myvalue* v1 = heap.construct<myvalue>();
+            v1->m_value = 1.0f;
+            v1->m_key   = 0;
+            myvalue* v2 = heap.construct<myvalue>();
+            v2->m_value = 2.0f;
+            v2->m_key   = 0;
 
             CHECK_TRUE(tree.add(1, v1));
             CHECK_TRUE(tree.add(2, v2));
-            CHECK_EQUAL(1, v1->key);
-            CHECK_EQUAL(2, v2->key);
+            CHECK_EQUAL(1, v1->m_key);
+            CHECK_EQUAL(2, v2->m_key);
 
-            CHECK_EQUAL(4, nodes->count());
+            CHECK_EQUAL(4, nodes.count());
 
-            CHECK_TRUE(tree.rem(v1->key, v1));
-            heap.destruct(v1);
-            CHECK_TRUE(tree.rem(v1->key, v2));
-            heap.destruct(v2);
+            void* vv1;
+            CHECK_TRUE(tree.rem(v1->m_key, vv1));
+            heap.destruct(vv1);
+
+            void* vv2;
+            CHECK_TRUE(tree.rem(v1->m_key, vv2));
+            heap.destruct(vv2);
+
+            tree.clear();
         }
     }
 }

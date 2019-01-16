@@ -761,18 +761,18 @@ namespace xcore
     // ######################################################################################################################################
     // ######################################################################################################################################
     // ######################################################################################################################################
-	struct xbtree::node_t
+    struct xbtree::node_t
     {
         inline node_t() { clear(); }
 
-        inline bool is_empty() const { return is_null(m_nodes[0]) && is_null(m_nodes[1]) && is_null(m_nodes[2]) && is_null(m_nodes[3]); }
+        inline bool is_empty() const { return m_nodes[0] == 0 && m_nodes[1] == 0 && m_nodes[2] == 0 && m_nodes[3] == 0; }
 
         void clear()
         {
-            m_nodes[0] = Null;
-            m_nodes[1] = Null;
-            m_nodes[2] = Null;
-            m_nodes[3] = Null;
+            m_nodes[0] = 0;
+            m_nodes[1] = 0;
+            m_nodes[2] = 0;
+            m_nodes[3] = 0;
         }
 
         XCORE_CLASS_PLACEMENT_NEW_DELETE
@@ -780,20 +780,20 @@ namespace xcore
         uptr m_nodes[4];
     };
 
-    static inline bool is_null(uptr n) { return n == 0; }
-    static inline bool is_node(uptr n) { return (n != Null) && ((n & 1) == 1); }
-    static inline bool is_value(uptr n) { return (n != Null) && ((n & 1) == 0); }
-	static inline uptr as_node(uptr n) { return ((uptr)n | 1); }
-    static inline uptr as_value(uptr n) { return ((uptr)n & ~(u64)1); }
-	static inline xbtree::node_t* as_node_ptr(uptr n) { return (xbtree::node_t*)((uptr)n & ~(u64)1); }
+    static inline bool            is_null(uptr n) { return n == 0; }
+    static inline bool            is_node(uptr n) { return (n != 0) && ((n & 1) == 1); }
+    static inline bool            is_value(uptr n) { return (n != 0) && ((n & 1) == 0); }
+    static inline uptr            as_node(uptr n) { return ((uptr)n | 1); }
+    static inline uptr            as_value(uptr n) { return ((uptr)n & ~(u64)1); }
+    static inline void*           as_value_ptr(uptr n) { return (void*)((uptr)n & ~(u64)1); }
+    static inline xbtree::node_t* as_node_ptr(uptr n) { return (xbtree::node_t*)((uptr)n & ~(u64)1); }
 
     void xbtree::init(xfsalloc* node_allocator, keyvalue* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
-        xpool   heap(m_node_alloc);
-        m_root = heap.construct<node_t>();
-        m_kv   = kv;
+        m_root       = nullptr;
+        m_kv         = kv;
     }
 
     void xbtree::init(xfsalloc* node_allocator, keyvalue* kv, key_indexer const* indexer)
@@ -819,22 +819,28 @@ namespace xcore
         keydexer           default_dexer(&m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
-        s32     level      = 0;
-        node_t* parentNode = m_root;
+        if (m_root == nullptr)
+        {
+            xpool heap(m_node_alloc);
+            m_root = heap.construct<node_t>();
+        }
+
+        s32     level = 0;
+        node_t* node  = m_root;
         do
         {
-            s32 childIndex     = idxr->get_index(key, level);
-            uptr childPtr = parentNode->m_nodes[childIndex];
+            s32  childIndex = idxr->get_index(key, level);
+            uptr childPtr   = node->m_nodes[childIndex];
             if (is_null(childPtr))
             {
                 m_kv->set_key(value, key);
-                parentNode->m_nodes[childIndex] = as_value((uptr)value);
+                node->m_nodes[childIndex] = as_value((uptr)value);
                 return true;
             }
             else if (is_value(childPtr))
             {
                 // Check for duplicate, see if this value is the value of this leaf
-                u64 const child_key = m_kv->get_key((void*)as_value(childPtr));
+                u64 const child_key = m_kv->get_key(as_value_ptr(childPtr));
                 if (idxr->keys_equal(child_key, key))
                 {
                     return false;
@@ -842,23 +848,23 @@ namespace xcore
 
                 // Create new node and add the existing item first and continue
                 xpool   pool(m_node_alloc);
-                node_t* newChildNode = pool.construct<node_t>();
-                parentNode->m_nodes[childIndex] = as_node((uptr)newChildNode);
+                node_t* newChildNode      = pool.construct<node_t>();
+                node->m_nodes[childIndex] = as_node((uptr)newChildNode);
 
                 // Compute the child index of this already existing leaf one level up
                 // and insert this existing leaf there.
                 s32 const childChildIndex              = idxr->get_index(child_key, level + 1);
                 newChildNode->m_nodes[childChildIndex] = childPtr;
 
-                // Continue, at the next level, correct parentNode
-                parentNode = newChildNode;
+                // Continue, at the next level, correct node
+                node = newChildNode;
                 level += 1;
             }
             else if (is_node(childPtr))
             {
                 // Continue traversing the tree until we find a null-child to place
                 // our value.
-                parentNode = as_node_ptr(childPtr);
+                node = as_node_ptr(childPtr);
                 level++;
             }
         } while (level < idxr->max_levels());
@@ -870,72 +876,156 @@ namespace xcore
     {
         struct utils
         {
-            static bool set_child_null_and_check(node_t* node, s32& in_out_index)
+            static u32 get_counts(uptr n, s32 i) { return (n == 0) ? 0x01000000 : (((n & 1) == 1) ? 0x00010000 : (0x00000100 | i)); }
+
+            static u32 check(node_t* node)
             {
-                node->m_nodes[in_out_index] = Null;
-                in_out_index                = (in_out_index + 1) & 0x3;
-                s32 c                       = is_null(node->m_nodes[in_out_index]) ? 0 : (0x0100 + in_out_index);
-                in_out_index                = (in_out_index + 1) & 0x3;
-                c += is_null(node->m_nodes[in_out_index]) ? 0 : (0x0100 + in_out_index);
-                in_out_index = (in_out_index + 1) & 0x3;
-                c += is_null(node->m_nodes[in_out_index]) ? 0 : (0x0100 + in_out_index);
-                in_out_index = c & 0xFF;
-                return (c & 0xFF00) == 0x0100;
+                u32 c = 0;
+                c += get_counts(node->m_nodes[0], 0);
+                c += get_counts(node->m_nodes[1], 1);
+                c += get_counts(node->m_nodes[2], 2);
+                c += get_counts(node->m_nodes[3], 3);
+                return (c & 0xFFFFFF00); // Return the counts [3:NULL][2:NODE][1:VALUE][0:0]
+            }
+
+            static u32 set_child_null_and_check(node_t* node, s32& index)
+            {
+                node->m_nodes[index] = Null;
+
+                // 0x..NNVV00
+                u32 c = 0x01000000;
+                index = (index + 1) & 0x3;
+                c += get_counts(node->m_nodes[index], index);
+                index = (index + 1) & 0x3;
+                c += get_counts(node->m_nodes[index], index);
+                index = (index + 1) & 0x3;
+                c += get_counts(node->m_nodes[index], index);
+
+                index = c & 0xFF;
+                return (c & 0xFFFFFF00); // Return the counts [3:NULL][2:NODE][1:VALUE][0:0]
             }
         };
+
+        if (m_root == nullptr)
+            return false;
 
         keydexer           default_dexer(&m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
-        s32     level            = 0;
-        node_t* parent           = nullptr;
-        s32     parentChildIndex = 0;
-        node_t* node             = m_root;
+        node_t* nodes[32];
+        s8      childs[32];
+
+        s32     level = 0;
+        node_t* node  = m_root;
         do
         {
             s32 childIndex = idxr->get_index(key, level);
-            uptr nodePtr = node->m_nodes[childIndex];
+
+            nodes[level]  = node;
+            childs[level] = childIndex;
+            uptr nodePtr  = node->m_nodes[childIndex];
+
             if (is_null(nodePtr))
             {
                 break;
             }
             else if (is_value(nodePtr))
             {
-                u64 const nodeKey = m_kv->get_key((void*)as_value(nodePtr));
+                u64 const nodeKey = m_kv->get_key(as_value_ptr(nodePtr));
                 if (idxr->keys_equal(nodeKey, key))
                 {
                     // Remove this leaf from node, if this results in node
                     // having no more children then this node should also be
                     // removed etc...
-                    value = (void*)as_value(nodePtr);
+                    value = as_value_ptr(nodePtr);
 
                     // Null out the leaf from this node and check if this
-                    // node has only 1 child left, if so we should 'unchain' it.
-                    if (utils::set_child_null_and_check(node, childIndex))
+                    // node has only 1 or no child left, if so we should 'unchain' it.
+                    s32 const n = utils::set_child_null_and_check(node, childIndex);
+                    if (n == 0x03000100 || n == 0x04000000)
                     {
-                        // childIndex contains the index of the only child left
-                        if (parent != nullptr)
+                        if (n == 0x03000100)
                         {
-                            parent->m_nodes[parentChildIndex] = node->m_nodes[childIndex];
-                            m_node_alloc->deallocate(node);
+                            // This case means that there is one 'value' left on this node.
+                            // We can move this value up only until we reach a parent node
+                            // that has more than 1 children.
+
+                            // Remember the value
+                            uptr otherValue = node->m_nodes[childIndex];
+
+                            // Move up and delete nodes that only have 1 child
+                            while (level > 0)
+                            {
+                                m_node_alloc->deallocate(node);
+
+                                level       = level - 1;
+                                node        = nodes[level];
+                                childIndex  = childs[level];
+                                s32 const c = utils::check(node);
+                                if (c != 0x00010000)
+                                {
+                                    // Place the value at its correct place
+                                    u64 const childKey        = m_kv->get_key(as_value_ptr(otherValue));
+                                    childIndex                = idxr->get_index(childKey, level);
+                                    node->m_nodes[childIndex] = otherValue;
+                                    break;
+                                }
+                                // Only 1 'node' left, that is us
+                            }
                         }
                     }
-
                     return true;
                 }
                 break;
             }
             else if (is_node(nodePtr))
             {
-                parent           = node;
-                parentChildIndex = childIndex;
-                node             = as_node_ptr(nodePtr);
+                node = as_node_ptr(nodePtr);
             }
 
             level++;
         } while (level < idxr->max_levels());
 
         return false;
+    }
+
+    void xbtree::clear()
+    {
+        if (m_root == nullptr)
+            return;
+
+        node_t* m_node[32];
+        s8      m_child[32];
+
+        m_node[0]  = m_root;
+        m_child[0] = 0;
+
+        s32 level = 1;
+        while (level > 0)
+        {
+            level -= 1;
+
+            node_t* node  = m_node[level];
+            s8      child = m_child[level];
+
+            // See if we still have a child node to traverse
+            while (child < 4)
+            {
+                if (is_node(node->m_nodes[child]))
+                {
+                    m_node[level]    = node;
+                    m_child[level++] = child;
+                    m_node[level]    = as_node_ptr(node->m_nodes[child]);
+                    m_child[level++] = 0;
+                    break;
+                }
+                child += 1;
+            }
+            if (child == 4)
+            {
+                m_node_alloc->deallocate(node);
+            }
+        }
     }
 
     bool xbtree::find(u64 key, void*& value) const
@@ -947,18 +1037,18 @@ namespace xcore
         node_t const* node  = m_root;
         do
         {
-            s32 childIndex     = idxr->get_index(key, level);
-            uptr nodePtr = node->m_nodes[childIndex];
+            s32  childIndex = idxr->get_index(key, level);
+            uptr nodePtr    = node->m_nodes[childIndex];
             if (is_null(nodePtr))
             {
                 break;
             }
             else if (is_value(nodePtr))
             {
-                u64 const childNodeKey = m_kv->get_key((void*)as_value(nodePtr));
+                u64 const childNodeKey = m_kv->get_key(as_value_ptr(nodePtr));
                 if (idxr->keys_equal(childNodeKey, key))
                 {
-                    value = (void*)as_value(nodePtr);
+                    value = as_value_ptr(nodePtr);
                     return true;
                 }
                 break;
@@ -1010,19 +1100,19 @@ namespace xcore
         s32           state = 0; // 0 = we are on target branch, -1 = we are on a lower-bound branch
         node_t const* node  = m_root;
         s8            childIndex;
-        uptr           childPtr;
+        uptr          childPtr;
         while (state == 0 && level < idxr->max_levels())
         {
-            childIndex     = idxr->get_index(key, level);
-            childPtr = node->m_nodes[childIndex];
+            childIndex = idxr->get_index(key, level);
+            childPtr   = node->m_nodes[childIndex];
 
             if (is_value(childPtr))
             {
-                u64 const childNodeKey = m_kv->get_key((void*)as_value(childPtr));
+                u64 const childNodeKey = m_kv->get_key(as_value_ptr(childPtr));
                 s32 const c            = idxr->keys_compare(childNodeKey, key);
                 if (c <= 0)
                 {
-                    value = (void*)as_value(childPtr);
+                    value = as_value_ptr(childPtr);
                     return true;
                 }
             }
@@ -1068,7 +1158,7 @@ namespace xcore
 
             if (is_value(childPtr))
             {
-                value = (void*)as_value(childPtr);
+                value = as_value_ptr(childPtr);
                 return true;
             }
 
@@ -1098,19 +1188,19 @@ namespace xcore
         s32           state = 0; // 0 = we are on target branch, -1 = we are on a lower-bound branch
         node_t const* node  = m_root;
         s8            childIndex;
-        uptr           childPtr;
+        uptr          childPtr;
         while (state == 0 && level < idxr->max_levels())
         {
-            childIndex     = idxr->get_index(key, level);
-            childPtr = node->m_nodes[childIndex];
+            childIndex = idxr->get_index(key, level);
+            childPtr   = node->m_nodes[childIndex];
 
             if (is_value(childPtr))
             {
-                u64 const childNodeKey = m_kv->get_key((void*)as_value(childPtr));
+                u64 const childNodeKey = m_kv->get_key(as_value_ptr(childPtr));
                 s32 const c            = idxr->keys_compare(childNodeKey, key);
                 if (c >= 0)
                 {
-                    value = (void*)as_value(childPtr);
+                    value = as_value_ptr(childPtr);
                     return true;
                 }
             }
@@ -1156,7 +1246,7 @@ namespace xcore
 
             if (is_value(childPtr))
             {
-                value = (void*)as_value(childPtr);
+                value = as_value_ptr(childPtr);
                 return true;
             }
 
