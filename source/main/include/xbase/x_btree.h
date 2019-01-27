@@ -126,6 +126,29 @@ namespace xcore
         keyvalue*          m_kv;
     };
 
+    // Dynamic sized nodes, using bitset to identify the slots that are set.
+    // Size of node is from 16B to 520B so this works great with an allocator
+    // that has a good Fixed Size Allocator setup.
+
+    // Every node consumes 6 bits, so a key of 32 bits and a root of 8 bits will
+    // have a maximum depth of 4 (4 * 6-bits = 24 bits + 8 bits root = 32 bits).
+    // Note: A root of 2 bits and a depth of 5 is also possible.
+
+    struct xztree
+    {
+        u64    m_branching;
+        znode* m_banches[];
+        //  16 = 8 ctrl, 1 node ptr
+        //  24 = 8 ctrl, 2 node ptrs
+        //  32 = 8 ctrl, 3 node ptrs
+        //  40 = 8 ctrl, 4 node ptrs
+        //  48 = 8 ctrl, 5 node ptrs
+        //  ..
+        // 128 = 8 ctrl, 15 node ptrs
+        //  ..
+        // 520 = 8 ctrl, 64 node ptrs
+    };
+
     // Now that we have a btree we can implement other well known data structures.
     // map<K,V>
     // set<V>
