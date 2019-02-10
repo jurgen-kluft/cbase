@@ -127,39 +127,87 @@ namespace xcore
     };
 
     // Dynamic sized nodes, using bitset to identify the slots that are set.
-    // Size of node is from 16B to 520B so this works great with an allocator
+    // Size of node is from 16B to 264B so this works great with an allocator
     // that has a good Fixed Size Allocator setup.
 
-    // Every node consumes 6 bits, so a key of 32 bits and a root of 8 bits will
-    // have a maximum depth of 4 (4 * 6-bits = 24 bits + 8 bits root = 32 bits).
-    // Note: A root of 2 bits and a depth of 5 is also possible.
+    // Every node consumes 5 bits, so a key of 32 bits and a root of 7 bits will
+    // have a maximum depth of 5 (5 * 5-bits = 25 bits + 7 bits root = 32 bits).
+    // Note: A root of 2 bits and a depth of 6 is also possible.
 
     struct xztree
     {
-        u64    m_branching;
-        znode* m_banches[];
-        //  16 = 8 ctrl, 1 node ptr
-        //  24 = 8 ctrl, 2 node ptrs
-        //  32 = 8 ctrl, 3 node ptrs
-        //  40 = 8 ctrl, 4 node ptrs
-        //  48 = 8 ctrl, 5 node ptrs
-        //  ..
-        // 128 = 8 ctrl, 15 node ptrs
-        //  ..
-        // 520 = 8 ctrl, 64 node ptrs
+        struct znode
+        {
+            u32    m_nodemap;
+            u32    m_valuemap;
+            znode* m_branches[]; // Node*[->] - Value*[<-]
+        };
+        static s32    size(znode* node);
+        static s32    max_level() { return 6; }
+        static s8  calc_index(s32 level, u32 key);
+        // Insert: Keep calling insert as long as it returns a valid znode*
+        static znode* insert(znode*& node, s8 i, void* value, xalloc* allocator);
+        // Remove: Keep calling remove as long as it returns a valid znode*
+        static znode* remove(znode*& node, s8 i, void* value, xalloc* allocator);
+        // Insert: Keep calling find as long as it returns a valid znode*
+        static znode* find(znode*& node, s8 i, void*& value);
     };
 
     // Now that we have a btree we can implement other well known data structures.
-    // map<K,V>
     // set<V>
+    // map<K,V>
+    // vector<V>
+    template <typename K> class xhasher
+    {
+    public:
+        u32 hash(K const& k) const { return 0; }
+    };
+    template <> class xhasher<s32>
+    {
+    public:
+        u32 hash(s32 const& k) const { return (u32)k; }
+    };
+    template <> class xhasher<u32>
+    {
+    public:
+        u32 hash(u32 const& k) const { return k; }
+    };
+    template <> class xhasher<s64>
+    {
+    public:
+        u32 hash(s64 const& k) const
+        {
+            u64 key = (u64)k;
+            key     = (~key) + (key << 18); // key = (key << 18) - key - 1;
+            key     = key ^ (key >> 31);
+            key     = key * 21; // key = (key + (key << 2)) + (key << 4);
+            key     = key ^ (key >> 11);
+            key     = key + (key << 6);
+            key     = key ^ (key >> 22);
+            return (u32)key;
+        }
+    };
+    template <> class xhasher<u64>
+    {
+    public:
+        u32 hash(u64 const& k) const
+        {
+            u64 key = k;
+            key     = (~key) + (key << 18); // key = (key << 18) - key - 1;
+            key     = key ^ (key >> 31);
+            key     = key * 21; // key = (key + (key << 2)) + (key << 4);
+            key     = key ^ (key >> 11);
+            key     = key + (key << 6);
+            key     = key ^ (key >> 22);
+            return (u32)key;
+        }
+    };
 
     template <typename K, typename V> class xmap
     {
     public:
-        typedef u64 (*hashfunc)(K const& key);
-
         xmap(xalloc* a) : m_allocator(a) {}
-        xmap(xalloc* a, hashfunc hashfn) : m_hash(hashfn), m_allocator(a) {}
+        xmap(xalloc* a, xhasher<K> hasher) : m_hash(hasher), m_allocator(a) {}
 
         bool insert(K const& key, V const& value);
         bool remove(K const& key, V& value);
@@ -173,19 +221,16 @@ namespace xcore
             K   m_key;
             V   m_value;
         };
-        hashfunc  m_hash;
-        xalloc*   m_allocator;
-        xfsalloc* m_node_allocator;
-        xbtree    m_tree;
+        xhasher<K> m_hash;
+        xalloc*    m_allocator;
+        xztree     m_tree;
     };
 
-    template <typename T> class xhashset
+    template <typename T> class xset
     {
     public:
-        typedef u64 (*hashfunc)(T const& value);
-
-        xhashset();
-        xhashset(hashfunc hash);
+        xset();
+        xset(xhasher<K> hasher);
 
         bool insert(T const& value);
         bool remove(T const& value);
@@ -194,13 +239,13 @@ namespace xcore
     private:
         struct value_t
         {
-            u64 m_hash;
+            inline value_t(u32 key, const T& value) : m_hash(key), m_value(value) {}
+            u32 m_key;
             T   m_value;
         };
-        hashfunc  m_hash;
-        xalloc*   m_allocator;
-        xfsalloc* m_node_allocator;
-        xbtree    m_tree;
+        xhasher<K> m_hash;
+        xalloc*    m_allocator;
+        xztree     m_tree;
     };
 }; // namespace xcore
 
