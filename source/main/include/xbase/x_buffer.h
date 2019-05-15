@@ -39,6 +39,8 @@ namespace xcore
 
 		xbinary_reader	reader() const;
 
+		static xcbuffer	from_ascii_string(const char*);
+
 		u32				m_len;
 		xbyte const*	m_const;
 	};
