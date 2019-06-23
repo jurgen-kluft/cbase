@@ -80,6 +80,9 @@ We need to redesign this a bit by limiting the feature set, design can consider 
 
 - thread
 - mutex, event, semaphore
+- per thread
+  - random number generator
+  - allocator
 
 ## xp2p
 
