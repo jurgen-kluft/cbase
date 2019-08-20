@@ -1851,7 +1851,7 @@ namespace xcore
 					return crunes(pos, pos+1);
 				}
 			}
-			return crunes();
+			return crunes(str, str);
 		}
 
 		runes find(runes const& _str, uchar32 _c, bool _casesensitive)
@@ -1863,7 +1863,7 @@ namespace xcore
 				runes sel = transpose(_str, csel);
 				return sel;
 			}
-			return runes();
+			return runes(_str.m_str, _str.m_str);
 		}
 
 		crunes findLast(crunes const& _str, uchar32 _c, bool _casesensitive)
