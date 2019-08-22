@@ -1740,7 +1740,7 @@ namespace xcore
 
 		void concatenate(runes& str, const crunes& concat, alloc* allocator, s32 size_alignment)
 		{
-			s64 const required = str.size() + concat.size();
+			s32 const required = str.size() + concat.size();
 			if (required > str.cap())
 			{
 				resize(str, required, allocator, size_alignment);
@@ -1750,7 +1750,7 @@ namespace xcore
 
 		void concatenate(runes& str, const crunes& concat1, const crunes& concat2, alloc* allocator, s32 size_alignment)
 		{
-			s64 const required = str.size() + concat1.size() + concat2.size();
+			s32 const required = str.size() + concat1.size() + concat2.size();
 			if (required > str.cap())
 			{
 				resize(str, required, allocator, size_alignment);
@@ -1863,7 +1863,7 @@ namespace xcore
 				runes sel = transpose(_str, csel);
 				return sel;
 			}
-			return runes(_str.m_str, _str.m_str);
+			return runes(_str.m_str, _str.m_str, _str.m_eos);
 		}
 
 		crunes findLast(crunes const& _str, uchar32 _c, bool _casesensitive)
@@ -2186,6 +2186,24 @@ namespace xcore
 			sel.m_str = _selection.m_str;
 			sel.m_end = _str.m_end;
 			sel.m_eos = _str.m_eos;
+			return sel;
+		}
+
+		crunes selectUntilEndExcludeSelection(const crunes& _str, const crunes& _selection)
+		{
+			crunes sel;
+			sel.m_str = _str.m_str;
+			sel.m_end = _str.m_end;
+			sel.m_cur = _selection.m_end;
+			return sel;
+		}
+
+		crunes selectUntilEndIncludeSelection(const crunes& _str, const crunes& _selection)
+		{
+			crunes sel;
+			sel.m_str = _str.m_str;
+			sel.m_cur = _selection.m_str;
+			sel.m_end = _str.m_end;
 			return sel;
 		}
 
