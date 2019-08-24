@@ -18,25 +18,27 @@ namespace xcore
         typedef char        rune;
         typedef char*       prune;
         typedef const char* pcrune;
+
+        static const rune TERMINATOR = '\0';
+
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
-            inline runes(prune _str, prune _end, pcrune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
+            inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
             inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
-            s32  size() const { return (s32)(m_end - m_str); }
-            s32  cap() const { return (s32)(m_eos - m_str); }
+
+            s32 size() const { return (s32)(m_end - m_str); }
+            s32 cap() const { return (s32)(m_eos - m_str); }
+
             bool is_empty() const { return m_str == m_end; }
-			bool is_valid() const { return m_str != nullptr && m_end < m_eos; }
-            void reset()
-            {
-				m_end = m_str;
-			}
+            bool is_valid() const { return m_str != nullptr && m_end < m_eos; }
+            void reset() { m_end = m_str; }
             void clear()
             {
                 if (m_str != nullptr)
                 {
                     m_end    = m_str;
-                    m_end[0] = '\0';
+                    m_end[0] = TERMINATOR;
                 }
             }
             runes operator=(runes const& other)
@@ -46,16 +48,16 @@ namespace xcore
                 m_eos = other.m_eos;
                 return *this;
             }
-            prune  m_str;
-            prune  m_end;
-            pcrune m_eos;
+            prune m_str; // Begin of string in memory and begin of character stream
+            prune m_end; // End of character/text stream
+            prune m_eos; // End of string in memory, points to a TERMINATOR
         };
         struct crunes
         {
-            inline crunes() : m_str(nullptr), m_cur(nullptr), m_end(nullptr) {}
+            inline crunes() : m_str(""), m_cur(m_str), m_end(m_str) {}
             inline crunes(pcrune _str) : m_str(_str), m_cur(_str), m_end(_str)
             {
-                while (*m_end != '\0')
+                while (*m_end != TERMINATOR)
                     ++m_end;
             }
             inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_cur(_str), m_end(_end)
@@ -63,23 +65,22 @@ namespace xcore
                 if (m_end == nullptr)
                 {
                     m_end = m_str;
-                    while (*m_end != '\0')
+                    while (*m_end != TERMINATOR)
                         ++m_end;
                 }
             }
             inline crunes(runes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
             inline crunes(crunes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
-            s64  size() const { return (s64)(m_end - m_str); }
-			bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
+
+            s32 size() const { return (s32)(m_end - m_str); }
+
+            bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
             bool is_empty() const { return m_str == m_end; }
-            void reset()
-            {
-				m_cur = m_str;
-			}
+            void reset() { m_cur = m_str; }
             void clear()
             {
                 m_str = "";
-				m_cur = m_str;
+                m_cur = m_str;
                 m_end = m_str;
             }
             crunes& operator=(crunes const& other)
@@ -90,7 +91,7 @@ namespace xcore
                 return *this;
             }
             pcrune m_str;
-			pcrune m_cur;
+            pcrune m_cur;
             pcrune m_end;
         };
 
@@ -102,12 +103,7 @@ namespace xcore
                 SIZE = L + 1
             };
             rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
-            void reset()
-            {
-                m_end    = m_str;
-                m_str[0] = '\0';
-            }
+            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = TERMINATOR; }
         };
 
         class alloc
@@ -123,20 +119,26 @@ namespace xcore
         typedef uchar8        rune;
         typedef uchar8*       prune;
         typedef const uchar8* pcrune;
+
+        static const rune TERMINATOR = '\0';
+
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
-            inline runes(prune _str, prune _end, pcrune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
+            inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
             inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
+
             s32  size() const { return (s32)(m_end - m_str); }
             s32  cap() const { return (s32)(m_eos - m_str); }
             bool is_empty() const { return m_str == m_end; }
+            void reset() { m_end = m_str; }
+
             void clear()
             {
                 if (m_str != nullptr)
                 {
                     m_end    = m_str;
-                    m_end[0] = '\0';
+                    m_end[0] = TERMINATOR;
                 }
             }
             runes& operator=(runes const& other)
@@ -146,10 +148,11 @@ namespace xcore
                 m_eos = other.m_eos;
                 return *this;
             }
-            prune  m_str;
-            prune  m_end;
-            pcrune m_eos;
+            prune m_str;
+            prune m_end;
+            prune m_eos;
         };
+
         struct crunes
         {
             inline crunes() : m_str(nullptr), m_end(nullptr) {}
@@ -180,7 +183,7 @@ namespace xcore
                 SIZE = L + 1
             };
             rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
+            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = 0; }
         };
 
         class alloc
@@ -196,10 +199,13 @@ namespace xcore
         typedef uchar16        rune;
         typedef uchar16*       prune;
         typedef const uchar16* pcrune;
+
+        static const rune TERMINATOR = 0;
+
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
-            inline runes(prune _str, prune _end, pcrune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
+            inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
             inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 
             s32  size() const { return (s32)(m_end - m_str); }
@@ -210,7 +216,7 @@ namespace xcore
                 if (m_str != nullptr)
                 {
                     m_end    = m_str;
-                    m_end[0] = '\0';
+                    m_end[0] = TERMINATOR;
                 }
             }
 
@@ -234,16 +240,16 @@ namespace xcore
                 return (s1 == other.m_end && s2 == m_end);
             }
 
-            prune  m_str;
-            prune  m_end;
-            pcrune m_eos;
+            prune m_str;
+            prune m_end;
+            prune m_eos;
         };
         struct crunes
         {
             inline crunes() : m_str(nullptr), m_cur(nullptr), m_end(nullptr) {}
             inline crunes(pcrune _str) : m_str(_str), m_cur(_str), m_end(_str)
             {
-                while (*m_end != '\0')
+                while (*m_end != TERMINATOR)
                     ++m_end;
             }
             inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_cur(_str), m_end(_end)
@@ -251,7 +257,7 @@ namespace xcore
                 if (m_end == nullptr)
                 {
                     m_end = m_str;
-                    while (*m_end != '\0')
+                    while (*m_end != TERMINATOR)
                         ++m_end;
                 }
             }
@@ -261,8 +267,8 @@ namespace xcore
             bool is_empty() const { return m_str == m_end; }
             void clear()
             {
-                m_str = (pcrune)"\0\0\0\0";
-				m_cur = m_str;
+                m_str = (pcrune) "\0\0\0\0";
+                m_cur = m_str;
                 m_end = m_str;
             }
             crunes& operator=(crunes const& other)
@@ -273,7 +279,7 @@ namespace xcore
                 return *this;
             }
             pcrune m_str;
-			pcrune m_cur;
+            pcrune m_cur;
             pcrune m_end;
         };
         template <s32 L> class runez : public runes
@@ -284,15 +290,16 @@ namespace xcore
                 SIZE = L + 1
             };
             rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
+
+            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = TERMINATOR; }
             inline runez(const char* str) : runes(m_str, m_str, &m_str[SIZE - 1])
             {
-                m_str[SIZE - 1] = 0;
-                while (*str != '\0' && m_str < m_eos)
+                m_eos[0] = TERMINATOR;
+                while (*str != ascii::TERMINATOR && m_str < m_eos)
                 {
                     *m_end++ = *str;
                 }
-                *m_end = '\0';
+                *m_end = TERMINATOR;
             }
         };
 
@@ -309,27 +316,28 @@ namespace xcore
         typedef uchar32        rune;
         typedef uchar32*       prune;
         typedef const uchar32* pcrune;
+
+        static const rune TERMINATOR = '\0';
+
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
-            inline runes(prune _str, prune _end, pcrune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
+            inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
             inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 
-            s32  size() const { return (s32)(m_end - m_str); }
-            s32  cap() const { return (s32)(m_eos - m_str); }
+            s32 size() const { return (s32)(m_end - m_str); }
+            s32 cap() const { return (s32)(m_eos - m_str); }
+
             bool is_empty() const { return m_str == m_end; }
-			bool is_valid() const { return m_str != nullptr && m_end < m_eos; }
-            
-            void reset()
-            {
-				m_end = m_str;
-			}
-			void clear()
+            bool is_valid() const { return m_str != nullptr && m_end < m_eos; }
+
+            void reset() { m_end = m_str; }
+            void clear()
             {
                 if (m_str != nullptr)
                 {
                     m_end    = m_str;
-                    m_end[0] = '\0';
+                    m_end[0] = TERMINATOR;
                 }
             }
 
@@ -341,16 +349,17 @@ namespace xcore
                 return *this;
             }
 
-            prune  m_str;
-            prune  m_end;
-            pcrune m_eos;
+            prune m_str;
+            prune m_end;
+            prune m_eos;
         };
+
         struct crunes
         {
             inline crunes() : m_str(nullptr), m_cur(nullptr), m_end(nullptr) {}
             inline crunes(pcrune _str) : m_str(_str), m_cur(_str), m_end(_str)
             {
-                while (*m_end != '\0')
+                while (*m_end != TERMINATOR)
                     ++m_end;
             }
             inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_cur(_str), m_end(_end)
@@ -358,23 +367,21 @@ namespace xcore
                 if (m_end == nullptr)
                 {
                     m_end = m_str;
-                    while (*m_end != '\0')
+                    while (*m_end != TERMINATOR)
                         ++m_end;
                 }
             }
             inline crunes(runes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
             inline crunes(crunes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
+
             s32  size() const { return (s32)(m_end - m_str); }
-			bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
+            bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
             bool is_empty() const { return m_str == m_end; }
-            void reset()
-            {
-				m_cur = m_str;
-            }
+            void reset() { m_cur = m_str; }
             void clear()
             {
-                m_str = (pcrune)"\0\0\0\0";
-				m_cur = m_str;
+                m_str = (pcrune) "\0\0\0\0";
+                m_cur = m_str;
                 m_end = m_str;
             }
             crunes& operator=(crunes const& other)
@@ -385,7 +392,7 @@ namespace xcore
                 return *this;
             }
             pcrune m_str;
-			pcrune m_cur;
+            pcrune m_cur;
             pcrune m_end;
         };
         template <s32 L> class runez : public runes
@@ -396,15 +403,16 @@ namespace xcore
                 SIZE = L + 1
             };
             rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_str[SIZE - 1] = 0; }
+
+            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = TERMINATOR; }
             inline runez(const char* str) : runes(m_str, m_str, &m_str[SIZE - 1])
             {
-                m_str[SIZE - 1] = 0;
-                while (*str != '\0' && m_str < m_eos)
+                m_eos[0] = TERMINATOR;
+                while (*str != ascii::TERMINATOR && m_str < m_eos)
                 {
                     *m_end++ = *str;
                 }
-                *m_end = '\0';
+                *m_end = TERMINATOR;
             }
         };
 
@@ -506,48 +514,10 @@ namespace xcore
 
     namespace ascii
     {
-        inline s64 size(crunes const& _str) { return _str.size(); }
+        s32 len(pcrune str, pcrune end);
 
-        inline prune endof(prune str, pcrune eos)
-        {
-            if (eos == nullptr)
-            {
-                prune end = str;
-                while (*end != '\0')
-                    end++;
-                return end;
-            }
-            else
-            {
-                prune end = str;
-                while (*end != '\0' && end < eos)
-                    end++;
-                return end;
-            }
-        }
-        inline pcrune endof(pcrune str, pcrune eos)
-        {
-            if (eos == nullptr)
-            {
-                pcrune end = str;
-                while (*end != '\0')
-                    end++;
-                return end;
-            }
-            else
-            {
-                pcrune end = str;
-                while (*end != '\0' && end < eos)
-                    end++;
-                return end;
-            }
-        }
-
-        inline s32 len(pcrune str, pcrune end)
-        {
-            end = endof(str, end);
-            return s32(end - str);
-        }
+        prune  endof(prune str, pcrune eos);
+        pcrune endof(pcrune str, pcrune eos);
 
         crunes find(crunes const& _str, uchar32 _c, bool inCaseSensitive = true);
         runes  find(runes const& _str, uchar32 _c, bool inCaseSensitive = true);
@@ -562,6 +532,37 @@ namespace xcore
         crunes findOneOf(crunes const& str, crunes const& set, bool inCaseSensitive = true);
         runes  findOneOf(runes const& str, crunes const& set, bool inCaseSensitive = true);
 
+        // -------------------------------------------------------------------------------
+        // crunes, functions
+        crunes findSelectUntil(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findSelectUntil(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+        crunes findLastSelectUntil(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findLastSelectUntil(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+        crunes findSelectUntilIncluded(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findSelectUntilIncluded(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+        crunes findLastSelectUntilIncluded(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findLastSelectUntilIncluded(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+
+        crunes findSelectAfter(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findSelectAfter(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+        crunes findLastSelectAfter(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findLastSelectAfter(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+
+        crunes selectBetween(const crunes& inStr, uchar32 inLeft, uchar32 inRight);
+        crunes selectNextBetween(const crunes& inStr, const crunes& inSelection, uchar32 inLeft, uchar32 inRight);
+
+        crunes selectBetweenLast(const crunes& inStr, uchar32 inLeft, uchar32 inRight);
+        crunes selectPreviousBetween(const crunes& inStr, const crunes& inSelection, uchar32 inLeft, uchar32 inRight);
+
+        crunes selectUntilEndExcludeSelection(const crunes& inStr, const crunes& inSelection);
+        crunes selectUntilEndIncludeSelection(const crunes& inStr, const crunes& inSelection);
+
+        crunes selectOverlap(const crunes& inStr, const crunes& inRight);
+
+        s32 compare(crunes const& str1, crunes const& str2, bool inCaseSensitive = true);
+
+        // -------------------------------------------------------------------------------
+        // runes, functions
         runes findSelectUntil(const runes& inStr, uchar32 inFind, bool inCaseSensitive = true);
         runes findSelectUntil(const runes& inStr, const crunes& inFind, bool inCaseSensitive = true);
         runes findLastSelectUntil(const runes& inStr, uchar32 inFind, bool inCaseSensitive = true);
@@ -585,7 +586,10 @@ namespace xcore
         runes selectUntilEndExcludeSelection(const runes& inStr, const runes& inSelection);
         runes selectUntilEndIncludeSelection(const runes& inStr, const runes& inSelection);
 
-        s32 compare(crunes const& str1, crunes const& str2, bool inCaseSensitive = true);
+        runes selectOverlap(const runes& inStr, const runes& inRight);
+
+        s32 compare(runes const& str1, runes const& str2, bool inCaseSensitive = true);
+        // -------------------------------------------------------------------------------
 
         crunes parse(crunes const& str, bool& value);
         crunes parse(crunes const& str, s32& value, s32 base = 10);
@@ -693,6 +697,9 @@ namespace xcore
     } // namespace ascii
 
     inline bool operator==(const ascii::crunes& lhs, const ascii::crunes& rhs) { return ascii::compare(lhs, rhs) == 0; }
+    inline bool operator!=(const ascii::crunes& lhs, const ascii::crunes& rhs) { return ascii::compare(lhs, rhs) != 0; }
+    inline bool operator==(const ascii::runes& lhs, const ascii::runes& rhs) { return ascii::compare(lhs, rhs) == 0; }
+    inline bool operator!=(const ascii::runes& lhs, const ascii::runes& rhs) { return ascii::compare(lhs, rhs) != 0; }
 
     namespace utf32
     {
@@ -714,6 +721,37 @@ namespace xcore
         crunes findOneOf(crunes const& str, crunes const& set, bool inCaseSensitive = true);
         runes  findOneOf(runes const& str, crunes const& set, bool inCaseSensitive = true);
 
+        // -------------------------------------------------------------------------------
+        // crunes, functions
+        crunes findSelectUntil(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findSelectUntil(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+        crunes findLastSelectUntil(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findLastSelectUntil(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+        crunes findSelectUntilIncluded(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findSelectUntilIncluded(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+        crunes findLastSelectUntilIncluded(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findLastSelectUntilIncluded(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+
+        crunes findSelectAfter(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findSelectAfter(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+        crunes findLastSelectAfter(const crunes& inStr, uchar32 inFind, bool inCaseSensitive = true);
+        crunes findLastSelectAfter(const crunes& inStr, const crunes& inFind, bool inCaseSensitive = true);
+
+        crunes selectBetween(const crunes& inStr, uchar32 inLeft, uchar32 inRight);
+        crunes selectNextBetween(const crunes& inStr, const crunes& inSelection, uchar32 inLeft, uchar32 inRight);
+
+        crunes selectBetweenLast(const crunes& inStr, uchar32 inLeft, uchar32 inRight);
+        crunes selectPreviousBetween(const crunes& inStr, const crunes& inSelection, uchar32 inLeft, uchar32 inRight);
+
+        crunes selectUntilEndExcludeSelection(const crunes& inStr, const crunes& inSelection);
+        crunes selectUntilEndIncludeSelection(const crunes& inStr, const crunes& inSelection);
+
+        crunes selectOverlap(const crunes& inStr, const crunes& inRight);
+
+        s32 compare(crunes const& str1, crunes const& str2, bool inCaseSensitive = true);
+
+        // -------------------------------------------------------------------------------
+        // runes, functions
         runes findSelectUntil(const runes& inStr, uchar32 inFind, bool inCaseSensitive = true);
         runes findSelectUntil(const runes& inStr, const crunes& inFind, bool inCaseSensitive = true);
         runes findLastSelectUntil(const runes& inStr, uchar32 inFind, bool inCaseSensitive = true);
@@ -739,7 +777,8 @@ namespace xcore
 
         runes selectOverlap(const runes& inStr, const runes& inRight);
 
-        s32 compare(crunes const& str1, crunes const& str2, bool inCaseSensitive = true);
+        s32 compare(runes const& str1, runes const& str2, bool inCaseSensitive = true);
+        // -------------------------------------------------------------------------------
 
         crunes parse(crunes const& str, bool& value);
         crunes parse(crunes const& str, s32& value, s32 base = 10);
@@ -828,15 +867,15 @@ namespace xcore
         void trim(runes&);                               // Trim whitespace from left and right side of xstring
         void trimLeft(runes&);                           // Trim whitespace from left side of xstring
         void trimRight(runes&);                          // Trim whitespace from right side of xstring
-        void trim(runes&, uchar32 inChar);               // Trim characters in <inCharSet> from left and right side of xstring
-        void trimLeft(runes&, uchar32 inChar);           // Trim character <inChar> from left side of xstring
-        void trimRight(runes&, uchar32 inChar);          // Trim character <inChar> from right side of xstring
+        void trim(runes&, rune inChar);                  // Trim characters in <inCharSet> from left and right side of xstring
+        void trimLeft(runes&, rune inChar);              // Trim character <inChar> from left side of xstring
+        void trimRight(runes&, rune inChar);             // Trim character <inChar> from right side of xstring
         void trim(runes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side of xstring
         void trimLeft(runes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side of xstring
         void trimRight(runes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side of xstring
         void trimQuotes(runes&);                         // Trim double quotes from left and right side of xstring
-        void trimQuotes(runes&, uchar32 quote);          // Trim double quotes from left and right side of xstring
-        void trimDelimiters(runes&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side of xstring
+        void trimQuotes(runes&, rune quote);             // Trim double quotes from left and right side of xstring
+        void trimDelimiters(runes&, rune inLeft, rune inRight); // Trim delimiters from left and right side of xstring
 
         void copy(const crunes& src, runes& dst);
         void copy(const crunes& src, runes& dst, alloc* allocator, s32 size_alignment);
@@ -846,6 +885,11 @@ namespace xcore
         void concatenate(runes& str, const crunes& concat1, const crunes& concat2, alloc* allocator, s32 size_alignment);
 
     }; // namespace utf32
+
+    inline bool operator==(const utf32::crunes& lhs, const utf32::crunes& rhs) { return utf32::compare(lhs, rhs) == 0; }
+    inline bool operator!=(const utf32::crunes& lhs, const utf32::crunes& rhs) { return utf32::compare(lhs, rhs) != 0; }
+    inline bool operator==(const utf32::runes& lhs, const utf32::runes& rhs) { return utf32::compare(lhs, rhs) == 0; }
+    inline bool operator!=(const utf32::runes& lhs, const utf32::runes& rhs) { return utf32::compare(lhs, rhs) != 0; }
 
 }; // namespace xcore
 

@@ -7,5 +7,5 @@
 namespace xcore
 {
 
-};	///< END xcore namespace
+};
 
