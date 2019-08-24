@@ -98,6 +98,8 @@ namespace xcore
 	class xbinary_reader
 	{
 	public:
+		inline              xbinary_reader(xbuffer const& b) : len_(b.size()), cursor_(0), buffer_(b.m_mutable) {}
+		inline              xbinary_reader(xcbuffer const& b) : len_(b.size()), cursor_(0), buffer_(b.m_const) {}
 		inline              xbinary_reader(xbyte const* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) {}
 
 		u32                 size() const;
@@ -137,8 +139,8 @@ namespace xcore
 	{
 	public:
 		inline              xbinary_writer() : len_(0), cursor_(0), buffer_() { }
-		inline              xbinary_writer(xbyte* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) { }
 		inline              xbinary_writer(xbuffer const& _buffer) : len_(_buffer.size()), cursor_(0), buffer_(_buffer.m_mutable) { }
+		inline              xbinary_writer(xbyte* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) { }
 
 		u32                 size() const;
 		u32                 len() const;

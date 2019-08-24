@@ -72,7 +72,7 @@ namespace xcore
             inline crunes(runes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
             inline crunes(crunes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
 
-            s32 size() const { return (s32)(m_end - m_str); }
+            s32 size() const { return (s32)(s64)(m_end - m_str); }
 
             bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
             bool is_empty() const { return m_str == m_end; }
@@ -772,8 +772,10 @@ namespace xcore
         runes selectBetweenLast(const runes& inStr, uchar32 inLeft, uchar32 inRight);
         runes selectPreviousBetween(const runes& inStr, const runes& inSelection, uchar32 inLeft, uchar32 inRight);
 
-        runes selectUntilEndExcludeSelection(const runes& inStr, const runes& inSelection);
-        runes selectUntilEndIncludeSelection(const runes& inStr, const runes& inSelection);
+        crunes selectUntilEndExcludeSelection(const crunes& inStr, const crunes& inSelection);
+        crunes selectUntilEndIncludeSelection(const crunes& inStr, const crunes& inSelection);
+        runes  selectUntilEndExcludeSelection(const runes& inStr, const runes& inSelection);
+        runes  selectUntilEndIncludeSelection(const runes& inStr, const runes& inSelection);
 
         runes selectOverlap(const runes& inStr, const runes& inRight);
 
