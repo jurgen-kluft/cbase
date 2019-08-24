@@ -17,12 +17,7 @@ namespace xcore
         xalloc* m_allocator;
 
     public:
-        inline xfixedsizealloc()
-            : m_alloc_size(0)
-            , m_count(0)
-            , m_allocator(nullptr)
-        {
-        }
+        inline xfixedsizealloc() : m_alloc_size(0), m_count(0), m_allocator(nullptr) {}
 
         s32 count() const { return m_count; }
 
@@ -443,11 +438,11 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
             void* vv1;
             CHECK_TRUE(tree.rem(v1->m_key, vv1));
-            heap.destruct(vv1);
+            heap.destruct<myvalue>((myvalue*)vv1);
 
             void* vv2;
             CHECK_TRUE(tree.rem(v1->m_key, vv2));
-            heap.destruct(vv2);
+            heap.destruct<myvalue>((myvalue*)vv2);
 
             tree.clear();
         }
