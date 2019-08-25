@@ -846,16 +846,16 @@ namespace xcore
 
         bool    starts_with(crunes const& str, uchar32 start);
         bool    starts_with(crunes const& str, crunes const& start);
-        bool    ends_with(crunes const& str, uchar32 end_char);
+        bool    ends_with(crunes const& str, uchar32 end);
         bool    ends_with(crunes const& str, crunes const& end);
         uchar32 first_char(crunes const& str);
         uchar32 last_char(crunes const& str);
 
-        void removeSelection(runes& str, crunes const& selection);
-        void keepOnlySelection(runes& str, crunes const& keep);
+        void removeSelection(runes& str, crunes const& sel);
+        void keepOnlySelection(runes& str, crunes const& sel);
 
-        void replaceSelection(runes& str, crunes const& selection, crunes const& replace);
-        void replaceSelection(runes& str, crunes const& selection, crunes const& replace, alloc* allocator, s32 size_alignment);
+        void replaceSelection(runes& str, crunes const& sel, crunes const& replace);
+        void replaceSelection(runes& str, crunes const& sel
 
         void findReplace(runes& str, uchar32 find, uchar32 replace, bool inCaseSensitive = true);
         void findReplace(runes& str, crunes const& find, crunes const& replace, bool inCaseSensitive = true);
@@ -863,18 +863,18 @@ namespace xcore
         void insert(runes& str, crunes const& insert);
         void insert(runes& str, crunes const& insert, alloc* allocator, s32 size_alignment);
 
-        void insert(runes& str, crunes const& selection, crunes const& insert);
-        void insert(runes& str, crunes const& selection, crunes const& insert, alloc* allocator, s32 size_alignment);
+        void insert(runes& str, crunes const& sel, crunes const& insert);
+        void insert(runes& str, crunes const& sel, crunes const& insert, alloc* allocator, s32 size_alignment);
 
         void trim(runes&);                               // Trim whitespace from left and right side of xstring
         void trimLeft(runes&);                           // Trim whitespace from left side of xstring
         void trimRight(runes&);                          // Trim whitespace from right side of xstring
-        void trim(runes&, rune inChar);                  // Trim characters in <inCharSet> from left and right side of xstring
-        void trimLeft(runes&, rune inChar);              // Trim character <inChar> from left side of xstring
-        void trimRight(runes&, rune inChar);             // Trim character <inChar> from right side of xstring
-        void trim(runes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side of xstring
-        void trimLeft(runes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side of xstring
-        void trimRight(runes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side of xstring
+        void trim(runes&, rune c);                       // Trim characters in <charset> from left and right side of xstring
+        void trimLeft(runes&, rune c);                   // Trim character <c> from left side of xstring
+        void trimRight(runes&, rune c);                  // Trim character <c> from right side of xstring
+        void trim(runes&, crunes const& charset);        // Trim characters in <charset> from left and right side of xstring
+        void trimLeft(runes&, crunes const& charset);    // Trim characters in <charset> from left side of xstring
+        void trimRight(runes&, crunes const& charset);   // Trim characters in <charset> from right side of xstring
         void trimQuotes(runes&);                         // Trim double quotes from left and right side of xstring
         void trimQuotes(runes&, rune quote);             // Trim double quotes from left and right side of xstring
         void trimDelimiters(runes&, rune inLeft, rune inRight); // Trim delimiters from left and right side of xstring
