@@ -1954,7 +1954,7 @@ namespace xcore
 				return crunes();
 
 			pcrune str_cursor = _str.m_end - _find.size();
-			while (str_cursor > _str.m_str)
+			while (str_cursor >= _str.m_str)
 			{
 				crunes	str_sel(str_cursor, str_cursor + _find.size());
 				s32 const cmp = compare(str_sel, _find, _casesensitive);
@@ -2012,6 +2012,7 @@ namespace xcore
 			runes selection = find(_str, _c, _casesensitive);
 			if (selection.is_empty())
 				return selection;
+			selection.m_end = selection.m_str;
 			selection.m_str = _str.m_str;
 			return selection;
 		}
@@ -2021,6 +2022,7 @@ namespace xcore
 			runes selection = find(_str, _find, _casesensitive);
 			if (selection.is_empty())
 				return selection;
+			selection.m_end = selection.m_str;
 			selection.m_str = _str.m_str;
 			return selection;
 		}
@@ -2030,6 +2032,7 @@ namespace xcore
 			runes selection = findLast(_str, _c, _casesensitive);
 			if (selection.is_empty())
 				return selection;
+			selection.m_end = selection.m_str;
 			selection.m_str = _str.m_str;
 			return selection;
 		}
@@ -2039,6 +2042,7 @@ namespace xcore
 			runes selection = findLast(_str, _find, _casesensitive);
 			if (selection.is_empty())
 				return selection;
+			selection.m_end = selection.m_str;
 			selection.m_str = _str.m_str;
 			return selection;
 		}
@@ -2048,7 +2052,7 @@ namespace xcore
 			runes selection = find(_str, _c, _casesensitive);
 			if (selection.is_empty())
 				return selection;
-			selection.m_str = _str.m_str + 1;
+			selection.m_str = _str.m_str;
 			return selection;
 		}
 
@@ -2057,7 +2061,7 @@ namespace xcore
 			runes selection = find(_str, _find, _casesensitive);
 			if (selection.is_empty())
 				return selection;
-			selection.m_str = _str.m_str + _find.size();
+			selection.m_str = _str.m_str;
 			return selection;
 		}
 
@@ -2066,7 +2070,7 @@ namespace xcore
 			runes selection = findLast(_str, _c, _casesensitive);
 			if (selection.is_empty())
 				return selection;
-			selection.m_str = _str.m_str + 1;
+			selection.m_str = _str.m_str;
 			return selection;
 		}
 
@@ -2075,7 +2079,7 @@ namespace xcore
 			runes selection = findLast(_str, _find, _casesensitive);
 			if (selection.is_empty())
 				return selection;
-			selection.m_str = _str.m_str + _find.size();
+			selection.m_str = _str.m_str;
 			return selection;
 		}
 
