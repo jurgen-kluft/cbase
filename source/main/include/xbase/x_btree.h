@@ -142,11 +142,9 @@ namespace xcore
             u32    m_valuemap;
             znode* m_branches[]; // Node*[->] - Value*[<-]
         };
-
-        static s32    size(znode* node);
-        static s32    max_level() { return 6; }
-        static s8     calc_index(s32 level, u32 key);
-
+        static s32 size(znode* node);
+        static s32 max_level() { return 6; }
+        static s8  calc_index(s32 level, u32 key);
         // Insert: Keep calling insert as long as it returns a valid znode*
         static znode* insert(znode*& node, s8 i, void* value, xalloc* allocator);
         // Remove: Keep calling remove as long as it returns a valid znode*
@@ -241,7 +239,7 @@ namespace xcore
     private:
         struct value_t
         {
-            inline value_t(u32 key, const T& value) : m_hash(key), m_value(value) {}
+            inline value_t(u32 key, const T& value) : m_key(key), m_value(value) {}
             u32 m_key;
             T   m_value;
         };
