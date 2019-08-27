@@ -133,7 +133,7 @@ namespace xcore
             pcrune str_cursor = _str.m_str;
             pcrune str_end    = _str.m_end - _find.size();
 
-            while (str_cursor <= str_end)
+            while (str_cursor < str_end)
             {
                 crunes    str_sel(str_cursor, str_cursor + _find.size());
                 s32 const cmp = compare(str_sel, _find, _casesensitive);
@@ -168,7 +168,7 @@ namespace xcore
                 return nothing_found(_str);
 
             pcrune str_cursor = _str.m_end - _find.size();
-            while (str_cursor > _str.m_str)
+            while (str_cursor >= _str.m_str)
             {
                 crunes    str_sel(str_cursor, str_cursor + _find.size());
                 s32 const cmp = compare(str_sel, _find, _casesensitive);
@@ -225,10 +225,8 @@ namespace xcore
         // ------------------------------------------------------------------------------------
         crunes findSelectUntil(const crunes& _str, uchar32 _c, bool _casesensitive)
         {
-            crunes sel = find(_str, _c, _casesensitive);
-            if (sel.is_empty())
-                return nothing_found(_str);
-            return crunes(_str.m_str, sel.m_str);
+            crunez<4> _find(_c);
+            return findSelectUntil(_str, _find, _casesensitive);
         }
 
         crunes findSelectUntil(const crunes& _str, const crunes& _find, bool _casesensitive)
@@ -241,10 +239,8 @@ namespace xcore
 
         crunes findLastSelectUntil(const crunes& _str, uchar32 _c, bool _casesensitive)
         {
-            crunes sel = findLast(_str, _c, _casesensitive);
-            if (sel.is_empty())
-                return nothing_found(_str);
-            return crunes(_str.m_str, sel.m_str);
+            crunez<4> _find(_c);
+            return findLastSelectUntil(_str, _find, _casesensitive);
         }
 
         crunes findLastSelectUntil(const crunes& _str, const crunes& _find, bool _casesensitive)
@@ -257,10 +253,8 @@ namespace xcore
 
         crunes findSelectUntilIncluded(const crunes& _str, uchar32 _c, bool _casesensitive)
         {
-            crunes sel = find(_str, _c, _casesensitive);
-            if (sel.is_empty())
-                return nothing_found(_str);
-            return crunes(_str.m_str, sel.m_end);
+            crunez<4> _find(_c);
+            return findSelectUntilIncluded(_str, _find, _casesensitive);
         }
 
         crunes findSelectUntilIncluded(const crunes& _str, const crunes& _find, bool _casesensitive)
@@ -273,10 +267,8 @@ namespace xcore
 
         crunes findLastSelectUntilIncluded(const crunes& _str, uchar32 _c, bool _casesensitive)
         {
-            crunes sel = findLast(_str, _c, _casesensitive);
-            if (sel.is_empty())
-                return nothing_found(_str);
-            return crunes(_str.m_str, sel.m_end);
+            crunez<4> _find(_c);
+            return findLastSelectUntilIncluded(_str, _find, _casesensitive);
         }
 
         crunes findLastSelectUntilIncluded(const crunes& _str, const crunes& _find, bool _casesensitive)

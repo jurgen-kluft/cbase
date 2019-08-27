@@ -784,9 +784,9 @@ namespace xcore
     static inline bool            is_node(uptr n) { return (n != 0) && ((n & 1) == 1); }
     static inline bool            is_value(uptr n) { return (n != 0) && ((n & 1) == 0); }
     static inline uptr            as_node(uptr n) { return ((uptr)n | 1); }
-    static inline uptr            as_value(uptr n) { return ((uptr)n & ~(u64)1); }
-    static inline void*           as_value_ptr(uptr n) { return (void*)((uptr)n & ~(u64)1); }
-    static inline xbtree::node_t* as_node_ptr(uptr n) { return (xbtree::node_t*)((uptr)n & ~(u64)1); }
+    static inline uptr            as_value(uptr n) { return ((uptr)n); }
+    static inline void*           as_value_ptr(uptr n) { ASSERT(is_value(n));  return (void*)((uptr)n); }
+    static inline xbtree::node_t* as_node_ptr(uptr n) { ASSERT(is_node(n)); return (xbtree::node_t*)((uptr)n & ~(u64)1); }
 
     void xbtree::init(xfsalloc* node_allocator, keyvalue* kv)
     {
@@ -890,7 +890,7 @@ namespace xcore
 
             static u32 set_child_null_and_check(node_t* node, s32& index)
             {
-                node->m_nodes[index] = Null;
+                node->m_nodes[index] = 0;
 
                 // 0x..NNVV00
                 u32 c = 0x01000000;
@@ -962,16 +962,14 @@ namespace xcore
                                 node        = nodes[level];
                                 childIndex  = childs[level];
                                 s32 const c = utils::check(node);
-                                if (c != 0x00010000)
-                                {
-                                    // Place the value at its correct place
-                                    u64 const childKey        = m_kv->get_key(as_value_ptr(otherValue));
-                                    childIndex                = idxr->get_index(childKey, level);
-                                    node->m_nodes[childIndex] = otherValue;
+                                if (c != 0x03010000)
                                     break;
-                                }
-                                // Only 1 'node' left, that is us
                             }
+
+                            // Place the value at its correct place
+                            u64 const childKey        = m_kv->get_key(as_value_ptr(otherValue));
+                            childIndex                = idxr->get_index(childKey, level);
+                            node->m_nodes[childIndex] = otherValue;
                         }
                     }
                     return true;
@@ -1023,7 +1021,8 @@ namespace xcore
             }
             if (child == 4)
             {
-                m_node_alloc->deallocate(node);
+				xpool heap(m_node_alloc);
+				heap.destruct(node);
             }
         }
     }

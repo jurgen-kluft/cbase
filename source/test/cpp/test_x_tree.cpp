@@ -31,7 +31,7 @@ namespace xcore
         virtual void* allocate()
         {
             m_count++;
-            return m_allocator->allocate(sizeof(m_alloc_size), sizeof(void*));
+            return m_allocator->allocate(m_alloc_size, sizeof(void*));
         }
         virtual void deallocate(void* p)
         {
@@ -406,7 +406,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         static myvalue_kv values;
 
-        UNITTEST_FIXTURE_SETUP() { nodes.init(sizeof(myvalue), gTestAllocator); }
+        UNITTEST_FIXTURE_SETUP() { nodes.init(sizeof(void*) * 4, gTestAllocator); }
 
         UNITTEST_FIXTURE_TEARDOWN() {}
 
@@ -430,17 +430,17 @@ UNITTEST_SUITE_BEGIN(xbtree)
             v2->m_value = 2.0f;
             v2->m_key   = 0;
 
-            //            CHECK_TRUE(tree.add(1, v1));
-            //            CHECK_TRUE(tree.add(2, v2));
-            //            CHECK_EQUAL(1, v1->m_key);
-            //            CHECK_EQUAL(2, v2->m_key);
-            //
-            //            CHECK_EQUAL(4, nodes.count());
-            //
-            //            void* vv1;
-            //            CHECK_TRUE(tree.rem(v1->m_key, vv1));
-            //            void* vv2;
-            //            CHECK_TRUE(tree.rem(v2->m_key, vv2));
+            CHECK_TRUE(tree.add(1, v1));
+            CHECK_TRUE(tree.add(2, v2));
+            CHECK_EQUAL(1, v1->m_key);
+            CHECK_EQUAL(2, v2->m_key);
+
+            CHECK_EQUAL(4, nodes.count());
+
+            void* vv1;
+            CHECK_TRUE(tree.rem(v1->m_key, vv1));
+            void* vv2;
+            CHECK_TRUE(tree.rem(v2->m_key, vv2));
 
             heap.destruct<myvalue>((myvalue*)v2);
             heap.destruct<myvalue>((myvalue*)v1);

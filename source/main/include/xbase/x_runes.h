@@ -11,16 +11,133 @@
 
 namespace xcore
 {
-#undef printf
+    #undef printf
 
-    namespace ascii
+	namespace ascii
     {
-        typedef char        rune;
-        typedef char*       prune;
-        typedef const char* pcrune;
-
+        typedef uchar        rune;
+        typedef uchar*       prune;
+        typedef const uchar* pcrune;
+        static const rune TERMINATOR = '\0';
+		struct runes;
+		struct crunes;
+	}
+	namespace utf8
+    {
+        typedef uchar8        rune;
+        typedef uchar8*       prune;
+        typedef const uchar8* pcrune;
         static const rune TERMINATOR = '\0';
 
+		struct runes;
+		struct crunes;
+	}
+	namespace utf16
+    {
+        typedef uchar16        rune;
+        typedef uchar16*       prune;
+        typedef const uchar16* pcrune;
+        static const rune TERMINATOR = '\0';
+
+		struct runes;
+		struct crunes;
+	}
+	namespace utf32
+    {
+        typedef uchar32        rune;
+        typedef uchar32*       prune;
+        typedef const uchar32* pcrune;
+        static const rune TERMINATOR = '\0';
+
+		struct runes;
+		struct crunes;
+	}
+
+    // NOTE:
+    //   UTF string manipulation is the easiest with UTF-32 since it is the only UTF format that
+    //   has a fixed rune size and thus is easier to index directly than UTF-8 or UTF-16.
+    namespace utf
+    {
+        // ASCII, UTF-8, UTF-16, UTF-32 conversions
+        uchar32 peek(ascii::crunes const& str);
+        uchar32 peek(utf8::crunes const& str);
+        uchar32 peek(utf16::crunes const& str);
+        uchar32 peek(utf32::crunes const& str);
+
+        uchar32 read(ascii::rune const*& str, ascii::rune const* end);
+        uchar32 read(utf8::rune const*& str, utf8::rune const* end);
+        uchar32 read(utf16::rune const*& str, utf16::rune const* end);
+        uchar32 read(utf32::rune const*& str, utf32::rune const* end);
+
+        uchar32 read(ascii::rune*& str, ascii::rune const* end);
+        uchar32 read(utf8::rune*& str, utf8::rune const* end);
+        uchar32 read(utf16::rune*& str, utf16::rune const* end);
+        uchar32 read(utf32::rune*& str, utf32::rune const* end);
+
+        uchar32 read(ascii::crunes& str);
+        uchar32 read(utf8::crunes& str);
+        uchar32 read(utf16::crunes& str);
+        uchar32 read(utf32::crunes& str);
+
+        void write(uchar32 c, uchar*& str, const uchar* end);
+        void write(uchar32 c, uchar8*& str, const uchar8* end);
+        void write(uchar32 c, uchar16*& str, const uchar16* end);
+        void write(uchar32 c, uchar32*& str, const uchar32* end);
+
+        bool write(uchar32 c, ascii::runes& str);
+        bool write(uchar32 c, utf8::runes& str);
+        bool write(uchar32 c, utf16::runes& str);
+        bool write(uchar32 c, utf32::runes& str);
+
+        void copy(char const* sstr, ascii::runes& dstr, bool write_terminator = true);
+        void copy(char const* sstr, utf16::runes& dstr, bool write_terminator = true);
+        void copy(char const* sstr, utf32::runes& dstr, bool write_terminator = true);
+
+        void copy(ascii::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
+        void copy(utf16::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
+        void copy(utf32::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
+
+        void copy(ascii::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
+        void copy(utf16::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
+        void copy(utf32::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
+
+        void copy(ascii::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
+        void copy(utf16::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
+        void copy(utf32::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
+
+        s32 size(uchar32 c);
+
+        bool is_eos(uchar const* str);
+        bool is_eos(uchar8 const* str);
+        bool is_eos(uchar16 const* str);
+        bool is_eos(uchar32 const* str);
+
+        bool can_read(ascii::runes const& str);
+        bool can_read(utf8::runes const& str);
+        bool can_read(utf16::runes const& str);
+        bool can_read(utf32::runes const& str);
+        bool can_read(ascii::crunes const& str);
+        bool can_read(utf8::crunes const& str);
+        bool can_read(utf16::crunes const& str);
+        bool can_read(utf32::crunes const& str);
+
+        bool can_write(ascii::runes const& str);
+        bool can_write(utf8::runes const& str);
+        bool can_write(utf16::runes const& str);
+        bool can_write(utf32::runes const& str);
+
+        bool read_is_crln(ascii::runes const& str);
+        bool read_is_crln(utf8::runes const& str);
+        bool read_is_crln(utf16::runes const& str);
+        bool read_is_crln(utf32::runes const& str);
+        bool read_is_crln(ascii::crunes const& str);
+        bool read_is_crln(utf8::crunes const& str);
+        bool read_is_crln(utf16::crunes const& str);
+        bool read_is_crln(utf32::crunes const& str);
+    }; // namespace utf
+    
+    namespace ascii
+    {
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
@@ -98,12 +215,30 @@ namespace xcore
         template <s32 L> class runez : public runes
         {
         public:
-            enum
-            {
-                SIZE = L + 1
-            };
+            enum { SIZE = L + 1 };
             rune m_str[SIZE];
             inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = TERMINATOR; }
+        };
+
+        template <s32 L> class crunez : public crunes
+        {
+        public:
+            enum { SIZE = L + 1 };
+            rune m_run[SIZE];
+
+            inline crunez(uchar32 c) : crunes(m_run, &m_run[SIZE - 1])
+            {
+				prune dst = m_run;
+                utf::write(c, dst, m_end);
+                utf::write(TERMINATOR, dst, m_end);
+				m_end = &m_run[1];
+            }
+            inline crunez(const char* str) : crunes(m_run, &m_run[SIZE - 1]) 
+            {
+				runes dst(m_run, m_run, &m_run[SIZE-1]);
+                utf::copy(str, dst, true);
+				m_end = dst.m_end;
+            }
         };
 
         class alloc
@@ -116,12 +251,6 @@ namespace xcore
 
     namespace utf8
     {
-        typedef uchar8        rune;
-        typedef uchar8*       prune;
-        typedef const uchar8* pcrune;
-
-        static const rune TERMINATOR = '\0';
-
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
@@ -196,12 +325,6 @@ namespace xcore
 
     namespace utf16
     {
-        typedef uchar16        rune;
-        typedef uchar16*       prune;
-        typedef const uchar16* pcrune;
-
-        static const rune TERMINATOR = 0;
-
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
@@ -313,12 +436,6 @@ namespace xcore
 
     namespace utf32
     {
-        typedef uchar32        rune;
-        typedef uchar32*       prune;
-        typedef const uchar32* pcrune;
-
-        static const rune TERMINATOR = '\0';
-
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
@@ -395,24 +512,43 @@ namespace xcore
             pcrune m_cur;
             pcrune m_end;
         };
+
         template <s32 L> class runez : public runes
         {
         public:
-            enum
-            {
-                SIZE = L + 1
-            };
-            rune m_str[SIZE];
+            enum { SIZE = L + 1 };
+            rune m_run[SIZE];
 
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = TERMINATOR; }
-            inline runez(const char* str) : runes(m_str, m_str, &m_str[SIZE - 1])
+            inline runez() : runes(m_run, m_run, &m_run[SIZE - 1]) { m_eos[0] = TERMINATOR; }
+            inline runez(const char* str) : runes(m_run, m_run, &m_run[SIZE - 1])
             {
                 m_eos[0] = TERMINATOR;
-                while (*str != ascii::TERMINATOR && m_str < m_eos)
+                while (*str != ascii::TERMINATOR && m_end < m_eos)
                 {
-                    *m_end++ = *str;
+                    *m_end++ = (*str++);
                 }
                 *m_end = TERMINATOR;
+            }
+        };
+
+        template <s32 L> class crunez : public crunes
+        {
+        public:
+            enum { SIZE = L + 1 };
+            rune m_run[SIZE];
+
+            inline crunez(uchar32 c) : crunes(m_run, &m_run[SIZE - 1]) 
+            {
+				prune dst = m_run;
+                utf::write(c, dst, m_end);
+                utf::write(TERMINATOR, dst, m_end);
+				m_end = &m_run[1];
+            }
+            inline crunez(const char* str) : crunes(m_run, &m_run[SIZE - 1]) 
+            {
+				runes dst(m_run, m_run, &m_run[SIZE-1]);
+                utf::copy(str, dst, true);
+				m_end = dst.m_end;
             }
         };
 
@@ -427,91 +563,6 @@ namespace xcore
 
 namespace xcore
 {
-    // NOTE:
-    //   UTF string manipulation is the easiest with UTF-32 since it is the only UTF format that
-    //   has a fixed rune size and thus is easier to index directly than UTF-8 or UTF-16.
-    //
-
-    // ASCII, UTF-8, UTF-16, UTF-32 conversions
-    namespace utf
-    {
-        uchar32 peek(ascii::crunes const& str);
-        uchar32 peek(utf8::crunes const& str);
-        uchar32 peek(utf16::crunes const& str);
-        uchar32 peek(utf32::crunes const& str);
-
-        uchar32 read(ascii::rune const*& str, ascii::rune const* end);
-        uchar32 read(utf8::rune const*& str, utf8::rune const* end);
-        uchar32 read(utf16::rune const*& str, utf16::rune const* end);
-        uchar32 read(utf32::rune const*& str, utf32::rune const* end);
-
-        uchar32 read(ascii::rune*& str, ascii::rune const* end);
-        uchar32 read(utf8::rune*& str, utf8::rune const* end);
-        uchar32 read(utf16::rune*& str, utf16::rune const* end);
-        uchar32 read(utf32::rune*& str, utf32::rune const* end);
-
-        uchar32 read(ascii::crunes& str);
-        uchar32 read(utf8::crunes& str);
-        uchar32 read(utf16::crunes& str);
-        uchar32 read(utf32::crunes& str);
-
-        void write(uchar32 c, uchar*& str, const uchar* end);
-        void write(uchar32 c, uchar8*& str, const uchar8* end);
-        void write(uchar32 c, uchar16*& str, const uchar16* end);
-        void write(uchar32 c, uchar32*& str, const uchar32* end);
-
-        bool write(uchar32 c, ascii::runes& str);
-        bool write(uchar32 c, utf8::runes& str);
-        bool write(uchar32 c, utf16::runes& str);
-        bool write(uchar32 c, utf32::runes& str);
-
-        void copy(char const* sstr, ascii::runes& dstr, bool write_terminator = true);
-        void copy(char const* sstr, utf16::runes& dstr, bool write_terminator = true);
-        void copy(char const* sstr, utf32::runes& dstr, bool write_terminator = true);
-
-        void copy(ascii::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
-        void copy(utf16::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
-        void copy(utf32::crunes const& sstr, ascii::runes& dstr, bool write_terminator = true);
-
-        void copy(ascii::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
-        void copy(utf16::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
-        void copy(utf32::crunes const& sstr, utf16::runes& dstr, bool write_terminator = true);
-
-        void copy(ascii::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
-        void copy(utf16::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
-        void copy(utf32::crunes const& sstr, utf32::runes& dstr, bool write_terminator = true);
-
-        s32 size(uchar32 c);
-
-        bool is_eos(uchar const* str);
-        bool is_eos(uchar8 const* str);
-        bool is_eos(uchar16 const* str);
-        bool is_eos(uchar32 const* str);
-
-        bool can_read(ascii::runes const& str);
-        bool can_read(utf8::runes const& str);
-        bool can_read(utf16::runes const& str);
-        bool can_read(utf32::runes const& str);
-        bool can_read(ascii::crunes const& str);
-        bool can_read(utf8::crunes const& str);
-        bool can_read(utf16::crunes const& str);
-        bool can_read(utf32::crunes const& str);
-
-        bool can_write(ascii::runes const& str);
-        bool can_write(utf8::runes const& str);
-        bool can_write(utf16::runes const& str);
-        bool can_write(utf32::runes const& str);
-
-        bool read_is_crln(ascii::runes const& str);
-        bool read_is_crln(utf8::runes const& str);
-        bool read_is_crln(utf16::runes const& str);
-        bool read_is_crln(utf32::runes const& str);
-        bool read_is_crln(ascii::crunes const& str);
-        bool read_is_crln(utf8::crunes const& str);
-        bool read_is_crln(utf16::crunes const& str);
-        bool read_is_crln(utf32::crunes const& str);
-    }; // namespace utf
-
     namespace ascii
     {
         s32 len(pcrune str, pcrune end);
@@ -855,7 +906,7 @@ namespace xcore
         void keepOnlySelection(runes& str, crunes const& sel);
 
         void replaceSelection(runes& str, crunes const& sel, crunes const& replace);
-        void replaceSelection(runes& str, crunes const& sel
+        void replaceSelection(runes& str, runes const& sel, crunes const& replace, alloc* allocator, s32 size_alignment);
 
         void findReplace(runes& str, uchar32 find, uchar32 replace, bool inCaseSensitive = true);
         void findReplace(runes& str, crunes const& find, crunes const& replace, bool inCaseSensitive = true);
