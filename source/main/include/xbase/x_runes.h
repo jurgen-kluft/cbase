@@ -64,6 +64,9 @@ namespace xcore
         uchar32 peek(utf16::crunes const& str);
         uchar32 peek(utf32::crunes const& str);
 
+        s32 compare(ascii::pcrune stra, ascii::pcrune strb);
+        s32 compare(utf32::pcrune stra, utf32::pcrune strb);
+
         uchar32 read(ascii::rune const*& str, ascii::rune const* end);
         uchar32 read(utf8::rune const*& str, utf8::rune const* end);
         uchar32 read(utf16::rune const*& str, utf16::rune const* end);

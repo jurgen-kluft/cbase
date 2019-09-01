@@ -75,6 +75,42 @@ namespace xcore
             return c;
         }
 
+        s32 compare(ascii::pcrune stra, ascii::pcrune strb)
+        {
+            uchar32 ca = *stra;
+            uchar32 cb = *strb;
+            while (ca != ascii::TERMINATOR && cb != ascii::TERMINATOR)
+            {
+                if (ca < cb)
+                    return -1;
+                else if (ca > cb)
+                    return 1;
+            }
+            if (ca == cb)
+                return 0;
+            if (ca == ascii::TERMINATOR)
+                return -1;
+            return 1;
+        }
+
+        s32 compare(utf32::pcrune stra, utf32::pcrune strb)
+        {
+            uchar32 ca = *stra;
+            uchar32 cb = *strb;
+            while (ca != utf32::TERMINATOR && cb != utf32::TERMINATOR)
+            {
+                if (ca < cb)
+                    return -1;
+                else if (ca > cb)
+                    return 1;
+            }
+            if (ca == cb)
+                return 0;
+            if (ca == utf32::TERMINATOR)
+                return -1;
+            return 1;
+        }
+
         uchar32 read(ascii::rune const*& str, ascii::rune const* end)
         {
             uchar32 c = *str;
