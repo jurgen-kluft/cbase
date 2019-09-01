@@ -219,9 +219,15 @@ namespace xcore
         {
         public:
             enum { SIZE = L + 1 };
-            rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = TERMINATOR; }
-        };
+            rune m_run[SIZE];
+            inline runez() : runes(m_run, m_run, &m_run[SIZE - 1]) { m_eos[0] = TERMINATOR; }
+
+            inline runez(const char* str) : runes(m_run, m_run, &m_run[SIZE - 1]) 
+            {
+				m_run[0] = TERMINATOR;
+                utf::copy(str, *this, true);
+            }
+		};
 
         template <s32 L> class crunez : public crunes
         {
