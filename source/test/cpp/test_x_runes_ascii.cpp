@@ -585,6 +585,76 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
             CHECK_EQUAL(1.0f, myfloat);
             CHECK_EQUAL(100, myint);
         }
-    }
+
+	
+        // ---------------------------------------------------------------------------
+		UNITTEST_TEST(path_parser_1)
+		{
+			ascii::crunes fullpath("C:\\projects\\binary_reader\\bin\\binary_reader.cpp.old");
+			ascii::crunes out_device;
+			ascii::crunes out_path;
+			ascii::crunes out_filename;
+			ascii::crunes out_extension;
+			ascii::crunes out_first_folder;
+
+			ascii::crunes slash("\\");
+			ascii::crunes devicesep(":\\");
+			out_device = ascii::findSelectUntilIncluded(fullpath, devicesep);
+			ascii::crunes filepath = ascii::selectUntilEndExcludeSelection(fullpath, out_device);
+			out_path = ascii::findLastSelectUntilIncluded(filepath, slash);
+			out_filename = ascii::selectUntilEndExcludeSelection(fullpath, out_path);
+			out_filename = ascii::findLastSelectUntil(out_filename, '.');
+			out_extension = ascii::selectUntilEndExcludeSelection(fullpath, out_filename);
+
+			ascii::trimRight(out_device, devicesep);
+
+			out_first_folder = ascii::findSelectUntil(out_path, slash);
+
+			ascii::crunes device("C");
+			CHECK_TRUE(device == out_device);
+			ascii::crunes path("projects\\binary_reader\\bin\\");
+			CHECK_TRUE(path == out_path);
+			ascii::crunes filename("binary_reader.cpp");
+			CHECK_TRUE(filename == out_filename);
+			ascii::crunes extension(".old");
+			CHECK_TRUE(extension == out_extension);
+			ascii::crunes first_folder("projects");
+			CHECK_TRUE(first_folder == out_first_folder);
+		}
+
+		UNITTEST_TEST(path_parser_2)
+		{
+			ascii::crunes fullpath("C:\\binary_reader.cpp.old");
+			ascii::crunes out_device;
+			ascii::crunes out_path;
+			ascii::crunes out_filename;
+			ascii::crunes out_extension;
+			ascii::crunes out_first_folder;
+
+			ascii::crunes slash("\\");
+			ascii::crunes devicesep(":\\");
+			out_device = ascii::findSelectUntilIncluded(fullpath, devicesep);
+			ascii::crunes filepath = ascii::selectUntilEndExcludeSelection(fullpath, out_device);
+			out_path = ascii::findLastSelectUntilIncluded(filepath, slash);
+			out_filename = ascii::selectUntilEndExcludeSelection(fullpath, out_path);
+			out_filename = ascii::findLastSelectUntil(out_filename, '.');
+			out_extension = ascii::selectUntilEndExcludeSelection(fullpath, out_filename);
+
+			ascii::trimRight(out_device, devicesep);
+
+			out_first_folder = ascii::findSelectUntil(out_path, slash);
+
+			ascii::crunes device("C");
+			CHECK_TRUE(device == out_device);
+			ascii::crunes path("");
+			CHECK_TRUE(path == out_path);
+			ascii::crunes filename("binary_reader.cpp");
+			CHECK_TRUE(filename == out_filename);
+			ascii::crunes extension(".old");
+			CHECK_TRUE(extension == out_extension);
+			ascii::crunes first_folder("");
+			CHECK_TRUE(first_folder == out_first_folder);
+		}
+	}
 }
 UNITTEST_SUITE_END

@@ -1,12 +1,12 @@
 #ifndef XNAMESPACE_NAME
-#define XNAMESPACE_NAME utfxx
-#include "xbase/x_runes.h"
-#include "xbase/x_debug.h"
-#include "xbase/x_integer.h"
-#include "xbase/x_console.h"
-#include "xbase/x_va_list.h"
-#include "xbase/x_runes.h"
-#include "xbase/x_printf.h"
+	#define XNAMESPACE_NAME utfxx
+	#include "xbase/x_runes.h"
+	#include "xbase/x_debug.h"
+	#include "xbase/x_integer.h"
+	#include "xbase/x_console.h"
+	#include "xbase/x_va_list.h"
+	#include "xbase/x_runes.h"
+	#include "xbase/x_printf.h"
 #else
 namespace xcore
 {
@@ -20,8 +20,8 @@ namespace xcore
             return r;
         }
 
-        runes  nothing_found(runes const& str) { return runes(str.m_eos, str.m_eos, str.m_eos); }
-        crunes nothing_found(crunes const& str) { return crunes(str.m_end, str.m_end); }
+        runes  nothing_found(runes const& str) { return runes(str.m_str, str.m_str, str.m_str); }
+        crunes nothing_found(crunes const& str) { return crunes(str.m_str, str.m_str); }
 
         s32 len(pcrune str, pcrune end)
         {
@@ -1285,6 +1285,122 @@ namespace xcore
             trimLeft(str, _left);
             trimRight(str, _right);
         }
+
+
+
+        void trim(crunes& str)
+        {
+            rune   charseta[] = {' ', '\t', TERMINATOR};
+            crunes charset(charseta, &charseta[2]);
+            trimLeft(str, charseta);
+            trimRight(str, charseta);
+        }
+
+        void trimLeft(crunes& str)
+        {
+            rune   charseta[] = {' ', '\t', TERMINATOR};
+            crunes charset(charseta, &charseta[2]);
+            trimLeft(str, charseta);
+        }
+
+        void trimRight(crunes& str)
+        {
+            rune   charseta[] = {' ', '\t', TERMINATOR};
+            crunes charset(charseta, &charseta[2]);
+            trimRight(str, charseta);
+        }
+
+        void trim(crunes& str, rune _c)
+        {
+            rune   charseta[] = {_c, TERMINATOR};
+            crunes charset(charseta, &charseta[1]);
+            trimLeft(str, charseta);
+            trimRight(str, charseta);
+        }
+
+        void trimLeft(crunes& str, rune _c)
+        {
+            rune charset[] = {_c, TERMINATOR};
+            trimLeft(str, charset);
+        }
+
+        void trimRight(crunes& str, rune _c)
+        {
+            rune charset[2] = {_c, TERMINATOR};
+            trimLeft(str, charset);
+        }
+
+        void trim(crunes& str, crunes const& _charset)
+        {
+            trimLeft(str, _charset);
+            trimRight(str, _charset);
+        }
+
+        void trimLeft(crunes& str, crunes const& _charset)
+        {
+            bool trim = true;
+            while (str.m_str < str.m_end && trim)
+            {
+                pcrune charptr = _charset.m_str;
+                trim           = false;
+                while (charptr < _charset.m_end)
+                {
+                    rune c = charptr[0];
+                    if (str.m_str[0] == c)
+                    {
+                        trim = true;
+                        str.m_str++;
+                        break;
+                    }
+                    charptr += 1;
+                }
+            }
+        }
+
+        void trimRight(crunes& str, crunes const& _charset)
+        {
+            bool trim = true;
+            while (str.m_end > str.m_str && trim)
+            {
+                pcrune charptr = _charset.m_str;
+                trim           = false;
+                while (charptr < _charset.m_end)
+                {
+                    rune c = charptr[0];
+                    if (str.m_end[-1] == c)
+                    {
+                        trim = true;
+                        str.m_end -= 1;
+                        break;
+                    }
+                    charptr += 1;
+                }
+            }
+        }
+
+        void trimQuotes(crunes& str)
+        {
+            rune   charseta[] = {'\'', '"', TERMINATOR};
+            crunes charset(charseta, &charseta[2]);
+            trim(str, charseta);
+        }
+
+        void trimQuotes(crunes& str, rune quote)
+        {
+            rune   charseta[] = {quote, TERMINATOR};
+            crunes charset(charseta, &charseta[1]);
+            trim(str, charseta);
+        }
+
+        void trimDelimiters(crunes& str, rune _left, rune _right)
+        {
+            trimLeft(str, _left);
+            trimRight(str, _right);
+        }
+
+
+
+
 
         void copy(crunes const& _src, runes& _dest)
         {

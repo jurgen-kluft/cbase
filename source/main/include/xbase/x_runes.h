@@ -65,6 +65,8 @@ namespace xcore
         uchar32 peek(utf32::crunes const& str);
 
         s32 compare(ascii::pcrune stra, ascii::pcrune strb);
+		s32 compare(utf32::pcrune stra, ascii::pcrune strb);
+		s32 compare(ascii::pcrune stra, utf32::pcrune strb);
         s32 compare(utf32::pcrune stra, utf32::pcrune strb);
 
         uchar32 read(ascii::rune const*& str, ascii::rune const* end);
@@ -144,7 +146,7 @@ namespace xcore
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
-            inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
+            inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) { *m_eos = TERMINATOR; }
             inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 
             s32 size() const { return (s32)(m_end - m_str); }
@@ -161,13 +163,47 @@ namespace xcore
                     m_end[0] = TERMINATOR;
                 }
             }
-            runes operator=(runes const& other)
+            void term()
+            {
+                if (m_end < m_eos)
+					*m_end = TERMINATOR;
+            }
+            
+			void concatenate(rune c)
+            {
+                if (m_end < m_eos)
+					*m_end++ = c;
+            }
+
+            void concatenate(const rune* str)
+            {
+                while (m_end < m_eos && *str != TERMINATOR)
+					*m_end++ = *str++;
+            }
+
+            runes& operator=(runes const& other)
             {
                 m_str = other.m_str;
                 m_end = other.m_end;
                 m_eos = other.m_eos;
                 return *this;
             }
+
+            runes& operator+=(const rune* str)
+            {
+                concatenate(str);
+                return *this;
+            }
+
+			runes&	operator+=(rune c)
+			{
+				if (m_end < m_eos)
+				{
+					*m_end++ = c;
+				}
+				return *this;
+			}
+
             prune m_str; // Begin of string in memory and begin of character stream
             prune m_end; // End of character/text stream
             prune m_eos; // End of string in memory, points to a TERMINATOR
@@ -220,12 +256,12 @@ namespace xcore
         public:
             enum { SIZE = L + 1 };
             rune m_run[SIZE];
-            inline runez() : runes(m_run, m_run, &m_run[SIZE - 1]) { m_eos[0] = TERMINATOR; }
+            inline runez() : runes(m_run, m_run, &m_run[SIZE - 1]) { }
 
             inline runez(const char* str) : runes(m_run, m_run, &m_run[SIZE - 1]) 
             {
-				m_run[0] = TERMINATOR;
-                utf::copy(str, *this, true);
+				concatenate(str);
+				term();
             }
 		};
 
@@ -237,16 +273,17 @@ namespace xcore
 
             inline crunez(uchar32 c) : crunes(m_run, &m_run[SIZE - 1])
             {
-				prune dst = m_run;
-                utf::write(c, dst, m_end);
-                utf::write(TERMINATOR, dst, m_end);
-				m_end = &m_run[1];
+				runes run(m_run, m_run, &m_run[SIZE - 1]);
+				run.concatenate((rune)c);
+				run.term();
+				m_end = run.m_end;
             }
             inline crunez(const char* str) : crunes(m_run, &m_run[SIZE - 1]) 
             {
-				runes dst(m_run, m_run, &m_run[SIZE-1]);
-                utf::copy(str, dst, true);
-				m_end = dst.m_end;
+				runes run(m_run, m_run, &m_run[SIZE-1]);
+                run.concatenate(str);
+				run.term();
+				m_end = run.m_end;
             }
         };
 
@@ -266,8 +303,6 @@ namespace xcore
             inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
             inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 
-            s32  size() const { return (s32)(m_end - m_str); }
-            s32  cap() const { return (s32)(m_eos - m_str); }
             bool is_empty() const { return m_str == m_end; }
             void reset() { m_end = m_str; }
 
@@ -297,7 +332,6 @@ namespace xcore
             inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
             inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
             inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
-            s32  size() const { return (s32)(m_end - m_str); }
             bool is_empty() const { return m_str == m_end; }
             void clear()
             {
@@ -313,23 +347,7 @@ namespace xcore
             pcrune m_str;
             pcrune m_end;
         };
-        template <s32 L> class runez : public runes
-        {
-        public:
-            enum
-            {
-                SIZE = L + 1
-            };
-            rune m_str[SIZE];
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = 0; }
-        };
 
-        class alloc
-        {
-        public:
-            virtual runes allocate(s32 len, s32 cap) = 0;
-            virtual void  deallocate(runes& slice)   = 0;
-        };
     } // namespace utf8
 
     namespace utf16
@@ -340,8 +358,6 @@ namespace xcore
             inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
             inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
 
-            s32  size() const { return (s32)(m_end - m_str); }
-            s32  cap() const { return (s32)(m_eos - m_str); }
             bool is_empty() const { return m_str == m_end; }
             void clear()
             {
@@ -413,33 +429,6 @@ namespace xcore
             pcrune m_str;
             pcrune m_cur;
             pcrune m_end;
-        };
-        template <s32 L> class runez : public runes
-        {
-        public:
-            enum
-            {
-                SIZE = L + 1
-            };
-            rune m_str[SIZE];
-
-            inline runez() : runes(m_str, m_str, &m_str[SIZE - 1]) { m_eos[0] = TERMINATOR; }
-            inline runez(const char* str) : runes(m_str, m_str, &m_str[SIZE - 1])
-            {
-                m_eos[0] = TERMINATOR;
-                while (*str != ascii::TERMINATOR && m_str < m_eos)
-                {
-                    *m_end++ = *str;
-                }
-                *m_end = TERMINATOR;
-            }
-        };
-
-        class alloc
-        {
-        public:
-            virtual runes allocate(s32 len, s32 cap) = 0;
-            virtual void  deallocate(runes& slice)   = 0;
         };
     } // namespace utf16
 
@@ -735,18 +724,31 @@ namespace xcore
         void insert(runes& str, crunes const& selection, crunes const& insert);
         void insert(runes& str, crunes const& selection, crunes const& insert, alloc* allocator, s32 size_alignment);
 
-        void trim(runes&);                               // Trim whitespace from left and right side of xstring
-        void trimLeft(runes&);                           // Trim whitespace from left side of xstring
-        void trimRight(runes&);                          // Trim whitespace from right side of xstring
-        void trim(runes&, uchar32 inChar);               // Trim characters in <inCharSet> from left and right side of xstring
-        void trimLeft(runes&, uchar32 inChar);           // Trim character <inChar> from left side of xstring
-        void trimRight(runes&, uchar32 inChar);          // Trim character <inChar> from right side of xstring
-        void trim(runes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side of xstring
-        void trimLeft(runes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side of xstring
-        void trimRight(runes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side of xstring
-        void trimQuotes(runes&);                         // Trim double quotes from left and right side of xstring
-        void trimQuotes(runes&, uchar32 quote);          // Trim double quotes from left and right side of xstring
-        void trimDelimiters(runes&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side of xstring
+        void trim(runes&);                               // Trim whitespace from left and right side
+        void trimLeft(runes&);                           // Trim whitespace from left side
+        void trimRight(runes&);                          // Trim whitespace from right side
+        void trim(runes&, uchar32 inChar);               // Trim characters in <inCharSet> from left and right side
+        void trimLeft(runes&, uchar32 inChar);           // Trim character <inChar> from left side 
+        void trimRight(runes&, uchar32 inChar);          // Trim character <inChar> from right side
+        void trim(runes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side
+        void trimLeft(runes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side 
+        void trimRight(runes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side 
+        void trimQuotes(runes&);                         // Trim double quotes from left and right side 
+        void trimQuotes(runes&, uchar32 quote);          // Trim double quotes from left and right side 
+        void trimDelimiters(runes&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side 
+
+        void trim(crunes&);                               // Trim whitespace from left and right side
+        void trimLeft(crunes&);                           // Trim whitespace from left side
+        void trimRight(crunes&);                          // Trim whitespace from right side
+        void trim(crunes&, uchar32 inChar);               // Trim characters in <inCharSet> from left and right side
+        void trimLeft(crunes&, uchar32 inChar);           // Trim character <inChar> from left side 
+        void trimRight(crunes&, uchar32 inChar);          // Trim character <inChar> from right side
+        void trim(crunes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side
+        void trimLeft(crunes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side 
+        void trimRight(crunes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side 
+        void trimQuotes(crunes&);                         // Trim double quotes from left and right side 
+        void trimQuotes(crunes&, uchar32 quote);          // Trim double quotes from left and right side 
+        void trimDelimiters(crunes&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side 
 
         void copy(const crunes& src, runes& dst);
         void copy(const crunes& src, runes& dst, alloc* allocator, s32 size_alignment);
@@ -926,18 +928,31 @@ namespace xcore
         void insert(runes& str, crunes const& sel, crunes const& insert);
         void insert(runes& str, crunes const& sel, crunes const& insert, alloc* allocator, s32 size_alignment);
 
-        void trim(runes&);                               // Trim whitespace from left and right side of xstring
-        void trimLeft(runes&);                           // Trim whitespace from left side of xstring
-        void trimRight(runes&);                          // Trim whitespace from right side of xstring
-        void trim(runes&, rune c);                       // Trim characters in <charset> from left and right side of xstring
-        void trimLeft(runes&, rune c);                   // Trim character <c> from left side of xstring
-        void trimRight(runes&, rune c);                  // Trim character <c> from right side of xstring
-        void trim(runes&, crunes const& charset);        // Trim characters in <charset> from left and right side of xstring
-        void trimLeft(runes&, crunes const& charset);    // Trim characters in <charset> from left side of xstring
-        void trimRight(runes&, crunes const& charset);   // Trim characters in <charset> from right side of xstring
-        void trimQuotes(runes&);                         // Trim double quotes from left and right side of xstring
-        void trimQuotes(runes&, rune quote);             // Trim double quotes from left and right side of xstring
-        void trimDelimiters(runes&, rune inLeft, rune inRight); // Trim delimiters from left and right side of xstring
+        void trim(runes&);                               // Trim whitespace from left and right side
+        void trimLeft(runes&);                           // Trim whitespace from left side
+        void trimRight(runes&);                          // Trim whitespace from right side
+        void trim(runes&, rune inChar);               // Trim characters in <inCharSet> from left and right side
+        void trimLeft(runes&, rune inChar);           // Trim character <inChar> from left side 
+        void trimRight(runes&, rune inChar);          // Trim character <inChar> from right side
+        void trim(runes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side
+        void trimLeft(runes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side 
+        void trimRight(runes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side 
+        void trimQuotes(runes&);                         // Trim double quotes from left and right side 
+        void trimQuotes(runes&, rune quote);          // Trim double quotes from left and right side 
+        void trimDelimiters(runes&, rune inLeft, rune inRight); // Trim delimiters from left and right side 
+
+        void trim(crunes&);                               // Trim whitespace from left and right side
+        void trimLeft(crunes&);                           // Trim whitespace from left side
+        void trimRight(crunes&);                          // Trim whitespace from right side
+        void trim(crunes&, rune inChar);               // Trim characters in <inCharSet> from left and right side
+        void trimLeft(crunes&, rune inChar);           // Trim character <inChar> from left side 
+        void trimRight(crunes&, rune inChar);          // Trim character <inChar> from right side
+        void trim(crunes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side
+        void trimLeft(crunes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side 
+        void trimRight(crunes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side 
+        void trimQuotes(crunes&);                         // Trim double quotes from left and right side 
+        void trimQuotes(crunes&, rune quote);          // Trim double quotes from left and right side 
+        void trimDelimiters(crunes&, rune inLeft, rune inRight); // Trim delimiters from left and right side 
 
         void copy(const crunes& src, runes& dst);
         void copy(const crunes& src, runes& dst, alloc* allocator, s32 size_alignment);
