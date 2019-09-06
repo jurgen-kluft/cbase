@@ -5,10 +5,13 @@
 #pragma once 
 #endif
 
+#include "xbase/x_debug.h"
 #include "xbase/x_memory.h"
 
 namespace xcore
 {
+	class xbuffer;
+
 	// The allocator interface
 	class xalloc
 	{
@@ -19,84 +22,6 @@ namespace xcore
 		virtual void		deallocate(void* p) = 0;						// Deallocate/Free memory
 
 		virtual void		release() = 0;
-
-	protected:
-		virtual				~xalloc() {}
-	};
-
-	// The fixed-size allocator interface
-	class xfsalloc
-	{
-	public:
-		virtual void*		allocate() = 0;
-		virtual void		deallocate(void*) = 0;
-
-		virtual void		release() = 0;
-
-	protected:
-		virtual				~xfsalloc() {}
-	};
-
-	// The dexer interface, 'pointer to index' and 'index to pointer'
-	class xdexer
-	{
-	public:
-		virtual void*		idx2ptr(u32 index) const = 0;
-		virtual u32			ptr2idx(void* ptr) const = 0;
-	};
-
-	class xfsallocdexed : public xfsalloc, public xdexer
-	{
-	public:
-		virtual void	release() = 0;
-
-	protected:
-		virtual			~xfsallocdexed() {}
-	};
-
-	template<typename T, typename... Args>
-	T*			xnew(Args... args)
-	{
-		void * mem = xalloc::get_system()->allocate(sizeof(T), sizeof(void*));
-		T* object = new (mem) T(args...);
-		return object;
-	}
-	template<typename T, typename... Args>
-	T*			xnew(xalloc* a, Args... args)
-	{
-		void * mem = a->allocate(sizeof(T), sizeof(void*));
-		T* object = new (mem) T(args...);
-		return object;
-	}
-
-	template<typename T>
-	void		xdelete(T* p)
-	{
-		p->~T();
-		xalloc::get_system()->deallocate(p);
-	}
-
-	template<typename T>
-	void		xdelete(xalloc* a, T* p)
-	{
-		p->~T();
-		a->deallocate(p);
-	}
-
-	class xheap
-	{
-		xalloc*		m_allocator;
-	public:
-		inline	xheap(xalloc* allocator) : m_allocator(allocator) {}
-
-		void*	allocate(xcore::u32 size, xcore::u32 alignment)
-		{
-			return m_allocator->allocate(size, alignment);
-		}
-		void	deallocate(void* p)
-		{
-			return m_allocator->deallocate(p);
-		}
 
 		template<typename T, typename... Args>
 		T*			construct(Args... args)
@@ -112,50 +37,84 @@ namespace xcore
 			p->~T();
 			deallocate(p);
 		}
+
+	protected:
+		virtual				~xalloc() {}
 	};
 
+	// fixed-size/type allocator
+	template<class T>
 	class xpool
 	{
-		xfsalloc*	m_fsalloc;
-
 	public:
-		inline	xpool(xfsalloc* fsalloc) : m_fsalloc(fsalloc) {}
+		virtual T*			allocate() = 0;
+		virtual void		deallocate(T*) = 0;
 
-		void*	allocate()
-		{
-			return m_fsalloc->allocate();
-		}
-		void	deallocate(void* p)
-		{
-			return m_fsalloc->deallocate(p);
-		}
+		virtual void		release() = 0;
 
-		template<typename T, typename... Args>
+		template<typename... Args>
 		T*			construct(Args... args)
 		{
-			void * mem = m_fsalloc->allocate();
+			void * mem = allocate();
 			T* object = new (mem) T(args...);
 			return object;
 		}
 
-		template<typename T>
 		void		destruct(T* p)
 		{
 			p->~T();
-			m_fsalloc->deallocate(p);
+			deallocate(p);
 		}
+
+	protected:
+		virtual				~xpool() {}
 	};
 
-	class xalloc_storage : public xalloc
+	// The dexer interface, 'pointer to index' and 'index to pointer'
+	class xdexer
+	{
+	public:
+		virtual void*		idx2ptr(u32 index) const = 0;
+		virtual u32			ptr2idx(void* ptr) const = 0;
+	};
+
+	template<class T>
+	class xpooldexed : public xpool<T>, public xdexer
+	{
+	public:
+		virtual void	release() = 0;
+
+	protected:
+		virtual			~xpooldexed() {}
+	};
+
+	// Global new and delete
+	template<typename T, typename... Args>
+	T*			xnew(Args... args)
+	{
+		void * mem = xalloc::get_system()->allocate(sizeof(T), sizeof(void*));
+		T* object = new (mem) T(args...);
+		return object;
+	}
+
+	template<typename T>
+	void		xdelete(T* p)
+	{
+		p->~T();
+		xalloc::get_system()->deallocate(p);
+	}
+
+	class xalloc_stack : public xalloc
 	{
 		static inline xbyte* align_ptr(xbyte* ptr, uptr align) { return (xbyte*)(((uptr)ptr + (align-1)) & ~(align-1)); }
 
 		xbyte*			m_base;
 		xbyte*			m_ptr;
 		xbyte*			m_end;
-		s32				m_cnt;
+		s64				m_cnt;
+
 	public:
-		inline			xalloc_storage(xbyte* store, xbyte* end) : m_base(store), m_ptr(store), m_end(end), m_cnt(0) {}
+						xalloc_stack(xbuffer& storage);
 
 		xalloc*			allocator() { return this; }
 
@@ -185,19 +144,31 @@ namespace xcore
 		virtual void	release() { m_base=nullptr; m_ptr=nullptr; m_end=nullptr; }
 	};
 
-	// Example:
-	// 	xalloc_buffer<1024> alloca;
-	// 	test_object* test = xnew<test_object>(heap, 200, 1000.0f);
-	// 	xdelete<>(heap, test);
+	// Allocate a single object in-place
+	class xallocinplace : public xalloc
+	{
+		xbyte*				m_data;
+		u64					m_size;
+	public:
+		inline				xallocinplace(xbyte* data, u64 size) : m_data(data), m_size(size) {}
+		virtual void*		allocate(xsize_t size, u32 align);
+		virtual void		deallocate(void* p);
+		virtual void		release();
+	};
 
 	template<u32 L>
-	class xalloc_buffer : public xalloc_storage
+	class xinplace
 	{
-		enum {SIZE = L};
-		xbyte m_buffer[SIZE];
+		enum { SIZE = (L+3)/4 };
+		u64				m_memory[SIZE];
 	public:
-		xalloc_buffer() : xalloc_storage(&m_buffer[0], &m_buffer[SIZE]) {}
+		inline			xinplace() {}
+		xallocinplace	allocator() const { return xallocinplace((xbyte*)m_memory, (u64)SIZE); }
+
+		template<class T>
+		inline T*		object() { return static_cast<T*>(m_memory); }
 	};
+
 
 	// Example:
 	// 	xheap heap(systemAllocator);

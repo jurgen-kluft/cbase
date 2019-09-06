@@ -15,10 +15,9 @@ namespace xcore
     class key_indexer
     {
     public:
-        virtual s32  max_levels() const                    = 0;
-        virtual bool keys_equal(u64 lhs, u64 rhs) const    = 0;
-        virtual s32  keys_compare(u64 lhs, u64 rhs) const  = 0;
-        virtual s32  get_index(u64 value, s32 level) const = 0;
+        virtual s32  max_levels() const                  = 0;
+        virtual s32  key_compare(u64 lhs, u64 rhs) const = 0;
+        virtual s32  key_to_index(s32 level, u64 value) const = 0;
     };
 
     struct key_indexer_data
@@ -28,13 +27,6 @@ namespace xcore
         s32 m_levels;
     };
 
-    // Move this to xallocator
-    // gCreateVMemBasedAllocator(a, vmem, sizeof(myleaf) (32?), 1*xGB, 64*xKB);
-    // Maximum number of myleaf allocations = (2048 - 1) * 16384 = 33.538.048 = ~32 Million nodes
-    xfsallocdexed* gCreateVMemBasedDexAllocator(xalloc* a, xvirtual_memory* vmem, u32 alloc_size, u64 addr_range,
-                                                u32 page_size);
-
-    //
     // A xbtree32 is a BST that is unbalanced and where branches grow/shrink when adding
     // or removing items. This particular implementation uses indices instead of pointers
     // and thus uses the same amount of memory on a 32-bit system compared to a 64-bit
@@ -71,10 +63,19 @@ namespace xcore
             virtual void set_key(u32 value, u64 key) = 0;
         };
 
-        void init(xfsallocdexed* node_allocator, keyvalue* kv);
-        void init(xfsallocdexed* node_allocator, keyvalue* kv, key_indexer const* indexer);
-        void init_from_index(xfsallocdexed* node_allocator, keyvalue* kv, u32 max_index);
-        void init_from_mask(xfsallocdexed* node_allocator, keyvalue* kv, u64 mask, bool sorted);
+        struct node_t
+        {
+            inline node_t() { clear(); }
+            inline bool is_empty() const { return is_null(m_nodes[0]) && is_null(m_nodes[1]) && is_null(m_nodes[2]) && is_null(m_nodes[3]); }
+            inline void clear() { m_nodes[0] = Null; m_nodes[1] = Null; m_nodes[2] = Null; m_nodes[3] = Null; }
+            u32 m_nodes[4];
+            XCORE_CLASS_PLACEMENT_NEW_DELETE
+        };
+
+        void init(xpooldexed<node_t>* node_allocator, keyvalue* kv);
+        void init(xpooldexed<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer);
+        void init_from_index(xpooldexed<node_t>* node_allocator, keyvalue* kv, u32 max_index);
+        void init_from_mask(xpooldexed<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted);
 
         bool add(u64 key, u32 value);
         bool rem(u64 key, u32& value);
@@ -89,7 +90,7 @@ namespace xcore
         u32                m_root;
         key_indexer_data   m_idxr_data;
         key_indexer const* m_idxr;
-        xfsallocdexed*     m_node_alloc;
+        xpooldexed<node_t>*m_node_alloc;
         keyvalue*          m_kv;
     };
 
@@ -102,10 +103,19 @@ namespace xcore
             virtual void set_key(void* value, u64 key) const = 0;
         };
 
-        void init(xfsalloc* node_allocator, keyvalue* kv);
-        void init(xfsalloc* node_allocator, keyvalue* kv, key_indexer const* idxr);
-        void init_from_index(xfsalloc* node_allocator, keyvalue* kv, u32 max_index);
-        void init_from_mask(xfsalloc* node_allocator, keyvalue* kv, u64 mask, bool sorted);
+        struct node_t
+        {
+            inline node_t() { clear(); }
+            inline bool is_empty() const { return m_nodes[0] == 0 && m_nodes[1] == 0 && m_nodes[2] == 0 && m_nodes[3] == 0; }
+            inline void clear() { m_nodes[0] = 0; m_nodes[1] = 0; m_nodes[2] = 0; m_nodes[3] = 0; }
+            uptr m_nodes[4];
+            XCORE_CLASS_PLACEMENT_NEW_DELETE
+        };        
+
+        void init(xpool<node_t>* node_allocator, keyvalue* kv);
+        void init(xpool<node_t>* node_allocator, keyvalue* kv, key_indexer const* idxr);
+        void init_from_index(xpool<node_t>* node_allocator, keyvalue* kv, u32 max_index);
+        void init_from_mask(xpool<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted);
 
         bool add(u64 key, void* value);
         bool rem(u64 key, void*& value);
@@ -122,7 +132,7 @@ namespace xcore
         key_indexer const* m_idxr;
         key_indexer_data   m_idxr_data;
         node_t*            m_root;
-        xfsalloc*          m_node_alloc;
+        xpool<node_t>*     m_node_alloc;
         keyvalue*          m_kv;
     };
 

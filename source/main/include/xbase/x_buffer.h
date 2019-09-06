@@ -39,7 +39,7 @@ namespace xcore
 
 		xbinary_reader	reader() const;
 
-		static xcbuffer	from_ascii_string(const char*);
+		static xcbuffer	from_ascii_string(const char* str);
 
 		u32				m_len;
 		xbyte const*	m_const;
@@ -84,10 +84,10 @@ namespace xcore
 	template<u32 L>
 	class xbytes : public xbuffer
 	{
-		enum {SIZE = L};
+		enum {SIZE = (L+3)/4};
 	public:
-		xbyte			m_data[SIZE];
-		inline			xbytes() : xbuffer(SIZE, m_data) {}
+		u64				m_data[SIZE];
+		inline			xbytes() : xbuffer(SIZE, (xbyte*)m_data) {}
 		xbuffer			buffer() const { return xbuffer(*this); }
 	};
 

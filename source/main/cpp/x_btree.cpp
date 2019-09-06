@@ -27,29 +27,18 @@ namespace xcore
     class keydexer : public key_indexer
     {
         key_indexer_data const* m_data;
-
     public:
-        keydexer(key_indexer_data const* data)
-            : m_data(data)
-        {
-        }
+        keydexer(key_indexer_data const* data) : m_data(data) { }
 
         virtual s32 max_levels() const { return m_data->m_levels; }
-
-        // The indexer knows which bits are being 'indexed' so it can
-        // tell us if two values are equal from its perspective.
-        virtual bool keys_equal(u64 lhs, u64 rhs) const { return (lhs & m_data->m_mask) == (rhs & m_data->m_mask); }
-
-        virtual s32 keys_compare(u64 lhs, u64 rhs) const
+        virtual s32 key_compare(u64 lhs, u64 rhs) const
         {
-            lhs = lhs & m_data->m_mask;
-            rhs = rhs & m_data->m_mask;
             if (lhs == rhs)
                 return 0;
             return (lhs < rhs) ? -1 : 1;
         }
 
-        virtual s32 get_index(u64 value, s32 level) const
+        virtual s32 key_to_index(s32 level, u64 value) const
         {
             s8 const  msk = 0x3;
             s32 const shr = (level * m_data->m_vars[0]) + m_data->m_vars[1];
@@ -347,48 +336,30 @@ namespace xcore
         return i & ~Type_Mask;
     }
 
-    struct xbtree32::node_t
-    {
-        inline node_t() { clear(); }
 
-        inline bool is_empty() const { return is_null(m_nodes[0]) && is_null(m_nodes[1]) && is_null(m_nodes[2]) && is_null(m_nodes[3]); }
-
-        void clear()
-        {
-            m_nodes[0] = Null;
-            m_nodes[1] = Null;
-            m_nodes[2] = Null;
-            m_nodes[3] = Null;
-        }
-
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
-
-        u32 m_nodes[4];
-    };
-    void xbtree32::init(xfsallocdexed* node_allocator, keyvalue* kv)
+    void xbtree32::init(xpooldexed<node_t>* node_allocator, keyvalue* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
-        xpool   pool(m_node_alloc);
-        node_t* root = pool.construct<node_t>();
+        node_t* root = 
         root->clear();
         m_root = m_node_alloc->ptr2idx(root);
         m_kv   = kv;
     }
 
-    void xbtree32::init(xfsallocdexed* node_allocator, keyvalue* kv, key_indexer const* indexer)
+    void xbtree32::init(xpooldexed<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer)
     {
         init(node_allocator, kv);
         m_idxr = indexer;
     }
 
-    void xbtree32::init_from_index(xfsallocdexed* node_allocator, keyvalue* kv, u32 max_index)
+    void xbtree32::init_from_index(xpooldexed<node_t>* node_allocator, keyvalue* kv, u32 max_index)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr_data, max_index);
     }
 
-    void xbtree32::init_from_mask(xfsallocdexed* node_allocator, keyvalue* kv, u64 mask, bool sorted)
+    void xbtree32::init_from_mask(xpooldexed<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr_data, mask, sorted);
@@ -403,7 +374,7 @@ namespace xcore
         node_t* parentNode = (node_t*)m_node_alloc->idx2ptr(m_root);
         do
         {
-            s32 childIndex     = idxr->get_index(key, level);
+            s32 childIndex     = idxr->key_to_index(level, key);
             u32 childNodeIndex = parentNode->m_nodes[childIndex];
             if (is_null(childNodeIndex))
             {
@@ -415,13 +386,12 @@ namespace xcore
             {
                 // Check for duplicate, see if this value is the value of this leaf
                 u64 const child_key = m_kv->get_key(as_index(childNodeIndex));
-                if (idxr->keys_equal(child_key, key))
+                if (idxr->key_compare(child_key, key))
                 {
                     return false;
                 }
 
                 // Create new node and add the existing item first and continue
-                xpool   pool(m_node_alloc);
                 node_t* newChildNode = pool.construct<node_t>();
                 newChildNode->clear();
                 u32 newChildNodeIndex           = m_node_alloc->ptr2idx(newChildNode);
@@ -761,24 +731,7 @@ namespace xcore
     // ######################################################################################################################################
     // ######################################################################################################################################
     // ######################################################################################################################################
-    struct xbtree::node_t
-    {
-        inline node_t() { clear(); }
 
-        inline bool is_empty() const { return m_nodes[0] == 0 && m_nodes[1] == 0 && m_nodes[2] == 0 && m_nodes[3] == 0; }
-
-        void clear()
-        {
-            m_nodes[0] = 0;
-            m_nodes[1] = 0;
-            m_nodes[2] = 0;
-            m_nodes[3] = 0;
-        }
-
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
-
-        uptr m_nodes[4];
-    };
 
     static inline bool            is_null(uptr n) { return n == 0; }
     static inline bool            is_node(uptr n) { return (n != 0) && ((n & 1) == 1); }
@@ -788,7 +741,7 @@ namespace xcore
     static inline void*           as_value_ptr(uptr n) { ASSERT(is_value(n));  return (void*)((uptr)n); }
     static inline xbtree::node_t* as_node_ptr(uptr n) { ASSERT(is_node(n)); return (xbtree::node_t*)((uptr)n & ~(u64)1); }
 
-    void xbtree::init(xfsalloc* node_allocator, keyvalue* kv)
+    void xbtree::init(xpool<node_t>* node_allocator, keyvalue* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
@@ -796,19 +749,19 @@ namespace xcore
         m_kv         = kv;
     }
 
-    void xbtree::init(xfsalloc* node_allocator, keyvalue* kv, key_indexer const* indexer)
+    void xbtree::init(xpool<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer)
     {
         init(node_allocator, kv);
         m_idxr = indexer;
     }
 
-    void xbtree::init_from_index(xfsalloc* node_allocator, keyvalue* kv, u32 max_index)
+    void xbtree::init_from_index(xpool<node_t>* node_allocator, keyvalue* kv, u32 max_index)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr_data, max_index);
     }
 
-    void xbtree::init_from_mask(xfsalloc* node_allocator, keyvalue* kv, u64 mask, bool sorted)
+    void xbtree::init_from_mask(xpool<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr_data, mask, sorted);
@@ -821,15 +774,14 @@ namespace xcore
 
         if (m_root == nullptr)
         {
-            xpool heap(m_node_alloc);
-            m_root = heap.construct<node_t>();
+            m_root = m_node_alloc->construct<node_t>();
         }
 
         s32     level = 0;
         node_t* node  = m_root;
         do
         {
-            s32  childIndex = idxr->get_index(key, level);
+            s32  childIndex = idxr->key_to_index(level, key);
             uptr childPtr   = node->m_nodes[childIndex];
             if (is_null(childPtr))
             {
@@ -841,7 +793,7 @@ namespace xcore
             {
                 // Check for duplicate, see if this value is the value of this leaf
                 u64 const child_key = m_kv->get_key(as_value_ptr(childPtr));
-                if (idxr->keys_equal(child_key, key))
+                if (idxr->key_compare(child_key, key) != 0)
                 {
                     return false;
                 }

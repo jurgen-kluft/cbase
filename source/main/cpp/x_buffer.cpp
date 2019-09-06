@@ -31,6 +31,14 @@ namespace xcore
 	inline void			write_f64(xbyte * ptr, f64 f) { u64 b = *((u64*)&f); for (s32 i = 0; i < sizeof(b); ++i) { ptr[i] = (u8)b; b = b >> 8; } }
 
 
+	xcbuffer	xcbuffer::from_ascii_string(const char* str)
+	{
+		u32 len = ascii::len(str, nullptr);
+		xcbuffer buffer(len, (xbyte const*)str);
+		return buffer;
+	}
+
+
 	/// ---------------------------------------------------------------------------------------
 	/// Binary Reader
 	/// ---------------------------------------------------------------------------------------

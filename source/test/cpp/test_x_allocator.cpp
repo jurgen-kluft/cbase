@@ -1,5 +1,6 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_debug.h"
+#include "xbase/x_buffer.h"
 
 #include "xunittest/xunittest.h"
 
@@ -103,35 +104,30 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			s32	mInteger;
 			f32	mFloat;
 			static xalloc* get_allocator() { return gTestAllocator; }
+
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
 		};
 
-		UNITTEST_TEST(test_xheap)
+		UNITTEST_TEST(test_construct)
 		{
-			xheap heap(gTestAllocator);
-			test_object4* obj = heap.construct<test_object4>();
-			heap.destruct<>(obj);
+			test_object4* obj = gTestAllocator->construct<test_object4>();
+			gTestAllocator->destruct<test_object4>(obj);
 		}
 
-		UNITTEST_TEST(test_xnew_xdelete_custom_xalloc)
+		UNITTEST_TEST(test_xalloc_stack)
 		{
-			test_object4* obj = xnew<test_object4>(gTestAllocator);
-			xdelete<>(gTestAllocator, obj);
-		}
-
-		UNITTEST_TEST(test_xalloc_storage)
-		{
-			xbyte store[256];
-			xalloc_storage sa(&store[0], &store[256]);
-			test_object4* obj = xnew<test_object4>(sa.allocator());
-			xdelete<>(sa.allocator(), obj);
+			xbytes<256> store;
+			xalloc_stack sa(store);
+			test_object4* obj = sa.construct<test_object4>();
+			sa.destruct<>(obj);
 		}
 
 		UNITTEST_TEST(test_xalloc_buffer)
 		{
-			xalloc_buffer<256> ba;
-			test_object4* obj = xnew<test_object4>(ba.allocator());
-			xdelete<>(ba.allocator(), obj);
+			xinplace<256> inplace;
+			xallocinplace allocator = inplace.allocator();
+			test_object4* obj = allocator.construct<test_object4>();
+			allocator.destruct<test_object4>(obj);
 		}
 	}
 }
