@@ -112,10 +112,7 @@ namespace xcore
 		return h64;
 	}
 
-
-
 	// ----------------------------------------------------------------------------
-
 	u64		map_key_hasher(xbyte const* data, u32 size)
 	{
 		return XXH64(data, size);

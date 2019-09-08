@@ -54,7 +54,6 @@ namespace xcore
         mask     = mask | (mask >> 4);
         mask     = mask | (mask >> 8);
         mask     = mask | (mask >> 16);
-        mask     = mask | (mask >> 32);
 
         u32 trailbitcnt = xcountTrailingZeros(mask);
         u32 maskbitcnt  = xcountBits(mask);
@@ -71,6 +70,11 @@ namespace xcore
             }
             maskbitcnt += 1;
         }
+        // Example: With a maximum index of 20000
+        //          mask    = 0x3FFF (32768-1)
+        //          levels  = 14/2 = 7 levels
+        //          vars[0] = 2 (node is splitting into 4 branches) 
+        //          vars[1] = 0
         keydexer.m_mask    = mask;
         keydexer.m_levels  = maskbitcnt / 2;
         keydexer.m_vars[0] = 2;
@@ -100,7 +104,7 @@ namespace xcore
         u32 maskbitcnt = xcountBits(mask);
         if ((maskbitcnt & 1) == 1)
         {
-            // Which way should we extend the mask to make the count 'even'
+            // Which way should we extend the mask to make the bit count 'even'
             if ((mask & (u64(1) << 63)) == 0)
             {
                 mask = mask | (mask << 1);
@@ -133,189 +137,6 @@ namespace xcore
         Type_Node = 0x80000000
     };
 
-#if 0
-    class vmalloc : public xdexedfxsa
-    {
-        enum
-        {
-            Null32 = 0xffffffff,
-            Null16 = 0xffff,
-        };
-
-        // Note: Keep bit 31-30 free! So only use bit 0-29 (30 bits)
-        inline u32 page_index(u32 index) const { return (index >> 13) & 0x1FFFF; }
-        inline u32 item_index(u32 index) const { return (index >> 0) & 0x1FFF; }
-        inline u32 to_index(u32 page_index, u32 item_index) const { return ((page_index & 0x1FFFF) << 13) | (item_index & 0x1FFF); }
-
-    public:
-        virtual void* allocate()
-        {
-            u32 page_index;
-            if (!m_notfull_used_pages.find(page_index))
-            {
-                if (!alloc_page(page_index))
-                {
-                    return nullptr;
-                }
-                m_notfull_used_pages.set(page_index);
-            }
-
-            page_t* page = get_page(page_index);
-
-            u32   i;
-            void* ptr = page->allocate(i);
-            if (page->m_alloc_cnt == m_page_max_alloc_count)
-            { // Page is full
-                m_notfull_used_pages.clr(page_index);
-            }
-            return ptr;
-        }
-
-        virtual void deallocate(void* p)
-        {
-            u32     page_index = (u32)(((uptr)p - (uptr)m_base_addr) / m_page_size);
-            page_t* page       = get_page(page_index);
-            u32     item_index = page->ptr2idx(p);
-            page->deallocate(item_index);
-            if (page->m_alloc_cnt == 0)
-            {
-                dealloc_page(page_index);
-            }
-        }
-
-        virtual void* idx2ptr(u32 i) const
-        {
-            page_t* page = get_page(page_index(i));
-            return page->idx2ptr(item_index(i));
-        }
-
-        virtual u32 ptr2idx(void* ptr) const
-        {
-            u32     page_index = (u32)(((uptr)ptr - (uptr)m_base_addr) / m_page_size);
-            page_t* page       = get_page(page_index);
-            u32     item_index = page->ptr2idx(ptr);
-            return to_index(page_index, item_index);
-        }
-
-        // Every used page has it's first 'alloc size' used for book-keeping
-        // sizeof == 8 bytes
-        struct page_t
-        {
-            void init(u32 alloc_size)
-            {
-                m_list_head  = Null16;
-                m_alloc_cnt  = 0;
-                m_alloc_size = alloc_size;
-                m_alloc_ptr  = alloc_size * 1;
-                // We do not initialize a free-list, instead we allocate from
-                // a 'pointer' which grows until we reach 'max alloc count'.
-                // After that allocation happens from m_list_head.
-            }
-
-            void* allocate(u32& item_index)
-            {
-                if (m_list_head != Null16)
-                { // Take it from the list
-                    item_index  = m_list_head;
-                    m_list_head = ((u16*)this)[m_list_head >> 1];
-                }
-                else
-                {
-                    item_index = m_alloc_ptr / m_alloc_size;
-                    m_alloc_ptr += m_alloc_size;
-                }
-
-                m_alloc_cnt += 1;
-                return (void*)((uptr)this + (item_index * m_alloc_size));
-            }
-
-            void deallocate(u32 item_index)
-            {
-                ((u16*)this)[item_index >> 1] = m_list_head;
-                m_list_head                   = item_index;
-                m_alloc_cnt -= 1;
-            }
-
-            void* idx2ptr(u32 index) const
-            {
-                void* ptr = (void*)((uptr)this + (index * m_alloc_size));
-                return ptr;
-            }
-
-            u32 ptr2idx(void* ptr) const
-            {
-                u32 item_index = (u32)(((uptr)ptr - (uptr)this) / m_alloc_size);
-                return item_index;
-            }
-
-            u16 m_list_head;
-            u16 m_alloc_cnt;
-            u16 m_alloc_size;
-            u16 m_alloc_ptr;
-        };
-
-        page_t* get_page(u32 page_index) const
-        {
-            page_t* page = (page_t*)((uptr)m_base_addr + page_index * m_page_size);
-            return page;
-        }
-
-        bool alloc_page(u32& page_index)
-        {
-            u32 freepage_index;
-            return m_notused_free_pages.find(freepage_index);
-        }
-
-        void dealloc_page(u32 page_index)
-        {
-            page_t* page = get_page(page_index);
-            m_vmem->decommit((void*)page, m_page_size, 1);
-            m_notused_free_pages.set(page_index);
-        }
-
-        void init(xalloc* a, xvirtual_memory* vmem, u32 alloc_size, u64 addr_range, u32 page_size)
-        {
-            m_alloc                = a;
-            m_vmem                 = vmem;
-            m_page_size            = page_size;
-            m_page_max_count       = (u32)(addr_range / page_size);
-            m_page_max_alloc_count = (page_size / alloc_size) - 1;
-            xheap heap(a);
-            m_notfull_used_pages.init(heap, m_page_max_count, false, true);
-            m_notused_free_pages.init(heap, m_page_max_count, true, true);
-        }
-
-        virtual void release()
-        {
-            // deallocate any allocated resources
-            // decommit all used pages
-            // release virtual memory
-            xheap heap(m_alloc);
-            m_notfull_used_pages.release(heap);
-            m_notused_free_pages.release(heap);
-        }
-
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
-
-        xalloc*          m_alloc;
-        xvirtual_memory* m_vmem;
-        void*            m_base_addr;
-        u32              m_page_size;
-        s32              m_page_max_count;
-        u32              m_page_max_alloc_count;
-        xbitlist         m_notfull_used_pages;
-        xbitlist         m_notused_free_pages;
-    };
-
-    xdexedfxsa* gCreateVMemBasedDexAllocator(xalloc* a, xvirtual_memory* vmem, u32 alloc_size, u64 addr_range, u32 page_size)
-    {
-        xheap    heap(a);
-        vmalloc* allocator = heap.construct<vmalloc>();
-        allocator->init(a, vmem, alloc_size, addr_range, page_size);
-        return allocator;
-    }
-#endif
-
     static inline bool is_null(u32 i) { return i == Null; }
     static inline bool is_node(u32 i) { return (i != Null) && ((i & Type_Mask) == Type_Node); }
     static inline bool is_leaf(u32 i) { return (i != Null) && ((i & Type_Mask) == Type_Leaf); }
@@ -337,29 +158,29 @@ namespace xcore
     }
 
 
-    void xbtree32::init(xpooldexed<node_t>* node_allocator, keyvalue* kv)
+    void xbtree32::init(xfsadexed<node_t>* node_allocator, keyvalue* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
-        node_t* root = 
+        node_t* root = m_node_alloc->construct<node_t>();
         root->clear();
         m_root = m_node_alloc->ptr2idx(root);
         m_kv   = kv;
     }
 
-    void xbtree32::init(xpooldexed<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer)
+    void xbtree32::init(xfsadexed<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer)
     {
         init(node_allocator, kv);
         m_idxr = indexer;
     }
 
-    void xbtree32::init_from_index(xpooldexed<node_t>* node_allocator, keyvalue* kv, u32 max_index)
+    void xbtree32::init_from_index(xfsadexed<node_t>* node_allocator, keyvalue* kv, u32 max_index)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr_data, max_index);
     }
 
-    void xbtree32::init_from_mask(xpooldexed<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted)
+    void xbtree32::init_from_mask(xfsadexed<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr_data, mask, sorted);
@@ -386,20 +207,20 @@ namespace xcore
             {
                 // Check for duplicate, see if this value is the value of this leaf
                 u64 const child_key = m_kv->get_key(as_index(childNodeIndex));
-                if (idxr->key_compare(child_key, key))
+                if (idxr->key_compare(child_key, key)!=0)
                 {
                     return false;
                 }
 
                 // Create new node and add the existing item first and continue
-                node_t* newChildNode = pool.construct<node_t>();
+                node_t* newChildNode = m_node_alloc->construct<node_t>();
                 newChildNode->clear();
                 u32 newChildNodeIndex           = m_node_alloc->ptr2idx(newChildNode);
                 parentNode->m_nodes[childIndex] = as_node(newChildNodeIndex);
 
                 // Compute the child index of this already existing leaf one level up
                 // and insert this existing leaf there.
-                s32 const childChildIndex              = idxr->get_index(child_key, level + 1);
+                s32 const childChildIndex              = idxr->key_to_index(level + 1, child_key);
                 newChildNode->m_nodes[childChildIndex] = childNodeIndex;
 
                 // Continue, at the next level, correct parentNode
@@ -445,7 +266,7 @@ namespace xcore
         node_t* node             = (node_t*)m_node_alloc->idx2ptr(m_root);
         do
         {
-            s32 childIndex = idxr->get_index(key, level);
+            s32 childIndex = idxr->key_to_index(level, key);
             u32 nodeIndex  = node->m_nodes[childIndex];
             if (is_null(nodeIndex))
             {
@@ -454,7 +275,7 @@ namespace xcore
             else if (is_leaf(nodeIndex))
             {
                 u64 const nodeKey = m_kv->get_key(nodeIndex);
-                if (idxr->keys_equal(nodeKey, key))
+                if (idxr->key_compare(nodeKey, key))
                 {
                     // Remove this leaf from node, if this results in node
                     // having no more children then this node should also be
@@ -499,7 +320,7 @@ namespace xcore
         node_t const* node  = (node_t*)m_node_alloc->idx2ptr(m_root);
         do
         {
-            s32 childIndex     = idxr->get_index(key, level);
+            s32 childIndex     = idxr->key_to_index(level, key);
             u32 childNodeIndex = node->m_nodes[childIndex];
             if (is_null(childNodeIndex))
             {
@@ -508,7 +329,7 @@ namespace xcore
             else if (is_leaf(childNodeIndex))
             {
                 u64 const childNodeKey = m_kv->get_key(childNodeIndex);
-                if (idxr->keys_equal(childNodeKey, key))
+                if (idxr->key_compare(childNodeKey, key))
                 {
                     value = childNodeIndex;
                     return true;
@@ -565,13 +386,13 @@ namespace xcore
         u32           childNodeIndex;
         while (state == 0 && level < idxr->max_levels())
         {
-            childIndex     = idxr->get_index(key, level);
+            childIndex     = idxr->key_to_index(level, key);
             childNodeIndex = node->m_nodes[childIndex];
 
             if (is_leaf(childNodeIndex))
             {
                 u64 const childNodeKey = m_kv->get_key(childNodeIndex);
-                s32 const c            = idxr->keys_compare(childNodeKey, key);
+                s32 const c            = idxr->key_compare(childNodeKey, key);
                 if (c <= 0)
                 {
                     value = childNodeIndex;
@@ -653,13 +474,13 @@ namespace xcore
         u32           childNodeIndex;
         while (state == 0 && level < idxr->max_levels())
         {
-            childIndex     = idxr->get_index(key, level);
+            childIndex     = idxr->key_to_index(level, key);
             childNodeIndex = node->m_nodes[childIndex];
 
             if (is_leaf(childNodeIndex))
             {
                 u64 const childNodeKey = m_kv->get_key(childNodeIndex);
-                s32 const c            = idxr->keys_compare(childNodeKey, key);
+                s32 const c            = idxr->key_compare(childNodeKey, key);
                 if (c >= 0)
                 {
                     value = childNodeIndex;
@@ -741,7 +562,7 @@ namespace xcore
     static inline void*           as_value_ptr(uptr n) { ASSERT(is_value(n));  return (void*)((uptr)n); }
     static inline xbtree::node_t* as_node_ptr(uptr n) { ASSERT(is_node(n)); return (xbtree::node_t*)((uptr)n & ~(u64)1); }
 
-    void xbtree::init(xpool<node_t>* node_allocator, keyvalue* kv)
+    void xbtree::init(xfsa<node_t>* node_allocator, keyvalue* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
@@ -749,19 +570,19 @@ namespace xcore
         m_kv         = kv;
     }
 
-    void xbtree::init(xpool<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer)
+    void xbtree::init(xfsa<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer)
     {
         init(node_allocator, kv);
         m_idxr = indexer;
     }
 
-    void xbtree::init_from_index(xpool<node_t>* node_allocator, keyvalue* kv, u32 max_index)
+    void xbtree::init_from_index(xfsa<node_t>* node_allocator, keyvalue* kv, u32 max_index)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr_data, max_index);
     }
 
-    void xbtree::init_from_mask(xpool<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted)
+    void xbtree::init_from_mask(xfsa<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr_data, mask, sorted);
@@ -799,13 +620,12 @@ namespace xcore
                 }
 
                 // Create new node and add the existing item first and continue
-                xpool   pool(m_node_alloc);
-                node_t* newChildNode      = pool.construct<node_t>();
+                node_t* newChildNode      = m_node_alloc->construct<node_t>();
                 node->m_nodes[childIndex] = as_node((uptr)newChildNode);
 
                 // Compute the child index of this already existing leaf one level up
                 // and insert this existing leaf there.
-                s32 const childChildIndex              = idxr->get_index(child_key, level + 1);
+                s32 const childChildIndex              = idxr->key_to_index(level + 1, key);
                 newChildNode->m_nodes[childChildIndex] = childPtr;
 
                 // Continue, at the next level, correct node
@@ -871,7 +691,7 @@ namespace xcore
         node_t* node  = m_root;
         do
         {
-            s32 childIndex = idxr->get_index(key, level);
+            s32 childIndex = idxr->key_to_index(level, key);
 
             nodes[level]  = node;
             childs[level] = childIndex;
@@ -884,7 +704,7 @@ namespace xcore
             else if (is_value(nodePtr))
             {
                 u64 const nodeKey = m_kv->get_key(as_value_ptr(nodePtr));
-                if (idxr->keys_equal(nodeKey, key))
+                if (idxr->key_compare(nodeKey, key) == 0)
                 {
                     // Remove this leaf from node, if this results in node
                     // having no more children then this node should also be
@@ -920,7 +740,7 @@ namespace xcore
 
                             // Place the value at its correct place
                             u64 const childKey        = m_kv->get_key(as_value_ptr(otherValue));
-                            childIndex                = idxr->get_index(childKey, level);
+                            childIndex                = idxr->key_to_index(level, childKey);
                             node->m_nodes[childIndex] = otherValue;
                         }
                     }
@@ -973,8 +793,7 @@ namespace xcore
             }
             if (child == 4)
             {
-				xpool heap(m_node_alloc);
-				heap.destruct(node);
+				m_node_alloc->destruct(node);
             }
         }
     }
@@ -988,7 +807,7 @@ namespace xcore
         node_t const* node  = m_root;
         do
         {
-            s32  childIndex = idxr->get_index(key, level);
+            s32  childIndex = idxr->key_to_index(level, key);
             uptr nodePtr    = node->m_nodes[childIndex];
             if (is_null(nodePtr))
             {
@@ -997,7 +816,7 @@ namespace xcore
             else if (is_value(nodePtr))
             {
                 u64 const childNodeKey = m_kv->get_key(as_value_ptr(nodePtr));
-                if (idxr->keys_equal(childNodeKey, key))
+                if (idxr->key_compare(childNodeKey, key) == 0)
                 {
                     value = as_value_ptr(nodePtr);
                     return true;
@@ -1054,13 +873,13 @@ namespace xcore
         uptr          childPtr;
         while (state == 0 && level < idxr->max_levels())
         {
-            childIndex = idxr->get_index(key, level);
+            childIndex = idxr->key_to_index(level, key);
             childPtr   = node->m_nodes[childIndex];
 
             if (is_value(childPtr))
             {
                 u64 const childNodeKey = m_kv->get_key(as_value_ptr(childPtr));
-                s32 const c            = idxr->keys_compare(childNodeKey, key);
+                s32 const c            = idxr->key_compare(childNodeKey, key);
                 if (c <= 0)
                 {
                     value = as_value_ptr(childPtr);
@@ -1142,13 +961,13 @@ namespace xcore
         uptr          childPtr;
         while (state == 0 && level < idxr->max_levels())
         {
-            childIndex = idxr->get_index(key, level);
+            childIndex = idxr->key_to_index(level, key);
             childPtr   = node->m_nodes[childIndex];
 
             if (is_value(childPtr))
             {
                 u64 const childNodeKey = m_kv->get_key(as_value_ptr(childPtr));
-                s32 const c            = idxr->keys_compare(childNodeKey, key);
+                s32 const c            = idxr->key_compare(childNodeKey, key);
                 if (c >= 0)
                 {
                     value = as_value_ptr(childPtr);

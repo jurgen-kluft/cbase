@@ -10,8 +10,6 @@
 
 namespace xcore
 {
-    class xvirtual_memory;
-
     class key_indexer
     {
     public:
@@ -66,16 +64,16 @@ namespace xcore
         struct node_t
         {
             inline node_t() { clear(); }
-            inline bool is_empty() const { return is_null(m_nodes[0]) && is_null(m_nodes[1]) && is_null(m_nodes[2]) && is_null(m_nodes[3]); }
-            inline void clear() { m_nodes[0] = Null; m_nodes[1] = Null; m_nodes[2] = Null; m_nodes[3] = Null; }
+            inline bool is_empty() const { return m_nodes[0] == m_nodes[1] == m_nodes[2] == m_nodes[3] == 0xffffffff; }
+            inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = 0xffffffff; }
             u32 m_nodes[4];
             XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
-        void init(xpooldexed<node_t>* node_allocator, keyvalue* kv);
-        void init(xpooldexed<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer);
-        void init_from_index(xpooldexed<node_t>* node_allocator, keyvalue* kv, u32 max_index);
-        void init_from_mask(xpooldexed<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted);
+        void init(xfsadexed<node_t>* node_allocator, keyvalue* kv);
+        void init(xfsadexed<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer);
+        void init_from_index(xfsadexed<node_t>* node_allocator, keyvalue* kv, u32 max_index);
+        void init_from_mask(xfsadexed<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted);
 
         bool add(u64 key, u32 value);
         bool rem(u64 key, u32& value);
@@ -90,7 +88,7 @@ namespace xcore
         u32                m_root;
         key_indexer_data   m_idxr_data;
         key_indexer const* m_idxr;
-        xpooldexed<node_t>*m_node_alloc;
+        xfsadexed<node_t>*m_node_alloc;
         keyvalue*          m_kv;
     };
 
@@ -112,10 +110,10 @@ namespace xcore
             XCORE_CLASS_PLACEMENT_NEW_DELETE
         };        
 
-        void init(xpool<node_t>* node_allocator, keyvalue* kv);
-        void init(xpool<node_t>* node_allocator, keyvalue* kv, key_indexer const* idxr);
-        void init_from_index(xpool<node_t>* node_allocator, keyvalue* kv, u32 max_index);
-        void init_from_mask(xpool<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted);
+        void init(xfsa<node_t>* node_allocator, keyvalue* kv);
+        void init(xfsa<node_t>* node_allocator, keyvalue* kv, key_indexer const* idxr);
+        void init_from_index(xfsa<node_t>* node_allocator, keyvalue* kv, u32 max_index);
+        void init_from_mask(xfsa<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted);
 
         bool add(u64 key, void* value);
         bool rem(u64 key, void*& value);
@@ -132,13 +130,19 @@ namespace xcore
         key_indexer const* m_idxr;
         key_indexer_data   m_idxr_data;
         node_t*            m_root;
-        xpool<node_t>*     m_node_alloc;
+        xfsa<node_t>*      m_node_alloc;
         keyvalue*          m_kv;
     };
 
     // Dynamic sized nodes, using bitset to identify the slots that are set.
-    // Size of node is from 16B to 264B so this works great with an allocator
-    // that has a good Fixed Size Allocator setup.
+    //
+    // On a 32-bit system:
+    //   Size of node is from 8B to 136B so this works great with an allocator
+    //   that has a good Fixed Size Allocator setup.
+    //
+    // On a 64-bit system:
+    //   Size of node is from 16B to 264B so this works great with an allocator
+    //   that has a good Fixed Size Allocator setup.
 
     // Every node consumes 5 bits, so a key of 32 bits and a root of 7 bits will
     // have a maximum depth of 5 (5 * 5-bits = 25 bits + 7 bits root = 32 bits).
@@ -146,27 +150,30 @@ namespace xcore
 
     struct xztree
     {
-        struct znode
+        // The array is compressed, only non-nullptr entries are there.
+        struct node
         {
-            u32    m_nodemap;
-            u32    m_valuemap;
-            znode* m_branches[]; // Node*[->] - Value*[<-]
+            u32    m_nodemap;   // In the array, a bit set indicates a node  (index=bit-pos)
+            u32    m_valuemap;  // In the array, a bit set indicates a value (index=bit-pos)
+            node* m_branches[]; // Node*[->] - Value*[<-]
         };
-        static s32 size(znode* node);
+        static s32 size(node* node);
         static s32 max_level() { return 6; }
         static s8  calc_index(s32 level, u32 key);
+
         // Insert: Keep calling insert as long as it returns a valid znode*
-        static znode* insert(znode*& node, s8 i, void* value, xalloc* allocator);
+        static node* insert(node*& node, s8 i, void* value, xalloc* allocator);
+        
         // Remove: Keep calling remove as long as it returns a valid znode*
-        static znode* remove(znode*& node, s8 i, void* value, xalloc* allocator);
+        static node* remove(node*& node, s8 i, void* value, xalloc* allocator);
+        
         // Insert: Keep calling find as long as it returns a valid znode*
-        static znode* find(znode*& node, s8 i, void*& value);
+        static node* find(node*& node, s8 i, void*& value);
     };
 
     // Now that we have a btree we can implement other well known data structures.
     // set<V>
     // map<K,V>
-    // vector<V>
     template <typename K> class xhasher
     {
     public:
@@ -217,7 +224,6 @@ namespace xcore
     {
     public:
         xmap(xalloc* a) : m_allocator(a) {}
-        xmap(xalloc* a, xhasher<K> hasher) : m_hash(hasher), m_allocator(a) {}
 
         bool insert(K const& key, V const& value);
         bool remove(K const& key, V& value);
@@ -226,21 +232,20 @@ namespace xcore
     private:
         struct value_t
         {
-            inline value_t(const K& key, const V& value) : m_hash(0), m_key(key), m_value(value) {}
-            u64 m_hash;
-            K   m_key;
-            V   m_value;
+            inline value_t(const K& key, const V& value) : m_hash(0), m_key(key), m_value(value), m_next(nullptr) {}
+            u64      m_hash;
+            value_t* m_next;
+            K        m_key;
+            V        m_value;
         };
-        xhasher<K> m_hash;
-        xalloc*    m_allocator;
-        xztree     m_tree;
+        xalloc*       m_allocator;
+        xztree::node* m_root;
     };
 
     template <typename T> class xset
     {
     public:
         xset();
-        xset(xhasher<T> hasher);
 
         bool insert(T const& value);
         bool remove(T const& value);
@@ -249,13 +254,13 @@ namespace xcore
     private:
         struct value_t
         {
-            inline value_t(u32 key, const T& value) : m_key(key), m_value(value) {}
-            u32 m_key;
-            T   m_value;
+            inline value_t(u32 key, const T& value) : m_key(key), m_value(value), m_next(nullptr) {}
+            u64      m_key;
+            value_t* m_next;
+            T        m_value;
         };
-        xhasher<T> m_hash;
-        xalloc*    m_allocator;
-        xztree     m_tree;
+        xalloc*       m_allocator;
+        xztree::node* m_tree;
     };
 }; // namespace xcore
 

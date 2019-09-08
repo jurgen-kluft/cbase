@@ -44,7 +44,7 @@ namespace xcore
 
 	// fixed-size/type allocator
 	template<class T>
-	class xpool
+	class xfsa
 	{
 	public:
 		virtual T*			allocate() = 0;
@@ -67,7 +67,7 @@ namespace xcore
 		}
 
 	protected:
-		virtual				~xpool() {}
+		virtual				~xfsa() {}
 	};
 
 	// The dexer interface, 'pointer to index' and 'index to pointer'
@@ -79,13 +79,13 @@ namespace xcore
 	};
 
 	template<class T>
-	class xpooldexed : public xpool<T>, public xdexer
+	class xfsadexed : public xfsa<T>, public xdexer
 	{
 	public:
 		virtual void	release() = 0;
 
 	protected:
-		virtual			~xpooldexed() {}
+		virtual			~xfsadexed() {}
 	};
 
 	// Global new and delete
