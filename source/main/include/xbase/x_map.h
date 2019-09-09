@@ -32,14 +32,14 @@ namespace xcore
         {
             u32    m_nodemap;   // In the array, a bit set indicates a node  (index=bit-pos)
             u32    m_valuemap;  // In the array, a bit set indicates a value (index=bit-pos)
-            node* m_branches[]; // Node*[->] - Value*[<-]
+            node* m_branches[1]; // Node*[->] - Value*[<-]
         };
 
         static s32 max_level() { return (64+4) / 5; }
         static s8  calc_index(s32 level, u64 key);
 
         static node* find(node*& root, node* n, s8 level, u64 k, void ** v, node ** path);
-        static node* insert(node*& root, s32 level, node** nodes, u64* keys, void** values, s32 count, xalloc* allocator);                
+        static node* insert(node*& root, s32 level, node** nodes, u64* keys, void** values, s32 count, xalloc* allocator);
         static node* remove(node*& root, node** path, s8 level, u64 key, xalloc* allocator);
     };
 

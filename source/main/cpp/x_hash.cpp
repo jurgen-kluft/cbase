@@ -4,6 +4,8 @@
 
 namespace xcore
 {
+	xhashing hasher;
+
 	// Return the bits of the specified 'x' rotated to the left by the
 	// specified 'b' number of bits.  Bits that are rotated off the end are
 	// wrapped around to the beginning.
@@ -47,6 +49,7 @@ namespace xcore
 		result = (result << 8) | p[5];
 		result = (result << 8) | p[6];
 		result = (result << 8) | p[7];
+		return result;
 	}
 
 	inline static void data_copy(const xbyte* src, const xbyte* end, xbyte* dst)
@@ -153,7 +156,6 @@ namespace xcore
 		return b;
 	}
 
-	xhashing hasher;
 };
 
 

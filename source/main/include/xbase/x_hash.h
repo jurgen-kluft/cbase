@@ -28,7 +28,8 @@ namespace xcore
         void hash(const void *data, s32 numBytes);
         u64  finalize();
     };
-    static xhashing hasher;
+
+    extern xhashing hasher;
 
     // Now that we have a btree we can implement other well known data structures.
     // set<V>
@@ -108,3 +109,5 @@ namespace xcore
         }
     };
 }
+
+#endif // __X_BASE_DEFAULT_HASH_H__

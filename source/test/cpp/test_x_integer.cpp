@@ -277,7 +277,7 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(2, xleastSignificantBit(a));
 			CHECK_EQUAL(6, xleastSignificantBit(b));
-			CHECK_EQUAL(-1, xleastSignificantBit(c));
+			CHECK_EQUAL(32, xleastSignificantBit(c));
 		}
 
 		UNITTEST_TEST(MostSignificantBit)
@@ -285,7 +285,7 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(3, xmostSignificantBit(a));
 			CHECK_EQUAL(6, xmostSignificantBit(b));
-			CHECK_EQUAL(-1, xmostSignificantBit(c));
+			CHECK_EQUAL(32, xmostSignificantBit(c));
 		}
 
 		UNITTEST_TEST(FindFirstBit)
@@ -293,7 +293,7 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(2, xfindFirstBit(a));
 			CHECK_EQUAL(6, xfindFirstBit(b));
-			CHECK_EQUAL(-1, xfindFirstBit(c));
+			CHECK_EQUAL(32, xfindFirstBit(c));
 		}
 
 		UNITTEST_TEST(FindLastBit)
@@ -301,7 +301,7 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(3 , xfindLastBit(a));
 			CHECK_EQUAL(6 , xfindLastBit(b));
-			CHECK_EQUAL(-1, xfindLastBit(c));
+			CHECK_EQUAL(32, xfindLastBit(c));
 		}
 
 		UNITTEST_TEST(Rol32)

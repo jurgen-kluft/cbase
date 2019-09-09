@@ -173,7 +173,7 @@ inline s32 xmostSignificantOneBit(u32 inInteger)
 inline s32 xleastSignificantBit(u32 inInteger)
 {
     if (inInteger == 0)
-        return -1;
+        return 32;
     s32 c = xcountTrailingZeros(inInteger);
     return c;
 }
@@ -184,7 +184,7 @@ inline s32 xleastSignificantBit(u32 inInteger)
 inline s32 xmostSignificantBit(u32 inInteger)
 {
     if (inInteger == 0)
-        return -1;
+        return 32;
     return 31 - xcountLeadingZeros(inInteger);
 }
 
@@ -194,7 +194,7 @@ inline s32 xmostSignificantBit(u32 inInteger)
 inline s32 xfindFirstBit(u32 inInteger)
 {
     if (inInteger == 0)
-        return -1;
+        return 32;
     return xcountTrailingZeros(inInteger);
 }
 
@@ -204,6 +204,6 @@ inline s32 xfindFirstBit(u32 inInteger)
 inline s32 xfindLastBit(u32 inInteger)
 {
     if (inInteger == 0)
-        return -1;
+        return 32;
     return 31 - xcountLeadingZeros(inInteger);
 }
