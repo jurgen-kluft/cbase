@@ -158,7 +158,7 @@ namespace xcore
     }
 
 
-    void xbtree32::init(xfsadexed<node_t>* node_allocator, keyvalue* kv)
+    void xbtree32::init(xfsadexed* node_allocator, keyvalue* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
@@ -168,19 +168,19 @@ namespace xcore
         m_kv   = kv;
     }
 
-    void xbtree32::init(xfsadexed<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer)
+    void xbtree32::init(xfsadexed* node_allocator, keyvalue* kv, key_indexer const* indexer)
     {
         init(node_allocator, kv);
         m_idxr = indexer;
     }
 
-    void xbtree32::init_from_index(xfsadexed<node_t>* node_allocator, keyvalue* kv, u32 max_index)
+    void xbtree32::init_from_index(xfsadexed* node_allocator, keyvalue* kv, u32 max_index)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr_data, max_index);
     }
 
-    void xbtree32::init_from_mask(xfsadexed<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted)
+    void xbtree32::init_from_mask(xfsadexed* node_allocator, keyvalue* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr_data, mask, sorted);
@@ -207,7 +207,7 @@ namespace xcore
             {
                 // Check for duplicate, see if this value is the value of this leaf
                 u64 const child_key = m_kv->get_key(as_index(childNodeIndex));
-                if (idxr->key_compare(child_key, key)!=0)
+                if (idxr->key_compare(child_key, key)==0)
                 {
                     return false;
                 }
@@ -275,7 +275,7 @@ namespace xcore
             else if (is_leaf(nodeIndex))
             {
                 u64 const nodeKey = m_kv->get_key(nodeIndex);
-                if (idxr->key_compare(nodeKey, key))
+                if (idxr->key_compare(nodeKey, key) == 0)
                 {
                     // Remove this leaf from node, if this results in node
                     // having no more children then this node should also be
@@ -329,7 +329,7 @@ namespace xcore
             else if (is_leaf(childNodeIndex))
             {
                 u64 const childNodeKey = m_kv->get_key(childNodeIndex);
-                if (idxr->key_compare(childNodeKey, key))
+                if (idxr->key_compare(childNodeKey, key) == 0)
                 {
                     value = childNodeIndex;
                     return true;
@@ -562,7 +562,7 @@ namespace xcore
     static inline void*           as_value_ptr(uptr n) { ASSERT(is_value(n));  return (void*)((uptr)n); }
     static inline xbtree::node_t* as_node_ptr(uptr n) { ASSERT(is_node(n)); return (xbtree::node_t*)((uptr)n & ~(u64)1); }
 
-    void xbtree::init(xfsa<node_t>* node_allocator, keyvalue* kv)
+    void xbtree::init(xfsa* node_allocator, keyvalue* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
@@ -570,19 +570,19 @@ namespace xcore
         m_kv         = kv;
     }
 
-    void xbtree::init(xfsa<node_t>* node_allocator, keyvalue* kv, key_indexer const* indexer)
+    void xbtree::init(xfsa* node_allocator, keyvalue* kv, key_indexer const* indexer)
     {
         init(node_allocator, kv);
         m_idxr = indexer;
     }
 
-    void xbtree::init_from_index(xfsa<node_t>* node_allocator, keyvalue* kv, u32 max_index)
+    void xbtree::init_from_index(xfsa* node_allocator, keyvalue* kv, u32 max_index)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr_data, max_index);
     }
 
-    void xbtree::init_from_mask(xfsa<node_t>* node_allocator, keyvalue* kv, u64 mask, bool sorted)
+    void xbtree::init_from_mask(xfsa* node_allocator, keyvalue* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr_data, mask, sorted);
@@ -596,6 +596,7 @@ namespace xcore
         if (m_root == nullptr)
         {
             m_root = m_node_alloc->construct<node_t>();
+			m_root->clear();
         }
 
         s32     level = 0;
@@ -614,18 +615,19 @@ namespace xcore
             {
                 // Check for duplicate, see if this value is the value of this leaf
                 u64 const child_key = m_kv->get_key(as_value_ptr(childPtr));
-                if (idxr->key_compare(child_key, key) != 0)
+                if (idxr->key_compare(child_key, key) == 0)
                 {
                     return false;
                 }
 
                 // Create new node and add the existing item first and continue
                 node_t* newChildNode      = m_node_alloc->construct<node_t>();
+				newChildNode->clear();
                 node->m_nodes[childIndex] = as_node((uptr)newChildNode);
 
                 // Compute the child index of this already existing leaf one level up
                 // and insert this existing leaf there.
-                s32 const childChildIndex              = idxr->key_to_index(level + 1, key);
+                s32 const childChildIndex              = idxr->key_to_index(level + 1, child_key);
                 newChildNode->m_nodes[childChildIndex] = childPtr;
 
                 // Continue, at the next level, correct node

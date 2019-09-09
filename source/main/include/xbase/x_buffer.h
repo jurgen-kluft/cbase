@@ -87,7 +87,7 @@ namespace xcore
 		enum {SIZE = (L+3)/4};
 	public:
 		u64				m_data[SIZE];
-		inline			xbytes() : xbuffer(SIZE, (xbyte*)m_data) {}
+		inline			xbytes() : xbuffer(SIZE*4, (xbyte*)m_data) {}
 		xbuffer			buffer() const { return xbuffer(*this); }
 	};
 

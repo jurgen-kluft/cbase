@@ -71,7 +71,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 		UNITTEST_TEST(operator_index)
 		{
 			xcarray a(array_data, sizeof(s32), 10);
-			for (u32 i=0; i<a.reserved(); ++i)
+			for (s32 i=0; i<a.reserved(); ++i)
 				a.push_back(&i);
 
 			s32* value = (s32*)a[0];
@@ -83,7 +83,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 		UNITTEST_TEST(swap)
 		{
 			xcarray a(array_data, sizeof(s32), 10);
-			for (u32 i=0; i<a.reserved(); ++i)
+			for (s32 i=0; i<a.reserved(); ++i)
 				a.push_back(&i);
 
 			a.swap(4, 7);
@@ -94,7 +94,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 		UNITTEST_TEST(remove)
 		{
 			xcarray a(array_data, sizeof(s32), 10);
-			for (u32 i=0; i<a.reserved(); ++i)
+			for (s32 i=0; i<a.reserved(); ++i)
 				a.push_back(&i);
 
 			CHECK_EQUAL(10, a.size());
@@ -118,7 +118,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 		UNITTEST_TEST(swap_remove)
 		{
 			xcarray a(array_data, sizeof(s32), 10);
-			for (u32 i=0; i<a.reserved(); ++i)
+			for (s32 i=0; i<a.reserved(); ++i)
 				a.push_back(&i);
 
 			CHECK_EQUAL(10, a.size());

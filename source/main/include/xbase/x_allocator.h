@@ -42,24 +42,26 @@ namespace xcore
 		virtual				~xalloc() {}
 	};
 
-	// fixed-size/type allocator
-	template<class T>
+	// fixed-size allocator
 	class xfsa
 	{
 	public:
-		virtual T*			allocate() = 0;
-		virtual void		deallocate(T*) = 0;
+		virtual u32			size() const = 0;
+		virtual void*		allocate() = 0;
+		virtual void		deallocate(void*) = 0;
 
 		virtual void		release() = 0;
 
-		template<typename... Args>
+		template<typename T, typename... Args>
 		T*			construct(Args... args)
 		{
+			ASSERT(sizeof(T) <= size());
 			void * mem = allocate();
 			T* object = new (mem) T(args...);
 			return object;
 		}
 
+		template<typename T>
 		void		destruct(T* p)
 		{
 			p->~T();
@@ -78,11 +80,10 @@ namespace xcore
 		virtual u32			ptr2idx(void* ptr) const = 0;
 	};
 
-	template<class T>
-	class xfsadexed : public xfsa<T>, public xdexer
+	class xfsadexed : public xfsa, public xdexer
 	{
 	public:
-		virtual void	release() = 0;
+		xfsadexed() {}
 
 	protected:
 		virtual			~xfsadexed() {}

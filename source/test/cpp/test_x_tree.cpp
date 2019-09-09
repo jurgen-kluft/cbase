@@ -10,24 +10,25 @@ extern xcore::xalloc* gTestAllocator;
 
 namespace xcore
 {
-    template<class T>
-    class xfsa_imp : public xfsa<T>
+    class xfsa_imp : public xfsa
     {
         u32     m_alloc_size;
         s32     m_count;
         xalloc* m_allocator;
 
     public:
-        inline xfsa_test() : m_alloc_size(0), m_count(0), m_allocator(nullptr) {}
+        inline xfsa_imp() : m_alloc_size(0), m_count(0), m_allocator(nullptr) {}
 
         s32 count() const { return m_count; }
 
-        void init(xalloc* a)
+        void init(xalloc* a, u32 size)
         {
-            m_alloc_size = sizeof(T);
+            m_alloc_size = size;
             m_count      = 0;
             m_allocator  = a;
         }
+
+        virtual u32   size() const { return m_alloc_size; }
 
         virtual void* allocate()
         {
@@ -42,34 +43,42 @@ namespace xcore
         virtual void release() {}
     };
 
-    template<class T>
-    class xnode_array : public xfsadexed<T>
+    class xnode_array : public xfsadexed
     {
-        enum
+        struct node
         {
-            Null = 0xffffffff
+			node() {}
+
+            union {
+                xbtree32::node_t m_node;
+                node*            m_next;
+            };
         };
-        T     m_nodes[32768];
+
+        node  m_nodes[32768];
         u32   m_direct;
-        T*    m_head;
+        node* m_freelist;
         s32   m_count;
 
     public:
-        xnode_array() { reset(); }
+        inline xnode_array() : m_direct(0), m_freelist(nullptr), m_count(0)
+		{
+		}
 
         void reset()
         {
             m_direct = 0;
-            m_head   = nullptr;
+            m_freelist   = nullptr;
             m_count  = 0;
         }
 
         s32 count() const { return m_count; }
 
+        virtual u32   size() const { return sizeof(node); }
         virtual void* allocate()
         {
             void* p = nullptr;
-            if (m_head == nullptr)
+            if (m_freelist == nullptr)
             {
                 if (m_direct < sizeof(m_nodes))
                 {
@@ -80,9 +89,9 @@ namespace xcore
             }
             else
             {
-                p      = m_head;
-                m_head = m_head->next;
-                m_count += 1;
+                p          = m_freelist;
+                m_freelist = m_freelist->m_next;
+                m_count   += 1;
             }
             return p;
         }
@@ -91,9 +100,9 @@ namespace xcore
         {
             x_memset(p, 0xDA, sizeof(node));
             node* n = (node*)p;
-            n->next = m_head;
-            m_head  = n;
-            m_count -= 1;
+            n->m_next   = m_freelist;
+            m_freelist  = n;
+            m_count    -= 1;
         }
 
         virtual void* idx2ptr(u32 index) const { return (void*)&m_nodes[index]; }
@@ -116,12 +125,8 @@ namespace xcore
         u64 key;
     };
 
-    class xvalue_array : public xfsadexed<value_t>, public xbtree32::keyvalue
+    class xvalue_array : public xfsadexed, public xbtree32::keyvalue
     {
-        enum
-        {
-            Null = 0xffffffff
-        };
         struct node
         {
             union {
@@ -146,6 +151,7 @@ namespace xcore
 
         s32 count() const { return m_count; }
 
+        virtual u32   size() const { return sizeof(node); }
         virtual void* allocate()
         {
             void* p = nullptr;
@@ -218,8 +224,8 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         UNITTEST_FIXTURE_TEARDOWN()
         {
-            heap.destruct(nodes);
-            heap.destruct(values);
+            gTestAllocator->destruct(nodes);
+            gTestAllocator->destruct(values);
         }
 
         UNITTEST_TEST(init)
@@ -378,7 +384,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
             XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
-        static xfsa_imp<xbtree::node_t> nodes;
+        static xfsa_imp nodes;
 
         class myvalue_kv : public xbtree::keyvalue
         {
@@ -398,7 +404,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         static myvalue_kv values;
 
-        UNITTEST_FIXTURE_SETUP() { nodes.init(gTestAllocator); }
+        UNITTEST_FIXTURE_SETUP() { nodes.init(gTestAllocator, sizeof(xbtree::node_t)); }
 
         UNITTEST_FIXTURE_TEARDOWN() {}
 
@@ -433,8 +439,8 @@ UNITTEST_SUITE_BEGIN(xbtree)
             void* vv2;
             CHECK_TRUE(tree.rem(v2->m_key, vv2));
 
-            heap.destruct<myvalue>((myvalue*)v2);
-            heap.destruct<myvalue>((myvalue*)v1);
+            gTestAllocator->destruct<myvalue>((myvalue*)v2);
+            gTestAllocator->destruct<myvalue>((myvalue*)v1);
 
             tree.clear();
         }
