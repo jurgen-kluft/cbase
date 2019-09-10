@@ -31,7 +31,6 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_utf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtls);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xva);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xhibitset);
 
 #ifndef X_NO_CUSTOM_INT64
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, __xint64);

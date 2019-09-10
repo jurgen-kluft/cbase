@@ -33,14 +33,26 @@ namespace xcore
             u32    m_nodemap;   // In the array, a bit set indicates a node  (index=bit-pos)
             u32    m_valuemap;  // In the array, a bit set indicates a value (index=bit-pos)
             node* m_branches[1]; // Node*[->] - Value*[<-]
+			XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
-        static s32 max_level() { return (64+4) / 5; }
-        static s8  calc_index(s32 level, u64 key);
+		struct path_t
+		{
+			node*	m_level[32];
+			s32		m_levels;
+		};
 
-        static node* find(node*& root, node* n, s8 level, u64 k, void ** v, node ** path);
-        static node* insert(node*& root, s32 level, node** nodes, u64* keys, void** values, s32 count, xalloc* allocator);
-        static node* remove(node*& root, node** path, s8 level, u64 key, xalloc* allocator);
+		struct found_t
+		{
+			u64 m_key;
+
+		};
+
+        static s32 max_level() { return (64+4) / 5; }
+
+        static node* find(node* n, s8 level, u64 k, node*& node, void*& value, path_t* path);
+        static node* insert(node*& root, s32 level, node* node, u64 hash1, void* value1, u64 hash2, void* value2, xalloc* allocator);
+        static node* remove(node*& root, path_t& path, s8 level, node* node, u64 key, xalloc* allocator);
     };
 
     template <typename K, typename V, typename H = xhasher<K>> class xmap
@@ -58,58 +70,58 @@ namespace xcore
         {            
             u64 const hash = m_hasher.hash(k);
 
+            void* ovalue = nullptr;
+            xztree::node* onode = nullptr;
+
             s32 level = 0;
             xztree::node* node = m_root;
-            void** ppvalue = nullptr;
-            s32 ivalue = -1;
-            while ((xztree::find(m_root, node, level, hash, ppvalue, ivalue, nullptr)) != null)
+			while ((xztree::find(node, level, hash, onode, ovalue, nullptr)) != nullptr)
             {
                 level++;
             }
-            if (ppvalue == nullptr)
-            {
-                // There is
 
+            if (ovalue == nullptr)
+            {
+                // There is no such key in the map yet, so we can insert it
+                value_t* pvalue = m_allocator->construct<value_t>(hash, k, v);
+				xztree::insert(m_root, level, onode, hash, pvalue, 0, nullptr, m_allocator);
             }
             else
             {
-                // So we got a pointer to the place where the value pointer is stored
-                if (*ppvalue == nullptr)
-                {
-                    // In this case there is no value pointer so we can create a value_t
-                    // and store the pointer directly
-                    value_t* pvalue = m_alloc->construct<value_t>(hash, k, v);
-                    
-                }
-                else
-                    value_t* pvalue = static_cast<value_t*>(*ppvalue);
-                {
-                    // In this case there is a value pointer so we first need to determine
-                    // if this value is unique
+                // So we encountered a branch where there is a value already
+                // In this case there is a value pointer so we first need to determine
+                // if this value is unique.
+				// We can condition this here but for now we keep it simple, we will only
+				// push members on the linked-list in the case of a hash-collision.
 
-                    value_t* piter = pvalue;
-                    while (piter != nullptr)
+				value_t* pvalue = static_cast<value_t*>(ovalue);
+                value_t* piter = pvalue;
+                while (piter != nullptr)
+                {
+                    if (hash == piter->m_hash)
                     {
-                        if (hash == piter->m_hash)
+                        if (k == piter->m_key && v == piter->m_value)
                         {
-                            if (k == piter->m_key && v == piter->m_value)
-                            {
-                                // Ok, so we found a duplicate, don't do anything more, just return false
-                                // meaning to say that we did not add this key-value pair.
-                                return false;
-                            }
+                            // Ok, so we found a duplicate, don't do anything more, just return false
+                            // indicating that we did not add this key-value pair.
+                            return false;
                         }
-                        piter = piter->m_next;
                     }
-                    if (piter == nullptr)
-                    {
-                        // We did not find any key-value pair so at this point our incoming
-                        // k,v is unique and we should add it and insert it into the linked list.
-                        value_t* pnewvalue = m_alloc->construct<value_t>(hash, k, v);
-                        pnewvalue->m_next = pvalue;
-                        *ppvalue = pnewvalue;
-                        return true;
-                    }
+					else
+					{
+						// The value here has a different hash, so we need to insert our value here
+						xztree::insert(m_root, level, onode, piter->m_hash, piter, hash, ovalue, m_allocator);
+						return true;
+					}
+                    piter = piter->m_next;
+                }
+                if (piter == nullptr)
+                {
+					// We have a hash collision, so add insert it into the linked-list
+                    value_t* pnewvalue = m_allocator->construct<value_t>(hash, k, v);
+					pnewvalue->m_next = pvalue->m_next;
+					pvalue->m_next = pnewvalue;
+                    return true;
                 }
             }
             return false;
@@ -119,17 +131,18 @@ namespace xcore
         {
             u64 const hash = m_hasher.hash(k);
 
+            void* value = nullptr;
+            xztree::node* vnode = nullptr;
+
             s32 level = 0;
-            xztree::node* node = nullptr;
-            void* pvalue = nullptr;
-            s32 ivalue = 0;
-            while ((xztree::find(m_root, node, level, hash, value, ivalue, nullptr)) != null)
+            xztree::node* node = m_root;
+			while (xztree::find(node, level, hash, vnode, value, nullptr) != nullptr)
             {
                 level++;
             }
-            if (pvalue != nullptr)
+            if (value != nullptr)
             {
-                value_t* pvalue = static_cast<value_t*>(*ppvalue);
+                value_t* pvalue = static_cast<value_t*>(value);
                 value_t* piter = pvalue;
                 while (piter != nullptr)
                 {
@@ -152,13 +165,14 @@ namespace xcore
         {
             u64 const hash = m_hasher.hash(k);
 
-            xztree::node* history[14];
+            xztree::path_t path;
+
+            void* value = nullptr;
+            node* vnode = nullptr;
 
             s32 level = 0;
-            xztree::node* node = nullptr;
-            void* pvalue = nullptr;
-            s32 ivalue = 0;
-            while ((xztree::find(m_root, node, level, hash, value, ivalue, history)) != null)
+			xztree::node* node = m_root;
+            while ((xztree::find(node, level, hash, vnode, value, ivalue, &path)) != null)
             {
                 level++;
             }
@@ -183,10 +197,10 @@ namespace xcore
                                 pprev->m_next = piter->m_next;
                             }
 
-                            // Linked list is empty then call node::remove
+                            // Linked list is empty? then call node::remove
                             if (**pvalue == nullptr)
                             {
-                                xztree::remove(m_root, history, level, hash, m_allocator);
+                                xztree::remove(m_root, path, level, vnode, hash, m_allocator);
                             }
                             return true;
                         }
@@ -206,6 +220,7 @@ namespace xcore
             value_t* m_next;
             K        m_key;
             V        m_value;
+			XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
         xalloc*       m_allocator;
         xztree::node* m_root;
@@ -228,6 +243,7 @@ namespace xcore
             u64      m_key;
             value_t* m_next;
             T        m_value;
+			XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
         xalloc*       m_allocator;
         xztree::node* m_root;
