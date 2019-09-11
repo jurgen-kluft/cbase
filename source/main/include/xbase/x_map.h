@@ -28,17 +28,17 @@ namespace xcore
     struct xztree
     {
         // The array is compressed, only non-nullptr entries are there.
-        struct node
+        struct node_t
         {
-            u32    m_nodemap;   // In the array, a bit set indicates a node  (index=bit-pos)
-            u32    m_valuemap;  // In the array, a bit set indicates a value (index=bit-pos)
-            node* m_branches[1]; // Node*[->] - Value*[<-]
+            u32     m_nodemap;   // In the array, a bit set indicates a node  (index=bit-pos)
+            u32     m_valuemap;  // In the array, a bit set indicates a value (index=bit-pos)
+            node_t* m_branches[1]; // Node*[->] - Value*[<-]
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
 		struct path_t
 		{
-			node*	m_level[32];
+			node_t*	m_level[32];
 			s32		m_levels;
 		};
 
@@ -50,9 +50,9 @@ namespace xcore
 
         static s32 max_level() { return (64+4) / 5; }
 
-        static node* find(node* n, s8 level, u64 k, node*& node, void*& value, path_t* path);
-        static node* insert(node*& root, s32 level, node* node, u64 hash1, void* value1, u64 hash2, void* value2, xalloc* allocator);
-        static node* remove(node*& root, path_t& path, s8 level, node* node, u64 key, xalloc* allocator);
+        static node_t* find(node_t* n, s8 level, u64 k, node_t*& node, void*& value, path_t* path);
+        static node_t* insert(node_t*& root, s32 level, node_t* parent, node_t* node, u64 hash1, void* value1, u64 hash2, void* value2, xalloc* allocator);
+        static node_t* remove(node_t*& root, path_t& path, s8 level, node_t* node, u64 key, xalloc* allocator);
     };
 
     template <typename K, typename V, typename H = xhasher<K>> class xmap
@@ -71,12 +71,17 @@ namespace xcore
             u64 const hash = m_hasher.hash(k);
 
             void* ovalue = nullptr;
-            xztree::node* onode = nullptr;
+            xztree::node_t* onode = nullptr;
 
             s32 level = 0;
-            xztree::node* node = m_root;
-			while ((xztree::find(node, level, hash, onode, ovalue, nullptr)) != nullptr)
+			xztree::node_t* parent = node;
+            xztree::node_t* node = m_root;
+			while (node != nullptr)
             {
+				parent = node;
+				xztree::node_t* child = xztree::find(parent, level, hash, onode, ovalue, nullptr);
+				if (child == nullptr)
+					break;
                 level++;
             }
 
@@ -132,10 +137,10 @@ namespace xcore
             u64 const hash = m_hasher.hash(k);
 
             void* value = nullptr;
-            xztree::node* vnode = nullptr;
+            xztree::node_t* vnode = nullptr;
 
             s32 level = 0;
-            xztree::node* node = m_root;
+            xztree::node_t* node = m_root;
 			while (xztree::find(node, level, hash, vnode, value, nullptr) != nullptr)
             {
                 level++;
@@ -171,7 +176,7 @@ namespace xcore
             node* vnode = nullptr;
 
             s32 level = 0;
-			xztree::node* node = m_root;
+			xztree::node_t* node = m_root;
             while ((xztree::find(node, level, hash, vnode, value, ivalue, &path)) != null)
             {
                 level++;
@@ -222,9 +227,9 @@ namespace xcore
             V        m_value;
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
-        xalloc*       m_allocator;
-        xztree::node* m_root;
-        H             m_hasher;
+        xalloc*         m_allocator;
+        xztree::node_t* m_root;
+        H               m_hasher;
     };
 
     template <typename T, typename H = xhasher<T>> class xset
@@ -245,9 +250,9 @@ namespace xcore
             T        m_value;
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
-        xalloc*       m_allocator;
-        xztree::node* m_root;
-        H             m_hasher;
+        xalloc*         m_allocator;
+        xztree::node_t* m_root;
+        H               m_hasher;
     };
 
 
