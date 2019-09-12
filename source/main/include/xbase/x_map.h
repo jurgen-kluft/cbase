@@ -32,7 +32,7 @@ namespace xcore
         {
             u32     m_nodemap;   // In the array, a bit set indicates a node  (index=bit-pos)
             u32     m_valuemap;  // In the array, a bit set indicates a value (index=bit-pos)
-            node_t* m_branches[1]; // Node*[->] - Value*[<-]
+            void*	m_branches[1]; // Node*[->] - Value*[<-]
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
@@ -74,14 +74,15 @@ namespace xcore
             xztree::node_t* onode = nullptr;
 
             s32 level = 0;
-			xztree::node_t* parent = node;
+			xztree::node_t* parent = nullptr;
             xztree::node_t* node = m_root;
 			while (node != nullptr)
             {
-				parent = node;
-				xztree::node_t* child = xztree::find(parent, level, hash, onode, ovalue, nullptr);
+				xztree::node_t* child = xztree::find(node, level, hash, onode, ovalue, nullptr);
 				if (child == nullptr)
 					break;
+				parent = node;
+				node = child;
                 level++;
             }
 

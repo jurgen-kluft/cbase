@@ -28,7 +28,19 @@ namespace xcore
 		u32 items = (n->m_nodemap | n->m_valuemap) & (1<<child);
 		return (items == 0);
 	}
-	
+
+	static inline xztree::node_t* node_construct(s32 array_size, xalloc* allocator)
+	{
+		xztree::node_t* node = static_cast<xztree::node_t*>(allocator->allocate(sizeof(xztree::node_t) + (sizeof(void*) * (array_size-1)), sizeof(void*)));
+		node->m_nodemap = 0;
+		node->m_valuemap = 0;
+		for (s32 i=0; i<array_size; ++i)
+		{
+			node->m_branches[i] = nullptr;
+		}
+		return node;
+	}
+
 	static inline void	node_insert1(xztree::node_t*& n, s8 child, void* child_item, xalloc* allocator)
 	{
 		// Allocate new node with one extra slot
@@ -78,22 +90,42 @@ namespace xcore
 		return nullptr;
 	}
 
+	static inline void node_set_item(xztree::node_t* node, s32 level, u64 hash, void* value)
+	{
+		s8 child = calc_child_index(level, hash);
+		s32 index = calc_array_index(child, node->m_nodemap, node->m_valuemap);
+		node->m_branches[index] = value;
+	}
+
 	xztree::node_t* xztree::insert(node_t*& root, s32 level, node_t* parent, node_t* node, u64 hash1, void* value1, u64 hash2, void* value2, xalloc* allocator)
 	{
-		// Here we insert 1 or 2 values into our tree
-		// If it is 1 value we just have to enlarge the branch array 
-		// If we have 2 values then we have to branch until the hash keys are different.
+		// Here we insert 1 or 2 values
+		// If it is 1 value we just have to enlarge the branch array of the current node
+		// If we have 2 values then we have to branch until the hash keys are different
 		if (value2 == nullptr)
 		{
-			// One value to insert
 			s8 const child = calc_child_index(level, hash1);
+			if (root == nullptr)
+			{
+				root = node_construct(1, allocator);
+				node = root;
+			}
+			// One value to insert
 			ASSERT(node_has_child(node, child) == false);	// We should not have this child since we are inserting
 			node_insert1(node, child, value1, allocator);
 		}
 		else
 		{
-			// We need to branch and create nodes at every level until the child index is different
+			ASSERT(root != nullptr);
+			ASSERT(calc_child_index(level, hash1) == calc_child_index(level, hash2));
 
+			// We need to branch and create nodes at every level until the child index is different
+			xztree::node_t* parent = node;
+			while (calc_child_index(level, hash1) == calc_child_index(level, hash2))
+			{
+				xztree::node_t* childnode = node_construct(1, allocator);
+				
+			}
 		}
 		return nullptr;
 	}
@@ -117,7 +149,7 @@ namespace xcore
 		s32 value;
 		mymap.find(0,value);
 
-		mymap.
+
 	}
 
 };
