@@ -5,14 +5,6 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
-#ifdef TARGET_PC
-#include <math.h>
-#elif defined(TARGET_MAC)
-#include <math.h>
-#else
-#error "Don't know how fmod for this platform"
-#endif
-
 // Shared code
 #include "xbase/private/x_printf.h"
 
@@ -24,45 +16,34 @@ namespace xcore
 
 	// --- FLAGS FOR VSPRINTF ---
 
-	/**
-	 * NUMERIC VALUES
-	 */
-#define LONGDBL            0x01        // long f64; unimplemented
-#define LONGINT            0x02        // long integer
-#define QUADINT            0x04        // quad integer
-#define SHORTINT           0x08        // short integer
-#define NUMBERMASK         0x0F
+	// NUMERIC VALUES
+	#define LONGDBL            0x01        // long f64; unimplemented
+	#define LONGINT            0x02        // long integer
+	#define QUADINT            0x04        // quad integer
+	#define SHORTINT           0x08        // short integer
+	#define NUMBERMASK         0x0F
 
-	 /**
-	  * OTHER FLAGS
-	  */
-#define ALT                0x10        // alternate form
-#define HEXPREFIX          0x20        // add 0x or 0X prefix
-#define LADJUST            0x40        // left adjustment
-#define ZEROPAD            0x80        // zero (as opposed to blank) pad
+	// OTHER FLAGS
+	#define ALT                0x10        // alternate form
+	#define HEXPREFIX          0x20        // add 0x or 0X prefix
+	#define LADJUST            0x40        // left adjustment
+	#define ZEROPAD            0x80        // zero (as opposed to blank) pad
 
-	  /**
-	   * TEXT FLAGS
-	   */
-#define LOWERCASE          0x100       // lower-case, yes/no
-#define UPPERCASE          0x200       // upper-case, YES/NO
-#define CAMELCASE          0x400       // camel-case, Yes/No
+	// TEXT FLAGS
+	#define LOWERCASE          0x100       // lower-case, yes/no
+	#define UPPERCASE          0x200       // upper-case, YES/NO
+	#define CAMELCASE          0x400       // camel-case, Yes/No
 
-	   /**
-		* CONSTANTS
-		*/
-#define SPF_LONG_MAX    0x7FFFFFFF
-#define WORKSIZE        128         // space for %c, %[diouxX], %[eEfgG]
-#define DEFPREC         6           // number of precision for the real numbers
+	// CONSTANTS
+	#define SPF_LONG_MAX    0x7FFFFFFF
+	#define WORKSIZE        128         // space for %c, %[diouxX], %[eEfgG]
+	#define DEFPREC         6           // number of precision for the real numbers
 
+	//==============================================================================
+	// FUNCTIONS
+	//==============================================================================
 
-		//==============================================================================
-		// FUNCTIONS
-		//==============================================================================
-
-		/**
-		 * pow for f64
-		 */
+	// pow for f64
 	static f64 sPow(f64 x, s32 p)
 	{
 		if (p == 0)
@@ -89,6 +70,109 @@ namespace xcore
 		}
 	}
 
+#if defined(X_BIG_ENDIAN)
+	struct ieee_double_shape_type
+	{
+		union
+		{
+			f64 value;
+			struct u32d
+			{
+				u32 msw;
+				u32 lsw;
+			};
+			u32d	parts;
+		};
+	};
+#else
+	struct ieee_double_shape_type
+	{
+		union
+		{
+			f64 value;
+			struct u32d
+			{
+				u32 lsw;
+				u32 msw;
+			};
+			u32d	parts;
+		};
+	};
+#endif
+
+	// Get two 32 bit ints from a double.
+	#define EXTRACT_WORDS(ix0,ix1,d)	\
+	do {								\
+	ieee_double_shape_type ew_u;		\
+	ew_u.value = (d);					\
+	(ix0) = ew_u.parts.msw;				\
+	(ix1) = ew_u.parts.lsw;				\
+	} while (0)
+
+	// Set a double from two 32 bit ints
+	#define INSERT_WORDS(d,ix0,ix1)		\
+	do {								\
+	ieee_double_shape_type iw_u;		\
+	iw_u.parts.msw = (ix0);				\
+	iw_u.parts.lsw = (ix1);				\
+	(d) = iw_u.value;					\
+	} while (0)
+
+	static const f64 one = 1.0;
+	f64 modf(f64 x, f64 *iptr)
+	{
+		s32 i0,i1,_j0;
+		u32 i;
+		EXTRACT_WORDS(i0,i1,x);
+		_j0 = ((i0>>20)&0x7ff)-0x3ff;	/* exponent of x */
+		if(_j0<20)
+		{	/* integer part in high x */
+			if(_j0<0)
+			{	/* |x|<1 */
+				INSERT_WORDS(*iptr,i0&0x80000000,0);	/* *iptr = +-0 */
+				return x;
+			}
+			else
+			{
+				i = (0x000fffff)>>_j0;
+				if(((i0&i)|i1)==0)
+				{	/* x is integral */
+					*iptr = x;
+					INSERT_WORDS(x,i0&0x80000000,0);	/* return +-0 */
+					return x;
+				}
+				else
+				{
+					INSERT_WORDS(*iptr,i0&(~i),0);
+					return x - *iptr;
+				}
+			}
+		}
+		else if (_j0>51)
+		{	/* no fraction part */
+			*iptr = x*one;
+			/* We must handle NaNs separately.  */
+			if (_j0 == 0x400 && ((i0 & 0xfffff) | i1))
+				return x*one;
+			INSERT_WORDS(x,i0&0x80000000,0);	/* return +-0 */
+			return x;
+		}
+		else
+		{	/* fraction part in low x */
+			i = ((u32)(0xffffffff))>>(_j0-20);
+			if((i1&i)==0)
+			{	/* x is integral */
+				*iptr = x;
+				INSERT_WORDS(x,i0&0x80000000,0);	/* return +-0 */
+				return x;
+			}
+			else
+			{
+				INSERT_WORDS(*iptr,i0,i1&(~i));
+				return x - *iptr;
+			}
+		}
+	}
 
 	/**
 	 *------------------------------------------------------------------------------

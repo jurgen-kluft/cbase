@@ -212,7 +212,7 @@ namespace xcore
 
 	inline bool     xcbuffer::operator < (const xcbuffer& other) const
 	{
-		return compare(other) == -1;
+		return compare(other) < 0;
 	}
 
 	inline bool     xcbuffer::operator <= (const xcbuffer& other) const
@@ -222,7 +222,7 @@ namespace xcore
 
 	inline bool     xcbuffer::operator > (const xcbuffer& other) const
 	{
-		return compare(other) == 1;
+		return compare(other) > 0;
 	}
 
 	inline bool     xcbuffer::operator >= (const xcbuffer& other) const
@@ -245,8 +245,6 @@ namespace xcore
 	}
 
 
-
-
 	inline void         xbuffer::reset(xbyte fill)
 	{
 		for (u32 i = 0; i < size(); ++i)
@@ -255,8 +253,7 @@ namespace xcore
 
 	inline void         xbuffer::clear()
 	{
-		for (u32 i = 0; i < size(); ++i)
-			m_mutable[i] = 0;
+		reset(0);
 	}
 
 	inline xbuffer      xbuffer::operator()(u32 from, u32 to) const
@@ -277,7 +274,6 @@ namespace xcore
 	{
 		return xbinary_writer(m_mutable, size());
 	}
-
 }
 
 #endif  ///< __XCORE_BUFFER_H__

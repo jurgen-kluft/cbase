@@ -27,15 +27,9 @@ namespace xcore
 		const xnoncopyable& operator=(const xnoncopyable&);
 
 	protected:
-
-		//! Create a xnoncopyable object
 		xnoncopyable() { }
-
-		//! Destroy a xnoncopyable object
 		~xnoncopyable() { }
-
-	}; /* xnoncopyable */
-
-} // namespace xcore
+	};
+}
 
 #endif // __XBASE_NONCOPYABLE_H__

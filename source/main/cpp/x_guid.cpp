@@ -1,6 +1,3 @@
-//===============================================================================
-// INCLUDES
-//===============================================================================
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_guid.h"
@@ -8,9 +5,6 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	//-------------------------------------------------------------------------------
@@ -98,6 +92,3 @@ namespace xcore
 		}
 	}
 };
-/**
- *  END xCore namespace
- */

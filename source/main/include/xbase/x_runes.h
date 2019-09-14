@@ -5,10 +5,6 @@
 #pragma once
 #endif
 
-//==============================================================================
-// INCLUDES
-//==============================================================================
-
 namespace xcore
 {
     #undef printf
@@ -961,13 +957,13 @@ namespace xcore
         void concatenate(runes& str, const crunes& concat, alloc* allocator, s32 size_alignment);
         void concatenate(runes& str, const crunes& concat1, const crunes& concat2, alloc* allocator, s32 size_alignment);
 
-    }; // namespace utf32
+    };
 
     inline bool operator==(const utf32::crunes& lhs, const utf32::crunes& rhs) { return utf32::compare(lhs, rhs) == 0; }
     inline bool operator!=(const utf32::crunes& lhs, const utf32::crunes& rhs) { return utf32::compare(lhs, rhs) != 0; }
     inline bool operator==(const utf32::runes& lhs, const utf32::runes& rhs) { return utf32::compare(lhs, rhs) == 0; }
     inline bool operator!=(const utf32::runes& lhs, const utf32::runes& rhs) { return utf32::compare(lhs, rhs) != 0; }
 
-}; // namespace xcore
+};
 
 #endif ///< __XBASE_RUNES_H__

@@ -10,7 +10,6 @@
 
 namespace xcore
 {
-
 	class xlog_to_console_imp : public xlogger
 	{
 		virtual void			initialize();

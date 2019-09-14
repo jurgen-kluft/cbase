@@ -8,7 +8,7 @@
 
 ~~Split of containers into xcore/xgenerics~~ DONE
 
-Simplify the whole string usage, currently we have code to handle ascii/utf8/utf16/utf32. Can we just use utf32 and remove all other code except the conversion from/to. Console, Log, printf/sprintf, sscanf etc.. should all just use a standard low-level string container that is utf32. It doesn't matter if there is dynamic allocation.
+Simplify the whole string usage, currently we have code to handle ascii/utf8/utf16/utf32. Can we just use ascii and utf32 and remove all other code except the conversion from/to. Console, Log, printf/sprintf, sscanf etc.. should all just use a standard low-level string container that is ascii and utf32. It doesn't matter if there is dynamic allocation.
   
 ## xcore (typeless/raw containers)
 
@@ -16,8 +16,8 @@ Simplify the whole string usage, currently we have code to handle ascii/utf8/utf
 - ~~array~~ DONE
 - ~~stack~~ DONE
 - ~~queue~~ DONE
-- ~~tree~~ DONE
-- custom trie-tree map
+- ~~map~~ DONE
+- ~~set~~ DONE
 
 ## xgenerics
 
@@ -26,21 +26,22 @@ Simplify the whole string usage, currently we have code to handle ascii/utf8/utf
 - ``stack<T>``
 - ``queue<T>``
 - ``map<K,V>``
-- custom trie-tree map
+- ``set<V>``
 
-## xstring
+## xstring (Alpha)
 
-string class (utf32) (Alpha version)
+string class (utf32)
 
 ## xallocator
 
 We need a virtual memory based allocator :smile:
+Also, split of debugging allocators like memento to xmemory
 
 ## xatomic
 
 Do we still need these lock free data structures ?
 
-## xhash
+## xhash (Alpha)
 
 Just a simple interface here and a couple of hash candidates. This is just hashing, no encryption.
 
@@ -52,18 +53,18 @@ Utilities to construct, update use merkle trees.
 
 AES-256
 
-## xrandom
+## xrandom (Alpha)
 
 A couple of random number generators
 
 - mersenne twister
 - and ?
 
-## xtime
+## xtime (Beta)
 
 Package for dealing with date and time
 
-## xfilesystem
+## xfilesystem (Proto)
 
 We need to redesign this a bit by limiting the feature set, design can consider multithreading but should by default be single-threaded
 
@@ -74,7 +75,7 @@ We need to redesign this a bit by limiting the feature set, design can consider 
 ## xmemory
 
 - Leak Detector
-- Use the allocator to allocate the meta-data for the xrbtree
+- Use the allocator to allocate meta-data
 
 ## xthread
 
@@ -82,7 +83,8 @@ We need to redesign this a bit by limiting the feature set, design can consider 
 - mutex, event, semaphore
 - per thread
   - random number generator
-  - allocator
+  - string allocator
+  - heap allocator
 
 ## xp2p
 
@@ -121,4 +123,4 @@ Localization to support many languages easily in an app.
 
 ## end
 
-that's it...
+that's it... (for now)

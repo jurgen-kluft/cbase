@@ -19,14 +19,6 @@ namespace xcore
 	class xtls
 	{
 	public:
-		virtual				~xtls() { }
-
-		virtual s32			max() const = 0;
-
-		virtual	void		vset(s32 SLOT, void * inData) = 0;
-		virtual	void		vget(s32 SLOT, void *& outData) = 0;
-		virtual	void		vget(s32 SLOT, void const *& outData) const = 0;
-
 		static void			sSet(xtls*);
 		static xtls*		sGet();
 
@@ -45,9 +37,14 @@ namespace xcore
 		template<s32 SLOT, class T>
 		static void	get(T *& outData)				{ void * p= nullptr; sGet()->vget(SLOT, p); outData = (T*)p;}
 
+	protected:
+		virtual				~xtls() { }
 
+		virtual s32			max() const = 0;
+		virtual	void		vset(s32 SLOT, void * inData) = 0;
+		virtual	void		vget(s32 SLOT, void *& outData) = 0;
+		virtual	void		vget(s32 SLOT, void const *& outData) const = 0;
 	};
-
 }
 
 #endif // __XBASE_THREAD_LOCAL_STORAGE_H__

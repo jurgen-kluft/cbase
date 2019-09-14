@@ -13,28 +13,27 @@ namespace xcore
 	class xcarray
 	{
 	public:
-		inline				xcarray() : mLength(0), mArraySize(0), mElementSize(0), mArray(0)		{ }
-		inline				xcarray(void* _array, s32 element_size, s32 array_size) : mLength(0), mArraySize(array_size), mElementSize(element_size), mArray((xbyte*)_array)	{ }
+		inline				xcarray() : mLength(0), mReservedItems(0), mSizeOfItem(0), mArray(0)		{ }
+		inline				xcarray(void* _array, s32 size_of_element, s32 number_of_elements) : mLength(0), mReservedItems(number_of_elements), mSizeOfItem(size_of_element), mArray((xbyte*)_array)	{ }
 
 		inline void			clear()									{ mLength = 0; }
 
-		inline s32			max() const								{ return mArraySize; }
 		inline s32			size() const							{ return mLength; }
-		inline s32			reserved() const						{ return mArraySize; }
+		inline s32			reserved() const						{ return mReservedItems; }
 		inline bool			is_empty() const						{ return mLength == 0; }
-		inline bool			is_full() const							{ ASSERT(mLength <= mArraySize); return mLength == mArraySize; }
+		inline bool			is_full() const							{ ASSERT(mLength <= max()); return mLength == mReservedItems; }
 
-		inline void			push_back(void const* item)				{ ASSERT(mLength<mArraySize); x_memcpy(&mArray[mLength * mElementSize], item, mElementSize); mLength += 1; }
-		inline bool			pop_back(void * out_item)				{ if (mLength > 0) { --mLength; x_memcpy(out_item, &mArray[mLength], mElementSize); return true; } else { return false; } }
+		inline void			push_back(void const* item)				{ ASSERT(mLength<reserved()); x_memcpy(&mArray[mLength * mSizeOfItem], item, mSizeOfItem); mLength += 1; }
+		inline bool			pop_back(void * out_item)				{ if (mLength > 0) { --mLength; x_memcpy(out_item, &mArray[mLength * mSizeOfItem], mSizeOfItem); return true; } else { return false; } }
 
 		inline xbyte*		begin() const							{ return mArray; }
-		inline xbyte*		next(xbyte* current) const				{ return current + mElementSize; }
-		inline xbyte*		end() const								{ return &mArray[mLength * mElementSize]; }
+		inline xbyte*		next(xbyte* current) const				{ return current + mSizeOfItem; }
+		inline xbyte*		end() const								{ return &mArray[mLength * mSizeOfItem]; }
 
-		inline void*		operator [] (s32 index)					{ ASSERT(index<(s32)mLength); return &mArray[index * mElementSize]; }
-		inline void const*	operator [] (s32 index) const			{ ASSERT(index<(s32)mLength); return &mArray[index * mElementSize]; }
+		inline void*		operator [] (s32 index)					{ ASSERT(index<(s32)mLength); return &mArray[index * mSizeOfItem]; }
+		inline void const*	operator [] (s32 index) const			{ ASSERT(index<(s32)mLength); return &mArray[index * mSizeOfItem]; }
 
-		inline xcarray		operator() (s32 from, s32 to) const		{ ASSERT(from<to && from<mArraySize && to<mArraySize); xcarray c(&mArray[from* mElementSize], mElementSize, to-from);  return c; }
+		inline xcarray		operator() (s32 from, s32 to) const		{ ASSERT(from<to && from<mReservedItems && to<mReservedItems); xcarray c(&mArray[from* mSizeOfItem], mSizeOfItem, to-from);  return c; }
 
 		void				swap(s32 a, s32 b);
 		void				remove(s32 i);
@@ -42,17 +41,17 @@ namespace xcore
 
 	private:
 		s32					mLength;
-		s32					mArraySize;
-		s32					mElementSize;
+		s32					mReservedItems;
+		s32					mSizeOfItem;
 		xbyte*				mArray;
 	};
 
 	inline void			xcarray::swap(s32 index_a, s32 index_b)
 	{
 		ASSERT (index_a < mLength && index_b < mLength);
-		xbyte* srca = &mArray[index_a * mElementSize];
-		xbyte* srcb = &mArray[index_b * mElementSize];
-		for (s32 i = 0; i < mElementSize; ++i)
+		xbyte* srca = &mArray[index_a * mSizeOfItem];
+		xbyte* srcb = &mArray[index_b * mSizeOfItem];
+		for (s32 i = 0; i < mSizeOfItem; ++i)
 		{
 			xbyte tmp = srca[i];
 			srca[i] = srcb[i];
@@ -66,7 +65,7 @@ namespace xcore
 		{
 			s32 const s = index + 1;
 			for (s32 i = s; i < mLength; ++i)
-				x_memcpy(&mArray[(i-1) * mElementSize], &mArray[i * mElementSize], mElementSize);
+				x_memcpy(&mArray[(i-1) * mSizeOfItem], &mArray[i * mSizeOfItem], mSizeOfItem);
 			mLength--;
 		}
 	}
@@ -78,7 +77,7 @@ namespace xcore
 			mLength -= 1;
 			if (index < mLength)
 			{
-				x_memcpy(&mArray[index * mElementSize], &mArray[mLength * mElementSize], mElementSize);
+				x_memcpy(&mArray[index * mSizeOfItem], &mArray[mLength * mSizeOfItem], mSizeOfItem);
 			}
 		}
 	}

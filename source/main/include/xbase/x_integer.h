@@ -16,29 +16,29 @@
 
 namespace xcore
 {
-//------------------------------------------------------------------------------
-// Author:
-//     Jurgen Kluft
-// Description:
-//     Practical integer calculus to assist the developer with integer math.
-//
-//<P>  The most practical functions are:
-//     - abs
-//     - mod
-//     - power of 2
-//     - log2
-//
-//------------------------------------------------------------------------------
-#undef min
-#undef max
+    //------------------------------------------------------------------------------
+    // Author:
+    //     Jurgen Kluft
+    // Description:
+    //     Practical integer calculus to assist the developer with integer math.
+    //
+    //<P>  The most practical functions are:
+    //     - abs
+    //     - mod
+    //     - power of 2
+    //     - log2
+    //
+    //------------------------------------------------------------------------------
+    #undef min
+    #undef max
 
-#ifdef log2
-#undef log2
-#endif
+    #ifdef log2
+        #undef log2
+    #endif
 
-#ifndef __GNU_C__
-#define X_INTU_OPTIMIZED
-#endif
+    #ifndef __GNU_C__
+        #define X_INTU_OPTIMIZED
+    #endif
 
     template <class T> T    xmin(T integerA, T integerB);    ///< Return the smallest value
     template <class T> T    xmax(T integerA, T integerB);    ///< Return the biggest value
@@ -89,21 +89,18 @@ namespace xcore
     template <> s32 xmin(s32 integerA, s32 integerB); ///< Return the smallest value
     template <> s32 xmax(s32 integerA, s32 integerB); ///< Return the biggest value
 
-//==============================================================================
-// INLINES
-//==============================================================================
-#include "xbase/private/x_integer_inline.h"
+    //==============================================================================
+    // INLINES
+    //==============================================================================
+    #include "xbase/private/x_integer_inline.h"
 
-#if defined TARGET_PC
-#include "xbase/private/x_integer_inline_win32.h"
-
-#elif defined TARGET_MAC
-#include "xbase/private/x_integer_inline_mac.h"
-
-#else
-#error "Current platform is not supported!"
-
-#endif
+    #if defined TARGET_PC
+        #include "xbase/private/x_integer_inline_win32.h"
+    #elif defined TARGET_MAC
+        #include "xbase/private/x_integer_inline_mac.h"
+    #else
+        #error "Current platform is not supported!"
+    #endif
 
 }; // namespace xcore
 

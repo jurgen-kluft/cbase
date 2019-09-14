@@ -43,13 +43,6 @@ namespace xcore
 		inline xcore::xbool     operator  ==			(xcore::xhandle h) const	{ return h.mHandle == mHandle; }		\
 		inline xcore::xbool     operator  !=			(xcore::xhandle h) const	{ return h.mHandle != mHandle; }		\
 	};
-
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
 
-//==============================================================================
-// END X_TYPES_H
-//==============================================================================
 #endif

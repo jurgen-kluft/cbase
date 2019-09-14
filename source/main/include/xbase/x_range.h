@@ -5,15 +5,6 @@
 #pragma once 
 #endif
 
-//==============================================================================
-// INCLUDES
-//==============================================================================
-#include "xbase/x_debug.h"
-
-
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	template<typename T>
@@ -188,4 +179,4 @@ namespace xcore
 	}
 };
 
-#endif ///< END __XBASE_LIMITS_H__
+#endif

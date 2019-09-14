@@ -5,10 +5,6 @@
 #pragma once 
 #endif
 
-
-//==============================================================================
-// INCLUDES
-//==============================================================================
 #include "xbase/x_debug.h"
 
 #ifndef X_NO_CUSTOM_UINT128
@@ -70,28 +66,7 @@ namespace xcore
 		static u64*			writenative64(u64* inDest, u64 inData);
 
 		/**
-		 * SafeDelete deletes <ioObject> and sets the pointer to NULL after releasing it
-		 *
-		 * SafeDelete returns immediately when <ioObject> is NULL
-		 */
-		template <typename taTYPE>
-		static inline void safedelete(taTYPE*& ioObject)
-		{ 
-			delete ioObject; 
-			ioObject=NULL; 
-		}
-
-		template <typename taTYPE>
-		static inline void safedeletearray(taTYPE*& ioObject)
-		{ 
-			delete[] ioObject; 
-			ioObject=NULL; 
-		}
-
-		/**
 		 *	Small binary mathematical functions
-		 *
-		 *
 		 *  u8, u16, u32, u64 element access
 		 */
 		static f_inline u8		lou8(u16 inUInt16)												{ return (inUInt16 & 0xFF); }

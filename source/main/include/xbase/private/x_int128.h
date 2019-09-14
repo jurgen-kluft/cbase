@@ -1,9 +1,3 @@
-/**
-* @file Head file x_int128.h
-*
-* xCore custom 128 bit signed integer.
-*/
-
 #ifndef __XBASE_128_BIT_SIGNED_INTEGER_H__
 #define __XBASE_128_BIT_SIGNED_INTEGER_H__
 #include "xbase/x_target.h"
@@ -13,17 +7,11 @@
 
 #ifndef X_NO_CUSTOM_INT128
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
-
-	// Forward declares
 	class __xint64;
 	class __xuint64;
 	class __xuint128;
-
 
 	class __xint128
 	{
@@ -217,9 +205,6 @@ namespace xcore
 
 	inline __xint128		abs(const __xint128& value)										{ __xint128 r(value); r.Abs(); return r; }
 };
-/**
- *  END xCore namespace
- */
 
 #endif
 #endif	///< __XBASE_128_BIT_SIGNED_INTEGER_H__

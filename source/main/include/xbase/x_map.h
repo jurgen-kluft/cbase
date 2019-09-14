@@ -1,5 +1,5 @@
-#ifndef __X_ALLOCATOR_MAP_H__
-#define __X_ALLOCATOR_MAP_H__
+#ifndef __X_BASE_MAP_H__
+#define __X_BASE_MAP_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -256,8 +256,6 @@ namespace xcore
         H               m_hasher;
     };
 
+};
 
-
-}; // namespace xcore
-
-#endif // __X_ALLOCATOR_MAP_H__
+#endif // __X_BASE_MAP_H__

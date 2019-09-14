@@ -1,8 +1,3 @@
-/**
-* @file Head file x_va_list.h
-* Core Variable Argument List
-*/
-
 #ifndef __XBASE_CORE_VA_LIST_H__
 #define __XBASE_CORE_VA_LIST_H__
 #include "xbase/x_target.h"
@@ -10,17 +5,10 @@
 #pragma once 
 #endif
 
-//==============================================================================
-// INCLUDES
-//==============================================================================
 #include "xbase/x_runes.h"
 
 namespace xcore
 {
-	//==============================================================================
-	//  FORWARD DECLARES
-	//==============================================================================
-
 	/** 
 	 *------------------------------------------------------------------------------
 	 * Author:
@@ -401,12 +389,6 @@ namespace xcore
 
 	#define X_VA_R_ARGS_16		const x_va_r& v1, const x_va_r& v2, const x_va_r& v3, const x_va_r& v4, const x_va_r& v5, const x_va_r& v6, const x_va_r& v7, const x_va_r& v8, const x_va_r& v9, const x_va_r& v10, const x_va_r& v11, const x_va_r& v12, const x_va_r& v13, const x_va_r& v14, const x_va_r& v15, const x_va_r& v16
 	#define X_VA_R_ARGS_16_DEF	const x_va_r& v1, const x_va_r& v2=x_va_r::sEmpty, const x_va_r& v3=x_va_r::sEmpty, const x_va_r& v4=x_va_r::sEmpty, const x_va_r& v5=x_va_r::sEmpty, const x_va_r& v6=x_va_r::sEmpty, const x_va_r& v7=x_va_r::sEmpty, const x_va_r& v8=x_va_r::sEmpty, const x_va_r& v9=x_va_r::sEmpty, const x_va_r& v10=x_va_r::sEmpty, const x_va_r& v11=x_va_r::sEmpty, const x_va_r& v12=x_va_r::sEmpty, const x_va_r& v13=x_va_r::sEmpty, const x_va_r& v14=x_va_r::sEmpty, const x_va_r& v15=x_va_r::sEmpty, const x_va_r& v16=x_va_r::sEmpty
-	//==============================================================================
-	// END xCore namespace
-	//==============================================================================
 };
-/**
- *  END xCore namespace
- */
 
 #endif ///< END __X_CORE_VA_LIST_H__

@@ -1,4 +1,3 @@
-#include "xbase/x_log.h"
 #include "xbase/x_va_list.h"
 #include "xbase/x_runes.h"
 
@@ -264,7 +263,6 @@ namespace xcore
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
 		ascii::crunes logformatrunes(logformat, ascii::endof(logformat, NULL));
-
 		ascii::crunes msgformatrunes(msgFormat, ascii::endof(msgFormat, NULL));
 
 		xlog::writeLine(xlog::INFO, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));

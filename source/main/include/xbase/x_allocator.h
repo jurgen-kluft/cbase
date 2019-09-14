@@ -12,7 +12,6 @@ namespace xcore
 {
 	class xbuffer;
 
-	// The allocator interface
 	class xalloc
 	{
 	public:
@@ -117,8 +116,6 @@ namespace xcore
 	public:
 						xalloc_stack(xbuffer& storage);
 
-		xalloc*			allocator() { return this; }
-
 		virtual void*	allocate(xsize_t size, u32 align)
 		{
 			if (m_ptr < m_end && align_ptr(m_ptr+size, align) <= m_end)
@@ -169,13 +166,6 @@ namespace xcore
 		template<class T>
 		inline T*		object() { return static_cast<T*>(m_memory); }
 	};
-
-
-	// Example:
-	// 	xheap heap(systemAllocator);
-	// 	test_object* test = xnew<test_object>(heap, 200, 1000.0f);
-	// 	xdelete<>(heap, test);
-
 
 	#define XCORE_CLASS_PLACEMENT_NEW_DELETE														\
 		void*	operator new(xcore::xsize_t num_bytes, void* mem)			{ return mem; }			\

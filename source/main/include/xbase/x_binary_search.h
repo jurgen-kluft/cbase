@@ -15,10 +15,6 @@ namespace xcore
 
 	extern u32		x_LowerBound(const void* inItem, const void* inData, u32 inLength, compare_predicate predicate);
 	extern u32		x_UpperBound(const void* inItem, const void* inData, u32 inLength, compare_predicate predicate);
-
-	//==============================================================================
-	// END xcore namespace
-	//==============================================================================
 };
 
 #endif	///< __XCORE_BINARY_SEARCH_H__

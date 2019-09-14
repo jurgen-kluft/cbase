@@ -1,9 +1,3 @@
-/**
-* @file Head file x_int256.h
-*
-* xCore custom 256 bit signed integer.
-*/
-
 #ifndef __XBASE_256_BIT_SIGNED_INTEGER_H__
 #define __XBASE_256_BIT_SIGNED_INTEGER_H__
 #include "xbase/x_target.h"
@@ -13,9 +7,6 @@
 
 #ifndef X_NO_CUSTOM_INT256
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	// Forward declares
@@ -171,9 +162,6 @@ namespace xcore
 	inline xbool		operator==(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) == 0); }
 	inline xbool		operator!=(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) != 0); }
 };
-/**
- *  END xCore namespace
- */
 
 #endif
 #endif	///< __XBASE_256_BIT_SIGNED_INTEGER_H__

@@ -3,10 +3,6 @@
 #include "xbase/x_log.h"
 #include "xbase/x_console.h"
 
-
-/**
- * xCore namespace
- */
 namespace xcore
 {
 	void				xlog_to_console_imp::initialize()

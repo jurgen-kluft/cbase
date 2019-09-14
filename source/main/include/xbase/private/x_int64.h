@@ -1,9 +1,3 @@
-/**
-* @file Head file x_int64.h
-*
-* xCore custom 64 bit signed integer.
-*/
-
 #ifndef __XBASE_64_BIT_SIGNED_INTEGER_H__
 #define __XBASE_64_BIT_SIGNED_INTEGER_H__
 #include "xbase/x_target.h"
@@ -14,19 +8,10 @@
 
 #include "xbase/x_debug.h"
 
-
-/**
- * xCore namespace
- */
 namespace xcore
 {
-	// Forward declares
 	class __xuint64;
 
-
-	/**
-	 * 64 bit signed integer
-	 */
 	class __xint64
 	{
 		enum ESettings
@@ -198,8 +183,6 @@ namespace xcore
 	inline xbool		operator==(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) == 0); }
 	inline xbool		operator!=(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) != 0); }
 };
-/**
- *  END xCore namespace
- */
+
 #endif
 #endif	///< __XBASE_64_BIT_SIGNED_INTEGER_H__

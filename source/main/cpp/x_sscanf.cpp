@@ -54,8 +54,6 @@ namespace xcore
 		else if (utf32::is_equalfold(c, 'o'))
 		{
 			str->Read();
-			bstr = "yes";
-			bval = true;
 			c = str->Peek();
 			if (utf32::is_equalfold(c, 'f'))
 			{
@@ -64,6 +62,7 @@ namespace xcore
 			}
 			else if (utf32::is_equalfold(c, 'n'))
 			{
+				bval = true;
 				bstr = "n";
 			}
 		}
