@@ -733,7 +733,7 @@ namespace xcore
 			CharReaderFromAsciiBuffer buf_reader(str.m_str, str.m_end);
 			CharReaderFromAsciiBuffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_str = buf_reader.mPtr;
+			str.m_str = buf_reader.m_ptr;
 			return scanned;
 		}
 
@@ -742,7 +742,7 @@ namespace xcore
 			CharReaderFromAsciiBuffer buf_reader(str.m_str, str.m_end);
 			CharReaderFromAsciiBuffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_str = buf_reader.mPtr;
+			str.m_str = buf_reader.m_ptr;
 			return scanned;
 		}
 	}
@@ -755,7 +755,7 @@ namespace xcore
 			CharReaderFromUtf32Buffer buf_reader(str.m_str, str.m_end);
 			CharReaderFromUtf32Buffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_str = buf_reader.mPtr;
+			str.m_str = buf_reader.m_ptr;
 			return scanned;
 		}
 
@@ -764,7 +764,7 @@ namespace xcore
 			CharReaderFromUtf32Buffer buf_reader(str.m_str, str.m_end);
 			CharReaderFromUtf32Buffer fmt_reader(fmt.m_str, fmt.m_end);
 			s32 scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-			str.m_str = buf_reader.mPtr;
+			str.m_str = buf_reader.m_ptr;
 			return scanned;
 		}
 	}

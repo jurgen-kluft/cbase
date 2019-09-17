@@ -90,7 +90,7 @@ namespace xcore
             {
                 // There is no such key in the map yet, so we can insert it
                 value_t* pvalue = m_allocator->construct<value_t>(hash, k, v);
-				xztree::insert(m_root, level, onode, hash, pvalue, 0, nullptr, m_allocator);
+				xztree::insert(m_root, level, parent, onode, hash, pvalue, 0, nullptr, m_allocator);
             }
             else
             {
@@ -116,7 +116,7 @@ namespace xcore
 					else
 					{
 						// The value here has a different hash, so we need to insert our value here
-						xztree::insert(m_root, level, onode, piter->m_hash, piter, hash, ovalue, m_allocator);
+						xztree::insert(m_root, level, parent, onode, piter->m_hash, piter, hash, ovalue, m_allocator);
 						return true;
 					}
                     piter = piter->m_next;

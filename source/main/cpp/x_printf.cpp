@@ -1193,7 +1193,7 @@ namespace xcore
 						utf32::runes UQtoAchars(&UQtoAcharsBuffer[0], &UQtoAcharsBuffer[0], &UQtoAcharsBuffer[128 - 1]);
 						CharBufferReversedWriter reversedWriter(UQtoAchars);
 						UQtoA(uqval, &reversedWriter, base, xbool((flags & ALT) != 0), xdigs);
-						Utf32ConstBuffer UQtoAbuffer(reversedWriter.mBegin, reversedWriter.mEnd);
+						Utf32ConstBuffer UQtoAbuffer(reversedWriter.m_begin, reversedWriter.m_end);
 						buffer->Write(UQtoAbuffer);
 						size = (s32)buffer->Count();
 					}
@@ -1206,7 +1206,7 @@ namespace xcore
 						utf32::runes UQtoAchars(&UQtoAcharsBuffer[0], &UQtoAcharsBuffer[0], &UQtoAcharsBuffer[128 - 1]);
 						CharBufferReversedWriter reversedWriter(UQtoAchars);
 						ULtoA(ulval, &reversedWriter, base, xbool((flags & ALT) != 0), xdigs);
-						Utf32ConstBuffer UQtoAbuffer(reversedWriter.mBegin, reversedWriter.mEnd);
+						Utf32ConstBuffer UQtoAbuffer(reversedWriter.m_begin, reversedWriter.m_end);
 						buffer->Write(UQtoAbuffer);
 						size = (s32)buffer->Count();
 					}
@@ -1317,7 +1317,7 @@ namespace xcore
 			CharWriterToAsciiBuffer writer(str.m_end, str.m_eos);
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
-			str.m_end = writer.mPtr;
+			str.m_end = writer.m_ptr;
 		}
 
 		void	vsprintf(runes& str, crunes const& format, const x_va_list& args)
@@ -1326,7 +1326,7 @@ namespace xcore
 			CharWriterToAsciiBuffer writer(str.m_end, str.m_eos);
 			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
-			str.m_end = writer.mPtr;
+			str.m_end = writer.m_ptr;
 		}
 
 		void	printf(crunes const& str)
@@ -1391,7 +1391,7 @@ namespace xcore
 			CharWriterToUtf32Buffer writer(str.m_end, str.m_eos);
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
-			str.m_end = writer.mPtr;
+			str.m_end = writer.m_ptr;
 		}
 
 		void	vsprintf(runes& str, crunes const& format, const x_va_list& args)
@@ -1400,7 +1400,7 @@ namespace xcore
 			CharWriterToUtf32Buffer writer(str.m_end, str.m_eos);
 			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
 			VSPrintf_internal(&writer, &reader, &buffer, args);
-			str.m_end = writer.mPtr;
+			str.m_end = writer.m_ptr;
 		}
 
 		void	printf(crunes const& str)

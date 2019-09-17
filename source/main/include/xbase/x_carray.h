@@ -21,7 +21,7 @@ namespace xcore
 		inline s32			size() const							{ return mLength; }
 		inline s32			reserved() const						{ return mReservedItems; }
 		inline bool			is_empty() const						{ return mLength == 0; }
-		inline bool			is_full() const							{ ASSERT(mLength <= max()); return mLength == mReservedItems; }
+		inline bool			is_full() const							{ ASSERT(mLength <= reserved()); return mLength == mReservedItems; }
 
 		inline void			push_back(void const* item)				{ ASSERT(mLength<reserved()); x_memcpy(&mArray[mLength * mSizeOfItem], item, mSizeOfItem); mLength += 1; }
 		inline bool			pop_back(void * out_item)				{ if (mLength > 0) { --mLength; x_memcpy(out_item, &mArray[mLength * mSizeOfItem], mSizeOfItem); return true; } else { return false; } }
