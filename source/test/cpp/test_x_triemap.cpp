@@ -201,8 +201,11 @@ namespace xcore
 					// Case 1: We have a split somewhere in this run. For this we
 					//         need to create a new node which will take the head
 					//         of the run and the bit for the branching.
-					//         This node will take the tail part of the run, if 
+					//         Node 'n' will take the tail part of the run, if 
 					//         there is anything left.
+					//		   The inserted node will have a child for node 'n' and
+					//         the other child a value_t for the incoming key-value.
+
 				}
             }
 
