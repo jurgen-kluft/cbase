@@ -16,46 +16,61 @@
 namespace xcore
 {
     // A compacted bittrie
-    struct value_t
+
+    const u16 POS_MASK = 0x0FC0;
+	const u16 RUN_MASK = 0x003F; 
+	const u16 CHILD_TYPE_MASK = 0x3000;
+
+	// Note:
+	// Using a FSA allocator we can change the pointers into u32 indices.
+	// Making the run maximum 32-bit and splitting off the run into its own u32.
+	// This will bring the sizeof node_t to 4 * 4 = 16 bytes and useable by our
+	// virtual memory allocator.
+
+
+	typedef	u32		key_t;
+	typedef	u32		val_t;
+
+	// Note: 64 bit keys and a FSA allocator
+	// The sizeof node_t will be 
+	static inline bool helper_is_bit_set(key_t data, s32 bit) 
+	{
+		return (data & ((key_t)1 << bit)) != 0; 
+	}
+    static inline key_t helper_get_run_keybits(key_t key, s32 pos, s32 len)
     {
-		inline value_t(u64 key, u64 value) : m_key(key), m_value(value) {}
-        u64 m_key;
-        u64 m_value;
-
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
-    };
-
-    const u64 POS_MASK = 0xFC00000000000000L;
-	const u64 RUN_MASK = 0x03F0000000000000L; 
-	const u64 BITS_MASK = 0x3FFFFFFFFFFFFL;
-	const u64 CHILD_TYPE_MASK = 0x000C000000000000L;
+		key_t const mask = (((key_t)1 << len) - 1) << ((sizeof(key_t) * 8) - (pos + len));
+		key = key & mask;
+		return key;
+    }
+	
+	struct value_t;
 
     struct node_t
     {
-        enum { KEY_MAX_BITCNT = 64, POS_BITCNT = 6, POS_SHIFT = 58, RUN_BITCNT = 6, RUN_SHIFT = 52, BITS_BITCNT = 50, BITS_SHIFT = 0 };
-        enum { CHILD_TYPE_BITCNT = 2, CHILD_TYPE_SHIFT = 50, CHILD_TYPE_VALUE = 0, CHILD_TYPE_NODE = 1 };
+		// Could go as high as 7 bits for POS and LEN, so maximum key bitcnt is 128 bits.
+        enum { KEY_MAX_BITCNT = 64, POS_BITCNT = 6, POS_SHIFT = 6, RUN_BITCNT = 6, RUN_SHIFT = 0  };
+        enum { CHILD_TYPE_BITCNT = 2, CHILD_TYPE_SHIFT = 12, CHILD_TYPE_VALUE = 0, CHILD_TYPE_NODE = 1 };
 
 		inline node_t() : m_data(0) { m_children[0] = nullptr; m_children[1] = nullptr; }
 
-        static inline s32 run_max_len() { return BITS_BITCNT; }
-		static inline s32 branch_len() { return 1; }
+        static inline s32 run_max_numbits() { return KEY_MAX_BITCNT; }
+		static inline s32 branch_numbits() { return 1; }
 
-        inline s32 get_run_pos() const { return ((m_data & POS_MASK) >> POS_SHIFT); }
-        inline s32 get_run_len() const { return ((m_data & RUN_MASK) >> RUN_SHIFT); }
-		inline u64 get_run_mask() const { return (((u64)1 << get_run_len()) - 1); }
-        inline u64 get_run_bits() const { return (m_data & (((u64)1 << get_run_len()) - 1)); }
-        inline u64 get_run_keymask() const { return (((u64)1 << get_run_len()) - 1) << (KEY_MAX_BITCNT - (get_run_pos() + get_run_len())); }
-		inline u64 get_run_keybits() const { return (m_data & BITS_MASK) << (KEY_MAX_BITCNT - (get_run_pos() + get_run_len())); }
-        inline s32 get_run_endpos() const { return get_run_pos() + get_run_len() + branch_len(); }	// The start pos for the child nodes
+        inline s32 get_run_bitpos() const { return ((m_data & POS_MASK) >> POS_SHIFT); }
+        inline s32 get_run_bitlen() const { return ((m_data & RUN_MASK) >> RUN_SHIFT); }
+        inline key_t get_run_keymask() const { return (((key_t)1 << get_run_bitlen()) - 1) << (KEY_MAX_BITCNT - (get_run_bitpos() + get_run_bitlen())); }
+        inline key_t get_run_keybits() const { return helper_get_run_keybits(m_key, get_run_bitpos(), get_run_bitlen()); }
+        inline s32 get_run_endpos() const { return get_run_bitpos() + get_run_bitlen() + branch_numbits(); }	// The start pos for the child nodes
 
         // Which bit(s) determines the child index ?
-        inline s32  get_child_bit() const { return (KEY_MAX_BITCNT - (get_run_pos() + get_run_len() + branch_len())); }
+        inline s32  get_child_bit() const { return (KEY_MAX_BITCNT - (get_run_bitpos() + get_run_bitlen() + branch_numbits())); }
         inline u8   get_child_type(s8 child) const { return (((m_data & CHILD_TYPE_MASK) >> CHILD_TYPE_SHIFT) >> child) & 1; }
-        inline void set_child_type(s8 child, u8 type) { m_data = m_data & ~((u64)1 << (CHILD_TYPE_SHIFT + child)); m_data = m_data | ((u64)type << (CHILD_TYPE_SHIFT + child)); }
+        inline void set_child_type(s8 child, u8 type) { m_data = m_data & ~((u16)1 << (CHILD_TYPE_SHIFT + child)); m_data = m_data | ((u16)type << (CHILD_TYPE_SHIFT + child)); }
 
-        inline void set_run_pos(u32 pos) { m_data = (m_data & ~POS_MASK) | (((u64)pos << POS_SHIFT) & POS_MASK); }
-        inline void set_run_len(u32 len) { m_data = (m_data & ~RUN_MASK) | (((u64)len << RUN_SHIFT) & RUN_MASK); }
-        inline void set_run_bits(u64 bits) { m_data = (m_data & ~BITS_MASK) | ((bits << BITS_SHIFT) & BITS_MASK); }
+        inline void set_run_bitpos(u32 pos) { m_data = (m_data & ~POS_MASK) | (((u16)pos << POS_SHIFT) & POS_MASK); }
+        inline void set_run_bitlen(u32 len) { m_data = (m_data & ~RUN_MASK) | (((u16)len << RUN_SHIFT) & RUN_MASK); }
+        inline void set_run_bits(key_t bits) { m_key = bits; }
 
         inline node_t* get_child_as_node(s8 child) const { ASSERT(get_child_type(child) == CHILD_TYPE_NODE); return m_children[child]; }
         inline value_t* get_child_as_value(s8 child) const { ASSERT(get_child_type(child) == CHILD_TYPE_VALUE); return (value_t*)(m_children[child]); }
@@ -65,21 +80,18 @@ namespace xcore
 
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
 
-        u64     m_data;
+		key_t   m_key;
+        u16     m_data;
         node_t* m_children[2];
     };
 
-    static inline bool helper_is_bit_set(u64 data, s32 bit) 
-	{
-		return (data & ((u64)1 << bit)) != 0; 
-	}
-    static inline u64 helper_get_run_bits(u64 key, s32 pos, s32 len)
+    struct value_t
     {
-        key = (key >> (node_t::KEY_MAX_BITCNT - (pos + len)));
-		u64 const mask = (((u64)1 << len) - 1);
-		key = key & mask;
-		return key;
-    }
+		inline value_t(key_t key, val_t value) : m_key(key), m_value(value) {}
+        key_t m_key;
+        val_t m_value;
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
+    };
 
     // Trie data structure where every node can cover a range of bits (not only 1 bit)
     class xdtrie
@@ -87,9 +99,9 @@ namespace xcore
     public:
 		inline xdtrie(xfsa* fsa) : m_root(nullptr), m_value(nullptr), m_num_values(0), m_num_nodes(0), m_nodes(fsa), m_values(fsa) {}
 
-        bool    insert(u64 key, u64 value);
-        bool    find(u64 key, u64& value);
-        bool    remove(u64 key);
+        bool    insert(key_t key, val_t value);
+        bool    find(key_t key, val_t& value);
+        bool    remove(key_t key);
 
     protected:
 		node_t* branch_two_values(node_t* parent, value_t* v1, value_t* v2, s8 pos);
@@ -105,25 +117,25 @@ namespace xcore
 	node_t* xdtrie::branch_two_values(node_t* parent, value_t* v1, value_t* v2, s8 pos)
 	{
         // Determine the length of the run (pos = start position (from msb to lsb))
-		u64 const mask = (0xFFFFFFFFFFFFFFFFUL >> pos);
-        u64 const diff = (v1->m_key ^ v2->m_key) & mask;
+		key_t const mask = (0xFFFFFFFFFFFFFFFFUL >> pos);
+        key_t const diff = (v1->m_key ^ v2->m_key) & mask;
         s32 const len = xcountLeadingZeros(diff) - pos;
 
         s32 p = pos;
         s32 l = len;
         node_t* head = parent;
-        if (l > node_t::run_max_len())
+        if (l > node_t::run_max_numbits())
         {
-            while (l > node_t::run_max_len())
+            while (l > node_t::run_max_numbits())
             {
                 // We need to create nodes to cover the identical run.
                 // Could take more than 1 node!
 				m_num_nodes++;
 			    node_t* intnode = m_nodes->construct<node_t>();
 
-                intnode->set_run_pos(p);
-                intnode->set_run_len(node_t::run_max_len());
-                intnode->set_run_bits(helper_get_run_bits(v1->m_key, p, node_t::run_max_len()));
+                intnode->set_run_bitpos(p);
+                intnode->set_run_bitlen(node_t::run_max_numbits());
+                intnode->set_run_bits(v1->m_key);
 
 				if (parent != nullptr)
 				{
@@ -136,16 +148,16 @@ namespace xcore
 				}
 
 				parent = intnode;
-                l -= (node_t::run_max_len() + node_t::branch_len());	// The +1 is for the bit used for determining the branch (left=0, right=1)
-                p += (node_t::run_max_len() + node_t::branch_len());	// Move the position further by the running length and the branch bit
+                l -= (node_t::run_max_numbits() + node_t::branch_numbits());	// The +1 is for the bit used for determining the branch (left=0, right=1)
+                p += (node_t::run_max_numbits() + node_t::branch_numbits());	// Move the position further by the running length and the branch bit
             }
         }
 
 		m_num_nodes++;
         node_t* n = m_nodes->construct<node_t>();
-        n->set_run_pos(p);
-        n->set_run_len(l);
-        n->set_run_bits(helper_get_run_bits(v1->m_key, p, l));
+        n->set_run_bitpos(p);
+        n->set_run_bitlen(l);
+        n->set_run_bits(v1->m_key);
 
 		if (parent != nullptr)
 		{
@@ -167,7 +179,7 @@ namespace xcore
 	}
 
 
-    bool    xdtrie::insert(u64 key, u64 value)
+    bool    xdtrie::insert(key_t key, val_t value)
     {
         // Before creating the first node (root) we wait until we have 2 elements
         if (m_root == nullptr)
@@ -199,11 +211,11 @@ namespace xcore
         while (n != nullptr)
         {
             // The run should be the same
-            s32 const runlen = n->get_run_len();
+            s32 const runlen = n->get_run_bitlen();
             if (runlen > 0)
             {
-                u64 const nbits = n->get_run_bits();
-                u64 const kbits = helper_get_run_bits(key, n->get_run_pos(), runlen);
+                key_t const nbits = n->get_run_keybits();
+                key_t const kbits = helper_get_run_keybits(key, n->get_run_bitpos(), runlen);
                 if (kbits != nbits)
 				{
 					// Case 1: We have a split somewhere in this run. For this we
@@ -224,15 +236,15 @@ namespace xcore
 					//s32 const len = xcountLeadingZeros(diff) - n->get_run_pos();
 
 					// Determine the length of the run (pos = start position (from msb to lsb))
-					s32 const span = n->get_run_len();
-					s32 const pos = n->get_run_pos();
-					u64 const mask = n->get_run_keymask();
-					u64 const diff = n->get_run_keybits() ^ (key & mask);
+					s32 const span = n->get_run_bitlen();
+					s32 const pos = n->get_run_bitpos();
+					key_t const mask = n->get_run_keymask();
+					key_t const diff = n->get_run_keybits() ^ (key & mask);
 					s32 const len = xcountLeadingZeros(diff) - pos;
 
-					sn->set_run_pos(pos);
-					sn->set_run_len(len);
-					sn->set_run_bits(helper_get_run_bits(key, pos, len));
+					sn->set_run_bitpos(pos);
+					sn->set_run_bitlen(len);
+					sn->set_run_bits(key);
 
 					m_num_values++;
 					value_t* v = m_values->construct<value_t>(key,value);
@@ -241,8 +253,8 @@ namespace xcore
 					sn->set_child_as_node(1-sc, n);
 
 					// Modify the run pos, run length of n
-					n->set_run_pos(sn->get_run_endpos());
-					n->set_run_len(span - (len + 1));
+					n->set_run_bitpos(sn->get_run_endpos());
+					n->set_run_bitlen(span - (len + 1));
 
 					// If parent != nullptr then we should replace child 'n' with 'sn'
 					// If parent == nullptr then it means we should update 'root'
@@ -296,7 +308,7 @@ namespace xcore
         return false;
     }
 
-    bool    xdtrie::find(u64 key, u64& value)
+    bool    xdtrie::find(key_t key, val_t& value)
     {
         if (m_value != nullptr)
         {
@@ -311,11 +323,11 @@ namespace xcore
         while (n != nullptr)
         {
             // The run should be the same
-            s32 const runlen = n->get_run_len();
+            s32 const runlen = n->get_run_bitlen();
             if (runlen > 0)
             {
-                u64 const nbits = n->get_run_bits();
-                u64 const kbits = helper_get_run_bits(key, n->get_run_pos(), runlen);
+                key_t const nbits = n->get_run_keybits();
+                key_t const kbits = helper_get_run_keybits(key, n->get_run_bitpos(), runlen);
                 if (kbits != nbits)
                     break;
             }
@@ -344,8 +356,20 @@ namespace xcore
         return false;
     }
 
-	bool    xdtrie::remove(u64 key)
+	bool    xdtrie::remove(key_t key)
 	{
+		// Find the value by traversing the trie and keep track of nodes for knowing parent
+		//
+		// When removing the value the following cases can apply:
+		// 
+		// 1. Node has 2 children, both are values:
+		//    The value that is left, replace the 'node' child of the parent with the 'value'
+		//    Delete this node.
+		// 2. Node has 2 children, one is a value, one is a node:
+		//    Remove the value.
+		//    Merge this 'node' with the child 'node'.
+		//    Delete this node.
+
 		return false;
 	}
 
@@ -431,13 +455,13 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 		{
 			xdtrie trie(m_fsa);
 
-			u64 key1 = 0xABAB0ABC1F000000L;
-			u64 key2 = 0xABAB0ABC0F000000L;
+			key_t key1 = (key_t)0xABAB0ABC1F0000L;
+			key_t key2 = (key_t)0xABAB0ABC0F0000L;
 
 			CHECK_EQUAL(true, trie.insert(key1, 10));
 			CHECK_EQUAL(true, trie.insert(key2, 20));
 
-			u64 value;
+			val_t value;
 			CHECK_EQUAL(true, trie.find(key1, value));
 
 			m_fsa->reset();
@@ -447,15 +471,15 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 		{
 			xdtrie trie(m_fsa);
 
-			u64 key1 = 0xABAB0ABC1F000000L;
-			u64 key2 = 0xABAB0ABC0F000000L;
-			u64 key3 = 0xABAB0A4C0F000000L;
+			key_t key1 = (key_t)0xABAB0ABC1F0000L;
+			key_t key2 = (key_t)0xABAB0ABC0F0000L;
+			key_t key3 = (key_t)0xABAB0A4C0F0000L;
 
 			CHECK_EQUAL(true, trie.insert(key1, 10));
 			CHECK_EQUAL(true, trie.insert(key2, 20));
 			CHECK_EQUAL(true, trie.insert(key3, 30));
 
-			u64 value;
+			val_t value;
 			CHECK_EQUAL(true, trie.find(key1, value));
 			CHECK_EQUAL(true, trie.find(key2, value));
 			CHECK_EQUAL(true, trie.find(key3, value));
@@ -467,15 +491,15 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 		{
 			xdtrie trie(m_fsa);
 
-			u64 key1 = 0xABAB0ABC1F000000L;
-			u64 key2 = 0xABAB0ABC0F000000L;
-			u64 key3 = 0xABAB0ABC0F000080L;
+			key_t key1 = (key_t)0xABAB0ABC1F0000L;
+			key_t key2 = (key_t)0xABAB0ABC0F0000L;
+			key_t key3 = (key_t)0xABAB0ABC0F0080L;
 
 			CHECK_EQUAL(true, trie.insert(key1, 10));
 			CHECK_EQUAL(true, trie.insert(key2, 20));
 			CHECK_EQUAL(true, trie.insert(key3, 30));
 
-			u64 value;
+			val_t value;
 			CHECK_EQUAL(true, trie.find(key1, value));
 			CHECK_EQUAL(true, trie.find(key2, value));
 			CHECK_EQUAL(true, trie.find(key3, value));
@@ -487,14 +511,14 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 		{
 			xdtrie trie(m_fsa);
 
-			u64 key1 = 0xABAB0ABC00000F00L;
-			u64 key2 = 0xABAB0ABC00001F00L;
-			u64 keyX = 0xABAB0ABC00011F00L;
+			key_t key1 = (key_t)0xAABBC0000F00L;
+			key_t key2 = (key_t)0xAABBC0001F00L;
+			key_t keyX = (key_t)0xAABBC0011F00L;
 
 			CHECK_EQUAL(true, trie.insert(key1, 10));
 			CHECK_EQUAL(true, trie.insert(key2, 20));
 
-			u64 value;
+			val_t value;
 			CHECK_EQUAL(true, trie.find(key1, value));
 			CHECK_EQUAL(true, trie.find(key2, value));
 
@@ -508,12 +532,12 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 			xdtrie trie(m_fsa);
 
 			const s32 numitems = 16;
-			u64 keys[numitems];
-			u64 seed = 0;
+			key_t keys[numitems];
+			key_t seed = 0;
 			for (s32 i=0; i<numitems; ++i)
 			{
 				seed = seed * 1664525UL + 1013904223UL; 
-				keys[i] = seed;
+				keys[i] = (key_t)seed;
 			}
 
 			for (s32 i=0; i<numitems; ++i)
@@ -521,7 +545,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 				CHECK_EQUAL(true, trie.insert(keys[i], i));
 			}
 
-			u64 value;
+			val_t value;
 			for (s32 i=0; i<numitems; ++i)
 			{
 				CHECK_EQUAL(true, trie.find(keys[i], value));
