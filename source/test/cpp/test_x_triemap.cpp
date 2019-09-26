@@ -1,23 +1,10 @@
 #define TEST_TRIEMAP
 #ifdef TEST_TRIEMAP
 
-// (c) 2011-2012 - Jurgen Kluft
-// Next-Generation implementation of the trie (hash) map
-// Uses less memory and is much faster.
-
-#ifdef TARGET_PC
-#include <windows.h>
-#include <map>
-#endif
-#ifdef TARGET_PS3
-#include <map>
-#include <sys/sys_time.h>
-#include <cell/perf/performance.h>
-#endif
-
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_allocator.h"
+#include "xbase/x_random.h"
 
 #include "xbase/x_integer.h"
 #include "xbase/x_runes.h"
@@ -28,13 +15,14 @@
 
 namespace xcore
 {
-    // A bit based trie
-
+    // A compacted bittrie
     struct value_t
     {
 		inline value_t(u64 key, u64 value) : m_key(key), m_value(value) {}
         u64 m_key;
         u64 m_value;
+
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 
     const u64 POS_MASK = 0xFC00000000000000L;
@@ -47,15 +35,19 @@ namespace xcore
         enum { KEY_MAX_BITCNT = 64, POS_BITCNT = 6, POS_SHIFT = 58, RUN_BITCNT = 6, RUN_SHIFT = 52, BITS_BITCNT = 50, BITS_SHIFT = 0 };
         enum { CHILD_TYPE_BITCNT = 2, CHILD_TYPE_SHIFT = 50, CHILD_TYPE_VALUE = 0, CHILD_TYPE_NODE = 1 };
 
+		inline node_t() : m_data(0) { m_children[0] = nullptr; m_children[1] = nullptr; }
+
         static inline s32 run_max_len() { return BITS_BITCNT; }
+		static inline s32 branch_len() { return 1; }
+
         inline s32 get_run_pos() const { return ((m_data & POS_MASK) >> POS_SHIFT); }
         inline s32 get_run_len() const { return ((m_data & RUN_MASK) >> RUN_SHIFT); }
         inline u64 get_run_mask() const { return (((u64)1 << get_run_len()) - 1) << (KEY_MAX_BITCNT - (get_run_pos() + get_run_len())); }
         inline u64 get_run() const { return (m_data & BITS_MASK); }
-        inline s32 get_run_endpos() const { return get_run_pos() + get_run_len() + 1; }	// The start pos for the child nodes
+        inline s32 get_run_endpos() const { return get_run_pos() + get_run_len() + branch_len(); }	// The start pos for the child nodes
 
-        // Which bit determines the child index ?
-        inline s32  get_child_bit() const { return (KEY_MAX_BITCNT - (get_run_pos() + get_run_len() + 1)); }
+        // Which bit(s) determines the child index ?
+        inline s32  get_child_bit() const { return (KEY_MAX_BITCNT - (get_run_pos() + get_run_len() + branch_len())); }
         inline u8   get_child_type(s8 child) const { return (((m_data & CHILD_TYPE_MASK) >> CHILD_TYPE_SHIFT) >> child) & 1; }
         inline void set_child_type(s8 child, u8 type) { m_data = m_data & ~((u64)1 << (CHILD_TYPE_SHIFT + child)); m_data = m_data | ((u64)type << (CHILD_TYPE_SHIFT + child)); }
 
@@ -69,11 +61,16 @@ namespace xcore
         inline void set_child_as_value(s8 child, value_t* cvalue) { m_children[child] = (node_t*)(cvalue); set_child_type(child, CHILD_TYPE_VALUE); }
         inline void set_child_as_node(s8 child, node_t* cnode) { m_children[child] = cnode; set_child_type(child, CHILD_TYPE_NODE); }
 
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
+
         u64     m_data;
         node_t* m_children[2];
     };
 
-    static inline bool helper_is_bit_set(u64 data, s32 bit) { return (data & bit) != 0; }
+    static inline bool helper_is_bit_set(u64 data, s32 bit) 
+	{
+		return (data & ((u64)1 << bit)) != 0; 
+	}
     static inline u64 helper_get_bits(u64 key, s32 pos, s32 len)
     {
         key = (key >> (node_t::KEY_MAX_BITCNT - (pos + len)));
@@ -108,7 +105,7 @@ namespace xcore
         u64 const diff = (v1->m_key ^ v2->m_key) & mask;
         s32 const len = xcountLeadingZeros(diff) - pos;
 
-        s32 p = 0;
+        s32 p = pos;
         s32 l = len;
         node_t* head = parent;
         if (l > node_t::run_max_len())
@@ -117,7 +114,8 @@ namespace xcore
             {
                 // We need to create nodes to cover the identical run.
                 // Could take more than 1 node!
-                node_t* intnode = (node_t*)m_nodes->allocate();
+			    node_t* intnode = m_nodes->construct<node_t>();
+
                 intnode->set_pos(p);
                 intnode->set_len(node_t::run_max_len());
                 intnode->set_run(helper_get_bits(v1->m_key, p, node_t::run_max_len()));
@@ -133,12 +131,12 @@ namespace xcore
 				}
 
 				parent = intnode;
-                l -= (node_t::run_max_len() + 1);	// The +1 is for the bit used for determining the branch (left=0, right=1)
-                p += (node_t::run_max_len() + 1);	// Move the position further by the running length and the branch bit
+                l -= (node_t::run_max_len() + node_t::branch_len());	// The +1 is for the bit used for determining the branch (left=0, right=1)
+                p += (node_t::run_max_len() + node_t::branch_len());	// Move the position further by the running length and the branch bit
             }
         }
 
-        node_t* n = (node_t*)m_nodes->allocate();
+        node_t* n = m_nodes->construct<node_t>();
         n->set_pos(p);
         n->set_len(l);
         n->set_run(helper_get_bits(v1->m_key, p, l));
@@ -187,6 +185,8 @@ namespace xcore
         }
 
 		// Find the node where we should branch off
+		node_t* parent = nullptr;
+		s32 child = 0;
         node_t* n = m_root;
         while (n != nullptr)
         {
@@ -201,27 +201,51 @@ namespace xcore
 					// Case 1: We have a split somewhere in this run. For this we
 					//         need to create a new node which will take the head
 					//         of the run and the bit for the branching.
-					//         Node 'n' will take the tail part of the run, if 
-					//         there is anything left.
+					//         Node 'n' will take the rest part of the run.
 					//		   The inserted node will have a child for node 'n' and
-					//         the other child a value_t for the incoming key-value.
+					//         a child for new value_t(key-value).
 
+					// + New node
+					// + Determine head run
+					// + Determine the child where the current node is going, set it
+					// + The other child is for the new value
+			        node_t* sn = m_nodes->construct<node_t>();
+
+					u64 const diff = (kbits ^ nbits);
+					s32 const len = xcountLeadingZeros(diff) - n->get_run_pos();
+					sn->set_pos(n->get_run_pos());
+					sn->set_len(len);
+					sn->set_run(helper_get_bits(key, n->get_run_pos(), len));
+
+					value_t* v = m_values->construct<value_t>(key,value);
+					s32 sc = helper_is_bit_set(key, sn->get_child_bit()) ? 1 : 0;
+					sn->set_child_as_value(sc, v);
+					sn->set_child_as_node(1-sc, n);
+
+					// Modify the run pos, run length of n
+					n->set_pos(sn->get_run_endpos());
+					n->set_len(n->get_run_len() - (sn->get_run_len() + 1));
+
+					// Parent should replace child 'n' with 'sn'
+					if (parent != nullptr)
+					{
+						parent->set_child_as_node(child, sn);
+					}
 				}
             }
 
+			// Keep tracking parent of node
             // Determine left/right child
-            s32 const child = (key >> n->get_child_bit()) & 1;
+			parent = n;
+            child = (key >> n->get_child_bit()) & 1;
             
             // Determine type-of child
             if (n->get_child_type(child) == node_t::CHILD_TYPE_NODE)
-            {
-                // Branch is a node, traverse further
-                node_t* cnode = n->get_child_as_node(child);
-                n = cnode;
+            {	// Branch is a node, traverse further
+                n = n->get_child_as_node(child);
             }
             else
-            {
-                // Branch is a value, see if this is the same key-value
+            {	// Branch is a value, see if this is the same key-value
                 value_t* v1 = n->get_child_as_value(child);
                 if (v1->m_key == key)
                 {
@@ -239,8 +263,7 @@ namespace xcore
 
 				value_t* v2 = m_values->construct<value_t>(key,value);
 				branch_two_values(n, v1, v2, n->get_run_endpos());
-
-                break;
+                return true;
             }
         }
 
@@ -272,7 +295,8 @@ namespace xcore
             }
 
             // Determine left/right child
-            s32 const child = (key >> n->get_child_bit()) & 1;
+			s32 const cbit = n->get_child_bit();
+            s32 const child = helper_is_bit_set(key, cbit) ? 1 : 0;
             
             // Determine type-of child
             if (n->get_child_type(child) == node_t::CHILD_TYPE_NODE)
@@ -319,6 +343,12 @@ namespace xcore
 
 		inline				xfsa_test() : m_pivot(0), m_capacity(8192), m_freelist(nullptr) {}
 
+		void				reset()
+		{
+			m_pivot = 0;
+			m_freelist = nullptr;
+		}
+
 		virtual u32			size() const { return sizeof(data_t); }
 		virtual void*		allocate()
 		{
@@ -343,6 +373,9 @@ namespace xcore
 		}
 
 		virtual void		release() {}
+
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
+
 	};
 }
 
@@ -371,20 +404,89 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 
 		}
 
-		UNITTEST_TEST(constructor1)
+		UNITTEST_TEST(insert_2)
 		{
 			xdtrie trie(m_fsa);
 
 			u64 key1 = 0xABAB0ABC1F000000L;
 			u64 key2 = 0xABAB0ABC0F000000L;
 
-			trie.insert(key1, 10);
-			trie.insert(key2, 20);
+			CHECK_EQUAL(true, trie.insert(key1, 10));
+			CHECK_EQUAL(true, trie.insert(key2, 20));
 
 			u64 value;
-			trie.find(key1, value);
+			CHECK_EQUAL(true, trie.find(key1, value));
+
+			m_fsa->reset();
 		}
 
+		UNITTEST_TEST(test_case_2)
+		{
+			xdtrie trie(m_fsa);
+
+			u64 key1 = 0xABAB0ABC1F000000L;
+			u64 key2 = 0xABAB0ABC0F000000L;
+			u64 key3 = 0xABAB0ABC0F000080L;
+
+			CHECK_EQUAL(true, trie.insert(key1, 10));
+			CHECK_EQUAL(true, trie.insert(key2, 20));
+			CHECK_EQUAL(true, trie.insert(key3, 30));
+
+			u64 value;
+			CHECK_EQUAL(true, trie.find(key1, value));
+			CHECK_EQUAL(true, trie.find(key2, value));
+			CHECK_EQUAL(true, trie.find(key3, value));
+
+			m_fsa->reset();
+		}
+
+		UNITTEST_TEST(insert_max_run_len)
+		{
+			xdtrie trie(m_fsa);
+
+			u64 key1 = 0xABAB0ABC00000F00L;
+			u64 key2 = 0xABAB0ABC00001F00L;
+			u64 keyX = 0xABAB0ABC00011F00L;
+
+			CHECK_EQUAL(true, trie.insert(key1, 10));
+			CHECK_EQUAL(true, trie.insert(key2, 20));
+
+			u64 value;
+			CHECK_EQUAL(true, trie.find(key1, value));
+			CHECK_EQUAL(true, trie.find(key2, value));
+
+			CHECK_EQUAL(false, trie.find(keyX, value));
+
+			m_fsa->reset();
+		}
+
+		UNITTEST_TEST(insert_many)
+		{
+			xdtrie trie(m_fsa);
+
+			const s32 numitems = 16;
+			u64 keys[numitems];
+			u64 seed = 0;
+			for (s32 i=0; i<numitems; ++i)
+			{
+				seed = seed * 1664525UL + 1013904223UL; 
+				keys[i] = seed;
+			}
+
+			for (s32 i=0; i<numitems; ++i)
+			{
+				CHECK_EQUAL(true, trie.insert(keys[i], i));
+			}
+
+			u64 value;
+			for (s32 i=0; i<numitems; ++i)
+			{
+				CHECK_EQUAL(true, trie.find(keys[i], value));
+				CHECK_EQUAL(value, i);
+			}
+
+			m_fsa->reset();
+		}
 
 	}
 }
