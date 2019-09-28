@@ -125,7 +125,7 @@ namespace xcore
         u64 key;
     };
 
-    class xvalue_array : public xfsadexed, public xbtree32::keyvalue
+    class xvalue_array : public xfsadexed, public xbtree_kv
     {
         struct node
         {
@@ -239,20 +239,20 @@ UNITTEST_SUITE_BEGIN(xbtree)
         UNITTEST_TEST(add)
         {
             xbtree32 tree;
-            tree.init_from_mask(nodes, values, 0xFF, true);
+            tree.init_from_mask(nodes, values, 0xFF00, true);
 
             value_t* v1 = (value_t*)values->allocate();
             v1->f       = 1.0f;
-            v1->key     = 1;
+            v1->key     = 0x0100;
             value_t* v2 = (value_t*)values->allocate();
             v2->f       = 2.0f;
-            v2->key     = 2;
+            v2->key     = 0x0200;
 
             CHECK_TRUE(tree.add(v1->key, values->ptr2idx(v1)));
             CHECK_TRUE(tree.add(v2->key, values->ptr2idx(v2)));
 
-            CHECK_EQUAL(1, v1->key);
-            CHECK_EQUAL(2, v2->key);
+            CHECK_EQUAL(0x0100, v1->key);
+            CHECK_EQUAL(0x0200, v2->key);
 
             CHECK_EQUAL(4, nodes->count());
             CHECK_EQUAL(2, values->count());
@@ -311,7 +311,8 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
             // One node = 16 bytes
             // Number of nodes = (256 + 64 + 16 + 4 + 1) = 341
-            // (341 * 16) / 1024 = 5.328125 bytes per value
+            // 341 * 16 bytes = 5456 bytes
+            // 5456 bytes / 1024 items = 5.328125 bytes per item
 
             for (u32 i = 0; i < value_count; ++i)
             {
@@ -386,7 +387,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         static xfsa_imp nodes;
 
-        class myvalue_kv : public xbtree::keyvalue
+        class myvalue_kv : public xbtree_kv
         {
         public:
             virtual u64 get_key(void* value) const
@@ -404,7 +405,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         static myvalue_kv values;
 
-        UNITTEST_FIXTURE_SETUP() { nodes.init(gTestAllocator, sizeof(xbtree::node_t)); }
+        UNITTEST_FIXTURE_SETUP() { nodes.init(gTestAllocator, xbtree::sizeof_node()); }
 
         UNITTEST_FIXTURE_TEARDOWN() {}
 
@@ -444,6 +445,118 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
             tree.clear();
         }
+
+        UNITTEST_TEST(add_many)
+        {
+            u32 const value_count = 1024;
+
+            xbtree tree;
+            tree.init_from_index(nodes, values, value_count);
+
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                value_t* v = (value_t*)values->allocate();
+                v->f       = 1.0f;
+                v->key     = value_count + i;
+                CHECK_TRUE(tree.add(i, values->ptr2idx(v)));
+            }
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                value_t* v = (value_t*)values->idx2ptr(i);
+                CHECK_EQUAL(i, v->key);
+            }
+            CHECK_EQUAL(256 + 64 + 16 + 4 + 1, nodes->count());
+            CHECK_EQUAL(value_count, (u32)values->count());
+
+            nodes->reset();
+            values->reset();
+        }
+
+        UNITTEST_TEST(find_many)
+        {
+            u32 const value_count = 1024;
+
+            xbtree tree;
+            tree.init_from_index(nodes, values, value_count);
+
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                value_t* v = (value_t*)values->allocate();
+                v->f       = 1.0f;
+                v->key     = value_count + i;
+                CHECK_TRUE(tree.add(i, values->ptr2idx(v)));
+            }
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                value_t* v = (value_t*)values->idx2ptr(i);
+                CHECK_EQUAL(i, v->key);
+            }
+            CHECK_EQUAL(256 + 64 + 16 + 4 + 1, nodes->count());
+            CHECK_EQUAL(value_count, (u32)values->count());
+
+            // One node = 32 bytes
+            // Number of nodes = (256 + 64 + 16 + 4 + 1) = 341
+            // 341 * 32 bytes = 10912 bytes
+            // 10912 bytes / 1024 items = 10.65625 bytes per item
+
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                u32 vi;
+                CHECK_TRUE(tree.find(i, vi));
+                value_t* v = (value_t*)values->idx2ptr(vi);
+                CHECK_NOT_NULL(v);
+                if (v != nullptr)
+                {
+                    CHECK_EQUAL(i, v->key);
+                }
+            }
+            nodes->reset();
+            values->reset();
+        }
+
+        UNITTEST_TEST(remove)
+        {
+            u32 const value_count = 1024;
+
+            xbtree tree;
+            tree.init_from_index(nodes, values, value_count);
+
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                value_t* v = (value_t*)values->allocate();
+                v->f       = 1.0f;
+                v->key     = value_count + i;
+                CHECK_TRUE(tree.add(i, values->ptr2idx(v)));
+            }
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                value_t* v = (value_t*)values->idx2ptr(i);
+                CHECK_EQUAL(i, v->key);
+            }
+            CHECK_EQUAL(256 + 64 + 16 + 4 + 1, nodes->count());
+            CHECK_EQUAL(value_count, (u32)values->count());
+
+            // Remove them
+            for (u32 i = 0; i < value_count; ++i)
+            {
+                u32 vi;
+                CHECK_TRUE(tree.rem(i, vi));
+                value_t* v = (value_t*)values->idx2ptr(vi);
+                CHECK_NOT_NULL(v);
+                if (v != nullptr)
+                {
+                    CHECK_EQUAL(i, v->key);
+                    values->deallocate(v);
+                }
+            }
+
+            CHECK_EQUAL(1, nodes->count());
+            CHECK_EQUAL(0, (u32)values->count());
+
+            nodes->reset();
+            values->reset();
+        }
+
     }
 }
 UNITTEST_SUITE_END

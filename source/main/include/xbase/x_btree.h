@@ -20,9 +20,8 @@ namespace xcore
 
     struct key_indexer_data
     {
-        u64 m_mask;
-        s16 m_vars[2];
-        s32 m_levels;
+        s8 m_vars[2];
+        s16 m_levels;
     };
 
     // The xbtree does not store the key, instead it relies on key retrieval through
@@ -37,8 +36,9 @@ namespace xcore
     // A xbtree is a BST that is unbalanced and where branches grow/shrink when adding
     // or removing items. The xbtree32 implementation uses indices instead of pointers
     // and thus uses the same amount of memory on a 32-bit system as compared to a 64-bit
-    // system. For every key-value inserted you can consider ~16/20 bytes.
-    //
+    // system. For every key-value inserted you can consider ~6/8 bytes for xbtree32. For
+    // xbtree it is an average of ~12/16 bytes per item.
+    // 
     // We use an `indexer` which is responsible for computing the index at every level
     // of the tree for a given 'key'. If the keydexer goes through the key from msb to lsb
     // then the keys are sorted in the btree, otherwise they are not sorted in the normal sense
@@ -72,6 +72,8 @@ namespace xcore
         bool lower_bound(u64 key, u32& value) const;
         bool upper_bound(u64 key, u32& value) const;
 
+        static inline s32 sizeof_node() { return 4 * sizeof(u32); }
+
     private:
         struct node_t;
         struct history_t;
@@ -96,6 +98,8 @@ namespace xcore
         bool find(u64 key, void*& value) const;
         bool lower_bound(u64 key, void*& value) const;
         bool upper_bound(u64 key, void*& value) const;
+
+        static inline s32 sizeof_node() { return 4 * sizeof(void*); }
 
     private:
         struct node_t;

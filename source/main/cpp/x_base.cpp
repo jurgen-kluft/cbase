@@ -8,9 +8,17 @@
 
 namespace xbase
 {
+#ifdef TARGET_PC
+	extern xcore::x_allocator_win32_system xcore::sSystemAllocator;
+#endif
+#ifdef TARGET_MAC
+	extern xcore::x_allocator_macos_system xcore::sSystemAllocator;
+#endif
+
 #ifdef X_ASSERT
 	void			x_Init()
 	{
+		xcore::sSystemAllocator.init();
 		xcore::xconsole::init_default_console();
 		xcore::xasserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
 	}

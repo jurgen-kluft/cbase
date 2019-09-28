@@ -105,13 +105,9 @@ namespace xcore
 		u64						mAllocationCount;
 	};
 
+	x_allocator_macos_system sSystemAllocator;
 	xalloc*			xalloc::get_system()
 	{
-		static x_allocator_macos_system sSystemAllocator;
-		if (!sSystemAllocator.isInitialized())
-		{
-			sSystemAllocator.init();
-		}
 		return &sSystemAllocator;
 	}
 

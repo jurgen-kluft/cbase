@@ -87,13 +87,9 @@ namespace xcore
 		u64						mAllocationCount;
 	};
 
+	x_allocator_win32_system sSystemAllocator;
 	xalloc*			xalloc::get_system()
 	{
-		static x_allocator_win32_system sSystemAllocator;
-		if (!sSystemAllocator.isInitialized())
-		{
-			sSystemAllocator.init();
-		}
 		return &sSystemAllocator;
 	}
 

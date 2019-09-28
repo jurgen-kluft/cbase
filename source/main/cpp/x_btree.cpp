@@ -17,12 +17,15 @@ namespace xcore
 
     class keydexer : public key_indexer
     {
-        key_indexer_data const* m_data;
+        key_indexer_data const m_data;
 
     public:
-        inline keydexer(key_indexer_data const* data) : m_data(data) {}
+        inline keydexer(key_indexer_data const& data) : m_data(data) {}
 
-        virtual s32 max_levels() const { return m_data->m_levels; }
+        virtual s32 max_levels() const
+        {
+            return m_data.m_levels;
+        }
         virtual s32 key_compare(u64 lhs, u64 rhs) const
         {
             if (lhs == rhs)
@@ -32,38 +35,14 @@ namespace xcore
 
         virtual s32 key_to_index(s32 level, u64 value) const
         {
-            s8 const  msk = 0x3;
-            s32 const shr = (level * m_data->m_vars[0]) + m_data->m_vars[1];
-            return (s8)(value >> shr) & msk;
+            s32 const shr = (level * m_data.m_vars[0]) + m_data.m_vars[1];
+            return (s8)(value >> shr) & 0x3;
         }
     };
 
-    void initialize_from_index(key_indexer_data& keydexer, u32 max_index, bool sorted)
+    void initialize_from_index(key_indexer_data& keydexer, u32 const max_index, bool const sorted)
     {
-        u64 mask = max_index;
-
-        // Expand to the next power-of-two
-        mask     = mask | (mask >> 1);
-        mask     = mask | (mask >> 2);
-        mask     = mask | (mask >> 4);
-        mask     = mask | (mask >> 8);
-        mask     = mask | (mask >> 16);
-
-        u32 trailbitcnt = xcountTrailingZeros(mask);
-        u32 maskbitcnt  = xcountBits(mask);
-        if ((maskbitcnt & 1) == 1)
-        {
-            // Which way should we extend the mask to make the count 'even'
-            if ((mask & (u64(1) << 63)) == 0)
-            {
-                mask = mask | (mask << 1);
-            }
-            else
-            {
-                mask = mask | (mask >> 1);
-            }
-            maskbitcnt += 1;
-        }
+        s32 const maskbitcnt = 64 - xcountLeadingZeros(max_index);
 
         // Initialize key indexer to take 2 bits at a time from high-frequency to low-frequency.
         // Root   : level 0
@@ -71,59 +50,48 @@ namespace xcore
         // Example: With a maximum index of 20000
         //          mask    = 0x3FFF (32768-1)
         //          levels  = 14/2 = 7 levels
-        //          vars[0] = 2 (node is splitting into 4 branches)
+        //          vars[0] = 2 (node is splitting into 4 branches = 2 bits)
         //          vars[1] = 0
-        keydexer.m_mask    = mask;
         keydexer.m_levels  = maskbitcnt / 2;
-        keydexer.m_vars[0] = 2;
-        keydexer.m_vars[1] = 0;
-    }
-
-    void initialize_from_mask(key_indexer_data& keydexer, u64 mask, bool sorted)
-    {
-        u64 lrange = mask;
-        lrange     = lrange | (lrange >> 1);
-        lrange     = lrange | (lrange >> 2);
-        lrange     = lrange | (lrange >> 4);
-        lrange     = lrange | (lrange >> 8);
-        lrange     = lrange | (lrange >> 16);
-        lrange     = lrange | (lrange >> 32);
-
-        u64 hrange = mask;
-        hrange     = hrange | (hrange << 1);
-        hrange     = hrange | (hrange << 2);
-        hrange     = hrange | (hrange << 4);
-        hrange     = hrange | (hrange << 8);
-        hrange     = hrange | (hrange << 16);
-        hrange     = hrange | (hrange << 32);
-
-        mask = hrange & lrange;
-
-        u32 maskbitcnt = xcountBits(mask);
-        if ((maskbitcnt & 1) == 1)
-        {
-            // Which way should we extend the mask to make the bit count 'even'
-            if ((mask & (u64(1) << 63)) == 0)
-            {
-                mask = mask | (mask << 1);
-            }
-            else
-            {
-                mask = mask | (mask >> 1);
-            }
-            maskbitcnt += 1;
-        }
-        keydexer.m_mask   = mask;
-        keydexer.m_levels = maskbitcnt / 2;
         if (sorted)
         {
             keydexer.m_vars[0] = -2;
-            keydexer.m_vars[1] = (keydexer.m_levels - 1) * 2;
+            keydexer.m_vars[1] = maskbitcnt - 2;
         }
         else
         {
             keydexer.m_vars[0] = 2;
             keydexer.m_vars[1] = 0;
+        }
+    }
+
+    void initialize_from_mask(key_indexer_data& keydexer, u64 mask, bool sorted)
+    {
+        s32 const trailbitcnt = xcountTrailingZeros(mask);
+        s32 const leadbitcnt = xcountLeadingZeros(mask);
+        s32 const maskbitcnt = 64 - trailbitcnt - leadbitcnt;
+
+        // Initialize key indexer to take 2 bits at a time from high-frequency to low-frequency.
+        // Root   : level 0
+        // Formula: shift = (level * m_vars[0]) + m_vars[1];
+        // Example: With a mask like 0x00FFFF00
+        //          mask       = 0x00FFFF00
+        //          maskbitcnt = 16
+        //          levels     = 16/2 = 8 levels
+        //          vars[0]    = 2 (node is splitting into 4 branches)
+        //          vars[1]    = trailbitcnt
+        // sorted-> vars[0]    = -2
+        //          vars[1]    = trailbitcnt + maskbitcnt - 2
+        keydexer.m_levels = (maskbitcnt+1) / 2;
+        if (sorted)
+        {
+            keydexer.m_vars[0] = -2;
+            keydexer.m_vars[1] = trailbitcnt + ((maskbitcnt+1)&0xFE) - 2;
+        }
+        else
+        {
+            keydexer.m_vars[0] = 2;
+            keydexer.m_vars[1] = trailbitcnt;
         }
     }
 
@@ -147,21 +115,21 @@ namespace xcore
         XCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 
-    static inline bool is_null(u32 i) { return i == Null; }
-    static inline bool is_node(u32 i) { return (i != Null) && ((i & Type_Mask) == Type_Node); }
-    static inline bool is_leaf(u32 i) { return (i != Null) && ((i & Type_Mask) == Type_Leaf); }
+    static inline bool is_null(u32 const i) { return i == Null; }
+    static inline bool is_node(u32 const i) { return (i != Null) && ((i & Type_Mask) == Type_Node); }
+    static inline bool is_leaf(u32 const i) { return (i != Null) && ((i & Type_Mask) == Type_Leaf); }
 
-    static inline u32 as_node(u32 i)
+    static inline u32 as_node(u32 const i)
     {
         ASSERT(i != Null);
         return i | Type_Node;
     }
-    static inline u32 as_leaf(u32 i)
+    static inline u32 as_leaf(u32 const i)
     {
         ASSERT(i != Null);
         return i | Type_Leaf;
     }
-    static inline u32 as_index(u32 i)
+    static inline u32 as_index(u32 const i)
     {
         ASSERT(i != Null);
         return i & ~Type_Mask;
