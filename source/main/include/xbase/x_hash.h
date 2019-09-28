@@ -31,9 +31,6 @@ namespace xcore
 
     extern xhashing hasher;
 
-    // Now that we have a btree we can implement other well known data structures.
-    // set<V>
-    // map<K,V>
     template <typename K> class xhasher
     {
     public:
@@ -105,6 +102,17 @@ namespace xcore
         {
             hasher.reset();
             hasher.hash((xbyte const*)&k, sizeof(f64));    
+            return hasher.finalize();
+        }
+    };
+
+    template <> class xhasher<void*>
+    {
+    public:
+        u64 hash(void* const& k) const 
+        {
+            hasher.reset();
+            hasher.hash((xbyte const*)&k, sizeof(void*));    
             return hasher.finalize();
         }
     };

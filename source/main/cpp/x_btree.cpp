@@ -6,29 +6,21 @@
 
 namespace xcore
 {
-    class xbtree32_keyvalue_ptr : public xbtree32::keyvalue
-    {
-    public:
-        inline xbtree32_keyvalue_ptr(xdexer* dx)
-            : m_dexer(dx)
-        {
-        }
-        virtual u64 get_key(u32 value) const
-        {
-            void* obj = m_dexer->idx2ptr(value);
-            return (u64)obj;
-        }
-        virtual void set_key(u32 value, u64 key) const {}
 
-    private:
-        xdexer* m_dexer;
-    };
+    // ######################################################################################################################################
+    // ######################################################################################################################################
+    // ######################################################################################################################################
+    //                                              btree using 32-bit indices
+    // ######################################################################################################################################
+    // ######################################################################################################################################
+    // ######################################################################################################################################
 
     class keydexer : public key_indexer
     {
         key_indexer_data const* m_data;
+
     public:
-        keydexer(key_indexer_data const* data) : m_data(data) { }
+        inline keydexer(key_indexer_data const* data) : m_data(data) {}
 
         virtual s32 max_levels() const { return m_data->m_levels; }
         virtual s32 key_compare(u64 lhs, u64 rhs) const
@@ -46,9 +38,11 @@ namespace xcore
         }
     };
 
-    void initialize_from_index(key_indexer_data& keydexer, u32 max_index)
+    void initialize_from_index(key_indexer_data& keydexer, u32 max_index, bool sorted)
     {
         u64 mask = max_index;
+
+        // Expand to the next power-of-two
         mask     = mask | (mask >> 1);
         mask     = mask | (mask >> 2);
         mask     = mask | (mask >> 4);
@@ -70,10 +64,14 @@ namespace xcore
             }
             maskbitcnt += 1;
         }
+
+        // Initialize key indexer to take 2 bits at a time from high-frequency to low-frequency.
+        // Root   : level 0
+        // Formula: shift = (level * m_vars[0]) + m_vars[1];
         // Example: With a maximum index of 20000
         //          mask    = 0x3FFF (32768-1)
         //          levels  = 14/2 = 7 levels
-        //          vars[0] = 2 (node is splitting into 4 branches) 
+        //          vars[0] = 2 (node is splitting into 4 branches)
         //          vars[1] = 0
         keydexer.m_mask    = mask;
         keydexer.m_levels  = maskbitcnt / 2;
@@ -137,6 +135,18 @@ namespace xcore
         Type_Node = 0x80000000
     };
 
+    struct xbtree32::node_t
+    {
+        inline node_t() {}
+        inline bool is_empty() const
+        {
+            return m_nodes[0] == 0xffffffff && m_nodes[1] == 0xffffffff && m_nodes[2] == 0xffffffffNulls [3] == 0xffffffff;
+        }
+        inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = 0xffffffff; }
+        u32         m_nodes[4];
+        XCORE_CLASS_PLACEMENT_NEW_DELETE
+    };
+
     static inline bool is_null(u32 i) { return i == Null; }
     static inline bool is_node(u32 i) { return (i != Null) && ((i & Type_Mask) == Type_Node); }
     static inline bool is_leaf(u32 i) { return (i != Null) && ((i & Type_Mask) == Type_Leaf); }
@@ -157,7 +167,6 @@ namespace xcore
         return i & ~Type_Mask;
     }
 
-
     void xbtree32::init(xfsadexed* node_allocator, keyvalue* kv)
     {
         m_idxr       = nullptr;
@@ -174,10 +183,10 @@ namespace xcore
         m_idxr = indexer;
     }
 
-    void xbtree32::init_from_index(xfsadexed* node_allocator, keyvalue* kv, u32 max_index)
+    void xbtree32::init_from_index(xfsadexed* node_allocator, keyvalue* kv, u32 max_index, bool sorted)
     {
         init(node_allocator, kv);
-        initialize_from_index(m_idxr_data, max_index);
+        initialize_from_index(m_idxr_data, max_index, sorted);
     }
 
     void xbtree32::init_from_mask(xfsadexed* node_allocator, keyvalue* kv, u64 mask, bool sorted)
@@ -207,7 +216,7 @@ namespace xcore
             {
                 // Check for duplicate, see if this value is the value of this leaf
                 u64 const child_key = m_kv->get_key(as_index(childNodeIndex));
-                if (idxr->key_compare(child_key, key)==0)
+                if (idxr->key_compare(child_key, key) == 0)
                 {
                     return false;
                 }
@@ -553,14 +562,30 @@ namespace xcore
     // ######################################################################################################################################
     // ######################################################################################################################################
 
+    struct xbtree::node_t
+    {
+        inline node_t() {}
+        inline bool is_empty() const { return m_nodes[0] == 0 && m_nodes[1] == 0 && m_nodes[2] == 0 && m_nodes[3] == 0; }
+        inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = 0; }
+        uptr        m_nodes[4];
+        XCORE_CLASS_PLACEMENT_NEW_DELETE
+    };
 
-    static inline bool            is_null(uptr n) { return n == 0; }
-    static inline bool            is_node(uptr n) { return (n != 0) && ((n & 1) == 1); }
-    static inline bool            is_value(uptr n) { return (n != 0) && ((n & 1) == 0); }
-    static inline uptr            as_node(uptr n) { return ((uptr)n | 1); }
-    static inline uptr            as_value(uptr n) { return ((uptr)n); }
-    static inline void*           as_value_ptr(uptr n) { ASSERT(is_value(n));  return (void*)((uptr)n); }
-    static inline xbtree::node_t* as_node_ptr(uptr n) { ASSERT(is_node(n)); return (xbtree::node_t*)((uptr)n & ~(u64)1); }
+    static inline bool  is_null(uptr n) { return n == 0; }
+    static inline bool  is_node(uptr n) { return (n != 0) && ((n & 1) == 1); }
+    static inline bool  is_value(uptr n) { return (n != 0) && ((n & 1) == 0); }
+    static inline uptr  as_node(uptr n) { return ((uptr)n | 1); }
+    static inline uptr  as_value(uptr n) { return ((uptr)n); }
+    static inline void* as_value_ptr(uptr n)
+    {
+        ASSERT(is_value(n));
+        return (void*)((uptr)n);
+    }
+    static inline xbtree::node_t* as_node_ptr(uptr n)
+    {
+        ASSERT(is_node(n));
+        return (xbtree::node_t*)((uptr)n & ~(u64)1);
+    }
 
     void xbtree::init(xfsa* node_allocator, keyvalue* kv)
     {
@@ -596,7 +621,7 @@ namespace xcore
         if (m_root == nullptr)
         {
             m_root = m_node_alloc->construct<node_t>();
-			m_root->clear();
+            m_root->clear();
         }
 
         s32     level = 0;
@@ -621,8 +646,8 @@ namespace xcore
                 }
 
                 // Create new node and add the existing item first and continue
-                node_t* newChildNode      = m_node_alloc->construct<node_t>();
-				newChildNode->clear();
+                node_t* newChildNode = m_node_alloc->construct<node_t>();
+                newChildNode->clear();
                 node->m_nodes[childIndex] = as_node((uptr)newChildNode);
 
                 // Compute the child index of this already existing leaf one level up
@@ -650,7 +675,10 @@ namespace xcore
     {
         struct utils
         {
-            static u32 get_counts(uptr n, s32 i) { return (n == 0) ? 0x01000000 : (((n & 1) == 1) ? 0x00010000 : (0x00000100 | i)); }
+            static u32 get_counts(uptr n, s32 i)
+            {
+                return (n == 0) ? 0x01000000 : (((n & 1) == 1) ? 0x00010000 : (0x00000100 | i));
+            }
 
             static u32 check(node_t* node)
             {
@@ -795,7 +823,7 @@ namespace xcore
             }
             if (child == 4)
             {
-				m_node_alloc->destruct(node);
+                m_node_alloc->destruct(node);
             }
         }
     }

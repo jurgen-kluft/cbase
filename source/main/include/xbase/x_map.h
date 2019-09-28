@@ -21,7 +21,7 @@ namespace xcore
     //   Size of node is from 16B to 264B so this works great with an allocator
     //   that has a good Fixed Size Allocator setup.
 
-    // Every node consumes 5 bits (maximum 32 branches)
+    // Every node consumes 5 bits out of the key (maximum 32 branches)
     // Key is 64-bits (the hash of K or V)
     // So we have a tree with a maximum depth of 13
 
