@@ -23,8 +23,6 @@ UNITTEST_SUITE_BEGIN(xmap_and_set)
         UNITTEST_TEST(map_s32)
         {
             xmap<s32, s32> map(gTestAllocator);
-
-            // TODO: Write some tests!
         }
     }
 
