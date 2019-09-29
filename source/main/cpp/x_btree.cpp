@@ -42,7 +42,7 @@ namespace xcore
 
     void initialize_from_index(key_indexer_data& keydexer, u32 const max_index, bool const sorted)
     {
-        s32 const maskbitcnt = 64 - xcountLeadingZeros(max_index);
+        s32 const maskbitcnt = (32 - xcountLeadingZeros(max_index) + 1) & 0x7ffffffe;
 
         // Initialize key indexer to take 2 bits at a time from high-frequency to low-frequency.
         // Root   : level 0
@@ -108,9 +108,9 @@ namespace xcore
         inline node_t() {}
         inline bool is_empty() const
         {
-            return m_nodes[0] == 0xffffffff && m_nodes[1] == 0xffffffff && m_nodes[2] == 0xffffffffNulls [3] == 0xffffffff;
+            return m_nodes[0] == Null && m_nodes[1] == Null && m_nodes[2] == Null && m_nodes[3] == Null;
         }
-        inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = 0xffffffff; }
+        inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = Null; }
         u32         m_nodes[4];
         XCORE_CLASS_PLACEMENT_NEW_DELETE
     };
@@ -135,7 +135,7 @@ namespace xcore
         return i & ~Type_Mask;
     }
 
-    void xbtree32::init(xfsadexed* node_allocator, keyvalue* kv)
+    void xbtree32::init(xfsadexed* node_allocator, xbtree32_kv* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
@@ -145,19 +145,19 @@ namespace xcore
         m_kv   = kv;
     }
 
-    void xbtree32::init(xfsadexed* node_allocator, keyvalue* kv, key_indexer const* indexer)
+    void xbtree32::init(xfsadexed* node_allocator, xbtree32_kv* kv, key_indexer const* indexer)
     {
         init(node_allocator, kv);
         m_idxr = indexer;
     }
 
-    void xbtree32::init_from_index(xfsadexed* node_allocator, keyvalue* kv, u32 max_index, bool sorted)
+    void xbtree32::init_from_index(xfsadexed* node_allocator, xbtree32_kv* kv, u32 max_index, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr_data, max_index, sorted);
     }
 
-    void xbtree32::init_from_mask(xfsadexed* node_allocator, keyvalue* kv, u64 mask, bool sorted)
+    void xbtree32::init_from_mask(xfsadexed* node_allocator, xbtree32_kv* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr_data, mask, sorted);
@@ -165,7 +165,7 @@ namespace xcore
 
     bool xbtree32::add(u64 key, u32 value)
     {
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         s32     level      = 0;
@@ -234,7 +234,7 @@ namespace xcore
             }
         };
 
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         s32     level            = 0;
@@ -290,7 +290,7 @@ namespace xcore
 
     bool xbtree32::find(u64 key, u32& value) const
     {
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         s32           level = 0;
@@ -352,7 +352,7 @@ namespace xcore
         // So we have to keep a traversal history so that we can traverse
         // back up to find a branch that is actually going to give us a
         // lower-bound.
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         history_t     path;
@@ -440,7 +440,7 @@ namespace xcore
         // So we have to keep a traversal history so that we can traverse
         // back up to find a branch that is actually going to give us a
         // lower-bound.
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         history_t     path;
@@ -555,7 +555,7 @@ namespace xcore
         return (xbtree::node_t*)((uptr)n & ~(u64)1);
     }
 
-    void xbtree::init(xfsa* node_allocator, keyvalue* kv)
+    void xbtree::init(xfsa* node_allocator, xbtree_kv* kv)
     {
         m_idxr       = nullptr;
         m_node_alloc = node_allocator;
@@ -563,19 +563,19 @@ namespace xcore
         m_kv         = kv;
     }
 
-    void xbtree::init(xfsa* node_allocator, keyvalue* kv, key_indexer const* indexer)
+    void xbtree::init(xfsa* node_allocator, xbtree_kv* kv, key_indexer const* indexer)
     {
         init(node_allocator, kv);
         m_idxr = indexer;
     }
 
-    void xbtree::init_from_index(xfsa* node_allocator, keyvalue* kv, u32 max_index)
+    void xbtree::init_from_index(xfsa* node_allocator, xbtree_kv* kv, u32 max_index, bool sorted)
     {
         init(node_allocator, kv);
-        initialize_from_index(m_idxr_data, max_index);
+        initialize_from_index(m_idxr_data, max_index, sorted);
     }
 
-    void xbtree::init_from_mask(xfsa* node_allocator, keyvalue* kv, u64 mask, bool sorted)
+    void xbtree::init_from_mask(xfsa* node_allocator, xbtree_kv* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr_data, mask, sorted);
@@ -583,7 +583,7 @@ namespace xcore
 
     bool xbtree::add(u64 key, void* value)
     {
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         if (m_root == nullptr)
@@ -679,7 +679,7 @@ namespace xcore
         if (m_root == nullptr)
             return false;
 
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         node_t* nodes[32];
@@ -798,7 +798,7 @@ namespace xcore
 
     bool xbtree::find(u64 key, void*& value) const
     {
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         s32           level = 0;
@@ -860,7 +860,7 @@ namespace xcore
         // So we have to keep a traversal history so that we can traverse
         // back up to find a branch that is actually going to give us a
         // lower-bound.
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         history_t     path;
@@ -948,7 +948,7 @@ namespace xcore
         // So we have to keep a traversal history so that we can traverse
         // back up to find a branch that is actually going to give us a
         // lower-bound.
-        keydexer           default_dexer(&m_idxr_data);
+        keydexer           default_dexer(m_idxr_data);
         key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         history_t     path;

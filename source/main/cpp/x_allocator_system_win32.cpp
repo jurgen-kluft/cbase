@@ -31,11 +31,6 @@ namespace xcore
 			return mInitialized == 1;
 		}
 
-		virtual const char*		name() const
-		{
-			return "win32 system allocator";
-		}
-
 		virtual void*			allocate(xsize_t size, u32 alignment)
 		{
 #ifdef TARGET_DEBUG
@@ -88,6 +83,14 @@ namespace xcore
 	};
 
 	x_allocator_win32_system sSystemAllocator;
+	void			xalloc::init_system()
+	{
+		if (sSystemAllocator.isInitialized())
+		{
+			sSystemAllocator.init();
+		}
+	}
+
 	xalloc*			xalloc::get_system()
 	{
 		return &sSystemAllocator;

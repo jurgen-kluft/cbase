@@ -26,11 +26,17 @@ namespace xcore
 
     // The xbtree does not store the key, instead it relies on key retrieval through
     // a proxy class. This allows the user to provide the key for a given value.
-    class xbtree_kv
+    class xbtree32_kv
     {
     public:
         virtual u64  get_key(u32 value) const    = 0;
         virtual void set_key(u32 value, u64 key) = 0;
+    };
+    class xbtree_kv
+    {
+    public:
+        virtual u64  get_key(void* value) const    = 0;
+        virtual void set_key(void* value, u64 key) = 0;
     };
 
     // A xbtree is a BST that is unbalanced and where branches grow/shrink when adding
@@ -60,10 +66,10 @@ namespace xcore
     //
     struct xbtree32
     {
-        void init(xfsadexed* node_allocator, xbtree_kv* kv);
-        void init(xfsadexed* node_allocator, xbtree_kv* kv, key_indexer const* indexer);
-        void init_from_index(xfsadexed* node_allocator, xbtree_kv* kv, u32 max_index, bool sorted);
-        void init_from_mask(xfsadexed* node_allocator, xbtree_kv* kv, u64 mask, bool sorted);
+        void init(xfsadexed* node_allocator, xbtree32_kv* kv);
+        void init(xfsadexed* node_allocator, xbtree32_kv* kv, key_indexer const* indexer);
+        void init_from_index(xfsadexed* node_allocator, xbtree32_kv* kv, u32 max_index, bool sorted);
+        void init_from_mask(xfsadexed* node_allocator, xbtree32_kv* kv, u64 mask, bool sorted);
 
         bool add(u64 key, u32 value);
         bool rem(u64 key, u32& value);
@@ -81,14 +87,16 @@ namespace xcore
         key_indexer_data   m_idxr_data;
         key_indexer const* m_idxr;
         xfsadexed*         m_node_alloc;
-        xbtree_kv*          m_kv;
+        xbtree32_kv*       m_kv;
     };
 
     struct xbtree
     {
-        void init(xfsa* node_allocator, xbtree_kv* kv);
+        struct node_t;
+
+		void init(xfsa* node_allocator, xbtree_kv* kv);
         void init(xfsa* node_allocator, xbtree_kv* kv, key_indexer const* idxr);
-        void init_from_index(xfsa* node_allocator, xbtree_kv* kv, u32 max_index);
+        void init_from_index(xfsa* node_allocator, xbtree_kv* kv, u32 max_index, bool sorted);
         void init_from_mask(xfsa* node_allocator, xbtree_kv* kv, u64 mask, bool sorted);
 
         bool add(u64 key, void* value);
@@ -101,8 +109,7 @@ namespace xcore
 
         static inline s32 sizeof_node() { return 4 * sizeof(void*); }
 
-    private:
-        struct node_t;
+	private:
         struct history_t;
         key_indexer const* m_idxr;
         key_indexer_data   m_idxr_data;

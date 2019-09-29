@@ -69,11 +69,6 @@ namespace xcore
 			return mInitialized == 1;
 		}
 
-		virtual const char*		name() const
-		{
-			return "macos system allocator";
-		}
-
 		virtual void*			allocate(xsize_t size, u32 alignment)
 		{
 			void* ptr = mac_aligned_malloc(size, alignment);
@@ -106,6 +101,15 @@ namespace xcore
 	};
 
 	x_allocator_macos_system sSystemAllocator;
+
+	void			xalloc::init_system()
+	{
+		if (sSystemAllocator.isInitialized())
+		{
+			sSystemAllocator.init();
+		}
+	}
+
 	xalloc*			xalloc::get_system()
 	{
 		return &sSystemAllocator;

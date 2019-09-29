@@ -15,6 +15,7 @@ namespace xcore
 	class xalloc
 	{
 	public:
+		static void			init_system();
 		static xalloc*		get_system();
 		
 		virtual void*		allocate(xsize_t size, u32 align) = 0;			// Allocate memory with alignment
