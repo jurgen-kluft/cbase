@@ -18,7 +18,7 @@ namespace xcore
 		static void			init_system();
 		static xalloc*		get_system();
 		
-		virtual void*		allocate(xsize_t size, u32 align) = 0;			// Allocate memory with alignment
+		virtual void*		allocate(u32 size, u32 align) = 0;			// Allocate memory with alignment
 		virtual void		deallocate(void* p) = 0;						// Deallocate/Free memory
 
 		virtual void		release() = 0;

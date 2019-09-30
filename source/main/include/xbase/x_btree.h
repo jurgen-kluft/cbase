@@ -10,18 +10,13 @@
 
 namespace xcore
 {
-    class key_indexer
+    struct xbtree_indexer
     {
-    public:
-        virtual s32  max_levels() const                  = 0;
-        virtual s32  key_compare(u64 lhs, u64 rhs) const = 0;
-        virtual s32  key_to_index(s32 level, u64 value) const = 0;
-    };
+		s32  max_levels() const { return m_levels; }
+        s32  key_to_index(s32 level, u64 value) const;
 
-    struct key_indexer_data
-    {
-        s8 m_vars[2];
-        s16 m_levels;
+        s8	m_vars[2];
+        s16	m_levels;
     };
 
     // The xbtree does not store the key, instead it relies on key retrieval through
@@ -67,7 +62,6 @@ namespace xcore
     struct xbtree32
     {
         void init(xfsadexed* node_allocator, xbtree32_kv* kv);
-        void init(xfsadexed* node_allocator, xbtree32_kv* kv, key_indexer const* indexer);
         void init_from_index(xfsadexed* node_allocator, xbtree32_kv* kv, u32 max_index, bool sorted);
         void init_from_mask(xfsadexed* node_allocator, xbtree32_kv* kv, u64 mask, bool sorted);
 
@@ -84,8 +78,7 @@ namespace xcore
         struct node_t;
         struct history_t;
         u32                m_root;
-        key_indexer_data   m_idxr_data;
-        key_indexer const* m_idxr;
+        xbtree_indexer     m_idxr;
         xfsadexed*         m_node_alloc;
         xbtree32_kv*       m_kv;
     };
@@ -95,25 +88,22 @@ namespace xcore
         struct node_t;
 
 		void init(xfsa* node_allocator, xbtree_kv* kv);
-        void init(xfsa* node_allocator, xbtree_kv* kv, key_indexer const* idxr);
         void init_from_index(xfsa* node_allocator, xbtree_kv* kv, u32 max_index, bool sorted);
         void init_from_mask(xfsa* node_allocator, xbtree_kv* kv, u64 mask, bool sorted);
 
-        bool add(u64 key, void* value);
-        bool rem(u64 key, void*& value);
-        void clear();
+        bool add(node_t*& root, u64 key, void* value);
+        bool rem(node_t*& root, u64 key, void*& value);
+        void clear(node_t*& root);
 
-        bool find(u64 key, void*& value) const;
-        bool lower_bound(u64 key, void*& value) const;
-        bool upper_bound(u64 key, void*& value) const;
+        bool find(node_t*& root, u64 key, void*& value) const;
+        bool lower_bound(node_t*& root, u64 key, void*& value) const;
+        bool upper_bound(node_t*& root, u64 key, void*& value) const;
 
         static inline s32 sizeof_node() { return 4 * sizeof(void*); }
 
 	private:
         struct history_t;
-        key_indexer const* m_idxr;
-        key_indexer_data   m_idxr_data;
-        node_t*            m_root;
+        xbtree_indexer     m_idxr;
         xfsa*              m_node_alloc;
         xbtree_kv*         m_kv;
     };
