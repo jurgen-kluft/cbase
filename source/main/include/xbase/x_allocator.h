@@ -117,7 +117,7 @@ namespace xcore
 	public:
 						xalloc_stack(xbuffer& storage);
 
-		virtual void*	allocate(xsize_t size, u32 align)
+		virtual void*	allocate(u32 size, u32 align)
 		{
 			if (m_ptr < m_end && align_ptr(m_ptr+size, align) <= m_end)
 			{
@@ -150,7 +150,7 @@ namespace xcore
 		u64					m_size;
 	public:
 		inline				xallocinplace(xbyte* data, u64 size) : m_data(data), m_size(size) {}
-		virtual void*		allocate(xsize_t size, u32 align);
+		virtual void*		allocate(u32 size, u32 align);
 		virtual void		deallocate(void* p);
 		virtual void		release();
 	};

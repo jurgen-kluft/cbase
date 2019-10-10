@@ -321,7 +321,8 @@ UNITTEST_SUITE_BEGIN(xbtree)
         {
             xbtree tree;
             tree.init(&nodes, &value_kv);
-            tree.clear();
+			xbtree::node_t* root = nullptr;
+            tree.clear(root);
         }
 
         UNITTEST_TEST(add)
@@ -336,22 +337,23 @@ UNITTEST_SUITE_BEGIN(xbtree)
             v2->m_value = 2.0f;
             v2->m_key   = 0;
 
-            CHECK_TRUE(tree.add(1, v1));
-            CHECK_TRUE(tree.add(2, v2));
+			xbtree::node_t* root = nullptr;
+            CHECK_TRUE(tree.add(root, 1, v1));
+            CHECK_TRUE(tree.add(root, 2, v2));
             CHECK_EQUAL(1, v1->m_key);
             CHECK_EQUAL(2, v2->m_key);
 
             CHECK_EQUAL(4, nodes.count());
 
             void* vv1;
-            CHECK_TRUE(tree.rem(v1->m_key, vv1));
+            CHECK_TRUE(tree.rem(root, v1->m_key, vv1));
             void* vv2;
-            CHECK_TRUE(tree.rem(v2->m_key, vv2));
+            CHECK_TRUE(tree.rem(root, v2->m_key, vv2));
 
             gTestAllocator->destruct<myvalue>((myvalue*)v2);
             gTestAllocator->destruct<myvalue>((myvalue*)v1);
 
-            tree.clear();
+            tree.clear(root);
         }
 
         UNITTEST_TEST(add_many)
@@ -361,12 +363,14 @@ UNITTEST_SUITE_BEGIN(xbtree)
             xbtree tree;
             tree.init_from_index(&nodes, &value_kv, value_count, false);
 
+			xbtree::node_t* root = nullptr;
+
             for (u32 i = 0; i < value_count; ++i)
             {
 				myvalue* v  = values.construct<myvalue>();
                 v->m_value  = 1.0f;
                 v->m_key    = value_count + i;
-                CHECK_TRUE(tree.add(i, v));
+                CHECK_TRUE(tree.add(root, i, v));
             }
             for (u32 i = 0; i < value_count; ++i)
             {
@@ -388,12 +392,14 @@ UNITTEST_SUITE_BEGIN(xbtree)
             xbtree tree;
             tree.init_from_index(&nodes, &value_kv, value_count, true);
 
-            for (u32 i = 0; i < value_count; ++i)
+			xbtree::node_t* root = nullptr;
+
+			for (u32 i = 0; i < value_count; ++i)
             {
 				myvalue* v  = values.construct<myvalue>();
                 v->m_value   = 1.0f;
                 v->m_key     = value_count + i;
-                CHECK_TRUE(tree.add(i, v));
+                CHECK_TRUE(tree.add(root, i, v));
             }
             for (u32 i = 0; i < value_count; ++i)
             {
@@ -411,7 +417,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
             for (u32 i = 0; i < value_count; ++i)
             {
                 void* vi;
-                CHECK_TRUE(tree.find(i, vi));
+                CHECK_TRUE(tree.find(root, i, vi));
                 myvalue* v = (myvalue*)vi;
                 CHECK_NOT_NULL(v);
                 if (v != nullptr)
@@ -430,12 +436,14 @@ UNITTEST_SUITE_BEGIN(xbtree)
             xbtree tree;
             tree.init_from_index(&nodes, &value_kv, value_count, false);
 
+			xbtree::node_t* root = nullptr;
+
             for (u32 i = 0; i < value_count; ++i)
             {
 				myvalue* v  = values.construct<myvalue>();
                 v->m_value   = 1.0f;
                 v->m_key     = value_count + i;
-                CHECK_TRUE(tree.add(i, v));
+                CHECK_TRUE(tree.add(root, i, v));
             }
             for (u32 i = 0; i < value_count; ++i)
             {
@@ -449,7 +457,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
             for (u32 i = 0; i < value_count; ++i)
             {
                 void* vi;
-                CHECK_TRUE(tree.rem(i, vi));
+                CHECK_TRUE(tree.rem(root, i, vi));
                 myvalue* v = (myvalue*)(vi);
                 CHECK_NOT_NULL(v);
                 if (v != nullptr)
@@ -473,6 +481,8 @@ UNITTEST_SUITE_BEGIN(xbtree)
             xbtree tree;
             tree.init_from_mask(&nodes, &value_kv, 0xffffffff, true);
 
+			xbtree::node_t* root = nullptr;
+
 			u32 seed = 0;
             for (u32 i = 0; i < 16378; ++i)
             {
@@ -482,15 +492,15 @@ UNITTEST_SUITE_BEGIN(xbtree)
                 v->m_key     = value_count + i;
 
 				seed = seed * 1664525 + 1013904223; 
-                CHECK_TRUE(tree.add(seed, v));
+                CHECK_TRUE(tree.add(root, seed, v));
             }
 
 			CHECK_EQUAL(11853, nodes.count());
 
             // One node = 32 bytes
             // Number of nodes = 11853
-            // 11853 * 32 bytes = 10912 bytes
-            // 10912 bytes / 1024 items = 10.65625 bytes per item
+            // 11853 * 32 bytes = 379296 bytes
+            // 379296 bytes / 16378 items = 23.158872 bytes per item
 
             nodes.reset();
             values.reset();

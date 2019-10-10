@@ -69,16 +69,11 @@ namespace xcore
 			return mInitialized == 1;
 		}
 
-		virtual void*			allocate(xsize_t size, u32 alignment)
+		virtual void*			allocate(u32 size, u32 alignment)
 		{
 			void* ptr = mac_aligned_malloc(size, alignment);
 			++mAllocationCount;
 			return ptr;
-		}
-
-		virtual void*			reallocate(void* ptr, xsize_t size, u32 alignment)
-		{
-			return mac_aligned_realloc(ptr, size, alignment);
 		}
 
 		virtual void			deallocate(void* ptr)

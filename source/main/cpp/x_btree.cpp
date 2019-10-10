@@ -15,32 +15,14 @@ namespace xcore
     // ######################################################################################################################################
     // ######################################################################################################################################
 
-    class keydexer : public key_indexer
+    s32 xbtree_indexer::key_to_index(s32 level, u64 value) const
     {
-        key_indexer_data const m_data;
+        s32 const shr = (level * m_vars[0]) + m_vars[1];
+        return (s8)(value >> shr) & 0x3;
+    }
 
-    public:
-        inline keydexer(key_indexer_data const& data) : m_data(data) {}
 
-        virtual s32 max_levels() const
-        {
-            return m_data.m_levels;
-        }
-        virtual s32 key_compare(u64 lhs, u64 rhs) const
-        {
-            if (lhs == rhs)
-                return 0;
-            return (lhs < rhs) ? -1 : 1;
-        }
-
-        virtual s32 key_to_index(s32 level, u64 value) const
-        {
-            s32 const shr = (level * m_data.m_vars[0]) + m_data.m_vars[1];
-            return (s8)(value >> shr) & 0x3;
-        }
-    };
-
-    void initialize_from_index(key_indexer_data& keydexer, u32 const max_index, bool const sorted)
+    void initialize_from_index(xbtree_indexer& keydexer, u32 const max_index, bool const sorted)
     {
         s32 const maskbitcnt = (32 - xcountLeadingZeros(max_index) + 1) & 0x7ffffffe;
 
@@ -65,7 +47,7 @@ namespace xcore
         }
     }
 
-    void initialize_from_mask(key_indexer_data& keydexer, u64 mask, bool sorted)
+    void initialize_from_mask(xbtree_indexer& keydexer, u64 mask, bool sorted)
     {
         s32 const trailbitcnt = xcountTrailingZeros(mask);
         s32 const leadbitcnt = xcountLeadingZeros(mask);
@@ -137,7 +119,6 @@ namespace xcore
 
     void xbtree32::init(xfsadexed* node_allocator, xbtree32_kv* kv)
     {
-        m_idxr       = nullptr;
         m_node_alloc = node_allocator;
         node_t* root = m_node_alloc->construct<node_t>();
         root->clear();
@@ -145,34 +126,25 @@ namespace xcore
         m_kv   = kv;
     }
 
-    void xbtree32::init(xfsadexed* node_allocator, xbtree32_kv* kv, key_indexer const* indexer)
-    {
-        init(node_allocator, kv);
-        m_idxr = indexer;
-    }
-
     void xbtree32::init_from_index(xfsadexed* node_allocator, xbtree32_kv* kv, u32 max_index, bool sorted)
     {
         init(node_allocator, kv);
-        initialize_from_index(m_idxr_data, max_index, sorted);
+        initialize_from_index(m_idxr, max_index, sorted);
     }
 
     void xbtree32::init_from_mask(xfsadexed* node_allocator, xbtree32_kv* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
-        initialize_from_mask(m_idxr_data, mask, sorted);
+        initialize_from_mask(m_idxr, mask, sorted);
     }
 
     bool xbtree32::add(u64 key, u32 value)
     {
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
-
         s32     level      = 0;
         node_t* parentNode = (node_t*)m_node_alloc->idx2ptr(m_root);
         do
         {
-            s32 childIndex     = idxr->key_to_index(level, key);
+            s32 childIndex     = m_idxr.key_to_index(level, key);
             u32 childNodeIndex = parentNode->m_nodes[childIndex];
             if (is_null(childNodeIndex))
             {
@@ -184,7 +156,7 @@ namespace xcore
             {
                 // Check for duplicate, see if this value is the value of this leaf
                 u64 const child_key = m_kv->get_key(as_index(childNodeIndex));
-                if (idxr->key_compare(child_key, key) == 0)
+                if (child_key == key)
                 {
                     return false;
                 }
@@ -197,7 +169,7 @@ namespace xcore
 
                 // Compute the child index of this already existing leaf one level up
                 // and insert this existing leaf there.
-                s32 const childChildIndex              = idxr->key_to_index(level + 1, child_key);
+                s32 const childChildIndex              = m_idxr.key_to_index(level + 1, child_key);
                 newChildNode->m_nodes[childChildIndex] = childNodeIndex;
 
                 // Continue, at the next level, correct parentNode
@@ -211,7 +183,7 @@ namespace xcore
                 parentNode = (node_t*)m_node_alloc->idx2ptr(as_index(childNodeIndex));
                 level++;
             }
-        } while (level < idxr->max_levels());
+        } while (level < m_idxr.max_levels());
 
         return false;
     }
@@ -234,16 +206,13 @@ namespace xcore
             }
         };
 
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
-
         s32     level            = 0;
         node_t* parent           = nullptr;
         s32     parentChildIndex = 0;
         node_t* node             = (node_t*)m_node_alloc->idx2ptr(m_root);
         do
         {
-            s32 childIndex = idxr->key_to_index(level, key);
+            s32 childIndex = m_idxr.key_to_index(level, key);
             u32 nodeIndex  = node->m_nodes[childIndex];
             if (is_null(nodeIndex))
             {
@@ -252,7 +221,7 @@ namespace xcore
             else if (is_leaf(nodeIndex))
             {
                 u64 const nodeKey = m_kv->get_key(nodeIndex);
-                if (idxr->key_compare(nodeKey, key) == 0)
+                if (nodeKey ==key)
                 {
                     // Remove this leaf from node, if this results in node
                     // having no more children then this node should also be
@@ -283,21 +252,18 @@ namespace xcore
             }
 
             level++;
-        } while (level < idxr->max_levels());
+        } while (level < m_idxr.max_levels());
 
         return false;
     }
 
     bool xbtree32::find(u64 key, u32& value) const
     {
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
-
         s32           level = 0;
         node_t const* node  = (node_t*)m_node_alloc->idx2ptr(m_root);
         do
         {
-            s32 childIndex     = idxr->key_to_index(level, key);
+            s32 childIndex     = m_idxr.key_to_index(level, key);
             u32 childNodeIndex = node->m_nodes[childIndex];
             if (is_null(childNodeIndex))
             {
@@ -306,7 +272,7 @@ namespace xcore
             else if (is_leaf(childNodeIndex))
             {
                 u64 const childNodeKey = m_kv->get_key(childNodeIndex);
-                if (idxr->key_compare(childNodeKey, key) == 0)
+                if (childNodeKey == key)
                 {
                     value = childNodeIndex;
                     return true;
@@ -319,7 +285,7 @@ namespace xcore
                 node = (node_t*)m_node_alloc->idx2ptr(as_index(childNodeIndex));
             }
             level++;
-        } while (level < idxr->max_levels());
+        } while (level < m_idxr.max_levels());
 
         value = Null;
         return false;
@@ -352,8 +318,6 @@ namespace xcore
         // So we have to keep a traversal history so that we can traverse
         // back up to find a branch that is actually going to give us a
         // lower-bound.
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         history_t     path;
         s32           level = 0;
@@ -361,16 +325,15 @@ namespace xcore
         node_t const* node  = (node_t*)m_node_alloc->idx2ptr(m_root);
         s8            childIndex;
         u32           childNodeIndex;
-        while (state == 0 && level < idxr->max_levels())
+        while (state == 0 && level < m_idxr.max_levels())
         {
-            childIndex     = idxr->key_to_index(level, key);
+            childIndex     = m_idxr.key_to_index(level, key);
             childNodeIndex = node->m_nodes[childIndex];
 
             if (is_leaf(childNodeIndex))
             {
                 u64 const childNodeKey = m_kv->get_key(childNodeIndex);
-                s32 const c            = idxr->key_compare(childNodeKey, key);
-                if (c <= 0)
+                if (childNodeKey <= key)
                 {
                     value = childNodeIndex;
                     return true;
@@ -405,7 +368,7 @@ namespace xcore
             }
         }
 
-        while (state == -1 && level < idxr->max_levels())
+        while (state == -1 && level < m_idxr.max_levels())
         {
             do
             {
@@ -440,25 +403,22 @@ namespace xcore
         // So we have to keep a traversal history so that we can traverse
         // back up to find a branch that is actually going to give us a
         // lower-bound.
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
-
         history_t     path;
         s32           level = 0;
         s32           state = 0; // 0 = we are on target branch, -1 = we are on a lower-bound branch
         node_t const* node  = (node_t const*)m_node_alloc->idx2ptr(m_root);
         s8            childIndex;
         u32           childNodeIndex;
-        while (state == 0 && level < idxr->max_levels())
+
+        while (state == 0 && level < m_idxr.max_levels())
         {
-            childIndex     = idxr->key_to_index(level, key);
+            childIndex     = m_idxr.key_to_index(level, key);
             childNodeIndex = node->m_nodes[childIndex];
 
             if (is_leaf(childNodeIndex))
             {
                 u64 const childNodeKey = m_kv->get_key(childNodeIndex);
-                s32 const c            = idxr->key_compare(childNodeKey, key);
-                if (c >= 0)
+                if (childNodeKey >= key)
                 {
                     value = childNodeIndex;
                     return true;
@@ -493,7 +453,7 @@ namespace xcore
             }
         }
 
-        while (state == -1 && level < idxr->max_levels())
+        while (state == -1 && level < m_idxr.max_levels())
         {
             do
             {
@@ -557,46 +517,35 @@ namespace xcore
 
     void xbtree::init(xfsa* node_allocator, xbtree_kv* kv)
     {
-        m_idxr       = nullptr;
         m_node_alloc = node_allocator;
-        m_root       = nullptr;
         m_kv         = kv;
-    }
-
-    void xbtree::init(xfsa* node_allocator, xbtree_kv* kv, key_indexer const* indexer)
-    {
-        init(node_allocator, kv);
-        m_idxr = indexer;
     }
 
     void xbtree::init_from_index(xfsa* node_allocator, xbtree_kv* kv, u32 max_index, bool sorted)
     {
         init(node_allocator, kv);
-        initialize_from_index(m_idxr_data, max_index, sorted);
+        initialize_from_index(m_idxr, max_index, sorted);
     }
 
     void xbtree::init_from_mask(xfsa* node_allocator, xbtree_kv* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
-        initialize_from_mask(m_idxr_data, mask, sorted);
+        initialize_from_mask(m_idxr, mask, sorted);
     }
 
-    bool xbtree::add(u64 key, void* value)
+    bool xbtree::add(node_t*& root, u64 key, void* value)
     {
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
-
-        if (m_root == nullptr)
+        if (root == nullptr)
         {
-            m_root = m_node_alloc->construct<node_t>();
-            m_root->clear();
+            root = m_node_alloc->construct<node_t>();
+            root->clear();
         }
 
         s32     level = 0;
-        node_t* node  = m_root;
+        node_t* node  = root;
         do
         {
-            s32  childIndex = idxr->key_to_index(level, key);
+            s32  childIndex = m_idxr.key_to_index(level, key);
             uptr childPtr   = node->m_nodes[childIndex];
             if (is_null(childPtr))
             {
@@ -608,7 +557,7 @@ namespace xcore
             {
                 // Check for duplicate, see if this value is the value of this leaf
                 u64 const child_key = m_kv->get_key(as_value_ptr(childPtr));
-                if (idxr->key_compare(child_key, key) == 0)
+                if (child_key == key)
                 {
                     return false;
                 }
@@ -620,7 +569,7 @@ namespace xcore
 
                 // Compute the child index of this already existing leaf one level up
                 // and insert this existing leaf there.
-                s32 const childChildIndex              = idxr->key_to_index(level + 1, child_key);
+                s32 const childChildIndex              = m_idxr.key_to_index(level + 1, child_key);
                 newChildNode->m_nodes[childChildIndex] = childPtr;
 
                 // Continue, at the next level, correct node
@@ -634,12 +583,12 @@ namespace xcore
                 node = as_node_ptr(childPtr);
                 level++;
             }
-        } while (level < idxr->max_levels());
+        } while (level < m_idxr.max_levels());
 
         return false;
     }
 
-    bool xbtree::rem(u64 key, void*& value)
+    bool xbtree::rem(node_t*& root, u64 key, void*& value)
     {
         struct utils
         {
@@ -676,20 +625,17 @@ namespace xcore
             }
         };
 
-        if (m_root == nullptr)
+        if (root == nullptr)
             return false;
-
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         node_t* nodes[32];
         s8      childs[32];
 
         s32     level = 0;
-        node_t* node  = m_root;
+        node_t* node  = root;
         do
         {
-            s32 childIndex = idxr->key_to_index(level, key);
+            s32 childIndex = m_idxr.key_to_index(level, key);
 
             nodes[level]  = node;
             childs[level] = childIndex;
@@ -702,7 +648,7 @@ namespace xcore
             else if (is_value(nodePtr))
             {
                 u64 const nodeKey = m_kv->get_key(as_value_ptr(nodePtr));
-                if (idxr->key_compare(nodeKey, key) == 0)
+                if (nodeKey == key)
                 {
                     // Remove this leaf from node, if this results in node
                     // having no more children then this node should also be
@@ -738,7 +684,7 @@ namespace xcore
 
                             // Place the value at its correct place
                             u64 const childKey        = m_kv->get_key(as_value_ptr(otherValue));
-                            childIndex                = idxr->key_to_index(level, childKey);
+                            childIndex                = m_idxr.key_to_index(level, childKey);
                             node->m_nodes[childIndex] = otherValue;
                         }
                     }
@@ -752,20 +698,20 @@ namespace xcore
             }
 
             level++;
-        } while (level < idxr->max_levels());
+        } while (level < m_idxr.max_levels());
 
         return false;
     }
 
-    void xbtree::clear()
+    void xbtree::clear(node_t*& root)
     {
-        if (m_root == nullptr)
+        if (root == nullptr)
             return;
 
         node_t* m_node[32];
         s8      m_child[32];
 
-        m_node[0]  = m_root;
+        m_node[0]  = root;
         m_child[0] = 0;
 
         s32 level = 1;
@@ -794,18 +740,16 @@ namespace xcore
                 m_node_alloc->destruct(node);
             }
         }
+		root = nullptr;
     }
 
-    bool xbtree::find(u64 key, void*& value) const
+    bool xbtree::find(node_t*& root, u64 key, void*& value) const
     {
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
-
         s32           level = 0;
-        node_t const* node  = m_root;
+        node_t const* node  = root;
         do
         {
-            s32  childIndex = idxr->key_to_index(level, key);
+            s32  childIndex = m_idxr.key_to_index(level, key);
             uptr nodePtr    = node->m_nodes[childIndex];
             if (is_null(nodePtr))
             {
@@ -814,7 +758,7 @@ namespace xcore
             else if (is_value(nodePtr))
             {
                 u64 const childNodeKey = m_kv->get_key(as_value_ptr(nodePtr));
-                if (idxr->key_compare(childNodeKey, key) == 0)
+                if (childNodeKey == key)
                 {
                     value = as_value_ptr(nodePtr);
                     return true;
@@ -827,7 +771,7 @@ namespace xcore
                 node = as_node_ptr(nodePtr);
             }
             level++;
-        } while (level < idxr->max_levels());
+        } while (level < m_idxr.max_levels());
 
         value = nullptr;
         return false;
@@ -854,31 +798,28 @@ namespace xcore
     };
 
     // Find an entry 'less-or-equal' to 'value'
-    bool xbtree::lower_bound(u64 key, void*& value) const
+    bool xbtree::lower_bound(node_t*& root, u64 key, void*& value) const
     {
         // When traversing the tree to find a lower-bound we might fail.
         // So we have to keep a traversal history so that we can traverse
         // back up to find a branch that is actually going to give us a
         // lower-bound.
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
 
         history_t     path;
         s32           level = 0;
         s32           state = 0; // 0 = we are on target branch, -1 = we are on a lower-bound branch
-        node_t const* node  = m_root;
+        node_t const* node  = root;
         s8            childIndex;
         uptr          childPtr;
-        while (state == 0 && level < idxr->max_levels())
+        while (state == 0 && level < m_idxr.max_levels())
         {
-            childIndex = idxr->key_to_index(level, key);
+            childIndex = m_idxr.key_to_index(level, key);
             childPtr   = node->m_nodes[childIndex];
 
             if (is_value(childPtr))
             {
                 u64 const childNodeKey = m_kv->get_key(as_value_ptr(childPtr));
-                s32 const c            = idxr->key_compare(childNodeKey, key);
-                if (c <= 0)
+                if (childNodeKey <= key)
                 {
                     value = as_value_ptr(childPtr);
                     return true;
@@ -913,7 +854,7 @@ namespace xcore
             }
         }
 
-        while (state == -1 && level < idxr->max_levels())
+        while (state == -1 && level < m_idxr.max_levels())
         {
             do
             {
@@ -942,31 +883,27 @@ namespace xcore
         return false;
     }
 
-    bool xbtree::upper_bound(u64 key, void*& value) const
+    bool xbtree::upper_bound(node_t *& root, u64 key, void*& value) const
     {
         // When traversing the tree to find a lower-bound we might fail.
         // So we have to keep a traversal history so that we can traverse
         // back up to find a branch that is actually going to give us a
         // lower-bound.
-        keydexer           default_dexer(m_idxr_data);
-        key_indexer const* idxr = m_idxr == nullptr ? &default_dexer : m_idxr;
-
         history_t     path;
         s32           level = 0;
         s32           state = 0; // 0 = we are on target branch, -1 = we are on a lower-bound branch
-        node_t const* node  = m_root;
+        node_t const* node  = root;
         s8            childIndex;
         uptr          childPtr;
-        while (state == 0 && level < idxr->max_levels())
+        while (state == 0 && level < m_idxr.max_levels())
         {
-            childIndex = idxr->key_to_index(level, key);
+            childIndex = m_idxr.key_to_index(level, key);
             childPtr   = node->m_nodes[childIndex];
 
             if (is_value(childPtr))
             {
                 u64 const childNodeKey = m_kv->get_key(as_value_ptr(childPtr));
-                s32 const c            = idxr->key_compare(childNodeKey, key);
-                if (c >= 0)
+                if (childNodeKey >= key)
                 {
                     value = as_value_ptr(childPtr);
                     return true;
@@ -1001,7 +938,7 @@ namespace xcore
             }
         }
 
-        while (state == -1 && level < idxr->max_levels())
+        while (state == -1 && level < m_idxr.max_levels())
         {
             do
             {

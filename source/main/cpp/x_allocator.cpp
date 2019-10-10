@@ -13,7 +13,7 @@ namespace xcore
 	{
 	}
 
-	void*		xallocinplace::allocate(xsize_t size, u32 align)
+	void*		xallocinplace::allocate(u32 size, u32 align)
 	{
 		ASSERT(size <= m_size);
 		return m_data;
