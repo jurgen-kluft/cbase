@@ -11,13 +11,16 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtypes);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xallocator);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbinary_search);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbitfield);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbuffer);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xcarray);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xcontainers);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdouble);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdtrie);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xfloat);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xguid);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xhibitset);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xinteger);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xqsort);
@@ -28,11 +31,8 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsprintf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsscanf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_ascii);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_utf);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtls);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xva);
-
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdtrie);
 
 
 #ifndef X_NO_CUSTOM_INT64
