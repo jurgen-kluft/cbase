@@ -46,7 +46,10 @@ namespace xcore
 
     void xhibitset::release(xalloc* alloc)
     {
-        alloc->deallocate(m_levels[0]);
+        if (alloc != nullptr)
+        {
+            alloc->deallocate(m_levels[0]);
+        }
         m_maxlevel = 0;
         m_numbits  = 0;
         m_find     = 0;
