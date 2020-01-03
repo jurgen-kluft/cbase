@@ -27,5 +27,70 @@ namespace xcore
 	{
 	}
 
+	static inline u32		get_item_idx(void* array_item, void* item, u32 sizeof_item)
+	{
+		u32 const index = (u32)(((u64)item - (u64)array_item) / sizeof_item);
+		return index;
+	}
 
+	static inline xbyte*	get_item_ptr(void* array_item, u32 index, u32 sizeof_item)
+	{
+		return (xbyte*)array_item + (index * sizeof_item);
+	}
+
+	xfsadexed_list::xfsadexed_list(void* array_item, u32 sizeof_item, u32 countof_item)
+		: m_data(array_item)
+		, m_sizeof(sizeof_item)
+		, m_countof(countof_item)
+		, m_freelist(0xffffffff)
+		, m_freeindex(0)
+	{
+		ASSERT(m_sizeof >= sizeof(u32));	// Can only deal with items that are 4 bytes or more
+	}
+
+	u32			xfsadexed_list::size() const { return m_sizeof; }
+
+	void*		xfsadexed_list::allocate()
+	{
+		u32 freeitem = 0xffffffff;
+		if (m_freelist != 0xffffffff)
+		{
+			freeitem = m_freelist;
+			m_freelist = *(u32*)get_item_ptr(m_data, m_freelist, m_sizeof);
+		}
+		else if (m_freeindex < m_countof)
+		{
+			freeitem = m_freeindex++;
+		}
+		
+		if (freeitem == 0xffffffff)
+			return nullptr;
+
+		return get_item_ptr(m_data, freeitem, m_sizeof);
+	}
+
+	void		xfsadexed_list::deallocate(void* p)
+	{
+		u32 const idx = ptr2idx(p);
+		u32* item = (u32*)p;
+		*item = m_freelist;
+		m_freelist = idx;
+	}
+
+	void*		xfsadexed_list::idx2ptr(u32 index) const
+	{
+		ASSERT(index < m_freeindex);
+		return get_item_ptr(m_data, index, m_sizeof);
+	}
+
+	u32			xfsadexed_list::ptr2idx(void* ptr) const
+	{
+		u32 const i = get_item_idx(m_data, ptr, m_sizeof);
+		ASSERT(i < m_freeindex);
+		return i;
+	}
+
+	void		xfsadexed_list::release()
+	{
+	}
 };

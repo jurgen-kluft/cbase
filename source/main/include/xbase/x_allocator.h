@@ -202,6 +202,26 @@ namespace xcore
 		inline void			destruct(T* obj) const							{ obj->~T(); }
 	};
 
+	class xfsadexed_list : public xfsadexed
+	{
+	public:
+		xfsadexed_list(void* array_item, u32 sizeof_item, u32 countof_item);
+		virtual void*		allocate();
+		virtual void		deallocate(void*);
+		virtual u32			size() const;
+		virtual void*		idx2ptr(u32 index) const;
+		virtual u32			ptr2idx(void* ptr) const;
+		virtual void		release();
+
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
+	private:
+		void*	m_data;
+		u32     m_sizeof;
+		u32     m_countof;
+		u32     m_freelist;
+		u32     m_freeindex;
+	};
+
 };
 
 #endif	///< __XBASE_ALLOCATOR_H__
