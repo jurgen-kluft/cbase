@@ -994,6 +994,7 @@ namespace xcore
 		#pragma inline_depth(255)
 
 		#define X_THREAD_LOCAL                __declspec(thread)
+		#define X_FINAL                       final
 
 		/// disable useless warnings
 		#pragma warning(disable:4800)
@@ -1072,6 +1073,7 @@ namespace xcore
 		#define X_OFFSET_OF(type, member)     (X_SIZE)&reinterpret_cast<const volatile char&>((((type *)0)->member))
 
 		#define X_THREAD_LOCAL                __declspec(thread)
+		#define X_FINAL                       final
 
 	#else
 		#error x_target, error; no compiler selected

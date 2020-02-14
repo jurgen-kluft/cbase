@@ -9,10 +9,6 @@ namespace xcore
 {
     class xalloc;
 
-    // this hierarchical bitlist has 2 modes set by 'invert'
-    // 1. false, searching quickly for '0' bits
-    // 2. true, searching quickly for '1' bits
-
     // Number of bits and how much memory they consume
     // 32/1Kbit/32Kbit/1Mbit/32Mbit/1Gbit
     //  4/  128/   4KB/128KB/   4MB/128MB ( * ~1.5)
@@ -29,20 +25,14 @@ namespace xcore
     class xhibitset
     {
     public:
-        enum EFind
-        {
-            FIND_0 = 0,
-            FIND_1 = 1
-        };
         inline xhibitset()
             : m_numbits(0)
             , m_maxlevel(0)
-            , m_find(FIND_0)
         {
         }
 
-        void init(u32* bits, u32 maxbits, EFind find);
-        void init(xalloc* alloc, u32 maxbits, EFind find);
+        void init(u32* bits, u32 maxbits);
+        void init(xalloc* alloc, u32 maxbits);
 
         void release(xalloc* alloc);
 
@@ -68,8 +58,7 @@ namespace xcore
         // 7 levels maximum, this means a maximum of 7 * 5 = 2^35 = 34.359.738.368
         u32* m_levels[7];
         u32  m_numbits;
-        s16  m_maxlevel;
-        s16  m_find;
+        s32  m_maxlevel;
     };
 }; // namespace xcore
 

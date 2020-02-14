@@ -1,7 +1,6 @@
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_allocator.h"
-
 #include "xbase/x_btree.h"
 
 namespace xcore
@@ -85,7 +84,7 @@ namespace xcore
         Type_Node = 0x80000000
     };
 
-    struct xbtree32::node_t
+    struct xbtree_idx::node_t
     {
         inline node_t() {}
         inline bool is_empty() const
@@ -117,7 +116,7 @@ namespace xcore
         return i & ~Type_Mask;
     }
 
-    void xbtree32::init(xfsadexed* node_allocator, xbtree32_kv* kv)
+    void xbtree_idx::init(xfsadexed* node_allocator, xbtree_idx_kv* kv)
     {
         m_node_alloc = node_allocator;
         node_t* root = m_node_alloc->construct<node_t>();
@@ -126,19 +125,19 @@ namespace xcore
         m_kv   = kv;
     }
 
-    void xbtree32::init_from_index(xfsadexed* node_allocator, xbtree32_kv* kv, u32 max_index, bool sorted)
+    void xbtree_idx::init_from_index(xfsadexed* node_allocator, xbtree_idx_kv* kv, u32 max_index, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr, max_index, sorted);
     }
 
-    void xbtree32::init_from_mask(xfsadexed* node_allocator, xbtree32_kv* kv, u64 mask, bool sorted)
+    void xbtree_idx::init_from_mask(xfsadexed* node_allocator, xbtree_idx_kv* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr, mask, sorted);
     }
 
-    bool xbtree32::add(u64 key, u32 value)
+    bool xbtree_idx::add(u64 key, u32 value)
     {
         s32     level      = 0;
         node_t* parentNode = (node_t*)m_node_alloc->idx2ptr(m_root);
@@ -188,7 +187,7 @@ namespace xcore
         return false;
     }
 
-    bool xbtree32::rem(u64 key, u32& value)
+    bool xbtree_idx::rem(u64 key, u32& value)
     {
         struct utils
         {
@@ -257,7 +256,7 @@ namespace xcore
         return false;
     }
 
-    bool xbtree32::find(u64 key, u32& value) const
+    bool xbtree_idx::find(u64 key, u32& value) const
     {
         s32           level = 0;
         node_t const* node  = (node_t*)m_node_alloc->idx2ptr(m_root);
@@ -291,7 +290,7 @@ namespace xcore
         return false;
     }
 
-    struct xbtree32::history_t
+    struct xbtree_idx::history_t
     {
         inline history_t() {}
 
@@ -312,7 +311,7 @@ namespace xcore
     };
 
     // Find an entry 'less-or-equal' to 'value'
-    bool xbtree32::lower_bound(u64 key, u32& value) const
+    bool xbtree_idx::lower_bound(u64 key, u32& value) const
     {
         // When traversing the tree to find a lower-bound we might fail.
         // So we have to keep a traversal history so that we can traverse
@@ -397,7 +396,7 @@ namespace xcore
         return false;
     }
 
-    bool xbtree32::upper_bound(u64 key, u32& value) const
+    bool xbtree_idx::upper_bound(u64 key, u32& value) const
     {
         // When traversing the tree to find a lower-bound we might fail.
         // So we have to keep a traversal history so that we can traverse
@@ -490,7 +489,7 @@ namespace xcore
     // ######################################################################################################################################
     // ######################################################################################################################################
 
-    struct xbtree::node_t
+    struct xbtree_ptr::node_t
     {
         inline node_t() {}
         inline bool is_empty() const { return m_nodes[0] == 0 && m_nodes[1] == 0 && m_nodes[2] == 0 && m_nodes[3] == 0; }
@@ -509,31 +508,31 @@ namespace xcore
         ASSERT(is_value(n));
         return (void*)((uptr)n);
     }
-    static inline xbtree::node_t* as_node_ptr(uptr n)
+    static inline xbtree_ptr::node_t* as_node_ptr(uptr n)
     {
         ASSERT(is_node(n));
-        return (xbtree::node_t*)((uptr)n & ~(u64)1);
+        return (xbtree_ptr::node_t*)((uptr)n & ~(u64)1);
     }
 
-    void xbtree::init(xfsa* node_allocator, xbtree_kv* kv)
+    void xbtree_ptr::init(xfsa* node_allocator, xbtree_ptr_kv* kv)
     {
         m_node_alloc = node_allocator;
         m_kv         = kv;
     }
 
-    void xbtree::init_from_index(xfsa* node_allocator, xbtree_kv* kv, u32 max_index, bool sorted)
+    void xbtree_ptr::init_from_index(xfsa* node_allocator, xbtree_ptr_kv* kv, u32 max_index, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_index(m_idxr, max_index, sorted);
     }
 
-    void xbtree::init_from_mask(xfsa* node_allocator, xbtree_kv* kv, u64 mask, bool sorted)
+    void xbtree_ptr::init_from_mask(xfsa* node_allocator, xbtree_ptr_kv* kv, u64 mask, bool sorted)
     {
         init(node_allocator, kv);
         initialize_from_mask(m_idxr, mask, sorted);
     }
 
-    bool xbtree::add(node_t*& root, u64 key, void* value)
+    bool xbtree_ptr::add(node_t*& root, u64 key, void* value)
     {
         if (root == nullptr)
         {
@@ -588,7 +587,7 @@ namespace xcore
         return false;
     }
 
-    bool xbtree::rem(node_t*& root, u64 key, void*& value)
+    bool xbtree_ptr::rem(node_t*& root, u64 key, void*& value)
     {
         struct utils
         {
@@ -703,7 +702,7 @@ namespace xcore
         return false;
     }
 
-    void xbtree::clear(node_t*& root)
+    void xbtree_ptr::clear(node_t*& root)
     {
         if (root == nullptr)
             return;
@@ -743,7 +742,7 @@ namespace xcore
 		root = nullptr;
     }
 
-    bool xbtree::find(node_t*& root, u64 key, void*& value) const
+    bool xbtree_ptr::find(node_t*& root, u64 key, void*& value) const
     {
         s32           level = 0;
         node_t const* node  = root;
@@ -777,7 +776,7 @@ namespace xcore
         return false;
     }
 
-    struct xbtree::history_t
+    struct xbtree_ptr::history_t
     {
         inline history_t() {}
 
@@ -798,7 +797,7 @@ namespace xcore
     };
 
     // Find an entry 'less-or-equal' to 'value'
-    bool xbtree::lower_bound(node_t*& root, u64 key, void*& value) const
+    bool xbtree_ptr::lower_bound(node_t*& root, u64 key, void*& value) const
     {
         // When traversing the tree to find a lower-bound we might fail.
         // So we have to keep a traversal history so that we can traverse
@@ -883,7 +882,7 @@ namespace xcore
         return false;
     }
 
-    bool xbtree::upper_bound(node_t *& root, u64 key, void*& value) const
+    bool xbtree_ptr::upper_bound(node_t *& root, u64 key, void*& value) const
     {
         // When traversing the tree to find a lower-bound we might fail.
         // So we have to keep a traversal history so that we can traverse

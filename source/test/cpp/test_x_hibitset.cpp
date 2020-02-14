@@ -1,4 +1,5 @@
-#include "xbase/x_bitlist.h"
+#include "xbase/x_hibitset.h"
+#include "xbase/x_memory.h"
 #include "xunittest/xunittest.h"
 
 using namespace xcore;
@@ -11,11 +12,17 @@ UNITTEST_SUITE_BEGIN(xhibitset)
 		UNITTEST_FIXTURE_TEARDOWN() {}
 
 		static u32 bitmap[4096];
-
-		UNITTEST_TEST(set)
+		static void clear_bitmap()
 		{
+			x_memset(bitmap, 0, sizeof(bitmap) * sizeof(bitmap[0]));
+		}
+
+		UNITTEST_TEST(set_and_is_set)
+		{
+			clear_bitmap();
+
 			xhibitset bset;
-			bset.init(bitmap, 8192, xhibitset::FIND_0);
+			bset.init(bitmap, 8192);
 			bset.reset();
 
 			CHECK_EQUAL(false, bset.is_set(10));
@@ -23,25 +30,54 @@ UNITTEST_SUITE_BEGIN(xhibitset)
 			CHECK_EQUAL(true, bset.is_set(10));
 		}
 
+		UNITTEST_TEST(set_and_is_set_many)
+		{
+			clear_bitmap();
+
+			xhibitset bset;
+			bset.init(bitmap, 8192);
+			bset.reset();
+
+			u32 b1;
+			CHECK_FALSE(bset.find(b1));
+
+			for (s32 b=0; b<1024; b++)
+			{
+				bset.set(b);
+				CHECK_TRUE(bset.find(b1));
+				CHECK_EQUAL(b, b1);
+				bset.clr(b);
+			}
+		}
+
 		UNITTEST_TEST(find_free_bit_1)
 		{
+			clear_bitmap();
+
 			xhibitset bset;
-			bset.init(bitmap, 8192, xhibitset::FIND_0);
+			bset.init(bitmap, 8192);
 			bset.reset();
+
+			for (s32 b=0; b<1024; b++)
+			{
+				bset.set(b);
+			}
 
 			for (s32 b=0; b<1024; b++)
 			{
 				u32 free_bit;
 				bset.find(free_bit);
 				CHECK_EQUAL(b, free_bit);
-				bset.set(b);
+				bset.clr(b);
 			}
 		}
 
 		UNITTEST_TEST(find_free_bit_2)
 		{
+			clear_bitmap();
+
 			xhibitset bset;
-			bset.init(bitmap, 8192, xhibitset::FIND_1);
+			bset.init(bitmap, 8192);
 			bset.reset();
 
 			// Should not be able to find any '1'

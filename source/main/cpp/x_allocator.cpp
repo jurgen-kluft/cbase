@@ -38,7 +38,35 @@ namespace xcore
 		return (xbyte*)array_item + (index * sizeof_item);
 	}
 
-	xfsadexed_list::xfsadexed_list(void* array_item, u32 sizeof_item, u32 countof_item)
+
+	xdexed_array::xdexed_array(void* array_item, u32 sizeof_item, u32 countof_item)
+		: m_data(array_item)
+		, m_sizeof(sizeof_item)
+		, m_countof(countof_item)
+	{
+	}
+
+	void*		xdexed_array::idx2ptr(u32 index) const
+	{
+		if (index == 0xffffffff)
+			return nullptr;
+		ASSERT(index < m_countof);
+		return get_item_ptr(m_data, index, m_sizeof);
+	}
+
+	u32			xdexed_array::ptr2idx(void* ptr) const
+	{
+		if (ptr == nullptr)
+			return 0xffffffff;
+		u32 const i = get_item_idx(m_data, ptr, m_sizeof);
+		ASSERT(i < m_countof);
+		return i;
+	}
+
+
+
+
+	xfsadexed_array::xfsadexed_array(void* array_item, u32 sizeof_item, u32 countof_item)
 		: m_data(array_item)
 		, m_sizeof(sizeof_item)
 		, m_countof(countof_item)
@@ -48,9 +76,9 @@ namespace xcore
 		ASSERT(m_sizeof >= sizeof(u32));	// Can only deal with items that are 4 bytes or more
 	}
 
-	u32			xfsadexed_list::size() const { return m_sizeof; }
+	u32			xfsadexed_array::size() const { return m_sizeof; }
 
-	void*		xfsadexed_list::allocate()
+	void*		xfsadexed_array::allocate()
 	{
 		u32 freeitem = 0xffffffff;
 		if (m_freelist != 0xffffffff)
@@ -69,7 +97,7 @@ namespace xcore
 		return get_item_ptr(m_data, freeitem, m_sizeof);
 	}
 
-	void		xfsadexed_list::deallocate(void* p)
+	void		xfsadexed_array::deallocate(void* p)
 	{
 		u32 const idx = ptr2idx(p);
 		u32* item = (u32*)p;
@@ -77,20 +105,20 @@ namespace xcore
 		m_freelist = idx;
 	}
 
-	void*		xfsadexed_list::idx2ptr(u32 index) const
+	void*		xfsadexed_array::idx2ptr(u32 index) const
 	{
 		ASSERT(index < m_freeindex);
 		return get_item_ptr(m_data, index, m_sizeof);
 	}
 
-	u32			xfsadexed_list::ptr2idx(void* ptr) const
+	u32			xfsadexed_array::ptr2idx(void* ptr) const
 	{
 		u32 const i = get_item_idx(m_data, ptr, m_sizeof);
 		ASSERT(i < m_freeindex);
 		return i;
 	}
 
-	void		xfsadexed_list::release()
+	void		xfsadexed_array::release()
 	{
 	}
 };

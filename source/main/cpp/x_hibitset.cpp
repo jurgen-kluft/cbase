@@ -1,4 +1,5 @@
 #include "xbase/x_target.h"
+#include "xbase/x_allocator.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_integer.h"
 #include "xbase/x_memory.h"
@@ -18,10 +19,9 @@ namespace xcore
         return numdwords * 4;
     }
 
-    void xhibitset::init(u32* bitlist, u32 maxbits, EFind find)
+    void xhibitset::init(u32* bitlist, u32 maxbits)
     {
 		m_numbits   = maxbits;
-        m_find      = (find == FIND_0) ? 0 : 1;
 
         // Figure out the pointer to every level
         u32  numbits = maxbits;
@@ -37,11 +37,12 @@ namespace xcore
         m_maxlevel = i;
     }
 
-    void xhibitset::init(xalloc* alloc, u32 maxbits, EFind find)
+    void xhibitset::init(xalloc* alloc, u32 maxbits)
     {
-        u32  ndwords = size_in_dwords(maxbits);
+        u32  const ndwords = size_in_dwords(maxbits);
         u32* bitlist = (u32*)alloc->allocate(ndwords * 4, sizeof(u32));
-        init(bitlist, maxbits, find);
+		x_memset(bitlist, 0, ndwords * 4);
+        init(bitlist, maxbits);
     }
 
     void xhibitset::release(xalloc* alloc)
@@ -52,7 +53,6 @@ namespace xcore
         }
         m_maxlevel = 0;
         m_numbits  = 0;
-        m_find     = 0;
     }
 
     // 5000 bits = 628 bytes = 157 u32 = (32768 bits level 0)
@@ -65,28 +65,9 @@ namespace xcore
 
     void xhibitset::reset()
     {
-        s32 i = 0;
-        u32 numbits = m_numbits;
-        while (numbits > 1)
-        {
-            u32* level = m_levels[i];
-            u32 numdwords = ((numbits + 31) / 32);
-            if (m_find == 0)
-            {
-	            x_memset(level, 0, numdwords * 4);
-				if (numbits < (numdwords * 32))
-				{
-					s32 shl = ((numdwords * 32) - numbits);
-					level[numdwords - 1] = (AllBitsSet << shl);
-				}
-            }
-            else
-            {
-	            x_memset(level, AllBitsSet, numdwords * 4);
-            }
-            numbits = (numbits + 31) >> 5;
-            i += 1;
-        }
+		u32* bitlist = m_levels[0];
+        u32  const ndwords = size_in_dwords(m_numbits);
+		x_memset(bitlist, 0, ndwords * 4);
     }
 
     void xhibitset::set(u32 bit)
@@ -98,24 +79,13 @@ namespace xcore
         while (i < m_maxlevel)
         {
             u32* level = m_levels[i];
-            u32  dwordIndex = bit / 32;
-            u32  dwordBit   = 1 << (bit & 31);
-            u32  dword0     = level[dwordIndex];
-            u32  dword1;
-            bool avalanche;
-            if (m_find == 0)
-            {
-                dword1    = dword0 | dwordBit;
-                avalanche = (dword0 != dword1 && dword1 == AllBitsSet);
-            }
-            else
-            {
-                dword1    = dword0 & ~dwordBit;
-                avalanche = (dword0 != dword1 && dword0 == AllBitsSet);
-            }
-
+            u32  const dwordIndex = bit / 32;
+            u32  const dwordBit   = 1 << (bit & 31);
+            u32  const dword0     = level[dwordIndex];
+            u32  const dword1     = dword0 | dwordBit;
             level[dwordIndex] = dword1;
 
+            bool const avalanche = (dword0 != dword1 && dword0 == 0);
             if (!avalanche)
                 break;
 
@@ -133,24 +103,14 @@ namespace xcore
         while (i < m_maxlevel)
         {
             u32* level = m_levels[i];
-            u32  dwordIndex = bit / 32;
-            u32  dwordBit   = 1 << (bit & 31);
-            u32  dword0     = level[dwordIndex];
-            u32  dword1;
-            bool avalanche;
-            if (m_find == 0)
-            {
-                dword1    = dword0 & ~dwordBit;
-                avalanche = (dword0 != dword1 && dword0 == AllBitsSet);
-            }
-            else
-            {
-                dword1    = dword0 | dwordBit;
-                avalanche = (dword0 != dword1 && dword1 == AllBitsSet);
-            }
+            u32  const dwordIndex = bit / 32;
+            u32  const dwordBit   = 1 << (bit & 31);
+            u32  const dword0     = level[dwordIndex];
+            u32  const dword1     = dword0 & ~dwordBit;
 
-            level[dwordIndex] = dword1;
+			level[dwordIndex] = dword1;
 
+            bool const avalanche  = (dword0 != dword1 && dword1 == 0);
             if (!avalanche)
                 break;
 
@@ -165,18 +125,18 @@ namespace xcore
         u32 const* level = m_levels[0];
         u32 dwordIndex = bit / 32;
         u32 dwordBit = bit & 31;
-        return ((level[dwordIndex]>>dwordBit) & 1) != m_find;
+        return ((level[dwordIndex]>>dwordBit) & 1) == 1;
     }
 
 	bool xhibitset::is_full() const
     {
 		u32 const* level = m_levels[m_maxlevel - 1];
-        return level[0] == ((1 - m_find) * 0xfffffffff);
+        return level[0] == 0xfffffffff;
     }
 
     bool xhibitset::find(u32& bit) const
     {
-        // Start at top level and find a '0' bit and move down
+        // Start at top level and find a '1' bit and move down
         u32 dwordIndex = 0;
 		u32 dwordBit = 0;
         s32 i = m_maxlevel - 1; 
@@ -184,10 +144,10 @@ namespace xcore
         {
             u32 const* level = m_levels[i];
             dwordIndex = (dwordIndex * 32) + dwordBit;
-            u32 dword0   = level[dwordIndex];
-            dwordBit = xfindFirstBit(~dword0);
-            if (dwordBit == 32)
+            u32 dword0 = level[dwordIndex];
+            if (dword0 == 0)
                 return false;
+            dwordBit = xfindFirstBit(dword0);
             i -= 1;
         }
 		bit = (dwordIndex * 32) + dwordBit;
@@ -228,7 +188,7 @@ namespace xcore
             {
                 if (il == 0)
                 {
-                    bit = (iw*32) + xfindFirstBit(w);
+                    bit = (iw * 32) + xfindFirstBit(w);
                     return true;
                 }
                 else

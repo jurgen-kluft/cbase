@@ -14,7 +14,7 @@ namespace xcore
 	public:
 		x_allocator_win32_system()
 			: mInitialized(0)
-			, mDefaultAlignment(4)
+			, mDefaultAlignment(sizeof(void*))
 			, mAllocationCount(0)
 		{
 		}

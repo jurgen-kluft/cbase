@@ -78,6 +78,11 @@ namespace xcore
 	public:
 		virtual void*		idx2ptr(u32 index) const = 0;
 		virtual u32			ptr2idx(void* ptr) const = 0;
+
+		template<typename T>
+		inline T*           idx2obj(u32 index) const { return static_cast<T*>(idx2ptr(index)); }
+		template<typename T>
+		inline u32          obj2idx(T* ptr) const { return ptr2idx(ptr); }
 	};
 
 	class xfsadexed : public xfsa, public xdexer
@@ -202,10 +207,24 @@ namespace xcore
 		inline void			destruct(T* obj) const							{ obj->~T(); }
 	};
 
-	class xfsadexed_list : public xfsadexed
+	class xdexed_array : public xdexer
 	{
 	public:
-		xfsadexed_list(void* array_item, u32 sizeof_item, u32 countof_item);
+		xdexed_array() : m_data(nullptr), m_sizeof(0), m_countof(0) {}
+		xdexed_array(void* array_item, u32 sizeof_item, u32 countof_item);
+		virtual void*		idx2ptr(u32 index) const;
+		virtual u32			ptr2idx(void* ptr) const;
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
+	private:
+		void*	m_data;
+		u32     m_sizeof;
+		u32     m_countof;
+	};
+
+	class xfsadexed_array : public xfsadexed
+	{
+	public:
+		xfsadexed_array(void* array_item, u32 sizeof_item, u32 countof_item);
 		virtual void*		allocate();
 		virtual void		deallocate(void*);
 		virtual u32			size() const;
