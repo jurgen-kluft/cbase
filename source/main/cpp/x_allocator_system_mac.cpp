@@ -69,20 +69,20 @@ namespace xcore
 			return mInitialized == 1;
 		}
 
-		virtual void*			allocate(u32 size, u32 alignment)
+		virtual void*			v_allocate(u32 size, u32 alignment)
 		{
 			void* ptr = mac_aligned_malloc(size, alignment);
 			++mAllocationCount;
 			return ptr;
 		}
 
-		virtual void			deallocate(void* ptr)
+		virtual void			v_deallocate(void* ptr)
 		{
 			--mAllocationCount;
 			mac_aligned_free(ptr);
 		}
 
-		virtual void			release()
+		virtual void			v_release()
 		{
 			ASSERTS(mAllocationCount==0, "ERROR: System Allocator is being released but still has allocations that are not freed");
 			mInitialized = 0;

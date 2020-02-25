@@ -16,7 +16,8 @@ namespace xcore
             numdwords += ((numbits + 31) / 32);
             numbits = (numbits + 31) >> 5;
         }
-        return numdwords * 4;
+		numdwords = xalignUp(numdwords, 2);
+        return numdwords * sizeof(u32);
     }
 
     void xhibitset::init(u32* bitlist, u32 maxbits)

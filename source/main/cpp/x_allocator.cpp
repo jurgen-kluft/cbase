@@ -13,17 +13,21 @@ namespace xcore
 	{
 	}
 
-	void*		xallocinplace::allocate(u32 size, u32 align)
+	void*		xallocinplace::v_allocate(u32 size, u32 align)
 	{
 		ASSERT(size <= m_size);
-		return m_data;
+		void* ptr = m_data;
+		m_data = (xbyte*)((u64)m_data + (u64)(align-1) & ~((u64)align - 1));
+		m_data = m_data + (size + (align-1) & ~(align - 1));
+		ASSERT(m_data <= (m_base + m_size));
+		return ptr;
 	}
 
-	void		xallocinplace::deallocate(void* p)
+	void		xallocinplace::v_deallocate(void* p)
 	{
 	}
 
-	void		xallocinplace::release()
+	void		xallocinplace::v_release()
 	{
 	}
 
@@ -46,7 +50,7 @@ namespace xcore
 	{
 	}
 
-	void*		xdexed_array::idx2ptr(u32 index) const
+	void*		xdexed_array::v_idx2ptr(u32 index) const
 	{
 		if (index == 0xffffffff)
 			return nullptr;
@@ -54,7 +58,7 @@ namespace xcore
 		return get_item_ptr(m_data, index, m_sizeof);
 	}
 
-	u32			xdexed_array::ptr2idx(void* ptr) const
+	u32			xdexed_array::v_ptr2idx(void* ptr) const
 	{
 		if (ptr == nullptr)
 			return 0xffffffff;
@@ -76,9 +80,9 @@ namespace xcore
 		ASSERT(m_sizeof >= sizeof(u32));	// Can only deal with items that are 4 bytes or more
 	}
 
-	u32			xfsadexed_array::size() const { return m_sizeof; }
+	u32			xfsadexed_array::v_size() const { return m_sizeof; }
 
-	void*		xfsadexed_array::allocate()
+	void*		xfsadexed_array::v_allocate()
 	{
 		u32 freeitem = 0xffffffff;
 		if (m_freelist != 0xffffffff)
@@ -97,7 +101,7 @@ namespace xcore
 		return get_item_ptr(m_data, freeitem, m_sizeof);
 	}
 
-	void		xfsadexed_array::deallocate(void* p)
+	void		xfsadexed_array::v_deallocate(void* p)
 	{
 		u32 const idx = ptr2idx(p);
 		u32* item = (u32*)p;
@@ -105,20 +109,20 @@ namespace xcore
 		m_freelist = idx;
 	}
 
-	void*		xfsadexed_array::idx2ptr(u32 index) const
+	void*		xfsadexed_array::v_idx2ptr(u32 index) const
 	{
 		ASSERT(index < m_freeindex);
 		return get_item_ptr(m_data, index, m_sizeof);
 	}
 
-	u32			xfsadexed_array::ptr2idx(void* ptr) const
+	u32			xfsadexed_array::v_ptr2idx(void* ptr) const
 	{
 		u32 const i = get_item_idx(m_data, ptr, m_sizeof);
 		ASSERT(i < m_freeindex);
 		return i;
 	}
 
-	void		xfsadexed_array::release()
+	void		xfsadexed_array::v_release()
 	{
 	}
 };

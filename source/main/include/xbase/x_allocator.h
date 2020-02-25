@@ -18,15 +18,15 @@ namespace xcore
 		static void			init_system();
 		static xalloc*		get_system();
 		
-		virtual void*		allocate(u32 size, u32 align) = 0;			// Allocate memory with alignment
-		virtual void		deallocate(void* p) = 0;						// Deallocate/Free memory
-
-		virtual void		release() = 0;
+		void*				allocate(u32 size, u32 alignment) { return v_allocate(size, alignment); }
+		void*				allocate(u32 size) { return v_allocate(size, sizeof(void*)); }
+		void				deallocate(void* ptr) { v_deallocate(ptr); }
+		void				release() { v_release(); }
 
 		template<typename T, typename... Args>
 		T*			construct(Args... args)
 		{
-			void * mem = allocate(sizeof(T), sizeof(void*));
+			void * mem = v_allocate(sizeof(T), sizeof(void*));
 			T* object = new (mem) T(args...);
 			return object;
 		}
@@ -35,10 +35,14 @@ namespace xcore
 		void		destruct(T* p)
 		{
 			p->~T();
-			deallocate(p);
+			v_deallocate(p);
 		}
 
 	protected:
+		virtual void*		v_allocate(u32 size, u32 align) = 0;			// Allocate memory with alignment
+		virtual void		v_deallocate(void* p) = 0;						// Deallocate/Free memory
+		virtual void		v_release() = 0;
+
 		virtual				~xalloc() {}
 	};
 
@@ -46,11 +50,10 @@ namespace xcore
 	class xfsa
 	{
 	public:
-		virtual u32			size() const = 0;
-		virtual void*		allocate() = 0;
-		virtual void		deallocate(void*) = 0;
-
-		virtual void		release() = 0;
+		inline u32		size() const { return v_size(); }
+		inline void*	allocate() { return v_allocate(); }
+		inline void		deallocate(void* ptr) { v_deallocate(ptr); }
+		inline void		release() { v_release(); }
 
 		template<typename T, typename... Args>
 		T*			construct(Args... args)
@@ -69,6 +72,11 @@ namespace xcore
 		}
 
 	protected:
+		virtual u32			v_size() const = 0;
+		virtual void*		v_allocate() = 0;
+		virtual void		v_deallocate(void*) = 0;
+		virtual void		v_release() = 0;
+
 		virtual				~xfsa() {}
 	};
 
@@ -76,29 +84,31 @@ namespace xcore
 	class xdexer
 	{
 	public:
-		virtual void*		idx2ptr(u32 index) const = 0;
-		virtual u32			ptr2idx(void* ptr) const = 0;
+		inline void*		idx2ptr(u32 index) const { return v_idx2ptr(index); }
+		inline u32			ptr2idx(void* ptr) const { return v_ptr2idx(ptr); }
 
 		template<typename T>
-		inline T*           idx2obj(u32 index) const { return static_cast<T*>(idx2ptr(index)); }
+		inline T*           idx2obj(u32 index) const { return static_cast<T*>(v_idx2ptr(index)); }
 		template<typename T>
-		inline u32          obj2idx(T* ptr) const { return ptr2idx(ptr); }
+		inline u32          obj2idx(T* ptr) const { return v_ptr2idx(ptr); }
+
+	protected:
+		virtual void*		v_idx2ptr(u32 index) const = 0;
+		virtual u32			v_ptr2idx(void* ptr) const = 0;
 	};
 
 	class xfsadexed : public xfsa, public xdexer
 	{
 	public:
 		xfsadexed() {}
-
-	protected:
-		virtual			~xfsadexed() {}
+		~xfsadexed() {}
 	};
 
 	// Global new and delete
 	template<typename T, typename... Args>
 	T*			xnew(Args... args)
 	{
-		void * mem = xalloc::get_system()->allocate(sizeof(T), sizeof(void*));
+		void * mem = xalloc::get_system()->allocate(sizeof(T));
 		T* object = new (mem) T(args...);
 		return object;
 	}
@@ -122,7 +132,8 @@ namespace xcore
 	public:
 						xalloc_stack(xbuffer& storage);
 
-		virtual void*	allocate(u32 size, u32 align)
+	protected:
+		virtual void*	v_allocate(u32 size, u32 align)
 		{
 			if (m_ptr < m_end && align_ptr(m_ptr+size, align) <= m_end)
 			{
@@ -134,7 +145,7 @@ namespace xcore
 			return nullptr;
 		}
 
-		virtual void	deallocate(void* p)
+		virtual void	v_deallocate(void* p)
 		{
 			if (p != nullptr)
 			{
@@ -145,19 +156,23 @@ namespace xcore
 			}
 		}
 
-		virtual void	release() { m_base=nullptr; m_ptr=nullptr; m_end=nullptr; }
+		virtual void	v_release() { m_base=nullptr; m_ptr=nullptr; m_end=nullptr; }
 	};
 
-	// Allocate a single object in-place
+	// Allocate a one or more objects in-place
 	class xallocinplace : public xalloc
 	{
+		xbyte*				m_base;
 		xbyte*				m_data;
 		u64					m_size;
+
 	public:
-		inline				xallocinplace(xbyte* data, u64 size) : m_data(data), m_size(size) {}
-		virtual void*		allocate(u32 size, u32 align);
-		virtual void		deallocate(void* p);
-		virtual void		release();
+		inline				xallocinplace(xbyte* data, u64 size) : m_base(data), m_data(data), m_size(size) {}
+
+	protected:
+		virtual void*		v_allocate(u32 size, u32 align);
+		virtual void		v_deallocate(void* p);
+		virtual void		v_release();
 	};
 
 	template<u32 L>
@@ -212,9 +227,12 @@ namespace xcore
 	public:
 		xdexed_array() : m_data(nullptr), m_sizeof(0), m_countof(0) {}
 		xdexed_array(void* array_item, u32 sizeof_item, u32 countof_item);
-		virtual void*		idx2ptr(u32 index) const;
-		virtual u32			ptr2idx(void* ptr) const;
+
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
+	protected:
+		virtual void*		v_idx2ptr(u32 index) const;
+		virtual u32			v_ptr2idx(void* ptr) const;
+
 	private:
 		void*	m_data;
 		u32     m_sizeof;
@@ -225,14 +243,18 @@ namespace xcore
 	{
 	public:
 		xfsadexed_array(void* array_item, u32 sizeof_item, u32 countof_item);
-		virtual void*		allocate();
-		virtual void		deallocate(void*);
-		virtual u32			size() const;
-		virtual void*		idx2ptr(u32 index) const;
-		virtual u32			ptr2idx(void* ptr) const;
-		virtual void		release();
+		~xfsadexed_array() {}
 
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
+
+	protected:
+		virtual void*		v_allocate();
+		virtual void		v_deallocate(void*);
+		virtual u32			v_size() const;
+		virtual void*		v_idx2ptr(u32 index) const;
+		virtual u32			v_ptr2idx(void* ptr) const;
+		virtual void		v_release();
+
 	private:
 		void*	m_data;
 		u32     m_sizeof;

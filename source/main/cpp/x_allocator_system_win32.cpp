@@ -31,7 +31,7 @@ namespace xcore
 			return mInitialized == 1;
 		}
 
-		virtual void*			allocate(u32 size, u32 alignment)
+		virtual void*			v_allocate(u32 size, u32 alignment)
 		{
 #ifdef TARGET_DEBUG
 			void* mem = _aligned_malloc_dbg(size, alignment, NULL, 0);
@@ -42,7 +42,7 @@ namespace xcore
 			return mem;
 		}
 
-		virtual void			deallocate(void* ptr)
+		virtual void			v_deallocate(void* ptr)
 		{
 			--mAllocationCount;
 #ifdef TARGET_DEBUG
@@ -52,7 +52,7 @@ namespace xcore
 #endif
 		}
 
-		virtual void			release()
+		virtual void			v_release()
 		{
 			ASSERTS(mAllocationCount==0, "ERROR: System Allocator is being released but still has allocations that are not freed");
 			mInitialized = 0;
