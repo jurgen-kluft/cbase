@@ -31,10 +31,10 @@ public:
 		return object;
 	}
 
-	template <typename T, u32 M = 0, typename... Args>
-	T *placement(Args... args)
+	template <typename T, typename... Args>
+	T *placement(u32 EXTRA = 0, Args... args)
 	{
-		void *mem = v_allocate(sizeof(T) + M, sizeof(void *));
+		void *mem = v_allocate(sizeof(T) + EXTRA, sizeof(void *));
 		T *object = new (mem) T(args...);
 		return object;
 	}
