@@ -111,12 +111,16 @@ namespace xcore
 
 	void*		xfsadexed_array::v_idx2ptr(u32 index) const
 	{
+		if (index == 0xffffffff)
+			return nullptr;
 		ASSERT(index < m_freeindex);
 		return get_item_ptr(m_data, index, m_sizeof);
 	}
 
 	u32			xfsadexed_array::v_ptr2idx(void* ptr) const
 	{
+		if (ptr == nullptr)
+			return 0xffffffff;
 		u32 const i = get_item_idx(m_data, ptr, m_sizeof);
 		ASSERT(i < m_freeindex);
 		return i;
