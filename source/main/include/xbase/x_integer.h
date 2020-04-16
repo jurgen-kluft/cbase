@@ -54,10 +54,10 @@ namespace xcore
     }
     template <class T> T xclamp(T integerA, T low, T high); ///< Return the clamp value
 
-    inline s32   xalign(s32 integer, s32 alignment);     ///< Return the aligned value of integer
-    inline s32   xalignDown(s32 integer, s32 alignment); ///< Return the aligned value of integer
-    inline s32   xalignUp(s32 integer, s32 alignment);   ///< Return the aligned value of integer
-    inline xbool xisAligned(s32 integer, s32 alignment); ///< Return xTRUE if integer is aligned
+    inline u32   xalign(u32 integer, u32 alignment);     ///< Return the aligned value of integer
+    inline u32   xalignDown(u32 integer, u32 alignment); ///< Return the aligned value of integer
+    inline u32   xalignUp(u32 integer, u32 alignment);   ///< Return the aligned value of integer
+    inline xbool xisAligned(u32 integer, u32 alignment); ///< Return xTRUE if integer is aligned
     inline s32   xabs(s32 integer);                      ///< Return the absolute value of integer
     inline s32   xneg(s32 integer, bool inDoNotNegate);  ///< Return the conditionally negated value of integer
     inline s32   xsqr(s32 integer);                      ///< Return the square of integer
@@ -65,13 +65,13 @@ namespace xcore
     inline s32   xmod(s32 integer, s32 inModuloValue);   ///< Return the modulo of integer using inModuloValue
     inline s32   xgcd(s32 inIntegerA, s32 integerB);     ///< Greatest common denominator (biggest modulo value of both integers)
     inline s32   xaverage(s32 integerA, s32 integerB);   ///< Calculate average of A & B without overflow or s64 use
-    inline xbool xispo2(s32 integer);                    ///< Check if integer is a power-of-two
+    inline xbool xispo2(u32 integer);                    ///< Check if integer is a power-of-two
     inline u32   xceilpo2(u32 integer);                  ///< Return the smallest power-of-two larger than integer
     inline u32   xfloorpo2(u32 integer);                 ///< Return the biggest power-of-two smaller than integer
     inline u32   xbitReverse(u32 integer);               ///< Reverse bits in 32 bit word
     inline s32   xcountBits(u32 integer);                ///< count one bits in 32 bit word
     inline s32   xcountBits(u64 integer);                ///< count one bits in 32 bit word
-    inline s32   xilog2(s32 integer);                    ///< Log2 of an integer
+    inline s32   xilog2(u32 integer);                    ///< Log2 of an integer
     inline s32   xcountTrailingZeros(u16 integer);       ///< find the number of trailing zeros in 32-bit v
     inline s32   xcountLeadingZeros(u16 integer);        ///< find the number of leading zeros in 32-bit v
     inline s32   xcountTrailingZeros(u32 integer);       ///< find the number of trailing zeros in 32-bit v

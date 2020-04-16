@@ -77,7 +77,7 @@ inline T        xclamp(T integer, T low, T high)
  * Return the aligned value of integer
  * Same as alignUp
  */
-inline s32       xalign(s32 integer, s32 alignment)
+inline u32       xalign(u32 integer, u32 alignment)
 {
 	ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 	return (integer) & (~(alignment-1));
@@ -86,7 +86,7 @@ inline s32       xalign(s32 integer, s32 alignment)
 /**
  * Return the floor based aligned value of integer
  */
-inline s32        xalignDown(s32 integer, s32 alignment)
+inline u32        xalignDown(u32 integer, u32 alignment)
 {
 	ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 	return (integer) & (~(alignment-1));
@@ -95,7 +95,7 @@ inline s32        xalignDown(s32 integer, s32 alignment)
 /**
  * Return the ceiling based aligned value of integer
  */
-inline s32        xalignUp(s32 integer, s32 alignment)
+inline u32        xalignUp(u32 integer, u32 alignment)
 {
 	ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 	return ((integer + (alignment-1)) & (~(alignment-1)));
@@ -104,7 +104,7 @@ inline s32        xalignUp(s32 integer, s32 alignment)
 /**
  * Check if integer is aligned
  */
-inline xbool       xisAligned(s32 integer, s32 alignment)
+inline xbool       xisAligned(u32 integer, u32 alignment)
 {
 	ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 	return integer == ((integer) & (~(alignment-1)));
@@ -181,7 +181,7 @@ inline s32        xaverage(s32 inIntegerA, s32 inIntegerB)
 /**
  * Check if integer is a power-of-two
  */
-inline xbool       xispo2(s32 inInteger)
+inline xbool       xispo2(u32 inInteger)
 {
     return (inInteger!=0) && (((inInteger) & (inInteger-1)) == 0);
 }
@@ -266,7 +266,7 @@ inline s32        xcountBits(u64 i)
 /**
  * Log2 of an integer
  */
-s32               xilog2(s32 inInteger)
+s32               xilog2(u32 inInteger)
 {
     s32 r = 0;
     s32 i = inInteger;
@@ -328,7 +328,7 @@ inline u32        xror32(u32 inInteger, u32 shift)
  *     x_IsAlign x_AlignLower
  */
 
-template< class T > T xalign( T addr, s32 alignTo );
+template< class T > T xalign( T addr, u32 alignTo );
 
 /**
  * Summary:
@@ -343,7 +343,7 @@ template< class T > T xalign( T addr, s32 alignTo );
  *     x_Align x_IsAlign
  */
 
-template< class T > T xalign_floor(T addr, s32 alignTo);
+template< class T > T xalign_floor(T addr, u32 alignTo);
 
 
 /**
@@ -358,7 +358,7 @@ template< class T > T xalign_floor(T addr, s32 alignTo);
  * See Also:
  *     x_Align x_AlignLower
  */
-template< class T > xbool xaligned( T addr, s32 alignTo );
+template< class T > xbool xaligned( T addr, u32 alignTo );
 
 
 /**
@@ -374,27 +374,12 @@ template< class T > xbool xaligned( T addr, s32 alignTo );
  */
 #define x_Bit(A) ((1)<<(A))
 
- /** Summary:
- *     It is a function used to test whether an integer number is a power of two.
- * Arguments:
- *     N    - Test if a number is a power of two.
- * Returns:
- *     xTRUE if it is a power of two, xFALSE if it is not.
- * Description:
- *     It is a function used to test whether an integer number is a power of two.
- */
-template< class T > 
-inline xbool xpowof2(T n) 
-{ 
-	return xbool( n==1 || ((n&(n-1))==0) ); 
-}
-
 /**
  * x_Align functions
  */
 
 template< class T > inline 
-T xalign( T addr, s32 alignTo ) 
+T xalign( T addr, u32 alignTo ) 
 {
     return T( ( (((u64)(addr)) + ((alignTo)-1)) & (-(alignTo)) )); 
 }
@@ -402,7 +387,7 @@ T xalign( T addr, s32 alignTo )
 //------------------------------------------------------------------------------
 
 template< class T > inline 
-T xalign_floor( T addr, s32 alignTo ) 
+T xalign_floor( T addr, u32 alignTo ) 
 { 
     return T( ( (((u64)(addr))) & (-(alignTo)) )); 
 }
@@ -410,7 +395,7 @@ T xalign_floor( T addr, s32 alignTo )
 //------------------------------------------------------------------------------
 
 template< class T > inline 
-xbool xaligned( T addr, s32 alignTo ) 
+xbool xaligned( T addr, u32 alignTo ) 
 { 
     return xbool((((u64)addr) & (alignTo-1)) == 0);
 }
