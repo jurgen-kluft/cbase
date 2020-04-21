@@ -23,8 +23,9 @@ namespace xcore
 		return ptr;
 	}
 
-	void		xallocinplace::v_deallocate(void* p)
+	u32	 	    xallocinplace::v_deallocate(void* p)
 	{
+		return 0;
 	}
 
 	void		xallocinplace::v_release()
@@ -101,12 +102,13 @@ namespace xcore
 		return get_item_ptr(m_data, freeitem, m_sizeof);
 	}
 
-	void		xfsadexed_array::v_deallocate(void* p)
+	u32		xfsadexed_array::v_deallocate(void* p)
 	{
 		u32 const idx = ptr2idx(p);
 		u32* item = (u32*)p;
 		*item = m_freelist;
 		m_freelist = idx;
+		return m_sizeof;
 	}
 
 	void*		xfsadexed_array::v_idx2ptr(u32 index) const
