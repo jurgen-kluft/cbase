@@ -63,7 +63,7 @@ namespace xcore
         template <typename T, typename... Args> T* construct(Args... args)
         {
             ASSERT(sizeof(T) <= size());
-            void* mem    = allocate();
+            void* mem    = v_allocate();
             T*    object = new (mem) T(args...);
             return object;
         }
@@ -71,7 +71,7 @@ namespace xcore
         template <typename T> void destruct(T* p)
         {
             p->~T();
-            deallocate(p);
+            v_deallocate(p);
         }
 
     protected:
@@ -153,7 +153,7 @@ namespace xcore
                 if (m_cnt == 0)
                     m_ptr = m_base;
             }
-			return 0;
+            return 0;
         }
 
         virtual void v_release()
