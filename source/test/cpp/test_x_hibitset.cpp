@@ -14,7 +14,8 @@ UNITTEST_SUITE_BEGIN(xhibitset)
 		static u32 bitmap[4096];
 		static void clear_bitmap()
 		{
-			x_memset(bitmap, 0, sizeof(bitmap) * sizeof(bitmap[0]));
+			for (s32 i=0; i<4096; ++i)
+				bitmap[i] = 0;
 		}
 
 		UNITTEST_TEST(set_and_is_set)

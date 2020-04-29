@@ -381,7 +381,7 @@ template< class T > xbool xaligned( T addr, u32 alignTo );
 template< class T > inline 
 T xalign( T addr, u32 alignTo ) 
 {
-    return T( ( (((u64)(addr)) + ((alignTo)-1)) & (-(alignTo)) )); 
+    return T( ( (addr) & (~(alignTo - 1)) )); 
 }
 
 //------------------------------------------------------------------------------
@@ -389,7 +389,7 @@ T xalign( T addr, u32 alignTo )
 template< class T > inline 
 T xalign_floor( T addr, u32 alignTo ) 
 { 
-    return T( ( (((u64)(addr))) & (-(alignTo)) )); 
+    return T( ( (((addr))) & (~(alignTo - 1)) )); 
 }
 
 //------------------------------------------------------------------------------
@@ -397,7 +397,7 @@ T xalign_floor( T addr, u32 alignTo )
 template< class T > inline 
 xbool xaligned( T addr, u32 alignTo ) 
 { 
-    return xbool((((u64)addr) & (alignTo-1)) == 0);
+    return xbool(((addr) & (alignTo - 1)) == 0);
 }
 
 

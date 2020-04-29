@@ -209,11 +209,11 @@ namespace xcore
 #define XCORE_CLASS_NEW_DELETE(get_allocator_func, align)                                                     \
     void* operator new(xcore::xsize_t num_bytes, void* mem) { return mem; }                                   \
     void  operator delete(void* mem, void*) {}                                                                \
-    void* operator new(xcore::xsize_t num_bytes) { return get_allocator_func()->allocate(num_bytes, align); } \
+    void* operator new(xcore::xsize_t num_bytes) { ASSERT(num_bytes < (xcore::xsize_t)2*1024*1024*1024); return get_allocator_func()->allocate((u32)num_bytes, align); } \
     void  operator delete(void* mem) { get_allocator_func()->deallocate(mem); }
 
 #define XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator_func, align)                                                 \
-    void* operator new[](xcore::xsize_t num_bytes) { return get_allocator_func()->allocate(num_bytes, align); } \
+    void* operator new[](xcore::xsize_t num_bytes) { ASSERT(num_bytes < (xcore::xsize_t)2*1024*1024*1024); return get_allocator_func()->allocate((u32)num_bytes, align); } \
     void  operator delete[](void* mem) { get_allocator_func()->deallocate(mem); }
 
     template <class T> class x_cdtor_default

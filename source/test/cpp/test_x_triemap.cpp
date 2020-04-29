@@ -28,7 +28,7 @@ namespace xcore
 	// virtual memory allocator.
 
 
-	typedef	u32		key_t;
+	typedef	u64		key_t;
 	typedef	u32		val_t;
 
 	// Note: 64 bit keys and a FSA allocator
@@ -396,8 +396,8 @@ namespace xcore
 			m_freelist = nullptr;
 		}
 
-		virtual u32			size() const { return sizeof(data_t); }
-		virtual void*		allocate()
+		virtual u32			v_size() const { return sizeof(data_t); }
+		virtual void*		v_allocate()
 		{
 			void* ptr;
 			if (m_pivot < m_capacity)
@@ -412,14 +412,15 @@ namespace xcore
 			return ptr;
 		}
 
-		virtual void		deallocate(void* ptr)
+		virtual u32			v_deallocate(void* ptr)
 		{
 			data_t* d = (data_t*)ptr;
 			d->m_next = m_freelist;
 			m_freelist = d;
+			return sizeof(data_t);
 		}
 
-		virtual void		release() {}
+		virtual void		v_release() {}
 
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
 
