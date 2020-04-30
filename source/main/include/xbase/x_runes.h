@@ -426,6 +426,14 @@ namespace xcore
             pcrune m_cur;
             pcrune m_end;
         };
+
+        class alloc
+        {
+        public:
+            virtual runes allocate(s32 len, s32 cap) = 0;
+            virtual void  deallocate(runes& slice)   = 0;
+        };
+
     } // namespace utf16
 
     namespace utf32
