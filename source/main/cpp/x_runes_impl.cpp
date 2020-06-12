@@ -1,6 +1,5 @@
 #ifndef XNAMESPACE_NAME
 	#define XNAMESPACE_NAME utfxx
-	#include "xbase/x_runes.h"
 	#include "xbase/x_debug.h"
 	#include "xbase/x_integer.h"
 	#include "xbase/x_console.h"
@@ -133,7 +132,7 @@ namespace xcore
             pcrune str_cursor = _str.m_str;
             pcrune str_end    = _str.m_end - _find.size();
 
-            while (str_cursor < str_end)
+            while (str_cursor <= str_end)
             {
                 crunes    str_sel(str_cursor, str_cursor + _find.size());
                 s32 const cmp = compare(str_sel, _find, _casesensitive);
@@ -389,9 +388,12 @@ namespace xcore
         }
 
         crunes selectOverlap(const crunes& lstr, const crunes& rstr)
-        { // Find the last character of 'lstr' in 'rstr'
+        {
+			// Find the last character of 'lstr' in 'rstr'
             // When found start to expand the string in 'lstr' to the left
             // while keep checking if 'rstr' also contains that character
+			
+			ASSERT(false);	// TODO
 
             return lstr;
         }
@@ -402,23 +404,31 @@ namespace xcore
                 return -1;
             if (_lstr.size() > _rstr.size())
                 return 1;
+            if (_lstr.size() == 0)
+				return 0;
 
             pcrune lstr = _lstr.m_str;
             pcrune rstr = _rstr.m_str;
-            while (lstr < _lstr.m_end && rstr < _rstr.m_end)
+
+			uchar32 lc, rc;
+            if (_casesensitive)
             {
-                uchar32 lc = *lstr++;
-                uchar32 rc = *rstr++;
-                if (!_casesensitive)
-                {
-                    lc = utf32::to_lower(lc);
-                    rc = utf32::to_lower(rc);
-                }
-                if (lc < rc)
-                    return -1;
-                else if (lc > rc)
-                    return 1;
-            }
+				do
+				{
+					lc = *lstr++;
+					rc = *rstr++;
+				} while (lc == rc && lstr < _lstr.m_end);
+			}
+			else
+			{
+				do
+				{
+                    lc = utf32::to_lower(*lstr++);
+                    rc = utf32::to_lower(*rstr++);
+				} while (lc == rc && lstr < _lstr.m_end);
+			}
+			if (lc < rc) return -1;
+			else if (lc > rc) return 1;
             return 0;
         }
 
@@ -470,7 +480,7 @@ namespace xcore
         runes findLastSelectUntilIncluded(const runes& _str, uchar32 _find, bool _casesensitive)
         {
             crunes cstr(_str);
-            crunes found = findSelectUntilIncluded(cstr, _find, _casesensitive);
+            crunes found = findLastSelectUntilIncluded(cstr, _find, _casesensitive);
             return crunes_to_runes(_str, found);
         }
 
@@ -897,6 +907,11 @@ namespace xcore
             return true;
         }
 
+		bool    is_quoted(crunes const& str, uchar32 quote) 
+		{
+			return is_delimited(str, quote, quote); 
+		}
+
         bool is_delimited(crunes const& _str, uchar32 delimit_left, uchar32 delimit_right)
         {
             uchar32 first = first_char(_str);
@@ -1030,10 +1045,10 @@ namespace xcore
 
         void removeSelection(runes& str, crunes const& selection)
         {
-            prune  src = (prune)selection.m_end;
             prune  dst = (prune)selection.m_str;
+            prune  src = (prune)selection.m_end;
             pcrune end = str.m_end;
-            while (dst < end)
+            while (src < end)
             {
                 *dst++ = *src++;
             }
@@ -1043,10 +1058,10 @@ namespace xcore
 
         void keepOnlySelection(runes& str, crunes const& keep)
         {
-            prune  src = (prune)keep.m_str;
             prune  dst = (prune)str.m_str;
+            prune  src = (prune)keep.m_str;
             pcrune end = keep.m_end;
-            while (dst < end)
+            while (src < end)
             {
                 *dst++ = *src++;
             }
@@ -1169,11 +1184,8 @@ namespace xcore
         }
 
         void insert(runes& str, crunes const& insert) {}
-
         void insert(runes& str, crunes const& insert, alloc* allocator, s32 size_alignment) {}
-
         void insert(runes& str, crunes const& selection, crunes const& insert) {}
-
         void insert(runes& str, crunes const& selection, crunes const& insert, alloc* allocator, s32 size_alignment) {}
 
         void trim(runes& str)
@@ -1400,21 +1412,21 @@ namespace xcore
 
 
 
-
-
-        void copy(crunes const& _src, runes& _dest)
+        void resize(runes& str, s32 cap, alloc* allocator, s32 size_alignment)
         {
-            _dest.m_end = _dest.m_str;
-            pcrune src  = _src.m_str;
-            while (_dest.m_end < _dest.m_eos)
-            {
-                if (src == _src.m_end)
-                {
-                    *_dest.m_end = TERMINATOR;
-                    break;
-                }
-                *_dest.m_end++ = *src++;
-            }
+            runes nstr = allocator->allocate(0, cap);
+			if (str.is_valid())
+			{
+				copy(str, nstr);
+				allocator->deallocate(str);
+			}
+            str = nstr;
+        }
+
+        void copy(crunes const& src, runes& dst)
+        {
+            dst.m_end = dst.m_str;
+			concatenate(dst, src);
         }
 
         void concatenate(runes& str, crunes const& con)
@@ -1432,13 +1444,11 @@ namespace xcore
             }
         }
 
-        void resize(runes& str, s32 cap, alloc* allocator, s32 size_alignment)
-        {
-            runes nstr = allocator->allocate(0, cap);
-            copy(str, nstr);
-            allocator->deallocate(str);
-            str = nstr;
-        }
+        void copy(const crunes& src, runes& dst, alloc* allocator, s32 size_alignment)
+		{
+            dst.m_end = dst.m_str;
+			concatenate(dst, src, allocator, size_alignment);
+		}
 
         void concatenate(runes& str, const crunes& concat, alloc* allocator, s32 size_alignment)
         {
@@ -1460,7 +1470,7 @@ namespace xcore
             concatenate(str, concat1);
             concatenate(str, concat2);
         }
-    } // namespace XNAMESPACE_NAME
+    }
 
 } // namespace xcore
 

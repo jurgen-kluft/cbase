@@ -149,7 +149,7 @@ namespace xcore
             s32 cap() const { return (s32)(m_eos - m_str); }
 
             bool is_empty() const { return m_str == m_end; }
-            bool is_valid() const { return m_str != nullptr && m_end < m_eos; }
+            bool is_valid() const { return m_str != nullptr && m_end <= m_eos; }
             void reset() { m_end = m_str; }
             void clear()
             {
@@ -206,7 +206,7 @@ namespace xcore
         };
         struct crunes
         {
-            inline crunes() : m_str(""), m_cur(m_str), m_end(m_str) {}
+            inline crunes() : m_str("\0"), m_cur(m_str), m_end(m_str) {}
             inline crunes(pcrune _str) : m_str(_str), m_cur(_str), m_end(_str)
             {
                 while (*m_end != TERMINATOR)
@@ -226,12 +226,12 @@ namespace xcore
 
             s32 size() const { return (s32)(s64)(m_end - m_str); }
 
-            bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
+            bool is_valid() const { return m_str != nullptr && m_cur <= m_end; }
             bool is_empty() const { return m_str == m_end; }
             void reset() { m_cur = m_str; }
             void clear()
             {
-                m_str = "";
+                m_str = "\0";
                 m_cur = m_str;
                 m_end = m_str;
             }
@@ -296,8 +296,20 @@ namespace xcore
         struct runes
         {
             inline runes() : m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
-            inline runes(prune _str, prune _end, prune _eos) : m_str(_str), m_end(_end), m_eos(_eos) {}
-            inline runes(runes const& other) : m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos) {}
+            inline runes(prune _str, prune _end, prune _eos)
+				: m_str(_str)
+				, m_end(_end)
+				, m_eos(_eos)
+			{
+
+			}
+			inline runes(runes const& other) 
+				: m_str(other.m_str)
+				, m_end(other.m_end)
+				, m_eos(other.m_eos)
+			{
+
+			}
 
             bool is_empty() const { return m_str == m_end; }
             void reset() { m_end = m_str; }
@@ -324,14 +336,47 @@ namespace xcore
 
         struct crunes
         {
-            inline crunes() : m_str(nullptr), m_end(nullptr) {}
-            inline crunes(pcrune _str, pcrune _end) : m_str(_str), m_end(_end) {}
-            inline crunes(runes const& other) : m_str(other.m_str), m_end(other.m_end) {}
-            inline crunes(crunes const& other) : m_str(other.m_str), m_end(other.m_end) {}
-            bool is_empty() const { return m_str == m_end; }
+            inline crunes() : m_str((pcrune)"\0\0"), m_end(m_str) {}
+            inline crunes(pcrune _str)
+				: m_str(_str)
+				, m_end(nullptr)
+			{
+				if (m_end == nullptr)
+				{
+					m_end = m_str;
+					while (utf::read(m_end, nullptr))
+					{
+					}
+				}
+			}
+            inline crunes(pcrune _str, pcrune _end)
+				: m_str(_str)
+				, m_end(_end)
+			{
+				if (m_end == nullptr)
+				{
+					m_end = m_str;
+					while (utf::read(m_end, nullptr))
+					{
+					}
+				}
+			}
+
+            inline crunes(runes const& other) 
+				: m_str(other.m_str)
+				, m_end(other.m_end)
+			{
+			}
+            inline crunes(crunes const& other) 
+				: m_str(other.m_str)
+				, m_end(other.m_end)
+			{
+			}
+            
+			bool is_empty() const { return m_str == m_end; }
             void clear()
             {
-                m_str = (pcrune) "";
+                m_str = (pcrune)"\0\0";
                 m_end = m_str;
             }
             crunes& operator=(crunes const& other)
@@ -448,7 +493,7 @@ namespace xcore
             s32 cap() const { return (s32)(m_eos - m_str); }
 
             bool is_empty() const { return m_str == m_end; }
-            bool is_valid() const { return m_str != nullptr && m_end < m_eos; }
+            bool is_valid() const { return m_str != nullptr && m_end <= m_eos; }
 
             void reset() { m_end = m_str; }
             void clear()
@@ -486,15 +531,18 @@ namespace xcore
                 if (m_end == nullptr)
                 {
                     m_end = m_str;
-                    while (*m_end != TERMINATOR)
-                        ++m_end;
+	                if (m_end != nullptr)
+		            {
+			            while (*m_end != TERMINATOR)
+				            ++m_end;
+					}
                 }
             }
             inline crunes(runes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
             inline crunes(crunes const& other) : m_str(other.m_str), m_cur(other.m_str), m_end(other.m_end) {}
 
             s32  size() const { return (s32)(m_end - m_str); }
-            bool is_valid() const { return m_str != nullptr && m_cur < m_end; }
+            bool is_valid() const { return m_str != nullptr && m_cur <= m_end; }
             bool is_empty() const { return m_str == m_end; }
             void reset() { m_cur = m_str; }
             void clear()
@@ -565,6 +613,7 @@ namespace xcore
 
 namespace xcore
 {
+    // NOTE: Identical to utf32 namespace
     namespace ascii
     {
         s32 len(pcrune str, pcrune end);
@@ -642,8 +691,9 @@ namespace xcore
         runes selectOverlap(const runes& inStr, const runes& inRight);
 
         s32 compare(runes const& str1, runes const& str2, bool inCaseSensitive = true);
-        // -------------------------------------------------------------------------------
 
+        // -------------------------------------------------------------------------------
+        // parse/from_string, to_string
         crunes parse(crunes const& str, bool& value);
         crunes parse(crunes const& str, s32& value, s32 base = 10);
         crunes parse(crunes const& str, u32& value, s32 base = 10);
@@ -652,17 +702,17 @@ namespace xcore
         crunes parse(crunes const& str, f32& value);
         crunes parse(crunes const& str, f64& value);
 
-        bool is_decimal(crunes const& str);
-        bool is_hexadecimal(crunes const& str, bool with_prefix = false);
-        bool is_float(crunes const& str);
-        bool is_GUID(crunes const& str);
-
         void to_string(runes& str, s32 val, s32 base = 10);
         void to_string(runes& str, u32 val, s32 base = 10);
         void to_string(runes& str, s64 val, s32 base = 10);
         void to_string(runes& str, u64 val, s32 base = 10);
         void to_string(runes& str, f32 val, s32 num_fractional_digits = 4);
         void to_string(runes& str, f64 val, s32 num_fractional_digits = 4);
+
+        bool is_decimal(crunes const& str);
+        bool is_hexadecimal(crunes const& str, bool with_prefix = false);
+        bool is_float(crunes const& str);
+        bool is_GUID(crunes const& str);
 
         inline bool is_space(uchar32 c) { return ((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
         inline bool is_upper(uchar32 c) { return ((c >= 'A') && (c <= 'Z')); }
@@ -692,7 +742,6 @@ namespace xcore
         }
 
         inline bool is_equal(uchar32 a, uchar32 b) { return (a == b); }
-
         inline bool is_equalfold(uchar32 a, uchar32 b)
         {
             a = to_lower(a);
@@ -700,12 +749,11 @@ namespace xcore
             return (a == b);
         }
 
-        bool        is_upper(crunes const& str);
-        bool        is_lower(crunes const& str);
-        bool        is_capitalized(crunes const& str);
-        bool        is_delimited(crunes const& str, uchar32 delimit_left = '\"', uchar32 delimit_right = '\"');
-        inline bool is_quoted(crunes const& str, uchar32 quote = '\"') { return is_delimited(str, quote, quote); }
-
+        bool    is_upper(crunes const& str);
+        bool    is_lower(crunes const& str);
+        bool    is_capitalized(crunes const& str);
+        bool    is_delimited(crunes const& str, uchar32 delimit_left = '\"', uchar32 delimit_right = '\"');
+        bool    is_quoted(crunes const& str, uchar32 quote = '\"');
         bool    starts_with(crunes const& str, uchar32 start);
         bool    starts_with(crunes const& str, crunes const& start);
         bool    ends_with(crunes const& str, uchar32 end_char);
@@ -713,11 +761,11 @@ namespace xcore
         uchar32 first_char(crunes const& str);
         uchar32 last_char(crunes const& str);
 
-        void removeSelection(runes& str, crunes const& selection);
-        void keepOnlySelection(runes& str, crunes const& keep);
+        void removeSelection(runes& str, crunes const& sel);
+        void keepOnlySelection(runes& str, crunes const& sel);
 
-        void replaceSelection(runes& str, crunes const& selection, crunes const& replace);
-        void replaceSelection(runes& str, crunes const& selection, crunes const& replace, alloc* allocator, s32 size_alignment);
+        void replaceSelection(runes& str, crunes const& sel, crunes const& replace);
+        void replaceSelection(runes& str, crunes const& sel, crunes const& replace, alloc* allocator, s32 size_alignment);
 
         void findReplace(runes& str, uchar32 find, uchar32 replace, bool inCaseSensitive = true);
         void findReplace(runes& str, crunes const& find, crunes const& replace, bool inCaseSensitive = true);
@@ -725,34 +773,34 @@ namespace xcore
         void insert(runes& str, crunes const& insert);
         void insert(runes& str, crunes const& insert, alloc* allocator, s32 size_alignment);
 
-        void insert(runes& str, crunes const& selection, crunes const& insert);
-        void insert(runes& str, crunes const& selection, crunes const& insert, alloc* allocator, s32 size_alignment);
+        void insert(runes& str, crunes const& sel, crunes const& insert);
+        void insert(runes& str, crunes const& sel, crunes const& insert, alloc* allocator, s32 size_alignment);
 
         void trim(runes&);                               // Trim whitespace from left and right side
         void trimLeft(runes&);                           // Trim whitespace from left side
         void trimRight(runes&);                          // Trim whitespace from right side
-        void trim(runes&, uchar32 inChar);               // Trim characters in <inCharSet> from left and right side
-        void trimLeft(runes&, uchar32 inChar);           // Trim character <inChar> from left side 
-        void trimRight(runes&, uchar32 inChar);          // Trim character <inChar> from right side
+        void trim(runes&, rune inChar);                  // Trim characters in <inCharSet> from left and right side
+        void trimLeft(runes&, rune inChar);              // Trim character <inChar> from left side 
+        void trimRight(runes&, rune inChar);             // Trim character <inChar> from right side
         void trim(runes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side
         void trimLeft(runes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side 
         void trimRight(runes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side 
         void trimQuotes(runes&);                         // Trim double quotes from left and right side 
-        void trimQuotes(runes&, uchar32 quote);          // Trim double quotes from left and right side 
-        void trimDelimiters(runes&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side 
+        void trimQuotes(runes&, rune quote);             // Trim double quotes from left and right side 
+        void trimDelimiters(runes&, rune inLeft, rune inRight); // Trim delimiters from left and right side 
 
         void trim(crunes&);                               // Trim whitespace from left and right side
         void trimLeft(crunes&);                           // Trim whitespace from left side
         void trimRight(crunes&);                          // Trim whitespace from right side
-        void trim(crunes&, uchar32 inChar);               // Trim characters in <inCharSet> from left and right side
-        void trimLeft(crunes&, uchar32 inChar);           // Trim character <inChar> from left side 
-        void trimRight(crunes&, uchar32 inChar);          // Trim character <inChar> from right side
+        void trim(crunes&, rune inChar);                  // Trim characters in <inCharSet> from left and right side
+        void trimLeft(crunes&, rune inChar);              // Trim character <inChar> from left side 
+        void trimRight(crunes&, rune inChar);             // Trim character <inChar> from right side
         void trim(crunes&, crunes const& inCharSet);      // Trim characters in <inCharSet> from left and right side
         void trimLeft(crunes&, crunes const& inCharSet);  // Trim characters in <inCharSet> from left side 
         void trimRight(crunes&, crunes const& inCharSet); // Trim characters in <inCharSet> from right side 
         void trimQuotes(crunes&);                         // Trim double quotes from left and right side 
-        void trimQuotes(crunes&, uchar32 quote);          // Trim double quotes from left and right side 
-        void trimDelimiters(crunes&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side 
+        void trimQuotes(crunes&, rune quote);             // Trim double quotes from left and right side 
+        void trimDelimiters(crunes&, rune inLeft, rune inRight); // Trim delimiters from left and right side 
 
         void copy(const crunes& src, runes& dst);
         void copy(const crunes& src, runes& dst, alloc* allocator, s32 size_alignment);
@@ -767,12 +815,13 @@ namespace xcore
     inline bool operator==(const ascii::runes& lhs, const ascii::runes& rhs) { return ascii::compare(lhs, rhs) == 0; }
     inline bool operator!=(const ascii::runes& lhs, const ascii::runes& rhs) { return ascii::compare(lhs, rhs) != 0; }
 
+    // NOTE: Identical to ascii namespace
     namespace utf32
     {
         s32 len(pcrune str, pcrune end);
 
-        prune  endof(prune str, pcrune end);
-        pcrune endof(pcrune str, pcrune end);
+        prune  endof(prune str, pcrune eos);
+        pcrune endof(pcrune str, pcrune eos);
 
         crunes find(crunes const& _str, uchar32 _c, bool inCaseSensitive = true);
         runes  find(runes const& _str, uchar32 _c, bool inCaseSensitive = true);
@@ -838,16 +887,15 @@ namespace xcore
         runes selectBetweenLast(const runes& inStr, uchar32 inLeft, uchar32 inRight);
         runes selectPreviousBetween(const runes& inStr, const runes& inSelection, uchar32 inLeft, uchar32 inRight);
 
-        crunes selectUntilEndExcludeSelection(const crunes& inStr, const crunes& inSelection);
-        crunes selectUntilEndIncludeSelection(const crunes& inStr, const crunes& inSelection);
         runes  selectUntilEndExcludeSelection(const runes& inStr, const runes& inSelection);
         runes  selectUntilEndIncludeSelection(const runes& inStr, const runes& inSelection);
 
         runes selectOverlap(const runes& inStr, const runes& inRight);
 
         s32 compare(runes const& str1, runes const& str2, bool inCaseSensitive = true);
-        // -------------------------------------------------------------------------------
 
+        // -------------------------------------------------------------------------------
+        // parse/from_string, to_string
         crunes parse(crunes const& str, bool& value);
         crunes parse(crunes const& str, s32& value, s32 base = 10);
         crunes parse(crunes const& str, u32& value, s32 base = 10);
@@ -856,17 +904,17 @@ namespace xcore
         crunes parse(crunes const& str, f32& value);
         crunes parse(crunes const& str, f64& value);
 
-        bool is_decimal(crunes const& str);
-        bool is_hexadecimal(crunes const& str, bool with_prefix = false);
-        bool is_float(crunes const& str);
-        bool is_GUID(crunes const& str);
-
         void to_string(runes& str, s32 val, s32 base = 10);
         void to_string(runes& str, u32 val, s32 base = 10);
         void to_string(runes& str, s64 val, s32 base = 10);
         void to_string(runes& str, u64 val, s32 base = 10);
         void to_string(runes& str, f32 val, s32 num_fractional_digits = 4);
         void to_string(runes& str, f64 val, s32 num_fractional_digits = 4);
+
+        bool is_decimal(crunes const& str);
+        bool is_hexadecimal(crunes const& str, bool with_prefix = false);
+        bool is_float(crunes const& str);
+        bool is_GUID(crunes const& str);
 
         inline bool is_space(uchar32 c) { return ((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
         inline bool is_upper(uchar32 c) { return ((c >= 'A') && (c <= 'Z')); }
@@ -904,12 +952,11 @@ namespace xcore
             return (a == b);
         }
 
-        bool        is_upper(crunes const& str);
-        bool        is_lower(crunes const& str);
-        bool        is_capitalized(crunes const& str);
-        bool        is_delimited(crunes const& str, uchar32 delimit_left = '\"', uchar32 delimit_right = '\"');
-        inline bool is_quoted(crunes const& str, uchar32 quote = '\"') { return is_delimited(str, quote, quote); }
-
+        bool    is_upper(crunes const& str);
+        bool    is_lower(crunes const& str);
+        bool    is_capitalized(crunes const& str);
+        bool    is_delimited(crunes const& str, uchar32 delimit_left = '\"', uchar32 delimit_right = '\"');
+        bool    is_quoted(crunes const& str, uchar32 quote = '\"');
         bool    starts_with(crunes const& str, uchar32 start);
         bool    starts_with(crunes const& str, crunes const& start);
         bool    ends_with(crunes const& str, uchar32 end);
@@ -919,16 +966,12 @@ namespace xcore
 
         void removeSelection(runes& str, crunes const& sel);
         void keepOnlySelection(runes& str, crunes const& sel);
-
         void replaceSelection(runes& str, crunes const& sel, crunes const& replace);
-        void replaceSelection(runes& str, runes const& sel, crunes const& replace, alloc* allocator, s32 size_alignment);
-
+        void replaceSelection(runes& str, crunes const& sel, crunes const& replace, alloc* allocator, s32 size_alignment);
         void findReplace(runes& str, uchar32 find, uchar32 replace, bool inCaseSensitive = true);
         void findReplace(runes& str, crunes const& find, crunes const& replace, bool inCaseSensitive = true);
-
         void insert(runes& str, crunes const& insert);
         void insert(runes& str, crunes const& insert, alloc* allocator, s32 size_alignment);
-
         void insert(runes& str, crunes const& sel, crunes const& insert);
         void insert(runes& str, crunes const& sel, crunes const& insert, alloc* allocator, s32 size_alignment);
 
@@ -964,8 +1007,13 @@ namespace xcore
         void concatenate(runes& str, const crunes& concat);
         void concatenate(runes& str, const crunes& concat, alloc* allocator, s32 size_alignment);
         void concatenate(runes& str, const crunes& concat1, const crunes& concat2, alloc* allocator, s32 size_alignment);
-
     };
+
+    // utf32 specific functions, different from 'namespace ascii'
+    namespace utf32
+    {
+        void copy(const ascii::crunes& src, runes& dst, alloc* allocator, s32 size_alignment);
+    }
 
     inline bool operator==(const utf32::crunes& lhs, const utf32::crunes& rhs) { return utf32::compare(lhs, rhs) == 0; }
     inline bool operator!=(const utf32::crunes& lhs, const utf32::crunes& rhs) { return utf32::compare(lhs, rhs) != 0; }

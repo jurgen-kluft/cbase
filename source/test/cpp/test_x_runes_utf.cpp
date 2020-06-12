@@ -34,6 +34,104 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
 			CHECK_EQUAL(4, sizeof(utf32::rune));
 		}
 
+		UNITTEST_TEST(peek_ascii)
+		{
+			const uchar str[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// fr�nch
+			ascii::crunes src(str);
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+		}
+
+		UNITTEST_TEST(peek_utf8)
+		{
+			const uchar8 str[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// fr�nch
+			utf8::crunes src(str);
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+		}
+
+		UNITTEST_TEST(peek_utf16)
+		{
+			const uchar16 str[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// fr�nch
+			utf16::crunes src(str);
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+		}
+
+		UNITTEST_TEST(peek_utf32)
+		{
+			const uchar32 str[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// fr�nch
+			utf32::crunes src(str);
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+			CHECK_EQUAL('f', utf::peek(src));
+		}
+
+
+
+		UNITTEST_TEST(read_ascii)
+		{
+			const uchar str[] = { 0x66, 0x72, 0xE9, 0x6E, 0x63, 0x68, 0x0 };	// frénch
+			ascii::crunes src(str);
+			CHECK_EQUAL('f', utf::read(src));
+			CHECK_EQUAL('r', utf::read(src));
+			CHECK_EQUAL(0xE9, utf::read(src));
+			CHECK_EQUAL('n', utf::read(src));
+			CHECK_EQUAL('c', utf::read(src));
+			CHECK_EQUAL('h', utf::read(src));
+			CHECK_EQUAL(ascii::TERMINATOR, utf::read(src));
+			CHECK_EQUAL(ascii::TERMINATOR, utf::read(src));
+		}
+
+		UNITTEST_TEST(read_utf8)
+		{
+			const uchar8 str[] = { 0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0 };	// fr�nch
+			utf8::crunes src(str);
+			CHECK_EQUAL('f', utf::read(src));
+			CHECK_EQUAL('r', utf::read(src));
+			CHECK_EQUAL(0xE9, utf::read(src));
+			CHECK_EQUAL('n', utf::read(src));
+			CHECK_EQUAL('c', utf::read(src));
+			CHECK_EQUAL('h', utf::read(src));
+			CHECK_EQUAL(utf8::TERMINATOR, utf::read(src));
+			CHECK_EQUAL(utf8::TERMINATOR, utf::read(src));
+		}
+
+		UNITTEST_TEST(read_utf16)
+		{
+			const uchar16 str[] = { 0x66, 0x72, 0xE9, 0x6E, 0x63, 0x68, 0x0 };	// frénch
+			utf16::crunes src(str);
+			CHECK_EQUAL('f', utf::read(src));
+			CHECK_EQUAL('r', utf::read(src));
+			CHECK_EQUAL(0xE9, utf::read(src));
+			CHECK_EQUAL('n', utf::read(src));
+			CHECK_EQUAL('c', utf::read(src));
+			CHECK_EQUAL('h', utf::read(src));
+			CHECK_EQUAL(utf16::TERMINATOR, utf::read(src));
+			CHECK_EQUAL(utf16::TERMINATOR, utf::read(src));
+		}
+
+		UNITTEST_TEST(read_utf32)
+		{
+			const uchar32 str[] = { 0x66, 0x72, 0xE9, 0x6E, 0x63, 0x68, 0x0 };	// frénch
+			utf32::crunes src(str);
+			CHECK_EQUAL('f', utf::read(src));
+			CHECK_EQUAL('r', utf::read(src));
+			CHECK_EQUAL(0xE9, utf::read(src));
+			CHECK_EQUAL('n', utf::read(src));
+			CHECK_EQUAL('c', utf::read(src));
+			CHECK_EQUAL('h', utf::read(src));
+			CHECK_EQUAL(utf32::TERMINATOR, utf::read(src));
+			CHECK_EQUAL(utf32::TERMINATOR, utf::read(src));
+		}
+
 		UNITTEST_TEST(copy_ascii_to_utf32)
 		{
 			ascii::crunes src("test");

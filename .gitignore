@@ -1,5 +1,7 @@
 #ignore all files
-*.*
+*
+!*/
+
 vendor/
 t2-output/
 target/
@@ -25,9 +27,10 @@ tags
 !*.hlsl
 !*.fragment
 
-!*.mold
-!*.sc
-!*.diagram
+!*.md
+!*.jpg
+!*.txt
+!*.html
 
 !*.ini
 !*.bat

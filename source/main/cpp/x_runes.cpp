@@ -27,7 +27,7 @@ namespace xcore
 
         uchar32 peek(ascii::crunes const& str)
         {
-            uchar32 c = '\0';
+            uchar32 c = utf32::TERMINATOR;
             if (can_read(str))
                 c = str.m_str[0];
             return c;
@@ -35,41 +35,19 @@ namespace xcore
 
         uchar32 peek(utf8::crunes const& str)
         {
-            uchar8 const* src = str.m_str;
-            uchar32       c   = '\0';
-            if (can_read(str))
-            {
-                c           = *src++;
-                s32 const l = sequence_sizeof_utf8((uchar8)c);
-                switch (l)
-                {
-                    case 1: break;
-                    case 2:
-                        c = ((c << 6) & 0x7ff) + ((src[0]) & 0x3f);
-                        src++;
-                        break;
-                    case 3:
-                        c = ((c << 12) & 0xffff) + (((src[0]) << 6) & 0xfff);
-                        ++src;
-                        c += (src[0]) & 0x3f;
-                        ++src;
-                        break;
-                    case 4:
-                        c = ((c << 18) & 0x1fffff) + (((src[0]) << 12) & 0x3ffff);
-                        ++src;
-                        c += ((src[0]) << 6) & 0xfff;
-                        ++src;
-                        c += (src[0]) & 0x3f;
-                        ++src;
-                        break;
-                }
-            }
-            return c;
+            utf8::pcrune src = str.m_str;
+            return read(src, str.m_end);
+        }
+
+		uchar32 peek(utf16::crunes const& str)
+        {
+            utf16::pcrune src = str.m_str;
+            return read(src, str.m_end);
         }
 
         uchar32 peek(utf32::crunes const& str)
         {
-            uchar32 c = '\0';
+            uchar32 c = utf32::TERMINATOR;
             if (can_read(str))
                 c = str.m_str[0];
             return c;
@@ -113,8 +91,8 @@ namespace xcore
 
         uchar32 read(ascii::rune const*& str, ascii::rune const* end)
         {
-            uchar32 c = *str;
-            if (c != '\0' && (end == NULL || str < end))
+            uchar32 c = ((uchar32)*str) & 0xFF;
+            if (c != utf32::TERMINATOR && (end == NULL || str < end))
             {
                 str++;
             }
@@ -124,7 +102,7 @@ namespace xcore
         uchar32 read(utf8::rune const*& str, utf8::rune const* end)
         {
             uchar32 c = *str;
-            if (c != '\0')
+            if (c != utf32::TERMINATOR)
             {
                 s32 const l = sequence_sizeof_utf8((uchar8)c);
                 if (end != NULL && (str + l) > end)
@@ -164,9 +142,9 @@ namespace xcore
         {
             uchar32 out_c;
             uchar16 c = *str;
-            if (c == '\0' || (end != NULL && str >= end))
+            if (c == utf16::TERMINATOR || (end != NULL && str >= end))
             {
-                out_c = '\0';
+                out_c = utf32::TERMINATOR;
                 return out_c;
             }
 
@@ -202,7 +180,7 @@ namespace xcore
         uchar32 read(utf32::rune const*& str, utf32::rune const* end)
         {
             uchar32 c = *str;
-            if (c != '\0' && (end == NULL || str < end))
+            if (c != utf32::TERMINATOR && (end == NULL || str < end))
             {
                 str++;
             }
@@ -212,7 +190,7 @@ namespace xcore
         uchar32 read(ascii::rune*& str, ascii::rune const* end)
         {
             uchar32 c = *str;
-            if (c != '\0' && (end == NULL || str < end))
+            if (c != utf32::TERMINATOR && (end == NULL || str < end))
             {
                 str++;
             }
@@ -222,7 +200,7 @@ namespace xcore
         uchar32 read(utf8::rune*& str, utf8::rune const* end)
         {
             uchar32 c = *str;
-            if (c != '\0' && (end == NULL || str < end))
+            if (c != utf32::TERMINATOR && (end == NULL || str < end))
             {
                 const uchar8* cstr = str;
                 c                  = read(cstr, end);
@@ -234,7 +212,7 @@ namespace xcore
         uchar32 read(utf32::rune*& str, utf32::rune const* end)
         {
             uchar32 c = *str;
-            if (c != '\0' && (end == NULL || str < end))
+            if (c != utf32::TERMINATOR && (end == NULL || str < end))
             {
                 str++;
             }
@@ -335,6 +313,17 @@ namespace xcore
             }
         }
 
+        bool write(uchar32 c, uchar16*& dst, uchar16* end)
+        {
+            if (!is_eos(dst) && dst < end)
+            {
+                write(c, dst, end);
+                return true;
+            }
+            return false;
+        }
+
+
         void write(uchar32 c, uchar32*& dst, uchar32 const* end)
         {
             if (dst < end)
@@ -349,7 +338,6 @@ namespace xcore
             if (can_write(dst))
             {
                 write(c, dst.m_end, dst.m_eos);
-                dst.m_end = dst.m_end;
                 return true;
             }
             return false;
@@ -360,7 +348,6 @@ namespace xcore
             if (can_write(dst))
             {
                 write(c, dst.m_end, dst.m_eos);
-                dst.m_end = dst.m_end;
                 return true;
             }
             return false;
@@ -371,7 +358,6 @@ namespace xcore
             if (can_write(dst))
             {
                 write(c, dst.m_end, dst.m_eos);
-                dst.m_end = dst.m_end;
                 return true;
             }
             return false;
@@ -382,17 +368,55 @@ namespace xcore
             if (can_write(dst))
             {
                 write(c, dst.m_end, dst.m_eos);
-                dst.m_end = dst.m_end;
                 return true;
             }
             return false;
         }
 
-        bool write(uchar32 c, uchar16*& dst, uchar16* end)
+
+        static bool terminate_str(ascii::runes& dst)
         {
-            if (!is_eos(dst) && dst < end)
+            if (can_write(dst))
             {
-                write(c, dst, end);
+				uchar32 c = ascii::TERMINATOR;
+				ascii::prune end = dst.m_end;
+                write(c, end, dst.m_eos);
+                return true;
+            }
+            return false;
+        }
+
+        static bool terminate_str(utf8::runes& dst)
+        {
+            if (can_write(dst))
+            {
+				uchar32 c = utf8::TERMINATOR;
+				utf8::prune end = dst.m_end;
+                write(c, end, dst.m_eos);
+                return true;
+            }
+            return false;
+        }
+
+        static bool terminate_str(utf16::runes& dst)
+        {
+            if (can_write(dst))
+            {
+				uchar32 c = utf16::TERMINATOR;
+				utf16::prune end = dst.m_end;
+                write(c, end, dst.m_eos);
+                return true;
+            }
+            return false;
+        }
+
+        static bool terminate_str(utf32::runes& dst)
+        {
+            if (can_write(dst))
+            {
+				uchar32 c = utf32::TERMINATOR;
+				utf32::prune end = dst.m_end;
+                write(c, end, dst.m_eos);
                 return true;
             }
             return false;
@@ -408,7 +432,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         void copy(char const* sstr, utf16::runes& dstr, bool write_terminator)
@@ -420,7 +444,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         void copy(char const* sstr, utf32::runes& dstr, bool write_terminator)
@@ -432,7 +456,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         // -> ASCII
@@ -447,7 +471,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         void copy(utf16::crunes const& sstr, ascii::runes& dstr, bool write_terminator)
@@ -460,7 +484,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         void copy(utf32::crunes const& sstr, ascii::runes& dstr, bool write_terminator)
@@ -473,7 +497,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         // -> UTF-16
@@ -488,7 +512,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         void copy(utf16::crunes const& sstr, utf16::runes& dstr, bool write_terminator)
@@ -501,7 +525,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         void copy(utf32::crunes const& sstr, utf16::runes& dstr, bool write_terminator)
@@ -514,7 +538,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         // -> UTF-32
@@ -529,7 +553,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         void copy(utf16::crunes const& sstr, utf32::runes& dstr, bool write_terminator)
@@ -544,7 +568,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         void copy(utf32::crunes const& sstr, utf32::runes& dstr, bool write_terminator)
@@ -559,7 +583,7 @@ namespace xcore
                     break;
             }
             if (write_terminator)
-                write('\0', dstr);
+                terminate_str(dstr);
         }
 
         s32 size(uchar32 c)
@@ -726,3 +750,19 @@ namespace xcore
 #define XNAMESPACE_NAME utf32
 #include "x_runes_impl.cpp"
 #undef XNAMESPACE_NAME
+
+namespace xcore
+{
+	namespace utf32
+	{
+		void copy(const ascii::crunes& src, runes& dst, alloc* allocator, s32 size_alignment)
+		{
+            s32 const required = dst.size() + src.size();
+            if (required > dst.cap())
+            {
+                resize(dst, required, allocator, size_alignment);
+            }
+			utf::copy(src, dst);
+		}
+	}
+}
