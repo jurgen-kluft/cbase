@@ -387,6 +387,16 @@ namespace xcore
             return sel;
         }
 
+		crunes selectBeforeExcludeSelection(const crunes& inStr, const crunes& inSelection)
+		{
+            crunes sel;
+            sel.m_str = inStr.m_str;
+            sel.m_end = inSelection.m_str;
+            sel.m_cur = sel.m_str;
+            return sel;
+		}
+
+
         crunes selectOverlap(const crunes& lstr, const crunes& rstr)
         {
 			// Find the last character of 'lstr' in 'rstr'

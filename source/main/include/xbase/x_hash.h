@@ -7,11 +7,19 @@
 
 namespace xcore
 {
+	// Using SipHash
     class xhashing
     {
-    private:
+    public:
+        xhashing();
+        void reset();
+        void hash(const void *data, s32 numBytes);
+        u64  finalize();
+
+	private:
         u64 d_v0, d_v1, d_v2, d_v3;
-        union {
+        union
+		{
             u64     d_alignment;
             xbyte   d_buf[8];
         };
@@ -21,15 +29,7 @@ namespace xcore
 
         enum { SEED_LENGTH = 16 }; // Seed length in bytes.
         void reset(xbyte const* seed);
-        
-    public:
-        xhashing();
-        void reset();
-        void hash(const void *data, s32 numBytes);
-        u64  finalize();
     };
-
-    extern xhashing hasher;
 
     template <typename K> class xhasher
     {
@@ -39,8 +39,9 @@ namespace xcore
 
     template <> class xhasher<s32>
     {
+		xhashing hasher;
     public:
-        u64 hash(s32 const& k) const 
+        u64 hash(s32 const& k) 
         {
             s32 data[2] = {k,k};
             hasher.reset();
@@ -51,8 +52,9 @@ namespace xcore
 
     template <> class xhasher<u32>
     {
+		xhashing hasher;
     public:
-        u64 hash(u32 const& k) const
+        u64 hash(u32 const& k) 
         {
             u32 data[2] = {k,k};
             hasher.reset();
@@ -63,8 +65,9 @@ namespace xcore
 
     template <> class xhasher<s64>
     {
+		xhashing hasher;
     public:
-        u64 hash(s64 const& k) const
+        u64 hash(s64 const& k)
         {
             hasher.reset();
             hasher.hash((xbyte const*)&k, sizeof(u64));    
@@ -74,8 +77,9 @@ namespace xcore
 
     template <> class xhasher<u64>
     {
+		xhashing hasher;
     public:
-        u64 hash(u64 const& k) const
+        u64 hash(u64 const& k)
         {
             hasher.reset();
             hasher.hash((xbyte const*)&k, sizeof(u64));    
@@ -85,8 +89,9 @@ namespace xcore
 
     template <> class xhasher<f32>
     {
+		xhashing hasher;
     public:
-        u64 hash(f32 const& k) const 
+        u64 hash(f32 const& k)
         {
             f32 data[2] = {k,k};
             hasher.reset();
@@ -97,8 +102,9 @@ namespace xcore
 
     template <> class xhasher<f64>
     {
+		xhashing hasher;
     public:
-        u64 hash(f64 const& k) const 
+        u64 hash(f64 const& k)
         {
             hasher.reset();
             hasher.hash((xbyte const*)&k, sizeof(f64));    
@@ -108,8 +114,9 @@ namespace xcore
 
     template <> class xhasher<void*>
     {
+		xhashing hasher;
     public:
-        u64 hash(void* const& k) const 
+        u64 hash(void* const& k) 
         {
             hasher.reset();
             hasher.hash((xbyte const*)&k, sizeof(void*));    

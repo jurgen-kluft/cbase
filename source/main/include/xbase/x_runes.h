@@ -688,6 +688,8 @@ namespace xcore
         runes selectUntilEndExcludeSelection(const runes& inStr, const runes& inSelection);
         runes selectUntilEndIncludeSelection(const runes& inStr, const runes& inSelection);
 
+		crunes selectBeforeExcludeSelection(const crunes& inStr, const crunes& inSelection);
+
         runes selectOverlap(const runes& inStr, const runes& inRight);
 
         s32 compare(runes const& str1, runes const& str2, bool inCaseSensitive = true);
@@ -860,6 +862,8 @@ namespace xcore
 
         crunes selectUntilEndExcludeSelection(const crunes& inStr, const crunes& inSelection);
         crunes selectUntilEndIncludeSelection(const crunes& inStr, const crunes& inSelection);
+
+		crunes selectBeforeExcludeSelection(const crunes& inStr, const crunes& inSelection);
 
         crunes selectOverlap(const crunes& inStr, const crunes& inRight);
 
