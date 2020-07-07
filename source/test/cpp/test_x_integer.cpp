@@ -220,6 +220,14 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			CHECK_EQUAL(0, xilog2(c));
 		}
 
+		UNITTEST_TEST(CountTrailingZeros16)
+		{
+			u16 a = 13, b = 64, c = 0, d = -1;
+			CHECK_EQUAL(0, xcountTrailingZeros(a));
+			CHECK_EQUAL(6, xcountTrailingZeros(b));
+			CHECK_EQUAL(16, xcountTrailingZeros(c));
+			CHECK_EQUAL(0, xcountTrailingZeros(d));
+		}
 		UNITTEST_TEST(CountTrailingZeros32)
 		{
 			u32 a = 13, b = 64, c = 0, d = -1;
@@ -238,6 +246,14 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			CHECK_EQUAL(48, xcountTrailingZeros(e));
 		}
 
+		UNITTEST_TEST(CountLeadingZeros16)
+		{
+			u16 a = 13, b = 64, c = 0, d = -1;
+			CHECK_EQUAL(12, xcountLeadingZeros(a));
+			CHECK_EQUAL(9, xcountLeadingZeros(b));
+			CHECK_EQUAL(16, xcountLeadingZeros(c));
+			CHECK_EQUAL( 0, xcountLeadingZeros(d));
+		}
 		UNITTEST_TEST(CountLeadingZeros32)
 		{
 			u32 a = 13, b = 64, c = 0, d = -1;
@@ -269,7 +285,7 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(8, xmostSignificantOneBit(a));
 			CHECK_EQUAL(64, xmostSignificantOneBit(b));
-			CHECK_EQUAL(0, xmostSignificantOneBit(c));
+			CHECK_EQUAL(32, xmostSignificantOneBit(c));
 		}
 
 		UNITTEST_TEST(LeastSignificantBit)

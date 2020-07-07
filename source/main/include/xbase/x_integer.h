@@ -79,7 +79,7 @@ namespace xcore
     inline s32   xcountTrailingZeros(u64 integer);       ///< find the number of trailing zeros in 64-bit v
     inline s32   xcountLeadingZeros(u64 integer);        ///< find the number of leading zeros in 64-bit v
     inline s32   xleastSignificantOneBit(u32 inInteger); ///< Return v but with only the Least Significant Bit "1"
-    inline s32   xmostSignificantOneBit(u32 integer);    ///< Return v but with only the Most Significant Bit "1"
+    inline u32   xmostSignificantOneBit(u32 integer);    ///< Return v but with only the Most Significant Bit "1"
     inline s32   xleastSignificantBit(u32 integer);      ///< Return the bit index of the Least Significant Bit "1"
     inline s32   xmostSignificantBit(u32 integer);       ///< Return the bit index of the Most Significant Bit "1"
     inline s32   xfindFirstBit(u16 integer);             ///< find the bit position/index of the first bit from low to high
@@ -95,19 +95,20 @@ namespace xcore
     template <> s32 xmin(s32 integerA, s32 integerB); ///< Return the smallest value
     template <> s32 xmax(s32 integerA, s32 integerB); ///< Return the biggest value
 
-    //==============================================================================
-    // INLINES
-    //==============================================================================
-    #include "xbase/private/x_integer_inline.h"
-
-    #if defined TARGET_PC
-        #include "xbase/private/x_integer_inline_win32.h"
-    #elif defined TARGET_MAC
-        #include "xbase/private/x_integer_inline_mac.h"
-    #else
-        #error "Current platform is not supported!"
-    #endif
-
 }; // namespace xcore
+
+//==============================================================================
+// INLINES
+//==============================================================================
+#include "xbase/private/x_integer_inline.h"
+
+#if defined TARGET_PC
+    #include "xbase/private/x_integer_inline_win32.h"
+#elif defined TARGET_MAC
+    #include "xbase/private/x_integer_inline_mac.h"
+#else
+    #include "xbase/private/x_integer_inline_generic.h"
+#endif
+
 
 #endif ///< __XBASE_INTEGER_UTILS_H__
