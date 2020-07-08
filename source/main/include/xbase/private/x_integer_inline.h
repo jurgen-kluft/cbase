@@ -193,14 +193,11 @@ namespace xcore
 	 */
 	inline u32        xceilpo2(u32 inInteger)
 	{
-		u32 t = inInteger-1;
-		t |= t >> 1;
-		t |= t >> 2;
-		t |= t >> 4;
-		t |= t >> 8;
-		t |= t >> 16;
-		t++;
-		return (inInteger==t) ? (inInteger) : (t);
+		ASSERT(inInteger < 0x80000000);
+		u32 const w = xcountLeadingZeros(inInteger);
+		u32 const l = 0x80000000 >> w;
+		if (l == inInteger) return inInteger;
+		return l << 1;
 	}
 
 	/**
@@ -208,14 +205,10 @@ namespace xcore
 	 */
 	inline u32        xfloorpo2(u32 inInteger)
 	{
-		u32 t = inInteger-1;
-		t |= t >> 1;
-		t |= t >> 2;
-		t |= t >> 4;
-		t |= t >> 8;
-		t |= t >> 16;
-		t++;
-		return (inInteger==t) ? (inInteger) : (t>>1);
+		u32 const w = xcountLeadingZeros(inInteger);
+		u32 const l = 0x80000000 >> w;
+		if (l == inInteger) return inInteger;
+		return l;
 	}
 
 	/**
