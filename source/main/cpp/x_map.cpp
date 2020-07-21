@@ -29,12 +29,11 @@ namespace xcore
 	static void TestMap()
 	{
 		xmap<s32, s32> mymap;
-
-		mymap.insert(0, 1000);
-		
-		s32 value;
-		mymap.find(0,value);
-
+		s32 k = 0;
+		s32 v = 1000;
+		mymap.insert(k, v);
+		mymap.find(k, v);
+		mymap.remove(k, v);
 
 	}
 

@@ -88,6 +88,23 @@ namespace xcore
         virtual ~xfsa() {}
     };
 
+	class xfsa_to_alloc : public xfsa
+	{
+	public:
+		xfsa_to_alloc() : m_allocator(nullptr), m_size(0) {}
+		xfsa_to_alloc(u32 size, xalloc* allocator) : m_allocator(allocator), m_size(size) {}
+
+	protected:
+		virtual u32   v_size() const       { return m_size; }
+		virtual void* v_allocate()         { return m_allocator->allocate(m_size, sizeof(void*)); }
+		virtual u32   v_deallocate(void*p) { return m_allocator->deallocate(p); }
+		virtual void  v_release()          { return m_allocator->release(); }
+
+	private:
+		xalloc*	m_allocator;
+		u32 m_size;
+	};
+
     // The dexer interface, 'pointer to index' and 'index to pointer'
     class xdexer
     {

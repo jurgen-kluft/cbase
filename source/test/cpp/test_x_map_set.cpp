@@ -23,6 +23,14 @@ UNITTEST_SUITE_BEGIN(xmap_and_set)
         UNITTEST_TEST(map_s32)
         {
             xmap<s32, s32> map(gTestAllocator);
+
+			s32 k = 0;
+			s32 v = 1000;
+			s32 f = 0;
+			CHECK_TRUE(map.insert(k, v));
+			CHECK_TRUE(map.find(k, f));
+			CHECK_EQUAL(v, f);
+			CHECK_TRUE(map.remove(k, v));
         }
     }
 
@@ -40,6 +48,7 @@ UNITTEST_SUITE_BEGIN(xmap_and_set)
         {
             xset<s32> set(gTestAllocator);
 
+			// TODO: Implementation
             // TODO: Write some tests!
         }
     }

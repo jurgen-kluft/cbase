@@ -34,8 +34,9 @@ namespace xcore
         virtual void set_key(void* value, u64 key) = 0;
     };
 
-    // A xbtree is a BST that is unbalanced and where branches grow/shrink when adding
-    // or removing items. The xbtree32 implementation uses indices instead of pointers
+	// 
+    // A xbtree is a low-level BST that is unbalanced and where branches grow/shrink when 
+    // adding or removing items. The xbtree32 implementation uses indices instead of pointers
     // and thus uses the same amount of memory on a 32-bit system as compared to a 64-bit
     // system. For every key-value inserted you can consider ~6/8 bytes for xbtree32. For
     // xbtree it is an average of ~12/16 bytes per item.
@@ -95,9 +96,9 @@ namespace xcore
         bool rem(node_t*& root, u64 key, void*& value);
         void clear(node_t*& root);
 
-        bool find(node_t*& root, u64 key, void*& value) const;
-        bool lower_bound(node_t*& root, u64 key, void*& value) const;
-        bool upper_bound(node_t*& root, u64 key, void*& value) const;
+        bool find(node_t* root, u64 key, void*& value) const;
+        bool lower_bound(node_t* root, u64 key, void*& value) const;
+        bool upper_bound(node_t* root, u64 key, void*& value) const;
 
         static inline s32 sizeof_node() { return 4 * sizeof(void*); }
 

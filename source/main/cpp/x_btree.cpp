@@ -534,6 +534,7 @@ namespace xcore
 
     bool xbtree_ptr::add(node_t*& root, u64 key, void* value)
     {
+		ASSERT(sizeof_node() == sizeof(node_t));
         if (root == nullptr)
         {
             root = m_node_alloc->construct<node_t>();
@@ -742,8 +743,14 @@ namespace xcore
 		root = nullptr;
     }
 
-    bool xbtree_ptr::find(node_t*& root, u64 key, void*& value) const
+    bool xbtree_ptr::find(node_t* root, u64 key, void*& value) const
     {
+		if (root == nullptr)
+		{
+			value = nullptr;
+			return false;
+		}
+
         s32           level = 0;
         node_t const* node  = root;
         do
@@ -797,7 +804,7 @@ namespace xcore
     };
 
     // Find an entry 'less-or-equal' to 'value'
-    bool xbtree_ptr::lower_bound(node_t*& root, u64 key, void*& value) const
+    bool xbtree_ptr::lower_bound(node_t* root, u64 key, void*& value) const
     {
         // When traversing the tree to find a lower-bound we might fail.
         // So we have to keep a traversal history so that we can traverse
@@ -882,7 +889,7 @@ namespace xcore
         return false;
     }
 
-    bool xbtree_ptr::upper_bound(node_t *& root, u64 key, void*& value) const
+    bool xbtree_ptr::upper_bound(node_t* root, u64 key, void*& value) const
     {
         // When traversing the tree to find a lower-bound we might fail.
         // So we have to keep a traversal history so that we can traverse

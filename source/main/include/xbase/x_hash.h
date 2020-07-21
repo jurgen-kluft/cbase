@@ -31,6 +31,8 @@ namespace xcore
         void reset(xbyte const* seed);
     };
 
+	u64	x_hasher(xbyte const* data, u32 size);
+
     template <typename K> class xhasher
     {
     public:
@@ -39,88 +41,64 @@ namespace xcore
 
     template <> class xhasher<s32>
     {
-		xhashing hasher;
     public:
-        u64 hash(s32 const& k) 
+        u64 hash(s32 const& k) const
         {
-            s32 data[2] = {k,k};
-            hasher.reset();
-            hasher.hash((xbyte const*)data, sizeof(u32) * 2);    
-            return hasher.finalize();
+            return x_hasher((const xbyte*)&k, sizeof(k));
         }
     };
 
     template <> class xhasher<u32>
     {
-		xhashing hasher;
     public:
-        u64 hash(u32 const& k) 
+        u64 hash(u32 const& k) const
         {
-            u32 data[2] = {k,k};
-            hasher.reset();
-            hasher.hash((xbyte const*)data, sizeof(u32) * 2);    
-            return hasher.finalize();
+            return x_hasher((const xbyte*)&k, sizeof(k));
         }
     };
 
     template <> class xhasher<s64>
     {
-		xhashing hasher;
     public:
-        u64 hash(s64 const& k)
+        u64 hash(s64 const& k) const
         {
-            hasher.reset();
-            hasher.hash((xbyte const*)&k, sizeof(u64));    
-            return hasher.finalize();
+            return x_hasher((const xbyte*)&k, sizeof(k));
         }
     };
 
     template <> class xhasher<u64>
     {
-		xhashing hasher;
     public:
-        u64 hash(u64 const& k)
+        u64 hash(u64 const& k) const
         {
-            hasher.reset();
-            hasher.hash((xbyte const*)&k, sizeof(u64));    
-            return hasher.finalize();
+            return x_hasher((const xbyte*)&k, sizeof(k));
         }
     };
 
     template <> class xhasher<f32>
     {
-		xhashing hasher;
     public:
-        u64 hash(f32 const& k)
+        u64 hash(f32 const& k) const
         {
-            f32 data[2] = {k,k};
-            hasher.reset();
-            hasher.hash((xbyte const*)data, sizeof(f32) * 2);    
-            return hasher.finalize();
+            return x_hasher((const xbyte*)&k, sizeof(k));
         }
     };
 
     template <> class xhasher<f64>
     {
-		xhashing hasher;
     public:
-        u64 hash(f64 const& k)
+        u64 hash(f64 const& k) const
         {
-            hasher.reset();
-            hasher.hash((xbyte const*)&k, sizeof(f64));    
-            return hasher.finalize();
+            return x_hasher((const xbyte*)&k, sizeof(k));
         }
     };
 
     template <> class xhasher<void*>
     {
-		xhashing hasher;
     public:
-        u64 hash(void* const& k) 
+        u64 hash(void* const& k) const
         {
-            hasher.reset();
-            hasher.hash((xbyte const*)&k, sizeof(void*));    
-            return hasher.finalize();
+            return x_hasher((const xbyte*)&k, sizeof(k));
         }
     };
 }
