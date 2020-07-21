@@ -48,8 +48,11 @@ UNITTEST_SUITE_BEGIN(xmap_and_set)
         {
             xset<s32> set(gTestAllocator);
 
-			// TODO: Implementation
-            // TODO: Write some tests!
+			s32 v = 1000;
+
+			CHECK_TRUE(set.insert(v));
+			CHECK_TRUE(set.contains(v));
+			CHECK_TRUE(set.remove(v));
         }
     }
 }

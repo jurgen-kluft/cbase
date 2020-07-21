@@ -24,8 +24,6 @@ namespace xcore
 		return (items == 0);
 	}
 
-
-
 	static void TestMap()
 	{
 		xmap<s32, s32> mymap;
@@ -34,7 +32,15 @@ namespace xcore
 		mymap.insert(k, v);
 		mymap.find(k, v);
 		mymap.remove(k, v);
+	}
 
+	static void TestSet()
+	{
+		xset<s32> myset;
+		s32 v = 1000;
+		myset.insert(v);
+		myset.contains(v);
+		myset.remove(v);
 	}
 
 };
