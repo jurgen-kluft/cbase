@@ -7,14 +7,14 @@ Cross platform base library
   - allocator
   - binary search
   - bitfield
-  - buffer
+  - buffer / binary reader / binary writer
   - console
   - debug (assert)
   - endian
   - integer
   - limits
   - log
-  - printf/sprintf
+  - printf / sprintf
   - random (interface)
   - singleton
   - slice

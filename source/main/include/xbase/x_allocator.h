@@ -55,6 +55,7 @@ namespace xcore
 	inline void* x_advance_ptr(void* ptr, u64 size) { return (void*)((uptr)ptr + size); }
     inline void* x_align_ptr(void* ptr, u32 alignment) { return (void*)(((uptr)ptr + (alignment - 1)) & ~((uptr)alignment - 1)); }
     inline uptr  x_diff_ptr(void* ptr, void* next_ptr) { return (uptr)((uptr)next_ptr - (uptr)ptr); }
+	inline bool  x_is_in_range(void* buffer, u64 size, void* ptr) { uptr begin = (uptr)buffer; uptr end = begin + size; uptr cursor = (uptr)ptr; return cursor >= begin && cursor < end; }
 
     // fixed-size allocator
     class xfsa

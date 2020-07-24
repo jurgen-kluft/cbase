@@ -7,6 +7,7 @@
 
 #include "xbase/x_debug.h"
 #include "xbase/x_memory.h"
+#include "xbase/x_allocator.h"
 
 namespace xcore
 {
@@ -27,7 +28,7 @@ namespace xcore
 		inline bool			pop_back(void * out_item)				{ if (mLength > 0) { --mLength; x_memcpy(out_item, &mArray[mLength * mSizeOfItem], mSizeOfItem); return true; } else { return false; } }
 
 		inline xbyte*		begin() const							{ return mArray; }
-		inline xbyte*		next(xbyte* current) const				{ return current + mSizeOfItem; }
+		inline xbyte*		next(xbyte* current) const				{ ASSERT(x_is_in_range(mArray, mReservedItems * mSizeOfItem, current)); return current + mSizeOfItem; }
 		inline xbyte*		end() const								{ return &mArray[mLength * mSizeOfItem]; }
 
 		inline void*		operator [] (s32 index)					{ ASSERT(index<(s32)mLength); return &mArray[index * mSizeOfItem]; }
