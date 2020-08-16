@@ -39,7 +39,7 @@ namespace xcore
             return read(src, str.m_end);
         }
 
-		uchar32 peek(utf16::crunes const& str)
+        uchar32 peek(utf16::crunes const& str)
         {
             utf16::pcrune src = str.m_str;
             return read(src, str.m_end);
@@ -63,6 +63,28 @@ namespace xcore
                     return -1;
                 else if (ca > cb)
                     return 1;
+                ca = *(++stra);
+                cb = *(++strb);
+            }
+            if (ca == cb)
+                return 0;
+            if (ca == ascii::TERMINATOR)
+                return -1;
+            return 1;
+        }
+
+        s32 compare(ascii::pcrune stra, utf32::pcrune strb)
+        {
+            uchar32 ca = *stra;
+            uchar32 cb = *strb;
+            while (ca != ascii::TERMINATOR && cb != utf32::TERMINATOR)
+            {
+                if (ca < cb)
+                    return -1;
+                else if (ca > cb)
+                    return 1;
+                ca = *(++stra);
+                cb = *(++strb);
             }
             if (ca == cb)
                 return 0;
@@ -81,10 +103,53 @@ namespace xcore
                     return -1;
                 else if (ca > cb)
                     return 1;
+                ca = *(++stra);
+                cb = *(++strb);
             }
             if (ca == cb)
                 return 0;
             if (ca == utf32::TERMINATOR)
+                return -1;
+            return 1;
+        }
+
+        s32 compare(utf32::pcrune stra, ascii::pcrune strb)
+        {
+            uchar32 ca = *stra;
+            uchar32 cb = *strb;
+            while (ca != utf32::TERMINATOR && cb != ascii::TERMINATOR)
+            {
+                if (ca < cb)
+                    return -1;
+                else if (ca > cb)
+                    return 1;
+                ca = *(++stra);
+                cb = *(++strb);
+            }
+            if (ca == cb)
+                return 0;
+            if (ca == utf32::TERMINATOR)
+                return -1;
+            return 1;
+        }
+
+        s32 compare(ascii::crunes const& cstra, utf32::pcrune strb)
+        {
+            ascii::pcrune stra = cstra.m_str;
+            uchar32       ca   = *stra;
+            uchar32       cb   = *strb;
+            while (stra < cstra.m_end && cb != utf32::TERMINATOR)
+            {
+                if (ca < cb)
+                    return -1;
+                else if (ca > cb)
+                    return 1;
+                ca = *(++stra);
+                cb = *(++strb);
+            }
+            if (stra == cstra.m_end)
+                return 0;
+            if (ascii::TERMINATOR < cb)
                 return -1;
             return 1;
         }
@@ -323,7 +388,6 @@ namespace xcore
             return false;
         }
 
-
         void write(uchar32 c, uchar32*& dst, uchar32 const* end)
         {
             if (dst < end)
@@ -373,13 +437,12 @@ namespace xcore
             return false;
         }
 
-
         static bool terminate_str(ascii::runes& dst)
         {
             if (can_write(dst))
             {
-				uchar32 c = ascii::TERMINATOR;
-				ascii::prune end = dst.m_end;
+                uchar32      c   = ascii::TERMINATOR;
+                ascii::prune end = dst.m_end;
                 write(c, end, dst.m_eos);
                 return true;
             }
@@ -390,8 +453,8 @@ namespace xcore
         {
             if (can_write(dst))
             {
-				uchar32 c = utf8::TERMINATOR;
-				utf8::prune end = dst.m_end;
+                uchar32     c   = utf8::TERMINATOR;
+                utf8::prune end = dst.m_end;
                 write(c, end, dst.m_eos);
                 return true;
             }
@@ -402,8 +465,8 @@ namespace xcore
         {
             if (can_write(dst))
             {
-				uchar32 c = utf16::TERMINATOR;
-				utf16::prune end = dst.m_end;
+                uchar32      c   = utf16::TERMINATOR;
+                utf16::prune end = dst.m_end;
                 write(c, end, dst.m_eos);
                 return true;
             }
@@ -414,8 +477,8 @@ namespace xcore
         {
             if (can_write(dst))
             {
-				uchar32 c = utf32::TERMINATOR;
-				utf32::prune end = dst.m_end;
+                uchar32      c   = utf32::TERMINATOR;
+                utf32::prune end = dst.m_end;
                 write(c, end, dst.m_eos);
                 return true;
             }
@@ -753,16 +816,16 @@ namespace xcore
 
 namespace xcore
 {
-	namespace utf32
-	{
-		void copy(const ascii::crunes& src, runes& dst, alloc* allocator, s32 size_alignment)
-		{
+    namespace utf32
+    {
+        void copy(const ascii::crunes& src, runes& dst, alloc* allocator, s32 size_alignment)
+        {
             s32 const required = dst.size() + src.size();
             if (required > dst.cap())
             {
                 resize(dst, required, allocator, size_alignment);
             }
-			utf::copy(src, dst);
-		}
-	}
-}
+            utf::copy(src, dst);
+        }
+    } // namespace utf32
+} // namespace xcore
