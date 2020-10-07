@@ -744,6 +744,7 @@ namespace xcore
         class alloc
         {
         public:
+            virtual ~alloc() {}
             virtual runes allocate(s32 len, s32 cap) = 0;
             virtual void  deallocate(runes& slice)   = 0;
         };
