@@ -34,7 +34,7 @@ namespace xcore
 
             s32           l   = 0;
             ascii::crunes src = str;
-            while (utf::can_read(src)
+            while (utf::can_read(src))
             {
                 uchar16* dst16 = (uchar16*)str16;
                 uchar16* end16 = dst16 + maxlen;
@@ -61,7 +61,7 @@ namespace xcore
 
             s32           l   = 0;
             utf32::crunes src = str;
-            while (utf::can_read(src)
+            while (utf::can_read(src))
             {
                 uchar16* dst16 = (uchar16*)str16;
                 uchar16* end16 = dst16 + maxlen;
