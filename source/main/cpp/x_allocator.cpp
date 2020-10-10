@@ -69,7 +69,14 @@ namespace xcore
 	}
 
 
-
+	xfsadexed_array::xfsadexed_array()
+        : m_data(nullptr)
+        , m_sizeof(0)
+        , m_countof(0)
+        , m_freelist(0xffffffff)
+        , m_freeindex(0xffffffff)
+	{
+	}
 
 	xfsadexed_array::xfsadexed_array(void* array_item, u32 sizeof_item, u32 countof_item)
 		: m_data(array_item)

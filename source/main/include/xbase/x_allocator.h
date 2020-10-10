@@ -285,6 +285,7 @@ namespace xcore
     class xfsadexed_array : public xfsadexed
     {
     public:
+        xfsadexed_array();
         xfsadexed_array(void* array_item, u32 sizeof_item, u32 countof_item);
         ~xfsadexed_array() {}
 
