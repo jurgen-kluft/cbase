@@ -13,7 +13,7 @@ namespace xcore
 	public:
 		virtual			~xtls_SingleThread() { }
 
-		virtual s32		max() const { return 32; }
+		virtual s32		vmax() const { return 32; }
 
 	protected:
 		virtual	void	vset(s32 slot, void * pvData) { mSlots[slot] = pvData; }

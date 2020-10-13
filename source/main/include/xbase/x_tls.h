@@ -40,7 +40,7 @@ namespace xcore
 	protected:
 		virtual				~xtls() { }
 
-		virtual s32			max() const = 0;
+		virtual s32			vmax() const = 0;
 		virtual	void		vset(s32 SLOT, void * inData) = 0;
 		virtual	void		vget(s32 SLOT, void *& outData) = 0;
 		virtual	void		vget(s32 SLOT, void const *& outData) const = 0;
