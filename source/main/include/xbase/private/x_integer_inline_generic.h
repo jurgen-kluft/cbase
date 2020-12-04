@@ -4,9 +4,6 @@ namespace xcore
 	// if 'v==0' this function returns 0
 	inline s32 xcountTrailingZeros(u16 integer)
 	{
-		if (integer == 0)
-			return 16;
-
 		s32 count = 0;
 		if ((integer & 0x000000FF) == 0)
 		{
@@ -26,10 +23,15 @@ namespace xcore
 		if ((integer & 0x00000001) == 0)
 		{
 			count += 1;
+			integer = integer >> 1;;
 		}
-
-		return count;
+		if ((integer & 0x00000001) == 1)
+		{
+			return count;
+		}
+		return 0;
 	}
+
 	 // find the number of trailing zeros in 32-bit value
 	 // if 'v==0' this function returns 0
 	inline s32 xcountTrailingZeros(u32 integer)
@@ -58,9 +60,13 @@ namespace xcore
 		if ((integer & 0x00000001) == 0)
 		{
 			count += 1;
+			integer = integer >> 1;;
 		}
-
-		return count;
+		if ((integer & 0x00000001) == 1)
+		{
+			return count;
+		}
+		return 0;
 	}
 	// find the number of trailing zeros in 64-bit value
 	// if 'v==0' this function returns 0
@@ -95,18 +101,19 @@ namespace xcore
 		if ((integer & 0x00000001) == 0)
 		{
 			count += 1;
+			integer = integer >> 1;
 		}
-
-		return count;
+		if ((integer & 0x00000001) == 1)
+		{
+			return count;
+		}
+		return 0;
 	}
 
 	// find the number of leading zeros in 16-bit v
 	// if 'v==0' this function returns 16
 	inline s32 xcountLeadingZeros(u16 integer)
 	{
-		if (integer == 0)
-			return 16;
-
 		s32 count = 0;
 		if ((integer & 0xFF000000) == 0)
 		{
@@ -126,8 +133,12 @@ namespace xcore
 		if ((integer & 0x80000000) == 0)
 		{
 			count += 1;
+			integer = integer << 1;
 		}
-
+		if ((integer & 0x80000000) == 0)
+		{
+			count += 1;
+		}
 		return count;
 	}
 	// find the number of leading zeros in 32-bit v
@@ -161,8 +172,12 @@ namespace xcore
 		if ((integer & 0x80000000) == 0)
 		{
 			count += 1;
+			integer = integer << 1;
 		}
-
+		if ((integer & 0x80000000) == 0)
+		{
+			count += 1;
+		}
 		return count;
 	}
 	// find the number of leading zeros in 64-bit v
@@ -201,8 +216,12 @@ namespace xcore
 		if ((integer & 0x8000000000000000UL) == 0)
 		{
 			count += 1;
+			integer = integer << 1;
 		}
-
+		if ((integer & 0x8000000000000000UL) == 0)
+		{
+			count += 1;
+		}
 		return count;
 	}
 
