@@ -226,7 +226,7 @@ namespace xcore
 #define XCORE_CLASS_PLACEMENT_NEW_DELETE                                    \
     void* operator new(xcore::xsize_t num_bytes, void* mem) { return mem; } \
     void  operator delete(void* mem, void*) {}                              \
-    void* operator new(xcore::xsize_t num_bytes) { return NULL; }           \
+    void* operator new(xcore::xsize_t num_bytes) noexcept { return NULL; }           \
     void  operator delete(void* mem) {}
 
 #define XCORE_CLASS_NEW_DELETE(get_allocator_func, align)                                                     \

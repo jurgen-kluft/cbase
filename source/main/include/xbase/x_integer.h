@@ -56,7 +56,9 @@ namespace xcore
 
     inline u32   xalign(u32 integer, u32 alignment);     ///< Return the aligned value of integer
     inline u32   xalignDown(u32 integer, u32 alignment); ///< Return the aligned value of integer
+    inline s32   xalignUp(s32 integer, s32 alignment);   ///< Return the aligned value of integer
     inline u32   xalignUp(u32 integer, u32 alignment);   ///< Return the aligned value of integer
+    inline u64   xalignUp(u64 integer, u64 alignment);   ///< Return the aligned value of integer
     inline xbool xisAligned(u32 integer, u32 alignment); ///< Return xTRUE if integer is aligned
     inline s32   xabs(s32 integer);                      ///< Return the absolute value of integer
     inline s32   xneg(s32 integer, bool inDoNotNegate);  ///< Return the conditionally negated value of integer

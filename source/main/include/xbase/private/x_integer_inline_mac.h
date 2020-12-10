@@ -7,7 +7,7 @@ namespace xcore
 	inline s32 xcountTrailingZeros(u16 integer)
 	{
 		if (integer == 0)
-			return 16;
+			return 0;
 
 		s32 count = 0;
 		if ((integer & 0x000000FF) == 0)
@@ -36,6 +36,9 @@ namespace xcore
 	 // if 'v==0' this function returns 0
 	inline s32 xcountTrailingZeros(u32 integer)
 	{
+        if (integer == 0)
+            return 0;
+
 		s32 count = 0;
 		if ((integer & 0x0000FFFF) == 0)
 		{
@@ -68,6 +71,9 @@ namespace xcore
 	// if 'v==0' this function returns 0
 	inline s32 xcountTrailingZeros(u64 integer)
 	{
+        if (integer == 0)
+            return 0;
+
 		s32 count = 0;
 		if ((integer & 0xFFFFFFFF) == 0)
 		{
@@ -110,22 +116,22 @@ namespace xcore
 			return 16;
 
 		s32 count = 0;
-		if ((integer & 0xFF000000) == 0)
+		if ((integer & 0xFF00) == 0)
 		{
 			count += 8;
 			integer = integer << 8;
 		}
-		if ((integer & 0xF0000000) == 0)
+		if ((integer & 0xF000) == 0)
 		{
 			count += 4;
 			integer = integer << 4;
 		}
-		if ((integer & 0xC0000000) == 0)
+		if ((integer & 0xC000) == 0)
 		{
 			count += 2;
 			integer = integer << 2;
 		}
-		if ((integer & 0x80000000) == 0)
+		if ((integer & 0x8000) == 0)
 		{
 			count += 1;
 		}
