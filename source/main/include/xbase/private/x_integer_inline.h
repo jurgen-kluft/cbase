@@ -104,6 +104,15 @@ namespace xcore
 	}
 
 	/**
+	* Return the ceiling based aligned value of integer
+	*/
+	inline u64        xalignUp(u64 integer, u64 alignment)
+	{
+		ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
+		return ((integer + (alignment-1)) & (~(alignment-1)));
+	}
+
+	/**
 	 * Check if integer is aligned
 	 */
 	inline xbool       xisAligned(u32 integer, u32 alignment)
@@ -184,6 +193,14 @@ namespace xcore
 	 * Check if integer is a power-of-two
 	 */
 	inline xbool       xispo2(u32 inInteger)
+	{
+		return (inInteger!=0) && (((inInteger) & (inInteger-1)) == 0);
+	}
+
+	/**
+	* Check if integer is a power-of-two
+	*/
+	inline xbool       xispo2(u64 inInteger)
 	{
 		return (inInteger!=0) && (((inInteger) & (inInteger-1)) == 0);
 	}
