@@ -16,7 +16,7 @@ namespace xcore
             numdwords += ((numbits + 31) / 32);
             numbits = (numbits + 31) >> 5;
         }
-        numdwords = xalignUp(numdwords, 2);
+        numdwords = xalignUp(numdwords, (u32)2);
         return numdwords * sizeof(u32);
     }
 

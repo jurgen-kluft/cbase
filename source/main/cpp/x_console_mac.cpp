@@ -106,7 +106,7 @@ namespace xcore
                     str8[ll]     = 0;
                     str8[ll + 1] = 0;
                 }
-                printf((const char*)str8);
+                printf("%s", (const char*)str8);
                 l += ll;
             }
 
@@ -141,7 +141,7 @@ namespace xcore
                     str8[ll]     = 0;
                     str8[ll + 1] = 0;
                 }
-                printf((const char*)str8);
+                printf("%s", (const char*)str8);
                 l += ll;
             }
 
