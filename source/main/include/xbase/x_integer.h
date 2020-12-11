@@ -67,7 +67,9 @@ namespace xcore
     inline s32   xmod(s32 integer, s32 inModuloValue);   ///< Return the modulo of integer using inModuloValue
     inline s32   xgcd(s32 inIntegerA, s32 integerB);     ///< Greatest common denominator (biggest modulo value of both integers)
     inline s32   xaverage(s32 integerA, s32 integerB);   ///< Calculate average of A & B without overflow or s64 use
+    inline xbool xispo2(s32 integer);                    ///< Check if integer is a power-of-two
     inline xbool xispo2(u32 integer);                    ///< Check if integer is a power-of-two
+    inline xbool xispo2(u64 integer);                    ///< Check if integer is a power-of-two
     inline u32   xceilpo2(u32 integer);                  ///< Return the smallest power-of-two larger than integer
     inline u32   xfloorpo2(u32 integer);                 ///< Return the biggest power-of-two smaller than integer
     inline u32   xbitReverse(u32 integer);               ///< Reverse bits in 32 bit word
