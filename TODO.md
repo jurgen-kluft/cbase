@@ -9,7 +9,12 @@
 ~~Split of containers into xcore/xgenerics~~ DONE
 
 Simplify the whole string usage, currently we have code to handle ascii/utf8/utf16/utf32. Can we just use ascii and utf32 and remove all other code except the conversion from/to. Console, Log, printf/sprintf, sscanf etc.. should all just use a standard low-level string container that is ascii and utf32. It doesn't matter if there is dynamic allocation.
-  
+
+Refactor x_integer to use scopes for types to be more explicit, e.g.
+u16_t, and add all functions under this
+u32_t, e.g. u32 size = 10; u32_t.floorpo2(size);
+u64_t
+
 ## xcore (typeless/raw containers)
 
 - ~~list~~ DONE
