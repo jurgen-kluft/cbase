@@ -2,7 +2,7 @@
 #define __XBASE_RUNES_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 namespace xcore
@@ -439,6 +439,8 @@ namespace xcore
                 m_end = other.m_end;
                 return *this;
             }
+            bool   operator==(crunes const& other) const { return m_str == other.m_str && m_end == other.m_end; }
+            bool   operator!=(crunes const& other) const { return m_str != other.m_str || m_end != other.m_end; }
             pcrune m_str;
             pcrune m_end;
         };
@@ -557,6 +559,8 @@ namespace xcore
                 m_end = other.m_end;
                 return *this;
             }
+            bool   operator==(crunes const& other) const { return m_str == other.m_str && m_end == other.m_end; }
+            bool   operator!=(crunes const& other) const { return m_str != other.m_str || m_end != other.m_end; }
             pcrune m_str;
             pcrune m_cur;
             pcrune m_end;
@@ -684,6 +688,10 @@ namespace xcore
                 m_end = other.m_end;
                 return *this;
             }
+
+            bool operator==(crunes const& other) const { return m_str == other.m_str && m_end == other.m_end; }
+            bool operator!=(crunes const& other) const { return m_str != other.m_str || m_end != other.m_end; }
+
             pcrune m_str;
             pcrune m_cur;
             pcrune m_end;
