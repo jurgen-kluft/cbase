@@ -37,10 +37,10 @@ namespace xcore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
-        virtual void write(const ascii::crunes& str);
-        virtual void write(const ascii::crunes& fmt, const x_va_list& args);
-        virtual void write(const utf32::crunes& str);
-        virtual void write(const utf32::crunes& fmt, const x_va_list& args);
+        virtual void write(const ascii::crunes_t& str);
+        virtual void write(const ascii::crunes_t& fmt, const x_va_list& args);
+        virtual void write(const utf32::crunes_t& str);
+        virtual void write(const utf32::crunes_t& fmt, const x_va_list& args);
 
         virtual void writeLine();
     };
@@ -65,13 +65,13 @@ namespace xcore
 
     void xconsole_null::write(u64 _value) {}
 
-    void xconsole_null::write(const ascii::crunes& str) {}
+    void xconsole_null::write(const ascii::crunes_t& str) {}
 
-    void xconsole_null::write(const ascii::crunes& fmt, const x_va_list& args) {}
+    void xconsole_null::write(const ascii::crunes_t& fmt, const x_va_list& args) {}
 
-    void xconsole_null::write(const utf32::crunes& str) {}
+    void xconsole_null::write(const utf32::crunes_t& str) {}
 
-    void xconsole_null::write(const utf32::crunes& fmt, const x_va_list& args) {}
+    void xconsole_null::write(const utf32::crunes_t& fmt, const x_va_list& args) {}
 
     void xconsole_null::writeLine() {}
 
@@ -103,10 +103,10 @@ namespace xcore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
-        virtual void write(const ascii::crunes& str);
-        virtual void write(const ascii::crunes& fmt, const x_va_list& args);
-        virtual void write(const utf32::crunes& str);
-        virtual void write(const utf32::crunes& fmt, const x_va_list& args);
+        virtual void write(const ascii::crunes_t& str);
+        virtual void write(const ascii::crunes_t& fmt, const x_va_list& args);
+        virtual void write(const utf32::crunes_t& str);
+        virtual void write(const utf32::crunes_t& fmt, const x_va_list& args);
 
         virtual void writeLine();
     };
@@ -121,7 +121,7 @@ namespace xcore
     {
         utf32::rune true32[]  = {'t', 'r', 'u', 'e', 0};
         utf32::rune false32[] = {'t', 'r', 'u', 'e', 0};
-        write(_value ? utf32::crunes(true32, true32 + 4) : utf32::crunes(false32, false32 + 5));
+        write(_value ? utf32::crunes_t(true32, true32 + 4) : utf32::crunes_t(false32, false32 + 5));
     }
 
     void xconsole_default::write(f64 _value)
@@ -166,23 +166,23 @@ namespace xcore
         write(tmp);
     }
 
-    void xconsole_default::write(const ascii::crunes& str) { mOut->write(str); }
+    void xconsole_default::write(const ascii::crunes_t& str) { mOut->write(str); }
 
-    void xconsole_default::write(const ascii::crunes& fmt, const x_va_list& args)
+    void xconsole_default::write(const ascii::crunes_t& fmt, const x_va_list& args)
     {
         XCONSOLE_LOCAL_STR_BUF(ascii::rune, str, 1024);
-        ascii::vsprintf(str, ascii::crunes(fmt), args);
-        ascii::crunes outstr(str);
+        ascii::vsprintf(str, ascii::crunes_t(fmt), args);
+        ascii::crunes_t outstr(str);
         mOut->write(outstr);
     }
 
-    void xconsole_default::write(const utf32::crunes& str) { mOut->write(str); }
+    void xconsole_default::write(const utf32::crunes_t& str) { mOut->write(str); }
 
-    void xconsole_default::write(const utf32::crunes& fmt, const x_va_list& args)
+    void xconsole_default::write(const utf32::crunes_t& fmt, const x_va_list& args)
     {
         XCONSOLE_LOCAL_STR_BUF(utf32::rune, str, 1024);
-        utf32::vsprintf(str, utf32::crunes(fmt), args);
-        utf32::crunes outstr(str);
+        utf32::vsprintf(str, utf32::crunes_t(fmt), args);
+        utf32::crunes_t outstr(str);
         mOut->write(outstr);
     }
 

@@ -42,12 +42,12 @@ namespace xcore
 
 	//-------------------------------------------------------------------------------
 
-	void xguid::toString(ascii::runes& str)const
+	void xguid::toString(runes_t& str)const
 	{ 
 		// high, word2, word1, low
 		ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
-		ascii::crunes fmt(fmtstr, ascii::endof(fmtstr, NULL));
-		ascii::sprintf(str, fmt, x_va(mGuid.ma32[0]), x_va(mGuid.ma32[1]), x_va(mGuid.ma32[2]), x_va(mGuid.ma32[3]) );
+		crunes_t fmt(fmtstr);
+		sprintf(str, fmt, x_va(mGuid.ma32[0]), x_va(mGuid.ma32[1]), x_va(mGuid.ma32[2]), x_va(mGuid.ma32[3]) );
 	}
 
 
@@ -64,31 +64,13 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	void xguid::fromString(ascii::crunes const& _str)
+	void xguid::fromString(crunes_t const& _str)
 	{
 		setNull();
 
-		ascii::crunes iter = _str;
-		for (s32 i=0, s=0; s<32; i++)
-		{
-			uchar32 c = utf::read(iter);
-			if (c == '\0')
-				break;
+		ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
+		crunes_t fmt(fmtstr);
+		sscanf(_str, fmt, x_va_r(&mGuid.ma32[0]), x_va_r(&mGuid.ma32[1]), x_va_r(&mGuid.ma32[2]), x_va_r(&mGuid.ma32[3]));
 
-			s32 d = -1;
-			if (c>='0' && c<='9')
-				d = c - '0';
-			else if (c>='a' && c<='f')
-				d = 10 + (c - 'a');
-			else if (c>='A' && c<='F')
-				d = 10 + (c - 'A');
-
-			if (d != -1)
-			{
-				u32& _word = mGuid.ma32[(s>>3)];
-				_word = (_word << 4) | (d & 0xf);
-				++s;
-			}
-		}
 	}
 };

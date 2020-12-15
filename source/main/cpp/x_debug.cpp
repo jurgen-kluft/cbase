@@ -96,7 +96,7 @@ namespace xcore
 		//
 		// utf32::runez<1024> report;
 		// utf32::runez<64> fmtstr;
-		// ascii::crunes fmtascii("*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n");
+		// ascii::crunes_t fmtascii("*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n");
 		// utf::copy(fmtascii, fmtstr);
 		// utf32::sprintf(report, fmtstr, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
 

@@ -1,4 +1,4 @@
-#include "xbase/x_runes.h"
+#include "xbase/x_target.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_integer.h"
 #include "xbase/x_console.h"
@@ -10,7 +10,203 @@ namespace xcore
 {
     namespace utf
     {
-        inline s32 sequence_sizeof_utf8(uchar8 c)
+        static s32 len(ascii::pcrune str, ascii::pcrune end);
+        static s32 len(utf32::pcrune str, utf32::pcrune end);
+
+        static ascii::prune  endof(ascii::prune str, ascii::pcrune eos);
+        static ascii::pcrune endof(ascii::pcrune str, ascii::pcrune eos);
+
+        static utf32::prune  endof(utf32::prune str, utf32::pcrune eos);
+        static utf32::pcrune endof(utf32::pcrune str, utf32::pcrune eos);
+
+        // UTF sequence sizes
+        static s32 sequence_sizeof_utf8(uchar8 c);
+        static s32 size(uchar32 c);
+
+        // Peek
+        static uchar32 peek(ascii::runes_t const& str);
+        static uchar32 peek(utf8::runes_t const& str);
+        static uchar32 peek(utf16::runes_t const& str);
+        static uchar32 peek(utf32::runes_t const& str);
+
+        static uchar32 peek(ascii::crunes_t const& str);
+        static uchar32 peek(utf8::crunes_t const& str);
+        static uchar32 peek(utf16::crunes_t const& str);
+        static uchar32 peek(utf32::crunes_t const& str);
+
+        // Skip
+        static bool skip(ascii::rune*& str, ascii::rune const* begin, ascii::rune const* end, s32 count);
+        static bool skip(utf8::rune*& str, utf8::rune const* begin, utf8::rune const* end, s32 count);
+        static bool skip(utf16::rune*& str, utf16::rune const* begin, utf16::rune const* end, s32 count);
+        static bool skip(utf32::rune*& str, utf32::rune const* begin, utf32::rune const* end, s32 count);
+
+        static bool skip(ascii::rune const*& str, ascii::rune const* begin, ascii::rune const* end, s32 count);
+        static bool skip(utf8::rune const*& str, utf8::rune const* begin, utf8::rune const* end, s32 count);
+        static bool skip(utf16::rune const*& str, utf16::rune const* begin, utf16::rune const* end, s32 count);
+        static bool skip(utf32::rune const*& str, utf32::rune const* begin, utf32::rune const* end, s32 count);
+
+        // Compare
+        static s32 compare(ascii::pcrune stra, ascii::pcrune strb);
+        static s32 compare(ascii::pcrune stra, utf32::pcrune strb);
+        static s32 compare(utf32::pcrune stra, utf32::pcrune strb);
+        static s32 compare(utf32::pcrune stra, ascii::pcrune strb);
+        static s32 compare(ascii::crunes_t const& cstra, utf32::pcrune strb);
+
+        // Read
+        static uchar32 read(ascii::rune const*& str, ascii::rune const* end);
+        static uchar32 read(utf8::rune const*& str, utf8::rune const* end);
+        static uchar32 read(utf16::rune const*& str, utf16::rune const* end);
+        static uchar32 read(utf32::rune const*& str, utf32::rune const* end);
+        static uchar32 read(ascii::rune*& str, ascii::rune const* end);
+        static uchar32 read(utf8::rune*& str, utf8::rune const* end);
+        static uchar32 read(utf32::rune*& str, utf32::rune const* end);
+        static uchar32 read(ascii::crunes_t& str);
+        static uchar32 read(utf8::crunes_t& str);
+        static uchar32 read(utf16::crunes_t& str);
+        static uchar32 read(utf32::crunes_t& str);
+
+        // Write
+        static void write(uchar32 c, uchar*& dest, uchar const* end);
+        static void write(uchar32 cp, uchar8*& dest, uchar8 const* end);
+        static void write(uchar32 rune, uchar16*& dest, uchar16 const* end);
+        static bool write(uchar32 c, uchar16*& dst, uchar16* end);
+        static void write(uchar32 c, uchar32*& dst, uchar32 const* end);
+        static bool write(uchar32 c, ascii::runes_t& dst);
+        static bool write(uchar32 c, utf8::runes_t& dst);
+        static bool write(uchar32 c, utf16::runes_t& dst);
+        static bool write(uchar32 c, utf32::runes_t& dst);
+
+        // Terminate
+        static bool terminate_str(ascii::runes_t& dst);
+        static bool terminate_str(utf8::runes_t& dst);
+        static bool terminate_str(utf16::runes_t& dst);
+        static bool terminate_str(utf32::runes_t& dst);
+
+        // const char* -> ascii / utf16 / utf32
+        static void copy(char const* sstr, ascii::runes_t& dstr, bool write_terminator);
+        static void copy(char const* sstr, utf16::runes_t& dstr, bool write_terminator);
+        static void copy(char const* sstr, utf32::runes_t& dstr, bool write_terminator);
+
+        // -> ASCII
+        static void copy(ascii::crunes_t const& sstr, ascii::runes_t& dstr, bool write_terminator);
+        static void copy(utf16::crunes_t const& sstr, ascii::runes_t& dstr, bool write_terminator);
+        static void copy(utf32::crunes_t const& sstr, ascii::runes_t& dstr, bool write_terminator);
+
+        // -> UTF-16
+        static void copy(ascii::crunes_t const& sstr, utf16::runes_t& dstr, bool write_terminator);
+        static void copy(utf16::crunes_t const& sstr, utf16::runes_t& dstr, bool write_terminator);
+        static void copy(utf32::crunes_t const& sstr, utf16::runes_t& dstr, bool write_terminator);
+
+        // -> UTF-32
+        static void copy(ascii::crunes_t const& sstr, utf32::runes_t& dstr, bool write_terminator);
+        static void copy(utf16::crunes_t const& sstr, utf32::runes_t& dstr, bool write_terminator);
+        static void copy(utf32::crunes_t const& sstr, utf32::runes_t& dstr, bool write_terminator);
+
+        static bool is_eos(uchar const* str);
+        static bool is_eos(uchar8 const* str);
+        static bool is_eos(uchar16 const* str);
+        static bool is_eos(uchar32 const* str);
+
+        static bool can_read(ascii::runes_t const& str);
+        static bool can_read(utf8::runes_t const& str);
+        static bool can_read(utf16::runes_t const& str);
+        static bool can_read(utf32::runes_t const& str);
+
+        static bool can_read(ascii::crunes_t const& str);
+        static bool can_read(utf8::crunes_t const& str);
+        static bool can_read(utf16::crunes_t const& str);
+        static bool can_read(utf32::crunes_t const& str);
+
+        static bool can_write(ascii::runes_t const& str);
+        static bool can_write(utf8::runes_t const& str);
+        static bool can_write(utf16::runes_t const& str);
+        static bool can_write(utf32::runes_t const& str);
+
+        static bool read_is_crln(ascii::runes_t const& str);
+        static bool read_is_crln(utf8::runes_t const& str);
+        static bool read_is_crln(utf32::runes_t const& str);
+
+        static bool read_is_crln(ascii::crunes_t const& str);
+        static bool read_is_crln(utf8::crunes_t const& str);
+        static bool read_is_crln(utf32::crunes_t const& str);
+
+        s32 len(ascii::pcrune str, ascii::pcrune end)
+        {
+            end = endof(str, end);
+            return s32(end - str);
+        }
+
+        ascii::prune endof(ascii::prune str, ascii::pcrune eos)
+        {
+            ascii::prune end = str;
+            if (eos == nullptr)
+            {
+                while (*end != ascii::TERMINATOR)
+                    end++;
+            }
+            else
+            {
+                while (*end != ascii::TERMINATOR && end < eos)
+                    end++;
+            }
+            return end;
+        }
+
+        ascii::pcrune endof(ascii::pcrune str, ascii::pcrune eos)
+        {
+            ascii::pcrune end = str;
+            if (eos == nullptr)
+            {
+                while (*end != ascii::TERMINATOR)
+                    end++;
+            }
+            else
+            {
+                while (*end != ascii::TERMINATOR && end < eos)
+                    end++;
+            }
+            return end;
+        }
+
+        s32 len(utf32::pcrune str, utf32::pcrune end)
+        {
+            end = endof(str, end);
+            return s32(end - str);
+        }
+
+        utf32::prune endof(utf32::prune str, utf32::pcrune eos)
+        {
+            utf32::prune end = str;
+            if (eos == nullptr)
+            {
+                while (*end != utf32::TERMINATOR)
+                    end++;
+            }
+            else
+            {
+                while (*end != utf32::TERMINATOR && end < eos)
+                    end++;
+            }
+            return end;
+        }
+
+        utf32::pcrune endof(utf32::pcrune str, utf32::pcrune eos)
+        {
+            utf32::pcrune end = str;
+            if (eos == nullptr)
+            {
+                while (*end != utf32::TERMINATOR)
+                    end++;
+            }
+            else
+            {
+                while (*end != utf32::TERMINATOR && end < eos)
+                    end++;
+            }
+            return end;
+        }
+
+        s32 sequence_sizeof_utf8(uchar8 c)
         {
             u8 lead = c;
             if (lead < 0x80)
@@ -25,32 +221,218 @@ namespace xcore
                 return 0;
         }
 
-        uchar32 peek(ascii::crunes const& str)
+        uchar32 peek(ascii::runes_t const& str)
         {
-            uchar32 c = utf32::TERMINATOR;
-            if (can_read(str))
-                c = str.m_str[0];
-            return c;
+            ascii::pcrune src = str.m_str;
+            return read(src, str.m_end);
         }
 
-        uchar32 peek(utf8::crunes const& str)
+        uchar32 peek(utf8::runes_t const& str)
         {
             utf8::pcrune src = str.m_str;
             return read(src, str.m_end);
         }
 
-        uchar32 peek(utf16::crunes const& str)
+        uchar32 peek(utf16::runes_t const& str)
         {
             utf16::pcrune src = str.m_str;
             return read(src, str.m_end);
         }
 
-        uchar32 peek(utf32::crunes const& str)
+        uchar32 peek(utf32::runes_t const& str)
         {
-            uchar32 c = utf32::TERMINATOR;
-            if (can_read(str))
-                c = str.m_str[0];
-            return c;
+            utf32::pcrune src = str.m_str;
+            return read(src, str.m_end);
+        }
+
+        uchar32 peek(ascii::crunes_t const& str)
+        {
+            ascii::pcrune src = str.m_str;
+            return read(src, str.m_end);
+        }
+
+        uchar32 peek(utf8::crunes_t const& str)
+        {
+            utf8::pcrune src = str.m_str;
+            return read(src, str.m_end);
+        }
+
+        uchar32 peek(utf16::crunes_t const& str)
+        {
+            utf16::pcrune src = str.m_str;
+            return read(src, str.m_end);
+        }
+
+        uchar32 peek(utf32::crunes_t const& str)
+        {
+            utf32::pcrune src = str.m_str;
+            return read(src, str.m_end);
+        }
+
+        bool skip(ascii::rune*& str, ascii::rune const* begin, ascii::rune const* end, s32 count)
+        {
+            ascii::rune const* cursor = str;
+            bool               result = skip(cursor, begin, end, count);
+            str += (cursor - str);
+            return result;
+        }
+
+        bool skip(utf8::rune*& str, utf8::rune const* begin, utf8::rune const* end, s32 count)
+        {
+            utf8::rune const* cursor = str;
+            bool              result = skip(cursor, begin, end, count);
+            str += (cursor - str);
+            return result;
+        }
+
+        bool skip(utf16::rune*& str, utf16::rune const* begin, utf16::rune const* end, s32 count)
+        {
+            utf16::rune const* cursor = str;
+            bool               result = skip(cursor, begin, end, count);
+            str += (cursor - str);
+            return result;
+        }
+
+        bool skip(utf32::rune*& str, utf32::rune const* begin, utf32::rune const* end, s32 count)
+        {
+            utf32::rune const* cursor = str;
+            bool               result = skip(cursor, begin, end, count);
+            str += (cursor - str);
+            return result;
+        }
+
+        bool skip(ascii::rune const*& str, ascii::rune const* begin, ascii::rune const* end, s32 count)
+        {
+            if (count < 0)
+            {
+                while ((end == NULL || str < end) && count < 0)
+                {
+                    str -= 1;
+                    uchar32 c = *str;
+                    if (c == ascii::TERMINATOR)
+                        break;
+                    count += 1;
+                }
+            }
+            else
+            {
+                uchar32 c = *str;
+                while (c != ascii::TERMINATOR && (end == NULL || str < end) && count > 0)
+                {
+                    str++;
+                    count -= 1;
+                }
+            }
+            return count == 0;
+        }
+
+        bool skip(utf8::rune const*& str, utf8::rune const* begin, utf8::rune const* end, s32 count)
+        {
+            if (count < 0)
+            {
+                ASSERT(false); // UTF-8 does not support stepping backwards
+            }
+            else
+            {
+                uchar32 c = *str;
+                while (c != utf8::TERMINATOR && count > 0)
+                {
+                    s32 const l = sequence_sizeof_utf8((uchar8)c);
+                    if (end != NULL && (str + l) > end)
+                        return false;
+
+                    switch (l)
+                    {
+                        case 0:
+                            c = '?'; // Illegal character in utf8, replace with '?'
+                            break;
+                        case 1: break;
+                        case 2:
+                            str++;
+                            c = ((c << 6) & 0x7ff) + ((str[0]) & 0x3f);
+                            break;
+                        case 3:
+                            str++;
+                            c = ((c << 12) & 0xffff) + (((str[0]) << 6) & 0xfff);
+                            ++str;
+                            c += (str[0]) & 0x3f;
+                            break;
+                        case 4:
+                            str++;
+                            c = ((c << 18) & 0x1fffff) + (((str[0]) << 12) & 0x3ffff);
+                            ++str;
+                            c += ((str[0]) << 6) & 0xfff;
+                            ++str;
+                            c += (str[0]) & 0x3f;
+                            break;
+                    }
+                    str++;
+                    c = *str;
+                    count -= 1;
+                }
+            }
+            return count == 0;
+        }
+
+        bool skip(utf16::rune const*& str, utf16::rune const* begin, utf16::rune const* end, s32 count)
+        {
+            if (count < 0)
+            {
+                ASSERT(false); // UTF-16 does not support stepping backwards
+            }
+            else
+            {
+                uchar32 c = *str;
+                while (c != utf16::TERMINATOR && (end == NULL || str < end) && count > 0)
+                {
+                    s32 l = 1;
+                    if (c < 0xd800)
+                    {
+                        l = 1;
+                    }
+                    else if (c < 0xdc00)
+                    {
+                        l = 2;
+                    }
+                    if (end == NULL || (str + l) <= end)
+                    {
+                        c = 0;
+                        for (s32 i = 0; i < l; i++)
+                        {
+                            c = c << 16;
+                            c = c | str[i];
+                        }
+                        str += l;
+                    }
+                    count -= 1;
+                }
+            }
+            return count == 0;
+        }
+
+        bool skip(utf32::rune const*& str, utf32::rune const* begin, utf32::rune const* end, s32 count)
+        {
+            if (count < 0)
+            {
+                while ((end == NULL || str < end) && count < 0)
+                {
+                    str -= 1;
+                    uchar32 c = *str;
+                    if (c == utf32::TERMINATOR)
+                        break;
+                    count += 1;
+                }
+            }
+            else
+            {
+                uchar32 c = *str;
+                while (c != utf32::TERMINATOR && (end == NULL || str < end) && count > 0)
+                {
+                    str++;
+                    count -= 1;
+                }
+            }
+            return count == 0;
         }
 
         s32 compare(ascii::pcrune stra, ascii::pcrune strb)
@@ -133,7 +515,7 @@ namespace xcore
             return 1;
         }
 
-        s32 compare(ascii::crunes const& cstra, utf32::pcrune strb)
+        s32 compare(ascii::crunes_t const& cstra, utf32::pcrune strb)
         {
             ascii::pcrune stra = cstra.m_str;
             uchar32       ca   = *stra;
@@ -284,10 +666,10 @@ namespace xcore
             return c;
         }
 
-        uchar32 read(ascii::crunes& str) { return read(str.m_str, str.m_end); }
-        uchar32 read(utf8::crunes& str) { return read(str.m_str, str.m_end); }
-        uchar32 read(utf16::crunes& str) { return read(str.m_str, str.m_end); }
-        uchar32 read(utf32::crunes& str) { return read(str.m_str, str.m_end); }
+        uchar32 read(ascii::crunes_t& str) { return read(str.m_str, str.m_end); }
+        uchar32 read(utf8::crunes_t& str) { return read(str.m_str, str.m_end); }
+        uchar32 read(utf16::crunes_t& str) { return read(str.m_str, str.m_end); }
+        uchar32 read(utf32::crunes_t& str) { return read(str.m_str, str.m_end); }
 
         // ####### WRITE ########
 
@@ -397,7 +779,7 @@ namespace xcore
             }
         }
 
-        bool write(uchar32 c, ascii::runes& dst)
+        bool write(uchar32 c, ascii::runes_t& dst)
         {
             if (can_write(dst))
             {
@@ -407,7 +789,7 @@ namespace xcore
             return false;
         }
 
-        bool write(uchar32 c, utf8::runes& dst)
+        bool write(uchar32 c, utf8::runes_t& dst)
         {
             if (can_write(dst))
             {
@@ -417,7 +799,7 @@ namespace xcore
             return false;
         }
 
-        bool write(uchar32 c, utf16::runes& dst)
+        bool write(uchar32 c, utf16::runes_t& dst)
         {
             if (can_write(dst))
             {
@@ -427,7 +809,7 @@ namespace xcore
             return false;
         }
 
-        bool write(uchar32 c, utf32::runes& dst)
+        bool write(uchar32 c, utf32::runes_t& dst)
         {
             if (can_write(dst))
             {
@@ -437,7 +819,7 @@ namespace xcore
             return false;
         }
 
-        static bool terminate_str(ascii::runes& dst)
+        bool terminate_str(ascii::runes_t& dst)
         {
             if (can_write(dst))
             {
@@ -449,7 +831,7 @@ namespace xcore
             return false;
         }
 
-        static bool terminate_str(utf8::runes& dst)
+        bool terminate_str(utf8::runes_t& dst)
         {
             if (can_write(dst))
             {
@@ -461,7 +843,7 @@ namespace xcore
             return false;
         }
 
-        static bool terminate_str(utf16::runes& dst)
+        bool terminate_str(utf16::runes_t& dst)
         {
             if (can_write(dst))
             {
@@ -473,7 +855,7 @@ namespace xcore
             return false;
         }
 
-        static bool terminate_str(utf32::runes& dst)
+        bool terminate_str(utf32::runes_t& dst)
         {
             if (can_write(dst))
             {
@@ -486,7 +868,7 @@ namespace xcore
         }
 
         // const char* -> ascii / utf16 / utf32
-        void copy(char const* sstr, ascii::runes& dstr, bool write_terminator)
+        void copy(char const* sstr, ascii::runes_t& dstr, bool write_terminator)
         {
             while (*sstr != '\0')
             {
@@ -498,7 +880,7 @@ namespace xcore
                 terminate_str(dstr);
         }
 
-        void copy(char const* sstr, utf16::runes& dstr, bool write_terminator)
+        void copy(char const* sstr, utf16::runes_t& dstr, bool write_terminator)
         {
             while (*sstr != '\0')
             {
@@ -510,7 +892,7 @@ namespace xcore
                 terminate_str(dstr);
         }
 
-        void copy(char const* sstr, utf32::runes& dstr, bool write_terminator)
+        void copy(char const* sstr, utf32::runes_t& dstr, bool write_terminator)
         {
             while (*sstr != '\0')
             {
@@ -524,9 +906,9 @@ namespace xcore
 
         // -> ASCII
 
-        void copy(ascii::crunes const& sstr, ascii::runes& dstr, bool write_terminator)
+        void copy(ascii::crunes_t const& sstr, ascii::runes_t& dstr, bool write_terminator)
         {
-            ascii::crunes src = sstr;
+            ascii::crunes_t src = sstr;
             while (can_read(src))
             {
                 uchar32 c = read(src);
@@ -537,9 +919,9 @@ namespace xcore
                 terminate_str(dstr);
         }
 
-        void copy(utf16::crunes const& sstr, ascii::runes& dstr, bool write_terminator)
+        void copy(utf16::crunes_t const& sstr, ascii::runes_t& dstr, bool write_terminator)
         {
-            utf16::crunes src = sstr;
+            utf16::crunes_t src = sstr;
             while (can_read(src))
             {
                 uchar32 c = read(src);
@@ -550,9 +932,9 @@ namespace xcore
                 terminate_str(dstr);
         }
 
-        void copy(utf32::crunes const& sstr, ascii::runes& dstr, bool write_terminator)
+        void copy(utf32::crunes_t const& sstr, ascii::runes_t& dstr, bool write_terminator)
         {
-            utf32::crunes src = sstr;
+            utf32::crunes_t src = sstr;
             while (can_read(src))
             {
                 uchar32 c = read(src);
@@ -565,9 +947,9 @@ namespace xcore
 
         // -> UTF-16
 
-        void copy(ascii::crunes const& sstr, utf16::runes& dstr, bool write_terminator)
+        void copy(ascii::crunes_t const& sstr, utf16::runes_t& dstr, bool write_terminator)
         {
-            ascii::crunes src = sstr;
+            ascii::crunes_t src = sstr;
             while (can_read(src))
             {
                 uchar32 c = read(src);
@@ -578,9 +960,9 @@ namespace xcore
                 terminate_str(dstr);
         }
 
-        void copy(utf16::crunes const& sstr, utf16::runes& dstr, bool write_terminator)
+        void copy(utf16::crunes_t const& sstr, utf16::runes_t& dstr, bool write_terminator)
         {
-            utf16::crunes src = sstr;
+            utf16::crunes_t src = sstr;
             while (can_read(src))
             {
                 uchar32 c = read(src);
@@ -591,9 +973,9 @@ namespace xcore
                 terminate_str(dstr);
         }
 
-        void copy(utf32::crunes const& sstr, utf16::runes& dstr, bool write_terminator)
+        void copy(utf32::crunes_t const& sstr, utf16::runes_t& dstr, bool write_terminator)
         {
-            utf32::crunes src = sstr;
+            utf32::crunes_t src = sstr;
             while (can_read(src))
             {
                 uchar32 c = read(src);
@@ -606,9 +988,9 @@ namespace xcore
 
         // -> UTF-32
 
-        void copy(ascii::crunes const& sstr, utf32::runes& dstr, bool write_terminator)
+        void copy(ascii::crunes_t const& sstr, utf32::runes_t& dstr, bool write_terminator)
         {
-            ascii::crunes src = sstr;
+            ascii::crunes_t src = sstr;
             while (can_read(src))
             {
                 uchar32 c = read(src);
@@ -619,9 +1001,9 @@ namespace xcore
                 terminate_str(dstr);
         }
 
-        void copy(utf16::crunes const& sstr, utf32::runes& dstr, bool write_terminator)
+        void copy(utf16::crunes_t const& sstr, utf32::runes_t& dstr, bool write_terminator)
         {
-            utf16::crunes src = sstr;
+            utf16::crunes_t src = sstr;
             while (true)
             {
                 uchar32 c = read(src);
@@ -634,9 +1016,9 @@ namespace xcore
                 terminate_str(dstr);
         }
 
-        void copy(utf32::crunes const& sstr, utf32::runes& dstr, bool write_terminator)
+        void copy(utf32::crunes_t const& sstr, utf32::runes_t& dstr, bool write_terminator)
         {
-            utf32::crunes src = sstr;
+            utf32::crunes_t src = sstr;
             while (true)
             {
                 uchar32 c = read(src);
@@ -687,145 +1069,1898 @@ namespace xcore
 
         bool is_eos(uchar32 const* str) { return str[0] == '\0'; }
 
-        bool can_read(ascii::runes const& str)
+        bool can_read(ascii::runes_t const& str)
         {
             if (str.m_end == nullptr)
                 return str.m_str[0] != '\0';
             return str.m_str < str.m_end && str.m_str[0] != '\0';
         }
 
-        bool can_read(utf8::runes const& str)
+        bool can_read(utf8::runes_t const& str)
         {
             if (str.m_end == nullptr)
                 return str.m_str[0] != '\0';
             return str.m_str < str.m_end && str.m_str[0] != '\0';
         }
 
-        bool can_read(utf16::runes const& str)
+        bool can_read(utf16::runes_t const& str)
         {
             if (str.m_end == nullptr)
                 return str.m_str[0] != '\0';
             return str.m_str < str.m_end && str.m_str[0] != '\0';
         }
 
-        bool can_read(utf32::runes const& str)
+        bool can_read(utf32::runes_t const& str)
         {
             if (str.m_end == nullptr)
                 return str.m_str[0] != '\0';
             return str.m_str < str.m_end && str.m_str[0] != '\0';
         }
 
-        bool can_read(ascii::crunes const& str)
+        bool can_read(ascii::crunes_t const& str)
         {
             if (str.m_end == nullptr)
                 return str.m_str[0] != '\0';
             return str.m_str < str.m_end && str.m_str[0] != '\0';
         }
 
-        bool can_read(utf8::crunes const& str)
+        bool can_read(utf8::crunes_t const& str)
         {
             if (str.m_end == nullptr)
                 return str.m_str[0] != '\0';
             return str.m_str < str.m_end && str.m_str[0] != '\0';
         }
 
-        bool can_read(utf16::crunes const& str)
+        bool can_read(utf16::crunes_t const& str)
         {
             if (str.m_end == nullptr)
                 return str.m_str[0] != '\0';
             return str.m_str < str.m_end && str.m_str[0] != '\0';
         }
 
-        bool can_read(utf32::crunes const& str)
+        bool can_read(utf32::crunes_t const& str)
         {
             if (str.m_end == nullptr)
                 return str.m_str[0] != '\0';
             return str.m_str < str.m_end && str.m_str[0] != '\0';
         }
 
-        bool can_write(ascii::runes const& str)
+        bool can_write(ascii::runes_t const& str)
         {
             ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
             return str.m_end < str.m_eos;
         }
 
-        bool can_write(utf8::runes const& str)
+        bool can_write(utf8::runes_t const& str)
         {
             ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
             return str.m_end < str.m_eos;
         }
 
-        bool can_write(utf16::runes const& str)
+        bool can_write(utf16::runes_t const& str)
         {
             ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
             return str.m_end < str.m_eos;
         }
 
-        bool can_write(utf32::runes const& str)
+        bool can_write(utf32::runes_t const& str)
         {
             ASSERT(str.m_end != nullptr && str.m_eos != nullptr);
             return str.m_end < str.m_eos;
         }
 
-        bool read_is_crln(ascii::runes const& str)
+        bool read_is_crln(ascii::runes_t const& str)
         {
             ASSERT(str.m_end != nullptr);
             return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
         }
 
-        bool read_is_crln(utf8::runes const& str)
+        bool read_is_crln(utf8::runes_t const& str)
         {
             ASSERT(str.m_end != nullptr);
             return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
         }
 
-        bool read_is_crln(utf32::runes const& str)
+        bool read_is_crln(utf32::runes_t const& str)
         {
             ASSERT(str.m_end != nullptr);
             return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
         }
 
-        bool read_is_crln(ascii::crunes const& str)
+        bool read_is_crln(ascii::crunes_t const& str)
         {
             ASSERT(str.m_end != nullptr);
             return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
         }
 
-        bool read_is_crln(utf8::crunes const& str)
+        bool read_is_crln(utf8::crunes_t const& str)
         {
             ASSERT(str.m_end != nullptr);
             return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
         }
 
-        bool read_is_crln(utf32::crunes const& str)
+        bool read_is_crln(utf32::crunes_t const& str)
         {
             ASSERT(str.m_end != nullptr);
             return (str.m_str + 1) < str.m_end && (str.m_str[0] == '\r' && str.m_str[1] == '\n');
         }
 
     } // namespace utf
-};    // namespace xcore
 
-#define XNAMESPACE_NAME ascii
-#include "x_runes_impl.cpp"
-#undef XNAMESPACE_NAME
-
-#define XNAMESPACE_NAME utf32
-#include "x_runes_impl.cpp"
-#undef XNAMESPACE_NAME
-
-namespace xcore
-{
-    namespace utf32
+    struct cursor_t
     {
-        void copy(const ascii::crunes& src, runes& dst, alloc* allocator, s32 size_alignment)
+        cursor_t& operator=(const cursor_t& other)
         {
-            s32 const required = dst.size() + src.size();
-            if (required > dst.cap())
-            {
-                resize(dst, required, allocator, size_alignment);
-            }
-            utf::copy(src, dst);
+            m_ptr.m_ascii = other.m_ptr.m_ascii;
+            return *this;
         }
-    } // namespace utf32
+        bool operator<(const cursor_t& other) const { return m_ptr.m_ascii < other.m_ptr.m_ascii; }
+        bool operator>(const cursor_t& other) const { return m_ptr.m_ascii > other.m_ptr.m_ascii; }
+        bool operator<=(const cursor_t& other) const { return m_ptr.m_ascii <= other.m_ptr.m_ascii; }
+        bool operator>=(const cursor_t& other) const { return m_ptr.m_ascii >= other.m_ptr.m_ascii; }
+        bool operator==(const cursor_t& other) const { return m_ptr.m_ascii == other.m_ptr.m_ascii; }
+        bool operator!=(const cursor_t& other) const { return m_ptr.m_ascii != other.m_ptr.m_ascii; }
+        union runeptr
+        {
+            inline runeptr()
+                : m_ascii(nullptr)
+            {
+            }
+            ascii::prune m_ascii;
+            utf8::prune  m_utf8;
+            utf16::prune m_utf16;
+            utf32::prune m_utf32;
+        };
+        runeptr m_ptr;
+    };
+
+    struct ccursor_t
+    {
+        ccursor_t& operator=(const ccursor_t& other)
+        {
+            m_ptr.m_ascii = other.m_ptr.m_ascii;
+            return *this;
+        }
+        bool operator<(const ccursor_t& other) const { return m_ptr.m_ascii < other.m_ptr.m_ascii; }
+        bool operator>(const ccursor_t& other) const { return m_ptr.m_ascii > other.m_ptr.m_ascii; }
+        bool operator<=(const ccursor_t& other) const { return m_ptr.m_ascii <= other.m_ptr.m_ascii; }
+        bool operator>=(const ccursor_t& other) const { return m_ptr.m_ascii >= other.m_ptr.m_ascii; }
+        bool operator==(const ccursor_t& other) const { return m_ptr.m_ascii == other.m_ptr.m_ascii; }
+        bool operator!=(const ccursor_t& other) const { return m_ptr.m_ascii != other.m_ptr.m_ascii; }
+        union runeptr
+        {
+            inline runeptr()
+                : m_ascii(nullptr)
+            {
+            }
+            ascii::pcrune m_ascii;
+            utf8::pcrune  m_utf8;
+            utf16::pcrune m_utf16;
+            utf32::pcrune m_utf32;
+        };
+        runeptr m_ptr;
+    };
+
+    // cursor_t functions
+    static cursor_t get_begin(runes_t const& str);
+    static cursor_t get_end(runes_t const& str);
+    static cursor_t get_eos(runes_t const& str);
+    static runes_t  select(runes_t const& str, cursor_t const& from, cursor_t const& to);
+    static cursor_t forwards(runes_t const& str, cursor_t& cursor, s32 step = 1);
+    static cursor_t backwards(runes_t const& str, cursor_t& cursor, s32 step = 1);
+    static uchar32  peek(runes_t const& str, cursor_t const& cursor);
+    static uchar32  read(runes_t const& str, cursor_t& cursor);
+    static bool     write(runes_t const& str, cursor_t& cursor, uchar32 c);
+    static bool     is_valid(runes_t const& str, cursor_t const& cursor);
+
+    // ccursor_t functions
+    static ccursor_t get_begin(crunes_t const& str);
+    static ccursor_t get_end(crunes_t const& str);
+    static ccursor_t get_eos(crunes_t const& str);
+    static crunes_t  select(crunes_t const& str, ccursor_t const& from, ccursor_t const& to);
+    static crunes_t  select(crunes_t const& str, ccursor_t const& from, u32 len);
+    static ccursor_t forwards(crunes_t const& str, ccursor_t& cursor, s32 step = 1);
+    static ccursor_t backwards(crunes_t const& str, ccursor_t& cursor, s32 step = 1);
+    static uchar32   peek(crunes_t const& str, ccursor_t const& cursor);
+    static uchar32   read(crunes_t const& str, ccursor_t& cursor);
+    static bool      write(crunes_t const& str, ccursor_t& cursor, uchar32 c);
+    static bool      is_valid(crunes_t const& str, ccursor_t const& cursor);
+
+    runes_t crunes_to_runes(runes_t const& str, crunes_t const& sel)
+    {
+        runes_t r(str);
+        r.m_runes.m_ascii.m_str += (sel.m_runes.m_ascii.m_str - str.m_runes.m_ascii.m_str);
+        r.m_runes.m_ascii.m_end += (sel.m_runes.m_ascii.m_end - str.m_runes.m_ascii.m_end);
+        return r;
+    }
+
+    inline runes_t  nothing_found(runes_t const& str) { return runes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
+    inline crunes_t nothing_found(crunes_t const& str) { return crunes_t(str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_str, str.m_type); }
+
+    crunes_t find(crunes_t const& _str, uchar32 _c, bool _casesensitive)
+    {
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+        ccursor_t pos;
+        while (iter < end)
+        {
+            pos              = iter;
+            uchar32    c     = peek(_str, iter);
+            bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
+            if (equal)
+            {
+                iter = forwards(_str, pos);
+                return select(_str, pos, iter);
+            }
+            iter = forwards(_str, iter);
+        }
+        return nothing_found(_str);
+    }
+
+    runes_t find(runes_t const& _str, uchar32 _c, bool _casesensitive)
+    {
+        crunes_t str(_str);
+        crunes_t csel = find(str, _c, _casesensitive);
+        return crunes_to_runes(_str, csel);
+    }
+
+    crunes_t findLast(crunes_t const& _str, uchar32 _c, bool _casesensitive)
+    {
+        ccursor_t iter  = get_end(_str);
+        ccursor_t begin = get_begin(_str);
+        ccursor_t pos;
+        while (iter > begin)
+        {
+            pos = iter;
+            backwards(_str, iter);
+            uchar32    c     = peek(_str, iter);
+            bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
+            if (equal)
+            {
+                return select(_str, iter, pos);
+            }
+            iter = backwards(_str, iter);
+        }
+        return nothing_found(_str);
+    }
+
+    runes_t findLast(runes_t const& _str, uchar32 _c, bool _casesensitive)
+    {
+        crunes_t str(_str);
+        crunes_t csel = findLast(str, _c, _casesensitive);
+        return crunes_to_runes(_str, csel);
+    }
+
+    bool contains(runes_t const& _str, uchar32 _c, bool _casesensitive = true)
+    {
+        runes_t pos = find(_str, _c, _casesensitive);
+        return !pos.is_empty();
+    }
+
+    bool contains(crunes_t const& _str, uchar32 _c, bool _casesensitive = true)
+    {
+        crunes_t pos = find(_str, _c, _casesensitive);
+        return !pos.is_empty();
+    }
+
+    crunes_t find(crunes_t const& _str, crunes_t const& _find, bool _casesensitive)
+    {
+        if (_str.is_empty())
+            return nothing_found(_str);
+        if (_find.is_empty())
+            return nothing_found(_str);
+        if (_find.size() > _str.size())
+            return nothing_found(_str);
+
+        ccursor_t iterb = get_begin(_str);
+        ccursor_t itere = forwards(_str, iterb, _find.size());
+        ccursor_t end   = get_end(_str);
+        while (itere <= end)
+        {
+            crunes_t  sel = select(_str, iterb, itere);
+            s32 const cmp = compare(sel, _find, _casesensitive);
+            if (cmp == 0)
+            {
+                return sel;
+            }
+            iterb = forwards(_str, iterb, 1);
+            itere = forwards(_str, itere, 1);
+        }
+        return nothing_found(_str);
+    }
+
+    runes_t find(runes_t const& _str, crunes_t const& _find, bool _casesensitive)
+    {
+        crunes_t str(_str);
+        crunes_t csel = find(str, _find, _casesensitive);
+        if (!csel.is_empty())
+        {
+            runes_t sel = crunes_to_runes(_str, csel);
+            return sel;
+        }
+        return nothing_found(_str);
+    }
+
+    crunes_t findLast(crunes_t const& _str, crunes_t const& _find, bool _casesensitive)
+    {
+        if (_str.is_empty())
+            return nothing_found(_str);
+        if (_find.is_empty())
+            return nothing_found(_str);
+        if (_find.size() > _str.size())
+            return nothing_found(_str);
+
+        ccursor_t begin = get_begin(_str);
+        ccursor_t itere = get_end(_str);
+        ccursor_t iterb = backwards(_str, itere, _find.size());
+        while (iterb >= begin)
+        {
+            crunes_t  sel = select(_str, iterb, itere);
+            s32 const cmp = compare(sel, _find, _casesensitive);
+            if (cmp == 0)
+            {
+                return sel;
+            }
+            iterb = backwards(_str, iterb, 1);
+            itere = backwards(_str, itere, 1);
+        }
+        return nothing_found(_str);
+    }
+
+    runes_t findLast(runes_t const& _str, crunes_t const& _find, bool _casesensitive)
+    {
+        crunes_t str(_str);
+        crunes_t csel = findLast(str, _find, _casesensitive);
+        if (!csel.is_empty())
+        {
+            runes_t sel = crunes_to_runes(_str, csel);
+            return sel;
+        }
+        return nothing_found(_str);
+    }
+
+    crunes_t findOneOf(crunes_t const& _str, crunes_t const& _any, bool _casesensitive)
+    {
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+        while (iter < end)
+        {
+            ccursor_t pos = iter;
+            uchar32   c   = read(_str, iter);
+
+            // See if this char can be found in the 'set'
+            crunes_t found = find(_any, c, _casesensitive);
+            if (!found.is_empty())
+                return select(_str, pos, iter);
+        }
+        return nothing_found(_str);
+    }
+
+    runes_t findOneOf(runes_t const& _str, crunes_t const& _any, bool _casesensitive)
+    {
+        crunes_t str(_str);
+        crunes_t csel = findOneOf(str, _any, _casesensitive);
+        if (!csel.is_empty())
+        {
+            runes_t sel = crunes_to_runes(_str, csel);
+            return sel;
+        }
+        return nothing_found(_str);
+    }
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    crunes_t findSelectUntil(const crunes_t& _str, uchar32 _c, bool _casesensitive)
+    {
+        crunez_t<utf32::rune, 4> _find(_c);
+        return findSelectUntil(_str, _find, _casesensitive);
+    }
+
+    crunes_t findSelectUntil(const crunes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t sel = find(_str, _find, _casesensitive);
+        if (sel.is_empty())
+            return nothing_found(_str);
+        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_str, _str.m_runes.m_ascii.m_eos, _str.m_type);
+    }
+
+    crunes_t findLastSelectUntil(const crunes_t& _str, uchar32 _c, bool _casesensitive)
+    {
+        crunez_t<utf32::rune, 4> _find(_c);
+        return findLastSelectUntil(_str, _find, _casesensitive);
+    }
+
+    crunes_t findLastSelectUntil(const crunes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t sel = findLast(_str, _find, _casesensitive);
+        if (sel.is_empty())
+            return nothing_found(_str);
+        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_str, _str.m_runes.m_ascii.m_eos, _str.m_type);
+    }
+
+    crunes_t findSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
+    {
+        crunez_t<utf32::rune, 4> _find(_c);
+        return findSelectUntilIncluded(_str, _find, _casesensitive);
+    }
+
+    crunes_t findSelectUntilIncluded(const crunes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t sel = find(_str, _find, _casesensitive);
+        if (sel.is_empty())
+            return nothing_found(_str);
+        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_end, _str.m_runes.m_ascii.m_eos, _str.m_type);
+    }
+
+    crunes_t findLastSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
+    {
+        crunez_t<utf32::rune, 4> _find(_c);
+        return findLastSelectUntilIncluded(_str, _find, _casesensitive);
+    }
+
+    crunes_t findLastSelectUntilIncluded(const crunes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t sel = findLast(_str, _find, _casesensitive);
+        if (sel.is_empty())
+            return nothing_found(_str);
+        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_end, _str.m_runes.m_ascii.m_eos, _str.m_type);
+    }
+
+    crunes_t selectAfterSelection(const crunes_t& _str, const crunes_t& _sel)
+    {
+        if (!_sel.is_empty())
+        {
+            crunes_t sel;
+            sel.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+            sel.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
+            sel.m_runes.m_ascii.m_str = _sel.m_runes.m_ascii.m_end;
+            sel.m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
+            return sel;
+        }
+        return nothing_found(_str);
+    }
+
+    crunes_t findSelectAfter(const crunes_t& _str, uchar32 _find, bool _casesensitive)
+    {
+        crunes_t sel = findSelectUntilIncluded(_str, _find, _casesensitive);
+        return selectAfterSelection(_str, sel);
+    }
+
+    crunes_t findSelectAfter(const crunes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t sel = findSelectUntilIncluded(_str, _find, _casesensitive);
+        return selectAfterSelection(_str, sel);
+    }
+
+    crunes_t findLastSelectAfter(const crunes_t& _str, uchar32 _find, bool _casesensitive)
+    {
+        crunes_t sel = findLastSelectUntilIncluded(_str, _find, _casesensitive);
+        return selectAfterSelection(_str, sel);
+    }
+
+    crunes_t findLastSelectAfter(const crunes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t sel = findLastSelectUntilIncluded(_str, _find, _casesensitive);
+        return selectAfterSelection(_str, sel);
+    }
+
+    crunes_t selectBetween(const crunes_t& _str, uchar32 _left, uchar32 _right)
+    {
+        crunes_t l = find(_str, _right);
+        if (!l.is_empty())
+        {
+            crunes_t after = selectUntilEndExcludeSelection(_str, l);
+            crunes_t r     = findLast(after, _left);
+            if (!l.is_empty())
+            {
+                return crunes_t(_str.m_runes.m_ascii.m_bos, l.m_runes.m_ascii.m_end, r.m_runes.m_ascii.m_str, _str.m_runes.m_ascii.m_eos, _str.m_type);
+            }
+        }
+        return nothing_found(_str);
+    }
+
+    crunes_t selectNextBetween(const crunes_t& _str, const crunes_t& _selection, uchar32 _left, uchar32 _right)
+    {
+        crunes_t str;
+        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
+        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
+        str.m_runes.m_ascii.m_str = _selection.m_runes.m_ascii.m_end;
+        return selectBetween(str, _left, _right);
+    }
+
+    crunes_t selectBetweenLast(const crunes_t& _str, uchar32 _left, uchar32 _right)
+    {
+        crunes_t r = findLast(_str, _right);
+        if (!r.is_empty())
+        {
+            crunes_t before = selectFromBeginningExcludeSelection(_str, r);
+            crunes_t l      = findLast(before, _left);
+            if (!l.is_empty())
+            {
+                return crunes_t(_str.m_runes.m_ascii.m_bos, l.m_runes.m_ascii.m_end, r.m_runes.m_ascii.m_str, _str.m_runes.m_ascii.m_eos, _str.m_type);
+            }
+        }
+        return nothing_found(_str);
+    }
+
+    crunes_t selectPreviousBetween(const crunes_t& _str, const crunes_t& _selection, uchar32 _left, uchar32 _right)
+    {
+        crunes_t str;
+        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
+        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
+        str.m_runes.m_ascii.m_end = _selection.m_runes.m_ascii.m_str;
+        str.m_type                = _str.m_type;
+        return selectBetweenLast(str, _left, _right);
+    }
+
+    crunes_t selectFromBeginningExcludeSelection(const crunes_t& _str, const crunes_t& _selection)
+    {
+        crunes_t str;
+        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
+        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
+        str.m_runes.m_ascii.m_end = _selection.m_runes.m_ascii.m_str;
+        str.m_type                = _str.m_type;
+        return str;
+    }
+
+    crunes_t selectFromBeginningIncludeSelection(const crunes_t& _str, const crunes_t& _selection)
+    {
+        crunes_t str;
+        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
+        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
+        str.m_runes.m_ascii.m_end = _selection.m_runes.m_ascii.m_end;
+        str.m_type                = _str.m_type;
+        return str;
+    }
+
+    crunes_t selectUntilEndExcludeSelection(const crunes_t& _str, const crunes_t& _selection)
+    {
+        crunes_t sel;
+        sel.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
+        sel.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        sel.m_runes.m_ascii.m_str = _selection.m_runes.m_ascii.m_end;
+        sel.m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
+        sel.m_type                = _str.m_type;
+        return sel;
+    }
+
+    crunes_t selectUntilEndIncludeSelection(const crunes_t& _str, const crunes_t& _selection)
+    {
+        crunes_t sel;
+        sel.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
+        sel.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        sel.m_runes.m_ascii.m_str = _selection.m_runes.m_ascii.m_str;
+        sel.m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
+        sel.m_type                = _str.m_type;
+        return sel;
+    }
+
+    crunes_t selectBeforeExcludeSelection(const crunes_t& _str, const crunes_t& _selection)
+    {
+        crunes_t sel;
+        sel.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
+        sel.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        sel.m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
+        sel.m_runes.m_ascii.m_end = _selection.m_runes.m_ascii.m_str;
+        sel.m_type                = _str.m_type;
+        return sel;
+    }
+
+    crunes_t selectOverlap(const crunes_t& lstr, const crunes_t& rstr)
+    {
+        // Find the last character of 'lstr' in 'rstr'
+        // When found start to expand the string in 'lstr' to the left
+        // while keep checking if 'rstr' also contains that character
+
+        ASSERT(false); // TODO
+
+        return lstr;
+    }
+
+    s32 compare(crunes_t const& _lstr, crunes_t const& _rstr, bool _casesensitive)
+    {
+        if (_lstr.size() < _rstr.size())
+            return -1;
+        if (_lstr.size() > _rstr.size())
+            return 1;
+        if (_lstr.size() == 0)
+            return 0;
+
+        ccursor_t lcursor = get_begin(_lstr);
+        ccursor_t rcursor = get_begin(_rstr);
+        ccursor_t lend    = get_end(_lstr);
+        ccursor_t rend    = get_end(_rstr);
+        uchar32   lc, rc;
+        if (_casesensitive)
+        {
+            do
+            {
+                lc = read(_lstr, lcursor);
+                rc = read(_rstr, rcursor);
+            } while (lc == rc && lcursor < lend && rcursor < rend);
+        }
+        else
+        {
+            do
+            {
+                lc = read(_lstr, lcursor);
+                rc = read(_rstr, rcursor);
+                lc = to_lower(lc);
+                rc = to_lower(rc);
+            } while (lc == rc && lcursor < lend && rcursor < rend);
+        }
+        if (lc < rc)
+            return -1;
+        else if (lc > rc)
+            return 1;
+        return 0;
+    }
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+    runes_t findSelectUntil(const runes_t& _str, uchar32 _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findSelectUntil(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findSelectUntil(const runes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findSelectUntil(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findLastSelectUntil(const runes_t& _str, uchar32 _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findLastSelectUntil(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findLastSelectUntil(const runes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findLastSelectUntil(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findSelectUntilIncluded(const runes_t& _str, uchar32 _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findSelectUntilIncluded(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findSelectUntilIncluded(const runes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findSelectUntilIncluded(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findLastSelectUntilIncluded(const runes_t& _str, uchar32 _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findLastSelectUntilIncluded(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findLastSelectUntilIncluded(const runes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findLastSelectUntilIncluded(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectAfterSelection(const runes_t& _str, const runes_t& _sel)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectAfterSelection(cstr, _sel);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findSelectAfter(const runes_t& _str, uchar32 _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findSelectAfter(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findSelectAfter(const runes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findSelectAfter(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findLastSelectAfter(const runes_t& _str, uchar32 _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findLastSelectAfter(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t findLastSelectAfter(const runes_t& _str, const crunes_t& _find, bool _casesensitive)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = findLastSelectAfter(cstr, _find, _casesensitive);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectBetween(const runes_t& _str, uchar32 _left, uchar32 _right)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectBetween(cstr, _left, _right);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectNextBetween(const runes_t& _str, const runes_t& _selection, uchar32 _left, uchar32 _right)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectNextBetween(cstr, _selection, _left, _right);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectBetweenLast(const runes_t& _str, uchar32 _left, uchar32 _right)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectBetweenLast(cstr, _left, _right);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectPreviousBetween(const runes_t& _str, const runes_t& _selection, uchar32 _left, uchar32 _right)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectPreviousBetween(cstr, _selection, _left, _right);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectFromBeginningExcludeSelection(const runes_t& _str, const crunes_t& _selection)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectFromBeginningExcludeSelection(cstr, _selection);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectFromBeginningIncludeSelection(const runes_t& _str, const crunes_t& _selection)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectFromBeginningIncludeSelection(cstr, _selection);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectUntilEndExcludeSelection(const runes_t& _str, const runes_t& _selection)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectUntilEndExcludeSelection(cstr, _selection);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectUntilEndIncludeSelection(const runes_t& _str, const runes_t& _selection)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectUntilEndIncludeSelection(cstr, _selection);
+        return crunes_to_runes(_str, found);
+    }
+
+    runes_t selectOverlap(const runes_t& _str, const runes_t& _rstr)
+    {
+        crunes_t cstr(_str);
+        crunes_t found = selectOverlap(cstr, _rstr);
+        return crunes_to_runes(_str, found);
+    }
+
+    s32 compare(runes_t const& _lstr, runes_t const& _rstr, bool _casesensitive)
+    {
+        crunes_t clstr(_lstr);
+        crunes_t crstr(_rstr);
+        return compare(clstr, crstr, _casesensitive);
+    }
+
+    //------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
+
+    crunes_t parse(crunes_t const& _str, bool& value)
+    {
+        crunes_t    str          = _str;
+        ascii::rune format_str[] = {'%', 'b', ascii::TERMINATOR};
+        crunes_t    format(format_str, format_str + 2);
+        sscanf(str, format, x_va_r(&value));
+        return str;
+    }
+
+    crunes_t parse(crunes_t const& _str, s8& value, s32 base)
+    {
+        s32      value32;
+        crunes_t adv = parse(_str, value32, base);
+        value        = (s8)value32;
+        return adv;
+    }
+
+    crunes_t parse(crunes_t const& _str, s16& value, s32 base)
+    {
+        crunes_t    str          = _str;
+        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'd'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sscanf(str, format, x_va_r(&value));
+        return str;
+    }
+
+    crunes_t parse(crunes_t const& _str, s32& value, s32 base)
+    {
+        crunes_t    str          = _str;
+        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'd'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sscanf(str, format, x_va_r(&value));
+        return str;
+    }
+
+    crunes_t parse(crunes_t const& _str, u32& value, s32 base)
+    {
+        crunes_t    str          = _str;
+        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'd'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sscanf(str, format, x_va_r(&value));
+        return str;
+    }
+
+    crunes_t parse(crunes_t const& _str, s64& value, s32 base)
+    {
+        crunes_t    str          = _str;
+        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'd'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sscanf(str, format, x_va_r(&value));
+        return str;
+    }
+
+    crunes_t parse(crunes_t const& _str, u64& value, s32 base)
+    {
+        crunes_t    str          = _str;
+        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'd'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sscanf(str, format, x_va_r(&value));
+        return str;
+    }
+
+    crunes_t parse(crunes_t const& _str, f32& value)
+    {
+        crunes_t    str          = _str;
+        ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
+        crunes_t    format(format_str, format_str + 2);
+        sscanf(str, format, x_va_r(&value));
+        return str;
+    }
+
+    crunes_t parse(crunes_t const& _str, f64& value)
+    {
+        crunes_t    str          = _str;
+        ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
+        crunes_t    format(format_str, format_str + 2);
+        sscanf(str, format, x_va_r(&value));
+        return str;
+    }
+
+    //------------------------------------------------------------------------------
+    bool is_decimal(crunes_t const& _str)
+    {
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+        while (iter < end)
+        {
+            uchar32 c = peek(_str, iter);
+            if (c != '-')
+                break;
+            read(_str, iter);
+        }
+        while (iter < end)
+        {
+            uchar32 c = read(_str, iter);
+            if (c < '0' || c > '9')
+                return false;
+        }
+        return true;
+    }
+
+    //------------------------------------------------------------------------------
+    bool is_hexadecimal(crunes_t const& _str, bool with_prefix)
+    {
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+
+        uchar32 p;
+        s32     pos = 0;
+        while (iter < end)
+        {
+            uchar32 c = read(_str, iter);
+            if (c == 'x')
+            {
+                if (pos == 1 && with_prefix && p == '0')
+                {
+                    // Ok, 0x.... prefix
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+            {
+                // Ok, digit or hex character
+                p = c;
+            }
+            else
+            {
+                return false;
+            }
+            pos++;
+        }
+        return true;
+    }
+
+    //------------------------------------------------------------------------------
+    bool is_float(crunes_t const& _str)
+    {
+        ascii::rune f32chars_str[] = {'E', 'e', '.', '#', 'Q', 'N', 'A', 'B', 'I', 'F', 0};
+        crunes_t    f32chars(f32chars_str, &f32chars_str[10]);
+
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+        while (iter < end)
+        {
+            uchar32 c = read(_str, iter);
+            if (c >= '0' && c <= '9')
+                continue;
+            if (!contains(f32chars, c))
+                return false;
+        }
+        return true;
+    }
+
+    //------------------------------------------------------------------------------
+    bool is_GUID(crunes_t const& _str)
+    {
+        ascii::rune f32chars_str[] = {'E', 'e', '.', '#', 'Q', 'N', 'A', 'B', 'I', 'F', 0};
+        crunes_t    f32charslen(f32chars_str, &f32chars_str[10]);
+
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+
+        // Does it have only 0-9, a-f, A-F characters
+        s32 n = 0;
+        s32 l = 0;
+        while (iter < end)
+        {
+            uchar32 c = read(_str, iter);
+            if (c >= '0' && c <= '9')
+            {
+                n++;
+                continue;
+            }
+            if (c >= 'A' && c <= 'F')
+            {
+                n++;
+                continue;
+            }
+            if (c >= 'a' && c <= 'f')
+            {
+                n++;
+                continue;
+            }
+            if (c == ':')
+            {
+                l++;
+                if (l > 3)
+                    return false;
+                continue;
+            }
+        }
+        // the length of the string must be 17 characters long (4*8 + 3 ':')
+        return (n == (4 * 8) && l == 3);
+    }
+
+    //------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
+
+    void to_string(runes_t& str, s32 val, s32 base)
+    {
+        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'd'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sprintf(str, format, x_va(val));
+    }
+
+    void to_string(runes_t& str, u32 val, s32 base)
+    {
+        ascii::rune format_str[] = {'%', 'u', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'u'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sprintf(str, format, x_va(val));
+    }
+
+    // *cFHbRXV[N]WWWR6FETY+
+
+    void to_string(runes_t& str, s64 val, s32 base)
+    {
+        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'd'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sprintf(str, format, x_va(val));
+    }
+
+    void to_string(runes_t& str, u64 val, s32 base)
+    {
+        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+        switch (base)
+        {
+            case 16: format_str[1] = 'x'; break;
+            case 10: format_str[1] = 'd'; break;
+            case 8: format_str[1] = 'o'; break;
+        };
+        crunes_t format(format_str, format_str + 2);
+        sprintf(str, format, x_va(val));
+    }
+
+    void to_string(runes_t& str, f32 val, s32 numFractionalDigits)
+    {
+        ascii::rune format_str[] = {'%', '.', '0', '2', 'f', ascii::TERMINATOR};
+        if (numFractionalDigits != 2 && numFractionalDigits > 0 && numFractionalDigits < 100)
+        {
+            format_str[2] = '0' + numFractionalDigits / 10;
+            format_str[3] = '0' + numFractionalDigits % 10;
+        }
+        crunes_t format(format_str, format_str + 5);
+        sprintf(str, format, x_va(val));
+    }
+
+    void to_string(runes_t& str, f64 val, s32 numFractionalDigits)
+    {
+        ascii::rune format_str[] = {'%', '.', '0', '2', 'f', ascii::TERMINATOR};
+        if (numFractionalDigits != 2 && numFractionalDigits > 0 && numFractionalDigits < 100)
+        {
+            format_str[2] = '0' + numFractionalDigits / 10;
+            format_str[3] = '0' + numFractionalDigits % 10;
+        }
+        crunes_t format(format_str, format_str + 5);
+        sprintf(str, format, x_va(val));
+    }
+
+    //------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
+
+    bool is_upper(crunes_t const& _str)
+    {
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+        while (iter < end)
+        {
+            uchar32 c = read(_str, iter);
+            if (is_lower(c))
+                return false;
+        }
+        return true;
+    }
+
+    bool is_lower(crunes_t const& _str)
+    {
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+        while (iter < end)
+        {
+            uchar32 c = read(_str, iter);
+            if (is_upper(c))
+                return false;
+        }
+        return true;
+    }
+
+    bool is_capitalized(crunes_t const& _str)
+    {
+        bool      b    = true;
+        ccursor_t iter = get_begin(_str);
+        ccursor_t end  = get_end(_str);
+        while (iter < end)
+        {
+            uchar32 c = read(_str, iter);
+            if (is_upper(c) != b)
+                return false;
+            b = (c == ' ');
+        }
+        return true;
+    }
+
+    bool is_quoted(crunes_t const& str, uchar32 quote) { return is_delimited(str, quote, quote); }
+
+    bool is_delimited(crunes_t const& _str, uchar32 delimit_left, uchar32 delimit_right)
+    {
+        uchar32 first = first_char(_str);
+        if (first == delimit_left)
+        {
+            uchar32 last = last_char(_str);
+            return last == delimit_right;
+        }
+        return false;
+    }
+
+    /**
+     * Assumption: Letters A-Z and a-z are contiguous in the character set.
+     * This is true for ASCII and UniCode.  (Not so for EBCDIC!)
+     */
+    void to_upper(runes_t& _str)
+    {
+        cursor_t iter = get_begin(_str);
+        cursor_t end  = get_end(_str);
+        while (iter < end)
+        {
+            uchar32 c = peek(_str, iter);
+            if ((c >= 'a') && (c <= 'z'))
+            {
+                c += ('A' - 'a');
+            }
+            write(_str, iter, c);
+        }
+    }
+
+    /**
+     * Assumption: Letters A-Z and a-z are contiguous in the character set.
+     * This is true for ASCII and UniCode.  (Not so for EBCDIC!)
+     */
+    void to_lower(runes_t& _str)
+    {
+        cursor_t iter = get_begin(_str);
+        cursor_t end  = get_end(_str);
+        while (iter < end)
+        {
+            uchar32 c = peek(_str, iter);
+            if ((c >= 'A') && (c <= 'Z'))
+            {
+                c += ('a' - 'A');
+            }
+            write(_str, iter, c);
+        }
+    }
+
+    // ------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------
+
+    bool starts_with(crunes_t const& _str, uchar32 start_char)
+    {
+        ccursor_t iter = get_begin(_str);
+        uchar32   c    = peek(_str, iter);
+        return start_char == c;
+    }
+
+    bool starts_with(crunes_t const& _str, crunes_t const& _start)
+    {
+        if (_start.size() > _str.size())
+            return false;
+
+        ccursor_t liter = get_begin(_str);
+        ccursor_t lend  = get_end(_str);
+        ccursor_t riter = get_begin(_start);
+        ccursor_t rend  = get_end(_start);
+
+        while (liter < lend && riter < rend)
+        {
+            uchar32 lc = peek(_str, liter);
+            uchar32 rc = peek(_start, riter);
+            if (lc != rc)
+                return false;
+        }
+        return liter <= lend && riter == rend;
+    }
+
+    bool ends_with(crunes_t const& _str, uchar32 end_char)
+    {
+        ccursor_t iter = get_end(_str);
+        ccursor_t last = backwards(_str, iter, 1);
+        if (is_valid(_str, last))
+        {
+            uchar32 c = read(_str, last);
+            return end_char == c;
+        }
+        return false;
+    }
+
+    bool ends_with(crunes_t const& _str, crunes_t const& _end)
+    {
+        if (_end.size() > _str.size())
+            return false;
+
+        ccursor_t lend  = get_end(_str);
+        ccursor_t liter = backwards(_str, lend, _end.size());
+        ccursor_t rend  = get_end(_end);
+        ccursor_t riter = get_begin(_end);
+
+        while (liter < lend && riter < rend)
+        {
+            uchar32 lc = peek(_str, liter);
+            uchar32 rc = peek(_end, riter);
+            if (lc != rc)
+                return false;
+        }
+        return liter == lend && riter == rend;
+    }
+
+    uchar32 first_char(crunes_t const& _str)
+    {
+        ccursor_t iter = get_begin(_str);
+        uchar32   c    = peek(_str, iter);
+        return c;
+    }
+
+    uchar32 last_char(crunes_t const& _str)
+    {
+        ccursor_t iter = get_end(_str);
+        ccursor_t last = backwards(_str, iter, 1);
+        uchar32   c    = peek(_str, last);
+        return c;
+    }
+
+    // ------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------
+
+    void removeSelection(runes_t& str, crunes_t const& selection)
+    {
+        //@note: treated as a mem move
+        xbyte* dst = (xbyte*)selection.m_runes.m_ascii.m_str;
+        xbyte* src = (xbyte*)selection.m_runes.m_ascii.m_end;
+        xbyte* end = (xbyte*)str.m_runes.m_ascii.m_end;
+        while (src < end)
+        {
+            *dst++ = *src++;
+        }
+        str.m_runes.m_ascii.m_end = (ascii::prune)dst;
+    }
+
+    void keepOnlySelection(runes_t& str, crunes_t const& keep)
+    {
+        //@note: treated as a mem move
+        xbyte*       dst = (xbyte*)str.m_runes.m_ascii.m_str;
+        xbyte*       src = (xbyte*)keep.m_runes.m_ascii.m_str;
+        xbyte const* end = (xbyte const*)keep.m_runes.m_ascii.m_end;
+        while (src < end)
+        {
+            *dst++ = *src++;
+        }
+        str.m_runes.m_ascii.m_end = (ascii::prune)dst;
+    }
+
+    void replaceSelection(runes_t& _str, crunes_t const& _selection, crunes_t const& replace)
+    {
+        runes_t str = crunes_to_runes(_str, _selection);
+
+        // The logic here is based on memory copy, we do not consider characters
+        s32 const selected_len = (s32)((xbyte const*)str.m_runes.m_ascii.m_end - (xbyte const*)str.m_runes.m_ascii.m_str);
+        s32 const replace_len  = (s32)((xbyte const*)replace.m_runes.m_ascii.m_end - (xbyte const*)replace.m_runes.m_ascii.m_str);
+
+        xbyte* end = NULL;
+        if (selected_len < replace_len)
+        {
+            // Move, expanding
+            s32 move_len = replace_len - selected_len;
+            if (move_len > ((xbyte const*)str.m_runes.m_ascii.m_eos - (xbyte*)str.m_runes.m_ascii.m_end))
+                move_len = (s32)(((xbyte const*)str.m_runes.m_ascii.m_eos - (xbyte*)str.m_runes.m_ascii.m_end));
+
+            // No matter what, push out anything at the end!
+            xbyte* dst = (xbyte*)((xbyte*)str.m_runes.m_ascii.m_end + ((xbyte const*)str.m_runes.m_ascii.m_eos - (xbyte*)str.m_runes.m_ascii.m_end) - 1);
+            xbyte* src = (xbyte*)((xbyte*)dst - move_len);
+            while (dst > (xbyte*)str.m_runes.m_ascii.m_end)
+                *dst-- = *src--;
+
+            end = (xbyte*)_str.m_runes.m_ascii.m_end + move_len; // Update str_end
+        }
+        else if (selected_len > replace_len)
+        {
+            // Move, shrinking
+            s32    move_len = selected_len - replace_len;
+            xbyte* dst      = (xbyte*)((xbyte*)str.m_runes.m_ascii.m_end - move_len);
+            xbyte* src      = (xbyte*)(str.m_runes.m_ascii.m_end);
+            while (src < (xbyte const*)str.m_runes.m_ascii.m_eos)
+                *dst++ = *src++;
+
+            end = (xbyte*)_str.m_runes.m_ascii.m_end - move_len; // Update str_end
+        }
+        else
+        {
+            end = (xbyte*)_str.m_runes.m_ascii.m_end;
+        }
+
+        // Replace
+        xbyte const* src     = (xbyte const*)replace.m_runes.m_ascii.m_str;
+        xbyte const* src_end = (xbyte const*)replace.m_runes.m_ascii.m_str + replace_len;
+        xbyte*       dst     = (xbyte*)str.m_runes.m_ascii.m_str;
+        while (src < src_end)
+            *dst++ = *src++;
+
+        _str.m_runes.m_ascii.m_end = (ascii::prune)end;
+    }
+
+    static inline bool isIn(runes_t const& str, crunes_t const& selection)
+    {
+        return (selection.m_runes.m_ascii.m_str >= str.m_runes.m_ascii.m_str && selection.m_runes.m_ascii.m_str < str.m_runes.m_ascii.m_end && selection.m_runes.m_ascii.m_end <= str.m_runes.m_ascii.m_end);
+    }
+
+    static crunes_t relocate(runes_t const& from, runes_t const& to, crunes_t const& selection)
+    {
+        if (isIn(from, selection))
+        {
+            crunes_t nselection(to);
+            s32      stroffset               = (s32)(selection.m_runes.m_ascii.m_str - from.m_runes.m_ascii.m_str);
+            s32      endoffset               = (s32)(selection.m_runes.m_ascii.m_end - from.m_runes.m_ascii.m_str);
+            nselection.m_runes.m_ascii.m_end = nselection.m_runes.m_ascii.m_str + endoffset;
+            nselection.m_runes.m_ascii.m_str = nselection.m_runes.m_ascii.m_str + stroffset;
+            return nselection;
+        }
+        return crunes_t();
+    }
+
+    void replaceSelection(runes_t& str, crunes_t const& selection, crunes_t const& replace, runes_alloc_t* allocator, s32 size_alignment)
+    {
+        s64 const diff = replace.size() - selection.size();
+        if (diff > 0)
+        {
+            // Do we need to allocate additional space for @str ?
+            // This will invalidate @selection
+            if ((str.size() + diff) > str.cap())
+            {
+                runes_t nstr = allocator->allocate(0, (str.size() + diff + size_alignment) & ~(size_alignment - 1), str.m_type);
+                copy(str, nstr);
+
+                // Relocate selection
+                crunes_t nselection = relocate(str, nstr, selection);
+
+                // Deallocate original str
+                allocator->deallocate(str);
+                str = nstr;
+            }
+        }
+        replaceSelection(str, selection, replace);
+    }
+
+    void findReplace(runes_t& _str, uchar32 _find, uchar32 _replace, bool _casesensitive)
+    {
+        runez_t<utf32::rune, 3> find(_find);
+        runez_t<utf32::rune, 3> replace(_replace);
+        findReplace(_str, find, replace, _casesensitive);
+    }
+
+    void findReplace(runes_t& _str, crunes_t const& _find, crunes_t const& _replace, bool _casesensitive)
+    {
+        runes_t selected = find(_str, _find, _casesensitive);
+        if (selected.is_empty())
+            return;
+        replaceSelection(_str, selected, _replace);
+    }
+
+    void insert(runes_t& str, crunes_t const& insert) {}
+    void insert(runes_t& str, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment) {}
+    void insert(runes_t& str, crunes_t const& selection, crunes_t const& insert) {}
+    void insert(runes_t& str, crunes_t const& selection, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment) {}
+
+    void trim(runes_t& str)
+    {
+        utf32::rune charseta[] = {' ', '\t', utf32::TERMINATOR};
+        crunes_t    charset(charseta, &charseta[2]);
+        trimLeft(str, charseta);
+        trimRight(str, charseta);
+    }
+
+    void trimLeft(runes_t& str)
+    {
+        utf32::rune charseta[] = {' ', '\t', utf32::TERMINATOR};
+        crunes_t    charset(charseta, &charseta[2]);
+        trimLeft(str, charseta);
+    }
+
+    void trimRight(runes_t& str)
+    {
+        utf32::rune charseta[] = {' ', '\t', utf32::TERMINATOR};
+        crunes_t    charset(charseta, &charseta[2]);
+        trimRight(str, charseta);
+    }
+
+    void trim(runes_t& str, uchar32 _c)
+    {
+        utf32::rune charseta[] = {_c, utf32::TERMINATOR};
+        crunes_t    charset(charseta, &charseta[1]);
+        trimLeft(str, charseta);
+        trimRight(str, charseta);
+    }
+
+    void trimLeft(runes_t& str, uchar32 _c)
+    {
+        utf32::rune charset[] = {_c, utf32::TERMINATOR};
+        trimLeft(str, charset);
+    }
+
+    void trimRight(runes_t& str, uchar32 _c)
+    {
+        utf32::rune charset[2] = {_c, utf32::TERMINATOR};
+        trimLeft(str, charset);
+    }
+
+    void trim(runes_t& str, crunes_t const& _charset)
+    {
+        trimLeft(str, _charset);
+        trimRight(str, _charset);
+    }
+
+    void trimLeft(runes_t& _str, crunes_t const& _charset)
+    {
+        bool            trim = true;
+        cursor_t        iter = get_begin(_str);
+        cursor_t const  end  = get_end(_str);
+        ccursor_t const cend = get_end(_charset);
+        cursor_t        l    = get_begin(_str);
+        while (iter < end && trim)
+        {
+            uchar32   c1    = read(_str, iter);
+            ccursor_t citer = get_begin(_charset);
+            trim            = false;
+            while (citer < cend)
+            {
+                uchar32 c2 = read(_charset, citer);
+                if (c1 == c2)
+                {
+                    trim = true;
+                    l    = iter;
+                    break;
+                }
+            }
+        }
+        _str = select(_str, l, end);
+    }
+
+    void trimRight(runes_t& _str, crunes_t const& _charset)
+    {
+        bool            trim  = true;
+        cursor_t        iter  = get_end(_str);
+        cursor_t const  begin = get_begin(_str);
+        ccursor_t const cend  = get_end(_charset);
+        cursor_t        r     = iter;
+        while (iter > begin && trim)
+        {
+            backwards(_str, iter, 1);
+            uchar32   c1    = peek(_str, iter);
+            ccursor_t citer = get_begin(_charset);
+            trim            = false;
+            while (citer < cend)
+            {
+                uchar32 c2 = peek(_charset, citer);
+                if (c1 == c2)
+                {
+                    trim = true;
+                    r    = iter;
+                    break;
+                }
+            }
+        }
+        _str = select(_str, begin, r);
+    }
+
+    void trimQuotes(runes_t& str)
+    {
+        uchar32  charseta[] = {'\'', '"', utf32::TERMINATOR};
+        crunes_t charset(charseta, &charseta[2]);
+        trim(str, charseta);
+    }
+
+    void trimQuotes(runes_t& str, uchar32 quote)
+    {
+        uchar32  charseta[] = {quote, utf32::TERMINATOR};
+        crunes_t charset(charseta, &charseta[1]);
+        trim(str, charseta);
+    }
+
+    void trimDelimiters(runes_t& str, uchar32 _left, uchar32 _right)
+    {
+        trimLeft(str, _left);
+        trimRight(str, _right);
+    }
+
+    void trim(crunes_t& str)
+    {
+        uchar32  charseta[] = {' ', '\t', utf32::TERMINATOR};
+        crunes_t charset(charseta, &charseta[2]);
+        trimLeft(str, charseta);
+        trimRight(str, charseta);
+    }
+
+    void trimLeft(crunes_t& str)
+    {
+        uchar32  charseta[] = {' ', '\t', utf32::TERMINATOR};
+        crunes_t charset(charseta, &charseta[2]);
+        trimLeft(str, charseta);
+    }
+
+    void trimRight(crunes_t& str)
+    {
+        uchar32  charseta[] = {' ', '\t', utf32::TERMINATOR};
+        crunes_t charset(charseta, &charseta[2]);
+        trimRight(str, charseta);
+    }
+
+    void trim(crunes_t& str, uchar32 _c)
+    {
+        uchar32  charseta[] = {_c, utf32::TERMINATOR};
+        crunes_t charset(charseta, &charseta[1]);
+        trimLeft(str, charseta);
+        trimRight(str, charseta);
+    }
+
+    void trimLeft(crunes_t& str, uchar32 _c)
+    {
+        uchar32 charset[] = {_c, utf32::TERMINATOR};
+        trimLeft(str, charset);
+    }
+
+    void trimRight(crunes_t& str, uchar32 _c)
+    {
+        uchar32 charset[2] = {_c, utf32::TERMINATOR};
+        trimLeft(str, charset);
+    }
+
+    void trim(crunes_t& str, crunes_t const& _charset)
+    {
+        trimLeft(str, _charset);
+        trimRight(str, _charset);
+    }
+
+    void trimLeft(crunes_t& _str, crunes_t const& _charset)
+    {
+        bool            trim = true;
+        ccursor_t       iter = get_begin(_str);
+        ccursor_t const end  = get_end(_str);
+        ccursor_t const cend = get_end(_charset);
+        ccursor_t       l    = get_begin(_str);
+        while (iter < end && trim)
+        {
+            uchar32   c1    = read(_str, iter);
+            ccursor_t citer = get_begin(_charset);
+            trim            = false;
+            while (citer < cend)
+            {
+                uchar32 c2 = read(_charset, citer);
+                if (c1 == c2)
+                {
+                    trim = true;
+                    l    = iter;
+                    break;
+                }
+            }
+        }
+        _str = select(_str, l, end);
+    }
+
+    void trimRight(crunes_t& _str, crunes_t const& _charset)
+    {
+        bool            trim  = true;
+        ccursor_t       iter  = get_end(_str);
+        ccursor_t const begin = get_begin(_str);
+        ccursor_t const cend  = get_end(_charset);
+        ccursor_t       r     = iter;
+        while (iter > begin && trim)
+        {
+            backwards(_str, iter, 1);
+            uchar32   c1    = peek(_str, iter);
+            ccursor_t citer = get_begin(_charset);
+            trim            = false;
+            while (citer < cend)
+            {
+                uchar32 c2 = peek(_charset, citer);
+                if (c1 == c2)
+                {
+                    trim = true;
+                    r    = iter;
+                    break;
+                }
+            }
+        }
+        _str = select(_str, begin, r);
+    }
+
+    void trimQuotes(crunes_t& str)
+    {
+        uchar32  charseta[] = {'\'', '"', utf32::TERMINATOR};
+        crunes_t charset(charseta, &charseta[2]);
+        trim(str, charseta);
+    }
+
+    void trimQuotes(crunes_t& str, uchar32 quote)
+    {
+        uchar32  charseta[] = {quote, utf32::TERMINATOR};
+        crunes_t charset(charseta, &charseta[1]);
+        trim(str, charseta);
+    }
+
+    void trimDelimiters(crunes_t& str, uchar32 _left, uchar32 _right)
+    {
+        trimLeft(str, _left);
+        trimRight(str, _right);
+    }
+
+    void resize(runes_t& str, s32 cap, runes_alloc_t* allocator, s32 size_alignment)
+    {
+        runes_t nstr = allocator->allocate(0, cap);
+        if (str.is_valid())
+        {
+            copy(str, nstr);
+            allocator->deallocate(str);
+        }
+        str = nstr;
+    }
+
+    void copy(crunes_t const& _src, runes_t& _dst)
+    {
+        ccursor_t siter  = get_begin(_src);
+        ccursor_t send   = get_end(_src);
+        cursor_t  dbegin = get_begin(_dst);
+        cursor_t  diter  = get_begin(_dst);
+        cursor_t  dend   = get_eos(_dst);
+        while (diter < dend && siter < send)
+        {
+            uchar32 c = read(_src, siter);
+            write(_dst, diter, c);
+        }
+        _dst = select(_dst, dbegin, diter);
+    }
+
+    void concatenate(runes_t& _dst, crunes_t const& _con)
+    {
+        ccursor_t siter  = get_begin(_con);
+        ccursor_t send   = get_end(_con);
+        cursor_t  dbegin = get_begin(_dst);
+        cursor_t  diter  = get_end(_dst);
+        cursor_t  dend   = get_eos(_dst);
+        while (diter < dend && siter < send)
+        {
+            uchar32 c = read(_con, siter);
+            write(_dst, diter, c);
+        }
+        _dst = select(_dst, dbegin, diter);
+    }
+
+    void copy(const crunes_t& src, runes_t& dst, runes_alloc_t* allocator, s32 size_alignment)
+    {
+        s32 const required = dst.size();
+        if (required > dst.cap())
+        {
+            resize(dst, required, allocator, size_alignment);
+        }
+        copy(src, dst);
+    }
+
+    void concatenate(runes_t& str, const crunes_t& concat, runes_alloc_t* allocator, s32 size_alignment)
+    {
+        s32 const required = str.size() + concat.size();
+        if (required > str.cap())
+        {
+            resize(str, required, allocator, size_alignment);
+        }
+        concatenate(str, concat);
+    }
+
+    void concatenate(runes_t& str, const crunes_t& concat1, const crunes_t& concat2, runes_alloc_t* allocator, s32 size_alignment)
+    {
+        s32 const required = str.size() + concat1.size() + concat2.size();
+        if (required > str.cap())
+        {
+            resize(str, required, allocator, size_alignment);
+        }
+        concatenate(str, concat1);
+        concatenate(str, concat2);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // cursor_t functions
+    cursor_t get_begin(runes_t const& str)
+    {
+        cursor_t c;
+        c.m_ptr.m_ascii = str.m_runes.m_ascii.m_str;
+        return c;
+    }
+    cursor_t get_end(runes_t const& str)
+    {
+        cursor_t c;
+        c.m_ptr.m_ascii = str.m_runes.m_ascii.m_end;
+        return c;
+    }
+    cursor_t get_eos(runes_t const& str)
+    {
+        cursor_t c;
+        c.m_ptr.m_ascii = str.m_runes.m_ascii.m_eos;
+        return c;
+    }
+    runes_t select(runes_t const& str, cursor_t const& from, cursor_t const& to)
+    {
+        runes_t r;
+        r.m_runes.m_ascii.m_bos = str.m_runes.m_ascii.m_bos;
+        r.m_runes.m_ascii.m_str = from.m_ptr.m_ascii;
+        r.m_runes.m_ascii.m_end = to.m_ptr.m_ascii;
+        r.m_runes.m_ascii.m_eos = str.m_runes.m_ascii.m_eos;
+        return r;
+    }
+    cursor_t forwards(runes_t const& str, cursor_t& cursor, s32 step)
+    {
+        cursor_t c = cursor;
+        switch (str.m_type)
+        {
+            case ascii::TYPE: utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, step); break;
+            case utf32::TYPE: utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, step); break;
+        }
+        return c;
+    }
+    cursor_t backwards(runes_t const& str, cursor_t& cursor, s32 step)
+    {
+        cursor_t c = cursor;
+        switch (str.m_type)
+        {
+            case ascii::TYPE: utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, -step); break;
+            case utf32::TYPE: utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, -step); break;
+        }
+        return c;
+    }
+    uchar32 peek(runes_t const& str, cursor_t const& cursor)
+    {
+        switch (str.m_type)
+        {
+            case ascii::TYPE: return utf::peek(str.m_runes.m_ascii);
+            case utf32::TYPE: return utf::peek(str.m_runes.m_utf32);
+        }
+        return '\0';
+    }
+    uchar32 read(runes_t const& str, cursor_t& cursor)
+    {
+        switch (str.m_type)
+        {
+            case ascii::TYPE: return utf::read(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_end);
+            case utf32::TYPE: return utf::read(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_end);
+        }
+        return '\0';
+    }
+    bool write(runes_t const& str, cursor_t& cursor, uchar32 c)
+    {
+        switch (str.m_type)
+        {
+            case ascii::TYPE: utf::write(c, cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_end); break;
+            case utf32::TYPE: utf::write(c, cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_end); break;
+            default: return false;
+        }
+        return true;
+    }
+
+    bool is_valid(runes_t const& str, cursor_t const& cursor) { return cursor.m_ptr.m_ascii >= str.m_runes.m_ascii.m_str && cursor.m_ptr.m_ascii < str.m_runes.m_ascii.m_end; }
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // ccursor_t functions
+    ccursor_t get_begin(crunes_t const& str)
+    {
+        ccursor_t c;
+        c.m_ptr.m_ascii = str.m_runes.m_ascii.m_str;
+        return c;
+    }
+    ccursor_t get_end(crunes_t const& str)
+    {
+        ccursor_t c;
+        c.m_ptr.m_ascii = str.m_runes.m_ascii.m_end;
+        return c;
+    }
+    ccursor_t get_eos(crunes_t const& str)
+    {
+        ccursor_t c;
+        c.m_ptr.m_ascii = str.m_runes.m_ascii.m_eos;
+        return c;
+    }
+    crunes_t select(crunes_t const& str, ccursor_t const& from, ccursor_t const& to)
+    {
+        crunes_t r;
+        r.m_runes.m_ascii.m_bos = str.m_runes.m_ascii.m_bos;
+        r.m_runes.m_ascii.m_str = from.m_ptr.m_ascii;
+        r.m_runes.m_ascii.m_end = to.m_ptr.m_ascii;
+        r.m_runes.m_ascii.m_eos = str.m_runes.m_ascii.m_eos;
+        return r;
+    }
+
+    crunes_t select(crunes_t const& str, ccursor_t const& from, u32 len)
+    {
+        crunes_t r;
+        r.m_runes.m_ascii.m_bos = str.m_runes.m_ascii.m_bos;
+        r.m_runes.m_ascii.m_eos = str.m_runes.m_ascii.m_eos;
+        r.m_runes.m_ascii.m_str = from.m_ptr.m_ascii;
+        r.m_runes.m_ascii.m_end = from.m_ptr.m_ascii;
+        if (str.m_type == ascii::TYPE)
+        {
+            r.m_runes.m_ascii.m_end += len;
+        }
+        else if (str.m_type == utf32::TYPE)
+        {
+            r.m_runes.m_utf32.m_end += len;
+        }
+        return r;
+    }
+
+    ccursor_t forwards(crunes_t const& str, ccursor_t& cursor, s32 step)
+    {
+        ccursor_t c = cursor;
+        switch (str.m_type)
+        {
+            case ascii::TYPE: utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, step); break;
+            case utf32::TYPE: utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, step); break;
+        }
+        return c;
+    }
+    ccursor_t backwards(crunes_t const& str, ccursor_t& cursor, s32 step)
+    {
+        ccursor_t c = cursor;
+        switch (str.m_type)
+        {
+            case ascii::TYPE: utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, -step); break;
+            case utf32::TYPE: utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, -step); break;
+        }
+        return c;
+    }
+
+    uchar32 peek(crunes_t const& str, ccursor_t const& cursor) { return '\0'; }
+    uchar32 read(crunes_t const& str, ccursor_t& cursor) { return '\0'; }
+    bool    write(crunes_t const& str, ccursor_t& cursor, uchar32 c) { return false; }
+    bool    is_valid(crunes_t const& str, ccursor_t const& cursor) { return cursor.m_ptr.m_ascii >= str.m_runes.m_ascii.m_str && cursor.m_ptr.m_ascii < str.m_runes.m_ascii.m_end; }
+
 } // namespace xcore

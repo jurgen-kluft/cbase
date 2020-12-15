@@ -5,7 +5,6 @@
 #ifndef SPU
 
 // Shared code
-#include "xbase/private/x_printf.h"
 
 namespace xcore
 {

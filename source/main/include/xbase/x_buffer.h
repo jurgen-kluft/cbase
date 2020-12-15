@@ -108,26 +108,29 @@ namespace xcore
 		xcbuffer            get_current_buffer() const;
 
 		bool                can_read(u32 number_of_bytes) const;        // check if we still can read n number of bytes
+		bool				at_end() const;
+		bool                seek(u32 cursor);
+		u32                 pos() const;
 
 		void                reset();
-		u32                 skip(s32);
+		s32                 skip(s32);
 
-		u32                 read(bool&);
-		u32                 read(u8&);
-		u32                 read(s8&);
-		u32                 read(u16&);
-		u32                 read(s16&);
-		u32                 read(u32&);
-		u32                 read(s32&);
-		u32                 read(u64&);
-		u32                 read(s64&);
-		u32                 read(f32&);
-		u32                 read(f64&);
+		s32                 read(bool&);
+		s32                 read(u8&);
+		s32                 read(s8&);
+		s32                 read(u16&);
+		s32                 read(s16&);
+		s32                 read(u32&);
+		s32                 read(s32&);
+		s32                 read(u64&);
+		s32                 read(s64&);
+		s32                 read(f32&);
+		s32                 read(f64&);
 
-		bool				read_data(u32 size, xbuffer& buf);
+		s32					read_data(u32 size, xbuffer& buf);
 
-		bool                view_data(u32 size, xcbuffer& buf);
-		bool                view_string(u32 size, const char*& str, const char*& end);
+		s32                 view_data(u32 size, xcbuffer& buf);
+		s32                 view_string(u32 size, const char*& str, const char*& end);
 
 	protected:
 		u32					len_;
@@ -149,27 +152,29 @@ namespace xcore
 		xbuffer             get_current_buffer() const;
 
 		bool                can_write(u32 num_bytes = 0) const;
+		bool				at_end() const;
+		bool                seek(u32 cursor);
+		u32                 pos() const;
 
 		void                reset();
-		u32                 skip(s32);
-
-		u32                 write(bool);
-		u32                 write(u8);
-		u32                 write(s8);
-		u32                 write(u16);
-		u32                 write(s16);
-		u32                 write(u32);
-		u32                 write(s32);
-		u32                 write(u64);
-		u32                 write(s64);
-		u32                 write(f32);
-		u32                 write(f64);
-
-		u32                 write_data(xbuffer const& cbuf);
-		u32                 write_data(xcbuffer const& cbuf);
-		u32                 write_string(char const* str, char const* end);
-
+		s32                 skip(s32 count);
 		xbinary_writer      reserve(u32 size);		// For writing something in the future you can remember this place - size
+
+		s32                 write(bool);
+		s32                 write(u8);
+		s32                 write(s8);
+		s32                 write(u16);
+		s32                 write(s16);
+		s32                 write(u32);
+		s32                 write(s32);
+		s32                 write(u64);
+		s32                 write(s64);
+		s32                 write(f32);
+		s32                 write(f64);
+
+		s32                 write_data(xbuffer const& cbuf);
+		s32                 write_data(xcbuffer const& cbuf);
+		s32                 write_string(char const* str, char const* end);
 
 	protected:
 		u32					len_;

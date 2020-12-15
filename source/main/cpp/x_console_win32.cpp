@@ -24,16 +24,16 @@ namespace xcore
         virtual void writeln()
         {
             utf32::rune line32[] = {'\r', 0};
-            write(utf32::crunes(line32, line32 + 1));
+            write(utf32::crunes_t(line32, line32 + 1));
         }
 
-        virtual s32 write(const ascii::crunes& str)
+        virtual s32 write(const ascii::crunes_t& str)
         {
             const s32 maxlen = 252;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            ascii::crunes src = str;
+            ascii::crunes_t src = str;
             while (utf::can_read(src))
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -54,13 +54,13 @@ namespace xcore
             return l;
         }
 
-        virtual s32 write(const utf32::crunes& str)
+        virtual s32 write(const utf32::crunes_t& str)
         {
             const s32 maxlen = 252;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf32::crunes src = str;
+            utf32::crunes_t src = str;
             while (utf::can_read(src))
             {
                 uchar16* dst16 = (uchar16*)str16;
