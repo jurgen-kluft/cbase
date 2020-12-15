@@ -10,10 +10,43 @@
 
 Simplify the whole string usage, currently we have code to handle ascii/utf8/utf16/utf32. Can we just use ascii and utf32 and remove all other code except the conversion from/to. Console, Log, printf/sprintf, sscanf etc.. should all just use a standard low-level string container that is ascii and utf32. It doesn't matter if there is dynamic allocation.
 
-Refactor x_integer to use scopes for types to be more explicit, e.g.
-u16_t, and add all functions under this
-u32_t, e.g. u32 size = 10; u32_t.floorpo2(size);
-u64_t
+Refactor to follow the below rules:
+
+- namespaces start with x (e.g. xcore)
+- struct/class ends with _t (e.g. alloc_t)
+- you may use a namespace or static class
+
+example:
+class xu16
+{
+public:
+  typedef u16 uxx;
+  static bool ispo2(uxx value);
+  static s32  clz(uxx value);
+  static s32  ctz(uxx value);
+  static uxx  floorpo2(uxx value);
+};
+class xu32
+{
+public:
+  typedef u32 uxx;
+  static bool ispo2(uxx value);
+  static s32  clz(uxx value);
+  static s32  ctz(uxx value);
+  static uxx  floorpo2(uxx value);
+};
+class xu64
+{
+public:
+  typedef u64 uxx;
+  static bool ispo2(uxx value);
+  static s32  clz(uxx value);
+  static s32  ctz(uxx value);
+  static uxx  floorpo2(uxx value);
+};
+
+u32 size = 10;
+u32 sizepo2 = xu32.floorpo2(size);
 
 ## xcore (typeless/raw containers)
 
