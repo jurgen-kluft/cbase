@@ -3125,6 +3125,13 @@ namespace xcore
         m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
         m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
     }
+    crunes_t::crunes_t(crunes_t const& _str) : m_type(_str.m_type)
+    {
+        m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
+        m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
+        m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
+    }
     crunes_t::crunes_t(ascii::crunes_t const& _str) : m_type(ascii::TYPE)
     {
         m_runes.m_ascii.m_bos = _str.m_bos;
@@ -3332,6 +3339,9 @@ namespace xcore
 
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
+    runes_reader_t::runes_reader_t()
+    {
+    }
 
     runes_reader_t::runes_reader_t(ascii::pcrune str, ascii::pcrune str_end)
     {
@@ -3476,6 +3486,21 @@ namespace xcore
     }
 
     bool runes_writer_t::at_end() const { return m_cursor.m_ptr.m_ascii >= m_runes.m_runes.m_ascii.m_end; }
+    bool runes_writer_t::valid() const { return m_cursor.m_ptr.m_ascii < m_runes.m_runes.m_ascii.m_end; }
+
+    u32  runes_writer_t::count() const
+    {
+        switch (m_runes.m_type)
+        {
+            case ascii::TYPE:
+                return (s32)(m_cursor.m_ptr.m_ascii - m_runes.m_runes.m_ascii.m_str);
+            case utf32::TYPE:
+                return (s32)(m_cursor.m_ptr.m_utf32 - m_runes.m_runes.m_utf32.m_str);
+            default:
+                break;
+        }
+        return 0;
+    }
     void runes_writer_t::reset() { m_cursor.m_ptr.m_ascii = m_runes.m_runes.m_ascii.m_str; }
 
     bool runes_writer_t::write(uchar32 c)
@@ -3497,6 +3522,34 @@ namespace xcore
         return false;
     }
 
-    bool runes_writer_t::write(crunes_t const& str) { return false; }
+    bool runes_writer_t::write(crunes_t const& str)
+    {
+        if (!at_end())
+        {
+            runes_reader_t reader(str);
+            switch (m_runes.m_type)
+            {
+                case ascii::TYPE:
+                    while (!reader.at_end() && !at_end())
+                    {
+                        uchar32 c = reader.read();
+                        //@note: use utf::write
+                        m_cursor.m_ptr.m_ascii[0] = (ascii::rune)c;
+                        m_cursor.m_ptr.m_ascii += 1;
+                    }
+                    return true;
+                case utf32::TYPE:
+                    while (!reader.at_end() && !at_end())
+                    {
+                        uchar32 c = reader.read();
+                        //@note: use utf::write
+                        m_cursor.m_ptr.m_utf32[0] = c;
+                        m_cursor.m_ptr.m_utf32 += 1;
+                    }
+                    return true;
+            }
+        }
+        return false;
+    }
 
 } // namespace xcore

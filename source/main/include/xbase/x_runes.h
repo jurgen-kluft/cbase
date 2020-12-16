@@ -258,51 +258,6 @@ namespace xcore
         s32      m_type;
     };
 
-    template <typename T, s32 L> class runez_t : public runes_t
-    {
-    public:
-        enum
-        {
-            SIZE = L + 1
-        };
-        T m_run[SIZE];
-        inline runez_t() : runes_t(m_run, m_run, &m_run[SIZE - 1]) {}
-        inline runez_t(uchar32 c) : runes_t(m_run, &m_run[SIZE - 1])
-        {
-            m_run[0] = c;
-            m_run[1] = 0;
-            m_runes.m_ascii.m_end += sizeof(T);
-        }
-        inline runez_t(const char* str) : runes_t(m_run, m_run, &m_run[SIZE - 1])
-        {
-            concatenate(str);
-            term();
-        }
-    };
-
-    template <typename T, s32 L> class crunez_t : public crunes_t
-    {
-    public:
-        enum
-        {
-            SIZE = L + 1
-        };
-        T m_run[SIZE];
-
-        inline crunez_t(uchar32 c) : crunes_t(m_run, &m_run[SIZE - 1])
-        {
-            m_run[0] = c;
-            m_run[1] = 0;
-            m_runes.m_ascii.m_end += sizeof(T);
-        }
-        inline crunez_t(const char* str) : crunes_t(m_run, &m_run[SIZE - 1])
-        {
-            runes_t run(m_run, m_run, &m_run[SIZE - 1]);
-            run.concatenate(str);
-            run.term();
-            m_end = run.m_end;
-        }
-    };
     class runes_alloc_t
     {
     public:
@@ -499,6 +454,56 @@ namespace xcore
     inline bool operator!=(const crunes_t& lhs, const crunes_t& rhs) { return compare(lhs, rhs) != 0; }
     inline bool operator==(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) == 0; }
     inline bool operator!=(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) != 0; }
+
+
+    // -------------------------------------------------------------------------------
+    // helpers for inline sized runes_t
+    template <typename T, s32 L> class runez_t : public runes_t
+    {
+    public:
+        enum
+        {
+            SIZE = L + 1
+        };
+        T m_run[SIZE];
+        inline runez_t() : runes_t(m_run, m_run, &m_run[SIZE - 1]) {}
+        inline runez_t(uchar32 c) : runes_t(m_run, &m_run[SIZE - 1])
+        {
+            m_run[0] = c;
+            m_run[1] = 0;
+            m_runes.m_ascii.m_end += sizeof(T);
+        }
+        inline runez_t(const char* str) : runes_t(m_run, m_run, &m_run[SIZE - 1])
+        {
+            concatenate(str);
+            term();
+        }
+    };
+
+    template <typename T, s32 L> class crunez_t : public crunes_t
+    {
+    public:
+        enum
+        {
+            SIZE = L + 1
+        };
+        T m_run[SIZE];
+
+        inline crunez_t(uchar32 c) : crunes_t(m_run, &m_run[SIZE - 1])
+        {
+            m_run[0] = c;
+            m_run[1] = 0;
+            m_runes.m_ascii.m_end += sizeof(T);
+        }
+
+        inline crunez_t(const char* str) : crunes_t(m_run, &m_run[SIZE - 1])
+        {
+            runes_t run(m_run, m_run, &m_run[SIZE - 1]);
+            concatenate(run, str);
+            run.term();
+            m_runes.m_ascii.m_end = run.m_runes.m_ascii.m_end;
+        }
+    };
 
     // -------------------------------------------------------------------------------
     // runes reader and writer

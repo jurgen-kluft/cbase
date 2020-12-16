@@ -121,7 +121,7 @@ namespace xcore
 			{
 			case ascii::TYPE: return write(str.m_runes.m_ascii);
 			case utf32::TYPE: return write(str.m_runes.m_utf32);
-			default:
+			default: break;
 				//@todo: UTF-8 and UTF-16
 			}
 			return 0;
