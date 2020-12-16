@@ -14,8 +14,8 @@ namespace xcore
 {
 //#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type local_var_name##Buffer[size + 1]; local_var_name##Buffer[size] = '\0'; type* local_var_name = &local_var_name##Buffer[0]; type* local_var_name##_eos = &local_var_name##Buffer[size];
 #define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
-    type    local_var_name##Buffer[size];                  \
-    type##s local_var_name(local_var_name##Buffer, local_var_name##Buffer, &local_var_name##Buffer[size - 1]);
+    type::rune    local_var_name##Buffer[size];                  \
+    runes_t local_var_name(local_var_name##Buffer, local_var_name##Buffer, local_var_name##Buffer, &local_var_name##Buffer[size - 1], type##::TYPE );
 
     class xconsole_null : public xconsole
     {
@@ -37,7 +37,8 @@ namespace xcore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
-        virtual void write(const ascii::crunes_t& str);
+		virtual void write(const crunes_t& buffer);
+		virtual void write(const ascii::crunes_t& str);
         virtual void write(const ascii::crunes_t& fmt, const x_va_list& args);
         virtual void write(const utf32::crunes_t& str);
         virtual void write(const utf32::crunes_t& fmt, const x_va_list& args);
@@ -65,7 +66,9 @@ namespace xcore
 
     void xconsole_null::write(u64 _value) {}
 
-    void xconsole_null::write(const ascii::crunes_t& str) {}
+	void xconsole_null::write(const crunes_t& str) {}
+	
+	void xconsole_null::write(const ascii::crunes_t& str) {}
 
     void xconsole_null::write(const ascii::crunes_t& fmt, const x_va_list& args) {}
 
@@ -103,6 +106,8 @@ namespace xcore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
+        virtual void write(const crunes_t& str);
+
         virtual void write(const ascii::crunes_t& str);
         virtual void write(const ascii::crunes_t& fmt, const x_va_list& args);
         virtual void write(const utf32::crunes_t& str);
@@ -119,60 +124,71 @@ namespace xcore
 
     void xconsole_default::write(bool _value)
     {
-        utf32::rune true32[]  = {'t', 'r', 'u', 'e', 0};
-        utf32::rune false32[] = {'t', 'r', 'u', 'e', 0};
-        write(_value ? utf32::crunes_t(true32, true32 + 4) : utf32::crunes_t(false32, false32 + 5));
+		crunes_t truestr("true", 4);
+		crunes_t falsestr("false", 5);
+        write(_value ? truestr : falsestr);
     }
 
     void xconsole_default::write(f64 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 256);
-        utf32::to_string(tmp, _value, 2);
+        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(s32 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 64);
-        utf32::to_string(tmp, _value, 2);
+        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(s64 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 64);
-        utf32::to_string(tmp, _value, 2);
+        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(f32 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 256);
-        utf32::to_string(tmp, _value, 2);
+        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(u32 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 256);
-        utf32::to_string(tmp, _value, 2);
+        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(u64 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(utf32::rune, tmp, 256);
-        utf32::to_string(tmp, _value, 2);
+        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
+
+    void xconsole_default::write(const crunes_t& str)
+	{
+		switch (str.m_type)
+		{
+		case ascii::TYPE: return write(str.m_runes.m_ascii);
+		case utf32::TYPE: return write(str.m_runes.m_utf32);
+		default: break;
+			//@todo: UTF-8 and UTF-16
+		}
+	}
 
     void xconsole_default::write(const ascii::crunes_t& str) { mOut->write(str); }
 
     void xconsole_default::write(const ascii::crunes_t& fmt, const x_va_list& args)
     {
-        XCONSOLE_LOCAL_STR_BUF(ascii::rune, str, 1024);
-        ascii::vsprintf(str, ascii::crunes_t(fmt), args);
-        ascii::crunes_t outstr(str);
+        XCONSOLE_LOCAL_STR_BUF(ascii, str, 1024);
+        vsprintf(str, crunes_t(fmt), args);
+        crunes_t outstr(str);
         mOut->write(outstr);
     }
 
@@ -180,9 +196,9 @@ namespace xcore
 
     void xconsole_default::write(const utf32::crunes_t& fmt, const x_va_list& args)
     {
-        XCONSOLE_LOCAL_STR_BUF(utf32::rune, str, 1024);
-        utf32::vsprintf(str, utf32::crunes_t(fmt), args);
-        utf32::crunes_t outstr(str);
+        XCONSOLE_LOCAL_STR_BUF(utf32, str, 1024);
+        vsprintf(str, utf32::crunes_t(fmt), args);
+        crunes_t outstr(str);
         mOut->write(outstr);
     }
 

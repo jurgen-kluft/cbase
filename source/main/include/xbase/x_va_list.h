@@ -339,6 +339,8 @@ namespace xcore
 		xbool					isUchar() const										{ return xbool(mType == TYPE_UCHAR); }
 		xbool					isPRunes() const									{ return xbool(mType == TYPE_PRUNES); }
 
+		runes_t*				getRunes() const									{ if (isPRunes()) return (runes_t*)mRef[0]; else return nullptr; }
+
 		static x_va_r			sEmpty;
 
 	protected:

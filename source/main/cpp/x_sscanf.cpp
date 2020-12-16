@@ -1,5 +1,5 @@
 #include "xbase/x_target.h"
-#include "xbase/x_debug.h.h"
+#include "xbase/x_debug.h"
 #include "xbase/x_runes.h"
 #include "xbase/x_va_list.h"
 
@@ -445,32 +445,26 @@ namespace xcore
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
-                        uchar*                  ascii_str = (uchar*)r;
-                        AsciiBuffer             ascii_str_buffer(ascii_str, ascii_str != NULL ? (ascii_str + r.var()) : ascii_str);
-                        CharWriterToAsciiBuffer ascii_str_writer(ascii_str_buffer);
+						runes_t* runes = r.getRunes();
+						if (runes != nullptr)
+						{
+							runes_writer_t str_writer(*runes);
 
-                        uchar32*                utf32_str = (uchar32*)r;
-                        Utf32Buffer             utf32_str_buffer(utf32_str, r.var());
-                        CharWriterToUtf32Buffer utf32_str_writer(utf32_str_buffer);
-
-                        CharWriter* str_writer = &ascii_str_writer;
-                        if (r.isPUChar32())
-                            str_writer = &utf32_str_writer;
-
-                        l = 0;
-                        while (reader->peek() != 0 && reader->peek() != ' ')
-                        {
-                            if (!(flag & SPACE_PAD))
-                            {
-                                str_writer->Write(reader->read());
-                            }
-                            else if (l < w)
-                            {
-                                str_writer->Write(reader->read());
-                                l++;
-                            }
-                            reader->read();
-                        }
+							l = 0;
+							while (reader->peek() != 0 && reader->peek() != ' ')
+							{
+								if (!(flag & SPACE_PAD))
+								{
+									str_writer.write(reader->read());
+								}
+								else if (l < w)
+								{
+									str_writer.write(reader->read());
+									l++;
+								}
+								reader->read();
+							}
+						}
 
                         scanned++;
                         parsing = 0;
@@ -496,14 +490,14 @@ namespace xcore
                     {
                         fmt->skip();
 
-                        utf32::rune               decimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-                        CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 12);
+                        utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+						runes_reader_t decimalChars(allDecimalChars, allDecimalChars + 12);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
                         s64 n1 = 0;
-                        if (SearchUntilOneOf(reader, &foo))
+                        if (SearchUntilOneOf(reader, &decimalChars))
                         {
                             n1 = StrToS64(reader, 10);
                         }
@@ -526,14 +520,14 @@ namespace xcore
                     {
                         fmt->skip();
 
-                        utf32::rune               decimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
-                        CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 10);
+                        utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+						runes_reader_t decimalChars(allDecimalChars, allDecimalChars + 10);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
                         s64 n2 = 0;
-                        if (SearchUntilOneOf(reader, &foo))
+                        if (SearchUntilOneOf(reader, &decimalChars))
                         {
                             n2 = StrToS64(reader, 10);
                         }
@@ -556,14 +550,14 @@ namespace xcore
                     {
                         fmt->skip();
 
-                        utf32::rune               decimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '0', 0};
-                        CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 8);
+						utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+						runes_reader_t octalChars(allDecimalChars, allDecimalChars + 8);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
                         s64 n2 = 0;
-                        if (SearchUntilOneOf(reader, &foo))
+                        if (SearchUntilOneOf(reader, &octalChars))
                         {
                             n2 = StrToS64(reader, 8);
                         }
@@ -587,8 +581,8 @@ namespace xcore
                     {
                         fmt->skip();
 
-                        utf32::rune               decimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
-                        CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 23);
+                        utf32::rune    allHexChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
+						runes_reader_t hexChars(allHexChars, allHexChars + 23);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
@@ -600,7 +594,7 @@ namespace xcore
                         }
 
                         u64 n2 = 0;
-                        if (SearchUntilOneOf(reader, &foo))
+                        if (SearchUntilOneOf(reader, &hexChars))
                         {
                             if (w == 2)
                             {
@@ -609,7 +603,7 @@ namespace xcore
                                 str[strl] = '\0';
                                 for (s32 j = 0; j < strl; ++j)
                                     str[j] = reader->read();
-                                CharReaderFromUtf32Buffer str_reader(str, NULL);
+								runes_reader_t str_reader(str, str + strl);
                                 n2 = StrToS64(&str_reader, 16);
                             }
                             else if (w == 4)
@@ -624,8 +618,8 @@ namespace xcore
                                     if (c == '\0')
                                         break;
                                 }
-                                CharReaderFromUtf32Buffer str_reader(str, NULL);
-                                n2 = StrToS64(&str_reader, 16);
+								runes_reader_t str_reader(str, str + strl);
+								n2 = StrToS64(&str_reader, 16);
                             }
                             else if (w == 8)
                             {
@@ -639,8 +633,8 @@ namespace xcore
                                     if (c == '\0')
                                         break;
                                 }
-                                CharReaderFromUtf32Buffer str_reader(str, NULL);
-                                n2 = StrToS64(&str_reader, 16);
+								runes_reader_t str_reader(str, str + strl);
+								n2 = StrToS64(&str_reader, 16);
                             }
                             else // if (w == 16)
                             {
@@ -654,8 +648,8 @@ namespace xcore
                                     if (c == '\0')
                                         break;
                                 }
-                                CharReaderFromUtf32Buffer str_reader(str, NULL);
-                                n2 = (u64)StrToS64(&str_reader, 16);
+								runes_reader_t str_reader(str, str + strl);
+								n2 = (u64)StrToS64(&str_reader, 16);
                             }
                         }
 
@@ -681,14 +675,14 @@ namespace xcore
                     {
                         fmt->skip();
 
-                        utf32::rune               decimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
-                        CharReaderFromUtf32Buffer foo(decimalChars, decimalChars + 14);
+                        utf32::rune    allFloatChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
+						runes_reader_t floatChars(allFloatChars, allFloatChars + 14);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
                         f64 n3 = 0;
-                        if (SearchUntilOneOf(reader, &foo))
+                        if (SearchUntilOneOf(reader, &floatChars))
                         {
                             n3 = StrToF64(reader);
                         }
@@ -732,22 +726,22 @@ namespace xcore
         return scanned;
     }
 
-    s32 sscanf(crunes& str, crunes const& fmt, X_VA_R_ARGS_16)
+    s32 sscanf(crunes_t & str, crunes_t const& fmt, X_VA_R_ARGS_16)
     {
         x_va_r_list    vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
         runes_reader_t buf_reader(str);
         runes_reader_t fmt_reader(fmt);
         s32            scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-        str.m_str              = buf_reader.m_ptr;
-        return scanned;
+		str = buf_reader.get_current();
+		return scanned;
     }
 
-    s32 vsscanf(crunes& str, crunes const& fmt, const x_va_r_list& vr_args)
+    s32 vsscanf(crunes_t & str, crunes_t const& fmt, const x_va_r_list& vr_args)
     {
         runes_reader_t buf_reader(str);
         runes_reader_t fmt_reader(fmt);
         s32            scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-        str.m_str              = buf_reader.m_ptr;
+		str = buf_reader.get_current();
         return scanned;
     }
 

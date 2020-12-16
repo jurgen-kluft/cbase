@@ -11,10 +11,8 @@
 #endif
 
 #include "xbase/x_va_list.h"
+#include "xbase/x_runes.h"
 
-/**
- * xCore namespace
- */
 namespace xcore
 {
     // Interface class, has specific (or configurable) implementations for different environments/platforms
@@ -52,6 +50,7 @@ namespace xcore
         {
         public:
             virtual s32  color(xconsole::EColor color)   = 0;
+            virtual s32  write(crunes_t const& str) = 0;
             virtual s32  write(ascii::crunes_t const& str) = 0;
             virtual s32  write(utf32::crunes_t const& str) = 0;
             virtual void writeln()                       = 0;
@@ -74,6 +73,7 @@ namespace xcore
         virtual void write(u32 _value)  = 0;
         virtual void write(u64 _value)  = 0;
 
+		virtual void write(const crunes_t& buffer)                            = 0;
         virtual void write(const ascii::crunes_t& buffer)                     = 0;
         virtual void write(const ascii::crunes_t& fmt, const x_va_list& args) = 0;
         virtual void write(const utf32::crunes_t& buffer)                     = 0;
@@ -129,7 +129,12 @@ namespace xcore
             writeLine(r.m_runes.m_ascii);
         }
 
-        inline void writeLine(const ascii::crunes_t& str)
+		inline void writeLine(const crunes_t& str)
+		{
+			write(str);
+			writeLine();
+		}
+		inline void writeLine(const ascii::crunes_t& str)
         {
             write(str);
             writeLine();

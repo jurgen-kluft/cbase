@@ -138,7 +138,7 @@ namespace xcore
 
     xcbuffer xcbuffer::from_ascii_string(const char* str)
     {
-        u32      len = ascii::len(str, nullptr);
+        s32      len = ascii::strlen((ascii::pcrune)str, nullptr);
         xcbuffer buffer(len, (xbyte const*)str);
         return buffer;
     }
@@ -601,9 +601,10 @@ namespace xcore
         if (_can_write(len_, cursor_, size))
         {
             char*         dststr = (char*)buffer_ + cursor_;
-            ascii::runes  dst(dststr, dststr, dststr + size);
-            ascii::crunes_t src(str, end);
-            utf::copy(src, dst);
+			while (str < end)
+			{
+				*dststr++ = *str++;
+			}
             cursor_ += size;
             return offset;
         }

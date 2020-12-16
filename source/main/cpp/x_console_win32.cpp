@@ -21,10 +21,58 @@ namespace xcore
     public:
         virtual s32 color(xconsole::EColor color) { return 0; }
 
+        void write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
+        {
+            s32 len = 0;
+            if (rune < 0xd800)
+            {
+                len = 1;
+            }
+            else if (rune < 0xe000)
+            {
+                len = 0;
+            }
+            else if (rune < 0x010000)
+            {
+                len = 1;
+            }
+            else if (rune < 0x110000)
+            {
+                len = 2;
+            }
+
+            if (dest != NULL && len > 0)
+            {
+                if (len == 1 && dest < end)
+                {
+                    *dest++ = (uchar16)rune;
+                }
+                else if ((dest + 1) < end)
+                {
+                    // 20-bit intermediate value
+                    u32 const iv = rune - 0x10000;
+                    *dest++      = static_cast<uchar16>((iv >> 10) + 0xd800);
+                    *dest++      = static_cast<uchar16>((iv & 0x03ff) + 0xdc00);
+                }
+            }
+        }
         virtual void writeln()
         {
             utf32::rune line32[] = {'\r', 0};
-            write(utf32::crunes_t(line32, line32 + 1));
+            crunes_t    line(line32, 1);
+            write(line);
+        }
+
+        virtual s32 write(const crunes_t& str)
+        {
+            switch (str.m_type)
+            {
+                case ascii::TYPE: return write(str.m_runes.m_ascii);
+                case utf32::TYPE: return write(str.m_runes.m_utf32);
+                default: //@todo: UTF-8 and UTF-16
+					break;
+            }
+            return 0;
         }
 
         virtual s32 write(const ascii::crunes_t& str)
@@ -33,16 +81,17 @@ namespace xcore
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            ascii::crunes_t src = str;
-            while (utf::can_read(src))
+            ascii::pcrune src = str.m_str;
+            ascii::pcrune end = str.m_end;
+            while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
                 uchar16* end16 = dst16 + maxlen;
                 s32      ll    = 0;
-                while (utf::can_read(src) && dst16 < end16)
+                while (src < end && dst16 < end16)
                 {
-                    uchar32 c = utf::read(src);
-                    utf::write(c, dst16, end16);
+                    uchar32 c = *src++;
+                    write_utf16(c, dst16, end16);
                     ll += 1;
                 }
                 str16[ll] = 0;
@@ -50,7 +99,6 @@ namespace xcore
                 ::fputws((const wchar_t*)str16, stdout);
                 l += ll;
             }
-
             return l;
         }
 
@@ -60,16 +108,17 @@ namespace xcore
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf32::crunes_t src = str;
-            while (utf::can_read(src))
+            utf32::pcrune src = str.m_str;
+            utf32::pcrune end = str.m_end;
+            while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
                 uchar16* end16 = dst16 + maxlen;
                 s32      ll    = 0;
-                while (utf::can_read(src) && dst16 < end16)
+                while (src < end && dst16 < end16)
                 {
-                    uchar32 c = utf::read(src);
-                    utf::write(c, dst16, end16);
+                    uchar32 c = *src++;
+                    write_utf16(c, dst16, end16);
                     ll += 1;
                 }
                 str16[ll] = 0;
@@ -88,8 +137,5 @@ namespace xcore
     }
 
 }; // namespace xcore
-    /**
-     *  END xCore namespace
-     */
-
+    
 #endif

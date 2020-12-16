@@ -5,828 +5,59 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
-// Shared code
-#include "xbase/private/x_printf.h"
-
 namespace xcore
 {
-	struct AsciiBuffer
+	struct printf_writer_t
 	{
-		inline			AsciiBuffer(char * str, u32 len) : m_str((uchar*)str), m_end((uchar*)str + len), m_eos((uchar*)str + len) { }
-		inline			AsciiBuffer(char * str, char const * end) : m_str((uchar*)str), m_end((uchar *)end), m_eos((uchar *)end) { }
-		inline			AsciiBuffer(char * str, char const * end, char const * eos) : m_str((uchar *)str), m_end((uchar *)end), m_eos((uchar *)eos) { }
+		printf_writer_t(runes_writer_t* w, bool write_to_console) : m_runes_writer(w), m_write_to_console(write_to_console), m_runes_count(0) {}
+		runes_writer_t*		m_runes_writer;
+		runez_t<utf32::rune, 64> m_write_to_console_cache;
+		bool                m_write_to_console;
+		s32                 m_runes_count;
 
-		uchar *			m_str;
-		uchar const *	m_end;
-		uchar const *	m_eos;
-	};
-
-	struct Utf32Buffer
-	{
-		inline			Utf32Buffer(uchar32 * str, u32 len) : m_str(str), m_end(str + len), m_eos(str + len) { }
-		inline			Utf32Buffer(uchar32 * str, uchar32 const * end) : m_str(str), m_end(end), m_eos(end) { }
-		inline			Utf32Buffer(uchar32 * str, uchar32 const * end, uchar32 const * eos) : m_str(str), m_end(end), m_eos(eos) { }
-		uchar32 *		m_str;
-		uchar32 const *	m_end;
-		uchar32 const *	m_eos;
-	};
-
-	struct AsciiConstBuffer
-	{
-		inline			AsciiConstBuffer(char const* str, u32 len) : m_str((uchar*)str), m_end((uchar*)str + len) { }
-		inline			AsciiConstBuffer(char const* str, char const* end) : m_str((uchar*)str), m_end((uchar*)end) { }
-
-		uchar const*	m_str;
-		uchar const*	m_end;
-	};
-
-	struct Utf32ConstBuffer
-	{
-		inline			Utf32ConstBuffer(uchar32 const* str, u32 len) : m_str(str), m_end(str + len) { }
-		inline			Utf32ConstBuffer(uchar32 const* str, uchar32 const* end) : m_str(str), m_end(end) { }
-
-		uchar32 const*	m_str;
-		uchar32 const*	m_end;
-	};
-
-
-	class CharBufferIterator
-	{
-	public:
-		virtual void		Do(AsciiConstBuffer b) = 0;
-		virtual void		Do(Utf32ConstBuffer b) = 0;
-	};
-
-	class CharBufferModifier
-	{
-	public:
-		virtual void		Do(AsciiBuffer b) = 0;
-		virtual void		Do(Utf32Buffer b) = 0;
-	};
-
-	class CharReader
-	{
-	public:
-		virtual uchar32		Peek() = 0;
-		virtual uchar32		Read() = 0;
-		virtual void		Skip() = 0;
-		virtual void		Reset() = 0;
-
-		virtual void		Iterate(CharBufferIterator* i) = 0;
-	};
-
-	class CharWriter
-	{
-	public:
-		virtual u64			Count() const = 0;
-		virtual void		Reset() = 0;
-
-		virtual bool		Write(uchar32 c) = 0;
-		virtual bool		Write(AsciiConstBuffer c) = 0;
-		virtual bool		Write(Utf32ConstBuffer c) = 0;
-
-		virtual void		Iterate(CharBufferIterator* i) = 0;
-		virtual void		Modify(CharBufferModifier* m) = 0;
-	};
-
-	class CharBufferFill : public CharBufferModifier
-	{
-	public:
-		inline				CharBufferFill(uchar32 c) : m_fill(c) {}
-
-		virtual void		Do(AsciiBuffer b)
+		bool				write(char c)
 		{
-			uchar* ptr = b.m_str;
-			while (ptr < b.m_end)
-				*ptr++ = (uchar)m_fill;
-		}
-
-		virtual void		Do(Utf32Buffer b)
-		{
-			uchar32* ptr = b.m_str;
-			while (ptr < b.m_end)
-				*ptr++ = m_fill;
-		}
-	private:
-		uchar32		m_fill;
-	};
-
-	class CharBufferPad : public CharBufferModifier
-	{
-	public:
-		enum EMode { HEAD = 0, TAIL = 1 };
-		inline				CharBufferPad(EMode mode, uchar32 f, uchar32 r) : m_mode(mode), m_find(f), m_replace(r) {}
-
-		virtual void		Do(AsciiBuffer b)
-		{
-			if (m_mode == HEAD)
-			{
-				uchar* ptr = b.m_str;
-				while (ptr < b.m_end && *ptr == m_find)
-					*ptr++ = (uchar)m_replace;
-			}
-			else
-			{
-				uchar* ptr = b.m_str + (b.m_end - b.m_str) - 1;
-				while (ptr >= b.m_str && *ptr == m_find)
-					*ptr-- = (uchar)m_replace;
-			}
-		}
-
-		virtual void		Do(Utf32Buffer b)
-		{
-			if (m_mode == HEAD)
-			{
-				uchar32* ptr = b.m_str;
-				while (ptr < b.m_end && *ptr == m_find)
-					*ptr++ = m_replace;
-			}
-			else
-			{
-				uchar32* ptr = b.m_str + (b.m_end - b.m_str) - 1;
-				while (ptr >= b.m_str && *ptr == m_find)
-					*ptr-- = m_replace;
-			}
-		}
-	private:
-		EMode		m_mode;
-		uchar32		m_find;
-		uchar32		m_replace;
-	};
-
-
-	class CharBufferToCharWriter : public CharBufferIterator
-	{
-	public:
-		inline				CharBufferToCharWriter(CharWriter* writer) : m_writer(writer) { }
-
-		virtual void		Do(AsciiConstBuffer b)
-		{
-			uchar const* src = b.m_str;
-			while (src < b.m_end)
-			{
-				char c = *src++;
-				m_writer->Write(c);
-			}
-		}
-
-		virtual void		Do(Utf32ConstBuffer b)
-		{
-			uchar32 const* src = b.m_str;
-			while (src < b.m_end)
-			{
-				uchar32 c = *src++;
-				m_writer->Write(c);
-			}
-		}
-
-	private:
-		CharWriter * m_writer;
-	};
-
-	class CharBufferContainsChar : public CharBufferIterator
-	{
-	public:
-		inline				CharBufferContainsChar(uchar32 c) : m_char(c), m_found(false) { }
-
-		inline bool			Found() const { return m_found; }
-
-		virtual void		Do(AsciiConstBuffer b)
-		{
-			uchar const* src = b.m_str;
-			while (src < b.m_end)
-			{
-				uchar32 c = *src++;
-				if (c == m_char)
-				{
-					m_found = true;
-					break;
-				}
-			}
-		}
-
-		virtual void		Do(Utf32ConstBuffer b)
-		{
-			uchar32 const* src = b.m_str;
-			while (src < b.m_end)
-			{
-				uchar32 c = *src++;
-				if (c == m_char)
-				{
-					m_found = true;
-					break;
-				}
-			}
-		}
-
-	private:
-		bool				m_found;
-		uchar32				m_char;
-	};
-
-	class CharBufferFindOneOf : public CharBufferIterator
-	{
-	public:
-		inline				CharBufferFindOneOf(CharReader* one_of) : m_oneof(one_of), m_found('\0') { }
-
-		inline uchar		Found() const { return (uchar)m_found; }
-
-		virtual void		Do(AsciiConstBuffer b)
-		{
-			m_found = '\0';
-			uchar const* src = b.m_str;
-			while (src < b.m_end)
-			{
-				uchar32 c = *src++;
-				CharBufferContainsChar contains(c);
-				m_oneof->Iterate(&contains);
-				if (contains.Found())
-				{
-					m_found = c;
-					break;
-				}
-			}
-		}
-
-		virtual void		Do(Utf32ConstBuffer b)
-		{
-			m_found = '\0';
-			uchar32 const* src = b.m_str;
-			while (src < b.m_end)
-			{
-				uchar32 c = *src++;
-				CharBufferContainsChar contains(c);
-				m_oneof->Iterate(&contains);
-				if (contains.Found())
-				{
-					m_found = c;
-					break;
-				}
-			}
-		}
-
-	private:
-		CharReader * m_oneof;
-		uchar32		 m_found;
-	};
-
-	class CharBufferReversedWriter : public CharWriter
-	{
-	public:
-		utf32::runes_t	m_str;
-		uchar32*		m_begin;
-		uchar32*		m_end;
-
-		inline			CharBufferReversedWriter() {}
-
-		inline			CharBufferReversedWriter(utf32::runes_t str) : m_str(str) { Reset(); }
-
-		virtual u64		Count() const { return 0; }
-
-		virtual void	Reset()
-		{
-			m_str.m_end = m_str.m_str;
-			*m_str.m_end = '\0';
-
-			while (m_str.m_end < m_str.m_eos)
-				*m_str.m_end++ = ' ';
-
-			m_begin = m_str.m_end;
-			m_end = m_str.m_end;
-		}
-
-		void			Flush()
-		{
-		}
-
-		virtual bool	Write(uchar32 c)
-		{
-			if (m_begin > m_str.m_str)
-			{
-				m_begin -= 1;
-				*m_begin = c;
-				return true;
-			}
 			return false;
 		}
-
-		virtual bool	Write(AsciiConstBuffer b)
+		
+		bool                write(uchar32 c)
 		{
-			Flush();
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual bool	Write(Utf32ConstBuffer b)
-		{
-			Flush();
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-
-		}
-
-		virtual void	Modify(CharBufferModifier* m)
-		{
-
-		}
-	};
-	class CharWriterCounter : public CharWriter
-	{
-	public:
-		inline			CharWriterCounter() : m_count(0) { }
-
-		virtual u64		Count() const { return m_count; }
-		virtual void	Reset() { m_count = 0; }
-
-		virtual bool	Write(uchar32 c)
-		{
-			m_count++;
-			return true;
-		}
-
-		virtual bool	Write(AsciiConstBuffer b)
-		{
-			m_count += b.m_end - b.m_str;
-			return true;
-		}
-
-		virtual bool	Write(Utf32ConstBuffer b)
-		{
-			m_count += b.m_end - b.m_str;
-			return true;
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-		}
-
-		virtual void	Modify(CharBufferModifier* m)
-		{
-		}
-
-	private:
-		u64				m_count;
-	};
-
-	class CharWriterAsAsciiToConsole : public CharWriter
-	{
-	public:
-		inline			CharWriterAsAsciiToConsole(AsciiBuffer cache) : m_count(0), m_cache(cache), m_cursor(cache.m_str) { }
-
-		virtual u64		Count() const { return m_count; }
-
-		virtual void	Reset() { m_count = 0; m_cursor = m_cache.m_str; m_cursor[0] = '\0'; }
-
-		void			Flush()
-		{
-			console->write(m_cache.m_str);
-			m_cursor = m_cache.m_str;
-			m_cursor[0] = '\0';
-		}
-
-		virtual bool	Write(uchar32 c)
-		{
-			if (m_cursor == m_cache.m_end)
-				Flush();
-
-			m_cursor[0] = (char)c;
-			m_cursor[1] = '\0';
-			m_cursor += 1;
-
-			return true;
-		}
-
-		virtual bool	Write(AsciiConstBuffer b)
-		{
-			Flush();
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual bool	Write(Utf32ConstBuffer b)
-		{
-			Flush();
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-			AsciiConstBuffer buffer(m_cache.m_str, m_cursor);
-			i->Do(buffer);
-		}
-
-		virtual void	Modify(CharBufferModifier* m)
-		{
-			AsciiBuffer buffer(m_cache.m_str, m_cursor, m_cache.m_end);
-			m->Do(buffer);
-		}
-
-	private:
-		u64				m_count;
-		AsciiBuffer		m_cache;
-		uchar*			m_cursor;
-	};
-
-	class CharWriterAsUtf32ToConsole : public CharWriter
-	{
-	public:
-		inline			CharWriterAsUtf32ToConsole(Utf32Buffer cache) : m_count(0), m_cache(cache), m_cursor(cache.m_str) { }
-
-		virtual u64		Count() const { return m_count; }
-		virtual void	Reset() { m_count = 0; m_cursor = m_cache.m_str; m_cursor[0] = '\0'; }
-
-		void			Flush()
-		{
-			console->write(m_cache.m_str);
-			m_cursor = m_cache.m_str;
-			*m_cursor = '\0';
-		}
-
-		virtual bool	Write(uchar32 c)
-		{
-			if (m_cursor == m_cache.m_end)
-				Flush();
-			*m_cursor++ = c;
-			*m_cursor = '\0';
-			return true;
-		}
-
-		virtual bool	Write(AsciiConstBuffer b)
-		{
-			Flush();
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual bool	Write(Utf32ConstBuffer b)
-		{
-			Flush();
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-			Utf32ConstBuffer buffer(m_cache.m_str, m_cursor);
-			i->Do(buffer);
-		}
-
-		virtual void	Modify(CharBufferModifier* m)
-		{
-			Utf32Buffer buffer(m_cache.m_str, m_cursor, m_cache.m_end);
-			m->Do(buffer);
-		}
-
-	private:
-		u64				m_count;
-		Utf32Buffer		m_cache;
-		uchar32*		m_cursor;
-	};
-
-	class CharWriterToAsciiBuffer : public CharWriter
-	{
-	public:
-		inline			CharWriterToAsciiBuffer(char* str, char const * str_end) : m_str(str), m_ptr(str), m_end(str_end), m_count(0) { }
-		inline			CharWriterToAsciiBuffer(AsciiBuffer str) : m_str(str.m_str), m_ptr(str.m_str), m_end(str.m_end), m_count(0) { }
-
-		virtual u64		Count() const { return m_count; }
-		virtual void	Reset() { m_ptr = m_str; m_count = 0; }
-
-		virtual bool	Write(uchar32 c)
-		{
-			bool const ok = Write_Prologue(c);
-			if (ok)
+			bool result = false;
+			if (m_runes_writer != nullptr)
+				result |= m_runes_writer->write(c);
+			if (m_write_to_console)
 			{
-				m_count += 1;
-				*m_ptr++ = (uchar)c;
-				*m_ptr = '\0';
+				m_write_to_console_cache += c;
 			}
-			return ok;
+			return result;
 		}
-
-		virtual bool	Write(AsciiConstBuffer b)
+		
+		bool                write(crunes_t const& runes)
 		{
-			if (m_ptr >= m_end)
-				return false;
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual bool	Write(Utf32ConstBuffer b)
-		{
-			if (m_ptr >= m_end)
-				return false;
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-			AsciiConstBuffer buffer(m_str, m_ptr);
-			i->Do(buffer);
-		}
-
-		virtual void	Modify(CharBufferModifier* m)
-		{
-			AsciiBuffer buffer(m_str, m_ptr, m_end);
-			m->Do(buffer);
-		}
-
-		u64				m_count;
-		char *			m_str;
-		char *			m_ptr;
-		char const *	m_end;
-
-	private:
-		bool			Write_Prologue(uchar32& c) const
-		{
-			if (m_ptr >= m_str && m_ptr < m_end)
+			flush();
+			bool result = false;
+			if (m_runes_writer != nullptr)
+				result |= m_runes_writer->write(runes);
+			if (m_write_to_console)
 			{
-				s32 len = 0;
-				if (c <= 0x7f) { len = 1; }
-				else if (c < 0x0800) { len = 2; }
-				else if (c < 0xd800) { len = 3; }
-				else if (c < 0xe000) { len = 0; }
-				else if (c < 0x010000) { len = 3; }
-				else if (c < 0x110000) { len = 4; }
+				console->write(runes);
+			}
+			return result;
+		}
 
-				if (len == 0 || len > 1)
+		void flush()
+		{
+			if (m_write_to_console)
+			{
+				if (m_write_to_console_cache.size() > 0)
 				{
-					c = '?';
-					len = 1;
-				}
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	};
-
-	class CharWriterToUtf32Buffer : public CharWriter
-	{
-	public:
-		inline			CharWriterToUtf32Buffer(uchar32 * str, uchar32 const * str_end) : m_str(str), m_ptr(str), m_end(str_end), m_count(0) { }
-		inline			CharWriterToUtf32Buffer(Utf32Buffer str) : m_str(str.m_str), m_ptr(str.m_str), m_end(str.m_end), m_count(0) { }
-
-		virtual u64		Count() const { return m_count; }
-		virtual void	Reset() { m_ptr = m_str; m_count = 0; }
-
-		virtual bool	Write(uchar32 c)
-		{
-			if (m_ptr >= m_end)
-				return false;
-			*m_ptr++ = c;
-			return true;
-		}
-
-		virtual bool	Write(AsciiConstBuffer b)
-		{
-			if (m_ptr >= m_end)
-				return false;
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual bool	Write(Utf32ConstBuffer b)
-		{
-			if (m_ptr >= m_end)
-				return false;
-			CharBufferToCharWriter writer(this);
-			writer.Do(b);
-			return true;
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-			Utf32ConstBuffer buffer(m_str, m_ptr);
-			i->Do(buffer);
-		}
-
-		virtual void	Modify(CharBufferModifier* m)
-		{
-			Utf32Buffer buffer(m_str, m_ptr, m_end);
-			m->Do(buffer);
-		}
-
-		u64				m_count;
-		uchar32 *		m_str;
-		uchar32 *		m_ptr;
-		uchar32 const *	m_end;
-	};
-
-	template<int SIZE>
-	class CharWriterToAsciiBufferWithBuffer : public CharWriter
-	{
-	public:
-		inline			CharWriterToAsciiBufferWithBuffer() : m_writer(m_buffer, &m_buffer[SIZE])
-		{
-			m_buffer[SIZE] = '\0';
-			m_buffer[SIZE + 1] = '\0';
-			m_buffer[SIZE + 2] = '\0';
-			m_buffer[SIZE + 3] = '\0';
-		}
-
-		virtual u64		Count() const { return m_writer.Count(); }
-		virtual void	Reset() { m_writer.Reset(); }
-
-		virtual bool	Write(uchar32 c)
-		{
-			return m_writer.Write(c);
-		}
-
-		virtual bool	Write(AsciiConstBuffer b)
-		{
-			return m_writer.Write(b);
-		}
-
-		virtual bool	Write(Utf32ConstBuffer b)
-		{
-			return m_writer.Write(b);
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-			m_writer.Iterate(i);
-		}
-
-		virtual void	Modify(CharBufferModifier* m)
-		{
-			m_writer.Modify(m);
-		}
-
-	private:
-		uchar			m_buffer[SIZE + 4];
-		CharWriterToAsciiBuffer m_writer;
-	};
-
-	template<int SIZE>
-	class CharWriterToUtf32BufferWithBuffer : public CharWriter
-	{
-	public:
-		inline			CharWriterToUtf32BufferWithBuffer() : m_writer(m_buffer, &m_buffer[SIZE])
-		{
-			m_buffer[SIZE] = '\0';
-		}
-
-		virtual u64		Count() const { return m_writer.Count(); }
-		virtual void	Reset() { m_writer.Reset(); }
-
-		virtual bool	Write(uchar32 c)
-		{
-			return m_writer.Write(c);
-		}
-
-		virtual bool	Write(AsciiConstBuffer b)
-		{
-			return m_writer.Write(b);
-		}
-
-		virtual bool	Write(Utf32ConstBuffer b)
-		{
-			return m_writer.Write(b);
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-			m_writer.Iterate(i);
-		}
-
-		virtual void	Modify(CharBufferModifier* m)
-		{
-			m_writer.Modify(m);
-		}
-
-	private:
-		uchar32			m_buffer[SIZE + 1];
-		CharWriterToUtf32Buffer m_writer;
-	};
-
-	class CharReaderFromAsciiBuffer : public CharReader
-	{
-	public:
-		inline			CharReaderFromAsciiBuffer(const char* str, const char* str_end) 
-			: m_str(str)
-			, m_ptr(str)
-			, m_end(str_end) 
-		{ 
-			if (m_end == NULL) 
-			{
-				m_end = m_str;
-				while (*m_end != '\0')
-				{
-					m_end++;
+					crunes_t cachestr = m_write_to_console_cache;
+					console->write(cachestr);
+					m_write_to_console_cache.reset();
 				}
 			}
 		}
-
-		virtual uchar32	Peek()
-		{
-			if (m_ptr >= m_end)
-				return '\0';
-			uchar32 c = *m_ptr;
-			return c;
-		}
-
-		virtual uchar32	Read()
-		{
-			if (m_ptr >= m_end)
-				return '\0';
-			uchar32 c = *m_ptr++;
-			return c;
-		}
-
-		virtual void	Skip()
-		{
-			if (m_ptr < m_end)
-				m_ptr++;
-		}
-
-		virtual void	Reset()
-		{
-			m_ptr = m_str;
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-			AsciiConstBuffer buffer(m_str, m_end);
-			i->Do(buffer);
-		}
-
-		const char*		m_str;
-		const char*		m_ptr;
-		const char*		m_end;
 	};
-
-	class CharReaderFromUtf32Buffer : public CharReader
-	{
-	public:
-		inline			CharReaderFromUtf32Buffer(const uchar32* str, const uchar32* str_end) 
-			: m_str(str)
-			, m_ptr(str)
-			, m_end(str_end) 
-		{ 
-			if (m_end == NULL) 
-			{
-				m_end = m_str;
-				while (*m_end != '\0')
-					++m_end;
-			}
-		}
-
-		virtual uchar32	Peek()
-		{
-			if (m_ptr >= m_end)
-				return '\0';
-			uchar32 c = *m_ptr;
-			return c;
-		}
-
-		virtual uchar32	Read()
-		{
-			if (m_ptr >= m_end)
-				return '\0';
-			uchar32 c = *m_ptr++;
-			return c;
-		}
-
-		virtual void	Skip()
-		{
-			if (m_ptr < m_end)
-				m_ptr++;
-		}
-
-		virtual void	Reset()
-		{
-			m_ptr = m_str;
-		}
-
-		virtual void	Iterate(CharBufferIterator* i)
-		{
-			Utf32ConstBuffer buffer(m_str, m_end);
-			i->Do(buffer);
-		}
-
-		const uchar32*		m_str;
-		const uchar32*		m_ptr;
-		const uchar32*		m_end;
-	};
-
 
 //==============================================================================
 // DEFINES
@@ -1003,7 +234,7 @@ namespace xcore
      * prec    - how many digits of precision
      *------------------------------------------------------------------------------
      */
-    static void dtoa(CharWriter* writer, f64 fpnum, char cvt, s32 width, s32 prec)
+    static void dtoa(runes_writer_t* writer, f64 fpnum, char cvt, s32 width, s32 prec)
     {
         static const f64 powTable[] = {1, 10, 10e1, 10e2, 10e3, 10e4, 10e5, 10e6, 10e7, 10e8, 10e9, 10e10, 10e11, 10e12, 10e13, 10e14, 10e15, 10e16, 10e17, 10e18, 10e19, 10e20, 10e21, 10e22, 10e23};
 
@@ -1029,16 +260,16 @@ namespace xcore
         if (x_f64u::isInfinite(fpnum))
         {
             if (fpnum < 0)
-                writer->Write('-');
-            AsciiConstBuffer str("Inf", 3);
-            writer->Write(str);
+                writer->write('-');
+			crunes_t str("Inf", 3);
+            writer->write(str);
             return;
         }
 
         if (x_f64u::isNAN(fpnum))
         {
-            AsciiConstBuffer str("NaN", 3);
-            writer->Write(str);
+            crunes_t str("NaN", 3);
+            writer->write(str);
             return;
         }
 
@@ -1346,19 +577,22 @@ namespace xcore
         s32 const pad      = width - fmtwidth;
 
         for (s32 i = 0; pad > 0 && i < pad; ++i)
-            writer->Write(' ');
+            writer->write(' ');
 
         if (is_neg)
         {
-            writer->Write('-');
+            writer->write('-');
         }
-        writer->Write(AsciiConstBuffer(iw, iwidth));
+		crunes_t workstr(iw, width);
+        writer->write(workstr);
         if (showdot)
         {
-            writer->Write('.');
-            writer->Write(AsciiConstBuffer(fwork, fwidth));
+            writer->write('.');
+			crunes_t fworkstr(fwork, fwidth);
+			writer->write(fworkstr);
         }
-        writer->Write(AsciiConstBuffer(ew, ewidth));
+		crunes_t eworkstr(ew, ewidth);
+		writer->write(eworkstr);
     }
 
     /**
@@ -1379,14 +613,30 @@ namespace xcore
 #define is_digit(c) ((u32)to_digit(c) >= 0 && ((u32)to_digit(c) <= 9))
 #define to_char(n) ((u32)((n) + '0'))
 
-    static void ULtoA(u32 val, CharWriter* writer, s32 base, xbool octzero, char const* xdigs)
+	static void ReverseCharStr(char* str, char* end)
+	{
+		// Reverse work buffer
+		char* head = str;
+		char* tail = end - 1;
+		while (head < tail)
+		{
+			char t = *head;
+			*head = *tail;
+			*tail = t;
+			head += 1;
+			tail -= 1;
+		}
+	}
+
+    static void ULtoA(u32 val, runes_writer_t* writer, s32 base, xbool octzero, char const* xdigs)
     {
         uchar32 c;
         s32     sval;
 
         ASSERT(writer);
 
-        // handle the three cases separately, in the hope of getting better/faster code.
+		char  work[WORKSIZE];
+		char* w = &work[WORKSIZE];
 
         switch (base)
         {
@@ -1399,7 +649,8 @@ namespace xcore
                 if (val > SPF_LONG_MAX)
                 {
                     c = to_char(val % 10);
-                    writer->Write(c);
+					w -= 1;
+					*w = c;
                     sval = (s32)(val / 10);
                 }
                 else
@@ -1410,8 +661,9 @@ namespace xcore
                 do
                 {
                     c = to_char(sval % 10);
-                    writer->Write(c);
-                    sval /= 10;
+					w -= 1;
+					*w = c;
+					sval /= 10;
                 } while (sval != 0);
 
                 break;
@@ -1420,17 +672,21 @@ namespace xcore
                 do
                 {
                     c = to_char(val & 7);
-                    writer->Write(c);
+					w -= 1;
+					*w = c;
                     val >>= 3;
                 } while (val);
-                if (octzero && c != '0')
-                    writer->Write(uchar32('0'));
+				if (octzero && c != '0')
+				{
+					*w-- = '0';
+				}
                 break;
 
             case 16:
                 do
                 {
-                    writer->Write(xdigs[val & 15]);
+					w -= 1;
+					*w = xdigs[val & 15];
                     val >>= 4;
                 } while (val);
 
@@ -1440,17 +696,22 @@ namespace xcore
                 /* oops */
                 break;
         }
+
+		ReverseCharStr(w, &work[WORKSIZE]);
+		crunes_t workstr(w, &work[WORKSIZE]);
+		writer->write(workstr);
     }
 
     /**
-     * Same as above but for s64
+     * Same as above but for u64
      */
-    static void UQtoA(u64 val, CharWriter* writer, s32 base, xbool octzero, char const* xdigs)
+    static void UQtoA(u64 val, runes_writer_t* writer, s32 base, xbool octzero, char const* xdigs)
     {
         uchar32 c;
         s64     sval;
 
-        // handle the three cases separately, in the hope of getting better/faster code.
+		char  work[WORKSIZE];
+		char* w = &work[WORKSIZE];
 
         switch (base)
         {
@@ -1463,7 +724,8 @@ namespace xcore
                 if (val > ((~(u64)0) >> 1))
                 {
                     c = to_char(val % 10);
-                    writer->Write(c);
+					w -= 1;
+					*w = c;
                     sval = (s64)(val / 10);
                 }
                 else
@@ -1474,8 +736,9 @@ namespace xcore
                 do
                 {
                     c = to_char(sval % 10);
-                    writer->Write(c);
-                    sval /= 10;
+					w -= 1;
+					*w = c;
+					sval /= 10;
                 } while (sval != 0);
 
                 break;
@@ -1484,12 +747,17 @@ namespace xcore
                 do
                 {
                     c = to_char(val & 7);
-                    writer->Write(c);
-                    val >>= 3;
+					w -= 1;
+					*w = c;
+					val >>= 3;
                 } while (val);
 
-                if (octzero && c != '0')
-                    writer->Write('0');
+				if (octzero && c != '0')
+				{
+					c = '0';
+					w -= 1;
+					*w = c;
+				}
 
                 break;
 
@@ -1497,8 +765,9 @@ namespace xcore
                 do
                 {
                     c = xdigs[val & 15];
-                    writer->Write(c);
-                    val >>= 4;
+					w -= 1;
+					*w = c;
+					val >>= 4;
                 } while (val);
 
                 break;
@@ -1507,9 +776,13 @@ namespace xcore
                 /* oops */
                 break;
         }
-    }
+	
+		ReverseCharStr(w, &work[WORKSIZE]);
+		crunes_t workstr(w, &work[WORKSIZE]);
+		writer->write(workstr);
+	}
 
-    static s32 boolToStr(u32 _boolean, CharWriter* writer, bool yesNo, xcore::s32 flags)
+    static s32 boolToStr(u32 _boolean, runes_writer_t* writer, bool yesNo, xcore::s32 flags)
     {
         const char* t[] = {"false", "true", "FALSE", "TRUE", "False", "True", "no", "yes", "NO", "YES", "No", "Yes"};
         s32         i   = yesNo ? 6 : 0;
@@ -1525,34 +798,18 @@ namespace xcore
         while (*src != '\0')
         {
             uchar32 c = *src++;
-            writer->Write(c);
+            writer->write(c);
             len += 1;
         }
         return len;
     }
 
-    /**
-     * WriteToBuffer
-     */
-    typedef void (*WriteBufferDelegate)(CharWriter* writer, uchar* string, s32 size);
 
-    static void WriteToBuffer(CharWriter* writer, uchar* str, s32 size)
-    {
-        ASSERT(str);
-        ASSERT(size >= 0);
-        writer->Write(AsciiConstBuffer((const char*)str, size));
-    }
-
-    /**
-     * PadToBuffer
-     */
-    typedef void (*PadBufferDelegate)(CharWriter* writer, s32 howMany, char with);
-
-    static void PadBuffer(CharWriter* writer, s32 howMany, char with)
+    static void PadBuffer(printf_writer_t* writer, s32 howMany, char with)
     {
         for (s32 i = 0; i < howMany; i++)
         {
-            if (writer->Write(with) == false)
+            if (writer->write(with) == false)
                 break;
         }
     }
@@ -1625,7 +882,7 @@ namespace xcore
      *------------------------------------------------------------------------------
      */
 
-    void VSPrintf_internal(CharWriter* writer, CharReader* reader, CharWriter* buffer, const x_va_list& args)
+    void VSPrintf_internal(printf_writer_t* writer, runes_reader_t* reader, runes_writer_t* buffer, const x_va_list& args)
     {
         ASSERT(reader != NULL);
         ASSERT(writer != NULL);
@@ -1633,7 +890,7 @@ namespace xcore
 
         uchar32     ch;        ///< character
         s32         n;         ///< handy integer (short term usage)
-        CharWriter* cp = NULL; ///< handy char pointer (short term usage)
+		runes_writer_t* cp = NULL; ///< handy char pointer (short term usage)
         s32         flags;     ///< flags as above
         s32         width;     ///< width from format (%8d), or 0
         s32         prec;      ///< precision from format (%.3d), or -1
@@ -1643,7 +900,6 @@ namespace xcore
         s32         dprec;     ///< a copy of prec if [diouxX], 0 otherwise
         s32         realsz;    ///< field size expanded by dprec, sign, etc
         s32         size;      ///< size of converted field or string
-        uchar       ox[2];     ///< space for 0x hex-prefix
 
         /// Initialize variables
         char const* xdigs    = NULL; // digits for [xX] conversion
@@ -1651,17 +907,17 @@ namespace xcore
         u64         uqval    = 0;    // %q integers
         s32         argindex = 0;
 
-        CharBufferToCharWriter copy_to_writer(writer);
+        //CharBufferToCharWriter copy_to_writer(writer);
 
         /// Scan the format for conversions (`%' character).
         for (;;)
         {
             while (true)
             {
-                ch = reader->Read();
+                ch = reader->read();
                 if ((ch == uchar32('\0')) || (ch == uchar32('%'))) // Find the first "interesting symbol"
                     break;
-                writer->Write(ch); // Write all the characters before the "interesting symbol"
+                writer->write(ch); // Write all the characters before the "interesting symbol"
             }
 
             // are we done?
@@ -1669,7 +925,7 @@ namespace xcore
                 goto done;
 
             // reset the temp buffer
-            buffer->Reset();
+            buffer->reset();
 
             // get ready for formating the info
             flags = 0;
@@ -1680,7 +936,7 @@ namespace xcore
             sign  = '\0';
 
         rflag:
-            ch = reader->Read();
+            ch = reader->read();
 
         reswitch:
             switch (ch)
@@ -1716,7 +972,7 @@ namespace xcore
                 case '+': sign = '+'; goto rflag;
 
                 case '.':
-                    ch = reader->Read();
+                    ch = reader->read();
                     if (ch == '*')
                     {
                         n    = (s32)args[argindex++];
@@ -1728,7 +984,7 @@ namespace xcore
                     while (is_digit(ch))
                     {
                         n  = 10 * n + to_digit(ch);
-                        ch = reader->Read();
+                        ch = reader->read();
                     }
 
                     prec = n < 0 ? -1 : n;
@@ -1754,7 +1010,7 @@ namespace xcore
                     do
                     {
                         n  = 10 * n + to_digit(ch);
-                        ch = reader->Read();
+                        ch = reader->read();
                         if (!is_digit(ch))
                             break;
                     } while (true);
@@ -1773,7 +1029,7 @@ namespace xcore
                 case 'l': flags |= LONGINT; goto rflag;
 
                 case 'c':
-                    buffer->Write((uchar32)args[argindex++]);
+                    buffer->write((uchar32)args[argindex++]);
                     size = 1;
                     sign = '\0';
                     break;
@@ -1825,7 +1081,7 @@ namespace xcore
 
                     if (sign == '+')
                     {
-                        writer->Write(sign);
+                        writer->write(sign);
                         width--;
                     }
 
@@ -1844,17 +1100,29 @@ namespace xcore
                     // right-adjusting zero padding
                     {
                         dtoa(buffer, _double, (char)ch, width, prec);
-                        size = (s32)buffer->Count();
+						size = (s32)buffer->count();
                     }
 
                     // check whether we have to pad or not
                     if (flags & ZEROPAD)
                     {
-                        CharBufferPad padder(CharBufferPad::HEAD, ' ', '0');
-                        buffer->Modify(&padder);
+						runes_t bufstr = buffer->get_current();
+						runes_reader_t bufreader(bufstr);
+						runes_writer_t bufwriter(bufstr);
+						while (!bufreader.at_end())
+						{
+							uchar32 c = bufreader.read();
+							if (c != ' ')
+								break;
+							bufwriter.write('0');
+						}
                     }
 
-                    buffer->Iterate(&copy_to_writer); // Copy 'buffer' to 'writer'
+                    // Copy 'buffer' to 'writer'
+					{
+						runes_t bufferstr = buffer->get_current();
+						writer->write(bufferstr);
+					}
 
                     if (flags & LADJUST)
                         PadBuffer(writer, -width - size, ' ');
@@ -1918,19 +1186,10 @@ namespace xcore
                     if (args[argindex].isPCURunes() || args[argindex].isPCTChar())
                     {
                         crunes_t src = *(crunes_t const*)args[argindex];
-						if (src.m_type == ascii::TYPE)
-						{
-							AsciiConstBuffer srcbuffer(src.m_runes.m_ascii.m_str, src.m_runes.m_ascii.m_end);
-							buffer->Write(srcbuffer);
-						}
-						else if (src.m_type == utf32::TYPE)
-						{
-							Utf32ConstBuffer srcbuffer(src.m_runes.m_utf32.m_str, src.m_runes.m_utf32.m_end);
-							buffer->Write(srcbuffer);
-						}
+						buffer->write(src);
                     }
 
-                    size = (s32)buffer->Count();
+                    size = (s32)buffer->count();
                     sign = '\0';
                     break;
 
@@ -2002,28 +1261,20 @@ namespace xcore
                     // explicit precision of zero is no characters.''
                     // -- ANSI X3J11
 					{
-						utf32::rune              UQtoAcharsBuffer[128];
-						utf32::runes_t           UQtoAchars = { &UQtoAcharsBuffer[0], &UQtoAcharsBuffer[0], &UQtoAcharsBuffer[0], &UQtoAcharsBuffer[128 - 1] };
-						CharBufferReversedWriter reversedWriter(UQtoAchars);
-
 						if (flags & QUADINT)
 						{
 							if (uqval != 0 || prec != 0)
 							{
-								UQtoA(uqval, &reversedWriter, base, xbool((flags & ALT) != 0), xdigs);
-								Utf32ConstBuffer UQtoAbuffer(reversedWriter.m_begin, reversedWriter.m_end);
-								buffer->Write(UQtoAbuffer);
-								size = (s32)buffer->Count();
+								UQtoA(uqval, buffer, base, xbool((flags & ALT) != 0), xdigs);
+								size = (s32)buffer->count();
 							}
 						}
 						else
 						{
 							if (ulval != 0 || prec != 0)
 							{
-								ULtoA(ulval, &reversedWriter, base, xbool((flags & ALT) != 0), xdigs);
-								Utf32ConstBuffer UQtoAbuffer(reversedWriter.m_begin, reversedWriter.m_end);
-								buffer->Write(UQtoAbuffer);
-								size = (s32)buffer->Count();
+								ULtoA(ulval, buffer, base, xbool((flags & ALT) != 0), xdigs);
+								size = (s32)buffer->count();
 							}
 						}
 					}
@@ -2034,7 +1285,7 @@ namespace xcore
                         goto done;
 
                     // pretend it was %c with argument ch
-                    buffer->Write(ch);
+                    buffer->write(ch);
                     size = 1;
                     sign = '\0';
 
@@ -2071,15 +1322,14 @@ namespace xcore
             // prefix
             if (sign)
             {
-                WriteToBuffer(writer, (uchar*)&sign, 1);
+				writer->write(sign);
             }
             else
             {
                 if (flags & HEXPREFIX)
                 {
-                    ox[0] = '0';
-                    ox[1] = (u8)ch;
-                    WriteToBuffer(writer, ox, 2);
+					writer->write('0');
+					writer->write(ch);
                 }
             }
 
@@ -2091,7 +1341,8 @@ namespace xcore
             PadBuffer(writer, dprec - size, '0');
 
             // write the integer number
-            buffer->Iterate(&copy_to_writer);
+			crunes_t bufferstr = buffer->get_current();
+			writer->write(bufferstr);
 
             // left-adjusting padding (always blank)
             if (flags & LADJUST)
@@ -2110,22 +1361,24 @@ namespace xcore
 
     s32 vcprintf(crunes_t const& format, const x_va_list& args)
     {
-		CharWriterCounter                           writer;
-		
+		s32 len = 0;
 		if (format.m_type == utf32::TYPE)
 		{
-			CharReaderFromUtf32Buffer                   reader(format.m_runes.m_utf32.m_str, format.m_runes.m_utf32.m_end);
-			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
+			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
+			runes_writer_t scratch(scratchbuffer);
+			runes_reader_t runesreader(format);
+			printf_writer_t writer(nullptr, false);
+			VSPrintf_internal(&writer, &runesreader, &scratch, args);
 		}
 		else if (format.m_type == ascii::TYPE)
 		{
-			CharReaderFromAsciiBuffer                   reader(format.m_runes.m_ascii.m_str, format.m_runes.m_ascii.m_end);
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
+			runez_t<ascii::rune, WORKSIZE> scratchbuffer;
+			runes_writer_t scratch(scratchbuffer);
+			runes_reader_t reader(format);
+			printf_writer_t writer(nullptr, false);
+			VSPrintf_internal(&writer, &reader, &scratch, args);
 		}
-
-        return (s32)writer.Count();
+        return len;
     }
 
     void sprintf(runes_t& str, crunes_t const& format, X_VA_ARGS_16)
@@ -2138,19 +1391,23 @@ namespace xcore
     {
 		if (format.m_type == utf32::TYPE)
 		{
-			CharReaderFromUtf32Buffer                   reader(format.m_runes.m_utf32.m_str, format.m_runes.m_utf32.m_end);
-			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
-			CharWriterToUtf32Buffer                     writer(str.m_runes.m_utf32.m_end, str.m_runes.m_utf32.m_eos);
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			str.m_runes.m_utf32.m_end = writer.m_ptr;
+			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
+			runes_writer_t scratch(scratchbuffer);
+			runes_reader_t runesreader(format);
+			runes_writer_t runeswriter(str);
+			printf_writer_t writer(&runeswriter, false);
+			VSPrintf_internal(&writer, &runesreader, &scratch, args);
+			str = writer.m_runes_writer->get_current();
 		}
 		else if (format.m_type == ascii::TYPE)
 		{
-			CharReaderFromAsciiBuffer                   reader(format.m_runes.m_ascii.m_str, format.m_runes.m_ascii.m_end);
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			CharWriterToAsciiBuffer                     writer(str.m_runes.m_ascii.m_end, str.m_runes.m_ascii.m_eos);
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			str.m_runes.m_ascii.m_end = writer.m_ptr;
+			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
+			runes_writer_t scratch(scratchbuffer);
+			runes_reader_t runesreader(format);
+			runes_writer_t runeswriter(str);
+			printf_writer_t writer(&runeswriter, false);
+			VSPrintf_internal(&writer, &runesreader, &scratch, args);
+			str = writer.m_runes_writer->get_current();
 		}
 	}
 
@@ -2175,21 +1432,19 @@ namespace xcore
 
 		if (format.m_type == utf32::TYPE)
 		{
-			utf32::rune                                 cache[cache_size + 1];
-			CharWriterAsUtf32ToConsole                  writer(Utf32Buffer(cache, cache + cache_size));
-			CharReaderFromUtf32Buffer                   reader(format.m_runes.m_utf32.m_str, format.m_runes.m_utf32.m_end);
-			CharWriterToUtf32BufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			writer.Flush();
+			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
+			runes_writer_t scratch(scratchbuffer);
+			runes_reader_t runesreader(format);
+			printf_writer_t writer(nullptr, true);
+			VSPrintf_internal(&writer, &runesreader, &scratch, args);
 		}
 		else if (format.m_type == ascii::TYPE)
 		{
-			ascii::rune                                 cache[cache_size + 1];
-			CharWriterAsAsciiToConsole                  writer(AsciiBuffer(cache, cache + cache_size));
-			CharReaderFromAsciiBuffer                   reader(format.m_runes.m_ascii.m_str, format.m_runes.m_ascii.m_end);
-			CharWriterToAsciiBufferWithBuffer<WORKSIZE> buffer;
-			VSPrintf_internal(&writer, &reader, &buffer, args);
-			writer.Flush();
+			runez_t<ascii::rune, WORKSIZE> scratchbuffer;
+			runes_writer_t scratch(scratchbuffer);
+			runes_reader_t runesreader(format);
+			printf_writer_t writer(nullptr, true);
+			VSPrintf_internal(&writer, &runesreader, &scratch, args);
 		}
 	}
 

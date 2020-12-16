@@ -25,9 +25,12 @@ namespace xcore
         };
         struct crunes_t
         {
+			crunes_t() : m_bos("\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
+			crunes_t(pcrune str, s32 len) : m_bos(str), m_str(str), m_end(str + len), m_eos(str + len) {}
+			crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(str), m_end(end), m_eos(end) {}
             pcrune m_bos, m_str, m_end, m_eos;
         };
-
+		s32 strlen(pcrune str, pcrune eos = nullptr);
     } // namespace ascii
     namespace utf8
     {
@@ -39,11 +42,12 @@ namespace xcore
 
         struct runes_t
         {
-            pcrune m_bos, m_str, m_end, m_eos;
+            prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t
         {
-            pcrune m_bos, m_str, m_end, m_eos;
+			crunes_t() : m_bos((pcrune)"\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
+			pcrune m_bos, m_str, m_end, m_eos;
         };
     } // namespace utf8
     namespace utf16
@@ -56,11 +60,12 @@ namespace xcore
 
         struct runes_t
         {
-            pcrune m_bos, m_str, m_end, m_eos;
+            prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t
         {
-            pcrune m_bos, m_str, m_end, m_eos;
+			crunes_t() : m_bos((pcrune)"\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
+			pcrune m_bos, m_str, m_end, m_eos;
         };
     } // namespace utf16
     namespace utf32
@@ -73,19 +78,21 @@ namespace xcore
 
         struct runes_t
         {
-            pcrune m_bos, m_str, m_end, m_eos;
+            prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t
         {
-            pcrune m_bos, m_str, m_end, m_eos;
+			crunes_t() : m_bos((pcrune)"\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
+			pcrune m_bos, m_str, m_end, m_eos;
         };
     } // namespace utf32
 
+	struct crunes_t;
     struct runes_t
     {
         struct ptr_t
         {
-            ptr_t& operator=(const ptr_t& other);
+			ptr_t& operator=(const ptr_t& other) { m_ptr.m_ascii = other.m_ptr.m_ascii; return *this; }
             bool   operator<(const ptr_t& other) const { return m_ptr.m_ascii < other.m_ptr.m_ascii; }
             bool   operator>(const ptr_t& other) const { return m_ptr.m_ascii > other.m_ptr.m_ascii; }
             bool   operator<=(const ptr_t& other) const { return m_ptr.m_ascii <= other.m_ptr.m_ascii; }
@@ -121,32 +128,17 @@ namespace xcore
         void clear();
         void term();
 
+		crunes_t get_crunes() const;
+
         void concatenate(ascii::rune c);
         void concatenate(utf32::rune c);
         void concatenate(const ascii::crunes_t& str);
         void concatenate(const utf32::crunes_t& str);
 
-        runes_t& operator+=(const ascii::crunes_t& str)
-        {
-            concatenate(str);
-            return *this;
-        }
-        runes_t& operator+=(const utf32::crunes_t& str)
-        {
-            concatenate(str);
-            return *this;
-        }
-        runes_t& operator+=(ascii::rune c)
-        {
-            concatenate(c);
-            return *this;
-        }
-        runes_t& operator+=(utf32::rune c)
-        {
-            concatenate(c);
-            return *this;
-        }
-
+		runes_t& operator+=(const ascii::crunes_t& str);
+		runes_t& operator+=(const utf32::crunes_t& str);
+		runes_t& operator+=(ascii::rune c);
+		runes_t& operator+=(utf32::rune c);
         runes_t& operator=(runes_t const& other);
 
         union urunes_t
@@ -171,8 +163,8 @@ namespace xcore
             ptr_t(utf16::pcrune ptr) : m_ptr(ptr) {}
             ptr_t(utf32::pcrune ptr) : m_ptr(ptr) {}
 
-            ptr_t& operator=(const ptr_t& other);
-            bool   operator<(const ptr_t& other) const { return m_ptr.m_ascii < other.m_ptr.m_ascii; }
+			ptr_t& operator=(const ptr_t& other) { m_ptr.m_ascii = other.m_ptr.m_ascii; return *this; }
+			bool   operator<(const ptr_t& other) const { return m_ptr.m_ascii < other.m_ptr.m_ascii; }
             bool   operator>(const ptr_t& other) const { return m_ptr.m_ascii > other.m_ptr.m_ascii; }
             bool   operator<=(const ptr_t& other) const { return m_ptr.m_ascii <= other.m_ptr.m_ascii; }
             bool   operator>=(const ptr_t& other) const { return m_ptr.m_ascii >= other.m_ptr.m_ascii; }
@@ -194,12 +186,16 @@ namespace xcore
         };
 
         crunes_t();
+        crunes_t(ascii::crunes_t const& _str);
         crunes_t(ascii::pcrune _str);
+        crunes_t(ascii::pcrune _str, u32 len);
         crunes_t(ascii::pcrune _str, ascii::pcrune _end);
         crunes_t(ascii::pcrune _str, ascii::pcrune _end, ascii::pcrune _eos, s32 _type = ascii::TYPE);
         crunes_t(ascii::pcrune _bos, ascii::pcrune _str, ascii::pcrune _end, ascii::pcrune _eos, s32 _type = ascii::TYPE);
 
-        crunes_t(utf32::pcrune _str);
+		crunes_t(utf32::crunes_t const& _str);
+		crunes_t(utf32::pcrune _str);
+        crunes_t(utf32::pcrune _str, u32 len);
         crunes_t(utf32::pcrune _str, utf32::pcrune _end);
         crunes_t(utf32::pcrune _str, utf32::pcrune _end, utf32::pcrune _eos, s32 _type = utf32::TYPE);
         crunes_t(utf32::pcrune _bos, utf32::pcrune _str, utf32::pcrune _end, utf32::pcrune _eos, s32 _type = utf32::TYPE);
@@ -311,10 +307,10 @@ namespace xcore
     crunes_t selectNextBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
     crunes_t selectBetweenLast(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
     crunes_t selectPreviousBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
-    crunes_t selectFromBeginningExcludeSelection(const crunes_t& inStr, const crunes_t& inSelection);
-    crunes_t selectFromBeginningIncludeSelection(const crunes_t& inStr, const crunes_t& inSelection);
-    crunes_t selectUntilEndExcludeSelection(const crunes_t& inStr, const crunes_t& inSelection);
-    crunes_t selectUntilEndIncludeSelection(const crunes_t& inStr, const crunes_t& inSelection);
+    crunes_t selectBeforeExclude(const crunes_t& inStr, const crunes_t& inSelection);
+    crunes_t selectBeforeInclude(const crunes_t& inStr, const crunes_t& inSelection);
+    crunes_t selectAfterExclude(const crunes_t& inStr, const crunes_t& inSelection);
+    crunes_t selectAfterInclude(const crunes_t& inStr, const crunes_t& inSelection);
     crunes_t selectOverlap(const crunes_t& inStr, const crunes_t& inRight);
 
     // -------------------------------------------------------------------------------
@@ -339,10 +335,10 @@ namespace xcore
     runes_t selectNextBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
     runes_t selectBetweenLast(const runes_t& inStr, uchar32 inLeft, uchar32 inRight);
     runes_t selectPreviousBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
-    runes_t selectFromBeginningExcludeSelection(const runes_t& inStr, const runes_t& inSelection);
-    runes_t selectFromBeginningIncludeSelection(const runes_t& inStr, const runes_t& inSelection);
-    runes_t selectUntilEndExcludeSelection(const runes_t& inStr, const runes_t& inSelection);
-    runes_t selectUntilEndIncludeSelection(const runes_t& inStr, const runes_t& inSelection);
+    runes_t selectBeforeExclude(const runes_t& inStr, const runes_t& inSelection);
+    runes_t selectBeforeInclude(const runes_t& inStr, const runes_t& inSelection);
+    runes_t selectAfterExclude(const runes_t& inStr, const runes_t& inSelection);
+    runes_t selectAfterInclude(const runes_t& inStr, const runes_t& inSelection);
     runes_t selectOverlap(const runes_t& inStr, const runes_t& inRight);
 
     // -------------------------------------------------------------------------------
@@ -426,6 +422,9 @@ namespace xcore
     void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert);
     void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment);
 
+    runes_t expand(runes_t& str, runes_t const& sel);
+    runes_t expand(runes_t& str, crunes_t const& sel);
+
     void trim(runes_t&);                                            // Trim whitespace from left and right side
     void trimLeft(runes_t&);                                        // Trim whitespace from left side
     void trimRight(runes_t&);                                       // Trim whitespace from right side
@@ -475,7 +474,9 @@ namespace xcore
         runes_reader_t(utf32::pcrune str, utf32::pcrune str_end);
         runes_reader_t(crunes_t const& runes);
 
-        crunes_t get_runes() const;
+		crunes_t get_source() const;
+		crunes_t get_current() const;
+
         bool     at_end() const;
         void     reset();
         uchar32  peek() const;
@@ -494,8 +495,12 @@ namespace xcore
         runes_writer_t(utf32::prune str, utf32::prune str_end);
         runes_writer_t(runes_t const& runes);
 
-        runes_t get_runes() const;
+		runes_t get_destination() const;
+		runes_t get_current() const;
+
         bool    at_end() const;
+        u32     count() const;
+
         void    reset();
         bool    write(uchar32 c);
         bool    write(crunes_t const& str);

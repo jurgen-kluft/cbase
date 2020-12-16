@@ -6,7 +6,6 @@
 
 #include "xbase/x_console.h"
 #include "xbase/x_runes.h"
-#include "xbase/x_runes.h"
 
 namespace xcore
 {
@@ -58,19 +57,57 @@ namespace xcore
             }
             if (fg != nullptr && bg != nullptr)
             {
-                printf("\x1b[%s;%sm", fg, bg);
+                ::printf("\x1b[%s;%sm", fg, bg);
             }
             if (fg != nullptr && bg == nullptr)
             {
-                printf("\x1b[%sm", fg);
+				::printf("\x1b[%sm", fg);
             }
             if (fg == nullptr && bg != nullptr)
             {
-                printf("\x1b[%sm", bg);
+				::printf("\x1b[%sm", bg);
             }
 
             return 0;
         }
+
+		void writeutf8(uchar32 cp, uchar8*& dest, uchar8 const* end)
+		{
+			if (cp < 0x80)
+			{ // one octet
+				if (dest < end)
+				{
+					*(dest++) = static_cast<uchar8>(cp);
+				}
+			}
+			else if (cp < 0x800)
+			{ // two octets
+				if ((dest + 1) < end)
+				{
+					*(dest++) = static_cast<uchar8>((cp >> 6) | 0xc0);
+					*(dest++) = static_cast<uchar8>((cp & 0x3f) | 0x80);
+				}
+			}
+			else if (cp < 0x10000)
+			{ // three octets
+				if ((dest + 2) < end)
+				{
+					*(dest++) = static_cast<uchar8>((cp >> 12) | 0xe0);
+					*(dest++) = static_cast<uchar8>(((cp >> 6) & 0x3f) | 0x80);
+					*(dest++) = static_cast<uchar8>((cp & 0x3f) | 0x80);
+				}
+			}
+			else
+			{ // four octets
+				if ((dest + 3) < end)
+				{
+					*(dest++) = static_cast<uchar8>((cp >> 18) | 0xf0);
+					*(dest++) = static_cast<uchar8>(((cp >> 12) & 0x3f) | 0x80);
+					*(dest++) = static_cast<uchar8>(((cp >> 6) & 0x3f) | 0x80);
+					*(dest++) = static_cast<uchar8>((cp & 0x3f) | 0x80);
+				}
+			}
+		}
 
         virtual void writeln()
         {
@@ -78,14 +115,27 @@ namespace xcore
             write(ascii::crunes_t(eol, eol + 1));
         }
 
+		virtual s32 write(const crunes_t& str)
+		{
+			switch (str.m_type)
+			{
+			case ascii::TYPE: return write(str.m_runes.m_ascii);
+			case utf32::TYPE: return write(str.m_runes.m_utf32);
+			default:
+				//@todo: UTF-8 and UTF-16
+			}
+			return 0;
+		}
+
         virtual s32 write(const ascii::crunes_t& str)
         {
             const s32 maxlen = 256;
             uchar8    str8[maxlen + 4];
 
             s32           l   = 0;
-            ascii::crunes_t src = str;
-            while (utf::can_read(src))
+            ascii::pcrune src = str.m_str;
+            ascii::pcrune end = str.m_end;
+            while (src < end)
             {
                 uchar8* dst8     = (uchar8*)str8;
                 uchar8* end8     = dst8 + maxlen;
@@ -95,10 +145,10 @@ namespace xcore
                 str8[maxlen + 3] = 0;
 
                 s32 ll = 0;
-                while (utf::can_read(src) && dst8 < end8)
+                while (src < end && dst8 < end8)
                 {
-                    uchar32 c = utf::read(src);
-                    utf::write(c, dst8, end8);
+                    uchar32 c = *src++;
+                    writeutf8(c, dst8, end8);
                     ll += 1;
                 }
                 if (ll < maxlen)
@@ -106,7 +156,7 @@ namespace xcore
                     str8[ll]     = 0;
                     str8[ll + 1] = 0;
                 }
-                printf("%s", (const char*)str8);
+				::printf("%s", (const char*)str8);
                 l += ll;
             }
 
@@ -119,9 +169,10 @@ namespace xcore
             uchar8    str8[maxlen + 4];
 
             s32           l   = 0;
-            utf32::crunes_t src = str;
-            while (utf::can_read(src))
-            {
+			utf32::pcrune src = str.m_str;
+			utf32::pcrune end = str.m_end;
+			while (src < end)
+			{
                 uchar8* dst8     = (uchar8*)str8;
                 uchar8* end8     = dst8 + maxlen;
                 str8[maxlen + 0] = 0;
@@ -130,10 +181,10 @@ namespace xcore
                 str8[maxlen + 3] = 0;
 
                 s32 ll = 0;
-                while (utf::can_read(src) && dst8 < end8)
+				while (src < end && dst8 < end8)
                 {
-                    uchar32 c = utf::read(src);
-                    utf::write(c, dst8, end8);
+                    uchar32 c = *src++;
+                    writeutf8(c, dst8, end8);
                     ll += 1;
                 }
                 if (ll < maxlen)
@@ -141,7 +192,7 @@ namespace xcore
                     str8[ll]     = 0;
                     str8[ll + 1] = 0;
                 }
-                printf("%s", (const char*)str8);
+				::printf("%s", (const char*)str8);
                 l += ll;
             }
 
