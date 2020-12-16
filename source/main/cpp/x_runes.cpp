@@ -11,11 +11,16 @@ namespace xcore
     namespace utf
     {
         static s32 len(ascii::pcrune str, ascii::pcrune end);
+        static s32 len(utf8::pcrune str, utf8::pcrune end);
+        static s32 len(utf16::pcrune str, utf16::pcrune end);
         static s32 len(utf32::pcrune str, utf32::pcrune end);
 
         static ascii::prune  endof(ascii::prune str, ascii::pcrune eos);
         static ascii::pcrune endof(ascii::pcrune str, ascii::pcrune eos);
-
+        static utf8::prune   endof(utf8::prune str, utf8::pcrune eos);
+        static utf8::pcrune  endof(utf8::pcrune str, utf8::pcrune eos);
+        static utf16::prune  endof(utf16::prune str, utf16::pcrune eos);
+        static utf16::pcrune endof(utf16::pcrune str, utf16::pcrune eos);
         static utf32::prune  endof(utf32::prune str, utf32::pcrune eos);
         static utf32::pcrune endof(utf32::pcrune str, utf32::pcrune eos);
 
@@ -136,6 +141,24 @@ namespace xcore
             return s32(end - str);
         }
 
+        s32 len(utf8::pcrune str, utf8::pcrune end)
+        {
+            end = endof(str, end);
+            return s32(end - str);
+        }
+
+        s32 len(utf16::pcrune str, utf16::pcrune end)
+        {
+            end = endof(str, end);
+            return s32(end - str);
+        }
+
+        s32 len(utf32::pcrune str, utf32::pcrune end)
+        {
+            end = endof(str, end);
+            return s32(end - str);
+        }
+
         ascii::prune endof(ascii::prune str, ascii::pcrune eos)
         {
             ascii::prune end = str;
@@ -168,10 +191,32 @@ namespace xcore
             return end;
         }
 
-        s32 len(utf32::pcrune str, utf32::pcrune end)
+        utf8::prune endof(utf8::prune str, utf8::pcrune eos)
         {
-            end = endof(str, end);
-            return s32(end - str);
+            utf8::prune end = str;
+            while (skip(end, str, eos, 1)) {}
+            return end;
+        }
+
+        utf8::pcrune endof(utf8::pcrune str, utf8::pcrune eos)
+        {
+            utf8::pcrune end = str;
+            while (skip(end, str, eos, 1)) {}
+            return end;
+        }
+
+        utf16::prune endof(utf16::prune str, utf16::pcrune eos)
+        {
+            utf16::prune end = str;
+            while (skip(end, str, eos, 1)) {}
+            return end;
+        }
+
+        utf16::pcrune endof(utf16::pcrune str, utf16::pcrune eos)
+        {
+            utf16::pcrune end = str;
+            while (skip(end, str, eos, 1)) {}
+            return end;
         }
 
         utf32::prune endof(utf32::prune str, utf32::pcrune eos)
@@ -1184,24 +1229,24 @@ namespace xcore
 
     } // namespace utf
 
-	namespace ascii
-	{
-		s32 strlen(pcrune str, pcrune eos)
-		{
-			ascii::pcrune end = str;
-			if (eos == nullptr)
-			{
-				while (*end != ascii::TERMINATOR)
-					end++;
-			}
-			else
-			{
-				while (*end != ascii::TERMINATOR && end < eos)
-					end++;
-			}
-			return (s32)(end - str);
-		}
-	}
+    namespace ascii
+    {
+        s32 strlen(pcrune str, pcrune eos)
+        {
+            ascii::pcrune end = str;
+            if (eos == nullptr)
+            {
+                while (*end != ascii::TERMINATOR)
+                    end++;
+            }
+            else
+            {
+                while (*end != ascii::TERMINATOR && end < eos)
+                    end++;
+            }
+            return (s32)(end - str);
+        }
+    } // namespace ascii
 
     typedef runes_t::ptr_t  rptr_t;
     typedef crunes_t::ptr_t cptr_t;
@@ -1240,7 +1285,7 @@ namespace xcore
     }
 
     inline runes_t  nothing_found(runes_t const& str) { return runes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
-    inline crunes_t nothing_found(crunes_t const& str) { return crunes_t(str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_str, str.m_type); }
+    inline crunes_t nothing_found(crunes_t const& str) { return crunes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
 
     crunes_t find(crunes_t const& _str, uchar32 _c, bool _casesensitive)
     {
@@ -1776,14 +1821,14 @@ namespace xcore
         return crunes_to_runes(_str, found);
     }
 
-    runes_t selectBeforeExclude(const runes_t& _str, const crunes_t& _selection)
+    runes_t selectBeforeExclude(const runes_t& _str, const runes_t& _selection)
     {
         crunes_t cstr(_str);
         crunes_t found = selectBeforeExclude(cstr, _selection);
         return crunes_to_runes(_str, found);
     }
 
-    runes_t selectBeforeInclude(const runes_t& _str, const crunes_t& _selection)
+    runes_t selectBeforeInclude(const runes_t& _str, const runes_t& _selection)
     {
         crunes_t cstr(_str);
         crunes_t found = selectBeforeInclude(cstr, _selection);
@@ -1832,55 +1877,50 @@ namespace xcore
 
     crunes_t parse(crunes_t const& _str, s8& value, s32 base)
     {
-        s32      value32;
-        crunes_t adv = parse(_str, value32, base);
-        value        = (s8)value32;
+        s64      value64;
+        crunes_t adv = parse(_str, value64, base);
+        value        = (s8)value64;
         return adv;
     }
 
     crunes_t parse(crunes_t const& _str, s16& value, s32 base)
     {
-        crunes_t    str          = _str;
-        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
-        switch (base)
-        {
-            case 16: format_str[1] = 'x'; break;
-            case 10: format_str[1] = 'd'; break;
-            case 8: format_str[1] = 'o'; break;
-        };
-        crunes_t format(format_str, format_str + 2);
-        sscanf(str, format, x_va_r(&value));
-        return str;
+        s64      value64;
+        crunes_t adv = parse(_str, value64, base);
+        value        = (s16)value64;
+        return adv;
     }
 
     crunes_t parse(crunes_t const& _str, s32& value, s32 base)
     {
-        crunes_t    str          = _str;
-        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
-        switch (base)
-        {
-            case 16: format_str[1] = 'x'; break;
-            case 10: format_str[1] = 'd'; break;
-            case 8: format_str[1] = 'o'; break;
-        };
-        crunes_t format(format_str, format_str + 2);
-        sscanf(str, format, x_va_r(&value));
-        return str;
+        s64      value64;
+        crunes_t adv = parse(_str, value64, base);
+        value        = (s32)value64;
+        return adv;
+    }
+
+    crunes_t parse(crunes_t const& _str, u8& value, s32 base)
+    {
+        u64      value64;
+        crunes_t adv = parse(_str, value64, base);
+        value        = (u8)value64;
+        return adv;
+    }
+
+    crunes_t parse(crunes_t const& _str, u16& value, s32 base)
+    {
+        u64      value64;
+        crunes_t adv = parse(_str, value64, base);
+        value        = (u16)value64;
+        return adv;
     }
 
     crunes_t parse(crunes_t const& _str, u32& value, s32 base)
     {
-        crunes_t    str          = _str;
-        ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
-        switch (base)
-        {
-            case 16: format_str[1] = 'x'; break;
-            case 10: format_str[1] = 'd'; break;
-            case 8: format_str[1] = 'o'; break;
-        };
-        crunes_t format(format_str, format_str + 2);
-        sscanf(str, format, x_va_r(&value));
-        return str;
+        u64      value64;
+        crunes_t adv = parse(_str, value64, base);
+        value        = (u16)value64;
+        return adv;
     }
 
     crunes_t parse(crunes_t const& _str, s64& value, s32 base)
@@ -2918,8 +2958,7 @@ namespace xcore
     // ------------------------------------------------------------------------------------------------------------------
     static ascii::rune sdefault_empty_runes[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-    runes_t::runes_t()
-        : m_type(ascii::TYPE)
+    runes_t::runes_t() : m_type(ascii::TYPE)
     {
         m_runes.m_ascii.m_bos = sdefault_empty_runes;
         m_runes.m_ascii.m_str = m_runes.m_ascii.m_bos;
@@ -2927,30 +2966,23 @@ namespace xcore
         m_runes.m_ascii.m_eos = m_runes.m_ascii.m_bos;
     }
 
-    runes_t::runes_t(runes_t const& other)
-        : m_type(other.m_type)
-    {
-        m_runes.m_ascii = other.m_runes.m_ascii;
-    }
+    runes_t::runes_t(runes_t const& other) : m_type(other.m_type) { m_runes.m_ascii = other.m_runes.m_ascii; }
 
-    runes_t::runes_t(ascii::prune _str, ascii::prune _end, s32 _type)
-        : m_type(_type)
+    runes_t::runes_t(ascii::prune _str, ascii::prune _end, s32 _type) : m_type(_type)
     {
         m_runes.m_ascii.m_bos = _str;
         m_runes.m_ascii.m_str = _str;
         m_runes.m_ascii.m_end = _end;
         m_runes.m_ascii.m_eos = _end;
     }
-    runes_t::runes_t(ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type)
-        : m_type(_type)
+    runes_t::runes_t(ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type) : m_type(_type)
     {
         m_runes.m_ascii.m_bos = _str;
         m_runes.m_ascii.m_str = _str;
         m_runes.m_ascii.m_end = _end;
         m_runes.m_ascii.m_eos = _eos;
     }
-    runes_t::runes_t(ascii::prune _bos, ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type)
-        : m_type(_type)
+    runes_t::runes_t(ascii::prune _bos, ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type) : m_type(_type)
     {
         m_runes.m_ascii.m_bos = _bos;
         m_runes.m_ascii.m_str = _str;
@@ -2958,24 +2990,21 @@ namespace xcore
         m_runes.m_ascii.m_eos = _eos;
     }
 
-    runes_t::runes_t(utf32::prune _str, utf32::prune _end, s32 _type)
-        : m_type(_type)
+    runes_t::runes_t(utf32::prune _str, utf32::prune _end, s32 _type) : m_type(_type)
     {
         m_runes.m_utf32.m_bos = _str;
         m_runes.m_utf32.m_str = _str;
         m_runes.m_utf32.m_eos = _end;
         m_runes.m_utf32.m_end = _end;
     }
-    runes_t::runes_t(utf32::prune _str, utf32::prune _end, utf32::prune _eos, s32 _type)
-        : m_type(_type)
+    runes_t::runes_t(utf32::prune _str, utf32::prune _end, utf32::prune _eos, s32 _type) : m_type(_type)
     {
         m_runes.m_utf32.m_bos = _str;
         m_runes.m_utf32.m_str = _str;
         m_runes.m_utf32.m_end = _end;
         m_runes.m_utf32.m_eos = _eos;
     }
-    runes_t::runes_t(utf32::prune _bos, utf32::prune _str, utf32::prune _end, utf32::prune _eos, s32 _type)
-        : m_type(_type)
+    runes_t::runes_t(utf32::prune _bos, utf32::prune _str, utf32::prune _end, utf32::prune _eos, s32 _type) : m_type(_type)
     {
         m_runes.m_utf32.m_bos = _bos;
         m_runes.m_utf32.m_str = _str;
@@ -3080,66 +3109,58 @@ namespace xcore
 
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
-    static ascii::rune const sdefault_empty_crunes[] = {0, 0, 0, 0, 0, 0, 0, 0};
+    static ascii::rune const sdefault_empty_ascii_crunes[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-    crunes_t::crunes_t()
-        : m_type(ascii::TYPE)
+    crunes_t::crunes_t() : m_type(ascii::TYPE)
     {
-        m_runes.m_ascii.m_bos = sdefault_empty_crunes;
+        m_runes.m_ascii.m_bos = sdefault_empty_ascii_crunes;
         m_runes.m_ascii.m_str = m_runes.m_ascii.m_bos;
         m_runes.m_ascii.m_end = m_runes.m_ascii.m_bos;
         m_runes.m_ascii.m_eos = m_runes.m_ascii.m_bos;
     }
-	crunes_t::crunes_t(runes_t const& _str)
-		: m_type(_str.m_type)
-	{
-		m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
-		m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
-		m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
-		m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
-	}
-	crunes_t::crunes_t(ascii::crunes_t const& _str)
-		: m_type(ascii::TYPE)
-	{
-		m_runes.m_ascii.m_bos = _str.m_bos;
-		m_runes.m_ascii.m_str = _str.m_str;
-		m_runes.m_ascii.m_end = _str.m_end;
-		m_runes.m_ascii.m_eos = _str.m_eos;
-	}
-	crunes_t::crunes_t(ascii::pcrune _str)
-		: m_type(ascii::TYPE)
-	{
-		m_runes.m_ascii.m_bos = _str;
-		m_runes.m_ascii.m_str = _str;
-		m_runes.m_ascii.m_end = utf::endof(_str, nullptr);
-		m_runes.m_ascii.m_eos = m_runes.m_ascii.m_end;
-	}
-	crunes_t::crunes_t(ascii::pcrune _str, u32 len)
-		: m_type(ascii::TYPE)
-	{
-		m_runes.m_ascii.m_bos = _str;
-		m_runes.m_ascii.m_str = _str;
-		m_runes.m_ascii.m_end = _str + len;
-		m_runes.m_ascii.m_eos = m_runes.m_ascii.m_end;
-	}
-	crunes_t::crunes_t(ascii::pcrune _str, ascii::pcrune _end)
-        : m_type(ascii::TYPE)
+    crunes_t::crunes_t(runes_t const& _str) : m_type(_str.m_type)
+    {
+        m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
+        m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
+        m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
+    }
+    crunes_t::crunes_t(ascii::crunes_t const& _str) : m_type(ascii::TYPE)
+    {
+        m_runes.m_ascii.m_bos = _str.m_bos;
+        m_runes.m_ascii.m_str = _str.m_str;
+        m_runes.m_ascii.m_end = _str.m_end;
+        m_runes.m_ascii.m_eos = _str.m_eos;
+    }
+    crunes_t::crunes_t(ascii::pcrune _str) : m_type(ascii::TYPE)
+    {
+        m_runes.m_ascii.m_bos = _str;
+        m_runes.m_ascii.m_str = _str;
+        m_runes.m_ascii.m_end = utf::endof(_str, nullptr);
+        m_runes.m_ascii.m_eos = m_runes.m_ascii.m_end;
+    }
+    crunes_t::crunes_t(ascii::pcrune _str, u32 len) : m_type(ascii::TYPE)
+    {
+        m_runes.m_ascii.m_bos = _str;
+        m_runes.m_ascii.m_str = _str;
+        m_runes.m_ascii.m_end = _str + len;
+        m_runes.m_ascii.m_eos = m_runes.m_ascii.m_end;
+    }
+    crunes_t::crunes_t(ascii::pcrune _str, ascii::pcrune _end) : m_type(ascii::TYPE)
     {
         m_runes.m_ascii.m_bos = _str;
         m_runes.m_ascii.m_str = _str;
         m_runes.m_ascii.m_end = _end;
         m_runes.m_ascii.m_eos = _end;
     }
-    crunes_t::crunes_t(ascii::pcrune _str, ascii::pcrune _end, ascii::pcrune _eos, s32 _type)
-        : m_type(_type)
+    crunes_t::crunes_t(ascii::pcrune _str, ascii::pcrune _end, ascii::pcrune _eos, s32 _type) : m_type(_type)
     {
         m_runes.m_ascii.m_bos = _str;
         m_runes.m_ascii.m_str = _str;
         m_runes.m_ascii.m_end = _end;
         m_runes.m_ascii.m_eos = _eos;
     }
-    crunes_t::crunes_t(ascii::pcrune _bos, ascii::pcrune _str, ascii::pcrune _end, ascii::pcrune _eos, s32 _type)
-        : m_type(_type)
+    crunes_t::crunes_t(ascii::pcrune _bos, ascii::pcrune _str, ascii::pcrune _end, ascii::pcrune _eos, s32 _type) : m_type(_type)
     {
         m_runes.m_ascii.m_bos = _bos;
         m_runes.m_ascii.m_str = _str;
@@ -3147,48 +3168,130 @@ namespace xcore
         m_runes.m_ascii.m_eos = _eos;
     }
 
-	crunes_t::crunes_t(utf32::crunes_t const& _str)
-		: m_type(utf32::TYPE)
-	{
-		m_runes.m_utf32.m_bos = _str.m_bos;
-		m_runes.m_utf32.m_str = _str.m_str;
-		m_runes.m_utf32.m_end = _str.m_end;
-		m_runes.m_utf32.m_eos = _str.m_eos;
-	}
-	crunes_t::crunes_t(utf32::pcrune _str)
-        : m_type(utf32::TYPE)
+    crunes_t::crunes_t(utf8::crunes_t const& _str) : m_type(utf8::TYPE)
+    {
+        m_runes.m_utf8.m_bos = _str.m_bos;
+        m_runes.m_utf8.m_str = _str.m_str;
+        m_runes.m_utf8.m_end = _str.m_end;
+        m_runes.m_utf8.m_eos = _str.m_eos;
+    }
+    crunes_t::crunes_t(utf8::pcrune _str) : m_type(utf8::TYPE)
+    {
+        m_runes.m_utf8.m_bos = _str;
+        m_runes.m_utf8.m_str = _str;
+        m_runes.m_utf8.m_end = utf::endof(_str, nullptr);
+        m_runes.m_utf8.m_eos = m_runes.m_utf8.m_end;
+    }
+    crunes_t::crunes_t(utf8::pcrune _str, u32 len) : m_type(utf8::TYPE)
+    {
+        m_runes.m_utf8.m_bos = _str;
+        m_runes.m_utf8.m_str = _str;
+        m_runes.m_utf8.m_end = _str;
+        utf::skip(m_runes.m_utf8.m_end, _str, nullptr, len);
+        m_runes.m_utf8.m_eos = m_runes.m_utf8.m_end;
+    }
+    crunes_t::crunes_t(utf8::pcrune _str, utf8::pcrune _end) : m_type(utf8::TYPE)
+    {
+        m_runes.m_utf8.m_bos = _str;
+        m_runes.m_utf8.m_str = _str;
+        m_runes.m_utf8.m_end = _end;
+        m_runes.m_utf8.m_eos = _end;
+    }
+    crunes_t::crunes_t(utf8::pcrune _str, utf8::pcrune _end, utf8::pcrune _eos) : m_type(utf8::TYPE)
+    {
+        m_runes.m_utf8.m_bos = _str;
+        m_runes.m_utf8.m_str = _str;
+        m_runes.m_utf8.m_end = _end;
+        m_runes.m_utf8.m_eos = _eos;
+    }
+    crunes_t::crunes_t(utf8::pcrune _bos, utf8::pcrune _str, utf8::pcrune _end, utf8::pcrune _eos) : m_type(utf8::TYPE)
+    {
+        m_runes.m_utf8.m_bos = _bos;
+        m_runes.m_utf8.m_str = _str;
+        m_runes.m_utf8.m_end = _end;
+        m_runes.m_utf8.m_eos = _eos;
+    }
+
+    crunes_t::crunes_t(utf16::crunes_t const& _str) : m_type(utf16::TYPE)
+    {
+        m_runes.m_utf16.m_bos = _str.m_bos;
+        m_runes.m_utf16.m_str = _str.m_str;
+        m_runes.m_utf16.m_end = _str.m_end;
+        m_runes.m_utf16.m_eos = _str.m_eos;
+    }
+    crunes_t::crunes_t(utf16::pcrune _str) : m_type(utf16::TYPE)
+    {
+        m_runes.m_utf16.m_bos = _str;
+        m_runes.m_utf16.m_str = _str;
+        m_runes.m_utf16.m_end = utf::endof(_str, nullptr);
+        m_runes.m_utf16.m_eos = m_runes.m_utf16.m_end;
+    }
+    crunes_t::crunes_t(utf16::pcrune _str, u32 len) : m_type(utf16::TYPE)
+    {
+        m_runes.m_utf16.m_bos = _str;
+        m_runes.m_utf16.m_str = _str;
+        m_runes.m_utf16.m_end = _str;
+        utf::skip(m_runes.m_utf16.m_end, _str, nullptr, len);
+        m_runes.m_utf16.m_eos = m_runes.m_utf16.m_end;
+    }
+    crunes_t::crunes_t(utf16::pcrune _str, utf16::pcrune _end) : m_type(utf16::TYPE)
+    {
+        m_runes.m_utf16.m_bos = _str;
+        m_runes.m_utf16.m_str = _str;
+        m_runes.m_utf16.m_end = _end;
+        m_runes.m_utf16.m_eos = _end;
+    }
+    crunes_t::crunes_t(utf16::pcrune _str, utf16::pcrune _end, utf16::pcrune _eos) : m_type(utf16::TYPE)
+    {
+        m_runes.m_utf16.m_bos = _str;
+        m_runes.m_utf16.m_str = _str;
+        m_runes.m_utf16.m_end = _end;
+        m_runes.m_utf16.m_eos = _eos;
+    }
+    crunes_t::crunes_t(utf16::pcrune _bos, utf16::pcrune _str, utf16::pcrune _end, utf16::pcrune _eos) : m_type(utf16::TYPE)
+    {
+        m_runes.m_utf16.m_bos = _bos;
+        m_runes.m_utf16.m_str = _str;
+        m_runes.m_utf16.m_end = _end;
+        m_runes.m_utf16.m_eos = _eos;
+    }
+
+    crunes_t::crunes_t(utf32::crunes_t const& _str) : m_type(utf32::TYPE)
+    {
+        m_runes.m_utf32.m_bos = _str.m_bos;
+        m_runes.m_utf32.m_str = _str.m_str;
+        m_runes.m_utf32.m_end = _str.m_end;
+        m_runes.m_utf32.m_eos = _str.m_eos;
+    }
+    crunes_t::crunes_t(utf32::pcrune _str) : m_type(utf32::TYPE)
     {
         m_runes.m_utf32.m_bos = _str;
         m_runes.m_utf32.m_str = _str;
         m_runes.m_utf32.m_end = utf::endof(_str, nullptr);
         m_runes.m_utf32.m_eos = m_runes.m_utf32.m_end;
     }
-	crunes_t::crunes_t(utf32::pcrune _str, u32 len)
-		: m_type(utf32::TYPE)
-	{
-		m_runes.m_utf32.m_bos = _str;
-		m_runes.m_utf32.m_str = _str;
-		m_runes.m_utf32.m_end = _str + len;
-		m_runes.m_utf32.m_eos = m_runes.m_utf32.m_end;
-	}
-	crunes_t::crunes_t(utf32::pcrune _str, utf32::pcrune _end)
-        : m_type(utf32::TYPE)
+    crunes_t::crunes_t(utf32::pcrune _str, u32 len) : m_type(utf32::TYPE)
+    {
+        m_runes.m_utf32.m_bos = _str;
+        m_runes.m_utf32.m_str = _str;
+        m_runes.m_utf32.m_end = _str + len;
+        m_runes.m_utf32.m_eos = m_runes.m_utf32.m_end;
+    }
+    crunes_t::crunes_t(utf32::pcrune _str, utf32::pcrune _end) : m_type(utf32::TYPE)
     {
         m_runes.m_utf32.m_bos = _str;
         m_runes.m_utf32.m_str = _str;
         m_runes.m_utf32.m_eos = _end;
         m_runes.m_utf32.m_end = _end;
     }
-    crunes_t::crunes_t(utf32::pcrune _str, utf32::pcrune _end, utf32::pcrune _eos, s32 _type)
-        : m_type(_type)
+    crunes_t::crunes_t(utf32::pcrune _str, utf32::pcrune _end, utf32::pcrune _eos) : m_type(utf32::TYPE)
     {
         m_runes.m_utf32.m_bos = _str;
         m_runes.m_utf32.m_str = _str;
         m_runes.m_utf32.m_end = _end;
         m_runes.m_utf32.m_eos = _eos;
     }
-    crunes_t::crunes_t(utf32::pcrune _bos, utf32::pcrune _str, utf32::pcrune _end, utf32::pcrune _eos, s32 _type)
-        : m_type(_type)
+    crunes_t::crunes_t(utf32::pcrune _bos, utf32::pcrune _str, utf32::pcrune _end, utf32::pcrune _eos) : m_type(utf32::TYPE)
     {
         m_runes.m_utf32.m_bos = _bos;
         m_runes.m_utf32.m_str = _str;
@@ -3196,27 +3299,48 @@ namespace xcore
         m_runes.m_utf32.m_eos = _eos;
     }
 
-	crunes_t& crunes_t::operator=(crunes_t const& other)
-	{
-		m_type = other.m_type;
-		m_runes.m_ascii.m_bos = other.m_runes.m_ascii.m_bos;
-		m_runes.m_ascii.m_str = other.m_runes.m_ascii.m_str;
-		m_runes.m_ascii.m_end = other.m_runes.m_ascii.m_end;
-		m_runes.m_ascii.m_eos = other.m_runes.m_ascii.m_eos;
-		return *this;
-	}
+    crunes_t& crunes_t::operator=(crunes_t const& other)
+    {
+        m_type                = other.m_type;
+        m_runes.m_ascii.m_bos = other.m_runes.m_ascii.m_bos;
+        m_runes.m_ascii.m_str = other.m_runes.m_ascii.m_str;
+        m_runes.m_ascii.m_end = other.m_runes.m_ascii.m_end;
+        m_runes.m_ascii.m_eos = other.m_runes.m_ascii.m_eos;
+        return *this;
+    }
+
+    s32 crunes_t::size() const
+    {
+        s32 size = 0;
+        switch (m_type)
+        {
+            case ascii::TYPE: size = (s32)((m_runes.m_ascii.m_end - m_runes.m_ascii.m_str) / sizeof(ascii::rune)); break;
+            case utf32::TYPE: size = (s32)((m_runes.m_utf32.m_end - m_runes.m_utf32.m_str) / sizeof(utf32::rune)); break;
+            case utf16::TYPE:
+            case utf8::TYPE: break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf value.
+        }
+        return size;
+    }
+    bool crunes_t::is_empty() const { return m_runes.m_ascii.m_end == m_runes.m_ascii.m_str; }
+    bool crunes_t::is_valid() const { return m_runes.m_ascii.m_end < m_runes.m_ascii.m_eos; }
+    void crunes_t::reset() { m_runes.m_ascii.m_end = m_runes.m_ascii.m_str; }
+    void crunes_t::clear()
+    {
+        m_runes.m_ascii.m_str = m_runes.m_ascii.m_bos;
+        m_runes.m_ascii.m_end = m_runes.m_ascii.m_bos;
+    }
 
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
 
     runes_reader_t::runes_reader_t(ascii::pcrune str, ascii::pcrune str_end)
     {
-        m_runes  = crunes_t(str, str, str_end, ascii::TYPE);
+        m_runes  = crunes_t(str, str, str_end);
         m_cursor = str;
     }
     runes_reader_t::runes_reader_t(utf32::pcrune str, utf32::pcrune str_end)
     {
-        m_runes  = crunes_t(str, str, str_end, utf32::TYPE);
+        m_runes  = crunes_t(str, str, str_end);
         m_cursor = str;
     }
     runes_reader_t::runes_reader_t(crunes_t const& runes)
@@ -3252,6 +3376,8 @@ namespace xcore
     }
 
     bool runes_reader_t::at_end() const { return m_cursor.m_ptr.m_ascii >= m_runes.m_runes.m_ascii.m_end; }
+    bool runes_reader_t::valid() const { return m_cursor.m_ptr.m_ascii < m_runes.m_runes.m_ascii.m_end; }
+
     void runes_reader_t::reset() { m_cursor.m_ptr.m_ascii = m_runes.m_runes.m_ascii.m_str; }
 
     uchar32 runes_reader_t::peek() const
@@ -3293,6 +3419,18 @@ namespace xcore
             }
             c -= 1;
         }
+    }
+
+    runes_reader_t runes_reader_t::select(crunes_t::ptr_t const& from, crunes_t::ptr_t to) const
+    {
+        runes_reader_t reader;
+        reader.m_runes.m_type                = m_runes.m_type;
+        reader.m_runes.m_runes.m_ascii.m_bos = m_runes.m_runes.m_ascii.m_str;
+        reader.m_runes.m_runes.m_ascii.m_eos = m_runes.m_runes.m_ascii.m_eos;
+        reader.m_runes.m_runes.m_ascii.m_str = from.m_ptr.m_ascii;
+        reader.m_runes.m_runes.m_ascii.m_end = to.m_ptr.m_ascii;
+        reader.m_cursor                      = from;
+        return reader;
     }
 
     runes_writer_t::runes_writer_t(ascii::prune str, ascii::prune str_end)
