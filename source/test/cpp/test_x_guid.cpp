@@ -147,22 +147,18 @@ UNITTEST_SUITE_BEGIN(xguid)
 		UNITTEST_TEST(toString)
 		{
 			xguid id(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
-
-			ascii::runez<256> strBuffer;
-			const char* guidStr = "11335577:22446688:557799BB:88AACCEE";
+			runez_t<ascii::rune, 256> strBuffer;
+			crunes_t guidStr("11335577:22446688:557799BB:88AACCEE");
 			id.toString(strBuffer);
-			CHECK_EQUAL(0, ascii::compare(strBuffer, ascii::crunes(guidStr)));
+			CHECK_EQUAL(0, compare(strBuffer, guidStr));
 		}
 
 		UNITTEST_TEST(fromString)
 		{
-			const char* guidStr = "11335577:22446688:557799BB:88AACCEE";
-
+			crunes_t guidStr("11335577:22446688:557799BB:88AACCEE");
 			xguid id1;
 			id1.fromString(guidStr);
-
 			xguid id2(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
-
 			CHECK_TRUE(id1 == id2);
 		}
 	}

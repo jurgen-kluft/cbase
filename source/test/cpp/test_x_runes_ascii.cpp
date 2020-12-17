@@ -31,7 +31,6 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
             copy(str, dst);
 
             CHECK_EQUAL(0, compare(str, dst));
-            CHECK_EQUAL(0, compare(str, dst));
             CHECK_EQUAL(23, str.size());
 
             runez_t<ascii::rune, 16> str2;
@@ -45,7 +44,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
         UNITTEST_TEST(find)
         {
-            crunes_t str1("this is a system string");
+            crunes_t str1("this is a system string admin!");
 
             crunes_t f1 = find(str1, 'e');
             CHECK_EQUAL('e', first_char(f1));
@@ -56,10 +55,14 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
             crunes_t found  = find(str1, tofind);
             CHECK_TRUE(found == crunes_t("system"));
 
-            crunes_t str3 = "SYSTEM";
-            CHECK_TRUE(find(str1, str3).is_empty());
-            CHECK_FALSE(find(str1, str3, false).is_empty());
-        }
+			crunes_t str3 = "SYSTEM";
+			CHECK_TRUE(find(str1, str3).is_empty());
+			CHECK_FALSE(find(str1, str3, false).is_empty());
+		
+			crunes_t str4 = "adMin!";
+			CHECK_TRUE(find(str1, str4).is_empty());
+			CHECK_FALSE(find(str1, str4, false).is_empty());
+		}
 
         UNITTEST_TEST(find_one_of)
         {
@@ -67,11 +70,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
             crunes_t set1  = "bcde";
             crunes_t found = findOneOf(str1, set1);
-            CHECK_TRUE(found == crunes_t("em string"));
+            CHECK_TRUE(found == crunes_t("e"));
 
             crunes_t set2 = "BCDE";
             found              = findOneOf(str1, set2, false);
-            CHECK_TRUE(found == crunes_t("em string"));
+            CHECK_TRUE(found == crunes_t("e"));
         }
 
         UNITTEST_TEST(replace)

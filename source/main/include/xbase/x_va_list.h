@@ -140,7 +140,7 @@ namespace xcore
 		operator				f32() const											{ return convertToFloat(); }
 		operator				f64() const											{ return convertToDouble(); }
 		operator				bool() const										{ return convertToBool(); }
-		operator				crunes_t const*() const								{ return convertToUChars(); }
+		operator				crunes_t () const								    { return convertToUChars(); }
 
 		void					convertToRunes(runes_t& chars) const;
 
@@ -158,11 +158,11 @@ namespace xcore
 		f32						convertToFloat() const;
 		f64						convertToDouble() const;
 		bool					convertToBool() const;
-		crunes_t const*			convertToUChars() const;
+		crunes_t    			convertToUChars() const;
 
 		u16						mType;
 		u16						mVar;
-		uptr					mArg[3];
+		uptr					mArg[4];
 	};
 
 

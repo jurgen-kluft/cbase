@@ -15,16 +15,17 @@ namespace xcore
 		bool                m_write_to_console;
 		s32                 m_runes_count;
 
-		bool				write(char c)
-		{
-			return false;
-		}
-		
 		bool                write(uchar32 c)
 		{
 			bool result = false;
 			if (m_runes_writer != nullptr)
+			{
 				result |= m_runes_writer->write(c);
+			}
+			else
+			{
+				m_runes_count += 1;
+			}
 			if (m_write_to_console)
 			{
 				m_write_to_console_cache += c;
@@ -34,12 +35,23 @@ namespace xcore
 		
 		bool                write(crunes_t const& runes)
 		{
-			flush();
 			bool result = false;
 			if (m_runes_writer != nullptr)
+			{
 				result |= m_runes_writer->write(runes);
+			}
+			else
+			{
+				runes_reader_t reader(runes);
+				while (!reader.at_end())
+				{
+					reader.skip();
+					m_runes_count += 1;
+				}
+			}
 			if (m_write_to_console)
 			{
+				flush();
 				console->write(runes);
 			}
 			return result;
@@ -583,11 +595,11 @@ namespace xcore
         {
             writer->write('-');
         }
-		crunes_t workstr(iw, width);
+		crunes_t workstr(iw, iwidth);
         writer->write(workstr);
         if (showdot)
         {
-            writer->write('.');
+            writer->write('.'); 
 			crunes_t fworkstr(fwork, fwidth);
 			writer->write(fworkstr);
         }
@@ -697,7 +709,7 @@ namespace xcore
                 break;
         }
 
-		ReverseCharStr(w, &work[WORKSIZE]);
+		//ReverseCharStr(w, &work[WORKSIZE]);
 		crunes_t workstr(w, &work[WORKSIZE]);
 		writer->write(workstr);
     }
@@ -777,7 +789,6 @@ namespace xcore
                 break;
         }
 	
-		ReverseCharStr(w, &work[WORKSIZE]);
 		crunes_t workstr(w, &work[WORKSIZE]);
 		writer->write(workstr);
 	}
@@ -1185,7 +1196,7 @@ namespace xcore
                 case 's':
                     if (args[argindex].isPCURunes() || args[argindex].isPCTChar())
                     {
-                        crunes_t src = *(crunes_t const*)args[argindex];
+                        crunes_t src = (crunes_t)args[argindex];
 						buffer->write(src);
                     }
 
@@ -1369,6 +1380,7 @@ namespace xcore
 			runes_reader_t runesreader(format);
 			printf_writer_t writer(nullptr, false);
 			VSPrintf_internal(&writer, &runesreader, &scratch, args);
+			len = writer.m_runes_count;
 		}
 		else if (format.m_type == ascii::TYPE)
 		{
@@ -1377,6 +1389,7 @@ namespace xcore
 			runes_reader_t reader(format);
 			printf_writer_t writer(nullptr, false);
 			VSPrintf_internal(&writer, &reader, &scratch, args);
+			len = writer.m_runes_count;
 		}
         return len;
     }

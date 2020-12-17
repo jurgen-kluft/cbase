@@ -11,9 +11,9 @@ namespace xcore
 
     namespace ascii
     {
-        typedef uchar        rune;
-        typedef uchar*       prune;
-        typedef const uchar* pcrune;
+        typedef char        rune;
+        typedef rune*       prune;
+        typedef const rune* pcrune;
         static const rune    TERMINATOR = '\0';
         static const s32     TYPE       = 1;
         struct runes_t
@@ -34,9 +34,9 @@ namespace xcore
     } // namespace ascii
     namespace utf8
     {
-        typedef uchar8        rune;
-        typedef uchar8*       prune;
-        typedef const uchar8* pcrune;
+        typedef u8        rune;
+        typedef rune*       prune;
+        typedef const rune* pcrune;
         static const s32      TYPE       = 3;
         static const rune     TERMINATOR = '\0';
 
@@ -52,9 +52,9 @@ namespace xcore
     } // namespace utf8
     namespace utf16
     {
-        typedef uchar16        rune;
-        typedef uchar16*       prune;
-        typedef const uchar16* pcrune;
+        typedef u16        rune;
+        typedef rune*       prune;
+        typedef const rune* pcrune;
         static const s32       TYPE       = 2;
         static const rune      TERMINATOR = '\0';
 
@@ -70,9 +70,9 @@ namespace xcore
     } // namespace utf16
     namespace utf32
     {
-        typedef uchar32        rune;
-        typedef uchar32*       prune;
-        typedef const uchar32* pcrune;
+        typedef u32        rune;
+        typedef rune*       prune;
+        typedef const rune* pcrune;
         static const s32       TYPE       = 4;
         static const rune      TERMINATOR = '\0';
 

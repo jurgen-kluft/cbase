@@ -23,22 +23,22 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 
 		UNITTEST_TEST(format_double)
 		{
-			ascii::runez<256> str;
-			ascii::crunes fmt("%f");
+			runez_t<ascii::rune, 256> str;
+			crunes_t fmt("%f");
 
 			f64 d = 3.1415;
-			ascii::sprintf(str, fmt, x_va(d));
-			ascii::crunes answer_str("3.141500");
-			CHECK_EQUAL(0, ascii::compare(answer_str, str));
+			sprintf(str, fmt, x_va(d));
+			crunes_t answer_str("3.141500");
+			CHECK_EQUAL(0, compare(answer_str, str));
 		}
 
 		UNITTEST_TEST(format_string)
 		{
-			ascii::runez<256> str;
-			ascii::crunes fmt("the %s");
+			runez_t<ascii::rune, 256> str;
+			crunes_t fmt("the %s");
 
-			ascii::sprintf(str, fmt, x_va("test string"));
-			CHECK_EQUAL(0, ascii::compare(str, "the test string"));
+			sprintf(str, fmt, x_va("test string"));
+			CHECK_EQUAL(0, compare(str, "the test string"));
 		}
 	}
 }

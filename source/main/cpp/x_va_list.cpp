@@ -10,13 +10,17 @@ namespace xcore
     x_va::x_va(const char* inVar)
         : mType(TYPE_PCTCHAR)
     {
-        *(crunes_t*)mArg = crunes_t(inVar);
+		mArg[0] = ascii::TYPE;
+		mArg[1] = (u64)inVar;
+		mArg[2] = (u64)inVar + ascii::strlen(inVar);
     }
 
     x_va::x_va(crunes_t const& str)
         : mType(TYPE_PCRUNES)
     {
-        *(crunes_t*)mArg = str;
+        mArg[0] = str.m_type;
+		mArg[1] = (u64)str.m_runes.m_ascii.m_str;
+		mArg[2] = (u64)str.m_runes.m_ascii.m_end;
     }
 
     void x_va::convertToRunes(runes_t& str) const
@@ -78,14 +82,16 @@ namespace xcore
             break;
             case TYPE_PCTCHAR:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
-                copy(ch, str);
+                crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				copy(ch, str);
             }
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
-                copy(ch, str);
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				copy(ch, str);
             }
             break;
             default: break; // Fall through
@@ -165,13 +171,15 @@ namespace xcore
             break;
             case TYPE_PCTCHAR:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
-                parse(ch, i);
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				parse(ch, i);
             }
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
 				parse(ch, i);
             }
             break;
@@ -230,13 +238,15 @@ namespace xcore
             break;
             case TYPE_PCTCHAR:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
-                parse(ch, i);
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				parse(ch, i);
             }
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
 				parse(ch, i);
             }
             break;
@@ -290,13 +300,15 @@ namespace xcore
             break;
             case TYPE_PCTCHAR:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
-                parse(ch, i);
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				parse(ch, i);
             }
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
 				parse(ch, i);
 			}
             break;
@@ -350,13 +362,15 @@ namespace xcore
             break;
             case TYPE_PCTCHAR:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
-                parse(ch, i);
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				parse(ch, i);
             }
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
 				parse(ch, i);
 			}
             break;
@@ -410,16 +424,18 @@ namespace xcore
 
             case TYPE_PCTCHAR:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
-                bool                 b  = false;
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				bool                 b  = false;
                 parse(ch, b);
                 i = b ? 1 : 0;
             }
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t const& ch = *(crunes_t const*)mArg;
-                bool                 b  = false;
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				bool                 b  = false;
 				parse(ch, i);
 				i = b ? 1 : 0;
             }
@@ -431,18 +447,20 @@ namespace xcore
         return i != 0;
     }
 
-    crunes_t const* x_va::convertToUChars() const
+    crunes_t  x_va::convertToUChars() const
     {
         switch (mType)
         {
             case TYPE_PCTCHAR:
+            case TYPE_PCRUNES:
             {
-                const crunes_t* p = (const crunes_t*)mArg;
-                return p;
+				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
+				ch.m_type = (s32)mArg[0];
+				return ch;
             }
             default: break; // Fall through
         };
-        return NULL;
+        return crunes_t();
     }
 
 
