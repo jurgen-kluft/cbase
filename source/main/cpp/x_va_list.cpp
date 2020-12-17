@@ -426,7 +426,7 @@ namespace xcore
             {
 				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
 				ch.m_type = (s32)mArg[0];
-				bool                 b  = false;
+				bool b  = false;
                 parse(ch, b);
                 i = b ? 1 : 0;
             }
@@ -435,8 +435,8 @@ namespace xcore
             {
 				crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
 				ch.m_type = (s32)mArg[0];
-				bool                 b  = false;
-				parse(ch, i);
+				bool b  = false;
+				parse(ch, b);
 				i = b ? 1 : 0;
             }
             break;
