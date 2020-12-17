@@ -5,7 +5,7 @@
 
 using namespace xcore;
 
-UNITTEST_SUITE_BEGIN(xbuffer)
+UNITTEST_SUITE_BEGIN(buffer_t)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -33,7 +33,7 @@ UNITTEST_SUITE_BEGIN(xbuffer)
         UNITTEST_TEST(test_xbinary_reader)
         {
             xbytes<2048>   buffer;
-            xbinary_writer writer = buffer.writer();
+            binary_writer_t writer = buffer.writer();
 
             CHECK_EQUAL(0, writer.skip(16));
             CHECK_EQUAL(16, writer.write(false));
@@ -51,7 +51,7 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 
             const char* cctext = "this is the buffer";
             crunes_t    chars(cctext);
-            xcbuffer    text(chars);
+            cbuffer_t    text(chars);
 
             xbytes<32> bytes;
             bytes.writer().write_data(text);
@@ -59,7 +59,7 @@ UNITTEST_SUITE_BEGIN(xbuffer)
             writer.write_data(bytes);
             writer.write_string(chars);
 
-            xbinary_reader reader = (buffer.reader());
+            binary_reader_t reader = (buffer.reader());
 
             bool the_bool;
             u8   the_u8;
@@ -101,11 +101,11 @@ UNITTEST_SUITE_BEGIN(xbuffer)
 
             s32        len = chars.size();
             xbytes<32> rdata;
-            xbuffer    rdatalen = rdata(0, len);
+            buffer_t    rdatalen = rdata(0, len);
             reader.read_data(rdatalen);
 			CHECK_EQUAL(rdatalen.size(), len);
 
-            xcbuffer rviewdata;
+            cbuffer_t rviewdata;
             reader.view_data(32, rviewdata);
 			CHECK_EQUAL(rviewdata.size(), 32);
 

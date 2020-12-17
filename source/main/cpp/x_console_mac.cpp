@@ -9,7 +9,7 @@
 
 namespace xcore
 {
-    class xconsole_out_macos : public xconsole::xout
+    class xconsole_out_macos : public console_t::out_t
     {
     public:
         // +---------+------------+------------+
@@ -31,29 +31,29 @@ namespace xcore
         // To set foreground and background color:           "\x1b[30;40m"
         // To reset all color attributes back to normal:     "\x1b[0m"
 
-        virtual s32 color(xconsole::EColor color)
+        virtual s32 color(console_t::EColor color)
         {
             const char* fg = nullptr;
             const char* bg = nullptr;
             switch (color)
             {
-                case xconsole::NORMAL: fg = "0"; break;
-                case xconsole::BLACK: fg = "30"; break;
-                case xconsole::RED: fg = "31"; break;
-                case xconsole::GREEN: fg = "32"; break;
-                case xconsole::YELLOW: fg = "33"; break;
-                case xconsole::BLUE: fg = "34"; break;
-                case xconsole::MAGENTA: fg = "35"; break;
-                case xconsole::CYAN: fg = "36"; break;
-                case xconsole::LTGREY: fg = "37"; break;
-                case xconsole::BG_BLACK: bg = "40"; break;
-                case xconsole::BG_RED: bg = "41"; break;
-                case xconsole::BG_GREEN: bg = "42"; break;
-                case xconsole::BG_YELLOW: bg = "43"; break;
-                case xconsole::BG_BLUE: bg = "44"; break;
-                case xconsole::BG_MAGENTA: bg = "45"; break;
-                case xconsole::BG_CYAN: bg = "46"; break;
-                case xconsole::BG_LTGREY: bg = "47"; break;
+                case console_t::NORMAL: fg = "0"; break;
+                case console_t::BLACK: fg = "30"; break;
+                case console_t::RED: fg = "31"; break;
+                case console_t::GREEN: fg = "32"; break;
+                case console_t::YELLOW: fg = "33"; break;
+                case console_t::BLUE: fg = "34"; break;
+                case console_t::MAGENTA: fg = "35"; break;
+                case console_t::CYAN: fg = "36"; break;
+                case console_t::LTGREY: fg = "37"; break;
+                case console_t::BG_BLACK: bg = "40"; break;
+                case console_t::BG_RED: bg = "41"; break;
+                case console_t::BG_GREEN: bg = "42"; break;
+                case console_t::BG_YELLOW: bg = "43"; break;
+                case console_t::BG_BLUE: bg = "44"; break;
+                case console_t::BG_MAGENTA: bg = "45"; break;
+                case console_t::BG_CYAN: bg = "46"; break;
+                case console_t::BG_LTGREY: bg = "47"; break;
             }
             if (fg != nullptr && bg != nullptr)
             {
@@ -200,7 +200,7 @@ namespace xcore
         }
     };
 
-    xconsole::xout* gGetDefaultConsoleOut()
+    console_t::out_t* gGetDefaultConsoleOut()
     {
         static xconsole_out_macos sConsoleOut;
         return &sConsoleOut;

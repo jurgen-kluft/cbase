@@ -11,11 +11,11 @@
 
 namespace xcore
 {
-	class xcarray
+	class carray_t
 	{
 	public:
-		inline				xcarray() : mLength(0), mReservedItems(0), mSizeOfItem(0), mArray(0)		{ }
-		inline				xcarray(void* _array, s32 size_of_element, s32 number_of_elements) : mLength(0), mReservedItems(number_of_elements), mSizeOfItem(size_of_element), mArray((xbyte*)_array)	{ }
+		inline				carray_t() : mLength(0), mReservedItems(0), mSizeOfItem(0), mArray(0)		{ }
+		inline				carray_t(void* _array, s32 size_of_element, s32 number_of_elements) : mLength(0), mReservedItems(number_of_elements), mSizeOfItem(size_of_element), mArray((xbyte*)_array)	{ }
 
 		inline void			clear()									{ mLength = 0; }
 
@@ -34,7 +34,7 @@ namespace xcore
 		inline void*		operator [] (s32 index)					{ ASSERT(index<(s32)mLength); return &mArray[index * mSizeOfItem]; }
 		inline void const*	operator [] (s32 index) const			{ ASSERT(index<(s32)mLength); return &mArray[index * mSizeOfItem]; }
 
-		inline xcarray		operator() (s32 from, s32 to) const		{ ASSERT(from<to && from<mReservedItems && to<mReservedItems); xcarray c(&mArray[from* mSizeOfItem], mSizeOfItem, to-from);  return c; }
+		inline carray_t		operator() (s32 from, s32 to) const		{ ASSERT(from<to && from<mReservedItems && to<mReservedItems); carray_t c(&mArray[from* mSizeOfItem], mSizeOfItem, to-from);  return c; }
 
 		void				swap(s32 a, s32 b);
 		void				remove(s32 i);
@@ -47,7 +47,7 @@ namespace xcore
 		xbyte*				mArray;
 	};
 
-	inline void			xcarray::swap(s32 index_a, s32 index_b)
+	inline void			carray_t::swap(s32 index_a, s32 index_b)
 	{
 		ASSERT (index_a < mLength && index_b < mLength);
 		xbyte* srca = &mArray[index_a * mSizeOfItem];
@@ -60,7 +60,7 @@ namespace xcore
 		}
 	}
 
-	inline void			xcarray::remove(s32 index)
+	inline void			carray_t::remove(s32 index)
 	{
 		if (index < mLength)
 		{
@@ -71,7 +71,7 @@ namespace xcore
 		}
 	}
 
-	inline void			xcarray::swap_remove(s32 index)
+	inline void			carray_t::swap_remove(s32 index)
 	{
 		if (mLength > 0)
 		{

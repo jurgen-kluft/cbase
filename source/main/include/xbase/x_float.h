@@ -39,15 +39,15 @@ namespace xcore
 		//---------------------------------------------------------------------------------------------------------------------
 		//    Rational Determination.
 		//---------------------------------------------------------------------------------------------------------------------
-		inline xbool    isPositiveZero(f32 inNumber);
-		inline xbool    isNegativeZero(f32 inNumber);
-		inline xbool    isPositiveInfinite(f32 inNumber);
-		inline xbool    isNegativeInfinite(f32 inNumber);
+		inline bool    isPositiveZero(f32 inNumber);
+		inline bool    isNegativeZero(f32 inNumber);
+		inline bool    isPositiveInfinite(f32 inNumber);
+		inline bool    isNegativeInfinite(f32 inNumber);
 
-		inline xbool    isInfinite(f32 inNumber);
-		inline xbool    isNAN(f32 inNumber);
-		inline xbool    isFinite(f32 inNumber);
-		inline xbool    isRational(f32 inNumber);
+		inline bool    isInfinite(f32 inNumber);
+		inline bool    isNAN(f32 inNumber);
+		inline bool    isFinite(f32 inNumber);
+		inline bool    isRational(f32 inNumber);
 
         inline u32      bin(f32 inNumber);
 		inline s32      sbin(f32 inNumber);
@@ -56,8 +56,8 @@ namespace xcore
 		inline s32      toS32(f32 inNumber);
 		inline u32      toU32(f32 inNumber);
 
-		inline xbool    isEqual(f32 inNumber, f32 inG);
-		inline xbool    isNotEqual(f32 inNumber, f32 inG);
+		inline bool    isEqual(f32 inNumber, f32 inG);
+		inline bool    isNotEqual(f32 inNumber, f32 inG);
 
 		inline f32      binaryAnd(f32 inNumber, u32 inB);
 		inline f32      binaryOr(f32 inNumber, u32 inB);
@@ -72,9 +72,9 @@ namespace xcore
 		inline s32      sign(f32 inNumber);
 		inline s32      sign(f32 inNumber, f32 inDelta);
 
-		inline xbool    isZero(f32 inNumber);
-		inline xbool    isNearZero(f32 inNumber, s32 inExp = -80);
-		inline xbool    isNear(f32 inNumber, f32 inRef, s32 inExp =- 80);
+		inline bool    isZero(f32 inNumber);
+		inline bool    isNearZero(f32 inNumber, s32 inExp = -80);
+		inline bool    isNear(f32 inNumber, f32 inRef, s32 inExp =- 80);
 
 		inline s32      roundToInt(f32 inNumber);
 
@@ -96,10 +96,10 @@ namespace xcore
 		//    Compare routines
 		//---------------------------------------------------------------------------------------------------------------------
 
-		inline xbool    isPositive(f32 inNumber);
-		inline xbool    isNegative(f32 inNumber);
-		inline xbool    isLessPositive(f32 inLHS, f32 inRHS);
-		inline xbool    isGreater(f32 inLHS, f32 inRHS);
+		inline bool    isPositive(f32 inNumber);
+		inline bool    isNegative(f32 inNumber);
+		inline bool    isLessPositive(f32 inLHS, f32 inRHS);
+		inline bool    isGreater(f32 inLHS, f32 inRHS);
 	};
 
 	//==============================================================================

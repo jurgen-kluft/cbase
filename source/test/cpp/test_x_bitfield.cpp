@@ -51,7 +51,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(isSet)
 		{
-			xbits<u32> b1(TEST_BIT_20);
+			bits_t<u32> b1(TEST_BIT_20);
 			CHECK_EQUAL(TEST_BIT_20, b1.mField);
 
 			CHECK_FALSE(b1.is_set(TEST_BIT_00));
@@ -61,7 +61,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(isAnySet)
 		{
-			xbits<u32> b1(TEST_BITS);
+			bits_t<u32> b1(TEST_BITS);
 			CHECK_EQUAL(TEST_BITS, b1.mField);
 
 			CHECK_FALSE(b1.is_any_set((TEST_BIT_02 | TEST_BIT_03)));
@@ -72,7 +72,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(_isOnlySet)
 		{
-			xbits<u32> b1(TEST_BITS);
+			bits_t<u32> b1(TEST_BITS);
 			CHECK_EQUAL(TEST_BITS, b1.mField);
 
 			CHECK_TRUE (b1.is_only_set(((TEST_BIT_04 | TEST_BIT_05 | TEST_BIT_06 | TEST_BIT_07))));
@@ -83,7 +83,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(_isCleared)
 		{
-			xbits<u32> b1(TEST_BITS);
+			bits_t<u32> b1(TEST_BITS);
 			CHECK_EQUAL(TEST_BITS, b1.mField);
 
 			CHECK_TRUE (b1.is_cleared((TEST_BIT_00 | TEST_BIT_01 | TEST_BIT_02 | TEST_BIT_03)));
@@ -92,7 +92,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(_getState)
 		{
-			xbits<u32> b1(TEST_BITS);
+			bits_t<u32> b1(TEST_BITS);
 			CHECK_EQUAL(TEST_BITS, b1.mField);
 
 			CHECK_TRUE (b1.get_state(TEST_BIT_04)==BITS_SET);
@@ -103,7 +103,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 		
 		UNITTEST_TEST(set1)
 		{
-			xbits<u32> b1 = 0;
+			bits_t<u32> b1 = 0;
 			CHECK_EQUAL(0, b1.mField);
 
 			b1.set(TEST_BIT_19);
@@ -119,7 +119,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(set2)
 		{
-			xbits<u32> b1 = 0;
+			bits_t<u32> b1 = 0;
 			CHECK_EQUAL(0, b1.mField);
 
 			b1.set(TEST_BIT_04, TEST_BITS);
@@ -135,7 +135,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(set3)
 		{
-			xbits<u32> b1 = 0;
+			bits_t<u32> b1 = 0;
 			CHECK_EQUAL(0, b1.mField);
 
 			CHECK_TRUE(b1.is_cleared(TEST_BIT_10));
@@ -147,7 +147,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(_clear)
 		{
-			xbits<u32> b1(TEST_BITS);
+			bits_t<u32> b1(TEST_BITS);
 			b1.clear(TEST_BITS);
 			CHECK_EQUAL(0, b1.mField);
 
@@ -159,7 +159,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(_clearAll) 
 		{
-			xbits<u32> b1(TEST_BITS);
+			bits_t<u32> b1(TEST_BITS);
 			CHECK_EQUAL(TEST_BITS, b1.mField);
 			b1.clear_all();
 			CHECK_EQUAL(0, b1.mField);
@@ -167,7 +167,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 
 		UNITTEST_TEST(_toggle)
 		{
-			xbits<u32> b1(TEST_BITS);
+			bits_t<u32> b1(TEST_BITS);
 			CHECK_EQUAL(TEST_BITS, b1.mField);
 
 			b1.toggle(TEST_BIT_08);
@@ -197,7 +197,7 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 		UNITTEST_TEST(xenum_instance)
 		{
 			ETestEnum e1(ETestEnum::TEST01);
-			xenum<ETestEnum::EEnum> i1(e1.e);
+			enum_t<ETestEnum::EEnum> i1(e1.e);
 
 			CHECK_TRUE(i1.is_set(e1.e));
 		}

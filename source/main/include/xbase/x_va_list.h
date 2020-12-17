@@ -14,7 +14,7 @@ namespace xcore
 	 * Author:
 	 *     Jurgen Kluft
 	 * Description:
-	 *     x_va_list using x_va is a type safe implementation of the variable argument
+	 *     va_list_t using va_t is a type safe implementation of the variable argument
 	 *     functionality that is provided by C/C++. The disadvantage of the variable
 	 *     argument functionality is that it is not 'type safe'. That is why we have
 	 *     overridden this by using a custom va_list.
@@ -36,7 +36,7 @@ namespace xcore
 	 *
 	 *------------------------------------------------------------------------------
 	 */
-	class x_va
+	class va_t
 	{
 		enum EProperty
 		{
@@ -84,49 +84,49 @@ namespace xcore
 		};
 
 	public:
-        x_va()
+        va_t()
             : mType(TYPE_EMPTY)
             , mVar(0)
         {
             mArg[0] = mArg[1] = mArg[2] = 0;
         }
-								x_va(const x_va& c) : mType(c.mType), mVar(0)   			{ *(u64*)mArg = *(u64*)c.mArg; }
-		explicit				x_va(s8 inVar) : mType(TYPE_INT8), mVar(0)					{ *(s8*)mArg = inVar; }
-		explicit				x_va(u8 inVar) : mType(TYPE_UINT8), mVar(0)					{ *(u8*)mArg = inVar; }
-		explicit				x_va(s16 inVar) : mType(TYPE_INT16), mVar(0)				{ *(s16*)mArg = inVar; }
-		explicit				x_va(u16 inVar) : mType(TYPE_UINT16), mVar(0)				{ *(u16*)mArg = inVar; }
-		explicit				x_va(s32 inVar) : mType(TYPE_INT32), mVar(0)				{ *(s32*)mArg = inVar; }
-		explicit				x_va(u32 inVar) : mType(TYPE_UINT32), mVar(0)				{ *(u32*)mArg = inVar; }
-		explicit				x_va(s64 inVar) : mType(TYPE_INT64), mVar(0)				{ *(s64*)mArg = inVar; }
-		explicit				x_va(u64 inVar) : mType(TYPE_UINT64), mVar(0)				{ *(u64*)mArg = inVar; }
-		explicit				x_va(bool inVar) : mType(TYPE_BOOL), mVar(0)				{ *(u32*)mArg = inVar ? 1 : 0; }
-		explicit				x_va(f32 inVar) : mType(TYPE_FLOAT32), mVar(0)				{ *(f32*)mArg = inVar; }
-		explicit				x_va(f64 inVar) : mType(TYPE_FLOAT64), mVar(0)				{ *(f64*)mArg = inVar; }
-		explicit				x_va(const char* inVar);
-		explicit				x_va(crunes_t const& str);
+								va_t(const va_t& c) : mType(c.mType), mVar(0)   			{ *(u64*)mArg = *(u64*)c.mArg; }
+		explicit				va_t(s8 inVar) : mType(TYPE_INT8), mVar(0)					{ *(s8*)mArg = inVar; }
+		explicit				va_t(u8 inVar) : mType(TYPE_UINT8), mVar(0)					{ *(u8*)mArg = inVar; }
+		explicit				va_t(s16 inVar) : mType(TYPE_INT16), mVar(0)				{ *(s16*)mArg = inVar; }
+		explicit				va_t(u16 inVar) : mType(TYPE_UINT16), mVar(0)				{ *(u16*)mArg = inVar; }
+		explicit				va_t(s32 inVar) : mType(TYPE_INT32), mVar(0)				{ *(s32*)mArg = inVar; }
+		explicit				va_t(u32 inVar) : mType(TYPE_UINT32), mVar(0)				{ *(u32*)mArg = inVar; }
+		explicit				va_t(s64 inVar) : mType(TYPE_INT64), mVar(0)				{ *(s64*)mArg = inVar; }
+		explicit				va_t(u64 inVar) : mType(TYPE_UINT64), mVar(0)				{ *(u64*)mArg = inVar; }
+		explicit				va_t(bool inVar) : mType(TYPE_BOOL), mVar(0)				{ *(u32*)mArg = inVar ? 1 : 0; }
+		explicit				va_t(f32 inVar) : mType(TYPE_FLOAT32), mVar(0)				{ *(f32*)mArg = inVar; }
+		explicit				va_t(f64 inVar) : mType(TYPE_FLOAT64), mVar(0)				{ *(f64*)mArg = inVar; }
+		explicit				va_t(const char* inVar);
+		explicit				va_t(crunes_t const& str);
 
 		EType					type() const										{ return (EType)mType; }
 
 		s32						sizeInBits() const									{ return (mType&SIZE_MASK)>>SIZE_SHIFT; }
 		s32						sizeInBytes() const									{ return ((mType&SIZE_MASK)>>SIZE_SHIFT) >> 3; }
 
-		xbool					isInteger() const									{ return xbool((mType&PROP_MASK)==PROP_INTEGER && sizeInBits()==8); }
-		xbool					isSignedInteger() const								{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_SIGNED)); }
-		xbool					isUnsignedInteger() const							{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_UNSIGNED)); }
+		bool					isInteger() const									{ return bool((mType&PROP_MASK)==PROP_INTEGER && sizeInBits()==8); }
+		bool					isSignedInteger() const								{ return bool(isInteger() && ((mType&PROP_MASK)==PROP_SIGNED)); }
+		bool					isUnsignedInteger() const							{ return bool(isInteger() && ((mType&PROP_MASK)==PROP_UNSIGNED)); }
 
-		xbool					isBool() const										{ return xbool(mType == TYPE_BOOL); }
-		xbool					isInt8() const										{ return xbool(mType == TYPE_INT8); }
-		xbool					isInt16() const										{ return xbool(mType == TYPE_INT16); }
-		xbool					isInt32() const										{ return xbool(mType == TYPE_INT32); }
-		xbool					isInt64() const										{ return xbool(mType == TYPE_INT64); }
-		xbool					isUInt8() const										{ return xbool(mType == TYPE_UINT8); }
-		xbool					isUInt16() const									{ return xbool(mType == TYPE_UINT16); }
-		xbool					isUInt32() const									{ return xbool(mType == TYPE_UINT32); }
-		xbool					isUInt64() const									{ return xbool(mType == TYPE_UINT64); }
-		xbool					isF32() const										{ return xbool(mType == TYPE_FLOAT32); }
-		xbool					isF64() const										{ return xbool(mType == TYPE_FLOAT64); }
-		xbool					isPCTChar() const									{ return xbool(mType == TYPE_PCTCHAR); }
-		xbool					isPCURunes() const									{ return xbool(mType == TYPE_PCRUNES); }
+		bool					isBool() const										{ return bool(mType == TYPE_BOOL); }
+		bool					isInt8() const										{ return bool(mType == TYPE_INT8); }
+		bool					isInt16() const										{ return bool(mType == TYPE_INT16); }
+		bool					isInt32() const										{ return bool(mType == TYPE_INT32); }
+		bool					isInt64() const										{ return bool(mType == TYPE_INT64); }
+		bool					isUInt8() const										{ return bool(mType == TYPE_UINT8); }
+		bool					isUInt16() const									{ return bool(mType == TYPE_UINT16); }
+		bool					isUInt32() const									{ return bool(mType == TYPE_UINT32); }
+		bool					isUInt64() const									{ return bool(mType == TYPE_UINT64); }
+		bool					isF32() const										{ return bool(mType == TYPE_FLOAT32); }
+		bool					isF64() const										{ return bool(mType == TYPE_FLOAT64); }
+		bool					isPCTChar() const									{ return bool(mType == TYPE_PCTCHAR); }
+		bool					isPCURunes() const									{ return bool(mType == TYPE_PCRUNES); }
 
 		operator				char() const										{ return (char)convertToInt8(); }
 		operator				s8() const											{ return convertToInt8(); }
@@ -144,7 +144,7 @@ namespace xcore
 
 		void					convertToRunes(runes_t& chars) const;
 
-		static const x_va		sEmpty;
+		static const va_t		sEmpty;
 
 	protected:
 		s8						convertToInt8() const;
@@ -166,42 +166,42 @@ namespace xcore
 	};
 
 
-	class x_va_list
+	class va_list_t
 	{
 	public:
-		typedef		const x_va&		rcva;
+		typedef		const va_t&		rcva;
 
-		x_va_list() : mLength(0)													{ }
-		x_va_list(rcva a1) : mLength(1)												{ mArg[0]=a1; }
-		x_va_list(rcva a1, rcva a2) : mLength(2)									{ mArg[0]=a1; mArg[1]=a2; }
-		x_va_list(rcva a1, rcva a2, rcva a3) : mLength(3)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4) : mLength(4)					{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5) : mLength(5)				{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6) : mLength(6)		{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7) : mLength(7)	{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8) : mLength(8)	{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9) : mLength(9)	{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10) : mLength(10)	{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11) : mLength(11)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12) : mLength(12)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13) : mLength(13)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14) : mLength(14)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14, rcva a15) : mLength(15)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; mArg[14]=a15; }
-		x_va_list(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14, rcva a15, rcva a16) : mLength(16)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; mArg[14]=a15; mArg[15]=a16; }
+		va_list_t() : mLength(0)													{ }
+		va_list_t(rcva a1) : mLength(1)												{ mArg[0]=a1; }
+		va_list_t(rcva a1, rcva a2) : mLength(2)									{ mArg[0]=a1; mArg[1]=a2; }
+		va_list_t(rcva a1, rcva a2, rcva a3) : mLength(3)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4) : mLength(4)					{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5) : mLength(5)				{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6) : mLength(6)		{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7) : mLength(7)	{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8) : mLength(8)	{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9) : mLength(9)	{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10) : mLength(10)	{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11) : mLength(11)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12) : mLength(12)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13) : mLength(13)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14) : mLength(14)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14, rcva a15) : mLength(15)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; mArg[14]=a15; }
+		va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14, rcva a15, rcva a16) : mLength(16)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; mArg[14]=a15; mArg[15]=a16; }
 
-		x_va_list(rcva a1, const x_va_list& inList) : mLength(1)					{ mArg[0] = a1; add(inList); }
-		x_va_list(rcva a1, rcva a2, const x_va_list& inList) : mLength(2)			{ mArg[0] = a1; mArg[1] = a2; add(inList); }
+		va_list_t(rcva a1, const va_list_t& inList) : mLength(1)					{ mArg[0] = a1; add(inList); }
+		va_list_t(rcva a1, rcva a2, const va_list_t& inList) : mLength(2)			{ mArg[0] = a1; mArg[1] = a2; add(inList); }
 
 		s32					length() const											{ return mLength; }
 
-		xbool				add(const x_va& inArg1)									{ if (mLength<11) { mArg[mLength++] = inArg1; return xTRUE; } return xFALSE; }
-		void				add(const x_va_list& inList)							{ for (s32 j=mLength, i=0; i<inList.mLength && j<11; ++i, ++j) mArg[j] = inList[i]; }
+		bool				add(const va_t& inArg1)									{ if (mLength<11) { mArg[mLength++] = inArg1; return xTRUE; } return xFALSE; }
+		void				add(const va_list_t& inList)							{ for (s32 j=mLength, i=0; i<inList.mLength && j<11; ++i, ++j) mArg[j] = inList[i]; }
 
-		const x_va&			operator[](s32 inIndex) const							{ if (inIndex>=0 && inIndex<mLength) return mArg[inIndex]; else return x_va::sEmpty; }
+		const va_t&			operator[](s32 inIndex) const							{ if (inIndex>=0 && inIndex<mLength) return mArg[inIndex]; else return va_t::sEmpty; }
 
 	protected:
 		s32					mLength;
-		x_va				mArg[16];
+		va_t				mArg[16];
 	};
 
 
@@ -210,7 +210,7 @@ namespace xcore
 	 * Author:
 	 *     Jurgen Kluft
 	 * Description:
-	 *     x_va_r_list using x_va_r is a type safe implementation of 'pointer to argument'
+	 *     x_va_r_list using va_r_t is a type safe implementation of 'pointer to argument'
 	 *     passing used by sscanf.
 	 *
 	 *<P>  The sscanf as we all know can be used as we have always done, there are no 
@@ -237,7 +237,7 @@ namespace xcore
 	 *
 	 *------------------------------------------------------------------------------
 	 */
-	class x_va_r
+	class va_r_t
 	{
 		enum EProperty
 		{
@@ -285,34 +285,34 @@ namespace xcore
 			TYPE_PRUNES   = 0x0080 | SIZE_PTR
 		};
 	public:
-								x_va_r() : mType(TYPE_EMPTY), mVar(0)							{ mRef[0] = NULL; }
-								x_va_r(const x_va_r& c) : mType(c.mType), mVar(0)				{ mRef[0] = c.mRef[0]; }
-								x_va_r(s8* inRef) : mType(TYPE_INT8), mVar(0)					{ mRef[0] = (uptr)inRef; }
-								x_va_r(u8* inRef) : mType(TYPE_UINT8), mVar(0)					{ mRef[0] = (uptr)inRef; }
-								x_va_r(s16* inRef) : mType(TYPE_INT16), mVar(0)					{ mRef[0] = (uptr)inRef; }
-								x_va_r(u16* inRef) : mType(TYPE_UINT16), mVar(0)				{ mRef[0] = (uptr)inRef; }
-								x_va_r(s32* inRef) : mType(TYPE_INT32), mVar(0)					{ mRef[0] = (uptr)inRef; }
-								x_va_r(u32* inRef) : mType(TYPE_UINT32), mVar(0)				{ mRef[0] = (uptr)inRef; }
-								x_va_r(s64* inRef) : mType(TYPE_INT64), mVar(0)					{ mRef[0] = (uptr)inRef; }
-								x_va_r(u64* inRef) : mType(TYPE_UINT64), mVar(0)				{ mRef[0] = (uptr)inRef; }
-								x_va_r(bool* inRef) : mType(TYPE_BOOL), mVar(0)					{ mRef[0] = (uptr)inRef; }
-								x_va_r(f32* inRef) : mType(TYPE_FLOAT32), mVar(0)				{ mRef[0] = (uptr)inRef; }
-								x_va_r(f64* inRef) : mType(TYPE_FLOAT64), mVar(0)				{ mRef[0] = (uptr)inRef; }
-								x_va_r(runes_t* inRef) : mType(TYPE_PRUNES), mVar(0)		    { mRef[0] = (uptr)inRef; }
+								va_r_t() : mType(TYPE_EMPTY), mVar(0)							{ mRef[0] = NULL; }
+								va_r_t(const va_r_t& c) : mType(c.mType), mVar(0)				{ mRef[0] = c.mRef[0]; }
+								va_r_t(s8* inRef) : mType(TYPE_INT8), mVar(0)					{ mRef[0] = (uptr)inRef; }
+								va_r_t(u8* inRef) : mType(TYPE_UINT8), mVar(0)					{ mRef[0] = (uptr)inRef; }
+								va_r_t(s16* inRef) : mType(TYPE_INT16), mVar(0)					{ mRef[0] = (uptr)inRef; }
+								va_r_t(u16* inRef) : mType(TYPE_UINT16), mVar(0)				{ mRef[0] = (uptr)inRef; }
+								va_r_t(s32* inRef) : mType(TYPE_INT32), mVar(0)					{ mRef[0] = (uptr)inRef; }
+								va_r_t(u32* inRef) : mType(TYPE_UINT32), mVar(0)				{ mRef[0] = (uptr)inRef; }
+								va_r_t(s64* inRef) : mType(TYPE_INT64), mVar(0)					{ mRef[0] = (uptr)inRef; }
+								va_r_t(u64* inRef) : mType(TYPE_UINT64), mVar(0)				{ mRef[0] = (uptr)inRef; }
+								va_r_t(bool* inRef) : mType(TYPE_BOOL), mVar(0)					{ mRef[0] = (uptr)inRef; }
+								va_r_t(f32* inRef) : mType(TYPE_FLOAT32), mVar(0)				{ mRef[0] = (uptr)inRef; }
+								va_r_t(f64* inRef) : mType(TYPE_FLOAT64), mVar(0)				{ mRef[0] = (uptr)inRef; }
+								va_r_t(runes_t* inRef) : mType(TYPE_PRUNES), mVar(0)		    { mRef[0] = (uptr)inRef; }
 
-		x_va_r&					operator=(s8 rhs);
-		x_va_r&					operator=(u8 rhs);
-		x_va_r&					operator=(s16 rhs);
-		x_va_r&					operator=(u16 rhs);
-		x_va_r&					operator=(s32 rhs);
-		x_va_r&					operator=(u32 rhs);
-		x_va_r&					operator=(s64 rhs);
-		x_va_r&					operator=(u64 rhs);
-		x_va_r&					operator=(f32 rhs);
-		x_va_r&					operator=(f64 rhs);
-		x_va_r&					operator=(bool rhs);
-		x_va_r&					operator=(const crunes_t& rhs);
-		x_va_r&					operator=(x_va const& rhs);
+		va_r_t&					operator=(s8 rhs);
+		va_r_t&					operator=(u8 rhs);
+		va_r_t&					operator=(s16 rhs);
+		va_r_t&					operator=(u16 rhs);
+		va_r_t&					operator=(s32 rhs);
+		va_r_t&					operator=(u32 rhs);
+		va_r_t&					operator=(s64 rhs);
+		va_r_t&					operator=(u64 rhs);
+		va_r_t&					operator=(f32 rhs);
+		va_r_t&					operator=(f64 rhs);
+		va_r_t&					operator=(bool rhs);
+		va_r_t&					operator=(const crunes_t& rhs);
+		va_r_t&					operator=(va_t const& rhs);
 
 		EType					type() const										{ return (EType)mType; }
 		u16						var() const											{ return mVar; }
@@ -320,28 +320,28 @@ namespace xcore
 		s32						sizeInBits() const									{ return ((mType&SIZE_MASK)>>SIZE_SHIFT)<<3; }
 		s32						sizeInBytes() const									{ return ((mType&SIZE_MASK)>>SIZE_SHIFT); }
 
-		xbool					isFloat() const										{ return xbool((mType&PROP_MASK)==PROP_FLOAT); }
-		xbool					isInteger() const									{ return xbool((mType&PROP_MASK)==PROP_INTEGER); }
-		xbool					isSignedInteger() const								{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_SIGNED)); }
-		xbool					isUnsignedInteger() const							{ return xbool(isInteger() && ((mType&PROP_MASK)==PROP_UNSIGNED)); }
+		bool					isFloat() const										{ return bool((mType&PROP_MASK)==PROP_FLOAT); }
+		bool					isInteger() const									{ return bool((mType&PROP_MASK)==PROP_INTEGER); }
+		bool					isSignedInteger() const								{ return bool(isInteger() && ((mType&PROP_MASK)==PROP_SIGNED)); }
+		bool					isUnsignedInteger() const							{ return bool(isInteger() && ((mType&PROP_MASK)==PROP_UNSIGNED)); }
 
-		xbool					isBool() const										{ return xbool(mType == TYPE_BOOL); }
-		xbool					isInt8() const										{ return xbool(mType == TYPE_INT8); }
-		xbool					isInt16() const										{ return xbool(mType == TYPE_INT16); }
-		xbool					isInt32() const										{ return xbool(mType == TYPE_INT32); }
-		xbool					isInt64() const										{ return xbool(mType == TYPE_INT64); }
-		xbool					isUInt8() const										{ return xbool(mType == TYPE_UINT8); }
-		xbool					isUInt16() const									{ return xbool(mType == TYPE_UINT16); }
-		xbool					isUInt32() const									{ return xbool(mType == TYPE_UINT32); }
-		xbool					isUInt64() const									{ return xbool(mType == TYPE_UINT64); }
-		xbool					isF32() const										{ return xbool(mType == TYPE_FLOAT32); }
-		xbool					isF64() const										{ return xbool(mType == TYPE_FLOAT64); }
-		xbool					isUchar() const										{ return xbool(mType == TYPE_UCHAR); }
-		xbool					isPRunes() const									{ return xbool(mType == TYPE_PRUNES); }
+		bool					isBool() const										{ return bool(mType == TYPE_BOOL); }
+		bool					isInt8() const										{ return bool(mType == TYPE_INT8); }
+		bool					isInt16() const										{ return bool(mType == TYPE_INT16); }
+		bool					isInt32() const										{ return bool(mType == TYPE_INT32); }
+		bool					isInt64() const										{ return bool(mType == TYPE_INT64); }
+		bool					isUInt8() const										{ return bool(mType == TYPE_UINT8); }
+		bool					isUInt16() const									{ return bool(mType == TYPE_UINT16); }
+		bool					isUInt32() const									{ return bool(mType == TYPE_UINT32); }
+		bool					isUInt64() const									{ return bool(mType == TYPE_UINT64); }
+		bool					isF32() const										{ return bool(mType == TYPE_FLOAT32); }
+		bool					isF64() const										{ return bool(mType == TYPE_FLOAT64); }
+		bool					isUchar() const										{ return bool(mType == TYPE_UCHAR); }
+		bool					isPRunes() const									{ return bool(mType == TYPE_PRUNES); }
 
 		runes_t*				getRunes() const									{ if (isPRunes()) return (runes_t*)mRef[0]; else return nullptr; }
 
-		static x_va_r			sEmpty;
+		static va_r_t			sEmpty;
 
 	protected:
 		u16						mType;
@@ -353,38 +353,38 @@ namespace xcore
 	struct x_va_r_list
 	{
 		x_va_r_list() : mLength(0)													{ }
-		x_va_r_list(x_va_r a1) : mLength(1)											{ mArg[0]=a1; }
-		x_va_r_list(x_va_r a1, x_va_r a2) : mLength(2)									{ mArg[0]=a1; mArg[1]=a2; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3) : mLength(3)								{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4) : mLength(4)								{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5) : mLength(5)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6) : mLength(6)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7) : mLength(7)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8) : mLength(8)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8, x_va_r a9) : mLength(9)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8, x_va_r a9, x_va_r a10) : mLength(10)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8, x_va_r a9, x_va_r a10, x_va_r a11) : mLength(11)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8, x_va_r a9, x_va_r a10, x_va_r a11, x_va_r a12) : mLength(12)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8, x_va_r a9, x_va_r a10, x_va_r a11, x_va_r a12, x_va_r a13) : mLength(13)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8, x_va_r a9, x_va_r a10, x_va_r a11, x_va_r a12, x_va_r a13, x_va_r a14) : mLength(14)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8, x_va_r a9, x_va_r a10, x_va_r a11, x_va_r a12, x_va_r a13, x_va_r a14, x_va_r a15) : mLength(15)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; mArg[14]=a15; }
-		x_va_r_list(x_va_r a1, x_va_r a2, x_va_r a3, x_va_r a4, x_va_r a5, x_va_r a6, x_va_r a7, x_va_r a8, x_va_r a9, x_va_r a10, x_va_r a11, x_va_r a12, x_va_r a13, x_va_r a14, x_va_r a15, x_va_r a16) : mLength(16)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; mArg[14]=a15; mArg[15]=a16; }
+		x_va_r_list(va_r_t a1) : mLength(1)											{ mArg[0]=a1; }
+		x_va_r_list(va_r_t a1, va_r_t a2) : mLength(2)									{ mArg[0]=a1; mArg[1]=a2; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3) : mLength(3)								{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4) : mLength(4)								{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5) : mLength(5)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6) : mLength(6)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7) : mLength(7)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8) : mLength(8)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9) : mLength(9)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10) : mLength(10)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11) : mLength(11)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12) : mLength(12)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13) : mLength(13)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14) : mLength(14)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15) : mLength(15)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; mArg[14]=a15; }
+		x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15, va_r_t a16) : mLength(16)							{ mArg[0]=a1; mArg[1]=a2; mArg[2]=a3; mArg[3]=a4; mArg[4]=a5; mArg[5]=a6; mArg[6]=a7; mArg[7]=a8; mArg[8]=a9; mArg[9]=a10; mArg[10]=a11; mArg[11]=a12; mArg[12]=a13; mArg[13]=a14; mArg[14]=a15; mArg[15]=a16; }
 
-		xbool				add(const x_va_r& inArg1)								{ if (mLength<16) { mArg[mLength++] = inArg1; return xTRUE; } return xFALSE; }
+		bool				add(const va_r_t& inArg1)								{ if (mLength<16) { mArg[mLength++] = inArg1; return xTRUE; } return xFALSE; }
 
-		x_va_r				operator[](s32 inIndex) const							{ if (inIndex>=0 && inIndex<mLength) return mArg[inIndex]; else return x_va_r::sEmpty; }
-		x_va_r				operator[](s32 inIndex)									{ if (inIndex>=0 && inIndex<mLength) return mArg[inIndex]; else return x_va_r::sEmpty; }
+		va_r_t				operator[](s32 inIndex) const							{ if (inIndex>=0 && inIndex<mLength) return mArg[inIndex]; else return va_r_t::sEmpty; }
+		va_r_t				operator[](s32 inIndex)									{ if (inIndex>=0 && inIndex<mLength) return mArg[inIndex]; else return va_r_t::sEmpty; }
 
 	protected:
 		s32					mLength;
-		x_va_r				mArg[16];
+		va_r_t				mArg[16];
 	};
 
-	#define X_VA_ARGS_16		const x_va& v1, const x_va& v2, const x_va& v3, const x_va& v4, const x_va& v5, const x_va& v6, const x_va& v7, const x_va& v8, const x_va& v9, const x_va& v10, const x_va& v11, const x_va& v12, const x_va& v13, const x_va& v14, const x_va& v15, const x_va& v16
-	#define X_VA_ARGS_16_DEF	const x_va& v1, const x_va& v2=x_va::sEmpty, const x_va& v3=x_va::sEmpty, const x_va& v4=x_va::sEmpty, const x_va& v5=x_va::sEmpty, const x_va& v6=x_va::sEmpty, const x_va& v7=x_va::sEmpty, const x_va& v8=x_va::sEmpty, const x_va& v9=x_va::sEmpty, const x_va& v10=x_va::sEmpty, const x_va& v11=x_va::sEmpty, const x_va& v12=x_va::sEmpty, const x_va& v13=x_va::sEmpty, const x_va& v14=x_va::sEmpty, const x_va& v15=x_va::sEmpty, const x_va& v16=x_va::sEmpty
+	#define X_VA_ARGS_16		const va_t& v1, const va_t& v2, const va_t& v3, const va_t& v4, const va_t& v5, const va_t& v6, const va_t& v7, const va_t& v8, const va_t& v9, const va_t& v10, const va_t& v11, const va_t& v12, const va_t& v13, const va_t& v14, const va_t& v15, const va_t& v16
+	#define X_VA_ARGS_16_DEF	const va_t& v1, const va_t& v2=va_t::sEmpty, const va_t& v3=va_t::sEmpty, const va_t& v4=va_t::sEmpty, const va_t& v5=va_t::sEmpty, const va_t& v6=va_t::sEmpty, const va_t& v7=va_t::sEmpty, const va_t& v8=va_t::sEmpty, const va_t& v9=va_t::sEmpty, const va_t& v10=va_t::sEmpty, const va_t& v11=va_t::sEmpty, const va_t& v12=va_t::sEmpty, const va_t& v13=va_t::sEmpty, const va_t& v14=va_t::sEmpty, const va_t& v15=va_t::sEmpty, const va_t& v16=va_t::sEmpty
 
-	#define X_VA_R_ARGS_16		const x_va_r& v1, const x_va_r& v2, const x_va_r& v3, const x_va_r& v4, const x_va_r& v5, const x_va_r& v6, const x_va_r& v7, const x_va_r& v8, const x_va_r& v9, const x_va_r& v10, const x_va_r& v11, const x_va_r& v12, const x_va_r& v13, const x_va_r& v14, const x_va_r& v15, const x_va_r& v16
-	#define X_VA_R_ARGS_16_DEF	const x_va_r& v1, const x_va_r& v2=x_va_r::sEmpty, const x_va_r& v3=x_va_r::sEmpty, const x_va_r& v4=x_va_r::sEmpty, const x_va_r& v5=x_va_r::sEmpty, const x_va_r& v6=x_va_r::sEmpty, const x_va_r& v7=x_va_r::sEmpty, const x_va_r& v8=x_va_r::sEmpty, const x_va_r& v9=x_va_r::sEmpty, const x_va_r& v10=x_va_r::sEmpty, const x_va_r& v11=x_va_r::sEmpty, const x_va_r& v12=x_va_r::sEmpty, const x_va_r& v13=x_va_r::sEmpty, const x_va_r& v14=x_va_r::sEmpty, const x_va_r& v15=x_va_r::sEmpty, const x_va_r& v16=x_va_r::sEmpty
+	#define X_VA_R_ARGS_16		const va_r_t& v1, const va_r_t& v2, const va_r_t& v3, const va_r_t& v4, const va_r_t& v5, const va_r_t& v6, const va_r_t& v7, const va_r_t& v8, const va_r_t& v9, const va_r_t& v10, const va_r_t& v11, const va_r_t& v12, const va_r_t& v13, const va_r_t& v14, const va_r_t& v15, const va_r_t& v16
+	#define X_VA_R_ARGS_16_DEF	const va_r_t& v1, const va_r_t& v2=va_r_t::sEmpty, const va_r_t& v3=va_r_t::sEmpty, const va_r_t& v4=va_r_t::sEmpty, const va_r_t& v5=va_r_t::sEmpty, const va_r_t& v6=va_r_t::sEmpty, const va_r_t& v7=va_r_t::sEmpty, const va_r_t& v8=va_r_t::sEmpty, const va_r_t& v9=va_r_t::sEmpty, const va_r_t& v10=va_r_t::sEmpty, const va_r_t& v11=va_r_t::sEmpty, const va_r_t& v12=va_r_t::sEmpty, const va_r_t& v13=va_r_t::sEmpty, const va_r_t& v14=va_r_t::sEmpty, const va_r_t& v15=va_r_t::sEmpty, const va_r_t& v16=va_r_t::sEmpty
 };
 
 #endif ///< END __X_CORE_VA_LIST_H__

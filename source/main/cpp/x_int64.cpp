@@ -155,8 +155,8 @@ namespace xcore {
 		__xint64 B(_value);
 
 		// Correctly handle negative values
-		xbool bANegative = xFALSE;
-		xbool bBNegative = xFALSE;
+		bool bANegative = xFALSE;
+		bool bBNegative = xFALSE;
 		if (IsNegative())
 		{
 			bANegative = xTRUE;
@@ -252,14 +252,14 @@ namespace xcore {
 			InverseTwosComplement();
 	}
 
-	xbool __xint64::IsNegative() const
+	bool __xint64::IsNegative() const
 	{
-		return xbool((m_MSB & 0x80000000) != 0);
+		return bool((m_MSB & 0x80000000) != 0);
 	}
 
-	xbool __xint64::IsPositive() const
+	bool __xint64::IsPositive() const
 	{
-		return xbool((m_MSB & 0x80000000) == 0);
+		return bool((m_MSB & 0x80000000) == 0);
 	}
 
 	void __xint64::TwosComplement()
@@ -392,7 +392,7 @@ namespace xcore {
 		return *this;
 	}
 
-	xbool __xint64::IsBitSet(s32 nIndex) const
+	bool __xint64::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < 96);
 
@@ -403,10 +403,10 @@ namespace xcore {
 		else
 			rVal = ((m_LSB & dwBitMask) != 0);
 
-		return xbool(rVal);
+		return bool(rVal);
 	}
 
-	void __xint64::SetBit(s32 nIndex, xbool _value)
+	void __xint64::SetBit(s32 nIndex, bool _value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < 96);
 
@@ -494,7 +494,7 @@ namespace xcore {
 			for (s32 i=0; i<NUM_BITS; i++)
 			{
 				Remainder += tempDividend.IsBitSet(i) ? One : Zero;
-				xbool bBit = (Remainder >= tempDivisor);
+				bool bBit = (Remainder >= tempDivisor);
 				Quotient.SetBit(i, bBit);
 				if (bBit)
 					Remainder -= tempDivisor;
@@ -514,8 +514,8 @@ namespace xcore {
 
 	s32	__xint64::Compare(const __xint64& other) const
 	{
-		const xbool thisPositive = IsPositive();
-		const xbool otherPositive = other.IsPositive();
+		const bool thisPositive = IsPositive();
+		const bool otherPositive = other.IsPositive();
 		if (thisPositive != otherPositive)
 		{
 			return thisPositive ? 1 : -1;	// If this is positive and other is negative then 1, else -1

@@ -15,7 +15,7 @@ namespace xcore
 
 	const __xuint64	__xuint64::Zero;
 	const __xuint64	__xuint64::One((u32)1);
-	const __xuint64	__xuint64::Max(xlimits<u32>::maximum(), xlimits<u32>::maximum());
+	const __xuint64	__xuint64::Max(limits_t<u32>::maximum(), limits_t<u32>::maximum());
 
 	__xuint64::__xuint64()
 	{
@@ -296,15 +296,15 @@ namespace xcore
 		return *this;
 	}
 
-	xbool __xuint64::IsBitSet(s32 nIndex) const
+	bool __xuint64::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 		u32 dwBitMask = 0x80000000 >> (nIndex % 32);
 		u32 dwBitIndex = (nIndex >> 5);
-		return xbool((mUInt32[dwBitIndex] & dwBitMask) != 0);
+		return bool((mUInt32[dwBitIndex] & dwBitMask) != 0);
 	}
 
-	void __xuint64::SetBit(s32 nIndex, xbool _value)
+	void __xuint64::SetBit(s32 nIndex, bool _value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -370,7 +370,7 @@ namespace xcore
 			for (s32 i=0; i<NUM_BITS; i++)
 			{
 				Remainder += tempDividend.IsBitSet(i) ? One : Zero;
-				xbool bBit = (Remainder >= tempDivisor);
+				bool bBit = (Remainder >= tempDivisor);
 				Quotient.SetBit(i, bBit);
 				if (bBit)
 					Remainder -= tempDivisor;

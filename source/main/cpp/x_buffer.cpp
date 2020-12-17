@@ -154,17 +154,17 @@ namespace xcore
         }
     } // namespace xuadrw
 
-    xcbuffer::xcbuffer(crunes_t const& str)
+    cbuffer_t::cbuffer_t(crunes_t const& str)
     {
         m_const          = (xbyte const*)str.m_runes.m_ascii.m_str;
         xbyte const* end = (xbyte const*)str.m_runes.m_ascii.m_end;
         m_len            = xcast<xsize_t, u32>(end - m_const);
     }
 
-    xcbuffer xcbuffer::from_ascii_string(const char* str)
+    cbuffer_t cbuffer_t::from_ascii_string(const char* str)
     {
         s32      len = ascii::strlen((ascii::pcrune)str, nullptr);
-        xcbuffer buffer(len, (xbyte const*)str);
+        cbuffer_t buffer(len, (xbyte const*)str);
         return buffer;
     }
 
@@ -173,12 +173,12 @@ namespace xcore
     /// ---------------------------------------------------------------------------------------
     inline bool _can_read(u32 _buffer_size, u32 _cursor, u32 _num_bytes) { return (_cursor + _num_bytes) <= _buffer_size; }
 
-    u32      xbinary_reader::size() const { return cursor_; }
-    u32      xbinary_reader::len() const { return len_; }
-    xcbuffer xbinary_reader::get_current_buffer() const { return xcbuffer(size(), buffer_ + cursor_); }
-    bool     xbinary_reader::can_read(u32 number_of_bytes) const { return _can_read(len_, cursor_, number_of_bytes); }
-    bool     xbinary_reader::at_end() const { return cursor_ == len_; }
-    bool     xbinary_reader::seek(u32 cursor)
+    u32      binary_reader_t::size() const { return cursor_; }
+    u32      binary_reader_t::len() const { return len_; }
+    cbuffer_t binary_reader_t::get_current_buffer() const { return cbuffer_t(size(), buffer_ + cursor_); }
+    bool     binary_reader_t::can_read(u32 number_of_bytes) const { return _can_read(len_, cursor_, number_of_bytes); }
+    bool     binary_reader_t::at_end() const { return cursor_ == len_; }
+    bool     binary_reader_t::seek(u32 cursor)
     {
         if (cursor <= len_)
         {
@@ -188,10 +188,10 @@ namespace xcore
         return false;
     }
 
-    u32  xbinary_reader::pos() const { return cursor_; }
-    void xbinary_reader::reset() { cursor_ = 0; }
+    u32  binary_reader_t::pos() const { return cursor_; }
+    void binary_reader_t::reset() { cursor_ = 0; }
 
-    s32 xbinary_reader::skip(s32 c)
+    s32 binary_reader_t::skip(s32 c)
     {
         s32 const offset = (s32)cursor_;
         if (_can_read(len_, cursor_, c))
@@ -202,7 +202,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(bool& b)
+    s32 binary_reader_t::read(bool& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, 1))
@@ -215,7 +215,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(u8& b)
+    s32 binary_reader_t::read(u8& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -228,7 +228,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(s8& b)
+    s32 binary_reader_t::read(s8& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -241,7 +241,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(u16& b)
+    s32 binary_reader_t::read(u16& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -254,7 +254,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(s16& b)
+    s32 binary_reader_t::read(s16& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -267,7 +267,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(u32& b)
+    s32 binary_reader_t::read(u32& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -280,7 +280,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(s32& b)
+    s32 binary_reader_t::read(s32& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -293,7 +293,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(u64& b)
+    s32 binary_reader_t::read(u64& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -306,7 +306,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(s64& b)
+    s32 binary_reader_t::read(s64& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -319,7 +319,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(f32& b)
+    s32 binary_reader_t::read(f32& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -332,7 +332,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::read(f64& b)
+    s32 binary_reader_t::read(f64& b)
     {
         u32 const offset = cursor_;
         if (_can_read(len_, cursor_, sizeof(b)))
@@ -347,7 +347,7 @@ namespace xcore
 
     // Direct Read
 
-    bool xbinary_reader::read_bool()
+    bool binary_reader_t::read_bool()
     {
         u32 const offset = cursor_;
         bool      b      = false;
@@ -360,7 +360,7 @@ namespace xcore
         return b;
     }
 
-    u8 xbinary_reader::read_u8()
+    u8 binary_reader_t::read_u8()
     {
         u32 const offset = cursor_;
         u8        b      = 0;
@@ -373,7 +373,7 @@ namespace xcore
         return b;
     }
 
-    s8 xbinary_reader::read_s8()
+    s8 binary_reader_t::read_s8()
     {
         s8        b      = 0;
         u32 const offset = cursor_;
@@ -386,7 +386,7 @@ namespace xcore
         return b;
     }
 
-    u16 xbinary_reader::read_u16()
+    u16 binary_reader_t::read_u16()
     {
         u16       b      = 0;
         u32 const offset = cursor_;
@@ -399,7 +399,7 @@ namespace xcore
         return b;
     }
 
-    s16 xbinary_reader::read_s16()
+    s16 binary_reader_t::read_s16()
     {
         s16       b      = 0;
         u32 const offset = cursor_;
@@ -412,7 +412,7 @@ namespace xcore
         return b;
     }
 
-    u32 xbinary_reader::read_u32()
+    u32 binary_reader_t::read_u32()
     {
         u32       b      = 0;
         u32 const offset = cursor_;
@@ -425,7 +425,7 @@ namespace xcore
         return b;
     }
 
-    s32 xbinary_reader::read_s32()
+    s32 binary_reader_t::read_s32()
     {
         s32       b      = 0;
         u32 const offset = cursor_;
@@ -438,7 +438,7 @@ namespace xcore
         return b;
     }
 
-    u64 xbinary_reader::read_u64()
+    u64 binary_reader_t::read_u64()
     {
         u64       b      = 0;
         u32 const offset = cursor_;
@@ -451,7 +451,7 @@ namespace xcore
         return b;
     }
 
-    s64 xbinary_reader::read_s64()
+    s64 binary_reader_t::read_s64()
     {
         s64       b      = 0;
         u32 const offset = cursor_;
@@ -464,7 +464,7 @@ namespace xcore
         return b;
     }
 
-    f32 xbinary_reader::read_f32()
+    f32 binary_reader_t::read_f32()
     {
         f32       b      = 0;
         u32 const offset = cursor_;
@@ -477,7 +477,7 @@ namespace xcore
         return b;
     }
 
-    f64 xbinary_reader::read_f64()
+    f64 binary_reader_t::read_f64()
     {
         f64       b      = 0;
         u32 const offset = cursor_;
@@ -492,13 +492,13 @@ namespace xcore
 
     // End Direct Read
 
-    s32 xbinary_reader::read_data(xbuffer& buf)
+    s32 binary_reader_t::read_data(buffer_t& buf)
     {
         u32 const size = buf.size();
         if (_can_read(len_, cursor_, size))
         {
             s32 const offset = (s32)cursor_;
-            xcbuffer  to_read(size, buffer_ + cursor_);
+            cbuffer_t  to_read(size, buffer_ + cursor_);
             buf.writer().write_data(to_read);
             cursor_ += size;
             return offset;
@@ -506,7 +506,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::view_data(u32 size, xcbuffer& buf)
+    s32 binary_reader_t::view_data(u32 size, cbuffer_t& buf)
     {
         s32 const offset = (s32)cursor_;
         buf.m_const      = buffer_ + cursor_;
@@ -515,13 +515,13 @@ namespace xcore
         return offset;
     }
 
-    s32 xbinary_reader::read_buffer(xbuffer& buf)
+    s32 binary_reader_t::read_buffer(buffer_t& buf)
     {
         u32 const size = read_u32();
         if (_can_read(len_, cursor_, size))
         {
             s32 const offset = (s32)cursor_;
-            xcbuffer  to_read(size, buffer_ + cursor_);
+            cbuffer_t  to_read(size, buffer_ + cursor_);
             buf.writer().write_data(to_read);
             cursor_ += size;
             return offset;
@@ -529,7 +529,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_reader::view_buffer(xcbuffer& buf)
+    s32 binary_reader_t::view_buffer(cbuffer_t& buf)
     {
         s32 const offset = (s32)cursor_;
         u32 const size   = read_u32();
@@ -539,7 +539,7 @@ namespace xcore
         return offset;
     }
 
-    s32 xbinary_reader::view_crunes(crunes_t& out_str)
+    s32 binary_reader_t::view_crunes(crunes_t& out_str)
     {
         if (size() == 0)
             return -1;
@@ -559,30 +559,30 @@ namespace xcore
     /// ---------------------------------------------------------------------------------------
     inline bool _can_write(u32 _buffer_size, u32 _cursor, u32 _num_bytes) { return (_cursor + _num_bytes) <= _buffer_size; }
 
-    u32 xbinary_writer::size() const { return cursor_; }
-    u32 xbinary_writer::len() const { return len_; }
+    u32 binary_writer_t::size() const { return cursor_; }
+    u32 binary_writer_t::len() const { return len_; }
 
-    xbuffer xbinary_writer::get_full_buffer() const
+    buffer_t binary_writer_t::get_full_buffer() const
     {
-        xbuffer buffer;
+        buffer_t buffer;
         buffer.m_mutable = buffer_;
         buffer.m_len     = len_;
         return buffer;
     }
 
-    xbuffer xbinary_writer::get_current_buffer() const
+    buffer_t binary_writer_t::get_current_buffer() const
     {
-        xbuffer buffer;
+        buffer_t buffer;
         buffer.m_mutable = buffer_ + cursor_;
         buffer.m_len     = size();
         return buffer;
     }
 
-    bool xbinary_writer::can_write(u32 num_bytes) const { return _can_write(len_, cursor_, num_bytes); }
+    bool binary_writer_t::can_write(u32 num_bytes) const { return _can_write(len_, cursor_, num_bytes); }
 
-    bool xbinary_writer::at_end() const { return cursor_ == len_; }
+    bool binary_writer_t::at_end() const { return cursor_ == len_; }
 
-    bool xbinary_writer::seek(u32 cursor)
+    bool binary_writer_t::seek(u32 cursor)
     {
         if (cursor <= len_)
         {
@@ -592,11 +592,11 @@ namespace xcore
         return false;
     }
 
-    u32 xbinary_writer::pos() const { return cursor_; }
+    u32 binary_writer_t::pos() const { return cursor_; }
 
-    void xbinary_writer::reset() { cursor_ = 0; }
+    void binary_writer_t::reset() { cursor_ = 0; }
 
-    s32 xbinary_writer::skip(s32 c)
+    s32 binary_writer_t::skip(s32 c)
     {
         s32 const offset = (s32)cursor_;
         if (_can_write(len_, cursor_, c))
@@ -607,7 +607,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(bool b)
+    s32 binary_writer_t::write(bool b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, 1))
@@ -619,7 +619,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(u8 b)
+    s32 binary_writer_t::write(u8 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -631,7 +631,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(s8 b)
+    s32 binary_writer_t::write(s8 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -643,7 +643,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(u16 b)
+    s32 binary_writer_t::write(u16 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -655,7 +655,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(s16 b)
+    s32 binary_writer_t::write(s16 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -667,7 +667,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(u32 b)
+    s32 binary_writer_t::write(u32 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -679,7 +679,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(s32 b)
+    s32 binary_writer_t::write(s32 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -691,7 +691,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(u64 b)
+    s32 binary_writer_t::write(u64 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -703,7 +703,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(s64 b)
+    s32 binary_writer_t::write(s64 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -715,7 +715,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(f32 b)
+    s32 binary_writer_t::write(f32 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -727,7 +727,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write(f64 b)
+    s32 binary_writer_t::write(f64 b)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, sizeof(b)))
@@ -739,7 +739,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write_data(xbuffer const& buf)
+    s32 binary_writer_t::write_data(buffer_t const& buf)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, (u32)buf.size()))
@@ -755,7 +755,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write_data(xcbuffer const& buf)
+    s32 binary_writer_t::write_data(cbuffer_t const& buf)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, (u32)buf.size()))
@@ -772,7 +772,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write_buffer(xbuffer const& buf)
+    s32 binary_writer_t::write_buffer(buffer_t const& buf)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, (u32)buf.size()))
@@ -789,7 +789,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write_buffer(xcbuffer const& buf)
+    s32 binary_writer_t::write_buffer(cbuffer_t const& buf)
     {
         u32 const offset = cursor_;
         if (_can_write(len_, cursor_, (u32)buf.size()))
@@ -806,7 +806,7 @@ namespace xcore
         return -1;
     }
 
-    s32 xbinary_writer::write_string(crunes_t const& str)
+    s32 binary_writer_t::write_string(crunes_t const& str)
     {
         u32 const   offset = cursor_;
         char const* srcstr = str.m_runes.m_ascii.m_str;
@@ -828,9 +828,9 @@ namespace xcore
         return -1;
     }
 
-    xbinary_writer xbinary_writer::reserve(u32 length)
+    binary_writer_t binary_writer_t::reserve(u32 length)
     {
-        xbinary_writer writer;
+        binary_writer_t writer;
         if (_can_write(len_, cursor_, length))
         {
             writer.len_    = length;

@@ -2,105 +2,87 @@
 #define __X_BASE_DEFAULT_HASH_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 namespace xcore
 {
-	// Using SipHash
-    class xhashing
+    // Using SipHash
+    class hashing_t
     {
     public:
-        xhashing();
+        hashing_t();
         void reset();
-        void hash(const void *data, s32 numBytes);
+        void hash(const void* data, s32 numBytes);
         u64  finalize();
 
-	private:
+    private:
         u64 d_v0, d_v1, d_v2, d_v3;
         union
-		{
-            u64     d_alignment;
-            xbyte   d_buf[8];
+        {
+            u64   d_alignment;
+            xbyte d_buf[8];
         };
 
-        s32 d_bufSize;       // The length of the data currently stored in the buffer.
-        s32 d_totalLength;   // The total length of all data that has been passed into the algorithm.
+        s32 d_bufSize;     // The length of the data currently stored in the buffer.
+        s32 d_totalLength; // The total length of all data that has been passed into the algorithm.
 
-        enum { SEED_LENGTH = 16 }; // Seed length in bytes.
+        enum
+        {
+            SEED_LENGTH = 16
+        }; // Seed length in bytes.
         void reset(xbyte const* seed);
     };
 
-	u64	x_hasher(xbyte const* data, u32 size);
+    u64 x_hasher(xbyte const* data, u32 size);
 
-    template <typename K> class xhasher
+    template <typename K> class hasher_t
     {
     public:
         u64 hash(K const& k) const { return 0; }
     };
 
-    template <> class xhasher<s32>
+    template <> class hasher_t<s32>
     {
     public:
-        u64 hash(s32 const& k) const
-        {
-            return x_hasher((const xbyte*)&k, sizeof(k));
-        }
+        u64 hash(s32 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
     };
 
-    template <> class xhasher<u32>
+    template <> class hasher_t<u32>
     {
     public:
-        u64 hash(u32 const& k) const
-        {
-            return x_hasher((const xbyte*)&k, sizeof(k));
-        }
+        u64 hash(u32 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
     };
 
-    template <> class xhasher<s64>
+    template <> class hasher_t<s64>
     {
     public:
-        u64 hash(s64 const& k) const
-        {
-            return x_hasher((const xbyte*)&k, sizeof(k));
-        }
+        u64 hash(s64 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
     };
 
-    template <> class xhasher<u64>
+    template <> class hasher_t<u64>
     {
     public:
-        u64 hash(u64 const& k) const
-        {
-            return x_hasher((const xbyte*)&k, sizeof(k));
-        }
+        u64 hash(u64 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
     };
 
-    template <> class xhasher<f32>
+    template <> class hasher_t<f32>
     {
     public:
-        u64 hash(f32 const& k) const
-        {
-            return x_hasher((const xbyte*)&k, sizeof(k));
-        }
+        u64 hash(f32 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
     };
 
-    template <> class xhasher<f64>
+    template <> class hasher_t<f64>
     {
     public:
-        u64 hash(f64 const& k) const
-        {
-            return x_hasher((const xbyte*)&k, sizeof(k));
-        }
+        u64 hash(f64 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
     };
 
-    template <> class xhasher<void*>
+    template <> class hasher_t<void*>
     {
     public:
-        u64 hash(void* const& k) const
-        {
-            return x_hasher((const xbyte*)&k, sizeof(k));
-        }
+        u64 hash(void* const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
     };
-}
+} // namespace xcore
 
 #endif // __X_BASE_DEFAULT_HASH_H__

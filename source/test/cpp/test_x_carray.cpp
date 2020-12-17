@@ -4,7 +4,7 @@
 using namespace xcore;
 
 
-UNITTEST_SUITE_BEGIN(xcarray)
+UNITTEST_SUITE_BEGIN(carray_t)
 {
 	UNITTEST_FIXTURE(main)
 	{
@@ -15,7 +15,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(construct)
 		{
-			xcarray a(array_data, sizeof(s32), 5);
+			carray_t a(array_data, sizeof(s32), 5);
 
 			CHECK_EQUAL(0, a.size());
 			CHECK_EQUAL(5, a.reserved());
@@ -23,7 +23,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(push_back)
 		{
-			xcarray a(array_data, sizeof(s32), 5);
+			carray_t a(array_data, sizeof(s32), 5);
 
 			CHECK_EQUAL(0, a.size());
 			CHECK_EQUAL(5, a.reserved());
@@ -37,7 +37,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(pop_back)
 		{
-			xcarray a(array_data, sizeof(s32), 5);
+			carray_t a(array_data, sizeof(s32), 5);
 
 			CHECK_EQUAL(0, a.size());
 			CHECK_EQUAL(5, a.reserved());
@@ -51,7 +51,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(push_and_pop_back)
 		{
-			xcarray a(array_data, sizeof(s32), 5);
+			carray_t a(array_data, sizeof(s32), 5);
 
 			CHECK_EQUAL(0, a.size());
 			CHECK_EQUAL(5, a.reserved());
@@ -70,7 +70,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(operator_index)
 		{
-			xcarray a(array_data, sizeof(s32), 10);
+			carray_t a(array_data, sizeof(s32), 10);
 			for (s32 i=0; i<a.reserved(); ++i)
 				a.push_back(&i);
 
@@ -82,7 +82,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(swap)
 		{
-			xcarray a(array_data, sizeof(s32), 10);
+			carray_t a(array_data, sizeof(s32), 10);
 			for (s32 i=0; i<a.reserved(); ++i)
 				a.push_back(&i);
 
@@ -93,7 +93,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 		
 		UNITTEST_TEST(remove)
 		{
-			xcarray a(array_data, sizeof(s32), 10);
+			carray_t a(array_data, sizeof(s32), 10);
 			for (s32 i=0; i<a.reserved(); ++i)
 				a.push_back(&i);
 
@@ -117,7 +117,7 @@ UNITTEST_SUITE_BEGIN(xcarray)
 
 		UNITTEST_TEST(swap_remove)
 		{
-			xcarray a(array_data, sizeof(s32), 10);
+			carray_t a(array_data, sizeof(s32), 10);
 			for (s32 i=0; i<a.reserved(); ++i)
 				a.push_back(&i);
 

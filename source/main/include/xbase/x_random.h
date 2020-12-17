@@ -7,10 +7,10 @@
 
 namespace xcore
 {
-	class xrandom
+	class random_t
 	{
 	public:
-		virtual				~xrandom() {}
+		virtual				~random_t() {}
 		virtual void		reset(s32 inSeed = 0) = 0;
 		virtual u32			generate() = 0;
 	};

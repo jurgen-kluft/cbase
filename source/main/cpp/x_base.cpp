@@ -11,20 +11,20 @@ namespace xbase
 #ifdef X_ASSERT
 	void			x_Init()
 	{
-		xcore::xalloc::init_system();
-		xcore::xconsole::init_default_console();
-		xcore::xasserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
+		xcore::alloc_t::init_system();
+		xcore::console_t::init_default_console();
+		xcore::asserthandler_t::sRegisterHandler(NULL);		// This will initialize the default handler
 	}
 
 	void			x_Exit()
 	{
-		xcore::xasserthandler::sRegisterHandler(NULL);		// This will initialize the default handler
+		xcore::asserthandler_t::sRegisterHandler(NULL);		// This will initialize the default handler
 	}
 #else
 	void			x_Init()
 	{
-		xcore::xalloc::init_system();
-		xcore::xconsole::init_default_console();
+		xcore::alloc_t::init_system();
+		xcore::console_t::init_default_console();
 	}
 
 	void			x_Exit()

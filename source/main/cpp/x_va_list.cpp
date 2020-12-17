@@ -5,9 +5,9 @@
 
 namespace xcore
 {
-    const x_va x_va::sEmpty;
+    const va_t va_t::sEmpty;
 
-    x_va::x_va(const char* inVar)
+    va_t::va_t(const char* inVar)
         : mType(TYPE_PCTCHAR)
     {
 		mArg[0] = ascii::TYPE;
@@ -15,7 +15,7 @@ namespace xcore
 		mArg[2] = (u64)inVar + ascii::strlen(inVar);
     }
 
-    x_va::x_va(crunes_t const& str)
+    va_t::va_t(crunes_t const& str)
         : mType(TYPE_PCRUNES)
     {
         mArg[0] = str.m_type;
@@ -23,7 +23,7 @@ namespace xcore
 		mArg[2] = (u64)str.m_runes.m_ascii.m_end;
     }
 
-    void x_va::convertToRunes(runes_t& str) const
+    void va_t::convertToRunes(runes_t& str) const
     {
         u32 i = 0;
         switch (mType)
@@ -98,37 +98,37 @@ namespace xcore
         };
     }
 
-    s8 x_va::convertToInt8() const
+    s8 va_t::convertToInt8() const
     {
         u32 i = convertToUInt32();
         return (s8)i;
     }
 
-    u8 x_va::convertToUInt8() const
+    u8 va_t::convertToUInt8() const
     {
         u32 i = convertToUInt32();
         return (u8)i;
     }
 
-    s16 x_va::convertToInt16() const
+    s16 va_t::convertToInt16() const
     {
         u32 i = convertToUInt32();
         return (s16)i;
     }
 
-    u16 x_va::convertToUInt16() const
+    u16 va_t::convertToUInt16() const
     {
         u32 i = convertToUInt32();
         return (u16)i;
     }
 
-    s32 x_va::convertToInt32() const
+    s32 va_t::convertToInt32() const
     {
         u32 i = convertToUInt32();
         return (s32)i;
     }
 
-    u32 x_va::convertToUInt32() const
+    u32 va_t::convertToUInt32() const
     {
         u32 i = 0;
         switch (mType)
@@ -189,13 +189,13 @@ namespace xcore
         return i;
     }
 
-    s64 x_va::convertToInt64() const
+    s64 va_t::convertToInt64() const
     {
         u64 i = convertToUInt64();
         return (s64)i;
     }
 
-    u64 x_va::convertToUInt64() const
+    u64 va_t::convertToUInt64() const
     {
         u64 i = 0;
         switch (mType)
@@ -256,7 +256,7 @@ namespace xcore
         return i;
     }
 
-    f32 x_va::convertToFloat() const
+    f32 va_t::convertToFloat() const
     {
         f32 i = 0.0f;
         switch (mType)
@@ -318,7 +318,7 @@ namespace xcore
         return i;
     }
 
-    f64 x_va::convertToDouble() const
+    f64 va_t::convertToDouble() const
     {
         f64 i = 0.0;
         switch (mType)
@@ -380,7 +380,7 @@ namespace xcore
         return i;
     }
 
-    bool x_va::convertToBool() const
+    bool va_t::convertToBool() const
     {
         u32 i = 0;
         switch (mType)
@@ -447,7 +447,7 @@ namespace xcore
         return i != 0;
     }
 
-    crunes_t  x_va::convertToUChars() const
+    crunes_t  va_t::convertToUChars() const
     {
         switch (mType)
         {
@@ -464,13 +464,13 @@ namespace xcore
     }
 
 
-    x_va_r x_va_r::sEmpty;
+    va_r_t va_r_t::sEmpty;
 
-    x_va_r& x_va_r::operator=(s8 rhs)
+    va_r_t& va_r_t::operator=(s8 rhs)
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((xbool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
+            case TYPE_BOOL: *((bool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
             // case TYPE_UINT:		*((u32*)mRef[0]) = rhs; break;
             // case TYPE_INT:		*((s32*)mRef[0]) = rhs; break;
             case TYPE_UINT32: *((u32*)mRef[0]) = rhs; break;
@@ -489,17 +489,17 @@ namespace xcore
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(u8 rhs)
+    va_r_t& va_r_t::operator=(u8 rhs)
     {
         *this = (s8)rhs;
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(s16 rhs)
+    va_r_t& va_r_t::operator=(s16 rhs)
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((xbool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
+            case TYPE_BOOL: *((bool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
             case TYPE_UINT32: *((u32*)mRef[0]) = rhs; break;
             case TYPE_INT32: *((s32*)mRef[0]) = rhs; break;
             case TYPE_UINT8: *((u8*)mRef[0]) = (u8)rhs; break;
@@ -516,17 +516,17 @@ namespace xcore
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(u16 rhs)
+    va_r_t& va_r_t::operator=(u16 rhs)
     {
         *this = (s16)rhs;
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(s32 rhs)
+    va_r_t& va_r_t::operator=(s32 rhs)
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((xbool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
+            case TYPE_BOOL: *((bool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
             case TYPE_UINT32: *((u32*)mRef[0]) = rhs; break;
             case TYPE_INT32: *((s32*)mRef[0]) = rhs; break;
             case TYPE_UINT8: *((u8*)mRef[0]) = (u8)rhs; break;
@@ -543,17 +543,17 @@ namespace xcore
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(u32 rhs)
+    va_r_t& va_r_t::operator=(u32 rhs)
     {
         *this = (s32)rhs;
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(s64 rhs)
+    va_r_t& va_r_t::operator=(s64 rhs)
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((xbool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
+            case TYPE_BOOL: *((bool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
             case TYPE_UINT32: *((u32*)mRef[0]) = (u32)rhs; break;
             case TYPE_INT32: *((s32*)mRef[0]) = (s32)rhs; break;
             case TYPE_UINT8: *((u8*)mRef[0]) = (u8)rhs; break;
@@ -570,17 +570,17 @@ namespace xcore
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(u64 rhs)
+    va_r_t& va_r_t::operator=(u64 rhs)
     {
         *this = (s64)rhs;
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(f32 rhs)
+    va_r_t& va_r_t::operator=(f32 rhs)
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((xbool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
+            case TYPE_BOOL: *((bool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
             case TYPE_UINT32: *((u32*)mRef[0]) = (u32)rhs; break;
             case TYPE_INT32: *((s32*)mRef[0]) = (s32)rhs; break;
             case TYPE_UINT8: *((u8*)mRef[0]) = (u8)rhs; break;
@@ -597,11 +597,11 @@ namespace xcore
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(f64 rhs)
+    va_r_t& va_r_t::operator=(f64 rhs)
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((xbool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
+            case TYPE_BOOL: *((bool*)mRef[0]) = rhs != 0 ? xTRUE : xFALSE; break;
             case TYPE_UINT32: *((u32*)mRef[0]) = (u32)rhs; break;
             case TYPE_INT32: *((s32*)mRef[0]) = (s32)rhs; break;
             case TYPE_UINT8: *((u8*)mRef[0]) = (u8)rhs; break;
@@ -618,11 +618,11 @@ namespace xcore
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(bool rhs)
+    va_r_t& va_r_t::operator=(bool rhs)
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((xbool*)mRef[0]) = xbool(rhs); break;
+            case TYPE_BOOL: *((bool*)mRef[0]) = bool(rhs); break;
             case TYPE_UINT32: *((u32*)mRef[0]) = rhs ? 1 : 0; break;
             case TYPE_INT32: *((s32*)mRef[0]) = rhs ? 1 : 0; break;
             case TYPE_UINT8: *((u8*)mRef[0]) = rhs ? 1 : 0; break;
@@ -639,7 +639,7 @@ namespace xcore
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(const crunes_t& rhs)
+    va_r_t& va_r_t::operator=(const crunes_t& rhs)
     {
         switch (mType)
         {
@@ -661,7 +661,7 @@ namespace xcore
         return *this;
     }
 
-    x_va_r& x_va_r::operator=(x_va const& rhs)
+    va_r_t& va_r_t::operator=(va_t const& rhs)
     {
         switch (mType)
         {

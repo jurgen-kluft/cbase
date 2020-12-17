@@ -7,7 +7,7 @@
 
 using namespace xcore;
 
-extern xcore::xalloc* gTestAllocator;
+extern xcore::alloc_t* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xstring_utf)
 {

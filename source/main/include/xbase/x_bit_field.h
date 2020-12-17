@@ -62,11 +62,11 @@ namespace xcore
 	};
 
 	template<typename T>
-	class xbits
+	class bits_t
 	{
 	public:
-		inline 				xbits(T inField) : mField(inField)						{ }
-		inline 				xbits(const xbits<T>& inField) : mField(inField.mField)	{ }
+		inline 				bits_t(T inField) : mField(inField)						{ }
+		inline 				bits_t(const bits_t<T>& inField) : mField(inField.mField)	{ }
 		
 		inline bool     	is_set(T inField) const  							{ return (mField & ((T)inField)) == ((T)inField); } ///< Check if all bits in <inField> are set
 		inline bool     	is_any_set(T inField) const     					{ return (mField & ((T)inField)) != 0; }    ///< Check if any bits of <inField> have been set in this bitfield
@@ -88,49 +88,49 @@ namespace xcore
 			else						return BITS_MIXED;
 		}
 
-		xbits<T>&			operator = (const xbits<T>& other) 					{ mField = other.mField; return *this; }
+		bits_t<T>&			operator = (const bits_t<T>& other) 					{ mField = other.mField; return *this; }
 
-		bool				operator == (const xbits<T>& other) const			{ return mField == other.mField; }
-		bool				operator != (const xbits<T>& other) const			{ return mField != other.mField; }
+		bool				operator == (const bits_t<T>& other) const			{ return mField == other.mField; }
+		bool				operator != (const bits_t<T>& other) const			{ return mField != other.mField; }
 
 		T					mField;
 	};
 
 
 	template<class ENUM>
-	struct xenum
+	struct enum_t
 	{
-		typedef u32 xfield;
-		inline				xenum() : bitfield(0)								{ ASSERTCT(sizeof(ENUM) <= sizeof(xfield)); }
-		inline				xenum(ENUM inField) : bitfield(inField)				{ ASSERTCT(sizeof(ENUM) <= sizeof(xfield)); }
+		typedef u32 field_t;
+		inline				enum_t() : bitfield(0)								{ ASSERTCT(sizeof(ENUM) <= sizeof(field_t)); }
+		inline				enum_t(ENUM inField) : bitfield(inField)				{ ASSERTCT(sizeof(ENUM) <= sizeof(field_t)); }
 
-		inline bool     	is_set(ENUM inField) const							{ return (bitfield & ((xfield)inField)) == ((xfield)inField); }		///< Check if all bits in <inField> are set
-		inline bool     	is_any_set(ENUM inField) const						{ return (bitfield & ((xfield)inField)) != 0; }						///< Check if any bits of <inField> have been set in this bitfield
-		inline bool     	is_only_set(ENUM inField) const						{ return (bitfield == ((xfield)inField)); }							///< Check if <inField> is the only bit set in this bitfield
-		inline bool     	is_cleared(ENUM inField) const						{ return (bitfield & ((xfield)inField)) == 0; }						///< Check if all bits in <inField> are cleared
+		inline bool     	is_set(ENUM inField) const							{ return (bitfield & ((field_t)inField)) == ((field_t)inField); }		///< Check if all bits in <inField> are set
+		inline bool     	is_any_set(ENUM inField) const						{ return (bitfield & ((field_t)inField)) != 0; }						///< Check if any bits of <inField> have been set in this bitfield
+		inline bool     	is_only_set(ENUM inField) const						{ return (bitfield == ((field_t)inField)); }							///< Check if <inField> is the only bit set in this bitfield
+		inline bool     	is_cleared(ENUM inField) const						{ return (bitfield & ((field_t)inField)) == 0; }						///< Check if all bits in <inField> are cleared
 
 		inline EBits   		get_state(ENUM inField) const   					///< get state of a number of bits
 		{
-			xfield result = bitfield & (xfield)inField;
+			field_t result = bitfield & (field_t)inField;
 			if (result==0)						return BITS_CLEARED;
-			else if (result==(xfield)inField)	return BITS_SET;
+			else if (result==(field_t)inField)	return BITS_SET;
 			else								return BITS_MIXED;
 		}
 
-		inline void			set(ENUM inField)                 					{ bitfield |= (xfield)inField; } ///< Set <inField>
-		inline void			set_masked(ENUM inField, ENUM inMask)  				{ ASSERTS((xfield)inField==((xfield)inField&(xfield)inMask), "<inField> contains bits not within the specified mask."); bitfield = (bitfield & (~inMask)) | inField; } ///< Mask off <inMask> and then set <inField>
-		inline void			test_set(ENUM inField, bool inValue)   				{ bitfield &= ~(xfield)inField; bitfield |= ((xfield)inField & (0-(xfield)inValue)); } ///< Set or clear <inField> depending on <inValue>
-		inline void			clear(ENUM inField)               					{ bitfield &= (~(xfield)inField); } ///< clear <inField>
-		inline void			clear_all()                          				{ bitfield = (xfield)0; } ///< clear all bits
-		inline void			toggle(ENUM inField)              					{ bitfield ^= (xfield)inField; } ///< Toggle <inField>
+		inline void			set(ENUM inField)                 					{ bitfield |= (field_t)inField; } ///< Set <inField>
+		inline void			set_masked(ENUM inField, ENUM inMask)  				{ ASSERTS((field_t)inField==((field_t)inField&(field_t)inMask), "<inField> contains bits not within the specified mask."); bitfield = (bitfield & (~inMask)) | inField; } ///< Mask off <inMask> and then set <inField>
+		inline void			test_set(ENUM inField, bool inValue)   				{ bitfield &= ~(field_t)inField; bitfield |= ((field_t)inField & (0-(field_t)inValue)); } ///< Set or clear <inField> depending on <inValue>
+		inline void			clear(ENUM inField)               					{ bitfield &= (~(field_t)inField); } ///< clear <inField>
+		inline void			clear_all()                          				{ bitfield = (field_t)0; } ///< clear all bits
+		inline void			toggle(ENUM inField)              					{ bitfield ^= (field_t)inField; } ///< Toggle <inField>
 
-		xenum<ENUM>&		operator = (const xenum<ENUM>& other) 				{ bitfield = other.bitfield; return *this; }
+		enum_t<ENUM>&		operator = (const enum_t<ENUM>& other) 				{ bitfield = other.bitfield; return *this; }
 
-		bool				operator == (const xenum<ENUM>& other) const		{ return bitfield == other.bitfield; }
-		bool				operator != (const xenum<ENUM>& other) const		{ return bitfield != other.bitfield; }
+		bool				operator == (const enum_t<ENUM>& other) const		{ return bitfield == other.bitfield; }
+		bool				operator != (const enum_t<ENUM>& other) const		{ return bitfield != other.bitfield; }
 
 	private:
-		xfield				bitfield;
+		field_t				bitfield;
 	};
 
 	#define XENUM_BEGIN(enum_name)				\

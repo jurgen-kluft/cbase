@@ -4,7 +4,7 @@
 
 using namespace xcore;
 
-UNITTEST_SUITE_BEGIN(xhibitset)
+UNITTEST_SUITE_BEGIN(hibitset_t)
 {
 	UNITTEST_FIXTURE(main)
 	{
@@ -22,7 +22,7 @@ UNITTEST_SUITE_BEGIN(xhibitset)
 		{
 			clear_bitmap();
 
-			xhibitset bset;
+			hibitset_t bset;
 			bset.init(bitmap, 8192);
 			bset.reset();
 
@@ -35,7 +35,7 @@ UNITTEST_SUITE_BEGIN(xhibitset)
 		{
 			clear_bitmap();
 
-			xhibitset bset;
+			hibitset_t bset;
 			bset.init(bitmap, 8192);
 			bset.reset();
 
@@ -55,7 +55,7 @@ UNITTEST_SUITE_BEGIN(xhibitset)
 		{
 			clear_bitmap();
 
-			xhibitset bset;
+			hibitset_t bset;
 			bset.init(bitmap, 8192);
 			bset.reset();
 
@@ -77,7 +77,7 @@ UNITTEST_SUITE_BEGIN(xhibitset)
 		{
 			clear_bitmap();
 
-			xhibitset bset;
+			hibitset_t bset;
 			bset.init(bitmap, 8192);
 			bset.reset();
 

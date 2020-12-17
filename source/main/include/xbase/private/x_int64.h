@@ -96,13 +96,13 @@ namespace xcore
 		/**
 		 *  Misc operators
 		 */
-		void 					SetBit(s32 nIndex, xbool _value);
-		xbool 					IsBitSet(s32 nIndex) const;
+		void 					SetBit(s32 nIndex, bool _value);
+		bool 					IsBitSet(s32 nIndex) const;
 
 		void 					Negate();
 
-		xbool 					IsNegative() const;
-		xbool 					IsPositive() const;
+		bool 					IsNegative() const;
+		bool 					IsPositive() const;
 
 		void 					Modulus(const __xint64& Divisor, __xint64& Quotient, __xint64& Remainder) const;
 		s32						Compare(const __xint64& other) const;
@@ -162,26 +162,26 @@ namespace xcore
 	inline __xint64  	operator|(s32 lhs, const __xint64& rhs) { __xint64 r(lhs); r|=rhs; return r; }
 	inline __xint64  	operator&(s32 lhs, const __xint64& rhs) { __xint64 r(lhs); r&=rhs; return r; }
 
-	inline xbool		operator<(const __xint64& lhs, const __xint64& rhs) { return xbool(lhs.Compare(rhs) == -1); }
-	inline xbool		operator>(const __xint64& lhs, const __xint64& rhs) { return xbool(lhs.Compare(rhs) == 1); }
-	inline xbool		operator<=(const __xint64& lhs, const __xint64& rhs) { return xbool(lhs.Compare(rhs) != 1); }
-	inline xbool		operator>=(const __xint64& lhs, const __xint64& rhs) { return xbool(lhs.Compare(rhs) != -1); }
-	inline xbool		operator==(const __xint64& lhs, const __xint64& rhs) { return xbool(lhs.Compare(rhs) == 0); }
-	inline xbool		operator!=(const __xint64& lhs, const __xint64& rhs) { return xbool(lhs.Compare(rhs) != 0); }
+	inline bool		operator<(const __xint64& lhs, const __xint64& rhs) { return bool(lhs.Compare(rhs) == -1); }
+	inline bool		operator>(const __xint64& lhs, const __xint64& rhs) { return bool(lhs.Compare(rhs) == 1); }
+	inline bool		operator<=(const __xint64& lhs, const __xint64& rhs) { return bool(lhs.Compare(rhs) != 1); }
+	inline bool		operator>=(const __xint64& lhs, const __xint64& rhs) { return bool(lhs.Compare(rhs) != -1); }
+	inline bool		operator==(const __xint64& lhs, const __xint64& rhs) { return bool(lhs.Compare(rhs) == 0); }
+	inline bool		operator!=(const __xint64& lhs, const __xint64& rhs) { return bool(lhs.Compare(rhs) != 0); }
 
-	inline xbool		operator<(const __xint64& lhs, s32 rhs) { return xbool(lhs.Compare(__xint64(rhs)) == -1); }
-	inline xbool		operator>(const __xint64& lhs, s32 rhs) { return xbool(lhs.Compare(__xint64(rhs)) == 1); }
-	inline xbool		operator<=(const __xint64& lhs, s32 rhs) { return xbool(lhs.Compare(__xint64(rhs)) != 1); }
-	inline xbool		operator>=(const __xint64& lhs, s32 rhs) { return xbool(lhs.Compare(__xint64(rhs)) != -1); }
-	inline xbool		operator==(const __xint64& lhs, s32 rhs) { return xbool(lhs.Compare(__xint64(rhs)) == 0); }
-	inline xbool		operator!=(const __xint64& lhs, s32 rhs) { return xbool(lhs.Compare(__xint64(rhs)) != 0); }
+	inline bool		operator<(const __xint64& lhs, s32 rhs) { return bool(lhs.Compare(__xint64(rhs)) == -1); }
+	inline bool		operator>(const __xint64& lhs, s32 rhs) { return bool(lhs.Compare(__xint64(rhs)) == 1); }
+	inline bool		operator<=(const __xint64& lhs, s32 rhs) { return bool(lhs.Compare(__xint64(rhs)) != 1); }
+	inline bool		operator>=(const __xint64& lhs, s32 rhs) { return bool(lhs.Compare(__xint64(rhs)) != -1); }
+	inline bool		operator==(const __xint64& lhs, s32 rhs) { return bool(lhs.Compare(__xint64(rhs)) == 0); }
+	inline bool		operator!=(const __xint64& lhs, s32 rhs) { return bool(lhs.Compare(__xint64(rhs)) != 0); }
 
-	inline xbool		operator< (s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) == -1); }
-	inline xbool		operator> (s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) == 1); }
-	inline xbool		operator<=(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) != 1); }
-	inline xbool		operator>=(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) != -1); }
-	inline xbool		operator==(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) == 0); }
-	inline xbool		operator!=(s32 lhs, const __xint64& rhs) { return xbool(__xint64(lhs).Compare(rhs) != 0); }
+	inline bool		operator< (s32 lhs, const __xint64& rhs) { return bool(__xint64(lhs).Compare(rhs) == -1); }
+	inline bool		operator> (s32 lhs, const __xint64& rhs) { return bool(__xint64(lhs).Compare(rhs) == 1); }
+	inline bool		operator<=(s32 lhs, const __xint64& rhs) { return bool(__xint64(lhs).Compare(rhs) != 1); }
+	inline bool		operator>=(s32 lhs, const __xint64& rhs) { return bool(__xint64(lhs).Compare(rhs) != -1); }
+	inline bool		operator==(s32 lhs, const __xint64& rhs) { return bool(__xint64(lhs).Compare(rhs) == 0); }
+	inline bool		operator!=(s32 lhs, const __xint64& rhs) { return bool(__xint64(lhs).Compare(rhs) != 0); }
 };
 
 #endif

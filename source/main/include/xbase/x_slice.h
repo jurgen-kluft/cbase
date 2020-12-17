@@ -10,32 +10,32 @@
 
 namespace xcore
 {
-    struct slice_data;
+    struct slice_data_t;
 
     //==============================================================================
-    // A reference counted slice owning a memory block with a view/window (from,to).
+    // A reference counted slice_t owning a memory block with a view/window (from,to).
     //==============================================================================
-    struct slice
+    struct slice_t
     {
-        slice();
-        slice(xalloc* allocator, s32 item_count, s32 item_size);
-        slice(slice_data* data, s32 from, s32 to);
+        slice_t();
+        slice_t(alloc_t* allocator, s32 item_count, s32 item_size);
+        slice_t(slice_data_t* data, s32 from, s32 to);
 
-        static void alloc(slice& slice, xalloc* allocator, s32 item_count, s32 item_size);
-        slice       construct(s32 _item_count, s32 _item_size) const;
+        static void alloc(slice_t& slice_t, alloc_t* allocator, s32 item_count, s32 item_size);
+        slice_t       construct(s32 _item_count, s32 _item_size) const;
 
         s32 size() const;
         s32 refcnt() const;
 
-        slice obtain() const;
+        slice_t obtain() const;
         void  release();
 
         void resize(s32 count);
         void insert(s32 count);
         void remove(s32 count);
 
-        slice view(s32 from, s32 to) const;
-        bool  split(s32 mid, slice& left, slice& right) const;
+        slice_t view(s32 from, s32 to) const;
+        bool  split(s32 mid, slice_t& left, slice_t& right) const;
 
         void*       begin();
         void const* begin() const;
@@ -46,7 +46,7 @@ namespace xcore
         void*       at(s32 index);
         void const* at(s32 index) const;
 
-        slice_data* mData;
+        slice_data_t* mData;
         s32         mFrom;
         s32         mTo;
     };
@@ -55,33 +55,33 @@ namespace xcore
     //   SLICE REFERENCE COUNTED DATA
     // ----------------------------------------------------------------------------------------
 
-    struct slice_data
+    struct slice_data_t
     {
-        slice_data();
-        slice_data(s32 item_count, s32 item_size);
-        slice_data(xbyte* data, s32 item_count, s32 item_size);
+        slice_data_t();
+        slice_data_t(s32 item_count, s32 item_size);
+        slice_data_t(xbyte* data, s32 item_count, s32 item_size);
 
-        static slice_data sNull;
+        static slice_data_t sNull;
 
-        slice_data* incref();
-        slice_data* incref() const;
-        slice_data* decref();
+        slice_data_t* incref();
+        slice_data_t* incref() const;
+        slice_data_t* decref();
 
-        // This function makes a new 'slice_data' with content copied from this
-        slice_data* copy(s32 from, s32 to);
+        // This function makes a new 'slice_data_t' with content copied from this
+        slice_data_t* copy(s32 from, s32 to);
 
         // These functions do not 'reallocate' this
         void resize(s32 from, s32 to);
         void insert(s32 at, s32 count);
         void remove(s32 at, s32 count);
 
-        static slice_data* alloc(xalloc* allocator, s32& to_itemcount, s32& to_itemsize);
+        static slice_data_t* alloc(alloc_t* allocator, s32& to_itemcount, s32& to_itemsize);
 
         mutable s32 mRefCount;
         s32         mItemCount; /// Count of total items
         s32         mItemSize;  /// Size of one item
         s32         mDummy;
-        xalloc*     mAllocator;
+        alloc_t*     mAllocator;
         xbyte*      mData;
     };
 } // namespace xcore

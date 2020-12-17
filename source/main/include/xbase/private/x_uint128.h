@@ -113,8 +113,8 @@ namespace xcore
 		/**
 		 *  Misc. Functions
 		 */
-		void 					SetBit(s32 nIndex, xbool value);
-		xbool 					IsBitSet(s32 nIndex) const;
+		void 					SetBit(s32 nIndex, bool value);
+		bool 					IsBitSet(s32 nIndex) const;
 
 		void 					Modulus(const __xuint128& Divisor, __xuint128& Quotient, __xuint128& Remainder) const;
 		s32						Compare(const __xuint128& other) const;

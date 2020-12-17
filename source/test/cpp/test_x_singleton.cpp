@@ -5,17 +5,17 @@
 
 using namespace xcore;
 
-extern xcore::xalloc* gTestAllocator;
+extern xcore::alloc_t* gTestAllocator;
 
-UNITTEST_SUITE_BEGIN(xsingleton)
+UNITTEST_SUITE_BEGIN(singleton_t)
 {
 
-	class test_singleton1 : public xsingleton<test_singleton1>
+	class test_singleton1 : public singleton_t<test_singleton1>
 	{
 	public:
 					test_singleton1() : mInteger(22) {}
 		
-		static xalloc*	singleton_allocator()
+		static alloc_t*	singleton_allocator()
 		{
 			return gTestAllocator;
 		}
@@ -29,7 +29,7 @@ UNITTEST_SUITE_BEGIN(xsingleton)
 		int			mInteger;
 	};
 
-	class test_singleton2 : public xsingleton<test_singleton2, xstatic_instantiation>
+	class test_singleton2 : public singleton_t<test_singleton2, static_instantiation_t>
 	{
 	public:
 		test_singleton2() : mInteger(22) {}

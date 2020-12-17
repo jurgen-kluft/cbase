@@ -10,13 +10,13 @@
 
 namespace xcore
 {
-    class xbuffer;
+    class buffer_t;
 
-    class xalloc
+    class alloc_t
     {
     public:
         static void    init_system();
-        static xalloc* get_system();
+        static alloc_t* get_system();
 
         void* allocate(u32 size, u32 alignment) { return v_allocate(size, alignment); }
         void* allocate(u32 size) { return v_allocate(size, sizeof(void*)); }
@@ -48,7 +48,7 @@ namespace xcore
         virtual u32   v_deallocate(void* p)           = 0; // Deallocate/Free memory
         virtual void  v_release()                     = 0;
 
-        virtual ~xalloc() {}
+        virtual ~alloc_t() {}
     };
 
 	// helper functions
@@ -58,7 +58,7 @@ namespace xcore
 	inline bool  x_is_in_range(void* buffer, u64 size, void* ptr) { uptr begin = (uptr)buffer; uptr end = begin + size; uptr cursor = (uptr)ptr; return cursor >= begin && cursor < end; }
 
     // fixed-size allocator
-    class xfsa
+    class fsa_t
     {
     public:
         inline u32   size() const { return v_size(); }
@@ -86,14 +86,14 @@ namespace xcore
         virtual u32   v_deallocate(void*) = 0;
         virtual void  v_release()         = 0;
 
-        virtual ~xfsa() {}
+        virtual ~fsa_t() {}
     };
 
-	class xfsa_to_alloc : public xfsa
+	class fsa_to_alloc_t : public fsa_t
 	{
 	public:
-		xfsa_to_alloc() : m_allocator(nullptr), m_size(0) {}
-		xfsa_to_alloc(u32 size, xalloc* allocator) : m_allocator(allocator), m_size(size) {}
+		fsa_to_alloc_t() : m_allocator(nullptr), m_size(0) {}
+		fsa_to_alloc_t(u32 size, alloc_t* allocator) : m_allocator(allocator), m_size(size) {}
 
 	protected:
 		virtual u32   v_size() const       { return m_size; }
@@ -102,12 +102,12 @@ namespace xcore
 		virtual void  v_release()          { return m_allocator->release(); }
 
 	private:
-		xalloc*	m_allocator;
+		alloc_t*	m_allocator;
 		u32 m_size;
 	};
 
     // The dexer interface, 'pointer to index' and 'index to pointer'
-    class xdexer
+    class dexer_t
     {
     public:
         inline void* idx2ptr(u32 index) const { return v_idx2ptr(index); }
@@ -121,17 +121,17 @@ namespace xcore
         virtual u32   v_ptr2idx(void* ptr) const = 0;
     };
 
-    class xfsadexed : public xfsa, public xdexer
+    class fsadexed_t : public fsa_t, public dexer_t
     {
     public:
-        xfsadexed() {}
-        ~xfsadexed() {}
+        fsadexed_t() {}
+        ~fsadexed_t() {}
     };
 
     // Global new and delete
     template <typename T, typename... Args> T* xnew(Args... args)
     {
-        void* mem    = xalloc::get_system()->allocate(sizeof(T));
+        void* mem    = alloc_t::get_system()->allocate(sizeof(T));
         T*    object = new (mem) T(args...);
         return object;
     }
@@ -139,10 +139,10 @@ namespace xcore
     template <typename T> void xdelete(T* p)
     {
         p->~T();
-        xalloc::get_system()->deallocate(p);
+        alloc_t::get_system()->deallocate(p);
     }
 
-    class xalloc_stack : public xalloc
+    class alloc_stack_t : public alloc_t
     {
         static inline xbyte* align_ptr(xbyte* ptr, uptr align) { return (xbyte*)(((uptr)ptr + (align - 1)) & ~(align - 1)); }
 
@@ -152,7 +152,7 @@ namespace xcore
         s64    m_cnt;
 
     public:
-        xalloc_stack(xbuffer& storage);
+        alloc_stack_t(buffer_t& storage);
 
     protected:
         virtual void* v_allocate(u32 size, u32 align)
@@ -188,14 +188,14 @@ namespace xcore
     };
 
     // Allocate a one or more objects in-place
-    class xallocinplace : public xalloc
+    class allocinplace_t : public alloc_t
     {
         xbyte* m_base;
         xbyte* m_data;
         u64    m_size;
 
     public:
-        inline xallocinplace(xbyte* data, u64 size)
+        inline allocinplace_t(xbyte* data, u64 size)
             : m_base(data)
             , m_data(data)
             , m_size(size)
@@ -208,7 +208,7 @@ namespace xcore
         virtual void  v_release();
     };
 
-    template <u32 L> class xinplace
+    template <u32 L> class inplace_t
     {
         enum
         {
@@ -217,8 +217,8 @@ namespace xcore
         u64 m_memory[SIZE];
 
     public:
-        inline xinplace() {}
-        xallocinplace allocator() const { return xallocinplace((xbyte*)m_memory, (u64)SIZE); }
+        inline inplace_t() {}
+        allocinplace_t allocator() const { return allocinplace_t((xbyte*)m_memory, (u64)SIZE); }
 
         template <class T> inline T* object() { return static_cast<T*>(m_memory); }
     };
@@ -239,7 +239,7 @@ namespace xcore
     void* operator new[](xcore::xsize_t num_bytes) { ASSERT(num_bytes < (xcore::xsize_t)2*1024*1024*1024); return get_allocator_func()->allocate((u32)num_bytes, align); } \
     void  operator delete[](void* mem) { get_allocator_func()->deallocate(mem); }
 
-    template <class T> class x_cdtor_default
+    template <class T> class cdtor_default_t
     {
     public:
         inline T* construct(void* mem) const { return static_cast<T*>(mem); }
@@ -252,7 +252,7 @@ namespace xcore
         inline void destruct(T* obj) const {}
     };
 
-    template <class T> class x_cdtor_placement_new
+    template <class T> class cdtor_placement_new_t
     {
     public:
         inline T*   construct(void* mem) const { return new (mem) T(); }
@@ -260,16 +260,16 @@ namespace xcore
         inline void destruct(T* obj) const { obj->~T(); }
     };
 
-    class xdexed_array : public xdexer
+    class dexed_array_t : public dexer_t
     {
     public:
-        xdexed_array()
+        dexed_array_t()
             : m_data(nullptr)
             , m_sizeof(0)
             , m_countof(0)
         {
         }
-        xdexed_array(void* array_item, u32 sizeof_item, u32 countof_item);
+        dexed_array_t(void* array_item, u32 sizeof_item, u32 countof_item);
 
         XCORE_CLASS_PLACEMENT_NEW_DELETE
     protected:
@@ -282,12 +282,12 @@ namespace xcore
         u32   m_countof;
     };
 
-    class xfsadexed_array : public xfsadexed
+    class fsadexed_array_t : public fsadexed_t
     {
     public:
-        xfsadexed_array();
-        xfsadexed_array(void* array_item, u32 sizeof_item, u32 countof_item);
-        ~xfsadexed_array() {}
+        fsadexed_array_t();
+        fsadexed_array_t(void* array_item, u32 sizeof_item, u32 countof_item);
+        ~fsadexed_array_t() {}
 
         XCORE_CLASS_PLACEMENT_NEW_DELETE
 

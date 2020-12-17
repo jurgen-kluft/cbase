@@ -11,137 +11,137 @@
 
 namespace xcore
 {
-    class xbuffer;
-    class xbinary_reader;
-    class xbinary_writer;
+    class buffer_t;
+    class binary_reader_t;
+    class binary_writer_t;
 	struct crunes_t;
 
     // --------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
-    class xcbuffer
+    class cbuffer_t
     {
     public:
-        inline xcbuffer() : m_len(0), m_const((xbyte const*)&m_len) {}
-        inline xcbuffer(u32 len, xbyte const* data) : m_len(len), m_const(data) {}
-        xcbuffer(xbuffer const& buffer);
-        xcbuffer(crunes_t const& str);
+        inline cbuffer_t() : m_len(0), m_const((xbyte const*)&m_len) {}
+        inline cbuffer_t(u32 len, xbyte const* data) : m_len(len), m_const(data) {}
+        cbuffer_t(buffer_t const& buffer);
+        cbuffer_t(crunes_t const& str);
 
         inline u32 size() const { return m_len; }
 
-        s32 compare(const xcbuffer& other) const;
+        s32 compare(const cbuffer_t& other) const;
 
-        bool operator==(const xcbuffer& other) const;
-        bool operator!=(const xcbuffer& other) const;
-        bool operator<(const xcbuffer& other) const;
-        bool operator<=(const xcbuffer& other) const;
-        bool operator>(const xcbuffer& other) const;
-        bool operator>=(const xcbuffer& other) const;
+        bool operator==(const cbuffer_t& other) const;
+        bool operator!=(const cbuffer_t& other) const;
+        bool operator<(const cbuffer_t& other) const;
+        bool operator<=(const cbuffer_t& other) const;
+        bool operator>(const cbuffer_t& other) const;
+        bool operator>=(const cbuffer_t& other) const;
 
-        xcbuffer operator()(u32 from, u32 to) const;
+        cbuffer_t operator()(u32 from, u32 to) const;
 
-        xbinary_reader reader() const;
+        binary_reader_t reader() const;
 
-        static xcbuffer from_ascii_string(const char* str);
+        static cbuffer_t from_ascii_string(const char* str);
 
         u32          m_len;
         xbyte const* m_const;
     };
 
-    class xbuffer
+    class buffer_t
     {
     public:
-        inline xbuffer() : m_len(0), m_mutable((xbyte*)&m_len) {}
-        inline xbuffer(u32 len, xbyte* data) : m_len(len), m_mutable(data) { reset(0); }
+        inline buffer_t() : m_len(0), m_mutable((xbyte*)&m_len) {}
+        inline buffer_t(u32 len, xbyte* data) : m_len(len), m_mutable(data) { reset(0); }
 
         inline u32 size() const { return m_len; }
 
         void reset(xbyte fill);
         void clear();
 
-        s32 compare(const xcbuffer& other) const
+        s32 compare(const cbuffer_t& other) const
         {
-            xcbuffer cthis(*this);
+            cbuffer_t cthis(*this);
             return cthis.compare(other);
         }
 
-        bool operator==(const xcbuffer& other) const
+        bool operator==(const cbuffer_t& other) const
         {
-            xcbuffer cthis(*this);
+            cbuffer_t cthis(*this);
             return cthis == other;
         }
-        bool operator!=(const xcbuffer& other) const
+        bool operator!=(const cbuffer_t& other) const
         {
-            xcbuffer cthis(*this);
+            cbuffer_t cthis(*this);
             return cthis != other;
         }
-        bool operator<(const xcbuffer& other) const
+        bool operator<(const cbuffer_t& other) const
         {
-            xcbuffer cthis(*this);
+            cbuffer_t cthis(*this);
             return cthis < other;
         }
-        bool operator<=(const xcbuffer& other) const
+        bool operator<=(const cbuffer_t& other) const
         {
-            xcbuffer cthis(*this);
+            cbuffer_t cthis(*this);
             return cthis <= other;
         }
-        bool operator>(const xcbuffer& other) const
+        bool operator>(const cbuffer_t& other) const
         {
-            xcbuffer cthis(*this);
+            cbuffer_t cthis(*this);
             return cthis > other;
         }
-        bool operator>=(const xcbuffer& other) const
+        bool operator>=(const cbuffer_t& other) const
         {
-            xcbuffer cthis(*this);
+            cbuffer_t cthis(*this);
             return cthis >= other;
         }
 
-        bool operator==(const xbuffer& other) const
+        bool operator==(const buffer_t& other) const
         {
-            xcbuffer cother(other);
-            xcbuffer cthis(*this);
+            cbuffer_t cother(other);
+            cbuffer_t cthis(*this);
             return cthis == cother;
         }
-        bool operator!=(const xbuffer& other) const
+        bool operator!=(const buffer_t& other) const
         {
-            xcbuffer cother(other);
-            xcbuffer cthis(*this);
+            cbuffer_t cother(other);
+            cbuffer_t cthis(*this);
             return cthis != cother;
         }
-        bool operator<(const xbuffer& other) const
+        bool operator<(const buffer_t& other) const
         {
-            xcbuffer cother(other);
-            xcbuffer cthis(*this);
+            cbuffer_t cother(other);
+            cbuffer_t cthis(*this);
             return cthis < cother;
         }
-        bool operator<=(const xbuffer& other) const
+        bool operator<=(const buffer_t& other) const
         {
-            xcbuffer cother(other);
-            xcbuffer cthis(*this);
+            cbuffer_t cother(other);
+            cbuffer_t cthis(*this);
             return cthis <= cother;
         }
-        bool operator>(const xbuffer& other) const
+        bool operator>(const buffer_t& other) const
         {
-            xcbuffer cother(other);
-            xcbuffer cthis(*this);
+            cbuffer_t cother(other);
+            cbuffer_t cthis(*this);
             return cthis > cother;
         }
-        bool operator>=(const xbuffer& other) const
+        bool operator>=(const buffer_t& other) const
         {
-            xcbuffer cother(other);
-            xcbuffer cthis(*this);
+            cbuffer_t cother(other);
+            cbuffer_t cthis(*this);
             return cthis >= cother;
         }
 
-        xbuffer operator()(u32 from, u32 to) const;
+        buffer_t operator()(u32 from, u32 to) const;
 
-        xbinary_reader reader() const;
-        xbinary_writer writer() const;
+        binary_reader_t reader() const;
+        binary_writer_t writer() const;
 
         u32    m_len;
         xbyte* m_mutable;
     };
 
-    template <u32 L> class xbytes : public xbuffer
+    template <u32 L> class xbytes : public buffer_t
     {
         enum
         {
@@ -150,24 +150,24 @@ namespace xcore
 
     public:
         u64 m_data[SIZE];
-        inline xbytes() : xbuffer(SIZE * 4, (xbyte*)m_data) {}
-        xbuffer buffer() const { return xbuffer(*this); }
+        inline xbytes() : buffer_t(SIZE * 4, (xbyte*)m_data) {}
+        buffer_t buffer() const { return buffer_t(*this); }
     };
 
     //
     // Helper classes for reading and writing to buffers
     //
 
-    class xbinary_reader
+    class binary_reader_t
     {
     public:
-        inline xbinary_reader(xbuffer const& b) : len_(b.size()), cursor_(0), buffer_(b.m_mutable) {}
-        inline xbinary_reader(xcbuffer const& b) : len_(b.size()), cursor_(0), buffer_(b.m_const) {}
-        inline xbinary_reader(xbyte const* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) {}
+        inline binary_reader_t(buffer_t const& b) : len_(b.size()), cursor_(0), buffer_(b.m_mutable) {}
+        inline binary_reader_t(cbuffer_t const& b) : len_(b.size()), cursor_(0), buffer_(b.m_const) {}
+        inline binary_reader_t(xbyte const* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) {}
 
         u32      size() const;
         u32      len() const;
-        xcbuffer get_current_buffer() const;
+        cbuffer_t get_current_buffer() const;
         bool     can_read(u32 number_of_bytes) const; // check if we still can read n number of bytes
         bool     at_end() const;
         bool     seek(u32 cursor);
@@ -196,10 +196,10 @@ namespace xcore
         s64      read_s64();
         f32      read_f32();
         f64      read_f64();
-        s32      read_data(xbuffer& buf);
-        s32      view_data(u32 size, xcbuffer& buf);
-		s32      read_buffer(xbuffer& buf);
-		s32      view_buffer(xcbuffer& buf);
+        s32      read_data(buffer_t& buf);
+        s32      view_data(u32 size, cbuffer_t& buf);
+		s32      read_buffer(buffer_t& buf);
+		s32      view_buffer(cbuffer_t& buf);
 		s32      view_crunes(crunes_t& out_str);
 
     protected:
@@ -208,18 +208,18 @@ namespace xcore
         xbyte const* buffer_;
     };
 
-    class xbinary_writer
+    class binary_writer_t
     {
     public:
-        inline xbinary_writer() : len_(0), cursor_(0), buffer_() {}
-        inline xbinary_writer(xbuffer const& _buffer) : len_(_buffer.size()), cursor_(0), buffer_(_buffer.m_mutable) {}
-        inline xbinary_writer(xbyte* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) {}
+        inline binary_writer_t() : len_(0), cursor_(0), buffer_() {}
+        inline binary_writer_t(buffer_t const& _buffer) : len_(_buffer.size()), cursor_(0), buffer_(_buffer.m_mutable) {}
+        inline binary_writer_t(xbyte* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) {}
 
         u32 size() const;
         u32 len() const;
 
-        xbuffer get_full_buffer() const;
-        xbuffer get_current_buffer() const;
+        buffer_t get_full_buffer() const;
+        buffer_t get_current_buffer() const;
 
         bool can_write(u32 num_bytes = 0) const;
         bool at_end() const;
@@ -228,7 +228,7 @@ namespace xcore
 
         void           reset();
         s32            skip(s32 count);
-        xbinary_writer reserve(u32 size); // For writing something in the future you can remember this place - size
+        binary_writer_t reserve(u32 size); // For writing something in the future you can remember this place - size
 
         s32 write(bool);
         s32 write(u8);
@@ -242,10 +242,10 @@ namespace xcore
         s32 write(f32);
         s32 write(f64);
 
-        s32 write_data(xbuffer const& cbuf);
-        s32 write_data(xcbuffer const& cbuf);
-        s32 write_buffer(xbuffer const& cbuf);	// Will write [s32=Length][u8[]=Data]
-        s32 write_buffer(xcbuffer const& cbuf);	// Will write [s32=Length][u8[]=Data]
+        s32 write_data(buffer_t const& cbuf);
+        s32 write_data(cbuffer_t const& cbuf);
+        s32 write_buffer(buffer_t const& cbuf);	// Will write [s32=Length][u8[]=Data]
+        s32 write_buffer(cbuffer_t const& cbuf);	// Will write [s32=Length][u8[]=Data]
         s32 write_string(crunes_t const& str);
 
     protected:
@@ -254,9 +254,9 @@ namespace xcore
         xbyte* buffer_;
     };
 
-    inline xcbuffer::xcbuffer(xbuffer const& buffer) : m_len(buffer.size()), m_const(buffer.m_mutable) {}
+    inline cbuffer_t::cbuffer_t(buffer_t const& buffer) : m_len(buffer.size()), m_const(buffer.m_mutable) {}
 
-    inline s32 xcbuffer::compare(const xcbuffer& other) const
+    inline s32 cbuffer_t::compare(const cbuffer_t& other) const
     {
         if (size() < other.size())
             return -1;
@@ -272,43 +272,43 @@ namespace xcore
         return 0;
     }
 
-    inline bool xcbuffer::operator==(const xcbuffer& other) const { return compare(other) == 0; }
-    inline bool xcbuffer::operator!=(const xcbuffer& other) const { return compare(other) != 0; }
-    inline bool xcbuffer::operator<(const xcbuffer& other) const { return compare(other) < 0; }
-    inline bool xcbuffer::operator<=(const xcbuffer& other) const { return compare(other) <= 0; }
-    inline bool xcbuffer::operator>(const xcbuffer& other) const { return compare(other) > 0; }
-    inline bool xcbuffer::operator>=(const xcbuffer& other) const { return compare(other) >= 0; }
+    inline bool cbuffer_t::operator==(const cbuffer_t& other) const { return compare(other) == 0; }
+    inline bool cbuffer_t::operator!=(const cbuffer_t& other) const { return compare(other) != 0; }
+    inline bool cbuffer_t::operator<(const cbuffer_t& other) const { return compare(other) < 0; }
+    inline bool cbuffer_t::operator<=(const cbuffer_t& other) const { return compare(other) <= 0; }
+    inline bool cbuffer_t::operator>(const cbuffer_t& other) const { return compare(other) > 0; }
+    inline bool cbuffer_t::operator>=(const cbuffer_t& other) const { return compare(other) >= 0; }
 
-    inline xcbuffer xcbuffer::operator()(u32 from, u32 to) const
+    inline cbuffer_t cbuffer_t::operator()(u32 from, u32 to) const
     {
         if (from < 0 || from >= to || from >= size())
-            return xcbuffer();
+            return cbuffer_t();
         if (to >= size())
-            return xcbuffer();
-        return xcbuffer(to - from, m_const + from);
+            return cbuffer_t();
+        return cbuffer_t(to - from, m_const + from);
     }
 
-    inline xbinary_reader xcbuffer::reader() const { return xbinary_reader(m_const, size()); }
+    inline binary_reader_t cbuffer_t::reader() const { return binary_reader_t(m_const, size()); }
 
-    inline void xbuffer::reset(xbyte fill)
+    inline void buffer_t::reset(xbyte fill)
     {
         for (u32 i = 0; i < size(); ++i)
             m_mutable[i] = fill;
     }
 
-    inline void xbuffer::clear() { reset(0); }
+    inline void buffer_t::clear() { reset(0); }
 
-    inline xbuffer xbuffer::operator()(u32 from, u32 to) const
+    inline buffer_t buffer_t::operator()(u32 from, u32 to) const
     {
         if (from < 0 || from >= to || from >= size())
-            return xbuffer();
+            return buffer_t();
         if (to >= size())
-            return xbuffer();
-        return xbuffer(to - from, m_mutable + from);
+            return buffer_t();
+        return buffer_t(to - from, m_mutable + from);
     }
 
-    inline xbinary_reader xbuffer::reader() const { return xbinary_reader(m_mutable, size()); }
-    inline xbinary_writer xbuffer::writer() const { return xbinary_writer(m_mutable, size()); }
+    inline binary_reader_t buffer_t::reader() const { return binary_reader_t(m_mutable, size()); }
+    inline binary_writer_t buffer_t::writer() const { return binary_writer_t(m_mutable, size()); }
 } // namespace xcore
 
 #endif ///< __XCORE_BUFFER_H__

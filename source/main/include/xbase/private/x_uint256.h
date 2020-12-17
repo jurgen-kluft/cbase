@@ -104,8 +104,8 @@ namespace xcore
 		/**
 		 *  Misc. Functions
 		 */
-		void 					SetBit(s32 nIndex, xbool value);
-		xbool 					IsBitSet(s32 nIndex) const;
+		void 					SetBit(s32 nIndex, bool value);
+		bool 					IsBitSet(s32 nIndex) const;
 
 		void 					Modulus(const __xuint256& Divisor, __xuint256& Quotient, __xuint256& Remainder) const;
 		s32						Compare(const __xuint256& other) const;
@@ -161,12 +161,12 @@ namespace xcore
 	inline __xuint256  		operator|(const __xuint256& lhs, s32 rhs) { __xuint256 r(lhs); r|=__xuint256(rhs); return r; }
 	inline __xuint256  		operator&(const __xuint256& lhs, s32 rhs) { __xuint256 r(lhs); r&=__xuint256(rhs); return r; }
 
-	inline xbool			operator<(const __xuint256& lhs, const __xuint256& rhs) { return xbool(lhs.Compare(rhs) == -1); }
-	inline xbool			operator>(const __xuint256& lhs, const __xuint256& rhs) { return xbool(lhs.Compare(rhs) == 1); }
-	inline xbool			operator<=(const __xuint256& lhs, const __xuint256& rhs) { return xbool(lhs.Compare(rhs) != 1); }
-	inline xbool			operator>=(const __xuint256& lhs, const __xuint256& rhs) { return xbool(lhs.Compare(rhs) != -1); }
-	inline xbool			operator==(const __xuint256& lhs, const __xuint256& rhs) { return xbool(lhs.Compare(rhs) == 0); }
-	inline xbool			operator!=(const __xuint256& lhs, const __xuint256& rhs) { return xbool(lhs.Compare(rhs) != 0); }
+	inline bool			operator<(const __xuint256& lhs, const __xuint256& rhs) { return bool(lhs.Compare(rhs) == -1); }
+	inline bool			operator>(const __xuint256& lhs, const __xuint256& rhs) { return bool(lhs.Compare(rhs) == 1); }
+	inline bool			operator<=(const __xuint256& lhs, const __xuint256& rhs) { return bool(lhs.Compare(rhs) != 1); }
+	inline bool			operator>=(const __xuint256& lhs, const __xuint256& rhs) { return bool(lhs.Compare(rhs) != -1); }
+	inline bool			operator==(const __xuint256& lhs, const __xuint256& rhs) { return bool(lhs.Compare(rhs) == 0); }
+	inline bool			operator!=(const __xuint256& lhs, const __xuint256& rhs) { return bool(lhs.Compare(rhs) != 0); }
 
 	//==============================================================================
 	// END xCore namespace

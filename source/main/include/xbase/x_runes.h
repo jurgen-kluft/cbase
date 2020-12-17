@@ -262,7 +262,7 @@ namespace xcore
     {
     public:
         virtual runes_t allocate(s32 len, s32 cap, s32 type = ascii::TYPE) = 0;
-        virtual void    deallocate(runes_t& slice)                         = 0;
+        virtual void    deallocate(runes_t& slice_t)                         = 0;
     };
 
     // -------------------------------------------------------------------------------

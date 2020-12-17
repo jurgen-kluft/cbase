@@ -4,7 +4,7 @@
 
 using namespace xcore;
 
-UNITTEST_SUITE_BEGIN(xtls)
+UNITTEST_SUITE_BEGIN(tls_t)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -22,13 +22,13 @@ UNITTEST_SUITE_BEGIN(xtls)
         {
 			gInstance.mInteger = 1;
 			gInstance.mFloat = 2.0f;
-			xtls::set<0, OurTlsObject>(&gInstance);
+			tls_t::set<0, OurTlsObject>(&gInstance);
 		}
 
 		UNITTEST_TEST(get)
 		{
 			OurTlsObject * obj;
-			xtls::get<0, OurTlsObject>(obj);
+			tls_t::get<0, OurTlsObject>(obj);
 			CHECK_EQUAL(1, obj->mInteger);
 			CHECK_EQUAL(2.0f, obj->mFloat);
 		}

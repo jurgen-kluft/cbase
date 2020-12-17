@@ -63,24 +63,24 @@ namespace x_f32u
     /**
      * Rational Determination.
      */
-    inline xbool    isPositiveZero(f32 inNumber)            { return xbool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == 0); } 
-    inline xbool    isNegativeZero(f32 inNumber)            { return xbool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == FF_SIGN_MASK); } 
+    inline bool    isPositiveZero(f32 inNumber)            { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == 0); } 
+    inline bool    isNegativeZero(f32 inNumber)            { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == FF_SIGN_MASK); } 
 #ifdef IEEE_FLOATS
-    inline xbool    isPositiveInfinite(f32 inNumber)        { return xbool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == FF_EXPONENT_MASK); } 
-    inline xbool    isNegativeInfinite(f32 inNumber)        { return xbool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == (FF_EXPONENT_MASK | FF_SIGN_MASK)); } 
+    inline bool    isPositiveInfinite(f32 inNumber)        { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == FF_EXPONENT_MASK); } 
+    inline bool    isNegativeInfinite(f32 inNumber)        { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == (FF_EXPONENT_MASK | FF_SIGN_MASK)); } 
 
-    inline xbool    isInfinite(f32 inNumber)                { return xbool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK)) == FF_EXPONENT_MASK); } 
-    inline xbool    isNAN(f32 inNumber)                     { return xbool(((bin(inNumber) & FF_EXPONENT_MASK) == FF_EXPONENT_MASK) && (bin(inNumber) & FF_FRACTION_MASK)); }
-    inline xbool    isFinite(f32 inNumber)                  { return xbool(!isInfinite(inNumber) && !isNAN(inNumber)); }
-    inline xbool    isRational(f32 inNumber)                { return xbool((bin(inNumber) & FF_EXPONENT_MASK) != FF_EXPONENT_MASK); }
+    inline bool    isInfinite(f32 inNumber)                { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK)) == FF_EXPONENT_MASK); } 
+    inline bool    isNAN(f32 inNumber)                     { return bool(((bin(inNumber) & FF_EXPONENT_MASK) == FF_EXPONENT_MASK) && (bin(inNumber) & FF_FRACTION_MASK)); }
+    inline bool    isFinite(f32 inNumber)                  { return bool(!isInfinite(inNumber) && !isNAN(inNumber)); }
+    inline bool    isRational(f32 inNumber)                { return bool((bin(inNumber) & FF_EXPONENT_MASK) != FF_EXPONENT_MASK); }
 #else
-    inline xbool    isPositiveInfinite(f32 inNumber)        { return xFALSE;}
-    inline xbool    isNegativeInfinite(f32 inNumber)        { return xFALSE;}
+    inline bool    isPositiveInfinite(f32 inNumber)        { return xFALSE;}
+    inline bool    isNegativeInfinite(f32 inNumber)        { return xFALSE;}
 
-    inline xbool    isInfinite(f32 inNumber)                { return xFALSE;}
-    inline xbool    isNAN(f32 inNumber)                     { return xFALSE;}
-    inline xbool    isFinite(f32 inNumber)                  { return xTRUE;}
-    inline xbool    isRational(f32 inNumber)                { return xTRUE;}
+    inline bool    isInfinite(f32 inNumber)                { return xFALSE;}
+    inline bool    isNAN(f32 inNumber)                     { return xFALSE;}
+    inline bool    isFinite(f32 inNumber)                  { return xTRUE;}
+    inline bool    isRational(f32 inNumber)                { return xTRUE;}
 #endif
     /**
      * bin. Returns the f32 as an u32. It's not casted, but the address is casted, so you get the binary representation.
@@ -100,12 +100,12 @@ namespace x_f32u
     /**
      * IsEqual, returns xTRUE if two floats are the same
      */
-    inline xbool    isEqual(f32 inNumber, f32 inG)          { return xbool(bin(inNumber)==bin(inG)); }
+    inline bool    isEqual(f32 inNumber, f32 inG)          { return bool(bin(inNumber)==bin(inG)); }
 
     /**
      * IsNotEqual, returns xTRUE if the two floats are not the same
      */
-    inline xbool    isNotEqual(f32 inNumber, f32 inG)       { return xbool(bin(inNumber)!=bin(inG)); }
+    inline bool    isNotEqual(f32 inNumber, f32 inG)       { return bool(bin(inNumber)!=bin(inG)); }
 
     /**
      * And. To 'And' a f32 with a binary value. Used for abs for example
@@ -163,13 +163,13 @@ namespace x_f32u
     Check if a number is close to zero
     @param    inExp Binary exponent for "nearness", default is -80 (so check is accurate to 2^-80 closeness)
     **/
-    inline xbool    isNearZero(f32 inNumber, s32 inExp)     { ASSERTS(inExp<0,"IsNearZero needs an exponent, this typically should be a negative s32"); return xbool(exponent(inNumber) <= inExp); }
+    inline bool    isNearZero(f32 inNumber, s32 inExp)     { ASSERTS(inExp<0,"IsNearZero needs an exponent, this typically should be a negative s32"); return bool(exponent(inNumber) <= inExp); }
 
     /**
      * Check if number is close to another number
      * @param inExp Binary exponent for "nearness", default is -80 (so check is accurate to 2^-80 closeness)
      */
-    inline xbool    isNear(f32 inNumber, f32 inRef, s32 inExp)    { return isNearZero(inNumber-inRef, inExp); }
+    inline bool    isNear(f32 inNumber, f32 inRef, s32 inExp)    { return isNearZero(inNumber-inRef, inExp); }
 
     /**
      * Round number to closes integer value
@@ -239,11 +239,11 @@ namespace x_f32u
     /**
      * Check if a number is zero
      */
-    inline xbool    isZero(f32 inNumber)
+    inline bool    isZero(f32 inNumber)
     {
         //???
         //ASSERT((-0.0f == 0.0f) && (+0.0f == 0.0f));
-        return xbool(inNumber == 0.0f);
+        return bool(inNumber == 0.0f);
     }
 
     /**
@@ -253,16 +253,16 @@ namespace x_f32u
     /**
      * Check if a number is positive
      */
-    inline xbool    isPositive(f32 inNumber) 
+    inline bool    isPositive(f32 inNumber) 
     {
-        return xbool(inNumber > 0.0f);
+        return bool(inNumber > 0.0f);
     }
 
     /**
      * Check if a number is negative
      */
-    inline xbool    isNegative(f32 inNumber) 
+    inline bool    isNegative(f32 inNumber) 
     {
-        return xbool(inNumber < 0.0f);
+        return bool(inNumber < 0.0f);
     }
 };

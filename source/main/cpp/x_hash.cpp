@@ -181,7 +181,7 @@ namespace xcore
 			*dst++ = *src++;
 	}
 
-	xhashing::xhashing()
+	hashing_t::hashing_t()
 		: d_v0(0)
 		, d_v1(0)
 		, d_v2(0)
@@ -191,13 +191,13 @@ namespace xcore
 	{
 	}
 
-	void xhashing::reset()
+	void hashing_t::reset()
 	{
 		u8 const seed[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 		reset(seed);
 	}
 
-	void xhashing::reset(const xbyte* seed)
+	void hashing_t::reset(const xbyte* seed)
 	{
 		ASSERT(seed);
 		d_bufSize = (0);
@@ -210,7 +210,7 @@ namespace xcore
 		d_v3 = 0x7465646279746573ULL ^ k1;
 	}
 
-	void xhashing::hash(const void *data, s32 numBytes)
+	void hashing_t::hash(const void *data, s32 numBytes)
 	{
 		ASSERT(0 != data || 0 == numBytes);
 
@@ -248,7 +248,7 @@ namespace xcore
 		data_copy(end, end + d_bufSize, d_buf);
 	}
 
-	u64 xhashing::finalize()
+	u64 hashing_t::finalize()
 	{
 		u64 b = static_cast<u64>(d_totalLength) << 56;
 		switch(d_bufSize)

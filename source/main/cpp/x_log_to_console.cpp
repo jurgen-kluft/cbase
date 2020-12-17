@@ -62,7 +62,7 @@ namespace xcore
 		console->write(str);
 	}
 
-	void 				xlog_to_console_imp::write(const ascii::crunes_t& format, const x_va_list& arguments)
+	void 				xlog_to_console_imp::write(const ascii::crunes_t& format, const va_list_t& arguments)
 	{
 		console->write(format, arguments);
 	}
@@ -72,7 +72,7 @@ namespace xcore
 		console->write(str);
 	}
 
-	void 				xlog_to_console_imp::write(const utf32::crunes_t& format, const x_va_list& arguments)
+	void 				xlog_to_console_imp::write(const utf32::crunes_t& format, const va_list_t& arguments)
 	{
 		console->write(format, arguments);
 	}
@@ -122,7 +122,7 @@ namespace xcore
 		console->writeLine(str);
 	}
 
-	void 				xlog_to_console_imp::writeLine(const ascii::crunes_t& format, const x_va_list& arguments)
+	void 				xlog_to_console_imp::writeLine(const ascii::crunes_t& format, const va_list_t& arguments)
 	{
 		console->writeLine(format, arguments);
 	}
@@ -132,7 +132,7 @@ namespace xcore
 		console->writeLine(str);
 	}
 
-	void 				xlog_to_console_imp::writeLine(const utf32::crunes_t& format, const x_va_list& arguments)
+	void 				xlog_to_console_imp::writeLine(const utf32::crunes_t& format, const va_list_t& arguments)
 	{
 		console->writeLine(format, arguments);
 	}

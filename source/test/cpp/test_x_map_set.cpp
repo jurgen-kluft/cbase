@@ -6,11 +6,11 @@
 
 using namespace xcore;
 
-extern xcore::xalloc* gTestAllocator;
+extern xcore::alloc_t* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xmap_and_set)
 {
-    UNITTEST_FIXTURE(xmap)
+    UNITTEST_FIXTURE(map_t)
     {
         UNITTEST_FIXTURE_SETUP()
         {
@@ -22,7 +22,7 @@ UNITTEST_SUITE_BEGIN(xmap_and_set)
 
         UNITTEST_TEST(map_s32)
         {
-            xmap<s32, s32> map(gTestAllocator);
+            map_t<s32, s32> map(gTestAllocator);
 
 			s32 k = 0;
 			s32 v = 1000;

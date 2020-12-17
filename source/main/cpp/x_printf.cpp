@@ -341,7 +341,7 @@ namespace xcore
 
                 ffpart = fpart;
 
-                xbool anySignificantInteger = xFALSE;
+                bool anySignificantInteger = xFALSE;
                 for (i = 0; i < prec; ++i)
                 {
                     ffpart = modf(ffpart * 10.0, &ifpart);
@@ -640,7 +640,7 @@ namespace xcore
 		}
 	}
 
-    static void ULtoA(u32 val, runes_writer_t* writer, s32 base, xbool octzero, char const* xdigs)
+    static void ULtoA(u32 val, runes_writer_t* writer, s32 base, bool octzero, char const* xdigs)
     {
         uchar32 c;
         s32     sval;
@@ -717,7 +717,7 @@ namespace xcore
     /**
      * Same as above but for u64
      */
-    static void UQtoA(u64 val, runes_writer_t* writer, s32 base, xbool octzero, char const* xdigs)
+    static void UQtoA(u64 val, runes_writer_t* writer, s32 base, bool octzero, char const* xdigs)
     {
         uchar32 c;
         s64     sval;
@@ -893,7 +893,7 @@ namespace xcore
      *------------------------------------------------------------------------------
      */
 
-    void VSPrintf_internal(printf_writer_t* writer, runes_reader_t* reader, runes_writer_t* buffer, const x_va_list& args)
+    void VSPrintf_internal(printf_writer_t* writer, runes_reader_t* reader, runes_writer_t* buffer, const va_list_t& args)
     {
         ASSERT(reader != NULL);
         ASSERT(writer != NULL);
@@ -1242,7 +1242,7 @@ namespace xcore
                 case 'x':
                     xdigs = "0123456789abcdef";
                 hex:
-                    if (flags & QUADINT || args[argindex].type() == x_va::TYPE_INT64 || args[argindex].type() == x_va::TYPE_UINT64)
+                    if (flags & QUADINT || args[argindex].type() == va_t::TYPE_INT64 || args[argindex].type() == va_t::TYPE_UINT64)
                     {
                         flags |= QUADINT;
                         uqval = (u64)args[argindex++];
@@ -1276,7 +1276,7 @@ namespace xcore
 						{
 							if (uqval != 0 || prec != 0)
 							{
-								UQtoA(uqval, buffer, base, xbool((flags & ALT) != 0), xdigs);
+								UQtoA(uqval, buffer, base, bool((flags & ALT) != 0), xdigs);
 								size = (s32)buffer->count();
 							}
 						}
@@ -1284,7 +1284,7 @@ namespace xcore
 						{
 							if (ulval != 0 || prec != 0)
 							{
-								ULtoA(ulval, buffer, base, xbool((flags & ALT) != 0), xdigs);
+								ULtoA(ulval, buffer, base, bool((flags & ALT) != 0), xdigs);
 								size = (s32)buffer->count();
 							}
 						}
@@ -1366,11 +1366,11 @@ namespace xcore
 
     s32 cprintf(crunes_t const& format, X_VA_ARGS_16)
     {
-        x_va_list                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+        va_list_t                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 		return vcprintf(format, args);
     }
 
-    s32 vcprintf(crunes_t const& format, const x_va_list& args)
+    s32 vcprintf(crunes_t const& format, const va_list_t& args)
     {
 		s32 len = 0;
 		if (format.m_type == utf32::TYPE)
@@ -1396,11 +1396,11 @@ namespace xcore
 
     void sprintf(runes_t& str, crunes_t const& format, X_VA_ARGS_16)
     {
-        x_va_list                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+        va_list_t                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 		vsprintf(str, format, args);
     }
 
-    void vsprintf(runes_t& str, crunes_t const& format, const x_va_list& args)
+    void vsprintf(runes_t& str, crunes_t const& format, const va_list_t& args)
     {
 		if (format.m_type == utf32::TYPE)
 		{
@@ -1435,11 +1435,11 @@ namespace xcore
 
     void printf(crunes_t const& format, X_VA_ARGS_16)
     {
-        x_va_list                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+        va_list_t                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
 		printf(format, args);
     }
 
-    void printf(crunes_t const& format, const x_va_list& args)
+    void printf(crunes_t const& format, const va_list_t& args)
     {
 		s32 const                                   cache_size = 128;
 

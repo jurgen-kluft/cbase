@@ -8,7 +8,7 @@ namespace xcore
 	// - A local thread allocator (local to the thread)
 	// - A random generator
 
-	class xtls_SingleThread : public xtls
+	class xtls_SingleThread : public tls_t
 	{
 	public:
 		virtual			~xtls_SingleThread() { }
@@ -24,14 +24,14 @@ namespace xcore
 	};
 
 	static xtls_SingleThread	sNonThreadSafeInstance;
-	static xtls*				sInstance = &sNonThreadSafeInstance;
+	static tls_t*				sInstance = &sNonThreadSafeInstance;
 
-	void			xtls::sSet(xtls* instance)
+	void			tls_t::sSet(tls_t* instance)
 	{
 		sInstance = instance;
 	}
 
-	xtls*			xtls::sGet()
+	tls_t*			tls_t::sGet()
 	{
 		return sInstance;
 	}

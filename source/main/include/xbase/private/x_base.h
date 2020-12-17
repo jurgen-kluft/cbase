@@ -7,7 +7,7 @@
 
 namespace xcore
 {
-	class xalloc;
-	extern xalloc*	x_GetXBaseAllocator();
+	class alloc_t;
+	extern alloc_t*	x_GetXBaseAllocator();
 };
 #endif // __XBASE_H__

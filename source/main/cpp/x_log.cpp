@@ -5,21 +5,21 @@
 
 namespace xcore
 {
-	static x_log_info	x_ST_LogInfo;	///< Single-Thread log info
-	x_log_info&			x_GetLogInfo_ST()
+	static log_info_t	x_ST_LogInfo;	///< Single-Thread log info
+	log_info_t&			x_GetLogInfo_ST()
 	{
 		return x_ST_LogInfo;
 	}
 
-	static x_log_info::_delegate*	sGetLogInfoFunc = x_GetLogInfo_ST;
+	static log_info_t::_delegate*	sGetLogInfoFunc = x_GetLogInfo_ST;
 
-	void				x_SetGetLogInfo(x_log_info::_delegate* Function)
+	void				x_SetGetLogInfo(log_info_t::_delegate* Function)
 	{
 		sGetLogInfoFunc = Function;
 	}
 
 	xlog_to_console_imp	sLogDefaultToConsole;
-	xlogger*			xlog::sLogger[xlog::COUNT] = 
+	logger_t*			log_t::sLogger[log_t::COUNT] = 
 	{
 		&sLogDefaultToConsole,
 		&sLogDefaultToConsole,
@@ -27,28 +27,28 @@ namespace xcore
 		&sLogDefaultToConsole
 	};
 
-	xlogger*			xlog::redirect(ELevel inLevel, xlogger* inLogger)
+	logger_t*			log_t::redirect(ELevel inLevel, logger_t* inLogger)
 	{
-		xlogger* old = xlog::sLogger[inLevel];
-		xlog::sLogger[inLevel] = inLogger;
+		logger_t* old = log_t::sLogger[inLevel];
+		log_t::sLogger[inLevel] = inLogger;
 		if (old == &sLogDefaultToConsole)
 			return NULL;
 		return old;
 	}
 
-	void				xlog::init()
+	void				log_t::init()
 	{
 		for (s32 i=0; i<COUNT; ++i)
 			sLogger[i] = &sLogDefaultToConsole;
 	}
 
-	void				xlog::flush()
+	void				log_t::flush()
 	{
 		for (s32 i=0; i<COUNT; ++i)
 			sLogger[i]->flush();
 	}
 
-	void				xlog::shutdown()
+	void				log_t::shutdown()
 	{
 		for (s32 i=0; i<COUNT; ++i)
 		{
@@ -57,7 +57,7 @@ namespace xcore
 		}
 	}
 
-	void				xlog::clear()
+	void				log_t::clear()
 	{
 		for (s32 i=0; i<COUNT; ++i)
 			if (sLogger[i]!=NULL)
@@ -67,162 +67,162 @@ namespace xcore
 	//-------------------------------------------------------------------------------------------------
 	// 
 	//-------------------------------------------------------------------------------------------------
-	void 				xlog::write(ELevel inLevel, bool _value)
+	void 				log_t::write(ELevel inLevel, bool _value)
 	{
 		sLogger[inLevel]->write(_value);
 	}
 
 
-	void 				xlog::write(ELevel inLevel, f64 _value)
+	void 				log_t::write(ELevel inLevel, f64 _value)
 	{
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				xlog::write(ELevel inLevel, s32 _value)
+	void 				log_t::write(ELevel inLevel, s32 _value)
 	{
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				xlog::write(ELevel inLevel, s64 _value)
+	void 				log_t::write(ELevel inLevel, s64 _value)
 	{
 		sLogger[inLevel]->write(_value);
 	}
 
 
-	void 				xlog::write(ELevel inLevel, f32 _value)
+	void 				log_t::write(ELevel inLevel, f32 _value)
 	{
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				xlog::write(ELevel inLevel, u32 _value)
+	void 				log_t::write(ELevel inLevel, u32 _value)
 	{
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				xlog::write(ELevel inLevel, u64 _value)
+	void 				log_t::write(ELevel inLevel, u64 _value)
 	{
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				xlog::write(ELevel inLevel, const ascii::crunes_t& str)
+	void 				log_t::write(ELevel inLevel, const ascii::crunes_t& str)
 	{
 		sLogger[inLevel]->write(str);
 	}
 
-	void 				xlog::write(ELevel inLevel, const ascii::crunes_t& format, const x_va_list& arguments)
+	void 				log_t::write(ELevel inLevel, const ascii::crunes_t& format, const va_list_t& arguments)
 	{
 		sLogger[inLevel]->write(format, arguments);
 	}
 
-	void 				xlog::write(ELevel inLevel, const utf32::crunes_t& str)
+	void 				log_t::write(ELevel inLevel, const utf32::crunes_t& str)
 	{
 		sLogger[inLevel]->write(str);
 	}
 
-	void 				xlog::write(ELevel inLevel, const utf32::crunes_t& format, const x_va_list& arguments)
+	void 				log_t::write(ELevel inLevel, const utf32::crunes_t& format, const va_list_t& arguments)
 	{
 		sLogger[inLevel]->write(format, arguments);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel)
+	void 				log_t::writeLine(ELevel inLevel)
 	{
 		sLogger[inLevel]->writeLine();
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, bool _value)
+	void 				log_t::writeLine(ELevel inLevel, bool _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}
 
 
-	void 				xlog::writeLine(ELevel inLevel, f64 _value)
+	void 				log_t::writeLine(ELevel inLevel, f64 _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, s32 _value)
+	void 				log_t::writeLine(ELevel inLevel, s32 _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, s64 _value)
+	void 				log_t::writeLine(ELevel inLevel, s64 _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}
 
 
-	void 				xlog::writeLine(ELevel inLevel, f32 _value)
+	void 				log_t::writeLine(ELevel inLevel, f32 _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, u32 _value)
+	void 				log_t::writeLine(ELevel inLevel, u32 _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, u64 _value)
+	void 				log_t::writeLine(ELevel inLevel, u64 _value)
 	{
 		sLogger[inLevel]->writeLine(_value);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const ascii::crunes_t& str)
+	void 				log_t::writeLine(ELevel inLevel, const ascii::crunes_t& str)
 	{
 		sLogger[inLevel]->writeLine(str);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const ascii::crunes_t& format, const x_va_list& arguments)
+	void 				log_t::writeLine(ELevel inLevel, const ascii::crunes_t& format, const va_list_t& arguments)
 	{
 		sLogger[inLevel]->writeLine(format, arguments);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const utf32::crunes_t& str)
+	void 				log_t::writeLine(ELevel inLevel, const utf32::crunes_t& str)
 	{
 		sLogger[inLevel]->writeLine(str);
 	}
 
-	void 				xlog::writeLine(ELevel inLevel, const utf32::crunes_t& format, const x_va_list& arguments)
+	void 				log_t::writeLine(ELevel inLevel, const utf32::crunes_t& format, const va_list_t& arguments)
 	{
 		sLogger[inLevel]->writeLine(format, arguments);
 	}
 
 
-	void 				xlogger::write(const ascii::crunes_t& str)
+	void 				logger_t::write(const ascii::crunes_t& str)
 	{ 
 		write(str);
 	}
 
-	void 				xlogger::writeLine(const ascii::crunes_t& str)
+	void 				logger_t::writeLine(const ascii::crunes_t& str)
 	{ 
 		writeLine(str);
 	}
 
-	void 				xlogger::write(const ascii::crunes_t& format, const x_va_list& arguments)
+	void 				logger_t::write(const ascii::crunes_t& format, const va_list_t& arguments)
 	{ 
 		write(format, arguments); 
 	}
 
-	void 				xlogger::writeLine(const ascii::crunes_t& format, const x_va_list& arguments)
+	void 				logger_t::writeLine(const ascii::crunes_t& format, const va_list_t& arguments)
 	{ 
 		writeLine(format, arguments); 
 	}
 
-	void 				xlogger::write(const utf32::crunes_t& str)
+	void 				logger_t::write(const utf32::crunes_t& str)
 	{ 
 		write(str);
 	}
 
-	void 				xlogger::writeLine(const utf32::crunes_t& str)
+	void 				logger_t::writeLine(const utf32::crunes_t& str)
 	{ 
 		writeLine(str);
 	}
 
-	void 				xlogger::write(const utf32::crunes_t& format, const x_va_list& arguments)
+	void 				logger_t::write(const utf32::crunes_t& format, const va_list_t& arguments)
 	{ 
 		write(format, arguments); 
 	}
 
-	void 				xlogger::writeLine(const utf32::crunes_t& format, const x_va_list& arguments)
+	void 				logger_t::writeLine(const utf32::crunes_t& format, const va_list_t& arguments)
 	{ 
 		writeLine(format, arguments); 
 	}
@@ -257,24 +257,24 @@ namespace xcore
 	 *     __x_LogWarning, __x_LogError
 	 *------------------------------------------------------------------------------
 	 */
-	void __x_LogMessage(const char* channel, const char* msgFormat, const x_va_list& args)
+	void __x_LogMessage(const char* channel, const char* msgFormat, const va_list_t& args)
 	{
-		x_log_info& info = sGetLogInfoFunc();
+		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
 		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
 		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
 
-		xlog::writeLine(xlog::INFO, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
+		log_t::writeLine(log_t::INFO, logformatrunes, va_list_t(va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel)));
 		if (args.length() > 0)
-			xlog::writeLine(xlog::INFO, msgformatrunes, args);
+			log_t::writeLine(log_t::INFO, msgformatrunes, args);
 		else
-			xlog::writeLine(xlog::INFO, msgformatrunes);
+			log_t::writeLine(log_t::INFO, msgformatrunes);
 	}
 
 	void __x_LogMessage(const char* channel, const char* message)
 	{
-		__x_LogMessage(channel, message, x_va_list());
+		__x_LogMessage(channel, message, va_list_t());
 	}
 
 	/**
@@ -297,24 +297,24 @@ namespace xcore
 	 *     __x_LogError, __x_LogMessage
 	 *------------------------------------------------------------------------------
 	 */
-	void __x_LogWarning(const char* channel, const char* msgFormat, const x_va_list& args)
+	void __x_LogWarning(const char* channel, const char* msgFormat, const va_list_t& args)
 	{
-		x_log_info& info = sGetLogInfoFunc();
+		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Warning CHANNEL:%s";
 		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
 		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
 
-		xlog::writeLine(xlog::WARNING, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
+		log_t::writeLine(log_t::WARNING, logformatrunes, va_list_t(va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel)));
 		if (args.length() > 0)
-			xlog::writeLine(xlog::WARNING, msgformatrunes, args);
+			log_t::writeLine(log_t::WARNING, msgformatrunes, args);
 		else
-			xlog::writeLine(xlog::WARNING, msgformatrunes);
+			log_t::writeLine(log_t::WARNING, msgformatrunes);
 	}
 
 	void __x_LogWarning(const char* channel, const char* message)
 	{
-		__x_LogWarning(channel, message, x_va_list());
+		__x_LogWarning(channel, message, va_list_t());
 	}
 
     /**
@@ -337,31 +337,31 @@ namespace xcore
 	 *     __x_LogWarning, __x_LogMessage
 	 *------------------------------------------------------------------------------
 	 */
-	void __x_LogError(const char* channel, const char* msgFormat, const x_va_list& args)
+	void __x_LogError(const char* channel, const char* msgFormat, const va_list_t& args)
 	{
-		x_log_info& info = sGetLogInfoFunc();
+		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
 		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
 		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
 
-		xlog::writeLine(xlog::ERROR, logformatrunes, x_va_list(x_va(info.mLogFileName), x_va(info.mLogLineNumber), x_va(info.mSequenceCount++), x_va(channel)));
+		log_t::writeLine(log_t::ERROR, logformatrunes, va_list_t(va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel)));
 		if (args.length() > 0)
-			xlog::writeLine(xlog::ERROR, msgformatrunes, args);
+			log_t::writeLine(log_t::ERROR, msgformatrunes, args);
 		else
-			xlog::writeLine(xlog::ERROR, msgformatrunes);
+			log_t::writeLine(log_t::ERROR, msgformatrunes);
 	}
 
 	void __x_LogError(const char* channel, const char* message)
 	{
-		__x_LogError(channel, message, x_va_list());
+		__x_LogError(channel, message, va_list_t());
 	}
 
 	//------------------------------------------------------------------------------
 
 	void x_LogFlush(void)
 	{
-		xlog::flush();
+		log_t::flush();
 	}
 
     /**
@@ -374,12 +374,12 @@ namespace xcore
 	 * Returns:
 	 *     void
 	 * Description:
-	 *     The function log fileName and lineNum into current x_log_info.
+	 *     The function log fileName and lineNum into current log_info_t.
 	 *------------------------------------------------------------------------------
 	 */
 	void x_LogPush(const char* fileName, s32 lineNum)
 	{
-		x_log_info& info = sGetLogInfoFunc();
+		log_info_t& info = sGetLogInfoFunc();
 		info.mLogLineNumber = lineNum;
 		info.mLogFileName  = fileName;
 	}

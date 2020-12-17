@@ -23,7 +23,7 @@ namespace xcore
 		class xnull { };
 
 		template<typename T> class xknown_type   { public: enum { isSystem = false, isIntegral = false, isFloat = false, isSigned = false }; };
-		template<>  class xknown_type<xbool>     { public: enum { isSystem =  true, isIntegral = false, isFloat = false, isSigned = false }; };
+		template<>  class xknown_type<bool>     { public: enum { isSystem =  true, isIntegral = false, isFloat = false, isSigned = false }; };
 		template<>  class xknown_type<xbool32>   { public: enum { isSystem =  true, isIntegral =  true, isFloat = false, isSigned =  true }; };
 		template<>  class xknown_type<u8>        { public: enum { isSystem =  true, isIntegral =  true, isFloat = false, isSigned = false }; };
 		template<>  class xknown_type<s8>        { public: enum { isSystem =  true, isIntegral =  true, isFloat = false, isSigned =  true }; };

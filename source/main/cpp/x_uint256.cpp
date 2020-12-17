@@ -461,16 +461,16 @@ namespace xcore
 		return *this;
 	}
 
-	xbool __xuint256::IsBitSet(s32 nIndex) const
+	bool __xuint256::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
 		u32 dwBitMask = 0x80000000 >> (nIndex % 32);
 		u32 dwBitIndex = nIndex >> 5;
-		return xbool((mUInt32[dwBitIndex] & dwBitMask) != 0);
+		return bool((mUInt32[dwBitIndex] & dwBitMask) != 0);
 	}
 
-	void __xuint256::SetBit(s32 nIndex, xbool value)
+	void __xuint256::SetBit(s32 nIndex, bool value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -537,7 +537,7 @@ namespace xcore
 			for (s32 i=0; i<NUM_BITS; i++)
 			{
 				Remainder += tempDividend.IsBitSet(i) ? One : Zero;
-				xbool bBit = (Remainder >= tempDivisor);
+				bool bBit = (Remainder >= tempDivisor);
 				Quotient.SetBit(i, bBit);
 				if (bBit)
 					Remainder -= tempDivisor;

@@ -14,24 +14,24 @@ namespace xcore
 	//==============================================================================
 	// Default input func
 	//==============================================================================
-	class xassert_default : public xasserthandler
+	class xassert_default : public asserthandler_t
 	{
 	public:
-		xbool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
+		bool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
 	};
 
-	static xasserthandler* sInternalSetAssertHandler(xasserthandler* handler)
+	static asserthandler_t* sInternalSetAssertHandler(asserthandler_t* handler)
 	{
 		if (handler==NULL)
 		{
 			static xassert_default sDefaultAssertHandler;
 			handler = &sDefaultAssertHandler;
 		}
-		xtls::set<xtls::ASSERT_HANDLER, xasserthandler>(handler);
+		tls_t::set<tls_t::ASSERT_HANDLER, asserthandler_t>(handler);
 		return handler;
 	}
 
-	void	xasserthandler::sRegisterHandler(xasserthandler* handler)
+	void	asserthandler_t::sRegisterHandler(asserthandler_t* handler)
 	{
 		sInternalSetAssertHandler(handler);
 	}
@@ -48,19 +48,19 @@ namespace xcore
 	//     messageString        - Additional string containing information about the 
 	//                            assert.
 	// Returns:
-	//     xbool - xTRUE when the program should be halted, xFALSE other wise
+	//     bool - xTRUE when the program should be halted, xFALSE other wise
 	// Description:
 	//     This function is call when an assert happens.
 	// See Also:
 	//     x_SetAssertHandler
 	//------------------------------------------------------------------------------
 
-	xbool xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+	bool xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
 	{
 		// From the TLS, get the debug object
 		// Call handle_assert() on that object and return
-		xasserthandler* handler;
-		xtls::get<xtls::ASSERT_HANDLER, xasserthandler>(handler);
+		asserthandler_t* handler;
+		tls_t::get<tls_t::ASSERT_HANDLER, asserthandler_t>(handler);
 
 		if (handler == NULL)
 			handler = sInternalSetAssertHandler(NULL);
@@ -69,12 +69,12 @@ namespace xcore
 	}
 
 
-	xbool xassert_default::handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+	bool xassert_default::handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
 	{
 		//
 		// handle flags
 		//
-		if ((flags & xasserthandler::XDB_FLAG_IGNORE) != 0) 
+		if ((flags & asserthandler_t::XDB_FLAG_IGNORE) != 0) 
 		{
 			return xFALSE;
 		}
@@ -82,7 +82,7 @@ namespace xcore
 		//
 		// next time ignore it
 		//
-		flags |= xasserthandler::XDB_FLAG_IGNORE;
+		flags |= asserthandler_t::XDB_FLAG_IGNORE;
 
 		//
 		// Survive NULL entries
@@ -98,12 +98,12 @@ namespace xcore
 		// utf32::runez<64> fmtstr;
 		// ascii::crunes_t fmtascii("*  EXPR: %s\n*  MSG : %s\n*  FILE: %s\n*  LINE: %d\n");
 		// utf::copy(fmtascii, fmtstr);
-		// utf32::sprintf(report, fmtstr, x_va(exprString), x_va(messageString), x_va(fileName), x_va(lineNumber));
+		// utf32::sprintf(report, fmtstr, va_t(exprString), va_t(messageString), va_t(fileName), va_t(lineNumber));
 
 		//
 		// Dump the scope info
 		//
-		x_LogError("Assert", "%s(%d): %s; %s ", x_va_list(x_va(fileName), x_va(lineNumber), x_va(exprString), x_va(messageString)));
+		x_LogError("Assert", "%s(%d): %s; %s ", va_list_t(va_t(fileName), va_t(lineNumber), va_t(exprString), va_t(messageString)));
 
 		//
 		// Default: Skip this assert

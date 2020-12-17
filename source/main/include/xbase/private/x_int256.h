@@ -90,13 +90,13 @@ namespace xcore
 		/**
 		 *  Misc operators
 		 */
-		void 					SetBit(s32 nIndex, xbool value);
-		xbool 					IsBitSet(s32 nIndex) const;
+		void 					SetBit(s32 nIndex, bool value);
+		bool 					IsBitSet(s32 nIndex) const;
 
 		void 					Negate();
 
-		xbool 					IsNegative() const;
-		xbool 					IsPositive() const;
+		bool 					IsNegative() const;
+		bool 					IsPositive() const;
 
 		void 					Modulus(const __xint256& Divisor, __xint256& Quotient, __xint256& Remainder) const;
 		s32						Compare(const __xint256& other) const;
@@ -155,12 +155,12 @@ namespace xcore
 	inline __xint256  	operator|(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r|=__xint256(rhs); return r; }
 	inline __xint256  	operator&(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r&=__xint256(rhs); return r; }
 
-	inline xbool		operator<(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) == -1); }
-	inline xbool		operator>(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) == 1); }
-	inline xbool		operator<=(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) != 1); }
-	inline xbool		operator>=(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) != -1); }
-	inline xbool		operator==(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) == 0); }
-	inline xbool		operator!=(const __xint256& lhs, const __xint256& rhs) { return xbool(lhs.Compare(rhs) != 0); }
+	inline bool		operator<(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) == -1); }
+	inline bool		operator>(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) == 1); }
+	inline bool		operator<=(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) != 1); }
+	inline bool		operator>=(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) != -1); }
+	inline bool		operator==(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) == 0); }
+	inline bool		operator!=(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) != 0); }
 };
 
 #endif

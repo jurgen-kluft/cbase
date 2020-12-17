@@ -18,18 +18,18 @@ namespace xcore
 	//==============================================================================
 	// The debug API
 	//==============================================================================
-	class xasserthandler
+	class asserthandler_t
 	{
 	public:
-		virtual	~xasserthandler() {}
+		virtual	~asserthandler_t() {}
 
 		enum EDebugFlags
 		{
 			XDB_FLAG_IGNORE = 1<<1,
 		};
-		virtual xbool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) = 0;
+		virtual bool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) = 0;
 
-		static void		sRegisterHandler(xasserthandler* handler);
+		static void		sRegisterHandler(asserthandler_t* handler);
 	};
 
 	//------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ namespace xcore
 	//     messageString        - Additional string containing information about the 
 	//                            assert.
 	// Returns:
-	//     xbool - TRUE when the program should be halted FALSE other wise
+	//     bool - TRUE when the program should be halted FALSE other wise
 	// Description:
 	//     This is the main entry of an assert, beyond this it will be dispatched to
 	//     the x_debug object associated with the current thread.
@@ -54,7 +54,7 @@ namespace xcore
 	//     ASSERTS XVERIFY
 	//------------------------------------------------------------------------------
 #ifdef X_ASSERT
-	extern xbool		xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
+	extern bool		xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
 #endif
 
 

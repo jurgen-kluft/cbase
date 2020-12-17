@@ -11,7 +11,7 @@ namespace xcore
 	#pragma error
 #endif
 
-	struct xhandle
+	struct handle_t
 	{
 		u32 mHandle;
 
@@ -20,28 +20,28 @@ namespace xcore
 			H_NULL = 0xffffffff
 		};
 
-		inline				xhandle		(void) : mHandle(H_NULL)	{}
-		inline explicit		xhandle		(u32 value)					{ mHandle = value;            }
-		inline xbool		isValid		(void) const				{ return xbool(mHandle != H_NULL);    }    
-		inline xbool		isNull 		(void) const				{ return xbool(mHandle == H_NULL);    }    
+		inline				handle_t		(void) : mHandle(H_NULL)	{}
+		inline explicit		handle_t		(u32 value)					{ mHandle = value;            }
+		inline bool		isValid		(void) const				{ return bool(mHandle != H_NULL);    }    
+		inline bool		isNull 		(void) const				{ return bool(mHandle == H_NULL);    }    
 		inline void 		setNull		(void)						{ mHandle = (u32)H_NULL;            }  
 		inline u32  		get			(void) const				{ return mHandle;             } 
 		inline void			set			(u32 v)						{ mHandle = v;                } 
-		inline bool			operator  ==(xhandle h) const			{ return h.mHandle == mHandle; }
-		inline bool			operator  !=(xhandle h) const			{ return h.mHandle != mHandle; }
-		inline bool			operator  <	(xhandle h) const			{ return mHandle < h.mHandle; }
-		inline bool			operator  <=(xhandle h) const			{ return mHandle <= h.mHandle; }
-		inline bool			operator  >	(xhandle h) const			{ return mHandle > h.mHandle; }
-		inline bool			operator  >=(xhandle h) const			{ return mHandle <= h.mHandle; }
+		inline bool			operator  ==(handle_t h) const			{ return h.mHandle == mHandle; }
+		inline bool			operator  !=(handle_t h) const			{ return h.mHandle != mHandle; }
+		inline bool			operator  <	(handle_t h) const			{ return mHandle < h.mHandle; }
+		inline bool			operator  <=(handle_t h) const			{ return mHandle <= h.mHandle; }
+		inline bool			operator  >	(handle_t h) const			{ return mHandle > h.mHandle; }
+		inline bool			operator  >=(handle_t h) const			{ return mHandle <= h.mHandle; }
 	};
 
 	#define X_HANDLE_TYPE(TYPE_NAME)																						\
-	struct TYPE_NAME : public xcore::xhandle																				\
+	struct TYPE_NAME : public xcore::handle_t																				\
 	{																														\
 		inline                  TYPE_NAME               (void)						{ }										\
 		inline explicit         TYPE_NAME               (xcore::u32 value)			{ mHandle = value; }					\
-		inline xcore::xbool     operator  ==			(xcore::xhandle h) const	{ return h.mHandle == mHandle; }		\
-		inline xcore::xbool     operator  !=			(xcore::xhandle h) const	{ return h.mHandle != mHandle; }		\
+		inline xcore::bool     operator  ==			(xcore::handle_t h) const	{ return h.mHandle == mHandle; }		\
+		inline xcore::bool     operator  !=			(xcore::handle_t h) const	{ return h.mHandle != mHandle; }		\
 	};
 };
 

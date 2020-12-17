@@ -10,7 +10,7 @@
 
 namespace xcore
 {
-	class xlog_to_console_imp : public xlogger
+	class xlog_to_console_imp : public logger_t
 	{
 		virtual void			initialize();
 		virtual void			flush();
@@ -27,9 +27,9 @@ namespace xcore
 		virtual void 			write(u32 value);
 		virtual void 			write(u64 value);
 		virtual void 			write(const ascii::crunes_t& str);
-		virtual void 			write(const ascii::crunes_t& format, const x_va_list& arguments);
+		virtual void 			write(const ascii::crunes_t& format, const va_list_t& arguments);
 		virtual void 			write(const utf32::crunes_t& str);
-		virtual void 			write(const utf32::crunes_t& format, const x_va_list& arguments);
+		virtual void 			write(const utf32::crunes_t& format, const va_list_t& arguments);
 
 		virtual void 			writeLine();
 		virtual void 			writeLine(bool value);
@@ -40,9 +40,9 @@ namespace xcore
 		virtual void 			writeLine(u32 value);
 		virtual void 			writeLine(u64 value);
 		virtual void 			writeLine(const ascii::crunes_t& str);
-		virtual void 			writeLine(const ascii::crunes_t& format, const x_va_list& arguments);
+		virtual void 			writeLine(const ascii::crunes_t& format, const va_list_t& arguments);
 		virtual void 			writeLine(const utf32::crunes_t& str);
-		virtual void 			writeLine(const utf32::crunes_t& format, const x_va_list& arguments);
+		virtual void 			writeLine(const utf32::crunes_t& format, const va_list_t& arguments);
 	};
 };
 

@@ -1,8 +1,3 @@
-/**
-* @file HwUInt128.cpp
-* Core custom 128 bit unsigned integer
-*/
-
 #include "xbase/x_target.h"
 #ifndef X_NO_CUSTOM_UINT128
 
@@ -30,10 +25,10 @@ namespace xcore
 			m_LSB = 0;
 			break;
 		case MAX:
-			m_MSB = xlimits<u32>::maximum();
-			m_DSB = xlimits<u32>::maximum();
-			m_CSB = xlimits<u32>::maximum();
-			m_LSB = xlimits<u32>::maximum();
+			m_MSB = limits_t<u32>::maximum();
+			m_DSB = limits_t<u32>::maximum();
+			m_CSB = limits_t<u32>::maximum();
+			m_LSB = limits_t<u32>::maximum();
 			break;
 		}
 	}
@@ -420,15 +415,15 @@ namespace xcore
 		return *this;
 	}
 
-	xbool __xuint128::IsBitSet(s32 nIndex) const
+	bool __xuint128::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 		u32 dwBitMask = 0x80000000 >> (nIndex % 32);
 		u32 dwBitIndex = nIndex >> 5;
-		return xbool((mUInt32[dwBitIndex] & dwBitMask) != 0);
+		return bool((mUInt32[dwBitIndex] & dwBitMask) != 0);
 	}
 
-	void __xuint128::SetBit(s32 nIndex, xbool value)
+	void __xuint128::SetBit(s32 nIndex, bool value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -500,7 +495,7 @@ namespace xcore
 			for (s32 i=0; i<NUM_BITS; i++)
 			{
 				Remainder += tempDividend.IsBitSet(i) ? One : Zero;
-				xbool bBit = (Remainder >= tempDivisor);
+				bool bBit = (Remainder >= tempDivisor);
 				Quotient.SetBit(i, bBit);
 				if (bBit)
 					Remainder -= tempDivisor;

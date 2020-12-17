@@ -1,4 +1,4 @@
-#include "xbase/x_va_list.h"
+#include "xbase/x_target.h"
 #include "xbase/x_memory.h"
 #include "xunittest/xunittest.h"
 
@@ -24,14 +24,14 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			CHECK_EQUAL(8, buffer1[2]);
 			CHECK_EQUAL(9, buffer1[3]);
 			
-			xmem_utils::memset(buffer1, 1, 4);
+			xmem::memset(buffer1, 1, 4);
 			CHECK_EQUAL(1, buffer1[0]);
 			CHECK_EQUAL(1, buffer1[1]);
 			CHECK_EQUAL(1, buffer1[2]);
 			CHECK_EQUAL(1, buffer1[3]);
 			CHECK_EQUAL(10, buffer1[4]);
 
-			xmem_utils::memset(&buffer1[5], 33, 4);
+			xmem::memset(&buffer1[5], 33, 4);
 			CHECK_EQUAL(33, buffer1[5]);
 			CHECK_EQUAL(33, buffer1[6]);
 			CHECK_EQUAL(33, buffer1[7]);
@@ -50,14 +50,14 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			CHECK_EQUAL(8, buffer1[2]);
 			CHECK_EQUAL(9, buffer1[3]);
 
-			xmem_utils::memclr(buffer1, 4);
+			xmem::memclr(buffer1, 4);
 			CHECK_EQUAL( 0, buffer1[0]);
 			CHECK_EQUAL( 0, buffer1[1]);
 			CHECK_EQUAL( 0, buffer1[2]);
 			CHECK_EQUAL( 0, buffer1[3]);
 			CHECK_EQUAL(10, buffer1[4]);
 
-			xmem_utils::memclr(&buffer1[5], 4);
+			xmem::memclr(&buffer1[5], 4);
 			CHECK_EQUAL(0, buffer1[5]);
 			CHECK_EQUAL(0, buffer1[6]);
 			CHECK_EQUAL(0, buffer1[7]);
@@ -77,14 +77,14 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			CHECK_EQUAL(8, buffer1[2]);
 			CHECK_EQUAL(9, buffer1[3]);
 
-			xmem_utils::memcpy(buffer1, buffer2, 4);
+			xmem::memcpy(buffer1, buffer2, 4);
 			CHECK_EQUAL(1, buffer1[0]);
 			CHECK_EQUAL(2, buffer1[1]);
 			CHECK_EQUAL(3, buffer1[2]);
 			CHECK_EQUAL(4, buffer1[3]);
 			CHECK_EQUAL(10, buffer1[4]);
 
-			xmem_utils::memcpy(buffer2, buffer1, 10);
+			xmem::memcpy(buffer2, buffer1, 10);
 			for (xcore::s32 i=1; i<=10; ++i)
 				CHECK_EQUAL(buffer1[i-1], buffer2[i-1]);
 
@@ -103,8 +103,8 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			CHECK_EQUAL(8, buffer1[2]);
 			CHECK_EQUAL(9, buffer1[3]);
 
-			CHECK_FALSE(xmem_utils::memcmp(buffer1, buffer2, 10)==0);
-			CHECK_TRUE(xmem_utils::memcmp(&buffer1[5], buffer2, 5)==0);
+			CHECK_FALSE(xmem::memcmp(buffer1, buffer2, 10)==0);
+			CHECK_TRUE(xmem::memcmp(&buffer1[5], buffer2, 5)==0);
 		}
 
 		UNITTEST_TEST(xmem_utils__memswap)
@@ -117,7 +117,7 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			for (xcore::s32 i=1; i<=10; ++i)
 				CHECK_EQUAL(i-1, buffer2[i-1]);
 
-			xmem_utils::memswap(buffer1, buffer2, 10);
+			xmem::memswap(buffer1, buffer2, 10);
 
 			for (xcore::s32 i=1; i<=10; ++i)
 				CHECK_EQUAL(i, buffer2[i-1]);
@@ -143,7 +143,7 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			}
 
 			// Overlapping memory copy
-			xmem_utils::memmove(&buffer1[5], buffer1, 10);
+			xmem::memmove(&buffer1[5], buffer1, 10);
 
 			// Testing for 1,2,3,4,5,1,2,3,4,5
 			for (xcore::s32 i=1; i<=5; ++i)
@@ -166,18 +166,18 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 
 		UNITTEST_TEST(toKb)
 		{
-			CHECK_EQUAL(0, xmem_utils::toKb(500));
-			CHECK_EQUAL(1, xmem_utils::toKb(1000));
-			CHECK_EQUAL(1, xmem_utils::toKb(1024));
-			CHECK_EQUAL(1000, xmem_utils::toKb(1000*1024));
+			CHECK_EQUAL(0, xmem::toKb(500));
+			CHECK_EQUAL(1, xmem::toKb(1000));
+			CHECK_EQUAL(1, xmem::toKb(1024));
+			CHECK_EQUAL(1000, xmem::toKb(1000*1024));
 		}
 
 		UNITTEST_TEST(toMb)
 		{
-			CHECK_EQUAL(0, xmem_utils::toMb(500*1024));
-			CHECK_EQUAL(1, xmem_utils::toMb(1000*1024));
-			CHECK_EQUAL(1, xmem_utils::toMb(1024*1024));
-			CHECK_EQUAL(1000, xmem_utils::toMb(1000*1024*1024));
+			CHECK_EQUAL(0, xmem::toMb(500*1024));
+			CHECK_EQUAL(1, xmem::toMb(1000*1024));
+			CHECK_EQUAL(1, xmem::toMb(1024*1024));
+			CHECK_EQUAL(1000, xmem::toMb(1000*1024*1024));
 		}
 
 		UNITTEST_TEST(readunaligned16)
@@ -185,7 +185,7 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5 };
 
 			xcore::u16 r;
-			xcore::u16 const* ptr = xmem_utils::readunaligned16((xcore::u16 const*)&buffer1[1], r);
+			xcore::u16 const* ptr = xmem::readunaligned16((xcore::u16 const*)&buffer1[1], r);
 			CHECK_EQUAL(2, (xcore::xsize_t)ptr - (xcore::xsize_t)&buffer1[1]);
 			CHECK_EQUAL(0x0708, r);
 		}
@@ -195,11 +195,11 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5 };
 
 			xcore::u32 r1;
-			xcore::u32 const* ptr1 = xmem_utils::readunaligned24((xcore::u32 const*)&buffer1[1], r1);
+			xcore::u32 const* ptr1 = xmem::readunaligned24((xcore::u32 const*)&buffer1[1], r1);
 			CHECK_EQUAL(3, (xcore::xsize_t)ptr1 - (xcore::xsize_t)&buffer1[1]);
 			CHECK_EQUAL(0x070809, r1);
 			xcore::u32 r2;
-			xcore::u32 const* ptr2 = xmem_utils::readunaligned24((xcore::u32 const*)&buffer1[2], r2);
+			xcore::u32 const* ptr2 = xmem::readunaligned24((xcore::u32 const*)&buffer1[2], r2);
 			CHECK_EQUAL(3, (xcore::xsize_t)ptr2 - (xcore::xsize_t)&buffer1[2]);
 			CHECK_EQUAL(0x08090a, r2);
 		}
@@ -209,11 +209,11 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5 };
 
 			xcore::u32 r1;
-			xcore::u32 const* ptr1 = xmem_utils::readunaligned32((xcore::u32 const*)&buffer1[1], r1);
+			xcore::u32 const* ptr1 = xmem::readunaligned32((xcore::u32 const*)&buffer1[1], r1);
 			CHECK_EQUAL(4, (xcore::xsize_t)ptr1 - (xcore::xsize_t)&buffer1[1]);
 			CHECK_EQUAL(0x0708090a, r1);
 			xcore::u32 r2;
-			xcore::u32 const* ptr2 = xmem_utils::readunaligned32((xcore::u32 const*)&buffer1[2], r2);
+			xcore::u32 const* ptr2 = xmem::readunaligned32((xcore::u32 const*)&buffer1[2], r2);
 			CHECK_EQUAL(4, (xcore::xsize_t)ptr2 - (xcore::xsize_t)&buffer1[2]);
 			CHECK_EQUAL(0x08090a01, r2);
 		}

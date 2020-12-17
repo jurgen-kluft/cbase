@@ -170,7 +170,7 @@
 namespace xcore
 {
     // Hardware enumeration
-    enum x_platform
+    enum eplatform
     {
         X_PLATFORM_NONE = 0,
         X_PLATFORM_PC   = (1 << 0),
@@ -1189,7 +1189,6 @@ namespace xcore
     typedef X_DOUBLE         f64;
     typedef X_BYTE           xbyte;
     typedef X_BOOL           xbool32;
-    typedef bool             xbool;
     typedef X_SIZE           xsize_t;
     typedef X_PTR_SIZED_INT  uptr;
 
@@ -1203,17 +1202,17 @@ namespace xcore
     //==============================================================================
     // Interfaces: binary reader and writer
     //==============================================================================
-    class xwriter
+    class writer_t
     {
     public:
-        virtual ~xwriter() {}
+        virtual ~writer_t() {}
         virtual void write(xbyte const*, u32) = 0;
     };
 
-    class xreader
+    class reader_t
     {
     public:
-        virtual ~xreader() {}
+        virtual ~reader_t() {}
         virtual s32 read(xbyte*, u32) = 0;
     };
 
@@ -1261,10 +1260,10 @@ namespace xcore
     //==============================================================================
     //  HANDLE BOOL
     //==============================================================================
-    const xbool xTrue  = true;  ///< the value of True to true
-    const xbool xFalse = false; ///< the value of False to false
-    const xbool xTRUE  = true;  ///< the value of True to true
-    const xbool xFALSE = false; ///< the value of False to false
+    const bool xTrue  = true;  ///< the value of True to true
+    const bool xFalse = false; ///< the value of False to false
+    const bool xTRUE  = true;  ///< the value of True to true
+    const bool xFALSE = false; ///< the value of False to false
 
 }; // namespace xcore
 

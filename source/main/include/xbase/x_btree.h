@@ -10,7 +10,7 @@
 
 namespace xcore
 {
-    struct xbtree_indexer
+    struct btree_indexer_t
     {
 		s32  max_levels() const { return m_levels; }
         s32  key_to_index(s32 level, u64 value) const;
@@ -21,13 +21,13 @@ namespace xcore
 
     // The xbtree does not store the key, instead it relies on key retrieval through
     // a proxy class. This allows the user to provide the key for a given value.
-    class xbtree_idx_kv
+    class btree_idx_kv_t
     {
     public:
         virtual u64  get_key(u32 value) const    = 0;
         virtual void set_key(u32 value, u64 key) = 0;
     };
-    class xbtree_ptr_kv
+    class btree_ptr_kv_t
     {
     public:
         virtual u64  get_key(void* value) const    = 0;
@@ -60,11 +60,11 @@ namespace xcore
     // Since this data-structure can be 'sorted' we also provide a lower- and upper-bound find
     // function.
     //
-    struct xbtree_idx
+    struct btree_idx_t
     {
-        void init(xfsadexed* node_allocator, xbtree_idx_kv* kv);
-        void init_from_index(xfsadexed* node_allocator, xbtree_idx_kv* kv, u32 max_index, bool sorted);
-        void init_from_mask(xfsadexed* node_allocator, xbtree_idx_kv* kv, u64 mask, bool sorted);
+        void init(fsadexed_t* node_allocator, btree_idx_kv_t* kv);
+        void init_from_index(fsadexed_t* node_allocator, btree_idx_kv_t* kv, u32 max_index, bool sorted);
+        void init_from_mask(fsadexed_t* node_allocator, btree_idx_kv_t* kv, u64 mask, bool sorted);
 
         bool add(u64 key, u32 value);
         bool rem(u64 key, u32& value);
@@ -79,18 +79,18 @@ namespace xcore
         struct node_t;
         struct history_t;
         u32                m_root;
-        xbtree_indexer     m_idxr;
-        xfsadexed*         m_node_alloc;
-        xbtree_idx_kv*     m_kv;
+        btree_indexer_t     m_idxr;
+        fsadexed_t*         m_node_alloc;
+        btree_idx_kv_t*     m_kv;
     };
 
-    struct xbtree_ptr
+    struct btree_ptr_t
     {
         struct node_t;
 
-		void init(xfsa* node_allocator, xbtree_ptr_kv* kv);
-        void init_from_index(xfsa* node_allocator, xbtree_ptr_kv* kv, u32 max_index, bool sorted);
-        void init_from_mask(xfsa* node_allocator, xbtree_ptr_kv* kv, u64 mask, bool sorted);
+		void init(fsa_t* node_allocator, btree_ptr_kv_t* kv);
+        void init_from_index(fsa_t* node_allocator, btree_ptr_kv_t* kv, u32 max_index, bool sorted);
+        void init_from_mask(fsa_t* node_allocator, btree_ptr_kv_t* kv, u64 mask, bool sorted);
 
         bool add(node_t*& root, u64 key, void* value);
         bool rem(node_t*& root, u64 key, void*& value);
@@ -104,9 +104,9 @@ namespace xcore
 
 	private:
         struct history_t;
-        xbtree_indexer     m_idxr;
-        xfsa*              m_node_alloc;
-        xbtree_ptr_kv*     m_kv;
+        btree_indexer_t     m_idxr;
+        fsa_t*              m_node_alloc;
+        btree_ptr_kv_t*     m_kv;
     };
 
 

@@ -34,7 +34,7 @@ namespace xcore
 	* abide by the standard C++ rules for static objects
 	* lifetimes.
 	*/
-	class xstatic_instantiation
+	class static_instantiation_t
 	{
 	protected:
 		/**
@@ -63,17 +63,17 @@ namespace xcore
 
 	
 	/**
-	* @class xheap_instantiation
+	* @class heap_instantiation_t
 	* @date <2011-02-16T17:57:45-0400>
 	* @version 2.2.0
 	*
-	* The xheap_instantiation policy allows the creation 
+	* The heap_instantiation_t policy allows the creation 
 	* and lifetime of an instance of a particular type
 	* to be managed using dynamic allocation and a singleton
 	* destroyer. This will abide by the standard C++ rules 
 	* for static objects lifetimes.
 	*/
-	class xheap_instantiation
+	class heap_instantiation_t
 	{
 	protected:
 		/**
@@ -87,7 +87,7 @@ namespace xcore
 		template <class T>
 		static void singleton_create(T*& ptr)
 		{
-			xalloc* allocator = T::singleton_allocator();
+			alloc_t* allocator = T::singleton_allocator();
 			u32 alignment = T::singleton_alignment();
 			void* mem = allocator->allocate(sizeof(T), alignment);
 			ptr = new (mem) T();
@@ -97,14 +97,14 @@ namespace xcore
 		static void singleton_destroy(T*& ptr)
 		{
 			ptr->~T();
-			xalloc* allocator = T::singleton_allocator();
+			alloc_t* allocator = T::singleton_allocator();
 			allocator->deallocate(ptr);
 			ptr = NULL;
 		}
 	};
 
 	/**
-	* @class xsingleton
+	* @class singleton_t
 	* @date <2011-02-16T17:57:45-0400>
 	* @version 2.2.0 
 	*
@@ -114,30 +114,30 @@ namespace xcore
 	*
 	* The create() and destroy() calls should execute once.
 	*
-	* For class T using xstatic_instantiation it is required that T has
+	* For class T using static_instantiation_t it is required that T has
 	* an enum value:
 	* - SINGLETON_ALIGNMENT = 4/8/16/32/64/...
 	*
-	* For class T using xheap_instantiation it is required that T has
+	* For class T using heap_instantiation_t it is required that T has
 	* 2 static functions:
-	* - static xalloc* singleton_allocator();
+	* - static alloc_t* singleton_allocator();
 	* - static u32           singleton_alignment();
 	*
 	* @code
 	*
-	* // Most common xsingleton (default is xheap_instantiation)
-	* xsingleton<LonesomeType>
+	* // Most common singleton_t (default is heap_instantiation_t)
+	* singleton_t<LonesomeType>
 	*
-	* // xsingleton that uses static storage 
-	* xsingleton<LonesomeType, xstatic_instantiation>
+	* // singleton_t that uses static storage 
+	* singleton_t<LonesomeType, static_instantiation_t>
 	*
-	* // xsingleton that uses heap storage 
-	* xsingleton<LonesomeType, xheap_instantiation>
+	* // singleton_t that uses heap storage 
+	* singleton_t<LonesomeType, heap_instantiation_t>
 	*
 	* @endcode
 	*/
-	template <class T, class InstantiationPolicy=xheap_instantiation>
-	class xsingleton : private InstantiationPolicy, private xnoncopyable
+	template <class T, class InstantiationPolicy=heap_instantiation_t>
+	class singleton_t : private InstantiationPolicy, private noncopyable_t
 	{
 		enum EAction { CREATE, GET, DESTROY };
 		static T*			handler(EAction action)
@@ -178,7 +178,7 @@ namespace xcore
 			return (T*)sSingleton;
 		}
 	public:
-		inline				xsingleton()			{ }
+		inline				singleton_t()			{ }
 
 		/**
 		* Provide access to the single instance through double-checked locking 

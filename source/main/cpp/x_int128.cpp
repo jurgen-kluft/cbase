@@ -324,14 +324,14 @@ namespace xcore {
 			InverseTwosComplement();
 	}
 
-	xbool __xint128::IsNegative() const
+	bool __xint128::IsNegative() const
 	{
-		return xbool((m_MSB & 0x80000000) != 0);
+		return bool((m_MSB & 0x80000000) != 0);
 	}
 
-	xbool __xint128::IsPositive() const
+	bool __xint128::IsPositive() const
 	{
-		return xbool((m_MSB & 0x80000000) == 0);
+		return bool((m_MSB & 0x80000000) == 0);
 	}
 
 	void __xint128::TwosComplement()
@@ -468,16 +468,16 @@ namespace xcore {
 		return *this;
 	}
 
-	xbool __xint128::IsBitSet(s32 nIndex) const
+	bool __xint128::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
 		u32 dwBitMask = 0x80000000 >> (nIndex % 32);
 		u32 dwBitIndex = nIndex >> 5;
-		return xbool((mUInt32[dwBitIndex] & dwBitMask) != 0);
+		return bool((mUInt32[dwBitIndex] & dwBitMask) != 0);
 	}
 
-	void __xint128::SetBit(s32 nIndex, xbool value)
+	void __xint128::SetBit(s32 nIndex, bool value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -561,7 +561,7 @@ namespace xcore {
 			for (s32 i=0; i<NUM_BITS; i++)
 			{
 				Remainder += tempDividend.IsBitSet(i) ? One : Zero;
-				xbool bBit = (Remainder >= tempDivisor);
+				bool bBit = (Remainder >= tempDivisor);
 				Quotient.SetBit(i, bBit);
 				if (bBit)
 					Remainder -= tempDivisor;
@@ -581,8 +581,8 @@ namespace xcore {
 
 	s32	__xint128::Compare(const __xint128& other) const
 	{
-		const xbool thisPositive = IsPositive();
-		const xbool otherPositive = other.IsPositive();
+		const bool thisPositive = IsPositive();
+		const bool otherPositive = other.IsPositive();
 		if (thisPositive != otherPositive)
 		{
 			return thisPositive ? 1 : -1;	// If this is positive and other is negative then 1, else -1

@@ -12,23 +12,23 @@
 
 namespace xcore
 {
-    template <typename K, typename V, typename H = xhasher<K>> class xmap
+    template <typename K, typename V, typename H = hasher_t<K>> class map_t
     {
     public:
-        inline xmap(xalloc* a = nullptr)
+        inline map_t(alloc_t* a = nullptr)
             : m_allocator(a)
             , m_fsa()
             , m_root(nullptr)
         {
             if (m_allocator == nullptr)
             {
-                m_allocator = xalloc::get_system();
+                m_allocator = alloc_t::get_system();
             }
-            m_fsa = xfsa_to_alloc(xbtree_ptr::sizeof_node(), m_allocator);
+            m_fsa = fsa_to_alloc_t(btree_ptr_t::sizeof_node(), m_allocator);
             m_tree.init_from_mask(&m_fsa, &m_kv, xU64Max, false);
         }
 
-		inline ~xmap()
+		inline ~map_t()
 		{
 			m_tree.clear(m_root);
 		}
@@ -146,7 +146,7 @@ namespace xcore
             V        m_value;
             XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
-        class kv_value_t : public xbtree_ptr_kv
+        class kv_value_t : public btree_ptr_kv_t
         {
         public:
             virtual u64 get_key(void* value) const
@@ -160,27 +160,27 @@ namespace xcore
                 pvalue->m_hash        = key;
             }
         };
-        xalloc*             m_allocator;
-        xfsa_to_alloc       m_fsa;
+        alloc_t*             m_allocator;
+        fsa_to_alloc_t       m_fsa;
         H                   m_hasher;
-        xbtree_ptr::node_t* m_root;
+        btree_ptr_t::node_t* m_root;
         kv_value_t          m_kv;
-        xbtree_ptr          m_tree;
+        btree_ptr_t          m_tree;
     };
 
-    template <typename T, typename H = xhasher<T>> class xset
+    template <typename T, typename H = hasher_t<T>> class xset
     {
     public:
-        inline xset(xalloc* a = nullptr)
+        inline xset(alloc_t* a = nullptr)
             : m_allocator(a)
             , m_fsa()
             , m_root(nullptr)
         {
             if (m_allocator == nullptr)
             {
-                m_allocator = xalloc::get_system();
+                m_allocator = alloc_t::get_system();
             }
-            m_fsa = xfsa_to_alloc(xbtree_ptr::sizeof_node(), m_allocator);
+            m_fsa = fsa_to_alloc_t(btree_ptr_t::sizeof_node(), m_allocator);
             m_tree.init_from_mask(&m_fsa, &m_kv, xU64Max, false);
         }
 
@@ -290,7 +290,7 @@ namespace xcore
             T        m_value;
             XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
-        class kv_value_t : public xbtree_ptr_kv
+        class kv_value_t : public btree_ptr_kv_t
         {
         public:
             virtual u64 get_key(void* value) const
@@ -304,12 +304,12 @@ namespace xcore
                 pvalue->m_hash        = key;
             }
         };
-        xalloc*             m_allocator;
-        xfsa_to_alloc       m_fsa;
+        alloc_t*             m_allocator;
+        fsa_to_alloc_t       m_fsa;
         H                   m_hasher;
-        xbtree_ptr::node_t* m_root;
+        btree_ptr_t::node_t* m_root;
         kv_value_t          m_kv;
-        xbtree_ptr          m_tree;
+        btree_ptr_t          m_tree;
     };
 
 }; // namespace xcore

@@ -6,11 +6,11 @@
 
 using namespace xcore;
 
-extern xcore::xalloc* gTestAllocator;
+extern xcore::alloc_t* gTestAllocator;
 
 namespace xcore
 {
-    class xobjects : public xfsadexed
+    class xobjects : public fsadexed_t
     {
         struct node
         {
@@ -92,7 +92,7 @@ namespace xcore
         u64 key;
     };
 
-    class xvalue_kv : public xbtree_idx_kv
+    class xvalue_kv : public btree_idx_kv_t
     {
 		xobjects*		m_objects;
 
@@ -140,7 +140,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         UNITTEST_TEST(init)
         {
-            xbtree_idx tree;
+            btree_idx_t tree;
             tree.init(nodes, value_kv);
             nodes->reset();
             values->reset();
@@ -148,7 +148,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         UNITTEST_TEST(add)
         {
-            xbtree_idx tree;
+            btree_idx_t tree;
             tree.init_from_mask(nodes, value_kv, 0xFF00, true);
 
             value_t* v1 = (value_t*)values->allocate();
@@ -175,7 +175,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
         {
             u32 const value_count = 1024;
 
-            xbtree_idx tree;
+            btree_idx_t tree;
             tree.init_from_index(nodes, value_kv, value_count, false);
 
             for (u32 i = 0; i < value_count; ++i)
@@ -201,7 +201,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
         {
             u32 const value_count = 1024;
 
-            xbtree_idx tree;
+            btree_idx_t tree;
             tree.init_from_index(nodes, value_kv, value_count, false);
 
             for (u32 i = 0; i < value_count; ++i)
@@ -243,7 +243,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
         {
             u32 const value_count = 1024;
 
-            xbtree_idx tree;
+            btree_idx_t tree;
             tree.init_from_index(nodes, value_kv, value_count, false);
 
             for (u32 i = 0; i < value_count; ++i)
@@ -296,7 +296,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
         static xobjects nodes;
 		static xobjects values;
 
-        class myvalue_kv : public xbtree_ptr_kv
+        class myvalue_kv : public btree_ptr_kv_t
         {
         public:
             virtual u64 get_key(void* value) const
@@ -320,15 +320,15 @@ UNITTEST_SUITE_BEGIN(xbtree)
 
         UNITTEST_TEST(init)
         {
-            xbtree_ptr tree;
+            btree_ptr_t tree;
             tree.init(&nodes, &value_kv);
-			xbtree_ptr::node_t* root = nullptr;
+			btree_ptr_t::node_t* root = nullptr;
             tree.clear(root);
         }
 
         UNITTEST_TEST(add)
         {
-            xbtree_ptr tree;
+            btree_ptr_t tree;
             tree.init_from_mask(&nodes, &value_kv, 0xFF, true);
 
             myvalue* v1 = gTestAllocator->construct<myvalue>();
@@ -338,7 +338,7 @@ UNITTEST_SUITE_BEGIN(xbtree)
             v2->m_value = 2.0f;
             v2->m_key   = 0;
 
-			xbtree_ptr::node_t* root = nullptr;
+			btree_ptr_t::node_t* root = nullptr;
             CHECK_TRUE(tree.add(root, 1, v1));
             CHECK_TRUE(tree.add(root, 2, v2));
             CHECK_EQUAL(1, v1->m_key);
@@ -361,10 +361,10 @@ UNITTEST_SUITE_BEGIN(xbtree)
         {
             u32 const value_count = 1024;
 
-            xbtree_ptr tree;
+            btree_ptr_t tree;
             tree.init_from_index(&nodes, &value_kv, value_count, false);
 
-			xbtree_ptr::node_t* root = nullptr;
+			btree_ptr_t::node_t* root = nullptr;
 
             for (u32 i = 0; i < value_count; ++i)
             {
@@ -390,10 +390,10 @@ UNITTEST_SUITE_BEGIN(xbtree)
         {
             u32 const value_count = 1024;
 
-            xbtree_ptr tree;
+            btree_ptr_t tree;
             tree.init_from_index(&nodes, &value_kv, value_count, false);
 
-			xbtree_ptr::node_t* root = nullptr;
+			btree_ptr_t::node_t* root = nullptr;
 
             CHECK_EQUAL(0, nodes.count());
 			for (u32 i = 0; i < value_count; ++i)
@@ -435,10 +435,10 @@ UNITTEST_SUITE_BEGIN(xbtree)
         {
             u32 const value_count = 1024;
 
-            xbtree_ptr tree;
+            btree_ptr_t tree;
             tree.init_from_index(&nodes, &value_kv, value_count, false);
 
-			xbtree_ptr::node_t* root = nullptr;
+			btree_ptr_t::node_t* root = nullptr;
 
             for (u32 i = 0; i < value_count; ++i)
             {
@@ -480,10 +480,10 @@ UNITTEST_SUITE_BEGIN(xbtree)
         {
             u32 const value_count = 32768;
 
-            xbtree_ptr tree;
+            btree_ptr_t tree;
             tree.init_from_mask(&nodes, &value_kv, 0xffffffff, true);
 
-			xbtree_ptr::node_t* root = nullptr;
+			btree_ptr_t::node_t* root = nullptr;
 
 			u32 seed = 0;
             for (u32 i = 0; i < 16378; ++i)

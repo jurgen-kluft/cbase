@@ -27,7 +27,7 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 			crunes_t fmt("%f");
 
 			f64 d = 3.1415;
-			sprintf(str, fmt, x_va(d));
+			sprintf(str, fmt, va_t(d));
 			crunes_t answer_str("3.141500");
 			CHECK_EQUAL(0, compare(answer_str, str));
 		}
@@ -37,7 +37,7 @@ UNITTEST_SUITE_BEGIN(xsprintf)
 			runez_t<ascii::rune, 256> str;
 			crunes_t fmt("the %s");
 
-			sprintf(str, fmt, x_va("test string"));
+			sprintf(str, fmt, va_t("test string"));
 			CHECK_EQUAL(0, compare(str, "the test string"));
 		}
 	}

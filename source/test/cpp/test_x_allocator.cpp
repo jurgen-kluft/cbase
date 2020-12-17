@@ -6,7 +6,7 @@
 
 using namespace xcore;
 
-extern xcore::xalloc* gTestAllocator;
+extern xcore::alloc_t* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xallocator)
 {
@@ -60,7 +60,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			test_object2():mInteger(3),mFloat(4.0){}
 			s32	mInteger;
 			f32	mFloat;
-			static xalloc* get_allocator() { return gTestAllocator; }
+			static alloc_t* get_allocator() { return gTestAllocator; }
 			XCORE_CLASS_NEW_DELETE(get_allocator, 16)
 		};
 
@@ -79,7 +79,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			test_object3():mInteger(2),mFloat(3.0){}
 			s32	mInteger;
 			f32	mFloat;
-			static xalloc* get_allocator() { return gTestAllocator; }
+			static alloc_t* get_allocator() { return gTestAllocator; }
 			XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator, 32)
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
 		};
@@ -103,7 +103,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
 			test_object4():mInteger(2),mFloat(3.0){}
 			s32	mInteger;
 			f32	mFloat;
-			static xalloc* get_allocator() { return gTestAllocator; }
+			static alloc_t* get_allocator() { return gTestAllocator; }
 
 			XCORE_CLASS_PLACEMENT_NEW_DELETE
 		};
@@ -117,15 +117,15 @@ UNITTEST_SUITE_BEGIN(xallocator)
 		UNITTEST_TEST(test_xalloc_stack)
 		{
 			xbytes<256> store;
-			xalloc_stack sa(store);
+			alloc_stack_t sa(store);
 			test_object4* obj = sa.construct<test_object4>();
 			sa.destruct<>(obj);
 		}
 
 		UNITTEST_TEST(test_xalloc_buffer)
 		{
-			xinplace<256> inplace;
-			xallocinplace allocator = inplace.allocator();
+			inplace_t<256> inplace;
+			allocinplace_t allocator = inplace.allocator();
 			test_object4* obj = allocator.construct<test_object4>();
 			allocator.destruct<test_object4>(obj);
 		}

@@ -124,7 +124,7 @@ namespace xcore
 	/**
 	 * Check if integer is aligned
 	 */
-	inline xbool       xisAligned(u32 integer, u32 alignment)
+	inline bool       xisAligned(u32 integer, u32 alignment)
 	{
 		ASSERTS(xispo2(alignment) == xTRUE, "Error: alignment value should be a power of 2");
 		return integer == ((integer) & (~(alignment-1)));
@@ -201,7 +201,7 @@ namespace xcore
     /**
      * Check if integer is a power-of-two
      */
-    inline xbool       xispo2(s32 inInteger)
+    inline bool       xispo2(s32 inInteger)
     {
         return (inInteger!=0) && (((inInteger) & (inInteger-1)) == 0);
     }
@@ -209,7 +209,7 @@ namespace xcore
 	/**
 	 * Check if integer is a power-of-two
 	 */
-	inline xbool       xispo2(u32 inInteger)
+	inline bool       xispo2(u32 inInteger)
 	{
 		return (inInteger!=0) && (((inInteger) & (inInteger-1)) == 0);
 	}
@@ -217,7 +217,7 @@ namespace xcore
 	/**
 	* Check if integer is a power-of-two
 	*/
-	inline xbool       xispo2(u64 inInteger)
+	inline bool       xispo2(u64 inInteger)
 	{
 		return (inInteger!=0) && (((inInteger) & (inInteger-1)) == 0);
 	}
@@ -387,7 +387,7 @@ namespace xcore
 	 * See Also:
 	 *     x_Align x_AlignLower
 	 */
-	template< class T > xbool xaligned( T addr, u32 alignTo );
+	template< class T > bool xaligned( T addr, u32 alignTo );
 
 
 	/**
@@ -424,9 +424,9 @@ namespace xcore
 	//------------------------------------------------------------------------------
 
 	template< class T > inline 
-	xbool xaligned( T addr, u32 alignTo ) 
+	bool xaligned( T addr, u32 alignTo ) 
 	{ 
-		return xbool(((addr) & (alignTo - 1)) == 0);
+		return bool(((addr) & (alignTo - 1)) == 0);
 	}
 
 

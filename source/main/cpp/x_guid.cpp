@@ -9,7 +9,7 @@ namespace xcore
 {
 	//-------------------------------------------------------------------------------
 
-	xguid& xguid::operator = (const xguid& other)
+	guid_t& guid_t::operator = (const guid_t& other)
 	{
 		for (s32 i=0; i<SIZE32; ++i)
 			mGuid.ma32[i] = other.mGuid.ma32[i];
@@ -18,7 +18,7 @@ namespace xcore
 
 	//-------------------------------------------------------------------------------
 
-	bool xguid::operator == (const xguid& other) const
+	bool guid_t::operator == (const guid_t& other) const
 	{
 		for (s32 i=0; i<SIZE32; ++i)
 		{
@@ -30,7 +30,7 @@ namespace xcore
 
 	//-------------------------------------------------------------------------------
 
-	bool xguid::operator != (const xguid& other) const
+	bool guid_t::operator != (const guid_t& other) const
 	{
 		for (s32 i=0; i<SIZE32; ++i)
 		{
@@ -42,12 +42,12 @@ namespace xcore
 
 	//-------------------------------------------------------------------------------
 
-	void xguid::toString(runes_t& str)const
+	void guid_t::toString(runes_t& str)const
 	{ 
 		// high, word2, word1, low
 		ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
 		crunes_t fmt(fmtstr);
-		sprintf(str, fmt, x_va(mGuid.ma32[0]), x_va(mGuid.ma32[1]), x_va(mGuid.ma32[2]), x_va(mGuid.ma32[3]) );
+		sprintf(str, fmt, va_t(mGuid.ma32[0]), va_t(mGuid.ma32[1]), va_t(mGuid.ma32[2]), va_t(mGuid.ma32[3]) );
 	}
 
 
@@ -64,13 +64,13 @@ namespace xcore
 	 *------------------------------------------------------------------------------
 	 */
 
-	void xguid::fromString(crunes_t const& _str)
+	void guid_t::fromString(crunes_t const& _str)
 	{
 		setNull();
 
 		ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
 		crunes_t fmt(fmtstr);
 		crunes_t str(_str);
-		sscanf(str, fmt, x_va_r(&mGuid.ma32[0]), x_va_r(&mGuid.ma32[1]), x_va_r(&mGuid.ma32[2]), x_va_r(&mGuid.ma32[3]));
+		sscanf(str, fmt, va_r_t(&mGuid.ma32[0]), va_r_t(&mGuid.ma32[1]), va_r_t(&mGuid.ma32[2]), va_r_t(&mGuid.ma32[3]));
 	}
 };

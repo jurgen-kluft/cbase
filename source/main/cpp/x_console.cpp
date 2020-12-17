@@ -1,8 +1,3 @@
-/**
- * @file x_console.cpp
- * Core console
- */
-
 #include "xbase/x_debug.h"
 #include "xbase/x_memory.h"
 #include "xbase/x_va_list.h"
@@ -17,7 +12,7 @@ namespace xcore
     type::rune local_var_name##Buffer[size];               \
     runes_t    local_var_name(local_var_name##Buffer, local_var_name##Buffer, local_var_name##Buffer, &local_var_name##Buffer[size - 1], type::TYPE);
 
-    class xconsole_null : public xconsole
+    class xconsole_null : public console_t
     {
     public:
         xconsole_null() {}
@@ -26,7 +21,7 @@ namespace xcore
         virtual void initialize();
         virtual void shutdown();
 
-        virtual s32 setColor(xconsole::EColor color);
+        virtual s32 setColor(console_t::EColor color);
 
         virtual void write(bool _value);
         virtual void write(f64 _value);
@@ -39,16 +34,16 @@ namespace xcore
 
         virtual void write(const crunes_t& buffer);
         virtual void write(const ascii::crunes_t& str);
-        virtual void write(const ascii::crunes_t& fmt, const x_va_list& args);
+        virtual void write(const ascii::crunes_t& fmt, const va_list_t& args);
         virtual void write(const utf32::crunes_t& str);
-        virtual void write(const utf32::crunes_t& fmt, const x_va_list& args);
+        virtual void write(const utf32::crunes_t& fmt, const va_list_t& args);
 
         virtual void writeLine();
     };
 
     void xconsole_null::initialize() {}
     void xconsole_null::shutdown() {}
-    s32  xconsole_null::setColor(xconsole::EColor color) { return 0; }
+    s32  xconsole_null::setColor(console_t::EColor color) { return 0; }
     void xconsole_null::write(bool _value) {}
     void xconsole_null::write(f64 _value) {}
     void xconsole_null::write(s32 _value) {}
@@ -58,26 +53,26 @@ namespace xcore
     void xconsole_null::write(u64 _value) {}
     void xconsole_null::write(const crunes_t& str) {}
     void xconsole_null::write(const ascii::crunes_t& str) {}
-    void xconsole_null::write(const ascii::crunes_t& fmt, const x_va_list& args) {}
+    void xconsole_null::write(const ascii::crunes_t& fmt, const va_list_t& args) {}
     void xconsole_null::write(const utf32::crunes_t& str) {}
-    void xconsole_null::write(const utf32::crunes_t& fmt, const x_va_list& args) {}
+    void xconsole_null::write(const utf32::crunes_t& fmt, const va_list_t& args) {}
     void xconsole_null::writeLine() {}
 
     static xconsole_null sNullConsole;
 
-    class xconsole_default : public xconsole
+    class xconsole_default : public console_t
     {
-        xconsole::xout* mOut;
+        console_t::out_t* mOut;
 
     public:
-        xconsole_default(xconsole::xout* _out) : mOut(_out) {}
+        xconsole_default(console_t::out_t* _out) : mOut(_out) {}
 
         virtual ~xconsole_default() {}
 
         virtual void initialize();
         virtual void shutdown();
 
-        virtual s32 setColor(xconsole::EColor color);
+        virtual s32 setColor(console_t::EColor color);
 
         virtual void write(bool _value);
         virtual void write(f64 _value);
@@ -91,9 +86,9 @@ namespace xcore
         virtual void write(const crunes_t& str);
 
         virtual void write(const ascii::crunes_t& str);
-        virtual void write(const ascii::crunes_t& fmt, const x_va_list& args);
+        virtual void write(const ascii::crunes_t& fmt, const va_list_t& args);
         virtual void write(const utf32::crunes_t& str);
-        virtual void write(const utf32::crunes_t& fmt, const x_va_list& args);
+        virtual void write(const utf32::crunes_t& fmt, const va_list_t& args);
 
         virtual void writeLine();
     };
@@ -102,7 +97,7 @@ namespace xcore
 
     void xconsole_default::shutdown() {}
 
-    s32 xconsole_default::setColor(xconsole::EColor color) { return mOut->color(color); }
+    s32 xconsole_default::setColor(console_t::EColor color) { return mOut->color(color); }
 
     void xconsole_default::write(bool _value)
     {
@@ -167,7 +162,7 @@ namespace xcore
 
     void xconsole_default::write(const ascii::crunes_t& str) { mOut->write(str); }
 
-    void xconsole_default::write(const ascii::crunes_t& fmt, const x_va_list& args)
+    void xconsole_default::write(const ascii::crunes_t& fmt, const va_list_t& args)
     {
         XCONSOLE_LOCAL_STR_BUF(ascii, str, 1024);
         vsprintf(str, crunes_t(fmt), args);
@@ -177,7 +172,7 @@ namespace xcore
 
     void xconsole_default::write(const utf32::crunes_t& str) { mOut->write(str); }
 
-    void xconsole_default::write(const utf32::crunes_t& fmt, const x_va_list& args)
+    void xconsole_default::write(const utf32::crunes_t& fmt, const va_list_t& args)
     {
         XCONSOLE_LOCAL_STR_BUF(utf32, str, 1024);
         vsprintf(str, utf32::crunes_t(fmt), args);
@@ -187,10 +182,10 @@ namespace xcore
 
     void xconsole_default::writeLine() { mOut->writeln(); }
 
-    extern xconsole::xout* gGetDefaultConsoleOut();
-    xconsole*              console = NULL;
+    extern console_t::out_t* gGetDefaultConsoleOut();
+    console_t*              console = NULL;
 
-    void xconsole::init_default_console()
+    void console_t::init_default_console()
     {
         static xconsole_default sDefaultConsole(gGetDefaultConsoleOut());
         console = &sDefaultConsole;

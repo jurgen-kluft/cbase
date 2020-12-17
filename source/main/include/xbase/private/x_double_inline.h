@@ -70,15 +70,15 @@ namespace x_f64u
      * Rational Determination.
      */
 #ifdef IEEE_FLOATS
-    inline xbool		isInfinite(f64 inNumber)						{ return xbool((bin(inNumber) & (sDoubleIEEE.DD_EXPONENT_MASK | sDoubleIEEE.DD_FRACTION_MASK)) == sDoubleIEEE.DD_EXPONENT_MASK); } 
-    inline xbool		isNAN(f64 inNumber)     						{ return xbool(((bin(inNumber) & sDoubleIEEE.DD_EXPONENT_MASK) == sDoubleIEEE.DD_EXPONENT_MASK) && (bin(inNumber) & sDoubleIEEE.DD_FRACTION_MASK)); }
-    inline xbool		isFinite(f64 inNumber)  						{ return xbool(!isInfinite(inNumber) && !isNAN(inNumber)); }
-    inline xbool		isRational(f64 inNumber)						{ return xbool((bin(inNumber) & sDoubleIEEE.DD_EXPONENT_MASK) != sDoubleIEEE.DD_EXPONENT_MASK); }
+    inline bool		isInfinite(f64 inNumber)						{ return bool((bin(inNumber) & (sDoubleIEEE.DD_EXPONENT_MASK | sDoubleIEEE.DD_FRACTION_MASK)) == sDoubleIEEE.DD_EXPONENT_MASK); } 
+    inline bool		isNAN(f64 inNumber)     						{ return bool(((bin(inNumber) & sDoubleIEEE.DD_EXPONENT_MASK) == sDoubleIEEE.DD_EXPONENT_MASK) && (bin(inNumber) & sDoubleIEEE.DD_FRACTION_MASK)); }
+    inline bool		isFinite(f64 inNumber)  						{ return bool(!isInfinite(inNumber) && !isNAN(inNumber)); }
+    inline bool		isRational(f64 inNumber)						{ return bool((bin(inNumber) & sDoubleIEEE.DD_EXPONENT_MASK) != sDoubleIEEE.DD_EXPONENT_MASK); }
 #else
-    inline xbool		isInfinite(f64 inNumber)						{ return xFALSE; }
-    inline xbool		isNAN(f64 inNumber)     						{ return xFALSE; }
-    inline xbool		isFinite(f64 inNumber)  						{ return xTRUE; }
-    inline xbool		isRational(f64 inNumber)						{ return xTRUE; }
+    inline bool		isInfinite(f64 inNumber)						{ return xFALSE; }
+    inline bool		isNAN(f64 inNumber)     						{ return xFALSE; }
+    inline bool		isFinite(f64 inNumber)  						{ return xTRUE; }
+    inline bool		isRational(f64 inNumber)						{ return xTRUE; }
 #endif
     /**
      * bin. Returns the f64 as an u64. It's not casted, but the address is casted, so you get the binary representation
@@ -101,12 +101,12 @@ namespace x_f64u
     /**
      * IsEqual, returns xTRUE if two doubles are the same
      */
-    inline xbool      isEqual(f64 inNumber, f64 inG)                    { return xbool(bin(inNumber)==bin(inG)); }
+    inline bool      isEqual(f64 inNumber, f64 inG)                    { return bool(bin(inNumber)==bin(inG)); }
 
     /**
      * IsNotEqual, returns xTRUE if the two doubles are not the same
      */
-    inline xbool      isNotEqual(f64 inNumber, f64 inG)                 { return xbool(bin(inNumber)!=bin(inG)); }
+    inline bool      isNotEqual(f64 inNumber, f64 inG)                 { return bool(bin(inNumber)!=bin(inG)); }
 
     /**
      * And. To 'And' a f64 with a binary value. Used for abs for example
@@ -164,13 +164,13 @@ namespace x_f64u
      * Check if a number is close to zero
      * @param inExp Binary exponent for "nearness", default is -80 (so check is accurate to 2^-80 closeness)
      */
-    inline xbool      isNearZero(f64 inNumber, s32 inExp)                 { ASSERTS(inExp<0, "IsNearZero needs an exponent, this typically should be a negative s32"); return xbool(exponent(inNumber) <= inExp); }
+    inline bool      isNearZero(f64 inNumber, s32 inExp)                 { ASSERTS(inExp<0, "IsNearZero needs an exponent, this typically should be a negative s32"); return bool(exponent(inNumber) <= inExp); }
 
     /**
      * Check if number is close to another number
      * @param inExp Binary exponent for "nearness", default is -80 (so check is accurate to 2^-80 closeness)
      */
-    inline xbool      isNear(f64 inNumber, f64 inRef, s32 inExp)          { return isNearZero(inNumber-inRef, inExp); }
+    inline bool      isNear(f64 inNumber, f64 inRef, s32 inExp)          { return isNearZero(inNumber-inRef, inExp); }
 
     /**
      * Round number to closes integer value
@@ -192,26 +192,26 @@ namespace x_f64u
      *    Trick routines. Optimized for doubles and sometimes for doubles
      *    Check if a number is zero
      */
-    inline xbool      isZero(f64 inNumber)
+    inline bool      isZero(f64 inNumber)
     {
         //ASSERT((-0.0 == 0.0) && (+0.0 == 0.0));
-        return xbool(inNumber == 0.0);
+        return bool(inNumber == 0.0);
     }
 
     /**
      *    Compare routines. Like is equal etc.  
      *    Check if a number is positive
      */
-    inline xbool      isPositive(f64 inNumber) 
+    inline bool      isPositive(f64 inNumber) 
     {
-        return xbool(inNumber > 0.0);
+        return bool(inNumber > 0.0);
     }
 
     /**
      * Check if a number is negative
      */
-    inline xbool      isNegative(f64 inNumber)
+    inline bool      isNegative(f64 inNumber)
     {
-        return xbool(inNumber < 0.0);
+        return bool(inNumber < 0.0);
     }
 };

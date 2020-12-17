@@ -16,11 +16,11 @@ namespace xcore
 	//    If an application needs a thread-safe TLS instance then please
 	//    include the xthread package, it has a thread-safe TLS implementation.
 	//==============================================================================
-	class xtls
+	class tls_t
 	{
 	public:
-		static void			sSet(xtls*);
-		static xtls*		sGet();
+		static void			sSet(tls_t*);
+		static tls_t*		sGet();
 
 		enum
 		{
@@ -38,7 +38,7 @@ namespace xcore
 		static void	get(T *& outData)				{ void * p= nullptr; sGet()->vget(SLOT, p); outData = (T*)p;}
 
 	protected:
-		virtual				~xtls() { }
+		virtual				~tls_t() { }
 
 		virtual s32			vmax() const = 0;
 		virtual	void		vset(s32 SLOT, void * inData) = 0;

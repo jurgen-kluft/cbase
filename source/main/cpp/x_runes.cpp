@@ -1930,7 +1930,7 @@ namespace xcore
         crunes_t    str          = _str;
         ascii::rune format_str[] = {'%', 'b', ascii::TERMINATOR};
         crunes_t    format(format_str, format_str + 2);
-        sscanf(str, format, x_va_r(&value));
+        sscanf(str, format, va_r_t(&value));
         return str;
     }
 
@@ -1993,7 +1993,7 @@ namespace xcore
             case 8: format_str[1] = 'o'; break;
         };
         crunes_t format(format_str, format_str + 2);
-        sscanf(str, format, x_va_r(&value));
+        sscanf(str, format, va_r_t(&value));
         return str;
     }
 
@@ -2008,7 +2008,7 @@ namespace xcore
             case 8: format_str[1] = 'o'; break;
         };
         crunes_t format(format_str, format_str + 2);
-        sscanf(str, format, x_va_r(&value));
+        sscanf(str, format, va_r_t(&value));
         return str;
     }
 
@@ -2017,7 +2017,7 @@ namespace xcore
         crunes_t    str          = _str;
         ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
         crunes_t    format(format_str, format_str + 2);
-        sscanf(str, format, x_va_r(&value));
+        sscanf(str, format, va_r_t(&value));
         return str;
     }
 
@@ -2026,7 +2026,7 @@ namespace xcore
         crunes_t    str          = _str;
         ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
         crunes_t    format(format_str, format_str + 2);
-        sscanf(str, format, x_va_r(&value));
+        sscanf(str, format, va_r_t(&value));
         return str;
     }
 
@@ -2158,7 +2158,7 @@ namespace xcore
             case 8: format_str[1] = 'o'; break;
         };
         crunes_t format(format_str, format_str + 2);
-        sprintf(str, format, x_va(val));
+        sprintf(str, format, va_t(val));
     }
 
     void to_string(runes_t& str, u32 val, s32 base)
@@ -2171,7 +2171,7 @@ namespace xcore
             case 8: format_str[1] = 'o'; break;
         };
         crunes_t format(format_str, format_str + 2);
-        sprintf(str, format, x_va(val));
+        sprintf(str, format, va_t(val));
     }
 
     // *cFHbRXV[N]WWWR6FETY+
@@ -2186,7 +2186,7 @@ namespace xcore
             case 8: format_str[1] = 'o'; break;
         };
         crunes_t format(format_str, format_str + 2);
-        sprintf(str, format, x_va(val));
+        sprintf(str, format, va_t(val));
     }
 
     void to_string(runes_t& str, u64 val, s32 base)
@@ -2199,7 +2199,7 @@ namespace xcore
             case 8: format_str[1] = 'o'; break;
         };
         crunes_t format(format_str, format_str + 2);
-        sprintf(str, format, x_va(val));
+        sprintf(str, format, va_t(val));
     }
 
     void to_string(runes_t& str, f32 val, s32 numFractionalDigits)
@@ -2211,7 +2211,7 @@ namespace xcore
             format_str[3] = '0' + numFractionalDigits % 10;
         }
         crunes_t format(format_str, format_str + 5);
-        sprintf(str, format, x_va(val));
+        sprintf(str, format, va_t(val));
     }
 
     void to_string(runes_t& str, f64 val, s32 numFractionalDigits)
@@ -2223,7 +2223,7 @@ namespace xcore
             format_str[3] = '0' + numFractionalDigits % 10;
         }
         crunes_t format(format_str, format_str + 5);
-        sprintf(str, format, x_va(val));
+        sprintf(str, format, va_t(val));
     }
 
     //------------------------------------------------------------------------------

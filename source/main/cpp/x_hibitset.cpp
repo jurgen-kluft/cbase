@@ -8,7 +8,7 @@
 
 namespace xcore
 {
-    u32 xhibitset::size_in_dwords(u32 numbits)
+    u32 hibitset_t::size_in_dwords(u32 numbits)
     {
         u32 numdwords = 0;
         while (numbits > 1)
@@ -20,7 +20,7 @@ namespace xcore
         return numdwords * sizeof(u32);
     }
 
-    void xhibitset::init(u32* bitlist, u32 maxbits)
+    void hibitset_t::init(u32* bitlist, u32 maxbits)
     {
         m_numbits = maxbits;
 
@@ -38,7 +38,7 @@ namespace xcore
         m_maxlevel = i;
     }
 
-    void xhibitset::init(xalloc* alloc, u32 maxbits)
+    void hibitset_t::init(alloc_t* alloc, u32 maxbits)
     {
         u32 const ndwords = size_in_dwords(maxbits);
         u32*      bitlist = (u32*)alloc->allocate(ndwords * 4, sizeof(u32));
@@ -46,7 +46,7 @@ namespace xcore
         init(bitlist, maxbits);
     }
 
-    void xhibitset::release(xalloc* alloc)
+    void hibitset_t::release(alloc_t* alloc)
     {
         if (alloc != nullptr)
         {
@@ -64,14 +64,14 @@ namespace xcore
     // level 2, bits= 5, dwords= 1, bytes= 4
     // total = 628 + 20 + 4 = 652 bytes
 
-    void xhibitset::reset()
+    void hibitset_t::reset()
     {
         u32*      bitlist = m_levels[0];
         u32 const ndwords = size_in_dwords(m_numbits);
         x_memset(bitlist, 0, ndwords * 4);
     }
 
-    void xhibitset::set(u32 bit)
+    void hibitset_t::set(u32 bit)
     {
         ASSERT(bit < m_numbits);
 
@@ -95,7 +95,7 @@ namespace xcore
         }
     }
 
-    void xhibitset::clr(u32 bit)
+    void hibitset_t::clr(u32 bit)
     {
         ASSERT(bit < m_numbits);
 
@@ -120,7 +120,7 @@ namespace xcore
         }
     }
 
-    bool xhibitset::is_set(u32 bit) const
+    bool hibitset_t::is_set(u32 bit) const
     {
         ASSERT(bit < m_numbits);
         u32 const* level      = m_levels[0];
@@ -129,13 +129,13 @@ namespace xcore
         return ((level[dwordIndex] >> dwordBit) & 1) == 1;
     }
 
-    bool xhibitset::is_full() const
+    bool hibitset_t::is_full() const
     {
         u32 const* level = m_levels[m_maxlevel - 1];
         return level[0] == 0xffffffff;
     }
 
-    bool xhibitset::find(u32& bit) const
+    bool hibitset_t::find(u32& bit) const
     {
         // Start at top level and find a '1' bit and move down
         u32 dwordIndex = 0;
@@ -155,7 +155,7 @@ namespace xcore
         return true;
     }
 
-    bool xhibitset::upper(u32 pivot, u32& bit) const
+    bool hibitset_t::upper(u32 pivot, u32& bit) const
     {
         if (pivot >= (m_numbits - 1))
         {
@@ -218,7 +218,7 @@ namespace xcore
         return false;
     }
 
-    bool xhibitset::lower(u32 pivot, u32& bit) const
+    bool hibitset_t::lower(u32 pivot, u32& bit) const
     {
         if (pivot == 0 || pivot > m_numbits)
         {

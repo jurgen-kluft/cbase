@@ -47,7 +47,7 @@ namespace xcore
 		return new_ptr;
 	}
 
-	class x_allocator_macos_system : public xalloc
+	class x_allocator_macos_system : public alloc_t
 	{
 	public:
 		x_allocator_macos_system()
@@ -98,7 +98,7 @@ namespace xcore
 
 	x_allocator_macos_system sSystemAllocator;
 
-	void			xalloc::init_system()
+	void			alloc_t::init_system()
 	{
 		if (sSystemAllocator.isInitialized())
 		{
@@ -106,7 +106,7 @@ namespace xcore
 		}
 	}
 
-	xalloc*			xalloc::get_system()
+	alloc_t*			alloc_t::get_system()
 	{
 		return &sSystemAllocator;
 	}

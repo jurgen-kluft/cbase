@@ -17,7 +17,7 @@ UNITTEST_SUITE_BEGIN(xva)
 
 		UNITTEST_TEST(x_va_bool)
 		{
-			x_va v(false);
+			va_t v(false);
 			CHECK_TRUE(v.isBool());
 
 			CHECK_FALSE(v.isInt8());
@@ -40,7 +40,7 @@ UNITTEST_SUITE_BEGIN(xva)
 
 		UNITTEST_TEST(x_va_s32)
 		{
-			x_va v((s32)100);
+			va_t v((s32)100);
 			CHECK_FALSE(v.isBool());
 
 			CHECK_FALSE(v.isInt8());
@@ -63,7 +63,7 @@ UNITTEST_SUITE_BEGIN(xva)
 
 		UNITTEST_TEST(x_va_pctchar)
 		{
-			x_va v("ascii string");
+			va_t v("ascii string");
 			CHECK_FALSE(v.isBool());
 
 			CHECK_FALSE(v.isInt8());

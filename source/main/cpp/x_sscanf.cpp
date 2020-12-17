@@ -429,7 +429,7 @@ namespace xcore
                         fmt->skip();
 
                         uchar32 c = reader->read();
-                        x_va_r  r = vr_args[i++];
+                        va_r_t  r = vr_args[i++];
                         r         = c;
                         scanned++;
                         parsing = 0;
@@ -439,7 +439,7 @@ namespace xcore
                     {
                         fmt->skip();
 
-                        x_va_r r = vr_args[i++];
+                        va_r_t r = vr_args[i++];
 
                         u32 i = 0;
                         while (reader->peek() != 0 && reader->peek() == ' ')
@@ -477,7 +477,7 @@ namespace xcore
                     case 'y':
                     {
                         fmt->skip();
-                        x_va_r r = vr_args[i++];
+                        va_r_t r = vr_args[i++];
                         bool   boolean;
                         MatchBoolStr(reader, boolean);
                         r = boolean;
@@ -504,7 +504,7 @@ namespace xcore
 
                         if (!suppress)
                         {
-                            x_va_r r = vr_args[i++];
+                            va_r_t r = vr_args[i++];
                             r        = n1;
                             scanned++;
                         }
@@ -534,7 +534,7 @@ namespace xcore
 
                         if (!suppress)
                         {
-                            x_va_r r = vr_args[i++];
+                            va_r_t r = vr_args[i++];
                             r        = n2;
                             scanned++;
                         }
@@ -564,7 +564,7 @@ namespace xcore
 
                         if (!suppress)
                         {
-                            x_va_r r = vr_args[i++];
+                            va_r_t r = vr_args[i++];
                             r        = n2;
                             scanned++;
                         }
@@ -655,7 +655,7 @@ namespace xcore
 
                         if (!suppress)
                         {
-                            x_va_r r = vr_args[i++];
+                            va_r_t r = vr_args[i++];
                             r        = n2;
                             scanned++;
                         }
@@ -689,7 +689,7 @@ namespace xcore
 
                         if (!suppress)
                         {
-                            x_va_r r = vr_args[i++];
+                            va_r_t r = vr_args[i++];
                             r        = n3;
                             scanned++;
                         }

@@ -2,12 +2,12 @@
 #define __X_HIERARCHICAL_BITSET_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 namespace xcore
 {
-    class xalloc;
+    class alloc_t;
 
     // Number of bits and how much memory they consume
     // 32/1Kbit/32Kbit/1Mbit/32Mbit/1Gbit
@@ -22,19 +22,15 @@ namespace xcore
     // level 3, bits= 16, dwords= 1, bytes= 4
     // total: 65536 + 2048 + 64 + 4 = 67652 bytes
 
-    class xhibitset
+    class hibitset_t
     {
     public:
-        inline xhibitset()
-            : m_numbits(0)
-            , m_maxlevel(0)
-        {
-        }
+        inline hibitset_t() : m_numbits(0), m_maxlevel(0) {}
 
         void init(u32* bits, u32 maxbits);
-        void init(xalloc* alloc, u32 maxbits);
+        void init(alloc_t* alloc, u32 maxbits);
 
-        void release(xalloc* alloc);
+        void release(alloc_t* alloc);
 
         void reset();
 

@@ -19,12 +19,12 @@ namespace xcore
 	 *     a data container holding the guid value. From the point of view of xcore 
 	 *     this defines a system type.
 	 */
-	struct xguid
+	struct guid_t
 	{
 	public:
-					xguid();
-					xguid(const xguid&);
-					xguid(u32 wordh, u32 word2, u32 word1, u32 wordl);         
+					guid_t();
+					guid_t(const guid_t&);
+					guid_t(u32 wordh, u32 word2, u32 word1, u32 wordl);         
 
 		void		setNull(void);                
 		bool		isNull(void) const;          
@@ -32,10 +32,10 @@ namespace xcore
 		void		set(u32 wordh, u32 word2, u32 word1, u32 wordl);
 		void		get(u32& wordh, u32& word2, u32& word1, u32& wordl) const;
 
-		xguid&		operator = (const xguid&);
+		guid_t&		operator = (const guid_t&);
 
-		bool		operator == (const xguid&) const;
-		bool		operator != (const xguid&) const;
+		bool		operator == (const guid_t&) const;
+		bool		operator != (const guid_t&) const;
 
 		void		toString(runes_t& str) const;
 		void		fromString(crunes_t const& str);
@@ -47,13 +47,13 @@ namespace xcore
 			SIZE16 = 8,
 			SIZE8 = 16
 		};
-		union guid_t
+		union uguid_t
 		{
 			u8			ma8[SIZE8];
 			u16			ma16[SIZE16];
 			u32			ma32[SIZE32];
 		};
-		guid_t		mGuid;
+		uguid_t		mGuid;
 	};
 
 	#include "private/x_guid_inline.h"

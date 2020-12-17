@@ -5,7 +5,7 @@
 
 using namespace xcore;
 
-extern xcore::xalloc* gTestAllocator;
+extern xcore::alloc_t* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xslice)
 {
@@ -16,8 +16,8 @@ UNITTEST_SUITE_BEGIN(xslice)
 
 		UNITTEST_TEST(slice_100)
 		{
-			slice s;
-			slice::alloc(s, gTestAllocator, 100, 4);
+			slice_t s;
+			slice_t::alloc(s, gTestAllocator, 100, 4);
 			s.release();
 		}
 	}

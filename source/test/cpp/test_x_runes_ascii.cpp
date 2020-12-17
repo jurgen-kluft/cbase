@@ -463,11 +463,11 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
             crunes_t str = "hello";
 
             crunes_t fmt    = "%d %s";
-            s32           length = cprintf(fmt, x_va(i), x_va(str));
+            s32           length = cprintf(fmt, va_t(i), va_t(str));
             CHECK_EQUAL(9, length);
 
             runez_t<ascii::rune, 32> buffer;
-            sprintf(buffer, fmt, x_va(i), x_va(str));
+            sprintf(buffer, fmt, va_t(i), va_t(str));
             CHECK_EQUAL(0, compare(buffer, crunes_t("100 hello")));
         }
 
@@ -476,7 +476,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
             s32           i      = 100;
             crunes_t str    = "hello";
             crunes_t fmt    = "%d %s";
-            s32           length = vcprintf(fmt, x_va_list(x_va(i), x_va(str)));
+            s32           length = vcprintf(fmt, va_list_t(va_t(i), va_t(str)));
             CHECK_EQUAL(9, length);
         }
 
@@ -489,7 +489,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
             crunes_t str = "hello";
             crunes_t fmt = "%d %s";
 
-            sprintf(buffer, fmt, x_va(i), x_va(str));
+            sprintf(buffer, fmt, va_t(i), va_t(str));
             CHECK_EQUAL(9, buffer.size());
             CHECK_TRUE(compare(buffer, "100 hello") == 0);
 
@@ -503,42 +503,42 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
             // ---------------------------------------------------------------------------
             // Boolean, True/False and Yes/No verification
             buffer.reset();
-            sprintf(buffer, "%b", x_va(true));
+            sprintf(buffer, "%b", va_t(true));
             CHECK_EQUAL(buffer.size(), 4);
             CHECK_TRUE(compare(buffer, "true") == 0);
 
             buffer.reset();
-            sprintf(buffer, "%B", x_va(true));
+            sprintf(buffer, "%B", va_t(true));
             CHECK_EQUAL(buffer.size(), 4);
             CHECK_TRUE(compare(buffer, "TRUE") == 0);
 
             buffer.reset();
-            sprintf(buffer, "%b", x_va(false));
+            sprintf(buffer, "%b", va_t(false));
             CHECK_EQUAL(buffer.size(), 5);
             CHECK_TRUE(compare(buffer, "false") == 0);
 
             buffer.reset();
-            sprintf(buffer, "%#b", x_va(false));
+            sprintf(buffer, "%#b", va_t(false));
             CHECK_EQUAL(buffer.size(), 5);
             CHECK_TRUE(compare(buffer, "False") == 0);
 
             buffer.reset();
-            sprintf(buffer, "%y", x_va(true));
+            sprintf(buffer, "%y", va_t(true));
             CHECK_EQUAL(buffer.size(), 3);
             CHECK_TRUE(compare(buffer, "yes") == 0);
 
             buffer.reset();
-            sprintf(buffer, "%y", x_va(false));
+            sprintf(buffer, "%y", va_t(false));
             CHECK_EQUAL(buffer.size(), 2);
             CHECK_TRUE(compare(buffer, "no") == 0);
 
             buffer.reset();
-            sprintf(buffer, "%Y", x_va(true));
+            sprintf(buffer, "%Y", va_t(true));
             CHECK_EQUAL(buffer.size(), 3);
             CHECK_TRUE(compare(buffer, "YES") == 0);
 
             buffer.reset();
-            sprintf(buffer, "%#y", x_va(true));
+            sprintf(buffer, "%#y", va_t(true));
             CHECK_EQUAL(buffer.size(), 3);
             CHECK_TRUE(compare(buffer, "Yes") == 0);
             // ---------------------------------------------------------------------------
@@ -551,7 +551,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
             s32           i   = 100;
             crunes_t str = "hello";
             crunes_t fmt = "%d %s";
-            vsprintf(buffer, fmt, x_va_list(x_va(i), x_va(str)));
+            vsprintf(buffer, fmt, va_list_t(va_t(i), va_t(str)));
             CHECK_EQUAL(9, buffer.size());
             CHECK_TRUE(compare(buffer, "100 hello") == 0);
         }
@@ -564,7 +564,7 @@ UNITTEST_SUITE_BEGIN(xstring_ascii)
 
             f32 myfloat;
             u32 myint;
-            sscanf(str, format, x_va_r(&myfloat), x_va_r(&myint));
+            sscanf(str, format, va_r_t(&myfloat), va_r_t(&myint));
 
             CHECK_EQUAL(1.0f, myfloat);
             CHECK_EQUAL(100, myint);

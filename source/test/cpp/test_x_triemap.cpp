@@ -149,7 +149,7 @@ namespace xcore
     class xdtrie
     {
     public:
-        inline xdtrie(xfsa* fsa)
+        inline xdtrie(fsa_t* fsa)
             : m_root(nullptr)
             , m_value(nullptr)
             , m_num_values(0)
@@ -170,8 +170,8 @@ namespace xcore
         value_t* m_value;
         s32      m_num_values;
         s32      m_num_nodes;
-        xfsa*    m_nodes;
-        xfsa*    m_values;
+        fsa_t*    m_nodes;
+        fsa_t*    m_values;
     };
 
     node_t* xdtrie::branch_two_values(node_t* parent, value_t* v1, value_t* v2, s8 pos)
@@ -525,7 +525,7 @@ namespace xcore
 
 namespace xcore
 {
-    class xfsa_test : public xfsa
+    class xfsa_test : public fsa_t
     {
     public:
         struct data_t
@@ -582,7 +582,7 @@ namespace xcore
     };
 } // namespace xcore
 
-extern xcore::xalloc* gTestAllocator;
+extern xcore::alloc_t* gTestAllocator;
 using namespace xcore;
 
 UNITTEST_SUITE_BEGIN(xdtrie)

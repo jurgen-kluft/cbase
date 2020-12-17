@@ -16,10 +16,10 @@
 
 namespace xcore
 {
-    class xconsole_out_win32 : public xconsole::xout
+    class xconsole_out_win32 : public console_t::out_t
     {
     public:
-        virtual s32 color(xconsole::EColor color) { return 0; }
+        virtual s32 color(console_t::EColor color) { return 0; }
 
         void write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
         {
@@ -130,7 +130,7 @@ namespace xcore
         }
     };
 
-    xconsole::xout* gGetDefaultConsoleOut()
+    console_t::out_t* gGetDefaultConsoleOut()
     {
         static xconsole_out_win32 sConsoleOut;
         return &sConsoleOut;

@@ -26,7 +26,7 @@ namespace xcore
 
 	static void TestMap()
 	{
-		xmap<s32, s32> mymap;
+		map_t<s32, s32> mymap;
 		s32 k = 0;
 		s32 v = 1000;
 		mymap.insert(k, v);
