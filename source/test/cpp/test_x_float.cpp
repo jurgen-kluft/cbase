@@ -92,15 +92,15 @@ UNITTEST_SUITE_BEGIN(xfloat)
 		UNITTEST_TEST(PositiveMaximum)
 		{
 			CHECK_EQUAL(x_f32u::positiveMaximum(), x_f32u::positiveMaximum());
-			CHECK_TRUE(x_f32u::positiveMaximum() >= 0xffffffff);
+			CHECK_TRUE(x_f32u::positiveMaximum() >= (f32)0xffffffff);
 			CHECK_TRUE(x_f32u::positiveMaximum() >= 9999.9f);
 		}
 
 		UNITTEST_TEST(NegativeMaximum)
 		{
 			CHECK_EQUAL(x_f32u::negativeMaximum(), x_f32u::negativeMaximum());
-			CHECK_TRUE(x_f32u::negativeMaximum() <= 0xffffffff);
-			CHECK_TRUE(x_f32u::negativeMaximum() <= 0x000fffff);
+			CHECK_TRUE(x_f32u::negativeMaximum() <= (f32)0xffffffff);
+			CHECK_TRUE(x_f32u::negativeMaximum() <= (f32)0x000fffff);
 			CHECK_TRUE(x_f32u::negativeMaximum() <= 0.1f);
 		}
 

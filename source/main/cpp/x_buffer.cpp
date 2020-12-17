@@ -158,7 +158,7 @@ namespace xcore
     {
         m_const          = (xbyte const*)str.m_runes.m_ascii.m_str;
         xbyte const* end = (xbyte const*)str.m_runes.m_ascii.m_end;
-        m_len            = xcast<size_t, u32>(end - m_const);
+        m_len            = xcast<xsize_t, u32>(end - m_const);
     }
 
     xcbuffer xcbuffer::from_ascii_string(const char* str)
