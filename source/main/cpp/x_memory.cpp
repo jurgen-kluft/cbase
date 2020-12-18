@@ -13,9 +13,10 @@
 
 namespace xcore
 {
+	namespace xmem
+	{
+
 #ifdef TARGET_MAC
-    namespace xmem
-    {
         void memcpy(void* dest, const void* src, u32 count) { ::memcpy(dest, src, count); }
 
         void memset(void* buf, u32 c, u32 inLength) { ::memset(buf, c, inLength); }
