@@ -40,8 +40,8 @@ namespace xcore
 	{																														\
 		inline                  TYPE_NAME               (void)						{ }										\
 		inline explicit         TYPE_NAME               (xcore::u32 value)			{ mHandle = value; }					\
-		inline xcore::bool     operator  ==			(xcore::handle_t h) const	{ return h.mHandle == mHandle; }		\
-		inline xcore::bool     operator  !=			(xcore::handle_t h) const	{ return h.mHandle != mHandle; }		\
+		inline bool     operator  ==			(xcore::handle_t h) const	{ return h.mHandle == mHandle; }		\
+		inline bool     operator  !=			(xcore::handle_t h) const	{ return h.mHandle != mHandle; }		\
 	};
 };
 
