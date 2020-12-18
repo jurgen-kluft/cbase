@@ -129,6 +129,12 @@ namespace xcore
             writeLine(r.m_runes.m_ascii);
         }
 
+        inline void writeLine(const char* str, const va_list_t& args)
+        {
+            crunes_t r(str, nullptr);
+            writeLine(r.m_runes.m_ascii, args);
+        }
+
 		inline void writeLine(const crunes_t& str)
 		{
 			write(str);

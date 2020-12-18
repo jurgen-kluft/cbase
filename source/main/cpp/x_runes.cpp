@@ -3226,6 +3226,16 @@ namespace xcore
         m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
         m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
     }
+    crunes_t::crunes_t(crunes_t const& _str, ptr_t const& from, ptr_t const& to)  : m_type(_str.m_type)
+    {
+        ASSERT(from >= _str.m_runes.m_ascii.m_bos && from < _str.m_runes.m_ascii.m_eos);
+        ASSERT(to >= _str.m_runes.m_ascii.m_bos && to < _str.m_runes.m_ascii.m_eos);
+        ASSERT(from <= to);
+        m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        m_runes.m_ascii.m_str = from.m_ptr.m_ascii;
+        m_runes.m_ascii.m_end = to.m_ptr.m_ascii;
+        m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
+    }
     crunes_t::crunes_t(ascii::crunes_t const& _str) : m_type(ascii::TYPE)
     {
         m_runes.m_ascii.m_bos = _str.m_bos;
@@ -3435,6 +3445,19 @@ namespace xcore
     // ------------------------------------------------------------------------------------------------------------------
     runes_reader_t::runes_reader_t() {}
 
+    runes_reader_t::runes_reader_t(ascii::pcrune str)
+    {
+        ascii::pcrune str_end = str;
+        while (*str_end != '\0') str_end++;
+        m_runes  = crunes_t(str, str, str_end, str_end);
+        m_cursor = str;
+    }
+    runes_reader_t::runes_reader_t(ascii::pcrune str, u32 len)
+    {
+        ascii::pcrune str_end = str + len;
+        m_runes  = crunes_t(str, str, str_end, str_end);
+        m_cursor = str;
+    }
     runes_reader_t::runes_reader_t(ascii::pcrune str, ascii::pcrune str_end)
     {
         m_runes  = crunes_t(str, str, str_end, str_end);

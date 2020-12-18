@@ -83,6 +83,7 @@ namespace xcore
         struct crunes_t
         {
             crunes_t() : m_bos((pcrune) "\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
+            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(str), m_end(end), m_eos(end) {}
             pcrune m_bos, m_str, m_end, m_eos;
         };
     } // namespace utf32
@@ -142,8 +143,6 @@ namespace xcore
         void reset();
         void clear();
         void term();
-
-        crunes_t get_crunes() const;
 
         void concatenate(ascii::rune c);
         void concatenate(utf32::rune c);
@@ -237,6 +236,7 @@ namespace xcore
 
         crunes_t(runes_t const& other);
         crunes_t(crunes_t const& other);
+        crunes_t(crunes_t const& other, ptr_t const& from, ptr_t const& to);
 
         s32  size() const;
         bool is_valid() const;
@@ -473,8 +473,11 @@ namespace xcore
             m_run[1] = 0;
             m_runes.m_ascii.m_end += sizeof(T);
         }
-        inline runez_t(const char* str) : runes_t(m_run, m_run, &m_run[SIZE - 1])
+        inline runez_t(const char* _str) : runes_t(m_run, m_run, &m_run[SIZE - 1])
         {
+            ascii::crunes_t str((ascii::pcrune)_str, (ascii::pcrune)_str);
+            while (*str.m_end != '\0') str.m_end++;
+            str.m_eos = str.m_end;
             concatenate(str);
             term();
         }
@@ -511,6 +514,7 @@ namespace xcore
     {
     public:
         runes_reader_t();
+        runes_reader_t(ascii::pcrune str);
         runes_reader_t(ascii::pcrune str, u32 len);
         runes_reader_t(ascii::pcrune str, ascii::pcrune str_end);
         runes_reader_t(utf32::pcrune str, utf32::pcrune str_end);
