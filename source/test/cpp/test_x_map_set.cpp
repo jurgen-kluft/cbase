@@ -34,7 +34,7 @@ UNITTEST_SUITE_BEGIN(xmap_and_set)
         }
     }
 
-    UNITTEST_FIXTURE(xset)
+    UNITTEST_FIXTURE(set_t)
     {
         UNITTEST_FIXTURE_SETUP()
         {
@@ -46,7 +46,7 @@ UNITTEST_SUITE_BEGIN(xmap_and_set)
 
         UNITTEST_TEST(set_s32)
         {
-            xset<s32> set(gTestAllocator);
+            set_t<s32> set(gTestAllocator);
 
 			s32 v = 1000;
 

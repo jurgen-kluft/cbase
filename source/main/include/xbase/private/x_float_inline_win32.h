@@ -1,4 +1,4 @@
-namespace x_f32u
+namespace xf32
 {
     inline s32        toS32(f32 inNumber)
     {

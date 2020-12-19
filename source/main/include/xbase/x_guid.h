@@ -5,13 +5,11 @@
 #pragma once 
 #endif
 
-//==============================================================================
-// INCLUDES
-//==============================================================================
-#include "xbase/x_runes.h"
-
 namespace xcore
 {
+	struct runes_t;
+	struct crunes_t;
+	
 	/**
 	 * Note: For a generator, take a look here http://cvs.ossp.org/dir?d=ossp-pkg/uuid
 	 * Description:

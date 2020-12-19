@@ -2,7 +2,7 @@
 #define __X_BASE_MAP_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "xbase/x_allocator.h"
@@ -15,10 +15,7 @@ namespace xcore
     template <typename K, typename V, typename H = hasher_t<K>> class map_t
     {
     public:
-        inline map_t(alloc_t* a = nullptr)
-            : m_allocator(a)
-            , m_fsa()
-            , m_root(nullptr)
+        inline map_t(alloc_t* a = nullptr) : m_allocator(a), m_fsa(), m_root(nullptr)
         {
             if (m_allocator == nullptr)
             {
@@ -28,10 +25,7 @@ namespace xcore
             m_tree.init_from_mask(&m_fsa, &m_kv, xU64Max, false);
         }
 
-		inline ~map_t()
-		{
-			m_tree.clear(m_root);
-		}
+        inline ~map_t() { m_tree.clear(m_root); }
 
         bool insert(K const& k, V const& v)
         {
@@ -133,13 +127,7 @@ namespace xcore
     private:
         struct value_t
         {
-            inline value_t(u64 hash, const K& key, const V& value)
-                : m_hash(hash)
-                , m_key(key)
-                , m_value(value)
-                , m_next(nullptr)
-            {
-            }
+            inline value_t(u64 hash, const K& key, const V& value) : m_hash(hash), m_key(key), m_value(value), m_next(nullptr) {}
             u64      m_hash;
             value_t* m_next;
             K        m_key;
@@ -162,19 +150,16 @@ namespace xcore
         };
         alloc_t*             m_allocator;
         fsa_to_alloc_t       m_fsa;
-        H                   m_hasher;
+        H                    m_hasher;
         btree_ptr_t::node_t* m_root;
-        kv_value_t          m_kv;
+        kv_value_t           m_kv;
         btree_ptr_t          m_tree;
     };
 
-    template <typename T, typename H = hasher_t<T>> class xset
+    template <typename T, typename H = hasher_t<T>> class set_t
     {
     public:
-        inline xset(alloc_t* a = nullptr)
-            : m_allocator(a)
-            , m_fsa()
-            , m_root(nullptr)
+        inline set_t(alloc_t* a = nullptr) : m_allocator(a), m_fsa(), m_root(nullptr)
         {
             if (m_allocator == nullptr)
             {
@@ -184,14 +169,11 @@ namespace xcore
             m_tree.init_from_mask(&m_fsa, &m_kv, xU64Max, false);
         }
 
-		~xset()
-		{
-			m_tree.clear(m_root);
-		}
+        ~set_t() { m_tree.clear(m_root); }
 
-        bool insert(T const& value) 
-		{
-			u64 const hash   = m_hasher.hash(value);
+        bool insert(T const& value)
+        {
+            u64 const hash   = m_hasher.hash(value);
             void*     vvalue = nullptr;
             if (m_tree.find(m_root, hash, vvalue))
             {
@@ -215,10 +197,10 @@ namespace xcore
                 m_tree.add(m_root, hash, new_value);
             }
             return true;
-		}
+        }
 
-        bool contains(T const& value) const 
-		{
+        bool contains(T const& value) const
+        {
             u64 const hash = m_hasher.hash(value);
 
             void* vvalue = nullptr;
@@ -235,11 +217,11 @@ namespace xcore
                 }
             }
             return false;
-		}
+        }
 
-        bool remove(T const& value) 
-		{
-			u64 const hash = m_hasher.hash(value);
+        bool remove(T const& value)
+        {
+            u64 const hash = m_hasher.hash(value);
 
             void* vvalue = nullptr;
             if (m_tree.rem(m_root, hash, vvalue))
@@ -274,17 +256,12 @@ namespace xcore
                 }
             }
             return false;
-		}
+        }
 
     private:
         struct value_t
         {
-            inline value_t(u64 hash, const T& value)
-                : m_hash(hash)
-                , m_next(nullptr)
-                , m_value(value)
-            {
-            }
+            inline value_t(u64 hash, const T& value) : m_hash(hash), m_next(nullptr), m_value(value) {}
             u64      m_hash;
             value_t* m_next;
             T        m_value;
@@ -306,9 +283,9 @@ namespace xcore
         };
         alloc_t*             m_allocator;
         fsa_to_alloc_t       m_fsa;
-        H                   m_hasher;
+        H                    m_hasher;
         btree_ptr_t::node_t* m_root;
-        kv_value_t          m_kv;
+        kv_value_t           m_kv;
         btree_ptr_t          m_tree;
     };
 

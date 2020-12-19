@@ -142,7 +142,7 @@ namespace xcore
         alloc_t::get_system()->deallocate(p);
     }
 
-    class alloc_stack_t : public alloc_t
+    class alloc_buffer_t : public alloc_t
     {
         static inline xbyte* align_ptr(xbyte* ptr, uptr align) { return (xbyte*)(((uptr)ptr + (align - 1)) & ~(align - 1)); }
 
@@ -152,7 +152,7 @@ namespace xcore
         s64    m_cnt;
 
     public:
-        alloc_stack_t(buffer_t& storage);
+        alloc_buffer_t(buffer_t& storage);
 
     protected:
         virtual void* v_allocate(u32 size, u32 align)

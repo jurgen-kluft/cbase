@@ -20,7 +20,6 @@ namespace xcore
         return (s8)(value >> shr) & 0x3;
     }
 
-
     void initialize_from_index(btree_indexer_t& keydexer, u32 const max_index, bool const sorted)
     {
         s32 const maskbitcnt = (32 - xcountLeadingZeros(max_index) + 1) & 0x7ffffffe;
@@ -33,7 +32,7 @@ namespace xcore
         //          levels  = 14/2 = 7 levels
         //          vars[0] = 2 (node is splitting into 4 branches = 2 bits)
         //          vars[1] = 0
-        keydexer.m_levels  = maskbitcnt / 2;
+        keydexer.m_levels = maskbitcnt / 2;
         if (sorted)
         {
             keydexer.m_vars[0] = -2;
@@ -49,8 +48,8 @@ namespace xcore
     void initialize_from_mask(btree_indexer_t& keydexer, u64 mask, bool sorted)
     {
         s32 const trailbitcnt = xcountTrailingZeros(mask);
-        s32 const leadbitcnt = xcountLeadingZeros(mask);
-        s32 const maskbitcnt = 64 - trailbitcnt - leadbitcnt;
+        s32 const leadbitcnt  = xcountLeadingZeros(mask);
+        s32 const maskbitcnt  = 64 - trailbitcnt - leadbitcnt;
 
         // Initialize key indexer to take 2 bits at a time from high-frequency to low-frequency.
         // Root   : level 0
@@ -63,11 +62,11 @@ namespace xcore
         //          vars[1]    = trailbitcnt
         // sorted-> vars[0]    = -2
         //          vars[1]    = trailbitcnt + maskbitcnt - 2
-        keydexer.m_levels = (maskbitcnt+1) / 2;
+        keydexer.m_levels = (maskbitcnt + 1) / 2;
         if (sorted)
         {
             keydexer.m_vars[0] = -2;
-            keydexer.m_vars[1] = trailbitcnt + ((maskbitcnt+1)&0xFE) - 2;
+            keydexer.m_vars[1] = trailbitcnt + ((maskbitcnt + 1) & 0xFE) - 2;
         }
         else
         {
@@ -87,10 +86,7 @@ namespace xcore
     struct btree_idx_t::node_t
     {
         inline node_t() {}
-        inline bool is_empty() const
-        {
-            return m_nodes[0] == Null && m_nodes[1] == Null && m_nodes[2] == Null && m_nodes[3] == Null;
-        }
+        inline bool is_empty() const { return m_nodes[0] == Null && m_nodes[1] == Null && m_nodes[2] == Null && m_nodes[3] == Null; }
         inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = Null; }
         u32         m_nodes[4];
         XCORE_CLASS_PLACEMENT_NEW_DELETE
@@ -220,7 +216,7 @@ namespace xcore
             else if (is_leaf(nodeIndex))
             {
                 u64 const nodeKey = m_kv->get_key(nodeIndex);
-                if (nodeKey ==key)
+                if (nodeKey == key)
                 {
                     // Remove this leaf from node, if this results in node
                     // having no more children then this node should also be
@@ -534,7 +530,7 @@ namespace xcore
 
     bool btree_ptr_t::add(node_t*& root, u64 key, void* value)
     {
-		ASSERT(sizeof_node() == sizeof(node_t));
+        ASSERT(sizeof_node() == sizeof(node_t));
         if (root == nullptr)
         {
             root = m_node_alloc->construct<node_t>();
@@ -592,10 +588,7 @@ namespace xcore
     {
         struct utils
         {
-            static u32 get_counts(uptr n, s32 i)
-            {
-                return (n == 0) ? 0x01000000 : (((n & 1) == 1) ? 0x00010000 : (0x00000100 | i));
-            }
+            static u32 get_counts(uptr n, s32 i) { return (n == 0) ? 0x01000000 : (((n & 1) == 1) ? 0x00010000 : (0x00000100 | i)); }
 
             static u32 check(node_t* node)
             {
@@ -740,16 +733,16 @@ namespace xcore
                 m_node_alloc->destruct(node);
             }
         }
-		root = nullptr;
+        root = nullptr;
     }
 
     bool btree_ptr_t::find(node_t* root, u64 key, void*& value) const
     {
-		if (root == nullptr)
-		{
-			value = nullptr;
-			return false;
-		}
+        if (root == nullptr)
+        {
+            value = nullptr;
+            return false;
+        }
 
         s32           level = 0;
         node_t const* node  = root;

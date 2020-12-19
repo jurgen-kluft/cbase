@@ -1,4 +1,4 @@
-namespace x_f64u
+namespace xf64
 {   
 	/**
      * Function IsLessPositive. 

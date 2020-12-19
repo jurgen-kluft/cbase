@@ -30,7 +30,7 @@ UNITTEST_SUITE_BEGIN(xva)
 			CHECK_FALSE(v.isUInt64());
 			CHECK_FALSE(v.isF32());
 			CHECK_FALSE(v.isF64());
-			CHECK_FALSE(v.isPCTChar());
+			CHECK_FALSE(v.isPCRunes());
 
 			CHECK_FALSE((bool)v);
 			CHECK_EQUAL(0, (s32)v);
@@ -53,7 +53,7 @@ UNITTEST_SUITE_BEGIN(xva)
 			CHECK_FALSE(v.isUInt64());
 			CHECK_FALSE(v.isF32());
 			CHECK_FALSE(v.isF64());
-			CHECK_FALSE(v.isPCTChar());
+			CHECK_FALSE(v.isPCRunes());
 
 			CHECK_TRUE((bool)v);
 			CHECK_EQUAL(100, (s32)v);
@@ -61,7 +61,7 @@ UNITTEST_SUITE_BEGIN(xva)
 			CHECK_EQUAL(100.0, (f64)v);
 		}
 
-		UNITTEST_TEST(x_va_pctchar)
+		UNITTEST_TEST(x_va_pcrunes)
 		{
 			va_t v("ascii string");
 			CHECK_FALSE(v.isBool());
@@ -76,7 +76,7 @@ UNITTEST_SUITE_BEGIN(xva)
 			CHECK_FALSE(v.isUInt64());
 			CHECK_FALSE(v.isF32());
 			CHECK_FALSE(v.isF64());
-			CHECK_TRUE(v.isPCTChar());
+			CHECK_TRUE(v.isPCRunes());
 
 			CHECK_FALSE((bool)v);	// "ascii string" != "true"
 		}

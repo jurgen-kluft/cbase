@@ -1,7 +1,7 @@
 /**
  * IEEE 754 description
  */
-namespace x_f64u
+namespace xf64
 {
     struct EDoubleIEEE
     {

@@ -9,7 +9,7 @@
 
 namespace xcore
 {
-    namespace x_f64u
+    namespace xf64
     {
         inline f64 abs(f64 inNumber);
         inline f64 neg(f64 inNumber);
@@ -90,7 +90,7 @@ namespace xcore
         inline bool isNegative(f64 inNumber);
         inline bool isLessPositive(f64 inLHS, f64 inRHS);
         inline bool isGreater(f64 inLHS, f64 inRHS);
-    }; // namespace x_f64u
+    }; // namespace xf64
 
 //==============================================================================
 // INLINES

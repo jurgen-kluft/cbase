@@ -36,7 +36,7 @@ namespace xcore
 
 	static void TestSet()
 	{
-		xset<s32> myset;
+		set_t<s32> myset;
 		s32 v = 1000;
 		myset.insert(v);
 		myset.contains(v);

@@ -10,7 +10,7 @@ enum EFloatIEEE
 };
 
 
-namespace x_f32u
+namespace xf32
 {
     /**
      * @return  This funtion returns an absolute number.

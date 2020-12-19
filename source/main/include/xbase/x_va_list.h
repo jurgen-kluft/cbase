@@ -79,7 +79,6 @@ namespace xcore
             TYPE_BOOL    = 0x0020 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
             TYPE_FLOAT32 = 0x0040 | PROP_FLOAT | SIZE_32,
             TYPE_FLOAT64 = 0x0050 | PROP_FLOAT | SIZE_64,
-            TYPE_PCTCHAR = 0x0060 | SIZE_PTR,
             TYPE_PCRUNES = 0x0080 | SIZE_PTR
         };
 
@@ -120,8 +119,7 @@ namespace xcore
         bool isUInt64() const { return bool(mType == TYPE_UINT64); }
         bool isF32() const { return bool(mType == TYPE_FLOAT32); }
         bool isF64() const { return bool(mType == TYPE_FLOAT64); }
-        bool isPCTChar() const { return bool(mType == TYPE_PCTCHAR); }
-        bool isPCURunes() const { return bool(mType == TYPE_PCRUNES); }
+        bool isPCRunes() const { return bool(mType == TYPE_PCRUNES); }
 
         operator char() const { return (char)convertToInt8(); }
         operator s8() const { return convertToInt8(); }
@@ -135,7 +133,7 @@ namespace xcore
         operator f32() const { return convertToFloat(); }
         operator f64() const { return convertToDouble(); }
         operator bool() const { return convertToBool(); }
-        operator crunes_t() const { return convertToUChars(); }
+        operator crunes_t() const { return convertToCRunes(); }
 
         void convertToRunes(runes_t& chars) const;
 
@@ -153,7 +151,7 @@ namespace xcore
         f32      convertToFloat() const;
         f64      convertToDouble() const;
         bool     convertToBool() const;
-        crunes_t convertToUChars() const;
+        crunes_t convertToCRunes() const;
 
         u16  mType;
         u16  mVar;

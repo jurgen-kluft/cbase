@@ -1,4 +1,4 @@
-namespace x_f32u
+namespace xf32
 {
     inline s32        toS32(f32 inB)                            { return (s32)inB; }
     inline u32        toU32(f32 inB)                            { return (u32)(s32)inB; }

@@ -269,7 +269,7 @@ namespace xcore
         char* ew = eworkend;
         *ew      = '\0';
 
-        if (x_f64u::isInfinite(fpnum))
+        if (xf64::isInfinite(fpnum))
         {
             if (fpnum < 0)
                 writer->write('-');
@@ -278,7 +278,7 @@ namespace xcore
             return;
         }
 
-        if (x_f64u::isNAN(fpnum))
+        if (xf64::isNAN(fpnum))
         {
             crunes_t str("NaN", 3);
             writer->write(str);
@@ -1194,7 +1194,7 @@ namespace xcore
                     goto nosign;
 
                 case 's':
-                    if (args[argindex].isPCURunes() || args[argindex].isPCTChar())
+                    if (args[argindex].isPCRunes())
                     {
                         crunes_t src = (crunes_t)args[argindex];
 						buffer->write(src);
