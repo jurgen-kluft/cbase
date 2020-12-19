@@ -10,10 +10,10 @@ namespace xcore
 {
     namespace utf
     {
-        static s32 len(ascii::pcrune str, ascii::pcrune end);
-        static s32 len(utf8::pcrune str, utf8::pcrune end);
-        static s32 len(utf16::pcrune str, utf16::pcrune end);
-        static s32 len(utf32::pcrune str, utf32::pcrune end);
+        static s32 countof_runes(ascii::pcrune str, ascii::pcrune end);
+        static s32 countof_runes(utf8::pcrune str, utf8::pcrune end);
+        static s32 countof_runes(utf16::pcrune str, utf16::pcrune end);
+        static s32 countof_runes(utf32::pcrune str, utf32::pcrune end);
 
         static ascii::prune  endof(ascii::prune str, ascii::pcrune eos);
         static ascii::pcrune endof(ascii::pcrune str, ascii::pcrune eos);
@@ -26,7 +26,7 @@ namespace xcore
 
         // UTF sequence sizes
         static s32 sequence_sizeof_utf8(uchar8 c);
-        static s32 size(uchar32 c);
+        static s32 rune_sizeinbytes(uchar32 c);
 
         // Peek
         static uchar32 peek(runes_t const& str, runes_t::ptr_t const& ptr);
@@ -148,25 +148,25 @@ namespace xcore
         static bool read_is_crln(utf16::crunes_t const& str, utf16::pcrune cursor);
         static bool read_is_crln(utf32::crunes_t const& str, utf32::pcrune cursor);
 
-        s32 len(ascii::pcrune str, ascii::pcrune end)
+        s32 countof_runes(ascii::pcrune str, ascii::pcrune end)
         {
             end = endof(str, end);
             return s32(end - str);
         }
 
-        s32 len(utf8::pcrune str, utf8::pcrune end)
+        s32 countof_runes(utf8::pcrune str, utf8::pcrune end)
         {
             end = endof(str, end);
             return s32(end - str);
         }
 
-        s32 len(utf16::pcrune str, utf16::pcrune end)
+        s32 countof_runes(utf16::pcrune str, utf16::pcrune end)
         {
             end = endof(str, end);
             return s32(end - str);
         }
 
-        s32 len(utf32::pcrune str, utf32::pcrune end)
+        s32 countof_runes(utf32::pcrune str, utf32::pcrune end)
         {
             end = endof(str, end);
             return s32(end - str);
@@ -413,10 +413,39 @@ namespace xcore
 
         bool skip(utf8::rune const*& str, utf8::rune const* begin, utf8::rune const* end, s32 count)
         {
+            ASSERT(begin != nullptr);
+            ASSERT(end != nullptr);
             if (count < 0)
             {
-                ASSERT(false); // UTF-8 does not support stepping backwards
-                return false;
+                // UTF-8 backwards iteration can be quite slow, since we need to iterate forwards to find
+                // (str - count)
+                utf8::pcrune iter = begin;
+                utf8::pcrune prev1 = iter;
+                utf8::pcrune prev2 = nullptr;
+
+                // First step forwards no matter the count, until we reach the end
+                s32 const forward_count = -count;
+                while (skip(iter, begin, str, forward_count))
+                {
+                    prev2 = prev1;
+                    prev1 = iter;
+                }
+                if (prev2 != nullptr)
+                {
+                    // Then step forwards by 1
+                    if (forward_count > 1)
+                    {
+                        prev1 = prev2;
+                        do
+                        {
+                            prev2 = prev1;
+                            skip(prev1, begin, str, 1);
+                            iter = prev1;
+                        } while (skip(iter, begin, str, forward_count));
+                    }
+                    str = prev2;
+                    count = 0;
+                }
             }
             else
             {
@@ -424,7 +453,7 @@ namespace xcore
                 while (c != utf8::TERMINATOR && count > 0)
                 {
                     s32 const l = sequence_sizeof_utf8((uchar8)c);
-                    if (end != NULL && (str + l) > end)
+                    if ((str + l) > end)
                         return false;
 
                     switch (l)
@@ -464,9 +493,35 @@ namespace xcore
         {
             if (count < 0)
             {
-                ASSERT(false); // UTF-16 does not support stepping backwards
-                return false;
-            }
+                // UTF-16 backwards iteration can be quite slow, since we need to iterate forwards to find
+                // (str - count)
+                utf16::pcrune iter = begin;
+                utf16::pcrune prev1 = iter;
+                utf16::pcrune prev2 = nullptr;
+
+                // First step forwards no matter the count, until we reach the end
+                s32 const forward_count = -count;
+                while (skip(iter, begin, str, forward_count))
+                {
+                    prev2 = prev1;
+                    prev1 = iter;
+                }
+                if (prev2 != nullptr)
+                {
+                    // Then step forwards by 1
+                    if (forward_count > 1)
+                    {
+                        prev1 = prev2;
+                        do
+                        {
+                            prev2 = prev1;
+                            skip(prev1, begin, str, 1);
+                            iter = prev1;
+                        } while (skip(iter, begin, str, forward_count));
+                    }
+                    str = prev2;
+                    count = 0;
+                }            }
             else
             {
                 uchar32 c = *str;
@@ -1331,7 +1386,7 @@ namespace xcore
     static bool     write(crunes_t const& str, cptr_t& cursor, uchar32 c);
     static bool     is_valid(crunes_t const& str, cptr_t const& cursor);
 
-    runes_t crunes_to_runes(runes_t const& str, crunes_t const& sel)
+    static runes_t crunes_to_runes(runes_t const& str, crunes_t const& sel)
     {
         runes_t r(str);
         r.m_runes.m_ascii.m_str += (sel.m_runes.m_ascii.m_str - str.m_runes.m_ascii.m_str);
@@ -1339,23 +1394,22 @@ namespace xcore
         return r;
     }
 
-    inline runes_t  nothing_found(runes_t const& str) { return runes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
-    inline crunes_t nothing_found(crunes_t const& str) { return crunes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
+    static inline runes_t  nothing_found(runes_t const& str) { return runes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
+    static inline crunes_t nothing_found(crunes_t const& str) { return crunes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
 
     crunes_t find(crunes_t const& _str, uchar32 _c, bool _casesensitive)
     {
         cptr_t iter = get_begin(_str);
         cptr_t end  = get_end(_str);
-        cptr_t pos;
         while (iter < end)
         {
-            pos              = iter;
             uchar32    c     = peek(_str, iter);
             bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
             if (equal)
             {
-                forwards(_str, pos);
-                return select(_str, iter, pos);
+                cptr_t begin = iter;
+                forwards(_str, iter);
+                return select(_str, begin, iter);
             }
             forwards(_str, iter);
         }
@@ -1373,18 +1427,17 @@ namespace xcore
     {
         cptr_t iter  = get_end(_str);
         cptr_t begin = get_begin(_str);
-        cptr_t pos;
         while (iter > begin)
         {
-            pos = iter;
+            cptr_t end = iter;
             backwards(_str, iter);
+
             uchar32    c     = peek(_str, iter);
             bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
             if (equal)
             {
-                return select(_str, iter, pos);
+                return select(_str, iter, end);
             }
-            backwards(_str, iter);
         }
         return nothing_found(_str);
     }
@@ -3147,17 +3200,6 @@ namespace xcore
         }
     }
 
-    crunes_t runes_t::get_crunes() const
-    {
-        crunes_t str;
-        str.m_type                = m_type;
-        str.m_runes.m_ascii.m_bos = m_runes.m_ascii.m_str;
-        str.m_runes.m_ascii.m_eos = m_runes.m_ascii.m_eos;
-        str.m_runes.m_ascii.m_str = m_runes.m_ascii.m_str;
-        str.m_runes.m_ascii.m_end = m_runes.m_ascii.m_end;
-        return str;
-    }
-
     void runes_t::concatenate(ascii::rune c)
     {
         if (!is_valid())
@@ -3226,7 +3268,7 @@ namespace xcore
         m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
         m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
     }
-    crunes_t::crunes_t(crunes_t const& _str, ptr_t const& from, ptr_t const& to)  : m_type(_str.m_type)
+    crunes_t::crunes_t(crunes_t const& _str, ptr_t const& from, ptr_t const& to) : m_type(_str.m_type)
     {
         ASSERT(from >= _str.m_runes.m_ascii.m_bos && from < _str.m_runes.m_ascii.m_eos);
         ASSERT(to >= _str.m_runes.m_ascii.m_bos && to < _str.m_runes.m_ascii.m_eos);
@@ -3448,15 +3490,16 @@ namespace xcore
     runes_reader_t::runes_reader_t(ascii::pcrune str)
     {
         ascii::pcrune str_end = str;
-        while (*str_end != '\0') str_end++;
+        while (*str_end != '\0')
+            str_end++;
         m_runes  = crunes_t(str, str, str_end, str_end);
         m_cursor = str;
     }
     runes_reader_t::runes_reader_t(ascii::pcrune str, u32 len)
     {
         ascii::pcrune str_end = str + len;
-        m_runes  = crunes_t(str, str, str_end, str_end);
-        m_cursor = str;
+        m_runes               = crunes_t(str, str, str_end, str_end);
+        m_cursor              = str;
     }
     runes_reader_t::runes_reader_t(ascii::pcrune str, ascii::pcrune str_end)
     {

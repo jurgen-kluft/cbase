@@ -2,7 +2,7 @@
 #define __XCORE_BUFFER_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "xbase/x_allocator.h"
@@ -14,7 +14,7 @@ namespace xcore
     class buffer_t;
     class binary_reader_t;
     class binary_writer_t;
-	struct crunes_t;
+    struct crunes_t;
 
     // --------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
@@ -53,7 +53,8 @@ namespace xcore
         inline buffer_t() : m_len(0), m_mutable((xbyte*)&m_len) {}
         inline buffer_t(u32 len, xbyte* data) : m_len(len), m_mutable(data) { reset(0); }
 
-        inline u32 size() const { return m_len; }
+        inline u32    size() const { return m_len; }
+        inline xbyte* data() { return m_mutable; }
 
         void reset(xbyte fill);
         void clear();
@@ -161,62 +162,67 @@ namespace xcore
     class binary_reader_t
     {
     public:
-        inline binary_reader_t(buffer_t const& b) : len_(b.size()), cursor_(0), buffer_(b.m_mutable) {}
-        inline binary_reader_t(cbuffer_t const& b) : len_(b.size()), cursor_(0), buffer_(b.m_const) {}
-        inline binary_reader_t(xbyte const* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) {}
+        inline binary_reader_t() : m_len(0), m_cursor(0), m_buffer(nullptr) {}
+        inline binary_reader_t(buffer_t const& b) : m_len(b.size()), m_cursor(0), m_buffer(b.m_mutable) {}
+        inline binary_reader_t(cbuffer_t const& b) : m_len(b.size()), m_cursor(0), m_buffer(b.m_const) {}
+        inline binary_reader_t(xbyte const* _buffer, u32 _len) : m_len(_len), m_cursor(0), m_buffer(_buffer) {}
 
-        u32      size() const;
-        u32      len() const;
+        u32       size() const;
+        u32       length() const;
+        u32       remain() const;
         cbuffer_t get_current_buffer() const;
-        bool     can_read(u32 number_of_bytes) const; // check if we still can read n number of bytes
-        bool     at_end() const;
-        bool     seek(u32 cursor);
-        u32      pos() const;
-        void     reset();
-        s32      skip(s32);
-        s32      read(bool&);
-        s32      read(u8&);
-        s32      read(s8&);
-        s32      read(u16&);
-        s32      read(s16&);
-        s32      read(u32&);
-        s32      read(s32&);
-        s32      read(u64&);
-        s32      read(s64&);
-        s32      read(f32&);
-        s32      read(f64&);
-        bool     read_bool();
-        u8       read_u8();
-        s8       read_s8();
-        u16      read_u16();
-        s16      read_s16();
-        u32      read_u32();
-        s32      read_s32();
-        u64      read_u64();
-        s64      read_s64();
-        f32      read_f32();
-        f64      read_f64();
-        s32      read_data(buffer_t& buf);
-        s32      view_data(u32 size, cbuffer_t& buf);
-		s32      read_buffer(buffer_t& buf);
-		s32      view_buffer(cbuffer_t& buf);
-		s32      view_crunes(crunes_t& out_str);
+        bool      can_read(u32 number_of_bytes) const; // check if we still can read n number of bytes
+        bool      at_end() const;
+        bool      seek(u32 cursor);
+        u32       pos() const;
+        void      reset();
+        s32       skip(s32);
+        s32       read(bool&);
+        s32       read(u8&);
+        s32       read(s8&);
+        s32       read(u16&);
+        s32       read(s16&);
+        s32       read(u32&);
+        s32       read(s32&);
+        s32       read(u64&);
+        s32       read(s64&);
+        s32       read(f32&);
+        s32       read(f64&);
+        u16       peek_u16() const;
+        bool      read_bool();
+        u8        read_u8();
+        s8        read_s8();
+        u16       read_u16();
+        s16       read_s16();
+        u32       read_u32();
+        s32       read_s32();
+        u64       read_u64();
+        s64       read_s64();
+        f32       read_f32();
+        f64       read_f64();
+        s32       read_data(buffer_t& buf);
+        s32       view_data(u32 size, cbuffer_t& buf);
+        s32       read_buffer(buffer_t& buf);
+        s32       view_buffer(cbuffer_t& buf);
+        s32       view_crunes(crunes_t& out_str);
 
     protected:
-        u32          len_;
-        u32          cursor_;
-        xbyte const* buffer_;
+        u32          m_len;
+        u32          m_cursor;
+        xbyte const* m_buffer;
     };
 
     class binary_writer_t
     {
     public:
-        inline binary_writer_t() : len_(0), cursor_(0), buffer_() {}
-        inline binary_writer_t(buffer_t const& _buffer) : len_(_buffer.size()), cursor_(0), buffer_(_buffer.m_mutable) {}
-        inline binary_writer_t(xbyte* _buffer, u32 _len) : len_(_len), cursor_(0), buffer_(_buffer) {}
+        inline binary_writer_t() : m_len(0), m_cursor(0), m_buffer() {}
+        inline binary_writer_t(buffer_t const& _buffer) : m_len(_buffer.size()), m_cursor(0), m_buffer(_buffer.m_mutable) {}
+        inline binary_writer_t(xbyte* _buffer, u32 _len) : m_len(_len), m_cursor(0), m_buffer(_buffer) {}
+        inline binary_writer_t(binary_writer_t const& other) : m_len(other.m_len), m_cursor(other.m_cursor), m_buffer(other.m_buffer) {}
 
         u32 size() const;
-        u32 len() const;
+        u32 length() const;
+        u32 remain() const;
 
         buffer_t get_full_buffer() const;
         buffer_t get_current_buffer() const;
@@ -226,9 +232,10 @@ namespace xcore
         bool seek(u32 cursor);
         u32  pos() const;
 
-        void           reset();
-        s32            skip(s32 count);
+        void            reset();
+        s32             skip(s32 count);
         binary_writer_t reserve(u32 size); // For writing something in the future you can remember this place - size
+        binary_writer_t range(u32 from, u32 to) const;
 
         s32 write(bool);
         s32 write(u8);
@@ -244,14 +251,22 @@ namespace xcore
 
         s32 write_data(buffer_t const& cbuf);
         s32 write_data(cbuffer_t const& cbuf);
-        s32 write_buffer(buffer_t const& cbuf);	// Will write [s32=Length][u8[]=Data]
-        s32 write_buffer(cbuffer_t const& cbuf);	// Will write [s32=Length][u8[]=Data]
+        s32 write_buffer(buffer_t const& cbuf);  // Will write [s32=Length][u8[]=Data]
+        s32 write_buffer(cbuffer_t const& cbuf); // Will write [s32=Length][u8[]=Data]
         s32 write_string(crunes_t const& str);
 
+        binary_writer_t& operator=(const binary_writer_t& other)
+        {
+            m_len    = other.m_len;
+            m_cursor = other.m_cursor;
+            m_buffer = other.m_buffer;
+            return *this;
+        }
+
     protected:
-        u32    len_;
-        u32    cursor_;
-        xbyte* buffer_;
+        u32    m_len;
+        u32    m_cursor;
+        xbyte* m_buffer;
     };
 
     inline cbuffer_t::cbuffer_t(buffer_t const& buffer) : m_len(buffer.size()), m_const(buffer.m_mutable) {}
