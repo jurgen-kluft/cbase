@@ -10,7 +10,7 @@ extern xcore::alloc_t* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xmap_and_set)
 {
-    UNITTEST_FIXTURE(map_t)
+    UNITTEST_FIXTURE(xmap)
     {
         UNITTEST_FIXTURE_SETUP()
         {
@@ -34,7 +34,7 @@ UNITTEST_SUITE_BEGIN(xmap_and_set)
         }
     }
 
-    UNITTEST_FIXTURE(set_t)
+    UNITTEST_FIXTURE(xset)
     {
         UNITTEST_FIXTURE_SETUP()
         {

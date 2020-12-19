@@ -2,51 +2,15 @@
 
 ## xcode
 
-~~Support Tundra build system~~ DONE
+Using Go to manage our packages and dependencies and generating Visual Studio projects as well as Tundra build files.
 
 ## xbase
 
-~~Split of containers into xcore/xgenerics~~ DONE
-
-Simplify the whole string usage, currently we have code to handle ascii/utf8/utf16/utf32. Can we just use ascii and utf32 and remove all other code except the conversion from/to. Console, Log, printf/sprintf, sscanf etc.. should all just use a standard low-level string container that is ascii and utf32. It doesn't matter if there is dynamic allocation.
-
-Refactor to follow the below rules:
+Naming convention:
 
 - namespaces start with x (e.g. xcore)
 - struct/class ends with _t (e.g. alloc_t)
 - you may use a namespace or static class
-
-example:
-class xu16
-{
-public:
-  typedef u16 uxx;
-  static bool ispo2(uxx value);
-  static s32  clz(uxx value);
-  static s32  ctz(uxx value);
-  static uxx  floorpo2(uxx value);
-};
-class xu32
-{
-public:
-  typedef u32 uxx;
-  static bool ispo2(uxx value);
-  static s32  clz(uxx value);
-  static s32  ctz(uxx value);
-  static uxx  floorpo2(uxx value);
-};
-class xu64
-{
-public:
-  typedef u64 uxx;
-  static bool ispo2(uxx value);
-  static s32  clz(uxx value);
-  static s32  ctz(uxx value);
-  static uxx  floorpo2(uxx value);
-};
-
-u32 size = 10;
-u32 sizepo2 = xu32.floorpo2(size);
 
 ## xcore (typeless/raw containers)
 
@@ -72,8 +36,8 @@ string class (utf32)
 
 ## xallocator
 
-We need a virtual memory based allocator :smile:
-Also, split of debugging allocators like memento to xmemory
+We need a virtual memory based allocator :smile: (see xvmem)
+Also, split of debugging allocators like memento to xdealloc
 
 ## xatomic
 
@@ -104,22 +68,25 @@ Package for dealing with date and time
 
 ## xfilesystem (Proto)
 
-We need to redesign this a bit by limiting the feature set, design can consider multithreading but should by default be single-threaded
+We need to redesign this a bit by limiting the feature set, design can consider multithreading but should by default be single-threaded.
 
 - xfile, xdir
 - xfileinfo, xdirinfo
 - xfilepath, xdirpath
 
-## xmemory
+## xdealloc
+
+Progress = Alpha
 
 - Leak Detector
 - Use the allocator to allocate meta-data
+- Memento
 
 ## xthread
 
 - thread
 - mutex, event, semaphore
-- per thread
+- per thread a context holding
   - random number generator
   - string allocator
   - heap allocator
@@ -133,6 +100,8 @@ We need to redesign this a bit by limiting the feature set, design can consider 
 
 ## xactor
 
+Progress = Alpha
+
 - erlang like actor framework
 - slim/optimized
 - maximum number of actors
@@ -141,11 +110,10 @@ We need to redesign this a bit by limiting the feature set, design can consider 
 
 ## xcmdline
 
-trim down to the bare minimum, remove the ugly opt library.
+Progress = Beta
 
 ## xtext
 
-- text reader/writer
 - parsing/tokenizer
   - <https://github.com/Sakrac/struse>
   - XML
