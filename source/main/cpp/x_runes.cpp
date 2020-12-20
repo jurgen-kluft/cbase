@@ -419,7 +419,7 @@ namespace xcore
             {
                 // UTF-8 backwards iteration can be quite slow, since we need to iterate forwards to find
                 // (str - count)
-                utf8::pcrune iter = begin;
+                utf8::pcrune iter  = begin;
                 utf8::pcrune prev1 = iter;
                 utf8::pcrune prev2 = nullptr;
 
@@ -443,7 +443,7 @@ namespace xcore
                             iter = prev1;
                         } while (skip(iter, begin, str, forward_count));
                     }
-                    str = prev2;
+                    str   = prev2;
                     count = 0;
                 }
             }
@@ -495,7 +495,7 @@ namespace xcore
             {
                 // UTF-16 backwards iteration can be quite slow, since we need to iterate forwards to find
                 // (str - count)
-                utf16::pcrune iter = begin;
+                utf16::pcrune iter  = begin;
                 utf16::pcrune prev1 = iter;
                 utf16::pcrune prev2 = nullptr;
 
@@ -519,9 +519,10 @@ namespace xcore
                             iter = prev1;
                         } while (skip(iter, begin, str, forward_count));
                     }
-                    str = prev2;
+                    str   = prev2;
                     count = 0;
-                }            }
+                }
+            }
             else
             {
                 uchar32 c = *str;
@@ -1394,8 +1395,14 @@ namespace xcore
         return r;
     }
 
-    static inline runes_t  nothing_found(runes_t const& str) { return runes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
-    static inline crunes_t nothing_found(crunes_t const& str) { return crunes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type); }
+    static inline runes_t nothing_found(runes_t const& str)
+    {
+        return runes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type);
+    }
+    static inline crunes_t nothing_found(crunes_t const& str)
+    {
+        return crunes_t(str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_str, str.m_type);
+    }
 
     crunes_t find(crunes_t const& _str, uchar32 _c, bool _casesensitive)
     {
@@ -1583,7 +1590,8 @@ namespace xcore
         crunes_t sel = find(_str, _find, _casesensitive);
         if (sel.is_empty())
             return nothing_found(_str);
-        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_str, _str.m_runes.m_ascii.m_eos, _str.m_type);
+        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_str,
+                        _str.m_runes.m_ascii.m_eos, _str.m_type);
     }
 
     crunes_t findLastSelectUntil(const crunes_t& _str, uchar32 _c, bool _casesensitive)
@@ -1597,7 +1605,8 @@ namespace xcore
         crunes_t sel = findLast(_str, _find, _casesensitive);
         if (sel.is_empty())
             return nothing_found(_str);
-        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_str, _str.m_runes.m_ascii.m_eos, _str.m_type);
+        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_str,
+                        _str.m_runes.m_ascii.m_eos, _str.m_type);
     }
 
     crunes_t findSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
@@ -1611,7 +1620,8 @@ namespace xcore
         crunes_t sel = find(_str, _find, _casesensitive);
         if (sel.is_empty())
             return nothing_found(_str);
-        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_end, _str.m_runes.m_ascii.m_eos, _str.m_type);
+        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_end,
+                        _str.m_runes.m_ascii.m_eos, _str.m_type);
     }
 
     crunes_t findLastSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
@@ -1625,7 +1635,8 @@ namespace xcore
         crunes_t sel = findLast(_str, _find, _casesensitive);
         if (sel.is_empty())
             return nothing_found(_str);
-        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_end, _str.m_runes.m_ascii.m_eos, _str.m_type);
+        return crunes_t(_str.m_runes.m_ascii.m_bos, _str.m_runes.m_ascii.m_str, sel.m_runes.m_ascii.m_end,
+                        _str.m_runes.m_ascii.m_eos, _str.m_type);
     }
 
     crunes_t selectAfterSelection(const crunes_t& _str, const crunes_t& _sel)
@@ -1675,7 +1686,8 @@ namespace xcore
             crunes_t r     = findLast(after, _left);
             if (!l.is_empty())
             {
-                return crunes_t(_str.m_runes.m_ascii.m_bos, l.m_runes.m_ascii.m_end, r.m_runes.m_ascii.m_str, _str.m_runes.m_ascii.m_eos, _str.m_type);
+                return crunes_t(_str.m_runes.m_ascii.m_bos, l.m_runes.m_ascii.m_end, r.m_runes.m_ascii.m_str,
+                                _str.m_runes.m_ascii.m_eos, _str.m_type);
             }
         }
         return nothing_found(_str);
@@ -1700,7 +1712,8 @@ namespace xcore
             crunes_t l      = findLast(before, _left);
             if (!l.is_empty())
             {
-                return crunes_t(_str.m_runes.m_ascii.m_bos, l.m_runes.m_ascii.m_end, r.m_runes.m_ascii.m_str, _str.m_runes.m_ascii.m_eos, _str.m_type);
+                return crunes_t(_str.m_runes.m_ascii.m_bos, l.m_runes.m_ascii.m_end, r.m_runes.m_ascii.m_str,
+                                _str.m_runes.m_ascii.m_eos, _str.m_type);
             }
         }
         return nothing_found(_str);
@@ -2488,7 +2501,8 @@ namespace xcore
 
         // The logic here is based on memory copy, we do not consider characters
         s32 const selected_len = (s32)((xbyte const*)str.m_runes.m_ascii.m_end - (xbyte const*)str.m_runes.m_ascii.m_str);
-        s32 const replace_len  = (s32)((xbyte const*)replace.m_runes.m_ascii.m_end - (xbyte const*)replace.m_runes.m_ascii.m_str);
+        s32 const replace_len =
+            (s32)((xbyte const*)replace.m_runes.m_ascii.m_end - (xbyte const*)replace.m_runes.m_ascii.m_str);
 
         xbyte* end = NULL;
         if (selected_len < replace_len)
@@ -2499,7 +2513,8 @@ namespace xcore
                 move_len = (s32)(((xbyte const*)str.m_runes.m_ascii.m_eos - (xbyte*)str.m_runes.m_ascii.m_end));
 
             // No matter what, push out anything at the end!
-            xbyte* dst = (xbyte*)((xbyte*)str.m_runes.m_ascii.m_end + ((xbyte const*)str.m_runes.m_ascii.m_eos - (xbyte*)str.m_runes.m_ascii.m_end) - 1);
+            xbyte* dst = (xbyte*)((xbyte*)str.m_runes.m_ascii.m_end +
+                                  ((xbyte const*)str.m_runes.m_ascii.m_eos - (xbyte*)str.m_runes.m_ascii.m_end) - 1);
             xbyte* src = (xbyte*)((xbyte*)dst - move_len);
             while (dst > (xbyte*)str.m_runes.m_ascii.m_end)
                 *dst-- = *src--;
@@ -2534,7 +2549,9 @@ namespace xcore
 
     static inline bool isIn(runes_t const& str, crunes_t const& selection)
     {
-        return (selection.m_runes.m_ascii.m_str >= str.m_runes.m_ascii.m_str && selection.m_runes.m_ascii.m_str < str.m_runes.m_ascii.m_end && selection.m_runes.m_ascii.m_end <= str.m_runes.m_ascii.m_end);
+        return (selection.m_runes.m_ascii.m_str >= str.m_runes.m_ascii.m_str &&
+                selection.m_runes.m_ascii.m_str < str.m_runes.m_ascii.m_end &&
+                selection.m_runes.m_ascii.m_end <= str.m_runes.m_ascii.m_end);
     }
 
     static crunes_t relocate(runes_t const& from, runes_t const& to, crunes_t const& selection)
@@ -2551,7 +2568,8 @@ namespace xcore
         return crunes_t();
     }
 
-    void replaceSelection(runes_t& str, crunes_t const& selection, crunes_t const& replace, runes_alloc_t* allocator, s32 size_alignment)
+    void replaceSelection(runes_t& str, crunes_t const& selection, crunes_t const& replace, runes_alloc_t* allocator,
+                          s32 size_alignment)
     {
         s64 const diff = replace.size() - selection.size();
         if (diff > 0)
@@ -2592,7 +2610,9 @@ namespace xcore
     void insert(runes_t& str, crunes_t const& insert) {}
     void insert(runes_t& str, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment) {}
     void insert(runes_t& str, crunes_t const& selection, crunes_t const& insert) {}
-    void insert(runes_t& str, crunes_t const& selection, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment) {}
+    void insert(runes_t& str, crunes_t const& selection, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment)
+    {
+    }
 
     void trim(runes_t& str)
     {
@@ -2897,7 +2917,8 @@ namespace xcore
         concatenate(str, concat);
     }
 
-    void concatenate(runes_t& str, const crunes_t& concat1, const crunes_t& concat2, runes_alloc_t* allocator, s32 size_alignment)
+    void concatenate(runes_t& str, const crunes_t& concat1, const crunes_t& concat2, runes_alloc_t* allocator,
+                     s32 size_alignment)
     {
         s32 const required = str.size() + concat1.size() + concat2.size();
         if (required > str.cap())
@@ -2946,10 +2967,13 @@ namespace xcore
     {
         switch (str.m_type)
         {
-            case ascii::TYPE: return utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, step);
+            case ascii::TYPE:
+                return utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, step);
             case utf8::TYPE: return utf::skip(cursor.m_ptr.m_utf8, str.m_runes.m_utf8.m_str, str.m_runes.m_utf8.m_end, step);
-            case utf16::TYPE: return utf::skip(cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_str, str.m_runes.m_utf16.m_end, step);
-            case utf32::TYPE: return utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, step);
+            case utf16::TYPE:
+                return utf::skip(cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_str, str.m_runes.m_utf16.m_end, step);
+            case utf32::TYPE:
+                return utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, step);
         }
         return false;
     }
@@ -2957,10 +2981,13 @@ namespace xcore
     {
         switch (str.m_type)
         {
-            case ascii::TYPE: return utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, -step);
+            case ascii::TYPE:
+                return utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, -step);
             case utf8::TYPE: return utf::skip(cursor.m_ptr.m_utf8, str.m_runes.m_utf8.m_str, str.m_runes.m_utf8.m_end, -step);
-            case utf16::TYPE: return utf::skip(cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_str, str.m_runes.m_utf16.m_end, -step);
-            case utf32::TYPE: return utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, -step);
+            case utf16::TYPE:
+                return utf::skip(cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_str, str.m_runes.m_utf16.m_end, -step);
+            case utf32::TYPE:
+                return utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, -step);
         }
         return false;
     }
@@ -2997,7 +3024,10 @@ namespace xcore
         return true;
     }
 
-    bool is_valid(runes_t const& str, rptr_t const& cursor) { return cursor.m_ptr.m_ascii >= str.m_runes.m_ascii.m_str && cursor.m_ptr.m_ascii < str.m_runes.m_ascii.m_end; }
+    bool is_valid(runes_t const& str, rptr_t const& cursor)
+    {
+        return cursor.m_ptr.m_ascii >= str.m_runes.m_ascii.m_str && cursor.m_ptr.m_ascii < str.m_runes.m_ascii.m_end;
+    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -3052,10 +3082,13 @@ namespace xcore
     {
         switch (str.m_type)
         {
-            case ascii::TYPE: return utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, step);
+            case ascii::TYPE:
+                return utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, step);
             case utf8::TYPE: return utf::skip(cursor.m_ptr.m_utf8, str.m_runes.m_utf8.m_str, str.m_runes.m_utf8.m_end, step);
-            case utf16::TYPE: return utf::skip(cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_str, str.m_runes.m_utf16.m_end, step);
-            case utf32::TYPE: return utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, step);
+            case utf16::TYPE:
+                return utf::skip(cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_str, str.m_runes.m_utf16.m_end, step);
+            case utf32::TYPE:
+                return utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, step);
         }
         return false;
     }
@@ -3063,10 +3096,13 @@ namespace xcore
     {
         switch (str.m_type)
         {
-            case ascii::TYPE: return utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, -step);
+            case ascii::TYPE:
+                return utf::skip(cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_str, str.m_runes.m_ascii.m_end, -step);
             case utf8::TYPE: return utf::skip(cursor.m_ptr.m_utf8, str.m_runes.m_utf8.m_str, str.m_runes.m_utf8.m_end, -step);
-            case utf16::TYPE: return utf::skip(cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_str, str.m_runes.m_utf16.m_end, -step);
-            case utf32::TYPE: return utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, -step);
+            case utf16::TYPE:
+                return utf::skip(cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_str, str.m_runes.m_utf16.m_end, -step);
+            case utf32::TYPE:
+                return utf::skip(cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_str, str.m_runes.m_utf32.m_end, -step);
         }
         return false;
     }
@@ -3099,7 +3135,10 @@ namespace xcore
     }
 
     bool write(crunes_t const& str, cptr_t& cursor, uchar32 c) { return false; }
-    bool is_valid(crunes_t const& str, cptr_t const& cursor) { return cursor.m_ptr.m_ascii >= str.m_runes.m_ascii.m_str && cursor.m_ptr.m_ascii < str.m_runes.m_ascii.m_end; }
+    bool is_valid(crunes_t const& str, cptr_t const& cursor)
+    {
+        return cursor.m_ptr.m_ascii >= str.m_runes.m_ascii.m_str && cursor.m_ptr.m_ascii < str.m_runes.m_ascii.m_end;
+    }
 
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
@@ -3167,7 +3206,9 @@ namespace xcore
             case ascii::TYPE: size = (s32)((m_runes.m_ascii.m_end - m_runes.m_ascii.m_str) / sizeof(ascii::rune)); break;
             case utf32::TYPE: size = (s32)((m_runes.m_utf32.m_end - m_runes.m_utf32.m_str) / sizeof(utf32::rune)); break;
             case utf16::TYPE:
-            case utf8::TYPE: break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf value.
+            case utf8::TYPE:
+                break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf
+                       // value.
         }
         return size;
     }
@@ -3313,7 +3354,8 @@ namespace xcore
         m_runes.m_ascii.m_end = _end;
         m_runes.m_ascii.m_eos = _eos;
     }
-    crunes_t::crunes_t(ascii::pcrune _bos, ascii::pcrune _str, ascii::pcrune _end, ascii::pcrune _eos, s32 _type) : m_type(_type)
+    crunes_t::crunes_t(ascii::pcrune _bos, ascii::pcrune _str, ascii::pcrune _end, ascii::pcrune _eos, s32 _type)
+        : m_type(_type)
     {
         m_runes.m_ascii.m_bos = _bos;
         m_runes.m_ascii.m_str = _str;
@@ -3470,7 +3512,9 @@ namespace xcore
             case ascii::TYPE: size = (s32)((m_runes.m_ascii.m_end - m_runes.m_ascii.m_str) / sizeof(ascii::rune)); break;
             case utf32::TYPE: size = (s32)((m_runes.m_utf32.m_end - m_runes.m_utf32.m_str) / sizeof(utf32::rune)); break;
             case utf16::TYPE:
-            case utf8::TYPE: break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf value.
+            case utf8::TYPE:
+                break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf
+                       // value.
         }
         return size;
     }
@@ -3592,9 +3636,13 @@ namespace xcore
                 }
                 break;
 
-            case utf8::TYPE: utf::skip(m_cursor.m_ptr.m_utf8, m_runes.m_runes.m_utf8.m_str, m_runes.m_runes.m_utf8.m_end, c); break;
+            case utf8::TYPE:
+                utf::skip(m_cursor.m_ptr.m_utf8, m_runes.m_runes.m_utf8.m_str, m_runes.m_runes.m_utf8.m_end, c);
+                break;
 
-            case utf16::TYPE: utf::skip(m_cursor.m_ptr.m_utf16, m_runes.m_runes.m_utf16.m_str, m_runes.m_runes.m_utf16.m_end, c); break;
+            case utf16::TYPE:
+                utf::skip(m_cursor.m_ptr.m_utf16, m_runes.m_runes.m_utf16.m_str, m_runes.m_runes.m_utf16.m_end, c);
+                break;
 
             case utf32::TYPE:
                 while (c > 0 && !at_end())
@@ -3628,7 +3676,10 @@ namespace xcore
         m_runes                = runes_t(str, str, str, str_end, utf32::TYPE);
         m_cursor.m_ptr.m_utf32 = str;
     }
-    runes_writer_t::runes_writer_t(runes_t const& runes) : m_runes(runes) { m_cursor.m_ptr.m_ascii = m_runes.m_runes.m_ascii.m_str; }
+    runes_writer_t::runes_writer_t(runes_t const& runes) : m_runes(runes)
+    {
+        m_cursor.m_ptr.m_ascii = m_runes.m_runes.m_ascii.m_str;
+    }
 
     runes_t runes_writer_t::get_destination() const
     {
@@ -3660,6 +3711,8 @@ namespace xcore
         switch (m_runes.m_type)
         {
             case ascii::TYPE: return (s32)(m_cursor.m_ptr.m_ascii - m_runes.m_runes.m_ascii.m_str);
+            case utf8::TYPE: return utf::countof_runes(m_runes.m_runes.m_utf8.m_str, m_cursor.m_ptr.m_utf8);
+            case utf16::TYPE: return utf::countof_runes(m_runes.m_runes.m_utf16.m_str, m_cursor.m_ptr.m_utf16);
             case utf32::TYPE: return (s32)(m_cursor.m_ptr.m_utf32 - m_runes.m_runes.m_utf32.m_str);
             default: break;
         }
@@ -3674,13 +3727,35 @@ namespace xcore
             switch (m_runes.m_type)
             {
                 case ascii::TYPE:
-                    m_cursor.m_ptr.m_ascii[0] = c;
-                    m_cursor.m_ptr.m_ascii += 1;
-                    return true;
+                    if (!at_end())
+                    {
+                        m_cursor.m_ptr.m_ascii[0] = c;
+                        m_cursor.m_ptr.m_ascii += 1;
+                        return true;
+                    }
+                    break;
+                case utf8::TYPE:
+                    if (!at_end())
+                    {
+                        utf::write(c, m_runes.m_runes.m_utf8, m_cursor.m_ptr.m_utf8);
+                        return true;
+                    }
+                    break;
+                case utf16::TYPE:
+                    if (!at_end())
+                    {
+                        utf::write(c, m_runes.m_runes.m_utf16, m_cursor.m_ptr.m_utf16);
+                        return true;
+                    }
+                    break;
                 case utf32::TYPE:
-                    m_cursor.m_ptr.m_utf32[0] = c;
-                    m_cursor.m_ptr.m_utf32 += 1;
-                    return true;
+                    if (!at_end())
+                    {
+                        m_cursor.m_ptr.m_utf32[0] = c;
+                        m_cursor.m_ptr.m_utf32 += 1;
+                        return true;
+                    }
+                    break;
             }
         }
         return false;
@@ -3700,6 +3775,20 @@ namespace xcore
                         //@note: use utf::write
                         m_cursor.m_ptr.m_ascii[0] = (ascii::rune)c;
                         m_cursor.m_ptr.m_ascii += 1;
+                    }
+                    return true;
+                case utf8::TYPE:
+                    while (!reader.at_end() && !at_end())
+                    {
+                        uchar32 c = reader.read();
+                        utf::write(c, m_runes.m_runes.m_utf8, m_cursor.m_ptr.m_utf8);
+                    }
+                    return true;
+                case utf16::TYPE:
+                    while (!reader.at_end() && !at_end())
+                    {
+                        uchar32 c = reader.read();
+                        utf::write(c, m_runes.m_runes.m_utf16, m_cursor.m_ptr.m_utf16);
                     }
                     return true;
                 case utf32::TYPE:
