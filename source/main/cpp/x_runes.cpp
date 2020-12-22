@@ -25,7 +25,8 @@ namespace xcore
         static utf32::pcrune endof(utf32::pcrune str, utf32::pcrune eos);
 
         // UTF sequence sizes
-        static s32 sequence_sizeof_utf8(uchar8 c);
+        static s32 sequence_sizeof_utf8(uchar32 c);
+        static s32 sequence_sizeof_utf16(uchar32 c);
         static s32 rune_sizeinbytes(uchar32 c);
 
         // Peek
@@ -156,14 +157,30 @@ namespace xcore
 
         s32 countof_runes(utf8::pcrune str, utf8::pcrune end)
         {
-            end = endof(str, end);
-            return s32(end - str);
+            s32 count = 0;
+            utf8::pcrune iter = str;
+            while (iter < end)
+            {
+                uchar32 c = iter[0];
+                s32 const l = sequence_sizeof_utf8(c);
+                count += 1;
+                iter += l;
+            }
+            return count;
         }
 
         s32 countof_runes(utf16::pcrune str, utf16::pcrune end)
         {
-            end = endof(str, end);
-            return s32(end - str);
+            s32 count = 0;
+            utf16::pcrune iter = str;
+            while (iter < end)
+            {
+                uchar32 c = iter[0];
+                s32 const l = sequence_sizeof_utf16(c);
+                count += 1;
+                iter += l;
+            }
+            return count;
         }
 
         s32 countof_runes(utf32::pcrune str, utf32::pcrune end)
@@ -264,19 +281,26 @@ namespace xcore
             return end;
         }
 
-        s32 sequence_sizeof_utf8(uchar8 c)
+        s32 sequence_sizeof_utf8(uchar32 c)
         {
-            u8 lead = c;
-            if (lead < 0x80)
+            if (c < 0x80)
                 return 1;
-            else if ((lead >> 5) == 0x6)
+            else if ((c >> 5) == 0x6)
                 return 2;
-            else if ((lead >> 4) == 0xe)
+            else if ((c >> 4) == 0xe)
                 return 3;
-            else if ((lead >> 3) == 0x1e)
+            else if ((c >> 3) == 0x1e)
                 return 4;
-            else
-                return 0;
+            return 0;
+        }
+
+        s32 sequence_sizeof_ut16(uchar32 c)
+        {
+            if (c < 0xd800)
+                return 1;
+            else if (c < 0xdc00)
+                return 2;
+            return 1;
         }
 
         uchar32 peek(runes_t const& str, runes_t::ptr_t const& ptr)
@@ -452,7 +476,7 @@ namespace xcore
                 uchar32 c = *str;
                 while (c != utf8::TERMINATOR && count > 0)
                 {
-                    s32 const l = sequence_sizeof_utf8((uchar8)c);
+                    s32 const l = sequence_sizeof_utf8(c);
                     if ((str + l) > end)
                         return false;
 
@@ -460,29 +484,33 @@ namespace xcore
                     {
                         case 0:
                             c = '?'; // Illegal character in utf8, replace with '?'
+                            str++;
                             break;
-                        case 1: break;
+                        case 1: 
+                            c = *str++;
+                            break;
                         case 2:
                             str++;
                             c = ((c << 6) & 0x7ff) + ((str[0]) & 0x3f);
+                            str++;
                             break;
                         case 3:
                             str++;
                             c = ((c << 12) & 0xffff) + (((str[0]) << 6) & 0xfff);
-                            ++str;
+                            str++;
                             c += (str[0]) & 0x3f;
+                            str++;
                             break;
                         case 4:
                             str++;
                             c = ((c << 18) & 0x1fffff) + (((str[0]) << 12) & 0x3ffff);
-                            ++str;
+                            str++;
                             c += ((str[0]) << 6) & 0xfff;
-                            ++str;
+                            str++;
                             c += (str[0]) & 0x3f;
+                            str++;
                             break;
                     }
-                    str++;
-                    c = *str;
                     count -= 1;
                 }
             }
@@ -528,16 +556,8 @@ namespace xcore
                 uchar32 c = *str;
                 while (c != utf16::TERMINATOR && (end == NULL || str < end) && count > 0)
                 {
-                    s32 l = 1;
-                    if (c < 0xd800)
-                    {
-                        l = 1;
-                    }
-                    else if (c < 0xdc00)
-                    {
-                        l = 2;
-                    }
-                    if (end == NULL || (str + l) <= end)
+                    s32 const l = sequence_sizeof_ut16(c);
+                    if ((str + l) <= end)
                     {
                         c = 0;
                         for (s32 i = 0; i < l; i++)
@@ -698,7 +718,7 @@ namespace xcore
             if (c != utf32::TERMINATOR)
             {
                 s32 const l = sequence_sizeof_utf8((uchar8)c);
-                if (end != NULL && (str + l) > end)
+                if ((str + l) > end)
                     return c;
 
                 switch (l)
