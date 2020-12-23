@@ -83,19 +83,19 @@ namespace xcore
         };
 
     public:
-        va_t() : mType(TYPE_EMPTY), mVar(0) { mArg[0] = mArg[1] = mArg[2] = 0; }
-        va_t(const va_t& c) : mType(c.mType), mVar(0) { *(u64*)mArg = *(u64*)c.mArg; }
-        explicit va_t(s8 inVar) : mType(TYPE_INT8), mVar(0) { *(s8*)mArg = inVar; }
-        explicit va_t(u8 inVar) : mType(TYPE_UINT8), mVar(0) { *(u8*)mArg = inVar; }
-        explicit va_t(s16 inVar) : mType(TYPE_INT16), mVar(0) { *(s16*)mArg = inVar; }
-        explicit va_t(u16 inVar) : mType(TYPE_UINT16), mVar(0) { *(u16*)mArg = inVar; }
-        explicit va_t(s32 inVar) : mType(TYPE_INT32), mVar(0) { *(s32*)mArg = inVar; }
-        explicit va_t(u32 inVar) : mType(TYPE_UINT32), mVar(0) { *(u32*)mArg = inVar; }
-        explicit va_t(s64 inVar) : mType(TYPE_INT64), mVar(0) { *(s64*)mArg = inVar; }
-        explicit va_t(u64 inVar) : mType(TYPE_UINT64), mVar(0) { *(u64*)mArg = inVar; }
-        explicit va_t(bool inVar) : mType(TYPE_BOOL), mVar(0) { *(u32*)mArg = inVar ? 1 : 0; }
-        explicit va_t(f32 inVar) : mType(TYPE_FLOAT32), mVar(0) { *(f32*)mArg = inVar; }
-        explicit va_t(f64 inVar) : mType(TYPE_FLOAT64), mVar(0) { *(f64*)mArg = inVar; }
+        va_t() : mType(TYPE_EMPTY), mCap(0) { mArg[0] = mArg[1] = mArg[2] = 0; }
+        va_t(const va_t& c) : mType(c.mType), mCap(0) { *(u64*)mArg = *(u64*)c.mArg; }
+        explicit va_t(s8 inVar) : mType(TYPE_INT8), mCap(0) { *(s8*)mArg = inVar; }
+        explicit va_t(u8 inVar) : mType(TYPE_UINT8), mCap(0) { *(u8*)mArg = inVar; }
+        explicit va_t(s16 inVar) : mType(TYPE_INT16), mCap(0) { *(s16*)mArg = inVar; }
+        explicit va_t(u16 inVar) : mType(TYPE_UINT16), mCap(0) { *(u16*)mArg = inVar; }
+        explicit va_t(s32 inVar) : mType(TYPE_INT32), mCap(0) { *(s32*)mArg = inVar; }
+        explicit va_t(u32 inVar) : mType(TYPE_UINT32), mCap(0) { *(u32*)mArg = inVar; }
+        explicit va_t(s64 inVar) : mType(TYPE_INT64), mCap(0) { *(s64*)mArg = inVar; }
+        explicit va_t(u64 inVar) : mType(TYPE_UINT64), mCap(0) { *(u64*)mArg = inVar; }
+        explicit va_t(bool inVar) : mType(TYPE_BOOL), mCap(0) { *(u32*)mArg = inVar ? 1 : 0; }
+        explicit va_t(f32 inVar) : mType(TYPE_FLOAT32), mCap(0) { *(f32*)mArg = inVar; }
+        explicit va_t(f64 inVar) : mType(TYPE_FLOAT64), mCap(0) { *(f64*)mArg = inVar; }
         explicit va_t(const char* inVar);
         explicit va_t(crunes_t const& str);
 
@@ -154,7 +154,7 @@ namespace xcore
         crunes_t convertToCRunes() const;
 
         u16  mType;
-        u16  mVar;
+        u16  mCap;
         uptr mArg[4];
     };
 
@@ -425,8 +425,8 @@ namespace xcore
         enum EProperty
         {
             PROP_INTEGER  = 0x0800,
-            PROP_SIGNED   = 0x0400,
-            PROP_UNSIGNED = 0x0200,
+            PROP_UNSIGNED = 0x0400,
+            PROP_ARRAY    = 0x0200,
             PROP_FLOAT    = 0x0100,
             PROP_MASK     = 0x0F00,
             PROP_SHIFT    = 8,
@@ -451,38 +451,41 @@ namespace xcore
             TYPE_EMPTY = 0,
             TYPE_MASK  = 0x00FF,
 
-            TYPE_INT8    = 0x0001 | PROP_INTEGER | PROP_SIGNED | SIZE_8,
-            TYPE_INT16   = 0x0002 | PROP_INTEGER | PROP_SIGNED | SIZE_16,
-            TYPE_INT     = 0x0004 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
-            TYPE_INT32   = 0x0004 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
-            TYPE_INT64   = 0x0008 | PROP_INTEGER | PROP_SIGNED | SIZE_64,
+            TYPE_INT8    = 0x0001 | PROP_INTEGER | SIZE_8,
+            TYPE_INT16   = 0x0002 | PROP_INTEGER | SIZE_16,
+            TYPE_INT     = 0x0004 | PROP_INTEGER | SIZE_32,
+            TYPE_INT32   = 0x0004 | PROP_INTEGER | SIZE_32,
+            TYPE_INT64   = 0x0008 | PROP_INTEGER | SIZE_64,
             TYPE_UINT8   = 0x0001 | PROP_INTEGER | PROP_UNSIGNED | SIZE_8,
             TYPE_UINT16  = 0x0002 | PROP_INTEGER | PROP_UNSIGNED | SIZE_16,
             TYPE_UINT    = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
             TYPE_UINT32  = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
             TYPE_UINT64  = 0x0008 | PROP_INTEGER | PROP_UNSIGNED | SIZE_64,
-            TYPE_BOOL    = 0x0020 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
+            TYPE_BOOL    = 0x0020 | PROP_INTEGER | SIZE_32,
             TYPE_UCHAR   = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
             TYPE_FLOAT32 = 0x0040 | PROP_FLOAT | SIZE_32,
             TYPE_FLOAT64 = 0x0050 | PROP_FLOAT | SIZE_64,
+            TYPE_AINT32  = 0x0004 | PROP_INTEGER | SIZE_32 | PROP_ARRAY,
             TYPE_PRUNES  = 0x0080 | SIZE_PTR
         };
 
     public:
-        va_r_t() : mType(TYPE_EMPTY), mVar(0) { mRef[0] = NULL; }
-        va_r_t(const va_r_t& c) : mType(c.mType), mVar(0) { mRef[0] = c.mRef[0]; }
-        va_r_t(s8* inRef) : mType(TYPE_INT8), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u8* inRef) : mType(TYPE_UINT8), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(s16* inRef) : mType(TYPE_INT16), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u16* inRef) : mType(TYPE_UINT16), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(s32* inRef) : mType(TYPE_INT32), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u32* inRef) : mType(TYPE_UINT32), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(s64* inRef) : mType(TYPE_INT64), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u64* inRef) : mType(TYPE_UINT64), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(bool* inRef) : mType(TYPE_BOOL), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(f32* inRef) : mType(TYPE_FLOAT32), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(f64* inRef) : mType(TYPE_FLOAT64), mVar(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(runes_t* inRef) : mType(TYPE_PRUNES), mVar(0) { mRef[0] = (uptr)inRef; }
+        va_r_t() : mType(TYPE_EMPTY), mCap(0), mSize(0), mDummy(0) { mRef[0] = NULL; }
+        va_r_t(const va_r_t& c) : mType(c.mType), mCap(0), mSize(0), mDummy(0) { mRef[0] = c.mRef[0]; }
+        va_r_t(s8* inRef) : mType(TYPE_INT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(u8* inRef) : mType(TYPE_UINT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(s16* inRef) : mType(TYPE_INT16), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(u16* inRef) : mType(TYPE_UINT16), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(s32* inRef) : mType(TYPE_INT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(u32* inRef) : mType(TYPE_UINT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(s32* inRef, s32 inCap) : mType(TYPE_INT32), mCap(inCap), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(u32* inRef, s32 inCap) : mType(TYPE_UINT32), mCap(inCap), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(s64* inRef) : mType(TYPE_INT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(u64* inRef) : mType(TYPE_UINT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(bool* inRef) : mType(TYPE_BOOL), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(f32* inRef) : mType(TYPE_FLOAT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(f64* inRef) : mType(TYPE_FLOAT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(runes_t* inRef) : mType(TYPE_PRUNES), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
 
         va_r_t& operator=(s8 rhs);
         va_r_t& operator=(u8 rhs);
@@ -498,16 +501,20 @@ namespace xcore
         va_r_t& operator=(const crunes_t& rhs);
         va_r_t& operator=(va_t const& rhs);
 
+        va_r_t& operator+=(s32 rhs);
+
         EType type() const { return (EType)mType; }
-        u16   var() const { return mVar; }
+        u16   var() const { return mCap; }
+        u16   size() const { return mSize; }
 
         s32 sizeInBits() const { return ((mType & SIZE_MASK) >> SIZE_SHIFT) << 3; }
         s32 sizeInBytes() const { return ((mType & SIZE_MASK) >> SIZE_SHIFT); }
 
-        bool isFloat() const { return bool((mType & PROP_MASK) == PROP_FLOAT); }
-        bool isInteger() const { return bool((mType & PROP_MASK) == PROP_INTEGER); }
-        bool isSignedInteger() const { return bool(isInteger() && ((mType & PROP_MASK) == PROP_SIGNED)); }
-        bool isUnsignedInteger() const { return bool(isInteger() && ((mType & PROP_MASK) == PROP_UNSIGNED)); }
+        bool isArray() const { return bool((mType & PROP_ARRAY) == PROP_ARRAY); }
+        bool isFloat() const { return bool((mType & PROP_FLOAT) == PROP_FLOAT); }
+        bool isInteger() const { return bool((mType & PROP_INTEGER) == PROP_INTEGER); }
+        bool isSignedInteger() const { return bool(isInteger() && ((mType & PROP_UNSIGNED) == 0)); }
+        bool isUnsignedInteger() const { return bool(isInteger() && ((mType & PROP_UNSIGNED) == PROP_UNSIGNED)); }
 
         bool isBool() const { return bool(mType == TYPE_BOOL); }
         bool isInt8() const { return bool(mType == TYPE_INT8); }
@@ -534,7 +541,9 @@ namespace xcore
         static va_r_t sEmpty;
 
         u16  mType;
-        u16  mVar;
+        u16  mCap;      // When PROP_ARRAY, this is the maximum capacity
+        u16  mSize;     // When PROP_ARRAY, this is the final size
+        u16  mDummy;
         uptr mRef[1];
     };
 
