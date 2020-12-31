@@ -57,6 +57,7 @@ namespace xcore
         typedef const rune* pcrune;
         static const s32       TYPE       = 2;
         static const rune      TERMINATOR = '\0';
+        static const u64       EMPTY_STRING = 0;
 
         struct runes_t
         {
@@ -64,7 +65,7 @@ namespace xcore
         };
         struct crunes_t
         {
-            crunes_t() : m_bos((pcrune) "\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
+            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
             pcrune m_bos, m_str, m_end, m_eos;
         };
     } // namespace utf16
