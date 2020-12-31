@@ -293,18 +293,21 @@ namespace xcore
     crunes_t findLastSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool inCaseSensitive = true);
 
     // -------------------------------------------------------------------------------
-    // search and select
+    // search and select text between delimiters
+    // e.g. selectBetween(str, '<', '>');
     crunes_t selectBetween(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
     crunes_t selectNextBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
     crunes_t selectBetweenLast(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
     crunes_t selectPreviousBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
+
+    // -------------------------------------------------------------------------------
+    // select before after
     crunes_t selectBeforeExclude(const crunes_t& inStr, const crunes_t& inSelection);
     crunes_t selectBeforeInclude(const crunes_t& inStr, const crunes_t& inSelection);
     crunes_t selectAfterExclude(const crunes_t& inStr, const crunes_t& inSelection);
     crunes_t selectAfterInclude(const crunes_t& inStr, const crunes_t& inSelection);
     crunes_t selectOverlap(const crunes_t& inStr, const crunes_t& inRight);
 
-    // -------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------
 
     runes_t findSelectUntil(const runes_t& inStr, uchar32 inFind, bool inCaseSensitive = true);
@@ -350,6 +353,7 @@ namespace xcore
     crunes_t parse(crunes_t const& str, u64& value, s32 base = 10);
     crunes_t parse(crunes_t const& str, f32& value);
     crunes_t parse(crunes_t const& str, f64& value);
+    
     void     to_string(runes_t& str, s32 val, s32 base = 10);
     void     to_string(runes_t& str, u32 val, s32 base = 10);
     void     to_string(runes_t& str, s64 val, s32 base = 10);
