@@ -89,9 +89,11 @@ namespace xcore
 	}
 
 	// find the bit position/index of the first bit from low to high
-	// If 'integer == 0' this function will return 0
+	// If 'integer == 0' this function will return -1
 	inline s32 xfindFirstBit(u32 integer)
 	{
+		if (integer == 0)
+			return -1;
 		return xcountTrailingZeros(integer);
 	}
 
@@ -106,6 +108,8 @@ namespace xcore
 	// If 'integer == 0' this function will return 0
 	inline s32 xfindFirstBit(u64 integer)
 	{
+		if (integer == 0)
+			return -1;
 		return xcountTrailingZeros(integer);
 	}
 
