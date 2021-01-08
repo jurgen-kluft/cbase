@@ -36,7 +36,7 @@ string class (utf32)
 
 ## xallocator
 
-We need a virtual memory based allocator :smile: (see xvmem)
+The package xvmem contains a virtual memory allocator.
 Also, split of debugging allocators like memento to xdealloc
 
 ## xatomic
@@ -102,7 +102,7 @@ Progress = Alpha
 
 Progress = Alpha
 
-- erlang like actor framework
+- simple actor framework
 - slim/optimized
 - maximum number of actors
 - actors manage the messages they send and will get them send back as GC
@@ -110,12 +110,11 @@ Progress = Alpha
 
 ## xcmdline
 
-Progress = Beta
+Progress = v1.0
 
 ## xtext
 
 - parsing/tokenizer
-  - <https://github.com/Sakrac/struse>
   - XML
   - JSON
   - Custom
