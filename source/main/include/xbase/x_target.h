@@ -1206,14 +1206,14 @@ namespace xcore
     {
     public:
         virtual ~writer_t() {}
-        virtual void write(xbyte const*, u32) = 0;
+        virtual s64 write(xbyte const*, s64) = 0;
     };
 
     class reader_t
     {
     public:
         virtual ~reader_t() {}
-        virtual s32 read(xbyte*, u32) = 0;
+        virtual s64 read(xbyte*, s64) = 0;
     };
 
     //==============================================================================
