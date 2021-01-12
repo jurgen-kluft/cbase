@@ -262,6 +262,7 @@ namespace xcore
     class runes_alloc_t
     {
     public:
+        virtual ~runes_alloc_t() {}
         virtual runes_t allocate(s32 len, s32 cap, s32 type = ascii::TYPE) = 0;
         virtual void    deallocate(runes_t& slice_t)                         = 0;
     };
