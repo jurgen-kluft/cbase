@@ -102,7 +102,8 @@ namespace xcore
 	{
 		typedef u32 field_t;
 		inline				enum_t() : bitfield(0)								{ ASSERTCT(sizeof(ENUM) <= sizeof(field_t)); }
-		inline				enum_t(ENUM inField) : bitfield(inField)				{ ASSERTCT(sizeof(ENUM) <= sizeof(field_t)); }
+		inline				enum_t(field_t inField) : bitfield(inField)			{ ASSERTCT(sizeof(ENUM) <= sizeof(field_t)); }
+		inline				enum_t(ENUM inField) : bitfield(inField)			{ ASSERTCT(sizeof(ENUM) <= sizeof(field_t)); }
 
 		inline bool     	is_set(ENUM inField) const							{ return (bitfield & ((field_t)inField)) == ((field_t)inField); }		///< Check if all bits in <inField> are set
 		inline bool     	is_any_set(ENUM inField) const						{ return (bitfield & ((field_t)inField)) != 0; }						///< Check if any bits of <inField> have been set in this bitfield
