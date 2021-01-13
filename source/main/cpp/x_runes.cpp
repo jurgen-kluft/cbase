@@ -223,28 +223,96 @@ namespace xcore
         utf8::prune endof(utf8::prune str, utf8::pcrune eos)
         {
             utf8::prune end = str;
-            while (skip(end, str, eos, 1)) {}
+            if (eos == nullptr)
+            {
+                while (*end != utf8::TERMINATOR)
+                {
+                    utf8::rune c = *end;
+                    s32 const l = sequence_sizeof_utf8(c);
+                    end += l;
+                }
+            }
+            else
+            {
+                while (*end != utf8::TERMINATOR && end < eos)
+                {
+                    utf8::rune c = *end;
+                    s32 const l = sequence_sizeof_utf8(c);
+                    end += l;
+                }
+            }
             return end;
         }
 
         utf8::pcrune endof(utf8::pcrune str, utf8::pcrune eos)
         {
             utf8::pcrune end = str;
-            while (skip(end, str, eos, 1)) {}
+            if (eos == nullptr)
+            {
+                while (*end != utf8::TERMINATOR)
+                {
+                    utf8::rune c = *end;
+                    s32 const l = sequence_sizeof_utf8(c);
+                    end += l;
+                }
+            }
+            else
+            {
+                while (*end != utf8::TERMINATOR && end < eos)
+                {
+                    utf8::rune c = *end;
+                    s32 const l = sequence_sizeof_utf8(c);
+                    end += l;
+                }
+            }
             return end;
         }
 
         utf16::prune endof(utf16::prune str, utf16::pcrune eos)
         {
             utf16::prune end = str;
-            while (skip(end, str, eos, 1)) {}
+            if (eos == nullptr)
+            {
+                while (*end != utf16::TERMINATOR)
+                {
+                    utf16::rune c = *end;
+                    s32 const l = sequence_sizeof_utf16(c);
+                    end += l;
+                }
+            }
+            else
+            {
+                while (*end != utf16::TERMINATOR && end < eos)
+                {
+                    utf16::rune c = *end;
+                    s32 const l = sequence_sizeof_utf16(c);
+                    end += l;
+                }
+            }
             return end;
         }
 
         utf16::pcrune endof(utf16::pcrune str, utf16::pcrune eos)
         {
             utf16::pcrune end = str;
-            while (skip(end, str, eos, 1)) {}
+            if (eos == nullptr)
+            {
+                while (*end != utf16::TERMINATOR)
+                {
+                    utf16::rune c = *end;
+                    s32 const l = sequence_sizeof_utf16(c);
+                    end += l;
+                }
+            }
+            else
+            {
+                while (*end != utf16::TERMINATOR && end < eos)
+                {
+                    utf16::rune c = *end;
+                    s32 const l = sequence_sizeof_utf16(c);
+                    end += l;
+                }
+            }
             return end;
         }
 
@@ -2976,6 +3044,7 @@ namespace xcore
     runes_t select(runes_t const& str, rptr_t const& from, rptr_t const& to)
     {
         runes_t r;
+        r.m_type = str.m_type;
         r.m_runes.m_ascii.m_bos = str.m_runes.m_ascii.m_bos;
         r.m_runes.m_ascii.m_str = from.m_ptr.m_ascii;
         r.m_runes.m_ascii.m_end = to.m_ptr.m_ascii;
@@ -3072,6 +3141,7 @@ namespace xcore
     crunes_t select(crunes_t const& str, cptr_t const& from, cptr_t const& to)
     {
         crunes_t r;
+        r.m_type = str.m_type;
         r.m_runes.m_ascii.m_bos = str.m_runes.m_ascii.m_bos;
         r.m_runes.m_ascii.m_str = from.m_ptr.m_ascii;
         r.m_runes.m_ascii.m_end = to.m_ptr.m_ascii;
@@ -3082,6 +3152,7 @@ namespace xcore
     crunes_t select(crunes_t const& str, cptr_t const& from, u32 len)
     {
         crunes_t r;
+        r.m_type = str.m_type;
         r.m_runes.m_ascii.m_bos = str.m_runes.m_ascii.m_bos;
         r.m_runes.m_ascii.m_eos = str.m_runes.m_ascii.m_eos;
         r.m_runes.m_ascii.m_str = from.m_ptr.m_ascii;
@@ -3161,11 +3232,10 @@ namespace xcore
 
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
-    static ascii::rune sdefault_empty_runes[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     runes_t::runes_t() : m_type(ascii::TYPE)
     {
-        m_runes.m_ascii.m_bos = sdefault_empty_runes;
+        m_runes.m_ascii.m_bos = nullptr;
         m_runes.m_ascii.m_str = m_runes.m_ascii.m_bos;
         m_runes.m_ascii.m_end = m_runes.m_ascii.m_bos;
         m_runes.m_ascii.m_eos = m_runes.m_ascii.m_bos;
@@ -3305,11 +3375,9 @@ namespace xcore
 
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
-    static ascii::rune const sdefault_empty_ascii_crunes[] = {0, 0, 0, 0, 0, 0, 0, 0};
-
     crunes_t::crunes_t() : m_type(ascii::TYPE)
     {
-        m_runes.m_ascii.m_bos = sdefault_empty_ascii_crunes;
+        m_runes.m_ascii.m_bos = nullptr;
         m_runes.m_ascii.m_str = m_runes.m_ascii.m_bos;
         m_runes.m_ascii.m_end = m_runes.m_ascii.m_bos;
         m_runes.m_ascii.m_eos = m_runes.m_ascii.m_bos;

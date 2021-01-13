@@ -448,7 +448,7 @@ namespace xcore
     void trimDelimiters(crunes_t&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side
 
     void copy(const crunes_t& src, runes_t& dst);
-    void copy(const crunes_t& src, runes_t& dst, runes_alloc_t* allocator, s32 size_alignment);
+    void copy(const crunes_t& src, runes_t& dst, runes_alloc_t* allocator, s32 size_alignment = 8);
 
     void concatenate(runes_t& str, const crunes_t& concat);
     void concatenate(runes_t& str, const crunes_t& concat, runes_alloc_t* allocator, s32 size_alignment);
