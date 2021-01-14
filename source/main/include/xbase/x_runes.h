@@ -146,11 +146,6 @@ namespace xcore
         void clear();
         void term();
 
-        void concatenate(ascii::rune c);
-        void concatenate(utf32::rune c);
-        void concatenate(const ascii::crunes_t& str);
-        void concatenate(const utf32::crunes_t& str);
-
         runes_t& operator+=(const ascii::crunes_t& str);
         runes_t& operator+=(const utf32::crunes_t& str);
         runes_t& operator+=(ascii::rune c);
@@ -483,10 +478,8 @@ namespace xcore
         }
         inline runez_t(const char* _str) : runes_t(m_run, m_run, &m_run[SIZE - 1])
         {
-            ascii::crunes_t str((ascii::pcrune)_str, (ascii::pcrune)_str);
-            while (*str.m_end != '\0') str.m_end++;
-            str.m_eos = str.m_end;
-            concatenate(str);
+            crunes_t str((ascii::pcrune)_str);
+            concatenate(*this, str);
             term();
         }
     };
@@ -510,7 +503,8 @@ namespace xcore
         inline crunez_t(const char* str) : crunes_t(m_run, &m_run[SIZE - 1])
         {
             runes_t run(m_run, m_run, &m_run[SIZE - 1]);
-            concatenate(run, str);
+            crunes_t cstr((ascii::pcrune)_str, (ascii::pcrune)_str);
+            concatenate(run, cstr);
             run.term();
             m_runes.m_ascii.m_end = run.m_runes.m_ascii.m_end;
         }
