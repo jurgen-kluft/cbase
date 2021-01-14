@@ -141,6 +141,7 @@ namespace xcore
         s32  cap() const;
         bool is_empty() const;
         bool is_valid() const;
+        bool is_nil() const;
         void reset();
         void clear();
         void term();
@@ -242,6 +243,7 @@ namespace xcore
         s32  size() const;
         bool is_valid() const;
         bool is_empty() const;
+        bool is_nil() const;
         void reset();
         void clear();
 
@@ -263,8 +265,8 @@ namespace xcore
     {
     public:
         virtual ~runes_alloc_t() {}
-        virtual runes_t allocate(s32 len, s32 cap, s32 type = ascii::TYPE) = 0;
-        virtual void    deallocate(runes_t& slice_t)                         = 0;
+        virtual runes_t allocate(s32 len, s32 cap, s32 type) = 0;
+        virtual void    deallocate(runes_t& slice_t)         = 0;
     };
 
     // -------------------------------------------------------------------------------
