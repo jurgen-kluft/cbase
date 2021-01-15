@@ -70,7 +70,6 @@ Package for dealing with date and time
 
 We need to redesign this a bit by limiting the feature set, design can consider multithreading but should by default be single-threaded.
 
-- xfile, xdir
 - xfileinfo, xdirinfo
 - xfilepath, xdirpath
 
