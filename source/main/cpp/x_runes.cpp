@@ -2945,7 +2945,7 @@ namespace xcore
 
     void resize(runes_t& str, s32 cap, runes_alloc_t* allocator, s32 size_alignment)
     {
-        runes_t nstr = allocator->allocate(0, cap);
+        runes_t nstr = allocator->allocate(0, cap, str.m_type);
         if (str.is_valid())
         {
             copy(str, nstr);
@@ -2964,6 +2964,8 @@ namespace xcore
         while (diter < dend && siter < send)
         {
             uchar32 c = read(_src, siter);
+            if (c == 0)
+                break;
             write(_dst, diter, c);
         }
         _dst = select(_dst, dbegin, diter);
@@ -2986,9 +2988,10 @@ namespace xcore
 
     void copy(const crunes_t& src, runes_t& dst, runes_alloc_t* allocator, s32 size_alignment)
     {
-        s32 const required = dst.size();
+        s32 const required = src.size();
         if (required > dst.cap())
         {
+            allocator->deallocate(dst);
             resize(dst, required, allocator, size_alignment);
         }
         copy(src, dst);
@@ -3292,8 +3295,8 @@ namespace xcore
         s32 size = 0;
         switch (m_type)
         {
-            case ascii::TYPE: size = (s32)((m_runes.m_ascii.m_end - m_runes.m_ascii.m_str) / sizeof(ascii::rune)); break;
-            case utf32::TYPE: size = (s32)((m_runes.m_utf32.m_end - m_runes.m_utf32.m_str) / sizeof(utf32::rune)); break;
+            case ascii::TYPE: size = (s32)((m_runes.m_ascii.m_end - m_runes.m_ascii.m_str)); break;
+            case utf32::TYPE: size = (s32)((m_runes.m_utf32.m_end - m_runes.m_utf32.m_str)); break;
             case utf16::TYPE:
             case utf8::TYPE:
                 break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf
@@ -3306,13 +3309,15 @@ namespace xcore
         s32 cap = 0;
         switch (m_type)
         {
-            case ascii::TYPE: cap = (s32)((m_runes.m_ascii.m_eos - m_runes.m_ascii.m_str) / sizeof(ascii::rune)); break;
-            case utf32::TYPE: cap = (s32)((m_runes.m_utf32.m_eos - m_runes.m_utf32.m_str) / sizeof(utf32::rune)); break;
+            case ascii::TYPE: cap = (s32)((m_runes.m_ascii.m_eos - m_runes.m_ascii.m_str)); break;
+            case utf32::TYPE: cap = (s32)((m_runes.m_utf32.m_eos - m_runes.m_utf32.m_str)); break;
         }
         return cap;
     }
+
     bool runes_t::is_empty() const { return size() == 0; }
     bool runes_t::is_valid() const { return m_runes.m_ascii.m_end < m_runes.m_ascii.m_eos; }
+    bool runes_t::is_nil() const { return m_runes.m_ascii.m_bos == nullptr; }
     void runes_t::reset() { m_runes.m_ascii.m_end = m_runes.m_ascii.m_str; }
     void runes_t::clear()
     {
@@ -3330,40 +3335,34 @@ namespace xcore
         }
     }
 
-    void runes_t::concatenate(ascii::rune c)
-    {
-        if (!is_valid())
-            return;
-        switch (m_type)
-        {
-            case ascii::TYPE: *m_runes.m_ascii.m_end++ = c; break;
-            case utf32::TYPE: *(m_runes.m_utf32.m_end)++ = c; break;
-            case utf16::TYPE: *m_runes.m_utf16.m_end++ = c; break;
-            case utf8::TYPE: *m_runes.m_utf8.m_end++ = c; break;
-        }
-    }
-    void runes_t::concatenate(utf32::rune c) {}
-    void runes_t::concatenate(const ascii::crunes_t& str) {}
-    void runes_t::concatenate(const utf32::crunes_t& str) {}
-
     runes_t& runes_t::operator+=(const ascii::crunes_t& str)
     {
-        concatenate(str);
+        crunes_t cstr(str);
+        concatenate(*this, cstr);
         return *this;
     }
     runes_t& runes_t::operator+=(const utf32::crunes_t& str)
     {
-        concatenate(str);
+        crunes_t cstr(str);
+        concatenate(*this, cstr);
         return *this;
     }
     runes_t& runes_t::operator+=(ascii::rune c)
     {
-        concatenate(c);
+        ascii::rune str[2];
+        str[0] = c;
+        str[1] = ascii::TERMINATOR;
+        crunes_t cstr(str, 1);
+        concatenate(*this, cstr);
         return *this;
     }
     runes_t& runes_t::operator+=(utf32::rune c)
     {
-        concatenate(c);
+        utf32::rune str[2];
+        str[0] = c;
+        str[1] = utf32::TERMINATOR;
+        crunes_t cstr(str, 1);
+        concatenate(*this, cstr);
         return *this;
     }
     runes_t& runes_t::operator=(runes_t const& other)
@@ -3596,8 +3595,8 @@ namespace xcore
         s32 size = 0;
         switch (m_type)
         {
-            case ascii::TYPE: size = (s32)((m_runes.m_ascii.m_end - m_runes.m_ascii.m_str) / sizeof(ascii::rune)); break;
-            case utf32::TYPE: size = (s32)((m_runes.m_utf32.m_end - m_runes.m_utf32.m_str) / sizeof(utf32::rune)); break;
+            case ascii::TYPE: size = (s32)((m_runes.m_ascii.m_end - m_runes.m_ascii.m_str)); break;
+            case utf32::TYPE: size = (s32)((m_runes.m_utf32.m_end - m_runes.m_utf32.m_str)); break;
             case utf16::TYPE:
             case utf8::TYPE:
                 break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf
@@ -3607,6 +3606,7 @@ namespace xcore
     }
     bool crunes_t::is_empty() const { return m_runes.m_ascii.m_end == m_runes.m_ascii.m_str; }
     bool crunes_t::is_valid() const { return m_runes.m_ascii.m_end < m_runes.m_ascii.m_eos; }
+    bool crunes_t::is_nil() const { return m_runes.m_ascii.m_bos == nullptr; }
     void crunes_t::reset() { m_runes.m_ascii.m_end = m_runes.m_ascii.m_str; }
     void crunes_t::clear()
     {
