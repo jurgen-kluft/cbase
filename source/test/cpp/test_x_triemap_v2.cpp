@@ -154,28 +154,28 @@ namespace xcore
         key_t const mask = (0xFFFFFFFFFFFFFFFFUL >> ppos);
         key_t const diff = (v1->m_key ^ v2->m_key) & mask;
         s32 const   clen = xcountLeadingZeros(diff) - ppos;
-        s32 const   cvec = clen / node_t::RUN_MAXLEN;
 
-        // We always need to create a branch at multiples of RUN_MAXLEN
+        // Do we always need to create a branch at multiples of RUN_MAXLEN
+        // Nope, we only need to create nodes for when the run is longer than RUN_MAXLEN
         // At which bit position can v1 and v2 diverge ?
         // In which vec does that bit position lie ?
         // Which vec are we currently at ?
         // Where is the next multiple of RUN_MAXLEN ?
         s32     p    = ppos;
         s32     l    = clen;
-        s32     v    = cvec;
         node_t* head = parent;
         if (l > node_t::RUN_MAXLEN)
         {
             while (l > node_t::RUN_MAXLEN)
             {
                 // We need to create nodes to cover the identical run.
-                // Could take more than 1 node!
+                // Can take more than 1 node!
                 m_num_nodes++;
                 node_t* intnode = m_nodes->construct<node_t>();
 
                 // What about 'vec'?
-                intnode->set_run_bitpos(p); // Should this not be 0 ?
+                // I don' think 'vec' matters, the only point that matters is the run length
+                intnode->set_run_bitpos(p);
                 intnode->set_run_bitlen(node_t::RUN_MAXLEN);
                 intnode->set_run_bits(v1->m_key); // Node should take its part from the full key
 
@@ -409,11 +409,11 @@ namespace xcore
         //
         // 1. Node has 2 children, both are values:
         //    The value that is left, replace the 'node' child of the parent with the 'value'
-        //    We can only do this when both nodes are in the same 'vec'
+        //    We can only do this when the combined run of both nodes <= node_t::RUN_MAXLEN
         //    Delete this node.
         // 2. Node has 2 children, one is a value, one is a node:
         //    Remove the value.
-        //    We are only allowed to merge the nodes when they have are in the same 'vec'
+        //    We are only allowed to merge the nodes when their combined run is <= node_t::RUN_MAXLEN
         //    Merge this 'node' with the child 'node'.
         //    Delete this node.
 
@@ -465,6 +465,9 @@ namespace xcore
                     // Found it, now remove this node
                     u8 const ctype = n->get_child_type(1 - child);
 
+                    // Can we actually merge the nodes, check if the resulting run
+                    // can fit into the maximum run length.
+                    // @TODO
                     if (ctype == node_t::CHILD_TYPE_VALUE)
                     {
                         // Case 1: node 'n' has two values
