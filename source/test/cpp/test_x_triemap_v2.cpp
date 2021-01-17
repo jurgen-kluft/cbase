@@ -31,11 +31,11 @@ namespace xcore
 
         enum
         {
-            RUN_MAXLEN        = 48, 
-            CHILD_TYPE_VALUE  = 0,
-            CHILD_TYPE_NODE   = 1,
-            BRANCH_NUMBITS    = 1,
-            KEY_MAX_BITCNT    = 64 // Actually this has a maximum of 256 bits, but the current implementation uses a 64-bit unsigned integer as the key
+            RUN_MAXLEN       = 48,
+            CHILD_TYPE_VALUE = 0,
+            CHILD_TYPE_NODE  = 1,
+            BRANCH_NUMBITS   = 1,
+            KEY_MAX_BITCNT   = 64 // Actually this has a maximum of 256 bits, but the current implementation uses a 64-bit unsigned integer as the key
         };
 
         inline node_t()
@@ -61,11 +61,12 @@ namespace xcore
 
         inline void set_run_bitpos(u32 pos) { m_pos = pos; }
         inline void set_run_bitlen(u32 len) { m_run = run; }
-        inline void set_run_bits(key_t bits)
-        {
-            s32 const vec = pos / RUN_MAXLEN; }
-            m_key         = bits >> (KEY_MAX_BITCNT - RUN_MAXLEN - (vec * RUN_MAXLEN));
-        }
+        inline void set_run_bits(key_t bits) { m_key = bits >> (KEY_MAX_BITCNT - (m_pos + m_run)); }
+
+        // pos = 16
+        // run = 8
+        // xxxxxxxx xxxxxxxx ........ xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx
+        // SHR by 64 - (16 + 8) = 40
 
         inline s8 get_indexof_child(child_t vvalue) const
         {
@@ -113,7 +114,7 @@ namespace xcore
     class xdtrie2
     {
     public:
-        inline xdtrie2(fsa_t* fsa)
+        inline xdtrie2(fsadexed_t* fsa)
             : m_root(nullptr)
             , m_value(nullptr)
             , m_num_values(0)
@@ -173,8 +174,6 @@ namespace xcore
                 m_num_nodes++;
                 node_t* intnode = m_nodes->construct<node_t>();
 
-                // What about 'vec'?
-                // I don' think 'vec' matters, the only point that matters is the run length
                 intnode->set_run_bitpos(p);
                 intnode->set_run_bitlen(node_t::RUN_MAXLEN);
                 intnode->set_run_bits(v1->m_key); // Node should take its part from the full key
