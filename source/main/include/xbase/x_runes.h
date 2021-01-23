@@ -503,7 +503,7 @@ namespace xcore
         inline crunez_t(const char* str) : crunes_t(m_run, &m_run[SIZE - 1])
         {
             runes_t run(m_run, m_run, &m_run[SIZE - 1]);
-            crunes_t cstr((ascii::pcrune)_str, (ascii::pcrune)_str);
+            crunes_t cstr((ascii::pcrune)str, (ascii::pcrune)str);
             concatenate(run, cstr);
             run.term();
             m_runes.m_ascii.m_end = run.m_runes.m_ascii.m_end;

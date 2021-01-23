@@ -78,6 +78,8 @@ namespace xcore
 	// If 'integer == 0' this function will return 0
 	inline s32 xfindFirstBit(u16 integer)
 	{
+		if (integer == 0)
+			return -1;
 		return xcountTrailingZeros(integer);
 	}
 

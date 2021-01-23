@@ -131,7 +131,7 @@ namespace xcore
 			count += 2;
 			integer = integer << 2;
 		}
-		if ((integer & 0x8000) == 0)
+		if ((integer & 0x4000) == 0)
 		{
 			count += 1;
 		}
@@ -166,7 +166,7 @@ namespace xcore
 			count += 2;
 			integer = integer << 2;
 		}
-		if ((integer & 0x80000000) == 0)
+		if ((integer & 0x40000000) == 0)
 		{
 			count += 1;
 		}
@@ -206,7 +206,7 @@ namespace xcore
 			count += 2;
 			integer = integer << 2;
 		}
-		if ((integer & 0x8000000000000000UL) == 0)
+		if ((integer & 0x4000000000000000UL) == 0)
 		{
 			count += 1;
 		}
@@ -246,6 +246,8 @@ namespace xcore
 	// If 'integer == 0' this function will return 0
 	inline s32 xfindFirstBit(u16 integer)
 	{
+		if (integer == 0)
+			return -1;
 		return xcountTrailingZeros(integer);
 	}
 
@@ -260,6 +262,8 @@ namespace xcore
 	// If 'integer == 0' this function will return 0
 	inline s32 xfindFirstBit(u32 integer)
 	{
+		if (integer == 0)
+			return -1;
 		return xcountTrailingZeros(integer);
 	}
 
@@ -274,6 +278,8 @@ namespace xcore
 	// If 'integer == 0' this function will return 0
 	inline s32 xfindFirstBit(u64 integer)
 	{
+		if (integer == 0)
+			return -1;
 		return xcountTrailingZeros(integer);
 	}
 
