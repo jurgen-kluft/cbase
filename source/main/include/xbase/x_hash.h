@@ -34,7 +34,7 @@ namespace xcore
         void reset(xbyte const* seed);
     };
 
-    u64 x_hasher(xbyte const* data, u32 size);
+    u64 calchash(xbyte const* data, u32 size);
 
     template <typename K> class hasher_t
     {
@@ -45,43 +45,54 @@ namespace xcore
     template <> class hasher_t<s32>
     {
     public:
-        u64 hash(s32 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
+        u64 hash(s32 const& k) const { return calchash((const xbyte*)&k, sizeof(k)); }
     };
 
     template <> class hasher_t<u32>
     {
     public:
-        u64 hash(u32 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
+        u64 hash(u32 const& k) const { return calchash((const xbyte*)&k, sizeof(k)); }
     };
 
     template <> class hasher_t<s64>
     {
     public:
-        u64 hash(s64 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
+        u64 hash(s64 const& k) const { return calchash((const xbyte*)&k, sizeof(k)); }
     };
 
     template <> class hasher_t<u64>
     {
     public:
-        u64 hash(u64 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
+        u64 hash(u64 const& k) const { return calchash((const xbyte*)&k, sizeof(k)); }
     };
 
     template <> class hasher_t<f32>
     {
     public:
-        u64 hash(f32 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
+        u64 hash(f32 const& k) const { return calchash((const xbyte*)&k, sizeof(k)); }
     };
 
     template <> class hasher_t<f64>
     {
     public:
-        u64 hash(f64 const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
+        u64 hash(f64 const& k) const { return calchash((const xbyte*)&k, sizeof(k)); }
     };
 
     template <> class hasher_t<void*>
     {
     public:
-        u64 hash(void* const& k) const { return x_hasher((const xbyte*)&k, sizeof(k)); }
+        u64 hash(void* const k) const { return calchash((const xbyte*)&k, sizeof(k)); }
+    };
+
+    template <> class hasher_t<const char*>
+    {
+    public:
+        u64 hash(const char* const k) const 
+        {
+            const char* i = k;
+            while (*i != '\0') i++;
+            return calchash((const xbyte*)k, (s32)(i-k));
+        }
     };
 } // namespace xcore
 
