@@ -1,6 +1,7 @@
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_hash.h"
+#include "xbase/x_runes.h"
 
 namespace xcore
 {
@@ -125,6 +126,7 @@ namespace xcore
 
     // ----------------------------------------------------------------------------
     u64 calchash(xbyte const* data, u32 size) { return XXH64(data, size); }
+
 } // namespace xcore
 
 namespace xcore
@@ -264,6 +266,29 @@ namespace xcore
         sipround(d_v0, d_v1, d_v2, d_v3);
         b = d_v0 ^ d_v1 ^ d_v2 ^ d_v3;
         return b;
+    }
+
+    u64 calchash(crunes_t const& strdata)
+    {
+        hashing_t hash;
+        hash.reset();
+
+        switch (strdata.m_type)
+        {
+        case ascii::TYPE: 
+            hash.hash(strdata.m_runes.m_ascii.m_str, strdata.size()); 
+            break;
+        case utf8::TYPE: 
+            hash.hash(strdata.m_runes.m_utf8.m_str, strdata.size()); 
+            break;
+        case utf16::TYPE:
+            hash.hash(strdata.m_runes.m_utf16.m_str, strdata.size()); 
+            break;
+        case utf32::TYPE:
+            hash.hash(strdata.m_runes.m_utf32.m_str, strdata.size()); 
+            break;
+        }
+        return hash.finalize();
     }
 
 }; // namespace xcore

@@ -7,6 +7,8 @@
 
 namespace xcore
 {
+    struct crunes_t;
+
     // Using SipHash
     class hashing_t
     {
@@ -35,6 +37,7 @@ namespace xcore
     };
 
     u64 calchash(xbyte const* data, u32 size);
+    u64 calchash(crunes_t const& str);
 
     template <typename K> class hasher_t
     {
