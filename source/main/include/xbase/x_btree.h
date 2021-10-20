@@ -35,11 +35,11 @@ namespace xcore
     };
 
 	// 
-    // A xbtree is a low-level BST that is unbalanced and where branches grow/shrink when 
-    // adding or removing items. The xbtree32 implementation uses indices instead of pointers
+    // A btree is a low-level BST that is unbalanced and where branches grow/shrink when 
+    // adding or removing items. The btree_idx_t implementation uses indices instead of pointers
     // and thus uses the same amount of memory on a 32-bit system as compared to a 64-bit
-    // system. For every key-value inserted you can consider ~6/8 bytes for xbtree32. For
-    // xbtree it is an average of ~12/16 bytes per item.
+    // system. For every key-value inserted you can consider ~6/8 bytes for btree_idx_t. For
+    // btree_ptr_t it is an average of ~12/16 bytes per item.
     // 
     // We use an `indexer` which is responsible for computing the index at every level
     // of the tree for a given 'key'. If the keydexer goes through the key from msb to lsb
