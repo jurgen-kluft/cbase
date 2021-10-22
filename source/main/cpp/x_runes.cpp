@@ -3320,9 +3320,25 @@ namespace xcore
             case ascii::TYPE: size = (s32)((m_runes.m_ascii.m_end - m_runes.m_ascii.m_str)); break;
             case utf32::TYPE: size = (s32)((m_runes.m_utf32.m_end - m_runes.m_utf32.m_str)); break;
             case utf16::TYPE:
+            {
+                utf16::prune str = m_runes.m_utf16.m_str;
+                while (*str != 0)
+                {
+                    size += 1;
+                    utf::read(m_runes.m_utf16, str);
+                }
+                break;
+            }
             case utf8::TYPE:
-                break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf
-                       // value.
+            {
+                utf8::prune str = m_runes.m_utf8.m_str;
+                while (*str != 0)
+                {
+                    size += 1;
+                    utf::read(m_runes.m_utf8, str);
+                }
+                break;
+            }
         }
         return size;
     }
@@ -3332,6 +3348,7 @@ namespace xcore
         switch (m_type)
         {
             case ascii::TYPE: cap = (s32)((m_runes.m_ascii.m_eos - m_runes.m_ascii.m_str)); break;
+            case utf16::TYPE: cap = (s32)((m_runes.m_utf16.m_eos - m_runes.m_utf16.m_str)); break;
             case utf32::TYPE: cap = (s32)((m_runes.m_utf32.m_eos - m_runes.m_utf32.m_str)); break;
         }
         return cap;
