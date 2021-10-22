@@ -129,9 +129,14 @@ namespace xcore
 
         runes_t();
         runes_t(runes_t const& other);
+
         runes_t(ascii::prune _str, ascii::prune _end, s32 _type = ascii::TYPE);
         runes_t(ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type = ascii::TYPE);
         runes_t(ascii::prune _bos, ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type = ascii::TYPE);
+
+        runes_t(utf16::prune _str, utf16::prune _end, s32 _type = utf16::TYPE);
+        runes_t(utf16::prune _str, utf16::prune _end, utf16::prune _eos, s32 _type = utf16::TYPE);
+        runes_t(utf16::prune _bos, utf16::prune _str, utf16::prune _end, utf16::prune _eos, s32 _type = utf16::TYPE);
 
         runes_t(utf32::prune _str, utf32::prune _end, s32 _type = utf32::TYPE);
         runes_t(utf32::prune _str, utf32::prune _end, utf32::prune _eos, s32 _type = utf32::TYPE);

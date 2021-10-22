@@ -3268,6 +3268,28 @@ namespace xcore
         m_runes.m_ascii.m_eos = _eos;
     }
 
+    runes_t::runes_t(utf16::prune _str, utf16::prune _end, s32 _type) : m_type(_type)
+    {
+        m_runes.m_utf16.m_bos = _str;
+        m_runes.m_utf16.m_str = _str;
+        m_runes.m_utf16.m_eos = _end;
+        m_runes.m_utf16.m_end = _end;
+    }
+    runes_t::runes_t(utf16::prune _str, utf16::prune _end, utf16::prune _eos, s32 _type) : m_type(_type)
+    {
+        m_runes.m_utf16.m_bos = _str;
+        m_runes.m_utf16.m_str = _str;
+        m_runes.m_utf16.m_end = _end;
+        m_runes.m_utf16.m_eos = _eos;
+    }
+    runes_t::runes_t(utf16::prune _bos, utf16::prune _str, utf16::prune _end, utf16::prune _eos, s32 _type) : m_type(_type)
+    {
+        m_runes.m_utf16.m_bos = _bos;
+        m_runes.m_utf16.m_str = _str;
+        m_runes.m_utf16.m_end = _end;
+        m_runes.m_utf16.m_eos = _eos;
+    }
+
     runes_t::runes_t(utf32::prune _str, utf32::prune _end, s32 _type) : m_type(_type)
     {
         m_runes.m_utf32.m_bos = _str;
