@@ -3312,6 +3312,43 @@ namespace xcore
         m_runes.m_utf32.m_eos = _eos;
     }
 
+    ascii::prune runes_t::str()
+    {
+        if (m_type == ascii::TYPE)
+            return m_runes.m_ascii.m_str;
+        return nullptr;
+    }
+    utf16::prune runes_t::str16()
+    {
+        if (m_type == utf16::TYPE)
+            return m_runes.m_utf16.m_str;
+        return nullptr;
+    }
+    utf32::prune runes_t::str32()
+    {
+        if (m_type == utf16::TYPE)
+            return m_runes.m_utf16.m_str;
+        return nullptr;
+    }
+    ascii::prune runes_t::end()
+    {
+        if (m_type == ascii::TYPE)
+            return m_runes.m_ascii.m_end;
+        return nullptr;
+    }
+    utf16::prune runes_t::end16()
+    {
+        if (m_type == utf16::TYPE)
+            return m_runes.m_utf16.m_end;
+        return nullptr;
+    }
+    utf32::prune runes_t::end32()
+    {
+        if (m_type == utf16::TYPE)
+            return m_runes.m_utf16.m_end;
+        return nullptr;
+    }
+
     s32 runes_t::size() const
     {
         s32 size = 0;

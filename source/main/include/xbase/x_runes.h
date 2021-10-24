@@ -142,6 +142,13 @@ namespace xcore
         runes_t(utf32::prune _str, utf32::prune _end, utf32::prune _eos, s32 _type = utf32::TYPE);
         runes_t(utf32::prune _bos, utf32::prune _str, utf32::prune _end, utf32::prune _eos, s32 _type = utf32::TYPE);
 
+        ascii::prune str();
+        utf16::prune str16();
+        utf32::prune str32();
+        ascii::prune end();
+        utf16::prune end16();
+        utf32::prune end32();
+
         s32  size() const;
         s32  cap() const;
         bool is_empty() const;
