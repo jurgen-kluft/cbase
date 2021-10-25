@@ -3326,8 +3326,8 @@ namespace xcore
     }
     utf32::prune runes_t::str32()
     {
-        if (m_type == utf16::TYPE)
-            return m_runes.m_utf16.m_str;
+        if (m_type == utf32::TYPE)
+            return m_runes.m_utf32.m_str;
         return nullptr;
     }
     ascii::prune runes_t::end()
@@ -3344,8 +3344,8 @@ namespace xcore
     }
     utf32::prune runes_t::end32()
     {
-        if (m_type == utf16::TYPE)
-            return m_runes.m_utf16.m_end;
+        if (m_type == utf32::TYPE)
+            return m_runes.m_utf32.m_end;
         return nullptr;
     }
 
