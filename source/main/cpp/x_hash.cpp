@@ -276,16 +276,16 @@ namespace xcore
         switch (strdata.m_type)
         {
         case ascii::TYPE: 
-            hash.hash(strdata.m_runes.m_ascii.m_str, strdata.size()); 
+            hash.hash(strdata.m_runes.m_ascii.m_str, strdata.size() * sizeof(ascii::rune)); 
             break;
         case utf8::TYPE: 
-            hash.hash(strdata.m_runes.m_utf8.m_str, strdata.size()); 
+            hash.hash(strdata.m_runes.m_utf8.m_str, strdata.size() * sizeof(utf8::rune)); 
             break;
         case utf16::TYPE:
-            hash.hash(strdata.m_runes.m_utf16.m_str, strdata.size()); 
+            hash.hash(strdata.m_runes.m_utf16.m_str, strdata.size() * sizeof(utf16::rune)); 
             break;
         case utf32::TYPE:
-            hash.hash(strdata.m_runes.m_utf32.m_str, strdata.size()); 
+            hash.hash(strdata.m_runes.m_utf32.m_str, strdata.size() * sizeof(utf32::rune)); 
             break;
         }
         return hash.finalize();
