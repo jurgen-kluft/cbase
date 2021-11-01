@@ -1783,8 +1783,8 @@ namespace xcore
     crunes_t selectNextBetween(const crunes_t& _str, const crunes_t& _selection, uchar32 _left, uchar32 _right)
     {
         crunes_t str;
-        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
-        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
         str.m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
         str.m_runes.m_ascii.m_str = _selection.m_runes.m_ascii.m_end;
         return selectBetween(str, _left, _right);
@@ -1809,8 +1809,8 @@ namespace xcore
     crunes_t selectPreviousBetween(const crunes_t& _str, const crunes_t& _selection, uchar32 _left, uchar32 _right)
     {
         crunes_t str;
-        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
-        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
         str.m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
         str.m_runes.m_ascii.m_end = _selection.m_runes.m_ascii.m_str;
         str.m_type                = _str.m_type;
@@ -1820,8 +1820,8 @@ namespace xcore
     crunes_t selectBeforeExclude(const crunes_t& _str, const crunes_t& _selection)
     {
         crunes_t str;
-        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
-        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
         str.m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
         str.m_runes.m_ascii.m_end = _selection.m_runes.m_ascii.m_str;
         str.m_type                = _str.m_type;
@@ -1831,8 +1831,8 @@ namespace xcore
     crunes_t selectBeforeInclude(const crunes_t& _str, const crunes_t& _selection)
     {
         crunes_t str;
-        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
-        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        str.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
         str.m_runes.m_ascii.m_str = _str.m_runes.m_ascii.m_str;
         str.m_runes.m_ascii.m_end = _selection.m_runes.m_ascii.m_end;
         str.m_type                = _str.m_type;
@@ -1842,8 +1842,8 @@ namespace xcore
     crunes_t selectAfterExclude(const crunes_t& _str, const crunes_t& _selection)
     {
         crunes_t sel;
-        sel.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
-        sel.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        sel.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        sel.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
         sel.m_runes.m_ascii.m_str = _selection.m_runes.m_ascii.m_end;
         sel.m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
         sel.m_type                = _str.m_type;
@@ -1853,8 +1853,8 @@ namespace xcore
     crunes_t selectAfterInclude(const crunes_t& _str, const crunes_t& _selection)
     {
         crunes_t sel;
-        sel.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_eos;
-        sel.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_bos;
+        sel.m_runes.m_ascii.m_bos = _str.m_runes.m_ascii.m_bos;
+        sel.m_runes.m_ascii.m_eos = _str.m_runes.m_ascii.m_eos;
         sel.m_runes.m_ascii.m_str = _selection.m_runes.m_ascii.m_str;
         sel.m_runes.m_ascii.m_end = _str.m_runes.m_ascii.m_end;
         sel.m_type                = _str.m_type;
@@ -3326,8 +3326,8 @@ namespace xcore
     }
     utf32::prune runes_t::str32()
     {
-        if (m_type == utf16::TYPE)
-            return m_runes.m_utf16.m_str;
+        if (m_type == utf32::TYPE)
+            return m_runes.m_utf32.m_str;
         return nullptr;
     }
     ascii::prune runes_t::end()
@@ -3344,8 +3344,8 @@ namespace xcore
     }
     utf32::prune runes_t::end32()
     {
-        if (m_type == utf16::TYPE)
-            return m_runes.m_utf16.m_end;
+        if (m_type == utf32::TYPE)
+            return m_runes.m_utf32.m_end;
         return nullptr;
     }
 

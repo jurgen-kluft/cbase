@@ -482,13 +482,12 @@ namespace xcore
         };
         T m_run[SIZE];
         inline runez_t() : runes_t(m_run, m_run, &m_run[SIZE - 1]) {}
-        inline runez_t(uchar32 c) : runes_t(m_run, &m_run[SIZE - 1])
+        inline runez_t(uchar32 c) : runes_t(m_run, &m_run[1])
         {
             m_run[0] = c;
             m_run[1] = 0;
-            m_runes.m_ascii.m_end += sizeof(T);
         }
-        inline runez_t(const char* _str) : runes_t(m_run, m_run, &m_run[SIZE - 1])
+        inline runez_t(const char* _str) : runes_t(m_run, m_run, m_run, &m_run[SIZE - 1])
         {
             crunes_t str((ascii::pcrune)_str);
             concatenate(*this, str);
@@ -505,16 +504,15 @@ namespace xcore
         };
         T m_run[SIZE];
 
-        inline crunez_t(uchar32 c) : crunes_t(m_run, &m_run[SIZE - 1])
+        inline crunez_t(uchar32 c) : crunes_t(m_run, &m_run[1])
         {
             m_run[0] = c;
             m_run[1] = 0;
-            m_runes.m_ascii.m_end += sizeof(T);
         }
 
-        inline crunez_t(const char* str) : crunes_t(m_run, &m_run[SIZE - 1])
+        inline crunez_t(const char* str) : crunes_t(m_run, m_run, m_run, &m_run[SIZE - 1])
         {
-            runes_t run(m_run, m_run, &m_run[SIZE - 1]);
+            runes_t run(m_run, m_run, m_run, &m_run[SIZE - 1]);
             crunes_t cstr((ascii::pcrune)str, (ascii::pcrune)str);
             concatenate(run, cstr);
             run.term();
