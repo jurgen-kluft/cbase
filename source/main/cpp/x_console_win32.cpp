@@ -56,26 +56,8 @@ namespace xcore
                 }
             }
         }
-        virtual void writeln()
-        {
-            utf32::rune line32[] = {'\r', 0};
-            crunes_t    line(line32, 1);
-            write(line);
-        }
 
-        virtual s32 write(const crunes_t& str)
-        {
-            switch (str.m_type)
-            {
-                case ascii::TYPE: return write(str.m_runes.m_ascii);
-                case utf32::TYPE: return write(str.m_runes.m_utf32);
-                default: //@todo: UTF-8 and UTF-16
-					break;
-            }
-            return 0;
-        }
-
-        virtual s32 write(const ascii::crunes_t& str)
+        s32 write(const ascii::crunes_t& str)
         {
             const s32 maxlen = 252;
             uchar16   str16[maxlen + 4];
@@ -102,7 +84,7 @@ namespace xcore
             return l;
         }
 
-        virtual s32 write(const utf32::crunes_t& str)
+        s32 write(const utf32::crunes_t& str)
         {
             const s32 maxlen = 252;
             uchar16   str16[maxlen + 4];
@@ -127,6 +109,32 @@ namespace xcore
                 l += ll;
             }
             return l;
+        }
+
+
+
+        virtual void writeln()
+        {
+            utf32::rune line32[] = {'\r', 0};
+            crunes_t    line(line32, 1);
+            write(line);
+        }
+
+        virtual s32 write(const crunes_t& str)
+        {
+            switch (str.m_type)
+            {
+                case ascii::TYPE: return write(str.m_runes.m_ascii);
+                case utf32::TYPE: return write(str.m_runes.m_utf32);
+                default: //@todo: UTF-8 and UTF-16
+					break;
+            }
+            return 0;
+        }
+
+        virtual s32 write(const crunes_t& str, const va_list_t& args)
+        {
+            return 0;
         }
     };
 

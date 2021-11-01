@@ -104,22 +104,12 @@ namespace xcore
 		sLogger[inLevel]->write(_value);
 	}
 
-	void 				log_t::write(ELevel inLevel, const ascii::crunes_t& str)
+	void 				log_t::write(ELevel inLevel, const crunes_t& str)
 	{
 		sLogger[inLevel]->write(str);
 	}
 
-	void 				log_t::write(ELevel inLevel, const ascii::crunes_t& format, const va_list_t& arguments)
-	{
-		sLogger[inLevel]->write(format, arguments);
-	}
-
-	void 				log_t::write(ELevel inLevel, const utf32::crunes_t& str)
-	{
-		sLogger[inLevel]->write(str);
-	}
-
-	void 				log_t::write(ELevel inLevel, const utf32::crunes_t& format, const va_list_t& arguments)
+	void 				log_t::write(ELevel inLevel, const crunes_t& format, const va_list_t& arguments)
 	{
 		sLogger[inLevel]->write(format, arguments);
 	}
@@ -166,66 +156,16 @@ namespace xcore
 		sLogger[inLevel]->writeLine(_value);
 	}
 
-	void 				log_t::writeLine(ELevel inLevel, const ascii::crunes_t& str)
+	void 				log_t::writeLine(ELevel inLevel, const crunes_t& str)
 	{
 		sLogger[inLevel]->writeLine(str);
 	}
 
-	void 				log_t::writeLine(ELevel inLevel, const ascii::crunes_t& format, const va_list_t& arguments)
+	void 				log_t::writeLine(ELevel inLevel, const crunes_t& format, const va_list_t& arguments)
 	{
 		sLogger[inLevel]->writeLine(format, arguments);
 	}
 
-	void 				log_t::writeLine(ELevel inLevel, const utf32::crunes_t& str)
-	{
-		sLogger[inLevel]->writeLine(str);
-	}
-
-	void 				log_t::writeLine(ELevel inLevel, const utf32::crunes_t& format, const va_list_t& arguments)
-	{
-		sLogger[inLevel]->writeLine(format, arguments);
-	}
-
-
-	void 				logger_t::write(const ascii::crunes_t& str)
-	{ 
-		write(str);
-	}
-
-	void 				logger_t::writeLine(const ascii::crunes_t& str)
-	{ 
-		writeLine(str);
-	}
-
-	void 				logger_t::write(const ascii::crunes_t& format, const va_list_t& arguments)
-	{ 
-		write(format, arguments); 
-	}
-
-	void 				logger_t::writeLine(const ascii::crunes_t& format, const va_list_t& arguments)
-	{ 
-		writeLine(format, arguments); 
-	}
-
-	void 				logger_t::write(const utf32::crunes_t& str)
-	{ 
-		write(str);
-	}
-
-	void 				logger_t::writeLine(const utf32::crunes_t& str)
-	{ 
-		writeLine(str);
-	}
-
-	void 				logger_t::write(const utf32::crunes_t& format, const va_list_t& arguments)
-	{ 
-		write(format, arguments); 
-	}
-
-	void 				logger_t::writeLine(const utf32::crunes_t& format, const va_list_t& arguments)
-	{ 
-		writeLine(format, arguments); 
-	}
 	
 	#ifdef X_LOG
 

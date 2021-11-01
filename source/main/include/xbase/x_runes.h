@@ -555,18 +555,20 @@ namespace xcore
     class runes_writer_t
     {
     public:
-        runes_writer_t(ascii::prune str, ascii::prune str_end);
-        runes_writer_t(utf32::prune str, utf32::prune str_end);
-        runes_writer_t(runes_t const& runes);
+        virtual bool write(uchar32 c) = 0;
+        virtual bool write(crunes_t const& str) = 0;
+    };
+
+    class runes_raw_writer_t : public runes_writer_t
+    {
+    public:
+        runes_raw_writer_t(ascii::prune str, ascii::prune str_end);
+        runes_raw_writer_t(utf32::prune str, utf32::prune str_end);
+        runes_raw_writer_t(runes_t const& runes);
 
         runes_t get_destination() const;
         runes_t get_current() const;
 
-        bool at_end() const;
-        bool valid() const;
-        u32  count() const;
-
-        void reset();
         bool write(uchar32 c);
         bool write(crunes_t const& str);
 

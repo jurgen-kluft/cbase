@@ -49,11 +49,11 @@ namespace xcore
         class out_t
         {
         public:
-            virtual s32  color(console_t::EColor color)   = 0;
-            virtual s32  write(crunes_t const& str) = 0;
-            virtual s32  write(ascii::crunes_t const& str) = 0;
-            virtual s32  write(utf32::crunes_t const& str) = 0;
-            virtual void writeln()                       = 0;
+            virtual s32  color(console_t::EColor color)                      = 0;
+            virtual s32  write(crunes_t const& str)                          = 0;
+            virtual s32  write(crunes_t const& str)                          = 0;
+            virtual s32  write(crunes_t const& str, , const va_list_t& args) = 0;
+            virtual void writeln()                                           = 0;
         };
 
         virtual ~console_t() {}
@@ -73,11 +73,8 @@ namespace xcore
         virtual void write(u32 _value)  = 0;
         virtual void write(u64 _value)  = 0;
 
-		virtual void write(const crunes_t& buffer)                            = 0;
-        virtual void write(const ascii::crunes_t& buffer)                     = 0;
-        virtual void write(const ascii::crunes_t& fmt, const va_list_t& args) = 0;
-        virtual void write(const utf32::crunes_t& buffer)                     = 0;
-        virtual void write(const utf32::crunes_t& fmt, const va_list_t& args) = 0;
+        virtual void write(const crunes_t& str)                        = 0;
+        virtual void write(const crunes_t& fmt, const va_list_t& args) = 0;
 
         inline void write(const char* str)
         {
@@ -135,27 +132,17 @@ namespace xcore
             writeLine(r.m_runes.m_ascii, args);
         }
 
-		inline void writeLine(const crunes_t& str)
-		{
-			write(str);
-			writeLine();
-		}
-		inline void writeLine(const ascii::crunes_t& str)
+        inline void writeLine(const crunes_t& str)
         {
             write(str);
             writeLine();
         }
-        inline void writeLine(const ascii::crunes_t& format, const va_list_t& args)
-        {
-            write(format, args);
-            writeLine();
-        }
-        inline void writeLine(const utf32::crunes_t& str)
+        inline void writeLine(const crunes_t& str)
         {
             write(str);
             writeLine();
         }
-        inline void writeLine(const utf32::crunes_t& format, const va_list_t& args)
+        inline void writeLine(const crunes_t& format, const va_list_t& args)
         {
             write(format, args);
             writeLine();

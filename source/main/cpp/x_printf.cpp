@@ -1119,7 +1119,7 @@ namespace xcore
                     {
 						runes_t bufstr = buffer->get_current();
 						runes_reader_t bufreader(bufstr);
-						runes_writer_t bufwriter(bufstr);
+						runes_raw_writer_t bufwriter(bufstr);
 						while (!bufreader.at_end())
 						{
 							uchar32 c = bufreader.read();
@@ -1376,7 +1376,7 @@ namespace xcore
 		if (format.m_type == utf32::TYPE)
 		{
 			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-			runes_writer_t scratch(scratchbuffer);
+			runes_raw_writer_t scratch(scratchbuffer);
 			runes_reader_t runesreader(format);
 			printf_writer_t writer(nullptr, false);
 			VSPrintf_internal(&writer, &runesreader, &scratch, args);
@@ -1385,7 +1385,7 @@ namespace xcore
 		else if (format.m_type == ascii::TYPE)
 		{
 			runez_t<ascii::rune, WORKSIZE> scratchbuffer;
-			runes_writer_t scratch(scratchbuffer);
+			runes_raw_writer_t scratch(scratchbuffer);
 			runes_reader_t reader(format);
 			printf_writer_t writer(nullptr, false);
 			VSPrintf_internal(&writer, &reader, &scratch, args);
@@ -1405,9 +1405,9 @@ namespace xcore
 		if (format.m_type == utf32::TYPE)
 		{
 			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-			runes_writer_t scratch(scratchbuffer);
+			runes_raw_writer_t scratch(scratchbuffer);
 			runes_reader_t runesreader(format);
-			runes_writer_t runeswriter(str);
+			runes_raw_writer_t runeswriter(str);
 			printf_writer_t writer(&runeswriter, false);
 			VSPrintf_internal(&writer, &runesreader, &scratch, args);
 			str = writer.m_runes_writer->get_current();
@@ -1415,9 +1415,9 @@ namespace xcore
 		else if (format.m_type == ascii::TYPE)
 		{
 			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-			runes_writer_t scratch(scratchbuffer);
+			runes_raw_writer_t scratch(scratchbuffer);
 			runes_reader_t runesreader(format);
-			runes_writer_t runeswriter(str);
+			runes_raw_writer_t runeswriter(str);
 			printf_writer_t writer(&runeswriter, false);
 			VSPrintf_internal(&writer, &runesreader, &scratch, args);
 			str = writer.m_runes_writer->get_current();
@@ -1446,7 +1446,7 @@ namespace xcore
 		if (format.m_type == utf32::TYPE)
 		{
 			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-			runes_writer_t scratch(scratchbuffer);
+			runes_raw_writer_t scratch(scratchbuffer);
 			runes_reader_t runesreader(format);
 			printf_writer_t writer(nullptr, true);
 			VSPrintf_internal(&writer, &runesreader, &scratch, args);
@@ -1454,7 +1454,7 @@ namespace xcore
 		else if (format.m_type == ascii::TYPE)
 		{
 			runez_t<ascii::rune, WORKSIZE> scratchbuffer;
-			runes_writer_t scratch(scratchbuffer);
+			runes_raw_writer_t scratch(scratchbuffer);
 			runes_reader_t runesreader(format);
 			printf_writer_t writer(nullptr, true);
 			VSPrintf_internal(&writer, &runesreader, &scratch, args);

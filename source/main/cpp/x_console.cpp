@@ -7,7 +7,6 @@
 
 namespace xcore
 {
-//#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size)	type local_var_name##Buffer[size + 1]; local_var_name##Buffer[size] = '\0'; type* local_var_name = &local_var_name##Buffer[0]; type* local_var_name##_eos = &local_var_name##Buffer[size];
 #define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
     type::rune local_var_name##Buffer[size];               \
     runes_t    local_var_name(local_var_name##Buffer, local_var_name##Buffer, local_var_name##Buffer, &local_var_name##Buffer[size - 1], type::TYPE);
@@ -33,10 +32,8 @@ namespace xcore
         virtual void write(u64 _value);
 
         virtual void write(const crunes_t& buffer);
-        virtual void write(const ascii::crunes_t& str);
-        virtual void write(const ascii::crunes_t& fmt, const va_list_t& args);
-        virtual void write(const utf32::crunes_t& str);
-        virtual void write(const utf32::crunes_t& fmt, const va_list_t& args);
+        virtual void write(const crunes_t& str);
+        virtual void write(const crunes_t& fmt, const va_list_t& args);
 
         virtual void writeLine();
     };
@@ -52,10 +49,8 @@ namespace xcore
     void xconsole_null::write(u32 _value) {}
     void xconsole_null::write(u64 _value) {}
     void xconsole_null::write(const crunes_t& str) {}
-    void xconsole_null::write(const ascii::crunes_t& str) {}
-    void xconsole_null::write(const ascii::crunes_t& fmt, const va_list_t& args) {}
-    void xconsole_null::write(const utf32::crunes_t& str) {}
-    void xconsole_null::write(const utf32::crunes_t& fmt, const va_list_t& args) {}
+    void xconsole_null::write(const crunes_t& str) {}
+    void xconsole_null::write(const crunes_t& fmt, const va_list_t& args) {}
     void xconsole_null::writeLine() {}
 
     static xconsole_null sNullConsole;
@@ -85,10 +80,8 @@ namespace xcore
 
         virtual void write(const crunes_t& str);
 
-        virtual void write(const ascii::crunes_t& str);
-        virtual void write(const ascii::crunes_t& fmt, const va_list_t& args);
-        virtual void write(const utf32::crunes_t& str);
-        virtual void write(const utf32::crunes_t& fmt, const va_list_t& args);
+        virtual void write(const crunes_t& str);
+        virtual void write(const crunes_t& fmt, const va_list_t& args);
 
         virtual void writeLine();
     };
@@ -99,10 +92,12 @@ namespace xcore
 
     s32 xconsole_default::setColor(console_t::EColor color) { return mOut->color(color); }
 
+    static const char* trueStr = "true";
+    static const char* falseStr = "false";
     void xconsole_default::write(bool _value)
     {
-        crunes_t truestr("true", 4);
-        crunes_t falsestr("false", 5);
+        crunes_t truestr(trueStr, trueStr+4);
+        crunes_t falsestr(falseStr, falseStr+5);
         write(_value ? truestr : falsestr);
     }
 
@@ -150,34 +145,12 @@ namespace xcore
 
     void xconsole_default::write(const crunes_t& str)
     {
-        switch (str.m_type)
-        {
-            case ascii::TYPE: return write(str.m_runes.m_ascii);
-            case utf32::TYPE: return write(str.m_runes.m_utf32);
-            default:
-                break;
-                //@todo: UTF-8 and UTF-16
-        }
+        mOut->write(str);
     }
 
-    void xconsole_default::write(const ascii::crunes_t& str) { mOut->write(str); }
-
-    void xconsole_default::write(const ascii::crunes_t& fmt, const va_list_t& args)
+    void xconsole_default::write(const crunes_t& fmt, const va_list_t& args)
     {
-        XCONSOLE_LOCAL_STR_BUF(ascii, str, 1024);
-        vsprintf(str, crunes_t(fmt), args);
-        crunes_t outstr(str);
-        mOut->write(outstr);
-    }
-
-    void xconsole_default::write(const utf32::crunes_t& str) { mOut->write(str); }
-
-    void xconsole_default::write(const utf32::crunes_t& fmt, const va_list_t& args)
-    {
-        XCONSOLE_LOCAL_STR_BUF(utf32, str, 1024);
-        vsprintf(str, utf32::crunes_t(fmt), args);
-        crunes_t outstr(str);
-        mOut->write(outstr);
+        mOut->write(fmt, args);
     }
 
     void xconsole_default::writeLine() { mOut->writeln(); }
