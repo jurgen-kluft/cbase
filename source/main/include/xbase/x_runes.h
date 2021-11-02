@@ -555,6 +555,7 @@ namespace xcore
     public:
         virtual bool write(uchar32 c) = 0;
         virtual bool write(crunes_t const& str) = 0;
+        virtual void flush() = 0;
     };
 
     class runes_raw_writer_t : public runes_writer_t
@@ -567,12 +568,17 @@ namespace xcore
         runes_t get_destination() const;
         runes_t get_current() const;
 
-        bool write(uchar32 c);
-        bool write(crunes_t const& str);
+        void reset();
+        s32  count() const;
+
+        virtual bool write(uchar32 c);
+        virtual bool write(crunes_t const& str);
+        virtual void flush();
 
     protected:
         runes_t        m_runes;
         runes_t::ptr_t m_cursor;
+        s32            m_count;
     };
 
 }; // namespace xcore

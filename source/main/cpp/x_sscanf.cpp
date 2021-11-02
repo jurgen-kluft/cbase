@@ -448,7 +448,7 @@ namespace xcore
 						runes_t* runes = r.getRunes();
 						if (runes != nullptr)
 						{
-							runes_writer_t str_writer(*runes);
+							runes_raw_writer_t str_writer(*runes);
 
 							l = 0;
 							while (reader->peek() != 0 && reader->peek() != ' ')

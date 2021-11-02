@@ -7,15 +7,16 @@
 
 namespace xcore
 {
-	struct printf_writer_t
+	class printf_writer_t : public runes_writer_t
 	{
-		printf_writer_t(runes_writer_t* w, bool write_to_console) : m_runes_writer(w), m_write_to_console(write_to_console), m_runes_count(0) {}
-		runes_writer_t*		m_runes_writer;
+    public:
+		printf_writer_t(runes_raw_writer_t* w, bool write_to_console) : m_runes_writer(w), m_write_to_console(write_to_console), m_runes_count(0) {}
+		runes_raw_writer_t*		m_runes_writer;
 		runez_t<utf32::rune, 64> m_write_to_console_cache;
 		bool                m_write_to_console;
 		s32                 m_runes_count;
 
-		bool                write(uchar32 c)
+		virtual bool        write(uchar32 c)
 		{
 			bool result = false;
 			if (m_runes_writer != nullptr)
@@ -28,12 +29,14 @@ namespace xcore
 			}
 			if (m_write_to_console)
 			{
-				m_write_to_console_cache += c;
+                if (m_write_to_console_cache.size() >= 63)
+                    flush();
+                m_write_to_console_cache += c;
 			}
 			return result;
 		}
 		
-		bool                write(crunes_t const& runes)
+		virtual bool        write(crunes_t const& runes)
 		{
 			bool result = false;
 			if (m_runes_writer != nullptr)
@@ -57,7 +60,7 @@ namespace xcore
 			return result;
 		}
 
-		void flush()
+		virtual void flush()
 		{
 			if (m_write_to_console)
 			{
@@ -893,7 +896,7 @@ namespace xcore
      *------------------------------------------------------------------------------
      */
 
-    void VSPrintf_internal(printf_writer_t* writer, runes_reader_t* reader, runes_writer_t* buffer, const va_list_t& args)
+    void VSPrintf_internal(printf_writer_t* writer, runes_reader_t* reader, runes_raw_writer_t* buffer, const va_list_t& args)
     {
         ASSERT(reader != NULL);
         ASSERT(writer != NULL);

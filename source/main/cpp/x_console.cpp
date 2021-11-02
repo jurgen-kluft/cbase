@@ -31,7 +31,6 @@ namespace xcore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
-        virtual void write(const crunes_t& buffer);
         virtual void write(const crunes_t& str);
         virtual void write(const crunes_t& fmt, const va_list_t& args);
 
@@ -48,7 +47,6 @@ namespace xcore
     void xconsole_null::write(f32 _value) {}
     void xconsole_null::write(u32 _value) {}
     void xconsole_null::write(u64 _value) {}
-    void xconsole_null::write(const crunes_t& str) {}
     void xconsole_null::write(const crunes_t& str) {}
     void xconsole_null::write(const crunes_t& fmt, const va_list_t& args) {}
     void xconsole_null::writeLine() {}
@@ -77,8 +75,6 @@ namespace xcore
 
         virtual void write(u32 _value);
         virtual void write(u64 _value);
-
-        virtual void write(const crunes_t& str);
 
         virtual void write(const crunes_t& str);
         virtual void write(const crunes_t& fmt, const va_list_t& args);

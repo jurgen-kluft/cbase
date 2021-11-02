@@ -51,8 +51,7 @@ namespace xcore
         public:
             virtual s32  color(console_t::EColor color)                      = 0;
             virtual s32  write(crunes_t const& str)                          = 0;
-            virtual s32  write(crunes_t const& str)                          = 0;
-            virtual s32  write(crunes_t const& str, , const va_list_t& args) = 0;
+            virtual s32  write(crunes_t const& str, const va_list_t& args) = 0;
             virtual void writeln()                                           = 0;
         };
 
@@ -132,11 +131,6 @@ namespace xcore
             writeLine(r.m_runes.m_ascii, args);
         }
 
-        inline void writeLine(const crunes_t& str)
-        {
-            write(str);
-            writeLine();
-        }
         inline void writeLine(const crunes_t& str)
         {
             write(str);
