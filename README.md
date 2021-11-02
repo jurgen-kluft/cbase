@@ -1,8 +1,8 @@
-# xbase
+# cbase
 
 Cross platform base library
 
-- xbase
+- cbase
   - types (s8/u8 .. s64/u64, f32/f64, uchar/../uchar32)
   - allocator
   - binary search
@@ -16,6 +16,7 @@ Cross platform base library
   - log
   - printf / sprintf
   - random (interface)
+  - runes (ascii, utf-8, utf-16, utf-32) and many string manipulation functions
   - singleton
   - slice
   - sort

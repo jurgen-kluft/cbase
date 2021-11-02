@@ -1,18 +1,19 @@
 # Scheduled code changes for all base packages
 
-## xcode
+## ccode
 
 Using Go to manage our packages and dependencies and generating Visual Studio projects as well as Tundra build files.
 
-## xbase
+## cbase
 
 Naming convention:
 
-- namespaces start with x (e.g. xcore)
+- package starts with c (e.g. cbase, ccore, cstring, callocator, chash, crandom, cfilesystem)
+- namespaces start with n (e.g. ncore)
 - struct/class ends with _t (e.g. alloc_t)
-- you may use a namespace or static class
+- global functions start with g (e.g. gmin, gmax, gpo2)
 
-## xcore (typeless/raw containers)
+## ccore (typeless/raw containers)
 
 - ~~list~~ DONE
 - ~~array~~ DONE
@@ -21,7 +22,7 @@ Naming convention:
 - ~~map~~ DONE
 - ~~set~~ DONE
 
-## xgenerics
+## cgenerics
 
 - ``list<T>``
 - ``array<T>``
@@ -30,50 +31,52 @@ Naming convention:
 - ``map<K,V>``
 - ``set<V>``
 
-## xstring (Alpha)
+## cstring (Alpha)
 
 string class (utf32)
 
-## xallocator
+## callocator
 
-The package xvmem contains a virtual memory allocator.
-Also, split of debugging allocators like memento to xdealloc
+The package nvmem contains a virtual memory allocator.
+Also, split of debugging allocators like memento to cdealloc
 
-## xatomic
+## catomic
 
 Do we still need these lock free data structures ?
 
-## xhash (Alpha)
+## chash (Alpha)
 
-Just a simple interface here and a couple of hash candidates. This is just hashing, no encryption.
+Just a simple interface here and a couple of hash candidates.
+This is just hashing, no encryption.
 
-## xmerkle
+## cmerkle
 
 Utilities to construct, update use merkle trees.
 
-## xcrypto (AES)
+## ccrypto (AES)
 
 AES-256
 
-## xrandom (Alpha)
+## crandom (Alpha)
 
 A couple of random number generators
 
 - mersenne twister
 - and ?
 
-## xtime (Beta)
+## ctime (Beta)
 
 Package for dealing with date and time
 
-## xfilesystem (Proto)
+## cfilesystem (Proto)
 
 We need to redesign this a bit by limiting the feature set, design can consider multithreading but should by default be single-threaded.
 
-- xfileinfo, xdirinfo
-- xfilepath, xdirpath
+- filesystem_t
+- fileinfo_t, dirinfo_t
+- filepath_t, dirpath_t
 
-## xdealloc
+## cdealloc
 
 Progress = Alpha
 
@@ -81,7 +84,7 @@ Progress = Alpha
 - Use the allocator to allocate meta-data
 - Memento
 
-## xthread
+## cthread
 
 - thread
 - mutex, event, semaphore
@@ -90,14 +93,14 @@ Progress = Alpha
   - string allocator
   - heap allocator
 
-## xp2p
+## cp2p
 
 - peer to peer library
 - connections are peer objects
 - 1st version = TCP
 - later we can look at UDP; like uTP or UDX
 
-## xactor
+## cactor
 
 Progress = Alpha
 
@@ -107,18 +110,18 @@ Progress = Alpha
 - actors manage the messages they send and will get them send back as GC
 - just sending messages
 
-## xcmdline
+## ccmdline
 
 Progress = v1.0
 
-## xtext
+## ctext
 
 - parsing/tokenizer
   - XML
   - JSON
   - Custom
 
-## xlocal
+## clocal
 
 Localization to support many languages easily in an app.
 

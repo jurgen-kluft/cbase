@@ -3109,6 +3109,7 @@ namespace xcore
         switch (str.m_type)
         {
             case ascii::TYPE: return utf::write(c, cursor.m_ptr.m_ascii, str.m_runes.m_ascii.m_eos); break;
+            case utf16::TYPE: return utf::write(c, cursor.m_ptr.m_utf16, str.m_runes.m_utf16.m_eos); break;
             case utf32::TYPE: return utf::write(c, cursor.m_ptr.m_utf32, str.m_runes.m_utf32.m_eos); break;
             default: return false;
         }
