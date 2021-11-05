@@ -7,27 +7,6 @@
 
 namespace xcore
 {
-	class printf_writer_t : public runes_writer_t
-	{
-		runes_raw_writer_t*		m_runes_writer;
-    public:
-		inline printf_writer_t(runes_raw_writer_t* w) : m_runes_writer(w) {}
-
-		virtual bool        write(uchar32 c)
-		{
-			return m_runes_writer->write(c);
-		}
-		
-		virtual bool        write(crunes_t const& runes)
-		{
-			return m_runes_writer->write(runes);
-		}
-
-		virtual void flush()
-		{
-            m_runes_writer->flush();
-		}
-	};
 
 	class counter_writer_t : public runes_writer_t
 	{
@@ -63,12 +42,13 @@ namespace xcore
     class console_writer_t : public runes_writer_t
 	{
 		runez_t<utf32::rune, 64> m_write_to_console_cache;
+
     public:
 		inline console_writer_t() {}
 
 		virtual bool        write(uchar32 c)
 		{
-            if (m_write_to_console_cache.size() >= 63)
+            if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
                 flush();
             m_write_to_console_cache += c;
 			return true;
@@ -78,7 +58,7 @@ namespace xcore
 		{
             flush();
 			console->write(runes);
-			return result;
+			return true;
 		}
 
 		virtual void flush()
@@ -837,7 +817,7 @@ namespace xcore
     }
 
 
-    static void PadBuffer(printf_writer_t* writer, s32 howMany, char with)
+    static void PadBuffer(runes_writer_t* writer, s32 howMany, char with)
     {
         for (s32 i = 0; i < howMany; i++)
         {
@@ -914,7 +894,7 @@ namespace xcore
      *------------------------------------------------------------------------------
      */
 
-    void VSPrintf_internal(printf_writer_t* writer, runes_reader_t* reader, runes_raw_writer_t* buffer, const va_list_t& args)
+    void VSPrintf_internal(runes_writer_t* writer, runes_reader_t* reader, runes_raw_writer_t* buffer, const va_list_t& args)
     {
         ASSERT(reader != NULL);
         ASSERT(writer != NULL);
@@ -1393,26 +1373,9 @@ namespace xcore
 
     s32 vcprintf(crunes_t const& format, const va_list_t& args)
     {
-		s32 len = 0;
-		if (format.m_type == utf32::TYPE)
-		{
-			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-			runes_raw_writer_t scratch(scratchbuffer);
-			runes_reader_t runesreader(format);
-			counter_writer_t writer;
-			VSPrintf_internal(&writer, &runesreader, &scratch, args);
-			len = writer.count();
-		}
-		else if (format.m_type == ascii::TYPE)
-		{
-			runez_t<ascii::rune, WORKSIZE> scratchbuffer;
-			runes_raw_writer_t scratch(scratchbuffer);
-			runes_reader_t reader(format);
-			counter_writer_t writer;
-			VSPrintf_internal(&writer, &reader, &scratch, args);
-			len = writer.count();
-		}
-        return len;
+		counter_writer_t writer;
+        vzprintf(writer, format, args);
+		return writer.count();
     }
 
     void sprintf(runes_t& str, crunes_t const& format, X_VA_ARGS_16)
@@ -1423,35 +1386,28 @@ namespace xcore
 
     void vsprintf(runes_t& str, crunes_t const& format, const va_list_t& args)
     {
-		if (format.m_type == utf32::TYPE)
-		{
-			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-			runes_raw_writer_t scratch(scratchbuffer);
-			runes_reader_t runesreader(format);
-			runes_raw_writer_t runeswriter(str);
-			printf_writer_t writer(&runeswriter);
-			VSPrintf_internal(&writer, &runesreader, &scratch, args);
-			str = writer.m_runes_writer->get_current();
-		}
-		else if (format.m_type == ascii::TYPE)
-		{
-			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-			runes_raw_writer_t scratch(scratchbuffer);
-			runes_reader_t runesreader(format);
-			runes_raw_writer_t runeswriter(str);
-			printf_writer_t writer(&runeswriter);
-			VSPrintf_internal(&writer, &runesreader, &scratch, args);
-			str = writer.m_runes_writer->get_current();
-		}
+		runes_raw_writer_t dstwriter(str);
+        vzprintf(dstwriter, format, args);
+		str = dstwriter.get_current();
 	}
+
+    void zprintf(runes_writer_t& dst, crunes_t const& format, X_VA_ARGS_16)
+    {
+        va_list_t args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+        vzprintf(dst, format, args);
+    }
+
+    void vzprintf(runes_writer_t& dst, crunes_t const& format, const va_list_t& args)
+    {
+        runez_t<utf32::rune, WORKSIZE> scratchbuffer;
+        runes_raw_writer_t scratch(scratchbuffer);
+        runes_reader_t runesreader(format);
+        VSPrintf_internal(&dst, &runesreader, &scratch, args);
+    }
 
     void printf(crunes_t const& str)
 	{
-		switch (str.m_type)
-		{
-			case ascii::TYPE: return console->write(str.m_runes.m_ascii);
-			case utf32::TYPE: return console->write(str.m_runes.m_utf32);
-		}
+		return console->write(str);
 	}
 
     void printf(crunes_t const& format, X_VA_ARGS_16)
@@ -1462,24 +1418,8 @@ namespace xcore
 
     void printf(crunes_t const& format, const va_list_t& args)
     {
-		s32 const                                   cache_size = 128;
-
-		if (format.m_type == utf32::TYPE)
-		{
-			runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-			runes_raw_writer_t scratch(scratchbuffer);
-			runes_reader_t runesreader(format);
-			console_writer_t writer();
-			VSPrintf_internal(&writer, &runesreader, &scratch, args);
-		}
-		else if (format.m_type == ascii::TYPE)
-		{
-			runez_t<ascii::rune, WORKSIZE> scratchbuffer;
-			runes_raw_writer_t scratch(scratchbuffer);
-			runes_reader_t runesreader(format);
-			console_writer_t writer();
-			VSPrintf_internal(&writer, &runesreader, &scratch, args);
-		}
+		console_writer_t dstwriter;
+        vzprintf(dstwriter, format, args);
 	}
 
 
