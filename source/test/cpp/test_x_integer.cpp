@@ -309,7 +309,7 @@ UNITTEST_SUITE_BEGIN(xinteger)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(2, xfindFirstBit(a));
 			CHECK_EQUAL(6, xfindFirstBit(b));
-			CHECK_EQUAL(0, xfindFirstBit(c));
+			CHECK_EQUAL(-1, xfindFirstBit(c));
 		}
 
 		UNITTEST_TEST(FindLastBit)
