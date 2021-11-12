@@ -247,6 +247,13 @@ namespace xcore
         crunes_t(crunes_t const& other);
         crunes_t(crunes_t const& other, ptr_t const& from, ptr_t const& to);
 
+        ascii::pcrune str() const;
+        utf16::pcrune str16() const;
+        utf32::pcrune str32() const;
+        ascii::pcrune end() const;
+        utf16::pcrune end16() const;
+        utf32::pcrune end32() const;
+
         s32  size() const;
         bool is_valid() const;
         bool is_empty() const;

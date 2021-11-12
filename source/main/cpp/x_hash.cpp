@@ -268,25 +268,29 @@ namespace xcore
         return b;
     }
 
+    // calculate the hash of a string, this string can be ascii, utf-8, utf-16 or utf-32.
+    // so use an intermediate buffer to convert the string into utf-32 and feed that to
+    // the hash algorithm.
     u64 calchash(crunes_t const& strdata)
     {
         hashing_t hash;
         hash.reset();
 
-        switch (strdata.m_type)
+        runes_reader_t reader(strdata);
+        uchar32 buffer[32];
+        s32 i = 0;
+        while (!reader.at_end())
         {
-        case ascii::TYPE: 
-            hash.hash(strdata.m_runes.m_ascii.m_str, strdata.size() * sizeof(ascii::rune)); 
-            break;
-        case utf8::TYPE: 
-            hash.hash(strdata.m_runes.m_utf8.m_str, strdata.size() * sizeof(utf8::rune)); 
-            break;
-        case utf16::TYPE:
-            hash.hash(strdata.m_runes.m_utf16.m_str, strdata.size() * sizeof(utf16::rune)); 
-            break;
-        case utf32::TYPE:
-            hash.hash(strdata.m_runes.m_utf32.m_str, strdata.size() * sizeof(utf32::rune)); 
-            break;
+            buffer[i++] = reader.read();
+            if (i == 32)
+            {
+                hash.hash(buffer, i * sizeof(uchar32));
+                i = 0;
+            }
+        }
+        if (i > 0)
+        {
+            hash.hash(buffer, i * sizeof(uchar32));
         }
         return hash.finalize();
     }
