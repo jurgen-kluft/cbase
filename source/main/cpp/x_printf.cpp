@@ -78,7 +78,7 @@ namespace xcore
 		{
             flush();
 			console->write(runes);
-			return result;
+			return true;
 		}
 
 		virtual void flush()
@@ -914,7 +914,7 @@ namespace xcore
      *------------------------------------------------------------------------------
      */
 
-    void VSPrintf_internal(printf_writer_t* writer, runes_reader_t* reader, runes_raw_writer_t* buffer, const va_list_t& args)
+    void VSPrintf_internal(runes_writer_t* writer, runes_reader_t* reader, runes_raw_writer_t* buffer, const va_list_t& args)
     {
         ASSERT(reader != NULL);
         ASSERT(writer != NULL);
