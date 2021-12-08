@@ -98,37 +98,43 @@ namespace xcore
         }
         static inline void write_u32(xbyte* ptr, u32 b)
         {
-            write_u16(ptr, (u16)((b >> 0) & 0xFFFF));
-            write_u16(ptr, (u16)((b >> 16) & 0xFFFF));
+            ptr[0] = (u8)(b);
+            ptr[1] = (u8)(b >> 8);
+            ptr[2] = (u8)(b >> 16);
+            ptr[3] = (u8)(b >> 24);
         }
         static inline void write_s32(xbyte* ptr, s32 b)
         {
             u32 const c = *((u32*)&b);
-            write_u16(ptr, (u16)((c >> 0) & 0xFFFF));
-            write_u16(ptr, (u16)((c >> 16) & 0xFFFF));
+            ptr[0] = (u8)(c);
+            ptr[1] = (u8)(c >> 8);
+            ptr[2] = (u8)(c >> 16);
+            ptr[3] = (u8)(c >> 24);
         }
         static inline void write_f32(xbyte* ptr, f32 f)
         {
             u32 const c = *((u32*)&f);
-            write_u16(ptr, (u16)((c >> 0) & 0xFFFF));
-            write_u16(ptr, (u16)((c >> 16) & 0xFFFF));
+            ptr[0] = (u8)(c);
+            ptr[1] = (u8)(c >> 8);
+            ptr[2] = (u8)(c >> 16);
+            ptr[3] = (u8)(c >> 24);
         }
         static inline void write_u64(xbyte* ptr, u64 b)
         {
             write_u16(ptr, (u32)((b >> 0) & 0xFFFFFFFF));
-            write_u16(ptr, (u32)((b >> 32) & 0xFFFFFFFF));
+            write_u16(ptr+4, (u32)((b >> 32) & 0xFFFFFFFF));
         }
         static inline void write_s64(xbyte* ptr, s64 b)
         {
             u64 const c = *((u64*)&b);
             write_u32(ptr, (u32)((c >> 0) & 0xFFFFFFFF));
-            write_u32(ptr, (u32)((c >> 32) & 0xFFFFFFFF));
+            write_u32(ptr+4, (u32)((c >> 32) & 0xFFFFFFFF));
         }
         static inline void write_f64(xbyte* ptr, f64 f)
         {
             u64 const c = *((u64*)&f);
             write_u32(ptr, (u32)((c >> 0) & 0xFFFFFFFF));
-            write_u32(ptr, (u32)((c >> 32) & 0xFFFFFFFF));
+            write_u32(ptr+4, (u32)((c >> 32) & 0xFFFFFFFF));
         }
     } // namespace xuadrw
 
@@ -183,7 +189,7 @@ namespace xcore
     s32 binary_reader_t::read(bool& b)
     {
         u32 const offset = m_cursor;
-        if (can_read(m_len))
+        if (can_read(sizeof(u8)))
         {
             xbyte const* ptr = m_buffer + m_cursor;
             m_cursor += 1;
@@ -679,7 +685,7 @@ namespace xcore
         u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_s32((xbyte*)m_buffer + m_cursor, b);
+            xuadrw::write_s32(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -691,7 +697,7 @@ namespace xcore
         u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_u64((xbyte*)m_buffer + m_cursor, b);
+            xuadrw::write_u64(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -703,7 +709,7 @@ namespace xcore
         u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_s64((xbyte*)m_buffer + m_cursor, b);
+            xuadrw::write_s64(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -715,7 +721,7 @@ namespace xcore
         u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_f32((xbyte*)m_buffer + m_cursor, b);
+            xuadrw::write_f32(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -727,7 +733,7 @@ namespace xcore
         u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_f64((xbyte*)m_buffer + m_cursor, b);
+            xuadrw::write_f64(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -740,7 +746,7 @@ namespace xcore
         if (can_write(buf.size()))
         {
             u32 const    n   = buf.size();
-            xbyte*       dst = (xbyte*)m_buffer + m_cursor;
+            xbyte*       dst = m_buffer + m_cursor;
             xbyte const* src = buf.m_mutable;
             for (u32 i = 0; i < n; i++)
                 *dst++ = *src++;

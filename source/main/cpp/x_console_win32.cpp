@@ -17,12 +17,47 @@
 
 namespace xcore
 {
-    class xconsole_out_win32 : public console_t::out_t
+    class out_writer_t : public runes_writer_t
     {
-    public:
-        virtual s32 color(console_t::EColor color) { return 0; }
+        runez_t<utf32::rune, 64> m_write_to_console_cache;
 
-        void write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
+    public:
+        inline out_writer_t() {}
+
+        virtual bool        write(uchar32 c)
+        {
+            if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
+                flush();
+            m_write_to_console_cache += c;
+            return true;
+        }
+
+        virtual bool        write(crunes_t const& str)
+        {
+            flush();
+            
+            switch (str.m_type)
+            {
+                case ascii::TYPE: return out_writer_t::write_ascii(str.m_runes.m_ascii);
+                case utf16::TYPE: return out_writer_t::write_utf16(str.m_runes.m_utf16);
+                case utf32::TYPE: return out_writer_t::write_utf32(str.m_runes.m_utf32);
+                default: //@todo: UTF-8
+                    break;
+            }
+            return true;
+        }
+
+        virtual void flush()
+        {
+            if (m_write_to_console_cache.size() > 0)
+            {
+                crunes_t cachestr = m_write_to_console_cache;
+                write_utf32(cachestr.m_runes.m_utf32);
+                m_write_to_console_cache.reset();
+            }
+        }
+
+        static void write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
         {
             s32 len = 0;
             if (rune < 0xd800)
@@ -58,7 +93,7 @@ namespace xcore
             }
         }
 
-        s32 write(const ascii::crunes_t& str)
+        static s32 write_ascii(const ascii::crunes_t& str)
         {
             const s32 maxlen = 252;
             uchar16   str16[maxlen + 4];
@@ -85,7 +120,34 @@ namespace xcore
             return l;
         }
 
-        s32 write(const utf32::crunes_t& str)
+        static s32 write_utf16(const utf16::crunes_t& str)
+        {
+            const s32 maxlen = 252;
+            uchar16   str16[maxlen + 4];
+
+            s32           l   = 0;
+            utf16::pcrune src = str.m_str;
+            utf16::pcrune end = str.m_end;
+            while (src < end)
+            {
+                uchar16* dst16 = (uchar16*)str16;
+                uchar16* end16 = dst16 + maxlen;
+                s32      ll    = 0;
+                while (src < end && dst16 < end16)
+                {
+                    uchar32 c = *src++;
+                    write_utf16(c, dst16, end16);
+                    ll += 1;
+                }
+                str16[ll] = 0;
+                ::OutputDebugStringW((LPCWSTR)str16);
+                ::fputws((const wchar_t*)str16, stdout);
+                l += ll;
+            }
+            return l;
+        }
+
+        static s32 write_utf32(const utf32::crunes_t& str)
         {
             const s32 maxlen = 252;
             uchar16   str16[maxlen + 4];
@@ -112,22 +174,28 @@ namespace xcore
             return l;
         }
 
+    };
 
+    class xconsole_out_win32 : public console_t::out_t
+    {
+    public:
+        virtual s32 color(console_t::EColor color) { return 0; }
 
         virtual void writeln()
         {
-            utf32::rune line32[] = {'\r', 0};
-            crunes_t    line(line32, 1);
-            write(line);
+            ascii::rune line32[] = {'\r', 0};
+            ascii::crunes_t line(line32, 1);
+            out_writer_t::write_ascii(line);
         }
 
         virtual s32 write(const crunes_t& str)
         {
             switch (str.m_type)
             {
-                case ascii::TYPE: return write(str.m_runes.m_ascii);
-                case utf32::TYPE: return write(str.m_runes.m_utf32);
-                default: //@todo: UTF-8 and UTF-16
+                case ascii::TYPE: return out_writer_t::write_ascii(str.m_runes.m_ascii);
+                case utf16::TYPE: return out_writer_t::write_utf16(str.m_runes.m_utf16);
+                case utf32::TYPE: return out_writer_t::write_utf32(str.m_runes.m_utf32);
+                default: //@todo: UTF-8
 					break;
             }
             return 0;
@@ -135,6 +203,8 @@ namespace xcore
 
         virtual s32 write(const crunes_t& str, const va_list_t& args)
         {
+            out_writer_t dstwriter;
+            vzprintf(dstwriter, str, args);
             return 0;
         }
     };

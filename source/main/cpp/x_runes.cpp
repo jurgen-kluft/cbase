@@ -3657,6 +3657,43 @@ namespace xcore
         m_runes.m_utf32.m_eos = _eos;
     }
 
+    ascii::pcrune crunes_t::str() const
+    {
+        if (m_type == ascii::TYPE)
+            return m_runes.m_ascii.m_str;
+        return nullptr;
+    }
+    utf16::pcrune crunes_t::str16() const
+    {
+        if (m_type == utf16::TYPE)
+            return m_runes.m_utf16.m_str;
+        return nullptr;
+    }
+    utf32::pcrune crunes_t::str32() const
+    {
+        if (m_type == utf32::TYPE)
+            return m_runes.m_utf32.m_str;
+        return nullptr;
+    }
+    ascii::pcrune crunes_t::end() const
+    {
+        if (m_type == ascii::TYPE)
+            return m_runes.m_ascii.m_end;
+        return nullptr;
+    }
+    utf16::pcrune crunes_t::end16() const
+    {
+        if (m_type == utf16::TYPE)
+            return m_runes.m_utf16.m_end;
+        return nullptr;
+    }
+    utf32::pcrune crunes_t::end32() const
+    {
+        if (m_type == utf32::TYPE)
+            return m_runes.m_utf32.m_end;
+        return nullptr;
+    }
+
     crunes_t& crunes_t::operator=(crunes_t const& other)
     {
         m_type                = other.m_type;
