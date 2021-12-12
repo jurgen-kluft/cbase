@@ -77,10 +77,6 @@ namespace xcore
 
     alloc_t* alloc_t::get_system() { return &sSystemAllocator; }
 
-    static alloc_t* sMainAllocator = &sSystemAllocator;
-    void     alloc_t::set_main(alloc_t* main_allocator) { sMainAllocator = main_allocator; }
-    alloc_t* alloc_t::get_main() { return sMainAllocator; }
-
 }; // namespace xcore
 
 #endif

@@ -17,8 +17,6 @@ namespace xcore
     public:
         static void     init_system();
         static alloc_t* get_system();
-        static void     set_main(alloc_t* main_allocator);
-        static alloc_t* get_main();
 
         void* allocate(u32 size, u32 alignment) { return v_allocate(size, alignment); }
         void* allocate(u32 size) { return v_allocate(size, sizeof(void*)); }

@@ -103,7 +103,6 @@ namespace xcore
 xcore::alloc_t* gTestAllocator = NULL;
 xcore::UnitTestAssertHandler gAssertHandler;
 
-
 bool gRunUnitTest(UnitTest::TestReporter& reporter)
 {
 	xbase::init();
@@ -121,6 +120,7 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 
 	xcore::TestAllocator testAllocator(systemAllocator);
 	gTestAllocator = &testAllocator;
+	xcore::context_t::set_system_alloc(&testAllocator);
 
 	int r = UNITTEST_SUITE_RUN(reporter, xCoreUnitTest);
 	if (UnitTest::GetNumAllocations()!=0)
@@ -132,6 +132,7 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	gTestAllocator->release();
 
 	UnitTest::SetAllocator(NULL);
+	xcore::context_t::set_system_alloc(systemAllocator);
 
 	xbase::exit();
 	return r==0;
