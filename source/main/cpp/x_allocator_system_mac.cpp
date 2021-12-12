@@ -13,19 +13,23 @@ namespace xcore
 {
     void* mac_aligned_malloc(size_t size, size_t alignment)
     {
-        if (alignment < (2 * sizeof(void*)))
+        if (alignment < (sizeof(void*)))
         {
-            alignment = (2 * sizeof(void*));
+            alignment = (sizeof(void*));
+        }
+        if (size < (sizeof(void*)))
+        {
+            size = (sizeof(void*));
         }
 
         void*     p1; // original block
-        void**    p2; // aligned block
-        s32 const offset = alignment + (2 * sizeof(void*));
-        if ((p1 = malloc(size + offset)) == NULL)
+        if ((p1 = malloc(size + alignment + sizeof(void*))) == NULL)
             return NULL;
-        p2     = (void**)(((uptr)(p1) + offset) & ~(alignment - 1));
+
+        void**    p2; // aligned block
+        p2     = (void**)(((uptr)(p1) + (alignment - 1)) & ~(alignment - 1));
+        p2     = (void**)(((uptr)(p1) + sizeof(void*)));
         p2[-1] = p1;
-        p2[-2] = (void*)size;
         if (((uptr)p2 & (alignment - 1)) != 0)
         {
             printf("ERROR in mac_aligned_malloc\n");
@@ -96,6 +100,10 @@ namespace xcore
     }
 
     alloc_t* alloc_t::get_system() { return &sSystemAllocator; }
+
+    static alloc_t* sMainAllocator = &sSystemAllocator;
+    void     alloc_t::set_main(alloc_t* main_allocator) { sMainAllocator = main_allocator; }
+    alloc_t* alloc_t::get_main() { return sMainAllocator; }
 
 }; // namespace xcore
 

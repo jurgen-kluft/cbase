@@ -144,14 +144,14 @@
 //     <table>
 //     Compiler Macro     \Description              \Version   Platform
 //     -----------------  ------------------------  ---------  ---------
-//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2005       PC
-//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2008       PC
-//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2010       PC
-//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2015       PC
-//     COMPILER_WINDOWS_MSVC      Microsoft Visual Studio   2017       PC
+//     COMPILER_MSVC      Microsoft Visual Studio   2005       PC
+//     COMPILER_MSVC      Microsoft Visual Studio   2008       PC
+//     COMPILER_MSVC      Microsoft Visual Studio   2010       PC
+//     COMPILER_MSVC      Microsoft Visual Studio   2015       PC
+//     COMPILER_MSVC      Microsoft Visual Studio   2017       PC
 //     COMPILER_WINDOWS_CLANG     CLang                     7.0        PC
 //
-//     COMPILER_MACOS_CLANG       CLang                     7.0        MacOS
+//     COMPILER_CLANG       CLang                     7.0        MacOS
 //
 //     </table>
 //     Other Macros provided to the user automatically are:
@@ -865,17 +865,24 @@ namespace xcore
 #endif
 
     //
+    //  Operating System Designation
+    //
+
+
+    //
     //  Compiler Designation
     //
 
-#undef COMPILER_WINDOWS_MSVC
-#undef COMPILER_MACOS_CLANG
+#undef COMPILER_MSVC
+#undef COMPILER_CLANG
 
 #undef COMPILER_DEFAULT
 #undef COMPILER_VERSION
 
 #ifdef TARGET_PC
 #    ifdef _MSC_VER
+
+#        define TARGET_OS_WINDOWS
 
     // 1200      == VC++ 6.0
     // 1200-1202 == VC++ 4
@@ -888,30 +895,30 @@ namespace xcore
 
 #        if _MSC_VER < 1400
 #        elif _MSC_VER == 1400
-#            define COMPILER_WINDOWS_MSVC
+#            define COMPILER_MSVC
 #            define COMPILER_VERSION 2005
 #        elif _MSC_VER == 1500
-#            define COMPILER_WINDOWS_MSVC
+#            define COMPILER_MSVC
 #            define COMPILER_DEFAULT
 #            define COMPILER_VERSION 2008
 #        elif _MSC_VER == 1600
-#            define COMPILER_WINDOWS_MSVC
+#            define COMPILER_MSVC
 #            define COMPILER_DEFAULT
 #            define COMPILER_VERSION 2010
 #        elif _MSC_VER == 1700
-#            define COMPILER_WINDOWS_MSVC
+#            define COMPILER_MSVC
 #            define COMPILER_DEFAULT
 #            define COMPILER_VERSION 2012
 #        elif _MSC_VER == 1800
-#            define COMPILER_WINDOWS_MSVC
+#            define COMPILER_MSVC
 #            define COMPILER_DEFAULT
 #            define COMPILER_VERSION 2013
 #        elif _MSC_VER >= 1900 && _MSC_VER < 1911
-#            define COMPILER_WINDOWS_MSVC
+#            define COMPILER_MSVC
 #            define COMPILER_DEFAULT
 #            define COMPILER_VERSION 2015
 #        elif _MSC_VER >= 1911
-#            define COMPILER_WINDOWS_MSVC
+#            define COMPILER_MSVC
 #            define COMPILER_DEFAULT
 #            define COMPILER_VERSION 2017
 #        else
@@ -922,7 +929,8 @@ namespace xcore
 #    endif
 #elif defined(TARGET_MAC)
 #    ifdef __clang__
-#        define COMPILER_MACOS_CLANG
+#        define TARGET_OS_MAC
+#        define COMPILER_CLANG
 #        define COMPILER_DEFAULT
 #        define COMPILER_VERSION 7
 #    else
@@ -935,7 +943,7 @@ namespace xcore
 #undef X_CHAR_BIT
 
 /// This one is for Windows; Microsoft Developer Studio Visual C/C++ Compiler
-#if defined(COMPILER_WINDOWS_MSVC)
+#if defined(COMPILER_MSVC)
 #    define X_NO_CUSTOM_INT64
 #    define X_NO_CUSTOM_UINT64
     class __xint128;
@@ -976,10 +984,12 @@ namespace xcore
 #    define X_UINT256      __xuint256
 #    ifdef TARGET_64BIT
 #        define X_SIZE              unsigned __int64
+#        define X_INT               __int64
 #        define X_PTR_SIZED_INT     __int64
 #        define X_ALIGNMENT_DEFAULT 8
 #    else
 #        define X_SIZE              unsigned int
+#        define X_INT               int
 #        define X_PTR_SIZED_INT     int
 #        define X_ALIGNMENT_DEFAULT 4
 #    endif
@@ -1001,7 +1011,7 @@ namespace xcore
 /// disable useless warnings
 #    pragma warning(disable : 4800)
 
-#elif defined(COMPILER_MACOS_CLANG)
+#elif defined(COMPILER_CLANG)
 #    define X_NO_CUSTOM_INT64
 #    define X_NO_CUSTOM_UINT64
     class __xint128;
@@ -1044,10 +1054,12 @@ namespace xcore
 
 #    ifdef TARGET_64BIT
 #        define X_SIZE              unsigned long
+#        define X_INT               signed long
 #        define X_PTR_SIZED_INT     signed long
 #        define X_ALIGNMENT_DEFAULT 8
 #    else
 #        define X_SIZE              unsigned int
+#        define X_INT               signed int
 #        define X_PTR_SIZED_INT     int
 #        define X_ALIGNMENT_DEFAULT 4
 #    endif
@@ -1190,8 +1202,10 @@ namespace xcore
     typedef X_BYTE           xbyte;
     typedef X_BOOL           xbool32;
     typedef X_SIZE           xsize_t;
+    typedef X_INT            xint_t;
     typedef X_PTR_SIZED_INT  uptr;
-
+    typedef X_WCHAR          wchar;
+    
     //==============================================================================
     // ASCII + UTF 8, 16, 32
     typedef char uchar;

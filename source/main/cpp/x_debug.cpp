@@ -1,7 +1,7 @@
 #include "xbase/x_target.h"
 #ifdef X_ASSERT
 
-#include "xbase/x_tls.h"
+#include "xbase/x_context.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_console.h"
 #include "xbase/x_log.h"
@@ -20,22 +20,28 @@ namespace xcore
 		bool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
 	};
 
-	static asserthandler_t* sInternalSetAssertHandler(asserthandler_t* handler)
+	asserthandler_t*	asserthandler_t::sGetDefaultAssertHandler()
 	{
-		if (handler==NULL)
-		{
-			static xassert_default sDefaultAssertHandler;
-			handler = &sDefaultAssertHandler;
-		}
-		tls_t::set<tls_t::ASSERT_HANDLER, asserthandler_t>(handler);
-		return handler;
-	}
-
-	void	asserthandler_t::sRegisterHandler(asserthandler_t* handler)
-	{
-		sInternalSetAssertHandler(handler);
+		static xassert_default sAssertHandler;
+		asserthandler_t* handler = &sAssertHandler;
+		return handler;		
 	}
 	
+	class xassert_release : public asserthandler_t
+	{
+	public:
+		bool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+		{
+			return false;
+		}
+	};
+
+	asserthandler_t*	asserthandler_t::sGetReleaseAssertHandler()
+	{
+		static xassert_release sAssertHandler;
+		asserthandler_t* handler = &sAssertHandler;
+		return handler;		
+	}
 
 	//------------------------------------------------------------------------------
 	// Summary:
@@ -57,13 +63,12 @@ namespace xcore
 
 	bool xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
 	{
-		// From the TLS, get the debug object
+		// From the thread context, get the assert handler
 		// Call handle_assert() on that object and return
-		asserthandler_t* handler;
-		tls_t::get<tls_t::ASSERT_HANDLER, asserthandler_t>(handler);
+		asserthandler_t* handler = context_t::assert_handler();
 
 		if (handler == NULL)
-			handler = sInternalSetAssertHandler(NULL);
+			handler = asserthandler_t::sGetDefaultAssertHandler();
 
 		return handler->handle_assert(flags, fileName, lineNumber, exprString, messageString);
 	}

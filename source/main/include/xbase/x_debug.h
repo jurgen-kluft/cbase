@@ -29,11 +29,11 @@ namespace xcore
 		};
 		virtual bool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) = 0;
 
-		static void		sRegisterHandler(asserthandler_t* handler);
+		static asserthandler_t* sGetDefaultAssertHandler();
+		static asserthandler_t* sGetReleaseAssertHandler();
 	};
 
 	//------------------------------------------------------------------------------
-
 
 	//------------------------------------------------------------------------------
 	// Summary:

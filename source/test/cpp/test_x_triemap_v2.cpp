@@ -1,4 +1,4 @@
-#define TEST_TRIEMAP2
+//#define TEST_TRIEMAP2
 #ifdef TEST_TRIEMAP2
 
 #include "xbase/x_target.h"
@@ -39,7 +39,8 @@ namespace xcore
         };
 
         inline node_t()
-            : m_data(0)
+            : m_run(0)
+            , m_pos(0)
         {
             m_children[0] = 0xffffffff;
             m_children[1] = 0xffffffff;
@@ -762,14 +763,14 @@ UNITTEST_SUITE_END
 
 #else
 
-#include "xbase\x_target.h"
-#include "xbase\x_allocator.h"
-#include "xbase\x_debug.h"
-#include "xbase\x_integer.h"
+#include "xbase/x_target.h"
+#include "xbase/x_allocator.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_integer.h"
 
-#include "xunittest\xunittest.h"
+#include "xunittest/xunittest.h"
 
-UNITTEST_SUITE_BEGIN(xdtrie2)
+UNITTEST_SUITE_BEGIN(xdtrie2_v2)
 {
     UNITTEST_FIXTURE(main)
     {

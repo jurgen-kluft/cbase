@@ -1,4 +1,5 @@
 #include "xbase/x_target.h"
+#include "xbase/x_allocator.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_integer.h"
 #include "xbase/x_console.h"
@@ -8,6 +9,7 @@
 
 namespace xcore
 {
+
     namespace utf
     {
         static s32 countof_runes(ascii::pcrune str, ascii::pcrune end);
@@ -190,6 +192,9 @@ namespace xcore
 
         ascii::prune endof(ascii::prune str, ascii::pcrune eos)
         {
+            if (str == nullptr)
+                return nullptr;
+
             ascii::prune end = str;
             if (eos == nullptr)
             {
@@ -206,6 +211,9 @@ namespace xcore
 
         ascii::pcrune endof(ascii::pcrune str, ascii::pcrune eos)
         {
+            if (str == nullptr)
+                return nullptr;
+
             ascii::pcrune end = str;
             if (eos == nullptr)
             {
@@ -222,6 +230,9 @@ namespace xcore
 
         utf8::prune endof(utf8::prune str, utf8::pcrune eos)
         {
+            if (str == nullptr)
+                return nullptr;
+
             utf8::prune end = str;
             if (eos == nullptr)
             {
@@ -246,6 +257,9 @@ namespace xcore
 
         utf8::pcrune endof(utf8::pcrune str, utf8::pcrune eos)
         {
+            if (str == nullptr)
+                return nullptr;
+
             utf8::pcrune end = str;
             if (eos == nullptr)
             {
@@ -270,6 +284,9 @@ namespace xcore
 
         utf16::prune endof(utf16::prune str, utf16::pcrune eos)
         {
+            if (str == nullptr)
+                return nullptr;
+
             utf16::prune end = str;
             if (eos == nullptr)
             {
@@ -294,6 +311,9 @@ namespace xcore
 
         utf16::pcrune endof(utf16::pcrune str, utf16::pcrune eos)
         {
+            if (str == nullptr)
+                return nullptr;
+
             utf16::pcrune end = str;
             if (eos == nullptr)
             {
@@ -318,6 +338,9 @@ namespace xcore
 
         utf32::prune endof(utf32::prune str, utf32::pcrune eos)
         {
+            if (str == nullptr)
+                return nullptr;
+
             utf32::prune end = str;
             if (eos == nullptr)
             {
@@ -334,6 +357,9 @@ namespace xcore
 
         utf32::pcrune endof(utf32::pcrune str, utf32::pcrune eos)
         {
+            if (str == nullptr)
+                return nullptr;
+
             utf32::pcrune end = str;
             if (eos == nullptr)
             {

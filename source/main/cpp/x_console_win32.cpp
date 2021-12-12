@@ -173,7 +173,6 @@ namespace xcore
             }
             return l;
         }
-
     };
 
     class xconsole_out_win32 : public console_t::out_t

@@ -1,6 +1,7 @@
 #include "xbase/x_base.h"
 #include "xbase/x_allocator.h"
 #include "xbase/x_console.h"
+#include "xbase/x_context.h"
 
 #include "xunittest/xunittest.h"
 #include "xunittest/private/ut_ReportAssert.h"
@@ -32,7 +33,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsprintf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsscanf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_ascii);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_utf);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, tls_t);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, context_t);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xva);
 
 
@@ -105,13 +106,13 @@ xcore::UnitTestAssertHandler gAssertHandler;
 
 bool gRunUnitTest(UnitTest::TestReporter& reporter)
 {
-	xbase::x_Init();
+	xbase::init();
 
 #ifdef TARGET_DEBUG
-	xcore::asserthandler_t::sRegisterHandler(&gAssertHandler);
+	xcore::context_t::set_assert_handler(&gAssertHandler);
 #endif
 
-	xcore::alloc_t* systemAllocator = xcore::alloc_t::get_system();
+	xcore::alloc_t* systemAllocator = xcore::context_t::system_alloc();
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
 
@@ -132,7 +133,7 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 
 	UnitTest::SetAllocator(NULL);
 
-	xbase::x_Exit();
+	xbase::exit();
 	return r==0;
 }
 

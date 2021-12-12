@@ -1,10 +1,10 @@
-#include "xbase/x_tls.h"
+#include "xbase/x_context.h"
 
 #include "xunittest/xunittest.h"
 
 using namespace xcore;
 
-UNITTEST_SUITE_BEGIN(tls_t)
+UNITTEST_SUITE_BEGIN(context_t)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -22,13 +22,13 @@ UNITTEST_SUITE_BEGIN(tls_t)
         {
 			gInstance.mInteger = 1;
 			gInstance.mFloat = 2.0f;
-			tls_t::set<0, OurTlsObject>(&gInstance);
+			context_t::set(0, 5, &gInstance);
 		}
 
 		UNITTEST_TEST(get)
 		{
-			OurTlsObject * obj;
-			tls_t::get<0, OurTlsObject>(obj);
+			OurTlsObject* obj;
+			context_t::get(0, 5, obj);
 			CHECK_EQUAL(1, obj->mInteger);
 			CHECK_EQUAL(2.0f, obj->mFloat);
 		}

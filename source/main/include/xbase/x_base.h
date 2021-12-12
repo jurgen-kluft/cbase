@@ -7,8 +7,8 @@
 
 namespace xbase
 {
-	extern void		x_Init();
-	extern void		x_Exit();
+	extern void init(xcore::s32 number_of_threads=1, xcore::s64 temporary_allocator_size=8192);
+	extern void exit();
 };
 
 #endif // __XBASE_H__

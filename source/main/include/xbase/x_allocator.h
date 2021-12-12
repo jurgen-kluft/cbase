@@ -15,8 +15,10 @@ namespace xcore
     class alloc_t
     {
     public:
-        static void    init_system();
+        static void     init_system();
         static alloc_t* get_system();
+        static void     set_main(alloc_t* main_allocator);
+        static alloc_t* get_main();
 
         void* allocate(u32 size, u32 alignment) { return v_allocate(size, alignment); }
         void* allocate(u32 size) { return v_allocate(size, sizeof(void*)); }
@@ -51,11 +53,42 @@ namespace xcore
         virtual ~alloc_t() {}
     };
 
-	// helper functions
-	inline void* x_advance_ptr(void* ptr, u64 size) { return (void*)((uptr)ptr + size); }
+    // class new and delete
+#define XCORE_CLASS_PLACEMENT_NEW_DELETE                                    \
+    void* operator new(xcore::xsize_t num_bytes, void* mem) { return mem; } \
+    void  operator delete(void* mem, void*) {}                              \
+    void* operator new(xcore::xsize_t num_bytes) noexcept { return NULL; }  \
+    void  operator delete(void* mem) {}
+
+#define XCORE_CLASS_NEW_DELETE(get_allocator_func, align)                   \
+    void* operator new(xcore::xsize_t num_bytes, void* mem) { return mem; } \
+    void  operator delete(void* mem, void*) {}                              \
+    void* operator new(xcore::xsize_t num_bytes)                            \
+    {                                                                       \
+        ASSERT(num_bytes < (xcore::xsize_t)2 * 1024 * 1024 * 1024);         \
+        return get_allocator_func()->allocate((u32)num_bytes, align);       \
+    }                                                                       \
+    void operator delete(void* mem) { get_allocator_func()->deallocate(mem); }
+
+#define XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator_func, align)       \
+    void* operator new[](xcore::xsize_t num_bytes)                    \
+    {                                                                 \
+        ASSERT(num_bytes < (xcore::xsize_t)2 * 1024 * 1024 * 1024);   \
+        return get_allocator_func()->allocate((u32)num_bytes, align); \
+    }                                                                 \
+    void operator delete[](void* mem) { get_allocator_func()->deallocate(mem); }
+
+    // helper functions
+    inline void* x_advance_ptr(void* ptr, xsize_t size) { return (void*)((uptr)ptr + size); }
     inline void* x_align_ptr(void* ptr, u32 alignment) { return (void*)(((uptr)ptr + (alignment - 1)) & ~((uptr)alignment - 1)); }
     inline uptr  x_diff_ptr(void* ptr, void* next_ptr) { return (uptr)((uptr)next_ptr - (uptr)ptr); }
-	inline bool  x_is_in_range(void* buffer, u64 size, void* ptr) { uptr begin = (uptr)buffer; uptr end = begin + size; uptr cursor = (uptr)ptr; return cursor >= begin && cursor < end; }
+    inline bool  x_is_in_range(void* buffer, xsize_t size, void* ptr)
+    {
+        uptr begin  = (uptr)buffer;
+        uptr end    = begin + size;
+        uptr cursor = (uptr)ptr;
+        return cursor >= begin && cursor < end;
+    }
 
     // fixed-size allocator
     class fsa_t
@@ -89,22 +122,30 @@ namespace xcore
         virtual ~fsa_t() {}
     };
 
-	class fsa_to_alloc_t : public fsa_t
-	{
-	public:
-		fsa_to_alloc_t() : m_allocator(nullptr), m_size(0) {}
-		fsa_to_alloc_t(u32 size, alloc_t* allocator) : m_allocator(allocator), m_size(size) {}
+    class fsa_to_alloc_t : public fsa_t
+    {
+    public:
+        fsa_to_alloc_t()
+            : m_allocator(nullptr)
+            , m_size(0)
+        {
+        }
+        fsa_to_alloc_t(u32 size, alloc_t* allocator)
+            : m_allocator(allocator)
+            , m_size(size)
+        {
+        }
 
-	protected:
-		virtual u32   v_size() const       { return m_size; }
-		virtual void* v_allocate()         { return m_allocator->allocate(m_size, sizeof(void*)); }
-		virtual u32   v_deallocate(void*p) { return m_allocator->deallocate(p); }
-		virtual void  v_release()          { return m_allocator->release(); }
+    protected:
+        virtual u32   v_size() const { return m_size; }
+        virtual void* v_allocate() { return m_allocator->allocate(m_size, sizeof(void*)); }
+        virtual u32   v_deallocate(void* p) { return m_allocator->deallocate(p); }
+        virtual void  v_release() { return m_allocator->release(); }
 
-	private:
-		alloc_t*	m_allocator;
-		u32 m_size;
-	};
+    private:
+        alloc_t* m_allocator;
+        u32      m_size;
+    };
 
     // The dexer interface, 'pointer to index' and 'index to pointer'
     class dexer_t
@@ -154,6 +195,10 @@ namespace xcore
     public:
         alloc_buffer_t(buffer_t& storage);
 
+        xbyte* data() { return m_base; }
+
+        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        
     protected:
         virtual void* v_allocate(u32 size, u32 align)
         {
@@ -222,22 +267,6 @@ namespace xcore
 
         template <class T> inline T* object() { return static_cast<T*>(m_memory); }
     };
-
-#define XCORE_CLASS_PLACEMENT_NEW_DELETE                                    \
-    void* operator new(xcore::xsize_t num_bytes, void* mem) { return mem; } \
-    void  operator delete(void* mem, void*) {}                              \
-    void* operator new(xcore::xsize_t num_bytes) noexcept { return NULL; }           \
-    void  operator delete(void* mem) {}
-
-#define XCORE_CLASS_NEW_DELETE(get_allocator_func, align)                                                     \
-    void* operator new(xcore::xsize_t num_bytes, void* mem) { return mem; }                                   \
-    void  operator delete(void* mem, void*) {}                                                                \
-    void* operator new(xcore::xsize_t num_bytes) { ASSERT(num_bytes < (xcore::xsize_t)2*1024*1024*1024); return get_allocator_func()->allocate((u32)num_bytes, align); } \
-    void  operator delete(void* mem) { get_allocator_func()->deallocate(mem); }
-
-#define XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator_func, align)                                                 \
-    void* operator new[](xcore::xsize_t num_bytes) { ASSERT(num_bytes < (xcore::xsize_t)2*1024*1024*1024); return get_allocator_func()->allocate((u32)num_bytes, align); } \
-    void  operator delete[](void* mem) { get_allocator_func()->deallocate(mem); }
 
     template <class T> class cdtor_default_t
     {

@@ -11,7 +11,7 @@ namespace xcore
 	{
 	public:
 		virtual				~random_t() {}
-		virtual void		reset(s32 inSeed = 0) = 0;
+		virtual void		reset(s64 inSeed = 0) = 0;
 		virtual u32			generate() = 0;
 	};
 
