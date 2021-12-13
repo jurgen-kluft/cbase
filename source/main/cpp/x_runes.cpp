@@ -3847,11 +3847,11 @@ namespace xcore
     }
 
     bool runes_reader_t::at_end() const { return m_cursor.m_ptr.m_ascii >= m_runes.m_runes.m_ascii.m_end; }
-    bool runes_reader_t::valid() const { return m_cursor.m_ptr.m_ascii < m_runes.m_runes.m_ascii.m_end; }
+    bool runes_reader_t::vvalid() const { return m_cursor.m_ptr.m_ascii < m_runes.m_runes.m_ascii.m_end; }
 
-    void runes_reader_t::reset() { m_cursor.m_ptr.m_ascii = m_runes.m_runes.m_ascii.m_str; }
+    void runes_reader_t::vreset() { m_cursor.m_ptr.m_ascii = m_runes.m_runes.m_ascii.m_str; }
 
-    uchar32 runes_reader_t::peek() const
+    uchar32 runes_reader_t::vpeek() const
     {
         uchar32 c = '\0';
         if (!at_end())
@@ -3867,7 +3867,7 @@ namespace xcore
         return c;
     }
 
-    bool runes_reader_t::read(uchar32& c)
+    bool runes_reader_t::vread(uchar32& c)
     {
         if (!at_end())
         {
@@ -3884,7 +3884,7 @@ namespace xcore
 		return false;
     }
 
-    void runes_reader_t::skip(s32 c)
+    void runes_reader_t::vskip(s32 c)
     {
         switch (m_runes.m_type)
         {
@@ -3994,7 +3994,7 @@ namespace xcore
         return p.m_ptr.m_ascii >= str.m_runes.m_ascii.m_eos;
     }
 
-    bool runes_writer_t::write(uchar32 c)
+    bool runes_writer_t::vwrite(uchar32 c)
     {
         if (!at_end(m_cursor, m_runes))
         {
@@ -4039,7 +4039,7 @@ namespace xcore
         return false;
     }
 
-    bool runes_writer_t::write(crunes_t const& str)
+    bool runes_writer_t::vwrite(crunes_t const& str)
     {
         if (!at_end(m_cursor, m_runes))
         {
@@ -4084,7 +4084,7 @@ namespace xcore
         return false;
     }
 
-    void runes_writer_t::flush()
+    void runes_writer_t::vflush()
     {
 
     }

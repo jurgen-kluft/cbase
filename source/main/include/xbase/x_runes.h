@@ -536,11 +536,20 @@ namespace xcore
 	class irunes_reader_t
 	{
 	public:
-		virtual void     reset() = 0;
-		virtual bool     valid() const = 0;
-		virtual uchar32  peek() const = 0;
-		virtual bool     read(uchar32& c) = 0;
-		virtual void     skip(s32 c = 1) = 0;
+
+		void             reset() { vreset(); }
+		bool             valid() const { return vvalid(); }
+		uchar32          peek() const { return vpeek(); }
+        bool             read(uchar32& c) { return vread(c); }
+		inline uchar32   read() { uchar32 c; vread(c); return c; }
+        inline void      skip(s32 c = 1) { vskip(c); }
+
+    protected:
+		virtual void     vreset() = 0;
+		virtual bool     vvalid() const = 0;
+		virtual uchar32  vpeek() const = 0;
+		virtual bool     vread(uchar32& c) = 0;
+		virtual void     vskip(s32 c = 1) = 0;
 	};
 
 	class runes_reader_t : public irunes_reader_t
@@ -562,14 +571,14 @@ namespace xcore
         crunes_t get_source() const;
         crunes_t get_current() const;
         bool     at_end() const;
-        bool     valid() const;
-        void     reset();
-        uchar32  peek() const;
-		bool     read(uchar32& c);
-		uchar32  read() { uchar32 c; read(c); return c; }
-		void     skip(s32 c = 1);
-
+        
     protected:
+        virtual bool     vvalid() const;
+        virtual void     vreset();
+        virtual uchar32  vpeek() const;
+		virtual bool     vread(uchar32& c);
+		virtual void     vskip(s32 c = 1);
+
         crunes_t        m_runes;
         crunes_t::ptr_t m_cursor;
     };
@@ -577,9 +586,14 @@ namespace xcore
     class irunes_writer_t
     {
     public:
-        virtual bool write(uchar32 c) = 0;
-        virtual bool write(crunes_t const& str) = 0;
-        virtual void flush() = 0;
+        bool write(uchar32 c) { return vwrite(c); }
+        bool write(crunes_t const& str) { return vwrite(str); }
+        void flush() { vflush(); }
+
+    protected:
+        virtual bool vwrite(uchar32 c) = 0;
+        virtual bool vwrite(crunes_t const& str) = 0;
+        virtual void vflush() = 0;
     };
 
     class runes_writer_t : public irunes_writer_t
@@ -597,11 +611,11 @@ namespace xcore
         void reset();
         s32  count() const;
 
-        virtual bool write(uchar32 c);
-        virtual bool write(crunes_t const& str);
-        virtual void flush();
-
     protected:
+        virtual bool vwrite(uchar32 c);
+        virtual bool vwrite(crunes_t const& str);
+        virtual void vflush();
+
         runes_t        m_runes;
         runes_t::ptr_t m_cursor;
         s32            m_count;

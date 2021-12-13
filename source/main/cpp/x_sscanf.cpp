@@ -12,7 +12,7 @@ namespace xcore
     // runes_reader_t -> rune_reader_t
     // CharWriter -> rune_writer_t
 
-    static bool SearchUntilOneOf(runes_reader_t* reader, runes_reader_t* foo)
+    static bool SearchUntilOneOf(irunes_reader_t* reader, irunes_reader_t* foo)
     {
         uchar32 c = reader->peek();
         while (c != '\0')
@@ -31,7 +31,7 @@ namespace xcore
         return false;
     }
 
-    static bool MatchBoolStr(runes_reader_t* str, bool& boolean)
+    static bool MatchBoolStr(irunes_reader_t* str, bool& boolean)
     {
         bool        bval = false;
         const char* bstr = NULL;
@@ -107,7 +107,7 @@ namespace xcore
      *      atod32 atoi32 atoi64 atof32 atof64
      *------------------------------------------------------------------------------
      */
-    s64 StrToS64(runes_reader_t* reader, s32 base)
+    s64 StrToS64(irunes_reader_t* reader, s32 base)
     {
         ASSERT(reader != NULL);
         ASSERT(base > 2);
@@ -179,11 +179,11 @@ namespace xcore
     }
 
     // <COMBINE atod64 >
-    s32 StrToS32(runes_reader_t* reader, s32 base) { return (s32)StrToS64(reader, base); }
+    s32 StrToS32(irunes_reader_t* reader, s32 base) { return (s32)StrToS64(reader, base); }
 
     //------------------------------------------------------------------------------
 
-    f64 StrToF64(runes_reader_t* reader)
+    f64 StrToF64(irunes_reader_t* reader)
     {
         // Evaluate sign
         s32 sign = 1;
@@ -376,7 +376,7 @@ namespace xcore
         INT64_SIZE = 8,
     };
 
-    s32 VSScanf(runes_reader_t* reader, runes_reader_t* fmt, const x_va_r_list& vr_args)
+    s32 VSScanf(irunes_reader_t* reader, irunes_reader_t* fmt, const x_va_r_list& vr_args)
     {
         s32 i        = 0;
         s32 w        = 0;
@@ -448,7 +448,7 @@ namespace xcore
 						runes_t* runes = r.getRunes();
 						if (runes != nullptr)
 						{
-							runes_raw_writer_t str_writer(*runes);
+							runes_writer_t str_writer(*runes);
 
 							l = 0;
 							while (reader->peek() != 0 && reader->peek() != ' ')

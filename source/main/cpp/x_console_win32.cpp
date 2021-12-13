@@ -17,24 +17,24 @@
 
 namespace xcore
 {
-    class out_writer_t : public runes_writer_t
+    class out_writer_t : public irunes_writer_t
     {
         runez_t<utf32::rune, 64> m_write_to_console_cache;
 
     public:
         inline out_writer_t() {}
 
-        virtual bool        write(uchar32 c)
+        virtual bool        vwrite(uchar32 c)
         {
             if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
-                flush();
+                vflush();
             m_write_to_console_cache += c;
             return true;
         }
 
-        virtual bool        write(crunes_t const& str)
+        virtual bool        vwrite(crunes_t const& str)
         {
-            flush();
+            vflush();
             
             switch (str.m_type)
             {
@@ -47,7 +47,7 @@ namespace xcore
             return true;
         }
 
-        virtual void flush()
+        virtual void vflush()
         {
             if (m_write_to_console_cache.size() > 0)
             {

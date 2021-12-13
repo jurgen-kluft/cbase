@@ -15,8 +15,8 @@ namespace xcore
     s32  vcprintf(crunes_t const& format, const va_list_t& args);
     void sprintf(runes_t& dst, crunes_t const& format, X_VA_ARGS_16_DEF);
     void vsprintf(runes_t& dst, crunes_t const& format, const va_list_t& args);
-    void zprintf(runes_writer_t& dst, crunes_t const& format, X_VA_ARGS_16_DEF);
-    void vzprintf(runes_writer_t& dst, crunes_t const& format, const va_list_t& args);
+    void zprintf(irunes_writer_t& dst, crunes_t const& format, X_VA_ARGS_16_DEF);
+    void vzprintf(irunes_writer_t& dst, crunes_t const& format, const va_list_t& args);
     void printf(crunes_t const& str);
     void printf(crunes_t const& format, X_VA_ARGS_16_DEF);
     void printf(crunes_t const& format, const va_list_t& args);

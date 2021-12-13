@@ -8,7 +8,7 @@
 namespace xcore
 {
 
-	class counter_writer_t : public runes_writer_t
+	class counter_writer_t : public irunes_writer_t
 	{
 		s32                 m_runes_count;
 
@@ -17,13 +17,13 @@ namespace xcore
 
         inline s32          count() const { return m_runes_count; }
 
-		virtual bool        write(uchar32 c)
+		virtual bool        vwrite(uchar32 c)
 		{
 			m_runes_count += 1;
 			return true;
 		}
 		
-		virtual bool        write(crunes_t const& runes)
+		virtual bool        vwrite(crunes_t const& runes)
 		{
             runes_reader_t reader(runes);
             while (!reader.at_end())
@@ -34,34 +34,34 @@ namespace xcore
 			return true;
 		}
 
-		virtual void flush()
+		virtual void vflush()
 		{
 		}
 	};
 
-    class console_writer_t : public runes_writer_t
+    class console_writer_t : public irunes_writer_t
 	{
 		runez_t<utf32::rune, 64> m_write_to_console_cache;
 
     public:
 		inline console_writer_t() {}
 
-		virtual bool        write(uchar32 c)
+		virtual bool        vwrite(uchar32 c)
 		{
             if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
-                flush();
+                vflush();
             m_write_to_console_cache += c;
 			return true;
 		}
 		
-		virtual bool        write(crunes_t const& runes)
+		virtual bool        vwrite(crunes_t const& runes)
 		{
-            flush();
+            vflush();
 			console->write(runes);
 			return true;
 		}
 
-		virtual void flush()
+		virtual void vflush()
 		{
             if (m_write_to_console_cache.size() > 0)
             {
@@ -247,7 +247,7 @@ namespace xcore
      * prec    - how many digits of precision
      *------------------------------------------------------------------------------
      */
-    static void dtoa(runes_writer_t* writer, f64 fpnum, char cvt, s32 width, s32 prec)
+    static void dtoa(irunes_writer_t* writer, f64 fpnum, char cvt, s32 width, s32 prec)
     {
         static const f64 powTable[] = {1, 10, 10e1, 10e2, 10e3, 10e4, 10e5, 10e6, 10e7, 10e8, 10e9, 10e10, 10e11, 10e12, 10e13, 10e14, 10e15, 10e16, 10e17, 10e18, 10e19, 10e20, 10e21, 10e22, 10e23};
 
@@ -641,7 +641,7 @@ namespace xcore
 		}
 	}
 
-    static void ULtoA(u32 val, runes_writer_t* writer, s32 base, bool octzero, char const* xdigs)
+    static void ULtoA(u32 val, irunes_writer_t* writer, s32 base, bool octzero, char const* xdigs)
     {
         uchar32 c;
         s32     sval;
@@ -718,7 +718,7 @@ namespace xcore
     /**
      * Same as above but for u64
      */
-    static void UQtoA(u64 val, runes_writer_t* writer, s32 base, bool octzero, char const* xdigs)
+    static void UQtoA(u64 val, irunes_writer_t* writer, s32 base, bool octzero, char const* xdigs)
     {
         uchar32 c;
         s64     sval;
@@ -794,7 +794,7 @@ namespace xcore
 		writer->write(workstr);
 	}
 
-    static s32 boolToStr(u32 _boolean, runes_writer_t* writer, bool yesNo, xcore::s32 flags)
+    static s32 boolToStr(u32 _boolean, irunes_writer_t* writer, bool yesNo, xcore::s32 flags)
     {
         const char* t[] = {"false", "true", "FALSE", "TRUE", "False", "True", "no", "yes", "NO", "YES", "No", "Yes"};
         s32         i   = yesNo ? 6 : 0;
@@ -817,7 +817,7 @@ namespace xcore
     }
 
 
-    static void PadBuffer(runes_writer_t* writer, s32 howMany, char with)
+    static void PadBuffer(irunes_writer_t* writer, s32 howMany, char with)
     {
         for (s32 i = 0; i < howMany; i++)
         {
@@ -894,7 +894,7 @@ namespace xcore
      *------------------------------------------------------------------------------
      */
 
-    void VSPrintf_internal(runes_writer_t* writer, runes_reader_t* reader, runes_raw_writer_t* buffer, const va_list_t& args)
+    void VSPrintf_internal(irunes_writer_t* writer, irunes_reader_t* reader, runes_writer_t* buffer, const va_list_t& args)
     {
         ASSERT(reader != NULL);
         ASSERT(writer != NULL);
@@ -902,7 +902,7 @@ namespace xcore
 
         uchar32     ch;        ///< character
         s32         n;         ///< handy integer (short term usage)
-		runes_writer_t* cp = NULL; ///< handy char pointer (short term usage)
+		irunes_writer_t* cp = NULL; ///< handy char pointer (short term usage)
         s32         flags;     ///< flags as above
         s32         width;     ///< width from format (%8d), or 0
         s32         prec;      ///< precision from format (%.3d), or -1
@@ -1120,7 +1120,7 @@ namespace xcore
                     {
 						runes_t bufstr = buffer->get_current();
 						runes_reader_t bufreader(bufstr);
-						runes_raw_writer_t bufwriter(bufstr);
+						runes_writer_t bufwriter(bufstr);
 						while (!bufreader.at_end())
 						{
 							uchar32 c = bufreader.read();
@@ -1386,21 +1386,21 @@ namespace xcore
 
     void vsprintf(runes_t& str, crunes_t const& format, const va_list_t& args)
     {
-		runes_raw_writer_t dstwriter(str);
+		runes_writer_t dstwriter(str);
         vzprintf(dstwriter, format, args);
 		str = dstwriter.get_current();
 	}
 
-    void zprintf(runes_writer_t& dst, crunes_t const& format, X_VA_ARGS_16)
+    void zprintf(irunes_writer_t& dst, crunes_t const& format, X_VA_ARGS_16)
     {
         va_list_t args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
         vzprintf(dst, format, args);
     }
 
-    void vzprintf(runes_writer_t& dst, crunes_t const& format, const va_list_t& args)
+    void vzprintf(irunes_writer_t& dst, crunes_t const& format, const va_list_t& args)
     {
         runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-        runes_raw_writer_t scratch(scratchbuffer);
+        runes_writer_t scratch(scratchbuffer);
         runes_reader_t runesreader(format);
         VSPrintf_internal(&dst, &runesreader, &scratch, args);
     }
