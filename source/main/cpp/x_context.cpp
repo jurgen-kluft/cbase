@@ -32,10 +32,11 @@ namespace xcore
         m_slots = nullptr;
     }
 
-    void context_t::register_thread()
+    s32 context_t::register_thread()
     {
         // Is this thread-safe ?
         sThreadIndex = sThreadIndexCount++;
+        return sThreadIndex;
     }
 
     void context_t::vset(s32 tidx, s32 slot, void* pvData) 

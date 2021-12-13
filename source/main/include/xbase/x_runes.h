@@ -134,6 +134,10 @@ namespace xcore
         runes_t(ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type = ascii::TYPE);
         runes_t(ascii::prune _bos, ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type = ascii::TYPE);
 
+		runes_t(utf8::prune _str, utf8::prune _end, s32 _type = utf8::TYPE);
+		runes_t(utf8::prune _str, utf8::prune _end, utf8::prune _eos, s32 _type = utf8::TYPE);
+		runes_t(utf8::prune _bos, utf8::prune _str, utf8::prune _end, utf8::prune _eos, s32 _type = utf8::TYPE);
+
         runes_t(utf16::prune _str, utf16::prune _end, s32 _type = utf16::TYPE);
         runes_t(utf16::prune _str, utf16::prune _end, utf16::prune _eos, s32 _type = utf16::TYPE);
         runes_t(utf16::prune _bos, utf16::prune _str, utf16::prune _end, utf16::prune _eos, s32 _type = utf16::TYPE);
@@ -529,17 +533,29 @@ namespace xcore
 
     // -------------------------------------------------------------------------------
     // runes reader and writer
-    class runes_reader_t
+	class irunes_reader_t
+	{
+	public:
+		virtual void     reset() = 0;
+		virtual bool     valid() const = 0;
+		virtual uchar32  peek() const = 0;
+		virtual bool     read(uchar32& c) = 0;
+		virtual void     skip(s32 c = 1) = 0;
+	};
+
+	class runes_reader_t : public irunes_reader_t
     {
     public:
         runes_reader_t();
         runes_reader_t(ascii::pcrune str);
         runes_reader_t(ascii::pcrune str, u32 len);
-        runes_reader_t(ascii::pcrune str, ascii::pcrune str_end);
-        runes_reader_t(utf32::pcrune str, utf32::pcrune str_end);
+		runes_reader_t(ascii::pcrune str, ascii::pcrune str_end);
+		runes_reader_t(utf8::pcrune str, utf8::pcrune str_end);
+		runes_reader_t(utf16::pcrune str, utf16::pcrune str_end);
+		runes_reader_t(utf32::pcrune str, utf32::pcrune str_end);
         runes_reader_t(crunes_t const& runes);
 
-        runes_reader_t  select(crunes_t::ptr_t const& from, crunes_t::ptr_t to) const;
+		runes_reader_t  select(crunes_t::ptr_t const& from, crunes_t::ptr_t to) const;
         crunes_t::ptr_t get_cursor() const { return m_cursor; }
         void            set_cursor(crunes_t::ptr_t const& c) { m_cursor = c; }
 
@@ -549,15 +565,16 @@ namespace xcore
         bool     valid() const;
         void     reset();
         uchar32  peek() const;
-        uchar32  read();
-        void     skip(s32 c = 1);
+		bool     read(uchar32& c);
+		uchar32  read() { uchar32 c; read(c); return c; }
+		void     skip(s32 c = 1);
 
     protected:
         crunes_t        m_runes;
         crunes_t::ptr_t m_cursor;
     };
 
-    class runes_writer_t
+    class irunes_writer_t
     {
     public:
         virtual bool write(uchar32 c) = 0;
@@ -565,12 +582,14 @@ namespace xcore
         virtual void flush() = 0;
     };
 
-    class runes_raw_writer_t : public runes_writer_t
+    class runes_writer_t : public irunes_writer_t
     {
     public:
-        runes_raw_writer_t(ascii::prune str, ascii::prune str_end);
-        runes_raw_writer_t(utf32::prune str, utf32::prune str_end);
-        runes_raw_writer_t(runes_t const& runes);
+		runes_writer_t(ascii::prune str, ascii::prune str_end);
+		runes_writer_t(utf8::prune str, utf8::prune str_end);
+		runes_writer_t(utf16::prune str, utf16::prune str_end);
+		runes_writer_t(utf32::prune str, utf32::prune str_end);
+		runes_writer_t(runes_t const& runes);
 
         runes_t get_destination() const;
         runes_t get_current() const;

@@ -33,7 +33,7 @@ namespace xcore
         static void init(s32 max_num_threads, s32 max_num_slots, alloc_t* allocator);
         static void exit(alloc_t* allocator);
 
-        static void register_thread();
+        static s32  register_thread();
         static s32  thread_index();
 
         static asserthandler_t* assert_handler()

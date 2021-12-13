@@ -82,7 +82,7 @@ namespace xcore
 
 namespace xbase
 {
-    void init(xcore::s32 number_of_threads, xcore::s64 temporary_allocator_size)
+    void init(xcore::s32 number_of_threads, xcore::s32 temporary_allocator_size)
     {
         xcore::alloc_t::init_system();
         xcore::console_t::init_default_console();

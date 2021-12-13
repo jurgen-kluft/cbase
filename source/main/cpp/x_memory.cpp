@@ -18,37 +18,15 @@ namespace xcore
 
 #ifdef TARGET_MAC
         void memcpy(void* dest, const void* src, u32 count) { ::memcpy(dest, src, count); }
-
         void memset(void* buf, u32 c, u32 inLength) { ::memset(buf, c, inLength); }
-
-        //------------------------------------------------------------------------------
         void* memmove(void* inDest, const void* inSrc, u32 inLength) { return ::memmove(inDest, inSrc, inLength); }
-
-        /**
-         * Compares the first count characters of buf1 and buf2 and
-         * \returns a value indicating their relationship.
-         */
         s32 memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength) { return ::memcmp(bufPtr1, bufPtr2, inLength); }
 #endif
 
 #ifdef TARGET_PC
-        /**
-         * Memory copy
-         */
         void memcpy(void* dest, const void* src, u32 count) { ::memcpy(dest, src, count); }
-
-        /**
-         * Sets the first count characters of dest to the character c.
-         */
         void memset(void* buf, u32 c, u32 inLength) { ::memset(buf, c, inLength); }
-
-        //------------------------------------------------------------------------------
         void* memmove(void* inDest, const void* inSrc, u32 inLength) { return ::memmove(inDest, inSrc, inLength); }
-
-        /**
-         * Compares the first count characters of buf1 and buf2 and
-         * \returns a value indicating their relationship.
-         */
         s32 memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength) { return ::memcmp(bufPtr1, bufPtr2, inLength); }
 #endif
 
