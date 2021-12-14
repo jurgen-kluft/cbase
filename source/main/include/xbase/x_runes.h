@@ -9,9 +9,11 @@ namespace xcore
 {
 #undef printf
 
-    const uchar32 cEOF = 0x05;
-    const uchar32 cEOL = 0x0A; // \n
-    const uchar32 cCR  = 0x0D; // \r
+    const uchar32 cEOS = 0x00; // \0, end of string
+    const uchar32 cEOT = 0x04; // end of transmission
+    const uchar32 cEOF = 0x05; // end of file
+    const uchar32 cEOL = 0x0A; // \n, end of line
+    const uchar32 cCR  = 0x0D; // \r, carriage return
 
     namespace ascii
     {
