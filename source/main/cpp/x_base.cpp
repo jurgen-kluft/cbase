@@ -86,7 +86,7 @@ namespace xbase
     {
         xcore::alloc_t::init_system();
         xcore::console_t::init_default_console();
-
+		xcore::context_t::init(number_of_threads, 16, xcore::alloc_t::get_system());
         xcore::context_t::register_thread(); // Should be called once from a created thread
 
 #ifdef X_ASSERT

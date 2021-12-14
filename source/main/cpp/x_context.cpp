@@ -13,7 +13,7 @@ namespace xcore
     static s32 sThreadIndexCount = 0;
     thread_local s32 sThreadIndex;
 
-    void*** context_t::m_slots = nullptr;
+    void** context_t::m_slots = nullptr;
     s32    context_t::m_max_num_threads = 0;
     s32    context_t::m_max_num_slots = 0;
 
@@ -21,7 +21,7 @@ namespace xcore
     {
         m_max_num_threads = max_num_threads;
         m_max_num_slots = max_num_slots;
-        m_slots = (void***)allocator->allocate(max_num_threads * max_num_slots * sizeof(void*), sizeof(void*));
+        m_slots = (void**)allocator->allocate(max_num_threads * max_num_slots * sizeof(void*), sizeof(void*));
     }
 
     void context_t::exit(alloc_t* allocator)
@@ -43,14 +43,14 @@ namespace xcore
     { 
         ASSERT(tidx < m_max_num_threads);
         ASSERT(slot < m_max_num_slots);
-        m_slots[tidx][slot] = pvData; 
+        m_slots[tidx*m_max_num_slots + slot] = pvData; 
     }
 
     void context_t::vget(s32 tidx, s32 slot, void*& pvData) 
     { 
         ASSERT(tidx < m_max_num_threads);
         ASSERT(slot < m_max_num_slots);
-        pvData = m_slots[tidx][slot]; 
+        pvData = m_slots[tidx*m_max_num_slots + slot]; 
     }
 
     s32 context_t::thread_index()

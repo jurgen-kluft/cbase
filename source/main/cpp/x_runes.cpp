@@ -3767,7 +3767,7 @@ namespace xcore
         return size;
     }
     bool crunes_t::is_empty() const { return m_runes.m_ascii.m_end == m_runes.m_ascii.m_str; }
-    bool crunes_t::is_valid() const { return m_runes.m_ascii.m_end < m_runes.m_ascii.m_eos; }
+    bool crunes_t::is_valid() const { return m_runes.m_ascii.m_end != nullptr && m_runes.m_ascii.m_end <= m_runes.m_ascii.m_eos; }
     bool crunes_t::is_nil() const { return m_runes.m_ascii.m_bos == nullptr; }
     void crunes_t::reset() { m_runes.m_ascii.m_end = m_runes.m_ascii.m_str; }
     void crunes_t::clear()

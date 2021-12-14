@@ -118,7 +118,7 @@ namespace xcore
         static void vset(s32 tidx, s32 SLOT, void* inData);
         static void vget(s32 tidx, s32 SLOT, void*& outData);
 
-        static void*** m_slots;
+        static void** m_slots;
         static s32    m_max_num_threads;
         static s32    m_max_num_slots;
     };
