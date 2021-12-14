@@ -9,13 +9,17 @@ namespace xcore
 {
 #undef printf
 
+    const uchar32 cEOF = 0x05;
+    const uchar32 cEOL = 0x0A; // \n
+    const uchar32 cCR  = 0x0D; // \r
+
     namespace ascii
     {
         typedef char        rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const rune    TERMINATOR = '\0';
-        static const s32     TYPE       = 1;
+        static const rune   TERMINATOR = '\0';
+        static const s32    TYPE       = 1;
         struct runes_t
         {
             prune m_bos; // Begin of stream
@@ -25,20 +29,38 @@ namespace xcore
         };
         struct crunes_t
         {
-            crunes_t() : m_bos("\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
-            crunes_t(pcrune str, s32 len) : m_bos(str), m_str(str), m_end(str + len), m_eos(str + len) {}
-            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(str), m_end(end), m_eos(end) {}
+            crunes_t()
+                : m_bos("\0\0\0\0")
+                , m_str(m_bos)
+                , m_end(m_bos)
+                , m_eos(m_bos)
+            {
+            }
+            crunes_t(pcrune str, s32 len)
+                : m_bos(str)
+                , m_str(str)
+                , m_end(str + len)
+                , m_eos(str + len)
+            {
+            }
+            crunes_t(pcrune str, pcrune end)
+                : m_bos(str)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(end)
+            {
+            }
             pcrune m_bos, m_str, m_end, m_eos;
         };
         s32 strlen(pcrune str, pcrune eos = nullptr);
     } // namespace ascii
     namespace utf8
     {
-        typedef u8        rune;
+        typedef u8          rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const s32      TYPE       = 3;
-        static const rune     TERMINATOR = '\0';
+        static const s32    TYPE       = 3;
+        static const rune   TERMINATOR = '\0';
 
         struct runes_t
         {
@@ -46,18 +68,24 @@ namespace xcore
         };
         struct crunes_t
         {
-            crunes_t() : m_bos((pcrune) "\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
+            crunes_t()
+                : m_bos((pcrune) "\0\0\0\0")
+                , m_str(m_bos)
+                , m_end(m_bos)
+                , m_eos(m_bos)
+            {
+            }
             pcrune m_bos, m_str, m_end, m_eos;
         };
     } // namespace utf8
     namespace utf16
     {
-        typedef u16        rune;
+        typedef u16         rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const s32       TYPE       = 2;
-        static const rune      TERMINATOR = '\0';
-        static const u64       EMPTY_STRING = 0;
+        static const s32    TYPE         = 2;
+        static const rune   TERMINATOR   = '\0';
+        static const u64    EMPTY_STRING = 0;
 
         struct runes_t
         {
@@ -65,17 +93,23 @@ namespace xcore
         };
         struct crunes_t
         {
-            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
+            crunes_t()
+                : m_bos((pcrune)&EMPTY_STRING)
+                , m_str(m_bos)
+                , m_end(m_bos)
+                , m_eos(m_bos)
+            {
+            }
             pcrune m_bos, m_str, m_end, m_eos;
         };
     } // namespace utf16
     namespace utf32
     {
-        typedef u32        rune;
+        typedef u32         rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const s32       TYPE       = 4;
-        static const rune      TERMINATOR = '\0';
+        static const s32    TYPE       = 4;
+        static const rune   TERMINATOR = '\0';
 
         struct runes_t
         {
@@ -83,8 +117,20 @@ namespace xcore
         };
         struct crunes_t
         {
-            crunes_t() : m_bos((pcrune) "\0\0\0\0"), m_str(m_bos), m_end(m_bos), m_eos(m_bos) {}
-            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(str), m_end(end), m_eos(end) {}
+            crunes_t()
+                : m_bos((pcrune) "\0\0\0\0")
+                , m_str(m_bos)
+                , m_end(m_bos)
+                , m_eos(m_bos)
+            {
+            }
+            crunes_t(pcrune str, pcrune end)
+                : m_bos(str)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(end)
+            {
+            }
             pcrune m_bos, m_str, m_end, m_eos;
         };
     } // namespace utf32
@@ -94,11 +140,26 @@ namespace xcore
     {
         struct ptr_t
         {
-			ptr_t() : m_ptr() {}
-			ptr_t(ascii::prune ptr) : m_ptr(ptr) {}
-			ptr_t(utf8::prune ptr) : m_ptr(ptr) {}
-			ptr_t(utf16::prune ptr) : m_ptr(ptr) {}
-			ptr_t(utf32::prune ptr) : m_ptr(ptr) {}
+            ptr_t()
+                : m_ptr()
+            {
+            }
+            ptr_t(ascii::prune ptr)
+                : m_ptr(ptr)
+            {
+            }
+            ptr_t(utf8::prune ptr)
+                : m_ptr(ptr)
+            {
+            }
+            ptr_t(utf16::prune ptr)
+                : m_ptr(ptr)
+            {
+            }
+            ptr_t(utf32::prune ptr)
+                : m_ptr(ptr)
+            {
+            }
 
             ptr_t& operator=(const ptr_t& other)
             {
@@ -113,11 +174,26 @@ namespace xcore
             bool operator!=(const ptr_t& other) const { return m_ptr.m_ascii != other.m_ptr.m_ascii; }
             union runeptr
             {
-                inline runeptr() : m_ascii(nullptr) {}
-				inline runeptr(ascii::prune ptr) : m_ascii(ptr) {}
-				inline runeptr(utf8::prune ptr) : m_utf8(ptr) {}
-				inline runeptr(utf16::prune ptr) : m_utf16(ptr) {}
-				inline runeptr(utf32::prune ptr) : m_utf32(ptr) {}
+                inline runeptr()
+                    : m_ascii(nullptr)
+                {
+                }
+                inline runeptr(ascii::prune ptr)
+                    : m_ascii(ptr)
+                {
+                }
+                inline runeptr(utf8::prune ptr)
+                    : m_utf8(ptr)
+                {
+                }
+                inline runeptr(utf16::prune ptr)
+                    : m_utf16(ptr)
+                {
+                }
+                inline runeptr(utf32::prune ptr)
+                    : m_utf32(ptr)
+                {
+                }
 
                 ascii::prune m_ascii;
                 utf8::prune  m_utf8;
@@ -134,9 +210,9 @@ namespace xcore
         runes_t(ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type = ascii::TYPE);
         runes_t(ascii::prune _bos, ascii::prune _str, ascii::prune _end, ascii::prune _eos, s32 _type = ascii::TYPE);
 
-		runes_t(utf8::prune _str, utf8::prune _end, s32 _type = utf8::TYPE);
-		runes_t(utf8::prune _str, utf8::prune _end, utf8::prune _eos, s32 _type = utf8::TYPE);
-		runes_t(utf8::prune _bos, utf8::prune _str, utf8::prune _end, utf8::prune _eos, s32 _type = utf8::TYPE);
+        runes_t(utf8::prune _str, utf8::prune _end, s32 _type = utf8::TYPE);
+        runes_t(utf8::prune _str, utf8::prune _end, utf8::prune _eos, s32 _type = utf8::TYPE);
+        runes_t(utf8::prune _bos, utf8::prune _str, utf8::prune _end, utf8::prune _eos, s32 _type = utf8::TYPE);
 
         runes_t(utf16::prune _str, utf16::prune _end, s32 _type = utf16::TYPE);
         runes_t(utf16::prune _str, utf16::prune _end, utf16::prune _eos, s32 _type = utf16::TYPE);
@@ -164,7 +240,7 @@ namespace xcore
 
         uchar32 peek() const;
         uchar32 read();
-        bool write(uchar32 c);
+        bool    write(uchar32 c);
 
         runes_t& operator+=(const ascii::crunes_t& str);
         runes_t& operator+=(const utf32::crunes_t& str);
@@ -174,7 +250,10 @@ namespace xcore
 
         union urunes_t
         {
-            inline urunes_t() : m_ascii() {}
+            inline urunes_t()
+                : m_ascii()
+            {
+            }
             ascii::runes_t m_ascii;
             utf8::runes_t  m_utf8;
             utf16::runes_t m_utf16;
@@ -188,11 +267,26 @@ namespace xcore
     {
         struct ptr_t
         {
-            ptr_t() : m_ptr() {}
-            ptr_t(ascii::pcrune ptr) : m_ptr(ptr) {}
-            ptr_t(utf8::pcrune ptr) : m_ptr(ptr) {}
-            ptr_t(utf16::pcrune ptr) : m_ptr(ptr) {}
-            ptr_t(utf32::pcrune ptr) : m_ptr(ptr) {}
+            ptr_t()
+                : m_ptr()
+            {
+            }
+            ptr_t(ascii::pcrune ptr)
+                : m_ptr(ptr)
+            {
+            }
+            ptr_t(utf8::pcrune ptr)
+                : m_ptr(ptr)
+            {
+            }
+            ptr_t(utf16::pcrune ptr)
+                : m_ptr(ptr)
+            {
+            }
+            ptr_t(utf32::pcrune ptr)
+                : m_ptr(ptr)
+            {
+            }
 
             ptr_t& operator=(const ptr_t& other)
             {
@@ -209,11 +303,26 @@ namespace xcore
             ptr_t furthest(const ptr_t& other) const { return other.m_ptr.m_ascii > m_ptr.m_ascii ? ptr_t(other.m_ptr.m_ascii) : ptr_t(m_ptr.m_ascii); }
             union runeptr
             {
-				inline runeptr() : m_ascii(nullptr) {}
-				inline runeptr(ascii::pcrune ptr) : m_ascii(ptr) {}
-                inline runeptr(utf8::pcrune ptr) : m_utf8(ptr) {}
-                inline runeptr(utf16::pcrune ptr) : m_utf16(ptr) {}
-                inline runeptr(utf32::pcrune ptr) : m_utf32(ptr) {}
+                inline runeptr()
+                    : m_ascii(nullptr)
+                {
+                }
+                inline runeptr(ascii::pcrune ptr)
+                    : m_ascii(ptr)
+                {
+                }
+                inline runeptr(utf8::pcrune ptr)
+                    : m_utf8(ptr)
+                {
+                }
+                inline runeptr(utf16::pcrune ptr)
+                    : m_utf16(ptr)
+                {
+                }
+                inline runeptr(utf32::pcrune ptr)
+                    : m_utf32(ptr)
+                {
+                }
                 ascii::pcrune m_ascii;
                 utf8::pcrune  m_utf8;
                 utf16::pcrune m_utf16;
@@ -276,7 +385,10 @@ namespace xcore
 
         union urunes_t
         {
-            inline urunes_t() : m_ascii() {}
+            inline urunes_t()
+                : m_ascii()
+            {
+            }
             ascii::crunes_t m_ascii;
             utf8::crunes_t  m_utf8;
             utf16::crunes_t m_utf16;
@@ -381,13 +493,13 @@ namespace xcore
     crunes_t parse(crunes_t const& str, u64& value, s32 base = 10);
     crunes_t parse(crunes_t const& str, f32& value);
     crunes_t parse(crunes_t const& str, f64& value);
-    
-    void     to_string(runes_t& str, s32 val, s32 base = 10);
-    void     to_string(runes_t& str, u32 val, s32 base = 10);
-    void     to_string(runes_t& str, s64 val, s32 base = 10);
-    void     to_string(runes_t& str, u64 val, s32 base = 10);
-    void     to_string(runes_t& str, f32 val, s32 num_fractional_digits = 4);
-    void     to_string(runes_t& str, f64 val, s32 num_fractional_digits = 4);
+
+    void to_string(runes_t& str, s32 val, s32 base = 10);
+    void to_string(runes_t& str, u32 val, s32 base = 10);
+    void to_string(runes_t& str, s64 val, s32 base = 10);
+    void to_string(runes_t& str, u64 val, s32 base = 10);
+    void to_string(runes_t& str, f32 val, s32 num_fractional_digits = 4);
+    void to_string(runes_t& str, f64 val, s32 num_fractional_digits = 4);
 
     // -------------------------------------------------------------------------------
     // filters
@@ -488,7 +600,6 @@ namespace xcore
     inline bool operator==(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) == 0; }
     inline bool operator!=(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) != 0; }
 
-
     // -------------------------------------------------------------------------------
     // helpers for inline sized runes_t
     template <typename T, s32 L> class runez_t : public runes_t
@@ -499,13 +610,18 @@ namespace xcore
             SIZE = L + 1
         };
         T m_run[SIZE];
-        inline runez_t() : runes_t(m_run, m_run, &m_run[SIZE - 1]) {}
-        inline runez_t(uchar32 c) : runes_t(m_run, &m_run[1])
+        inline runez_t()
+            : runes_t(m_run, m_run, &m_run[SIZE - 1])
+        {
+        }
+        inline runez_t(uchar32 c)
+            : runes_t(m_run, &m_run[1])
         {
             m_run[0] = c;
             m_run[1] = 0;
         }
-        inline runez_t(const char* _str) : runes_t(m_run, m_run, m_run, &m_run[SIZE - 1])
+        inline runez_t(const char* _str)
+            : runes_t(m_run, m_run, m_run, &m_run[SIZE - 1])
         {
             crunes_t str((ascii::pcrune)_str);
             concatenate(*this, str);
@@ -522,15 +638,17 @@ namespace xcore
         };
         T m_run[SIZE];
 
-        inline crunez_t(uchar32 c) : crunes_t(m_run, &m_run[1])
+        inline crunez_t(uchar32 c)
+            : crunes_t(m_run, &m_run[1])
         {
             m_run[0] = c;
             m_run[1] = 0;
         }
 
-        inline crunez_t(const char* str) : crunes_t(m_run, m_run, m_run, &m_run[SIZE - 1])
+        inline crunez_t(const char* str)
+            : crunes_t(m_run, m_run, m_run, &m_run[SIZE - 1])
         {
-            runes_t run(m_run, m_run, m_run, &m_run[SIZE - 1]);
+            runes_t  run(m_run, m_run, m_run, &m_run[SIZE - 1]);
             crunes_t cstr((ascii::pcrune)str, (ascii::pcrune)str);
             concatenate(run, cstr);
             run.term();
@@ -540,51 +658,55 @@ namespace xcore
 
     // -------------------------------------------------------------------------------
     // runes reader and writer
-	class irunes_reader_t
-	{
-	public:
-
-		void             reset() { vreset(); }
-		bool             valid() const { return vvalid(); }
-		uchar32          peek() const { return vpeek(); }
-        bool             read(uchar32& c) { return vread(c); }
-		inline uchar32   read() { uchar32 c; vread(c); return c; }
-        inline void      skip(s32 c = 1) { vskip(c); }
+    class irunes_reader_t
+    {
+    public:
+        void           reset() { vreset(); }
+        bool           valid() const { return vvalid(); }
+        uchar32        peek() const { return vpeek(); }
+        bool           read(uchar32& c) { return vread(c); }
+        inline uchar32 read()
+        {
+            uchar32 c;
+            vread(c);
+            return c;
+        }
+        inline void skip(s32 c = 1) { vskip(c); }
 
     protected:
-		virtual void     vreset() = 0;
-		virtual bool     vvalid() const = 0;
-		virtual uchar32  vpeek() const = 0;
-		virtual bool     vread(uchar32& c) = 0;
-		virtual void     vskip(s32 c) = 0;
-	};
+        virtual void    vreset()          = 0;
+        virtual bool    vvalid() const    = 0;
+        virtual uchar32 vpeek() const     = 0;
+        virtual bool    vread(uchar32& c) = 0;
+        virtual void    vskip(s32 c)      = 0;
+    };
 
-	class runes_reader_t : public irunes_reader_t
+    class runes_reader_t : public irunes_reader_t
     {
     public:
         runes_reader_t();
         runes_reader_t(ascii::pcrune str);
         runes_reader_t(ascii::pcrune str, u32 len);
-		runes_reader_t(ascii::pcrune str, ascii::pcrune str_end);
-		runes_reader_t(utf8::pcrune str, utf8::pcrune str_end);
-		runes_reader_t(utf16::pcrune str, utf16::pcrune str_end);
-		runes_reader_t(utf32::pcrune str, utf32::pcrune str_end);
+        runes_reader_t(ascii::pcrune str, ascii::pcrune str_end);
+        runes_reader_t(utf8::pcrune str, utf8::pcrune str_end);
+        runes_reader_t(utf16::pcrune str, utf16::pcrune str_end);
+        runes_reader_t(utf32::pcrune str, utf32::pcrune str_end);
         runes_reader_t(crunes_t const& runes);
 
-		runes_reader_t  select(crunes_t::ptr_t const& from, crunes_t::ptr_t to) const;
+        runes_reader_t  select(crunes_t::ptr_t const& from, crunes_t::ptr_t to) const;
         crunes_t::ptr_t get_cursor() const { return m_cursor; }
         void            set_cursor(crunes_t::ptr_t const& c) { m_cursor = c; }
 
         crunes_t get_source() const;
         crunes_t get_current() const;
         bool     at_end() const;
-        
+
     protected:
-        virtual bool     vvalid() const;
-        virtual void     vreset();
-        virtual uchar32  vpeek() const;
-		virtual bool     vread(uchar32& c);
-		virtual void     vskip(s32 c);
+        virtual bool    vvalid() const;
+        virtual void    vreset();
+        virtual uchar32 vpeek() const;
+        virtual bool    vread(uchar32& c);
+        virtual void    vskip(s32 c);
 
         crunes_t        m_runes;
         crunes_t::ptr_t m_cursor;
@@ -598,19 +720,19 @@ namespace xcore
         void flush() { vflush(); }
 
     protected:
-        virtual bool vwrite(uchar32 c) = 0;
+        virtual bool vwrite(uchar32 c)           = 0;
         virtual bool vwrite(crunes_t const& str) = 0;
-        virtual void vflush() = 0;
+        virtual void vflush()                    = 0;
     };
 
     class runes_writer_t : public irunes_writer_t
     {
     public:
-		runes_writer_t(ascii::prune str, ascii::prune str_end);
-		runes_writer_t(utf8::prune str, utf8::prune str_end);
-		runes_writer_t(utf16::prune str, utf16::prune str_end);
-		runes_writer_t(utf32::prune str, utf32::prune str_end);
-		runes_writer_t(runes_t const& runes);
+        runes_writer_t(ascii::prune str, ascii::prune str_end);
+        runes_writer_t(utf8::prune str, utf8::prune str_end);
+        runes_writer_t(utf16::prune str, utf16::prune str_end);
+        runes_writer_t(utf32::prune str, utf32::prune str_end);
+        runes_writer_t(runes_t const& runes);
 
         runes_t get_destination() const;
         runes_t get_current() const;
