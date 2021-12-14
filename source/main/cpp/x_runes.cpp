@@ -3460,6 +3460,65 @@ namespace xcore
         }
     }
 
+    uchar32 runes_t::peek() const
+    {
+        if (m_runes.m_ascii.m_end!=nullptr && m_runes.m_ascii.m_str<m_runes.m_ascii.m_end)
+        {
+            uchar32 c;
+            switch (m_type)
+            {
+                case ascii::TYPE: c = *m_runes.m_ascii.m_str; break;
+                case utf8::TYPE: c = utf::peek(m_runes.m_utf8.m_str, m_runes.m_utf8.m_end); break;
+                case utf16::TYPE: c = utf::peek(m_runes.m_utf16.m_str, m_runes.m_utf16.m_end); break;
+                case utf32::TYPE: c = *m_runes.m_utf32.m_str; break;
+            }
+			return c;
+        }
+		return '\0';
+    }
+
+    uchar32 runes_t::read()
+    {
+        if (m_runes.m_ascii.m_end!=nullptr && m_runes.m_ascii.m_str<m_runes.m_ascii.m_end)
+        {
+            uchar32 c;
+            switch (m_type)
+            {
+                case ascii::TYPE: c = *m_runes.m_ascii.m_str++; break;
+                case utf8::TYPE: c = utf::read(m_runes.m_utf8.m_str, m_runes.m_utf8.m_end); break;
+                case utf16::TYPE: c = utf::read(m_runes.m_utf16.m_str, m_runes.m_utf16.m_end); break;
+                case utf32::TYPE: c = *m_runes.m_utf32.m_str++; break;
+            }
+			return c;
+        }
+		return '\0';
+    }
+
+    bool runes_t::write(uchar32 c)
+    {
+        if (m_runes.m_ascii.m_end!=nullptr && m_runes.m_ascii.m_end<m_runes.m_ascii.m_eos)
+        {
+            switch (m_type)
+            {
+                case ascii::TYPE:
+                    m_runes.m_ascii.m_end[0] = c;
+                    m_runes.m_ascii.m_end += 1;
+                    return true;
+                case utf8::TYPE:
+                    utf::write(c, m_runes.m_utf8.m_end, m_runes.m_utf8.m_eos);
+                    return true;
+                case utf16::TYPE:
+                    utf::write(c, m_runes.m_utf16.m_end, m_runes.m_utf16.m_eos);
+                    return true;
+                case utf32::TYPE:
+                    m_runes.m_utf32.m_end[0] = c;
+                    m_runes.m_utf32.m_end += 1;
+                    return true;
+            }
+        }
+        return false;
+    }
+
     runes_t& runes_t::operator+=(const ascii::crunes_t& str)
     {
         crunes_t cstr(str);
@@ -3776,6 +3835,40 @@ namespace xcore
         m_runes.m_ascii.m_end = m_runes.m_ascii.m_bos;
     }
 
+    uchar32 crunes_t::peek() const
+    {
+        if (m_runes.m_ascii.m_end!=nullptr && m_runes.m_ascii.m_str<m_runes.m_ascii.m_end)
+        {
+            uchar32 c;
+            switch (m_type)
+            {
+                case ascii::TYPE: c = *m_runes.m_ascii.m_str; break;
+                case utf8::TYPE: c = utf::peek(m_runes.m_utf8.m_str, m_runes.m_utf8.m_end); break;
+                case utf16::TYPE: c = utf::peek(m_runes.m_utf16.m_str, m_runes.m_utf16.m_end); break;
+                case utf32::TYPE: c = *m_runes.m_utf32.m_str; break;
+            }
+			return c;
+        }
+		return '\0';
+    }
+
+    uchar32 crunes_t::read()
+    {
+        if (m_runes.m_ascii.m_end!=nullptr && m_runes.m_ascii.m_str<m_runes.m_ascii.m_end)
+        {
+            uchar32 c;
+            switch (m_type)
+            {
+                case ascii::TYPE: c = *m_runes.m_ascii.m_str++; break;
+                case utf8::TYPE: c = utf::read(m_runes.m_utf8.m_str, m_runes.m_utf8.m_end); break;
+                case utf16::TYPE: c = utf::read(m_runes.m_utf16.m_str, m_runes.m_utf16.m_end); break;
+                case utf32::TYPE: c = *m_runes.m_utf32.m_str++; break;
+            }
+			return c;
+        }
+		return '\0';
+    }
+
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
     runes_reader_t::runes_reader_t() {}
@@ -4001,39 +4094,23 @@ namespace xcore
             switch (m_runes.m_type)
             {
                 case ascii::TYPE:
-                    if (!at_end(m_cursor, m_runes))
-                    {
-                        m_cursor.m_ptr.m_ascii[0] = c;
-                        m_cursor.m_ptr.m_ascii += 1;
-                        m_count += 1;
-                        return true;
-                    }
-                    break;
+                    m_cursor.m_ptr.m_ascii[0] = c;
+                    m_cursor.m_ptr.m_ascii += 1;
+                    m_count += 1;
+                    return true;
                 case utf8::TYPE:
-                    if (!at_end(m_cursor, m_runes))
-                    {
-                        utf::write(c, m_runes.m_runes.m_utf8, m_cursor.m_ptr.m_utf8);
-                        m_count += 1;
-                        return true;
-                    }
-                    break;
+                    utf::write(c, m_runes.m_runes.m_utf8, m_cursor.m_ptr.m_utf8);
+                    m_count += 1;
+                    return true;
                 case utf16::TYPE:
-                    if (!at_end(m_cursor, m_runes))
-                    {
-                        utf::write(c, m_runes.m_runes.m_utf16, m_cursor.m_ptr.m_utf16);
-                        m_count += 1;
-                        return true;
-                    }
-                    break;
+                    utf::write(c, m_runes.m_runes.m_utf16, m_cursor.m_ptr.m_utf16);
+                    m_count += 1;
+                    return true;
                 case utf32::TYPE:
-                    if (!at_end(m_cursor, m_runes))
-                    {
-                        m_cursor.m_ptr.m_utf32[0] = c;
-                        m_cursor.m_ptr.m_utf32 += 1;
-                        m_count += 1;
-                        return true;
-                    }
-                    break;
+                    m_cursor.m_ptr.m_utf32[0] = c;
+                    m_cursor.m_ptr.m_utf32 += 1;
+                    m_count += 1;
+                    return true;
             }
         }
         return false;

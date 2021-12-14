@@ -162,6 +162,10 @@ namespace xcore
         void clear();
         void term();
 
+        uchar32 peek() const;
+        uchar32 read();
+        bool write(uchar32 c);
+
         runes_t& operator+=(const ascii::crunes_t& str);
         runes_t& operator+=(const utf32::crunes_t& str);
         runes_t& operator+=(ascii::rune c);
@@ -264,6 +268,9 @@ namespace xcore
         bool is_nil() const;
         void reset();
         void clear();
+
+        uchar32 peek() const;
+        uchar32 read();
 
         crunes_t& operator=(crunes_t const& other);
 
@@ -549,7 +556,7 @@ namespace xcore
 		virtual bool     vvalid() const = 0;
 		virtual uchar32  vpeek() const = 0;
 		virtual bool     vread(uchar32& c) = 0;
-		virtual void     vskip(s32 c = 1) = 0;
+		virtual void     vskip(s32 c) = 0;
 	};
 
 	class runes_reader_t : public irunes_reader_t
@@ -577,7 +584,7 @@ namespace xcore
         virtual void     vreset();
         virtual uchar32  vpeek() const;
 		virtual bool     vread(uchar32& c);
-		virtual void     vskip(s32 c = 1);
+		virtual void     vskip(s32 c);
 
         crunes_t        m_runes;
         crunes_t::ptr_t m_cursor;
