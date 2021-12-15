@@ -10,10 +10,24 @@ namespace xcore
 #undef printf
 
     const uchar32 cEOS = 0x00; // \0, end of string
-    const uchar32 cEOT = 0x04; // end of transmission
     const uchar32 cEOF = 0x05; // end of file
     const uchar32 cEOL = 0x0A; // \n, end of line
     const uchar32 cCR  = 0x0D; // \r, carriage return
+    const uchar32 cTAB = 0x09; // \t, tab
+
+    struct erunes_t
+    {
+        inline erunes_t() : m_special(0) {}
+
+        void eos() { m_special |= 0x01; }
+        void eof() { m_special |= 0x02; }
+        void eol() { m_special |= 0x04; }
+        void  cr() { m_special |= 0x08; }
+        void tab() { m_special |= 0x10; }
+
+        bool has(uchar32 c) const;
+        u8 m_special;
+    };
 
     namespace ascii
     {
@@ -244,6 +258,9 @@ namespace xcore
         uchar32 read();
         bool    write(uchar32 c);
 
+        bool scan(erunes_t special_chars);   // scan until we reach one of the 'chars'
+        bool skip(erunes_t special_chars);   // skip until we reach a character not part of 'chars'
+
         runes_t& operator+=(const ascii::crunes_t& str);
         runes_t& operator+=(const utf32::crunes_t& str);
         runes_t& operator+=(ascii::rune c);
@@ -382,6 +399,9 @@ namespace xcore
 
         uchar32 peek() const;
         uchar32 read();
+
+        bool scan(erunes_t special_chars);   // scan until we reach one of the 'chars'
+        bool skip(erunes_t special_chars);   // skip until we reach a character not part of 'chars'
 
         crunes_t& operator=(crunes_t const& other);
 

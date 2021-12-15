@@ -3263,6 +3263,24 @@ namespace xcore
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
 
+    bool erunes_t::has(uchar32 c) const
+    {
+        switch (c)
+        {
+            case cEOS : return (m_special & 0x01) != 0;
+            case cEOF : return (m_special & 0x02) != 0;
+            case cEOL : return (m_special & 0x04) != 0;
+            case cCR  : return (m_special & 0x08) != 0;
+            case cTAB : return (m_special & 0x10) != 0;
+            default: break;
+        }
+        return false;
+    }
+
+
+    // ------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------
+
     runes_t::runes_t() : m_type(ascii::TYPE)
     {
         m_runes.m_ascii.m_bos = nullptr;
@@ -3519,6 +3537,109 @@ namespace xcore
         return false;
     }
 
+    bool runes_t::scan(erunes_t special_chars)
+    {
+        uchar32 c;
+        switch (m_type)
+        {
+            case ascii::TYPE: 
+                while (m_runes.m_ascii.m_str < m_runes.m_ascii.m_end)
+                {
+                    c = *m_runes.m_ascii.m_str;
+                    if (special_chars.has(c))
+                    {
+                        return true;
+                    }
+                    m_runes.m_ascii.m_str++;
+                }
+                break;
+            case utf8::TYPE: 
+                while (m_runes.m_utf8.m_str < m_runes.m_utf8.m_end)
+                {
+                    c = utf::peek(m_runes.m_utf8.m_str, m_runes.m_utf8.m_end); 
+                    if (special_chars.has(c))
+                    {
+                        return true;
+                    }
+                    utf::skip(m_runes.m_utf8.m_str, m_runes.m_utf8.m_bos, m_runes.m_utf8.m_end, 1); 
+                }
+                break;
+            case utf16::TYPE: 
+                while (m_runes.m_utf16.m_str < m_runes.m_utf16.m_end)
+                {
+                    c = utf::peek(m_runes.m_utf16.m_str, m_runes.m_utf16.m_end); 
+                    if (special_chars.has(c))
+                    {
+                        return true;
+                    }
+                    utf::skip(m_runes.m_utf16.m_str, m_runes.m_utf16.m_bos, m_runes.m_utf16.m_end, 1); 
+                }
+                break;
+            case utf32::TYPE: 
+                while (m_runes.m_utf32.m_str < m_runes.m_utf32.m_end)
+                {
+                    c = utf::peek(m_runes.m_utf32.m_str, m_runes.m_utf32.m_end); 
+                    if (special_chars.has(c))
+                    {
+                        return true;
+                    }
+                    utf::skip(m_runes.m_utf32.m_str, m_runes.m_utf32.m_bos, m_runes.m_utf32.m_end, 1); 
+                }
+                break;
+        }
+        return false;
+    }
+
+    bool runes_t::skip(erunes_t special_chars)
+    {
+        bool special = true;
+        switch (m_type)
+        {
+            case ascii::TYPE: 
+                while (m_runes.m_ascii.m_str < m_runes.m_ascii.m_end)
+                {
+                    uchar32 c = *m_runes.m_ascii.m_str;
+                    special = special_chars.has(c) && special;
+                    if (!special)
+                        break;
+                    m_runes.m_ascii.m_str++;
+                }
+                break;
+            case utf8::TYPE: 
+                while (m_runes.m_utf8.m_str < m_runes.m_utf8.m_end)
+                {
+                    uchar32 c = utf::peek(m_runes.m_utf8.m_str, m_runes.m_utf8.m_end); 
+                    special = special_chars.has(c) && special;
+                    if (!special)
+                        break;
+                    utf::skip(m_runes.m_utf8.m_str, m_runes.m_utf8.m_bos, m_runes.m_utf8.m_end, 1); 
+                }
+                break;
+            case utf16::TYPE: 
+                while (m_runes.m_utf16.m_str < m_runes.m_utf16.m_end)
+                {
+                    uchar32 c = utf::peek(m_runes.m_utf16.m_str, m_runes.m_utf16.m_end); 
+                    special = special_chars.has(c) && special;
+                    if (!special)
+                        break;
+                    utf::skip(m_runes.m_utf16.m_str, m_runes.m_utf16.m_bos, m_runes.m_utf16.m_end, 1); 
+                }
+                break;
+            case utf32::TYPE: 
+                while (m_runes.m_utf32.m_str < m_runes.m_utf32.m_end)
+                {
+                    uchar32 c = utf::peek(m_runes.m_utf32.m_str, m_runes.m_utf32.m_end); 
+                    special = special_chars.has(c) && special;
+                    if (!special)
+                        break;
+                    utf::skip(m_runes.m_utf32.m_str, m_runes.m_utf32.m_bos, m_runes.m_utf32.m_end, 1); 
+                }
+                break;
+        }
+        return !special;
+    }
+
+
     runes_t& runes_t::operator+=(const ascii::crunes_t& str)
     {
         crunes_t cstr(str);
@@ -3560,7 +3681,7 @@ namespace xcore
     // ------------------------------------------------------------------------------------------------------------------
     crunes_t::crunes_t() : m_type(ascii::TYPE)
     {
-        m_runes.m_ascii.m_bos = nullptr;
+        m_runes.m_ascii.m_bos = "\0\0\0\0";
         m_runes.m_ascii.m_str = m_runes.m_ascii.m_bos;
         m_runes.m_ascii.m_end = m_runes.m_ascii.m_bos;
         m_runes.m_ascii.m_eos = m_runes.m_ascii.m_bos;
@@ -3867,6 +3988,108 @@ namespace xcore
 			return c;
         }
 		return '\0';
+    }
+
+    bool crunes_t::scan(erunes_t special_chars)
+    {
+        uchar32 c;
+        switch (m_type)
+        {
+            case ascii::TYPE: 
+                while (m_runes.m_ascii.m_str < m_runes.m_ascii.m_end)
+                {
+                    c = *m_runes.m_ascii.m_str;
+                    if (special_chars.has(c))
+                    {
+                        return true;
+                    }
+                    m_runes.m_ascii.m_str++;
+                }
+                break;
+            case utf8::TYPE: 
+                while (m_runes.m_utf8.m_str < m_runes.m_utf8.m_end)
+                {
+                    c = utf::peek(m_runes.m_utf8.m_str, m_runes.m_utf8.m_end); 
+                    if (special_chars.has(c))
+                    {
+                        return true;
+                    }
+                    utf::skip(m_runes.m_utf8.m_str, m_runes.m_utf8.m_bos, m_runes.m_utf8.m_end, 1); 
+                }
+                break;
+            case utf16::TYPE: 
+                while (m_runes.m_utf16.m_str < m_runes.m_utf16.m_end)
+                {
+                    c = utf::peek(m_runes.m_utf16.m_str, m_runes.m_utf16.m_end); 
+                    if (special_chars.has(c))
+                    {
+                        return true;
+                    }
+                    utf::skip(m_runes.m_utf16.m_str, m_runes.m_utf16.m_bos, m_runes.m_utf16.m_end, 1); 
+                }
+                break;
+            case utf32::TYPE: 
+                while (m_runes.m_utf32.m_str < m_runes.m_utf32.m_end)
+                {
+                    c = utf::peek(m_runes.m_utf32.m_str, m_runes.m_utf32.m_end); 
+                    if (special_chars.has(c))
+                    {
+                        return true;
+                    }
+                    utf::skip(m_runes.m_utf32.m_str, m_runes.m_utf32.m_bos, m_runes.m_utf32.m_end, 1); 
+                }
+                break;
+        }
+        return false;
+    }
+
+    bool crunes_t::skip(erunes_t special_chars)
+    {
+        bool special = true;
+        switch (m_type)
+        {
+            case ascii::TYPE: 
+                while (m_runes.m_ascii.m_str < m_runes.m_ascii.m_end)
+                {
+                    uchar32 c = *m_runes.m_ascii.m_str;
+                    special = special_chars.has(c) && special;
+                    if (!special)
+                        break;
+                    m_runes.m_ascii.m_str++;
+                }
+                break;
+            case utf8::TYPE: 
+                while (m_runes.m_utf8.m_str < m_runes.m_utf8.m_end)
+                {
+                    uchar32 c = utf::peek(m_runes.m_utf8.m_str, m_runes.m_utf8.m_end); 
+                    special = special_chars.has(c) && special;
+                    if (!special)
+                        break;
+                    utf::skip(m_runes.m_utf8.m_str, m_runes.m_utf8.m_bos, m_runes.m_utf8.m_end, 1); 
+                }
+                break;
+            case utf16::TYPE: 
+                while (m_runes.m_utf16.m_str < m_runes.m_utf16.m_end)
+                {
+                    uchar32 c = utf::peek(m_runes.m_utf16.m_str, m_runes.m_utf16.m_end); 
+                    special = special_chars.has(c) && special;
+                    if (!special)
+                        break;
+                    utf::skip(m_runes.m_utf16.m_str, m_runes.m_utf16.m_bos, m_runes.m_utf16.m_end, 1); 
+                }
+                break;
+            case utf32::TYPE: 
+                while (m_runes.m_utf32.m_str < m_runes.m_utf32.m_end)
+                {
+                    uchar32 c = utf::peek(m_runes.m_utf32.m_str, m_runes.m_utf32.m_end); 
+                    special = special_chars.has(c) && special;
+                    if (!special)
+                        break;
+                    utf::skip(m_runes.m_utf32.m_str, m_runes.m_utf32.m_bos, m_runes.m_utf32.m_end, 1); 
+                }
+                break;
+        }
+        return !special;
     }
 
     // ------------------------------------------------------------------------------------------------------------------
