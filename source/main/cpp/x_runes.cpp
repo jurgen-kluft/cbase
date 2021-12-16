@@ -4176,7 +4176,7 @@ namespace xcore
     }
 
     bool runes_reader_t::at_end() const { return m_cursor.m_ascii >= m_runes.m_ascii.m_end; }
-    bool runes_reader_t::vvalid() const { return m_cursor.m_ascii < m_runes.m_ascii.m_end; }
+    bool runes_reader_t::vvalid() const { return m_cursor.m_ascii >= m_runes.m_ascii.m_str && m_cursor.m_ascii < m_runes.m_ascii.m_end; }
 
     void runes_reader_t::vreset() { m_cursor.m_ascii = m_runes.m_ascii.m_str; }
 
