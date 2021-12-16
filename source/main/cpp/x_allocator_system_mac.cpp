@@ -1,13 +1,13 @@
 #include "xbase/x_target.h"
 #ifdef TARGET_MAC
 
-#    include <stdlib.h>
-#    include <cstring>
-#    include <stdio.h>
+#include <stdlib.h>
+#include <cstring>
+#include <stdio.h>
 
-#    include "xbase/x_memory.h"
-#    include "xbase/x_integer.h"
-#    include "xbase/x_allocator.h"
+#include "xbase/x_memory.h"
+#include "xbase/x_integer.h"
+#include "xbase/x_allocator.h"
 
 namespace xcore
 {
@@ -22,11 +22,11 @@ namespace xcore
             size = (sizeof(void*));
         }
 
-        void*     p1; // original block
+        void* p1; // original block
         if ((p1 = malloc(size + alignment + sizeof(void*))) == NULL)
             return NULL;
 
-        void**    p2; // aligned block
+        void** p2; // aligned block
         p2     = (void**)(((uptr)(p1) + (alignment - 1)) & ~(alignment - 1));
         p2     = (void**)(((uptr)(p1) + sizeof(void*)));
         p2[-1] = p1;
@@ -51,13 +51,26 @@ namespace xcore
     class x_allocator_macos_system : public alloc_t
     {
     public:
-        x_allocator_macos_system() : mInitialized(0), mDefaultAlignment(4), mAllocationCount(0) {}
+        x_allocator_macos_system()
+            : mInitialized(0)
+            , mDefaultAlignment(4)
+            , mAllocationCount(0)
+        {
+        }
 
         void init()
         {
             mInitialized      = 1;
             mAllocationCount  = 0;
             mDefaultAlignment = 4;
+        }
+
+        void exit()
+        {
+            ASSERTS(mAllocationCount == 0, "ERROR: System Allocator is being released but still has allocations that are not freed");
+            mInitialized      = 0;
+            mDefaultAlignment = 0;
+            mAllocationCount  = 0;
         }
 
         bool isInitialized() { return mInitialized == 1; }
@@ -76,13 +89,7 @@ namespace xcore
             return 0;
         }
 
-        virtual void v_release()
-        {
-            ASSERTS(mAllocationCount == 0, "ERROR: System Allocator is being released but still has allocations that are not freed");
-            mInitialized      = 0;
-            mDefaultAlignment = 0;
-            mAllocationCount  = 0;
-        }
+        virtual void v_release() {}
 
         s32 mInitialized;
         s32 mDefaultAlignment;
@@ -93,9 +100,17 @@ namespace xcore
 
     void alloc_t::init_system()
     {
-        if (sSystemAllocator.isInitialized())
+        if (!sSystemAllocator.isInitialized())
         {
             sSystemAllocator.init();
+        }
+    }
+    
+    void alloc_t::exit_system()
+    {
+        if (sSystemAllocator.isInitialized())
+        {
+            sSystemAllocator.exit();
         }
     }
 

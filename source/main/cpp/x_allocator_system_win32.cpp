@@ -26,6 +26,14 @@ namespace xcore
             mDefaultAlignment = 4;
         }
 
+        void exit()
+        {
+            ASSERTS(mAllocationCount == 0, "ERROR: System Allocator is being released but still has allocations that are not freed");
+            mInitialized      = 0;
+            mDefaultAlignment = 0;
+            mAllocationCount  = 0;
+        }
+
         bool isInitialized() { return mInitialized == 1; }
 
         virtual void* v_allocate(u32 size, u32 alignment)
@@ -47,7 +55,7 @@ namespace xcore
 #else
             _aligned_free(ptr);
 #endif
-			return 0;
+            return 0;
         }
 
         virtual void v_release()
@@ -69,9 +77,16 @@ namespace xcore
     x_allocator_win32_system sSystemAllocator;
     void                     alloc_t::init_system()
     {
-        if (sSystemAllocator.isInitialized())
+        if (!sSystemAllocator.isInitialized())
         {
             sSystemAllocator.init();
+        }
+    }
+    void alloc_t::exit_system()
+    {
+        if (sSystemAllocator.isInitialized())
+        {
+            sSystemAllocator.exit();
         }
     }
 
