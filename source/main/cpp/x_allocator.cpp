@@ -5,7 +5,7 @@
 
 namespace xcore
 {
-    alloc_buffer_t::alloc_buffer_t(buffer_t& storage) : m_base(storage.m_mutable), m_ptr(storage.m_mutable), m_end(storage.m_mutable + storage.m_len), m_cnt(0) {}
+    alloc_buffer_t::alloc_buffer_t(xbyte* buffer, s64 length) : m_base(buffer), m_ptr(buffer), m_end(buffer + length), m_cnt(0) {}
 
     void* allocinplace_t::v_allocate(u32 size, u32 align)
     {

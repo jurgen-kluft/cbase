@@ -15,7 +15,9 @@ namespace xcore
     class alloc_t
     {
     public:
-        static void     init_system();
+        static void init_system();
+        static void exit_system();
+
         static alloc_t* get_system();
 
         void* allocate(u32 size, u32 alignment) { return v_allocate(size, alignment); }
@@ -191,12 +193,12 @@ namespace xcore
         s64    m_cnt;
 
     public:
-        alloc_buffer_t(buffer_t& storage);
+        alloc_buffer_t(xbyte* buffer, s64 length);
 
         xbyte* data() { return m_base; }
 
         XCORE_CLASS_PLACEMENT_NEW_DELETE
-        
+
     protected:
         virtual void* v_allocate(u32 size, u32 align)
         {
