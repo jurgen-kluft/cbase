@@ -109,13 +109,14 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 #ifdef TARGET_DEBUG
 	xcore::context_t::set_assert_handler(&gAssertHandler);
 #endif
+	xcore::console->write("Configuration: ");
+	xcore::console->setColor(xcore::console_t::YELLOW);
+	xcore::console->writeLine(TARGET_FULL_DESCR_STR);
+	xcore::console->setColor(xcore::console_t::NORMAL);
 
 	xcore::alloc_t* systemAllocator = xcore::context_t::system_alloc();
 	xcore::UnitTestAllocator unittestAllocator( systemAllocator );
 	UnitTest::SetAllocator(&unittestAllocator);
-
-	xcore::console->write("Configuration: ");
-	xcore::console->writeLine(TARGET_FULL_DESCR_STR);
 
 	xcore::TestAllocator testAllocator(systemAllocator);
 	gTestAllocator = &testAllocator;
