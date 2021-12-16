@@ -273,10 +273,8 @@ namespace xcore
     {
         struct ptr_t
         {
-            ptr_t()
-                : m_ascii(nullptr)
-            {
-            }
+            ptr_t();
+            
             ptr_t(ascii::pcrune ptr)
                 : m_ascii(ptr)
             {

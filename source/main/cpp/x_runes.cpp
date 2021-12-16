@@ -3647,10 +3647,16 @@ namespace xcore
 
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
+    static const char* sNullAsciiString = "\0\0\0\0";
+    crunes_t::ptr_t::ptr_t()
+        : m_ascii(sNullAsciiString)
+    {
+    }
+
     crunes_t::crunes_t()
         : m_type(ascii::TYPE)
     {
-        m_ascii.m_bos = "\0\0\0\0";
+        m_ascii.m_bos = sNullAsciiString;
         m_ascii.m_str = m_ascii.m_bos;
         m_ascii.m_end = m_ascii.m_bos;
         m_ascii.m_eos = m_ascii.m_bos;
@@ -3991,7 +3997,7 @@ namespace xcore
         switch (m_type)
         {
             case ascii::TYPE:
-                if (cursor.m_ascii < m_ascii.m_str)
+                if (cursor.m_ascii >= m_ascii.m_str)
                 {
                     while (cursor.m_ascii < m_ascii.m_end)
                     {
@@ -4005,7 +4011,7 @@ namespace xcore
                 }
                 break;
             case utf8::TYPE:
-                if (cursor.m_utf8 < m_utf8.m_str)
+                if (cursor.m_utf8 >= m_utf8.m_str)
                 {
                     while (cursor.m_utf8 < m_utf8.m_end)
                     {
@@ -4019,7 +4025,7 @@ namespace xcore
                 }
                 break;
             case utf16::TYPE:
-                if (cursor.m_utf16 < m_utf16.m_str)
+                if (cursor.m_utf16 >= m_utf16.m_str)
                 {
                     while (cursor.m_utf16 < m_utf16.m_end)
                     {
@@ -4033,7 +4039,7 @@ namespace xcore
                 }
                 break;
             case utf32::TYPE:
-                if (cursor.m_utf32 < m_utf32.m_str)
+                if (cursor.m_utf32 >= m_utf32.m_str)
                 {
                     while (cursor.m_utf32 < m_utf32.m_end)
                     {
