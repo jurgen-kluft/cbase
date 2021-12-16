@@ -17,16 +17,26 @@ namespace xcore
 
     struct erunes_t
     {
-        inline erunes_t() : m_special(0) {}
+        enum
+        {
+            eos = 0x01,
+            eof = 0x02,
+            eol = 0x04,
+            cr  = 0x08,
+            tab = 0x10,
+        };
+        u8 m_erunes;
 
-        void eos() { m_special |= 0x01; }
-        void eof() { m_special |= 0x02; }
-        void eol() { m_special |= 0x04; }
-        void  cr() { m_special |= 0x08; }
-        void tab() { m_special |= 0x10; }
+        inline erunes_t(u8 r)
+            : m_erunes(r)
+        {
+        }
+        inline erunes_t(erunes_t const& r)
+            : m_erunes(r.m_erunes)
+        {
+        }
 
         bool has(uchar32 c) const;
-        u8 m_special;
     };
 
     namespace ascii
@@ -157,66 +167,48 @@ namespace xcore
         struct ptr_t
         {
             ptr_t()
-                : m_ptr()
+                : m_ascii(nullptr)
             {
             }
             ptr_t(ascii::prune ptr)
-                : m_ptr(ptr)
+                : m_ascii(ptr)
             {
             }
             ptr_t(utf8::prune ptr)
-                : m_ptr(ptr)
+                : m_utf8(ptr)
             {
             }
             ptr_t(utf16::prune ptr)
-                : m_ptr(ptr)
+                : m_utf16(ptr)
             {
             }
             ptr_t(utf32::prune ptr)
-                : m_ptr(ptr)
+                : m_utf32(ptr)
             {
             }
 
             ptr_t& operator=(const ptr_t& other)
             {
-                m_ptr.m_ascii = other.m_ptr.m_ascii;
+                m_ascii = other.m_ascii;
                 return *this;
             }
-            bool operator<(const ptr_t& other) const { return m_ptr.m_ascii < other.m_ptr.m_ascii; }
-            bool operator>(const ptr_t& other) const { return m_ptr.m_ascii > other.m_ptr.m_ascii; }
-            bool operator<=(const ptr_t& other) const { return m_ptr.m_ascii <= other.m_ptr.m_ascii; }
-            bool operator>=(const ptr_t& other) const { return m_ptr.m_ascii >= other.m_ptr.m_ascii; }
-            bool operator==(const ptr_t& other) const { return m_ptr.m_ascii == other.m_ptr.m_ascii; }
-            bool operator!=(const ptr_t& other) const { return m_ptr.m_ascii != other.m_ptr.m_ascii; }
-            union runeptr
-            {
-                inline runeptr()
-                    : m_ascii(nullptr)
-                {
-                }
-                inline runeptr(ascii::prune ptr)
-                    : m_ascii(ptr)
-                {
-                }
-                inline runeptr(utf8::prune ptr)
-                    : m_utf8(ptr)
-                {
-                }
-                inline runeptr(utf16::prune ptr)
-                    : m_utf16(ptr)
-                {
-                }
-                inline runeptr(utf32::prune ptr)
-                    : m_utf32(ptr)
-                {
-                }
 
+            bool operator<(const ptr_t& other) const { return m_ascii < other.m_ascii; }
+            bool operator>(const ptr_t& other) const { return m_ascii > other.m_ascii; }
+            bool operator<=(const ptr_t& other) const { return m_ascii <= other.m_ascii; }
+            bool operator>=(const ptr_t& other) const { return m_ascii >= other.m_ascii; }
+            bool operator==(const ptr_t& other) const { return m_ascii == other.m_ascii; }
+            bool operator!=(const ptr_t& other) const { return m_ascii != other.m_ascii; }
+
+            ptr_t furthest(const ptr_t& other) const { return other.m_ascii > m_ascii ? ptr_t(other.m_ascii) : ptr_t(m_ascii); }
+
+            union
+            {
                 ascii::prune m_ascii;
                 utf8::prune  m_utf8;
                 utf16::prune m_utf16;
                 utf32::prune m_utf32;
             };
-            runeptr m_ptr;
         };
 
         runes_t();
@@ -258,8 +250,8 @@ namespace xcore
         uchar32 read();
         bool    write(uchar32 c);
 
-        bool scan(erunes_t special_chars);   // scan until we reach one of the 'chars'
-        bool skip(erunes_t special_chars);   // skip until we reach a character not part of 'chars'
+        bool scan(ptr_t& cursor, erunes_t special_chars) const; // scan until we reach one of the 'chars'
+        bool skip(ptr_t& cursor, erunes_t special_chars) const; // skip until we reach a character not part of 'chars'
 
         runes_t& operator+=(const ascii::crunes_t& str);
         runes_t& operator+=(const utf32::crunes_t& str);
@@ -267,18 +259,13 @@ namespace xcore
         runes_t& operator+=(utf32::rune c);
         runes_t& operator=(runes_t const& other);
 
-        union urunes_t
+        union
         {
-            inline urunes_t()
-                : m_ascii()
-            {
-            }
             ascii::runes_t m_ascii;
             utf8::runes_t  m_utf8;
             utf16::runes_t m_utf16;
             utf32::runes_t m_utf32;
         };
-        urunes_t m_runes;
         s32      m_type;
     };
 
@@ -287,67 +274,47 @@ namespace xcore
         struct ptr_t
         {
             ptr_t()
-                : m_ptr()
+                : m_ascii(nullptr)
             {
             }
             ptr_t(ascii::pcrune ptr)
-                : m_ptr(ptr)
+                : m_ascii(ptr)
             {
             }
             ptr_t(utf8::pcrune ptr)
-                : m_ptr(ptr)
+                : m_utf8(ptr)
             {
             }
             ptr_t(utf16::pcrune ptr)
-                : m_ptr(ptr)
+                : m_utf16(ptr)
             {
             }
             ptr_t(utf32::pcrune ptr)
-                : m_ptr(ptr)
+                : m_utf32(ptr)
             {
             }
 
             ptr_t& operator=(const ptr_t& other)
             {
-                m_ptr.m_ascii = other.m_ptr.m_ascii;
+                m_ascii = other.m_ascii;
                 return *this;
             }
-            bool operator<(const ptr_t& other) const { return m_ptr.m_ascii < other.m_ptr.m_ascii; }
-            bool operator>(const ptr_t& other) const { return m_ptr.m_ascii > other.m_ptr.m_ascii; }
-            bool operator<=(const ptr_t& other) const { return m_ptr.m_ascii <= other.m_ptr.m_ascii; }
-            bool operator>=(const ptr_t& other) const { return m_ptr.m_ascii >= other.m_ptr.m_ascii; }
-            bool operator==(const ptr_t& other) const { return m_ptr.m_ascii == other.m_ptr.m_ascii; }
-            bool operator!=(const ptr_t& other) const { return m_ptr.m_ascii != other.m_ptr.m_ascii; }
+            bool operator<(const ptr_t& other) const { return m_ascii < other.m_ascii; }
+            bool operator>(const ptr_t& other) const { return m_ascii > other.m_ascii; }
+            bool operator<=(const ptr_t& other) const { return m_ascii <= other.m_ascii; }
+            bool operator>=(const ptr_t& other) const { return m_ascii >= other.m_ascii; }
+            bool operator==(const ptr_t& other) const { return m_ascii == other.m_ascii; }
+            bool operator!=(const ptr_t& other) const { return m_ascii != other.m_ascii; }
 
-            ptr_t furthest(const ptr_t& other) const { return other.m_ptr.m_ascii > m_ptr.m_ascii ? ptr_t(other.m_ptr.m_ascii) : ptr_t(m_ptr.m_ascii); }
-            union runeptr
+            ptr_t furthest(const ptr_t& other) const { return other.m_ascii > m_ascii ? ptr_t(other.m_ascii) : ptr_t(m_ascii); }
+
+            union
             {
-                inline runeptr()
-                    : m_ascii(nullptr)
-                {
-                }
-                inline runeptr(ascii::pcrune ptr)
-                    : m_ascii(ptr)
-                {
-                }
-                inline runeptr(utf8::pcrune ptr)
-                    : m_utf8(ptr)
-                {
-                }
-                inline runeptr(utf16::pcrune ptr)
-                    : m_utf16(ptr)
-                {
-                }
-                inline runeptr(utf32::pcrune ptr)
-                    : m_utf32(ptr)
-                {
-                }
                 ascii::pcrune m_ascii;
                 utf8::pcrune  m_utf8;
                 utf16::pcrune m_utf16;
                 utf32::pcrune m_utf32;
             };
-            runeptr m_ptr;
         };
 
         crunes_t();
@@ -400,23 +367,18 @@ namespace xcore
         uchar32 peek() const;
         uchar32 read();
 
-        bool scan(erunes_t special_chars);   // scan until we reach one of the 'chars'
-        bool skip(erunes_t special_chars);   // skip until we reach a character not part of 'chars'
+        bool scan(ptr_t& cursor, erunes_t special_chars) const; // scan until we reach one of the 'chars'
+        bool skip(ptr_t& cursor, erunes_t special_chars) const; // skip until we reach a character not part of 'chars'
 
         crunes_t& operator=(crunes_t const& other);
 
-        union urunes_t
+        union
         {
-            inline urunes_t()
-                : m_ascii()
-            {
-            }
             ascii::crunes_t m_ascii;
             utf8::crunes_t  m_utf8;
             utf16::crunes_t m_utf16;
             utf32::crunes_t m_utf32;
         };
-        urunes_t m_runes;
         s32      m_type;
     };
 
@@ -674,7 +636,7 @@ namespace xcore
             crunes_t cstr((ascii::pcrune)str, (ascii::pcrune)str);
             concatenate(run, cstr);
             run.term();
-            m_runes.m_ascii.m_end = run.m_runes.m_ascii.m_end;
+            m_ascii.m_end = run.m_ascii.m_end;
         }
     };
 

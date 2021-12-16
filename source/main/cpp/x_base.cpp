@@ -32,19 +32,19 @@ namespace xcore
 
             runes_t r;
             r.m_type                         = type;
-            r.m_runes.m_ascii.m_bos          = (ascii::prune)m_allocator->allocate(cap * sizeofrune, sizeof(void*));
-            r.m_runes.m_ascii.m_end          = r.m_runes.m_ascii.m_bos + len * sizeofrune;
-            r.m_runes.m_ascii.m_eos          = r.m_runes.m_ascii.m_bos + (cap - 1) * sizeofrune;
-            r.m_runes.m_ascii.m_end[0]       = '\0';
-            r.m_runes.m_ascii.m_end[cap - 1] = '\0';
+            r.m_ascii.m_bos          = (ascii::prune)m_allocator->allocate(cap * sizeofrune, sizeof(void*));
+            r.m_ascii.m_end          = r.m_ascii.m_bos + len * sizeofrune;
+            r.m_ascii.m_eos          = r.m_ascii.m_bos + (cap - 1) * sizeofrune;
+            r.m_ascii.m_end[0]       = '\0';
+            r.m_ascii.m_end[cap - 1] = '\0';
             return r;
         }
 
         virtual void deallocate(runes_t& r)
         {
-            if (r.m_runes.m_ascii.m_bos != nullptr)
+            if (r.m_ascii.m_bos != nullptr)
             {
-                m_allocator->deallocate(r.m_runes.m_ascii.m_bos);
+                m_allocator->deallocate(r.m_ascii.m_bos);
                 r = runes_t();
             }
         }

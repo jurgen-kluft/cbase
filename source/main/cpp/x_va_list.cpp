@@ -17,8 +17,8 @@ namespace xcore
     va_t::va_t(crunes_t const& str) : mType(TYPE_PCRUNES)
     {
         mArg[0] = str.m_type;
-        mArg[1] = (u64)str.m_runes.m_ascii.m_str;
-        mArg[2] = (u64)str.m_runes.m_ascii.m_end;
+        mArg[1] = (u64)str.m_ascii.m_str;
+        mArg[2] = (u64)str.m_ascii.m_end;
     }
 
     void va_t::convertToRunes(runes_t& str) const

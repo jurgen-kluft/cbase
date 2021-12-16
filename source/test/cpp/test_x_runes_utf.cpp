@@ -138,13 +138,13 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
         UNITTEST_TEST(copy_ascii_to_utf32)
         {
             crunes_t src("test");
-            CHECK_EQUAL('t', src.m_runes.m_ascii.m_str[0]);
-            CHECK_EQUAL('e', src.m_runes.m_ascii.m_str[1]);
+            CHECK_EQUAL('t', src.m_ascii.m_str[0]);
+            CHECK_EQUAL('e', src.m_ascii.m_str[1]);
 
             runez_t<utf32::rune, 16> dst;
             copy(src, dst);
 
-            CHECK_EQUAL('t', dst.m_runes.m_utf32.m_str[0]);
+            CHECK_EQUAL('t', dst.m_utf32.m_str[0]);
         }
 
         UNITTEST_TEST(read1_utf8)
@@ -155,7 +155,7 @@ UNITTEST_SUITE_BEGIN(xstring_utf)
             for (s32 i = 0; i < 5; ++i)
             {
                 uchar32 ch = reader1.read();
-                CHECK_EQUAL((uchar32)str11.m_runes.m_utf8.m_str[i], ch);
+                CHECK_EQUAL((uchar32)str11.m_utf8.m_str[i], ch);
             }
 
             const uchar8 str2[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch

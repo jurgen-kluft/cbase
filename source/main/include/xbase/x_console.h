@@ -78,7 +78,7 @@ namespace xcore
         inline void write(const char* str)
         {
             crunes_t r(str, nullptr);
-            write(r.m_runes.m_ascii);
+            write(r.m_ascii);
         }
 
         virtual void writeLine() = 0;
@@ -122,13 +122,13 @@ namespace xcore
         inline void writeLine(const char* str)
         {
             crunes_t r(str, nullptr);
-            writeLine(r.m_runes.m_ascii);
+            writeLine(r.m_ascii);
         }
 
         inline void writeLine(const char* str, const va_list_t& args)
         {
             crunes_t r(str, nullptr);
-            writeLine(r.m_runes.m_ascii, args);
+            writeLine(r.m_ascii, args);
         }
 
         inline void writeLine(const crunes_t& str)

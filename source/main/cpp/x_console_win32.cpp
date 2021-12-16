@@ -38,9 +38,9 @@ namespace xcore
             
             switch (str.m_type)
             {
-                case ascii::TYPE: return out_writer_t::write_ascii(str.m_runes.m_ascii);
-                case utf16::TYPE: return out_writer_t::write_utf16(str.m_runes.m_utf16);
-                case utf32::TYPE: return out_writer_t::write_utf32(str.m_runes.m_utf32);
+                case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii);
+                case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16);
+                case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32);
                 default: //@todo: UTF-8
                     break;
             }
@@ -52,7 +52,7 @@ namespace xcore
             if (m_write_to_console_cache.size() > 0)
             {
                 crunes_t cachestr = m_write_to_console_cache;
-                write_utf32(cachestr.m_runes.m_utf32);
+                write_utf32(cachestr.m_utf32);
                 m_write_to_console_cache.reset();
             }
         }
@@ -191,9 +191,9 @@ namespace xcore
         {
             switch (str.m_type)
             {
-                case ascii::TYPE: return out_writer_t::write_ascii(str.m_runes.m_ascii);
-                case utf16::TYPE: return out_writer_t::write_utf16(str.m_runes.m_utf16);
-                case utf32::TYPE: return out_writer_t::write_utf32(str.m_runes.m_utf32);
+                case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii);
+                case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16);
+                case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32);
                 default: //@todo: UTF-8
 					break;
             }

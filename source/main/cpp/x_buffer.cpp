@@ -140,8 +140,8 @@ namespace xcore
 
     cbuffer_t::cbuffer_t(crunes_t const& str)
     {
-        m_const          = (xbyte const*)str.m_runes.m_ascii.m_str;
-        xbyte const* end = (xbyte const*)str.m_runes.m_ascii.m_end;
+        m_const          = (xbyte const*)str.m_ascii.m_str;
+        xbyte const* end = (xbyte const*)str.m_ascii.m_end;
         m_len            = (end - m_const);
     }
 
@@ -532,10 +532,10 @@ namespace xcore
         xsize_t const offset          = m_cursor;
         out_str.m_type                = read_s32();
         s32 const strlen              = read_s32();
-        out_str.m_runes.m_ascii.m_bos = (char const*)(m_buffer + m_cursor);
-        out_str.m_runes.m_ascii.m_str = (out_str.m_runes.m_ascii.m_bos);
-        out_str.m_runes.m_ascii.m_end = (out_str.m_runes.m_ascii.m_bos + strlen);
-        out_str.m_runes.m_ascii.m_eos = (out_str.m_runes.m_ascii.m_bos + strlen);
+        out_str.m_ascii.m_bos = (char const*)(m_buffer + m_cursor);
+        out_str.m_ascii.m_str = (out_str.m_ascii.m_bos);
+        out_str.m_ascii.m_end = (out_str.m_ascii.m_bos + strlen);
+        out_str.m_ascii.m_eos = (out_str.m_ascii.m_bos + strlen);
         m_cursor += strlen;
         return offset;
     }
@@ -809,8 +809,8 @@ namespace xcore
     xsize_t binary_writer_t::write_string(crunes_t const& str)
     {
         xsize_t const   offset = m_cursor;
-        char const* srcstr = str.m_runes.m_ascii.m_str;
-        char const* srcend = str.m_runes.m_ascii.m_end;
+        char const* srcstr = str.m_ascii.m_str;
+        char const* srcend = str.m_ascii.m_end;
         xsize_t const   size   = (srcend - srcstr);
         if (can_write(2 + 2 + size))
         {
