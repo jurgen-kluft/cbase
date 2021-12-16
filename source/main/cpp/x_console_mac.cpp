@@ -89,24 +89,23 @@ namespace xcore
         static s32 write_ascii(const ascii::crunes_t& str)
         {
             const s32 maxlen = 252;
-            uchar16   str16[maxlen + 4];
+            char   str8[maxlen + 4];
 
             s32           l   = 0;
             ascii::pcrune src = str.m_str;
             ascii::pcrune end = str.m_end;
             while (src < end)
             {
-                uchar16* dst16 = (uchar16*)str16;
-                uchar16* end16 = dst16 + maxlen;
+                char* dst8 = (char*)str8;
+                char* end8 = dst8 + maxlen;
                 s32      ll    = 0;
-                while (src < end && dst16 < end16)
+                while (src < end && dst8 < end8)
                 {
-                    uchar32 c = *src++;
-                    write_utf16(c, dst16, end16);
+                    *dst8++ = (char)(*src++);
                     ll += 1;
                 }
-                str16[ll] = 0;
-                ::wprintf(L"%s", (const wchar_t*)str16);
+                str8[ll] = 0;
+                ::printf("%s", (const char*)str8);
                 l += ll;
             }
             return l;
@@ -229,7 +228,7 @@ namespace xcore
 
         virtual void writeln()
         {
-            ascii::rune line32[] = {'\r', 0};
+            ascii::rune line32[] = {'\n', 0};
             ascii::crunes_t line(line32, 1);
             out_writer_t::write_ascii(line);
         }
