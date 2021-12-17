@@ -116,8 +116,8 @@ UNITTEST_SUITE_BEGIN(xallocator)
 
         UNITTEST_TEST(test_alloc_buffer)
         {
-            xbytes<256>   store;
-            alloc_buffer_t sa(store);
+            inplace_t<256> inplace;
+            alloc_buffer_t sa(inplace.object<xbyte>(), inplace.size());
             test_object4* obj = sa.construct<test_object4>();
             sa.destruct<>(obj);
         }

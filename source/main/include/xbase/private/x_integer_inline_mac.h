@@ -1,3 +1,5 @@
+
+
 namespace xcore
 {
 	// TODO: Optimize this using intrinsics
@@ -8,103 +10,25 @@ namespace xcore
 	{
 		if (integer == 0)
 			return 0;
-
-		s32 count = 0;
-		if ((integer & 0x000000FF) == 0)
-		{
-			count += 8;
-			integer = integer >> 8;
-		}
-		if ((integer & 0x0000000F) == 0)
-		{
-			count += 4;
-			integer = integer >> 4;
-		}
-		if ((integer & 0x00000003) == 0)
-		{
-			count += 2;
-			integer = integer >> 2;
-		}
-		if ((integer & 0x00000001) == 0)
-		{
-			count += 1;
-		}
-
+		s32 count = __builtin_ctzll(integer);
 		return count;
 	}
 	 // find the number of trailing zeros in 32-bit value
 	 // if 'v==0' this function returns 0
 	inline s32 xcountTrailingZeros(u32 integer)
 	{
-        if (integer == 0)
-            return 0;
-
-		s32 count = 0;
-		if ((integer & 0x0000FFFF) == 0)
-		{
-			count += 16;
-			integer = integer >> 16;
-		}
-		if ((integer & 0x000000FF) == 0)
-		{
-			count += 8;
-			integer = integer >> 8;
-		}
-		if ((integer & 0x0000000F) == 0)
-		{
-			count += 4;
-			integer = integer >> 4;
-		}
-		if ((integer & 0x00000003) == 0)
-		{
-			count += 2;
-			integer = integer >> 2;
-		}
-		if ((integer & 0x00000001) == 0)
-		{
-			count += 1;
-		}
-
+		if (integer == 0)
+			return 0;
+		s32 count = __builtin_ctzll(integer);
 		return count;
 	}
 	// find the number of trailing zeros in 64-bit value
 	// if 'v==0' this function returns 0
 	inline s32 xcountTrailingZeros(u64 integer)
 	{
-        if (integer == 0)
-            return 0;
-
-		s32 count = 0;
-		if ((integer & 0xFFFFFFFF) == 0)
-		{
-			count += 32;
-			integer = integer >> 32;
-		}
-		if ((integer & 0x0000FFFF) == 0)
-		{
-			count += 16;
-			integer = integer >> 16;
-		}
-		if ((integer & 0x000000FF) == 0)
-		{
-			count += 8;
-			integer = integer >> 8;
-		}
-		if ((integer & 0x0000000F) == 0)
-		{
-			count += 4;
-			integer = integer >> 4;
-		}
-		if ((integer & 0x00000003) == 0)
-		{
-			count += 2;
-			integer = integer >> 2;
-		}
-		if ((integer & 0x00000001) == 0)
-		{
-			count += 1;
-		}
-
+		if (integer == 0)
+			return 0;
+		s32 count = __builtin_ctzll(integer);
 		return count;
 	}
 
@@ -114,29 +38,8 @@ namespace xcore
 	{
 		if (integer == 0)
 			return 16;
-
-		s32 count = 0;
-		if ((integer & 0xFF00) == 0)
-		{
-			count += 8;
-			integer = integer << 8;
-		}
-		if ((integer & 0xF000) == 0)
-		{
-			count += 4;
-			integer = integer << 4;
-		}
-		if ((integer & 0xC000) == 0)
-		{
-			count += 2;
-			integer = integer << 2;
-		}
-		if ((integer & 0x4000) == 0)
-		{
-			count += 1;
-		}
-
-		return count;
+		s32 count = __builtin_clz(integer);
+		return count - 16;
 	}
 	// find the number of leading zeros in 32-bit v
 	// if 'v==0' this function returns 32
@@ -144,33 +47,7 @@ namespace xcore
 	{
 		if (integer == 0)
 			return 32;
-
-		s32 count = 0;
-		if ((integer & 0xFFFF0000) == 0)
-		{
-			count += 16;
-			integer = integer << 16;
-		}
-		if ((integer & 0xFF000000) == 0)
-		{
-			count += 8;
-			integer = integer << 8;
-		}
-		if ((integer & 0xF0000000) == 0)
-		{
-			count += 4;
-			integer = integer << 4;
-		}
-		if ((integer & 0xC0000000) == 0)
-		{
-			count += 2;
-			integer = integer << 2;
-		}
-		if ((integer & 0x40000000) == 0)
-		{
-			count += 1;
-		}
-
+		s32 count = __builtin_clz(integer);
 		return count;
 	}
 	// find the number of leading zeros in 64-bit v
@@ -179,41 +56,9 @@ namespace xcore
 	{
 		if (integer == 0)
 			return 64;
-
-		s32 count = 0;
-		if ((integer & 0xFFFFFFFF00000000UL) == 0)
-		{
-			count += 32;
-			integer = integer << 32;
-		}
-		if ((integer & 0xFFFF000000000000UL) == 0)
-		{
-			count += 16;
-			integer = integer << 16;
-		}
-		if ((integer & 0xFF00000000000000UL) == 0)
-		{
-			count += 8;
-			integer = integer << 8;
-		}
-		if ((integer & 0xF000000000000000UL) == 0)
-		{
-			count += 4;
-			integer = integer << 4;
-		}
-		if ((integer & 0xC000000000000000UL) == 0)
-		{
-			count += 2;
-			integer = integer << 2;
-		}
-		if ((integer & 0x4000000000000000UL) == 0)
-		{
-			count += 1;
-		}
-
+		s32 count = __builtin_clzll(integer);
 		return count;
 	}
-
 
 	// Return v but with only the Least Significant Bit "1"
 	inline s32 xleastSignificantOneBit(u32 integer) { return (integer ^ (integer & (integer - 1))); }

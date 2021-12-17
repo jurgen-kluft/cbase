@@ -13,9 +13,9 @@ namespace xcore
 {
     void* mac_aligned_malloc(size_t size, size_t alignment)
     {
-        if (alignment < (sizeof(void*)))
+        if (alignment < 2*(sizeof(void*)))
         {
-            alignment = (sizeof(void*));
+            alignment = 2*(sizeof(void*));
         }
         if (size < (sizeof(void*)))
         {
@@ -23,17 +23,14 @@ namespace xcore
         }
 
         void* p1; // original block
-        if ((p1 = malloc(size + alignment + sizeof(void*))) == NULL)
+        if ((p1 = malloc(size + 2*alignment)) == NULL)
             return NULL;
 
         void** p2; // aligned block
-        p2     = (void**)(((uptr)(p1) + (alignment - 1)) & ~(alignment - 1));
-        p2     = (void**)(((uptr)(p1) + sizeof(void*)));
+        p2     = (void**)(((uptr)(p1) & ~(alignment - 1)));
+        p2     = (void**)(((uptr)(p2) + 2*alignment));
+        p2[-2] = (void*)size;
         p2[-1] = p1;
-        if (((uptr)p2 & (alignment - 1)) != 0)
-        {
-            printf("ERROR in mac_aligned_malloc\n");
-        }
         return (void*)p2;
     }
 

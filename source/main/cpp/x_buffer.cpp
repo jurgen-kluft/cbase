@@ -531,7 +531,7 @@ namespace xcore
             return -1;
         xsize_t const offset          = m_cursor;
         out_str.m_type                = read_s32();
-        s32 const strlen              = read_s32();
+        s64 const strlen              = read_s64();
         out_str.m_ascii.m_bos = (char const*)(m_buffer + m_cursor);
         out_str.m_ascii.m_str = (out_str.m_ascii.m_bos);
         out_str.m_ascii.m_end = (out_str.m_ascii.m_bos + strlen);
@@ -812,7 +812,7 @@ namespace xcore
         char const* srcstr = str.m_ascii.m_str;
         char const* srcend = str.m_ascii.m_end;
         xsize_t const   size   = (srcend - srcstr);
-        if (can_write(2 + 2 + size))
+        if (can_write(4 + 8 + size))
         {
             write(str.m_type);
             write(size);

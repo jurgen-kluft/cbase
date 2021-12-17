@@ -98,7 +98,7 @@ namespace xcore
 
 // CONSTANTS
 #define SPF_LONG_MAX 0x7FFFFFFF
-#define WORKSIZE 128 // space for %c, %[diouxX], %[eEfgG]
+#define WORKSIZE 127 // space for %c, %[diouxX], %[eEfgG]
 #define DEFPREC 6    // number of precision for the real numbers
 
     //==============================================================================

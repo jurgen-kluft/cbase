@@ -263,9 +263,10 @@ namespace xcore
 
     public:
         inline inplace_t() {}
-        allocinplace_t allocator() const { return allocinplace_t((xbyte*)m_memory, (u64)SIZE); }
-
-        template <class T> inline T* object() { return static_cast<T*>(m_memory); }
+        
+        allocinplace_t allocator() const { return allocinplace_t((xbyte*)m_memory, (u64)SIZE * 8); }
+        inline u64 size() const { return (u64)SIZE * 8; }
+        template <class T> inline T* object() { return (T*)(m_memory); }
     };
 
     template <class T> class cdtor_default_t

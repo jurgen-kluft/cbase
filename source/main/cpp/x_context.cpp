@@ -41,16 +41,14 @@ namespace xcore
 
     void context_t::vset(s32 tidx, s32 slot, void* pvData) 
     { 
-        ASSERT(tidx < m_max_num_threads);
-        ASSERT(slot < m_max_num_slots);
-        m_slots[tidx*m_max_num_slots + slot] = pvData; 
+        if (m_slots == nullptr) { return; }
+        else { m_slots[tidx*m_max_num_slots + slot] = pvData; }
     }
 
     void context_t::vget(s32 tidx, s32 slot, void*& pvData) 
     { 
-        ASSERT(tidx < m_max_num_threads);
-        ASSERT(slot < m_max_num_slots);
-        pvData = m_slots[tidx*m_max_num_slots + slot]; 
+        if (m_slots == nullptr) { pvData = nullptr; return; }
+        else { pvData = m_slots[tidx*m_max_num_slots + slot]; }
     }
 
     s32 context_t::thread_index()

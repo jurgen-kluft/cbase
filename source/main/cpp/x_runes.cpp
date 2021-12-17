@@ -3249,7 +3249,10 @@ namespace xcore
     runes_t::runes_t(runes_t const& other)
         : m_type(other.m_type)
     {
-        m_ascii = other.m_ascii;
+        m_ascii.m_bos = other.m_ascii.m_bos;
+        m_ascii.m_str = other.m_ascii.m_str;
+        m_ascii.m_end = other.m_ascii.m_end;
+        m_ascii.m_eos = other.m_ascii.m_eos;
     }
 
     runes_t::runes_t(ascii::prune _str, ascii::prune _end, s32 _type)
@@ -4155,12 +4158,7 @@ namespace xcore
 
     crunes_t runes_reader_t::get_source() const
     {
-        crunes_t str;
-        str.m_type        = m_runes.m_type;
-        str.m_ascii.m_bos = m_runes.m_ascii.m_str;
-        str.m_ascii.m_eos = m_runes.m_ascii.m_eos;
-        str.m_ascii.m_str = m_runes.m_ascii.m_str;
-        str.m_ascii.m_end = m_runes.m_ascii.m_end;
+        crunes_t str(m_runes);
         return str;
     }
 
@@ -4168,9 +4166,9 @@ namespace xcore
     {
         crunes_t str;
         str.m_type        = m_runes.m_type;
-        str.m_ascii.m_bos = m_runes.m_ascii.m_str;
-        str.m_ascii.m_eos = m_runes.m_ascii.m_eos;
+        str.m_ascii.m_bos = m_runes.m_ascii.m_bos;
         str.m_ascii.m_str = m_cursor.m_ascii;
+        str.m_ascii.m_eos = m_runes.m_ascii.m_eos;
         str.m_ascii.m_end = m_runes.m_ascii.m_end;
         return str;
     }
@@ -4284,22 +4282,13 @@ namespace xcore
 
     runes_t runes_writer_t::get_destination() const
     {
-        runes_t str;
-        str.m_type        = m_runes.m_type;
-        str.m_ascii.m_bos = m_runes.m_ascii.m_bos;
-        str.m_ascii.m_eos = m_runes.m_ascii.m_eos;
-        str.m_ascii.m_str = m_runes.m_ascii.m_str;
-        str.m_ascii.m_end = m_runes.m_ascii.m_end;
+        runes_t str(m_runes);
         return str;
     }
 
     runes_t runes_writer_t::get_current() const
     {
-        runes_t str;
-        str.m_type        = m_runes.m_type;
-        str.m_ascii.m_bos = m_runes.m_ascii.m_bos;
-        str.m_ascii.m_eos = m_runes.m_ascii.m_eos;
-        str.m_ascii.m_str = m_runes.m_ascii.m_str;
+        runes_t str(m_runes);
         str.m_ascii.m_end = m_cursor.m_ascii;
         return str;
     }
@@ -4352,7 +4341,7 @@ namespace xcore
             switch (m_runes.m_type)
             {
                 case ascii::TYPE:
-                    while (!reader.read(c) && !at_end(m_cursor, m_runes))
+                    while (reader.read(c) && !at_end(m_cursor, m_runes))
                     {
                         //@note: use utf::write
                         m_cursor.m_ascii[0] = (ascii::rune)c;
@@ -4361,21 +4350,21 @@ namespace xcore
                     }
                     return true;
                 case utf8::TYPE:
-                    while (!reader.read(c) && !at_end(m_cursor, m_runes))
+                    while (reader.read(c) && !at_end(m_cursor, m_runes))
                     {
                         utf::write(c, m_runes.m_utf8, m_cursor.m_utf8);
                         m_count += 1;
                     }
                     return true;
                 case utf16::TYPE:
-                    while (!reader.read(c) && !at_end(m_cursor, m_runes))
+                    while (reader.read(c) && !at_end(m_cursor, m_runes))
                     {
                         utf::write(c, m_runes.m_utf16, m_cursor.m_utf16);
                         m_count += 1;
                     }
                     return true;
                 case utf32::TYPE:
-                    while (!reader.read(c) && !at_end(m_cursor, m_runes))
+                    while (reader.read(c) && !at_end(m_cursor, m_runes))
                     {
                         //@note: use utf::write
                         m_cursor.m_utf32[0] = c;
