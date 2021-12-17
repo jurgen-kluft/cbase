@@ -12,11 +12,11 @@ namespace xcore
 {
     struct btree_indexer_t
     {
-		s32  max_levels() const { return m_levels; }
-        s32  key_to_index(s32 level, u64 value) const;
+        s32 max_levels() const { return m_levels; }
+        s32 key_to_index(s32 level, u64 value) const;
 
-        s8	m_vars[2];
-        s16	m_levels;
+        s8  m_vars[2];
+        s16 m_levels;
     };
 
     // The xbtree does not store the key, instead it relies on key retrieval through
@@ -34,13 +34,13 @@ namespace xcore
         virtual void set_key(void* value, u64 key) = 0;
     };
 
-	// 
-    // A btree is a low-level BST that is unbalanced and where branches grow/shrink when 
+    //
+    // A btree is a low-level BST that is unbalanced and where branches grow/shrink when
     // adding or removing items. The btree_idx_t implementation uses indices instead of pointers
     // and thus uses the same amount of memory on a 32-bit system as compared to a 64-bit
     // system. For every key-value inserted you can consider ~6/8 bytes for btree_idx_t. For
     // btree_ptr_t it is an average of ~12/16 bytes per item.
-    // 
+    //
     // We use an `indexer` which is responsible for computing the index at every level
     // of the tree for a given 'key'. If the keydexer goes through the key from msb to lsb
     // then the keys are sorted in the btree, otherwise they are not sorted in the normal sense
@@ -78,17 +78,17 @@ namespace xcore
     private:
         struct node_t;
         struct history_t;
-        u32                m_root;
-        btree_indexer_t     m_idxr;
-        fsadexed_t*         m_node_alloc;
-        btree_idx_kv_t*     m_kv;
+        u32             m_root;
+        btree_indexer_t m_idxr;
+        fsadexed_t*     m_node_alloc;
+        btree_idx_kv_t* m_kv;
     };
 
     struct btree_ptr_t
     {
         struct node_t;
 
-		void init(fsa_t* node_allocator, btree_ptr_kv_t* kv);
+        void init(fsa_t* node_allocator, btree_ptr_kv_t* kv);
         void init_from_index(fsa_t* node_allocator, btree_ptr_kv_t* kv, u32 max_index, bool sorted);
         void init_from_mask(fsa_t* node_allocator, btree_ptr_kv_t* kv, u64 mask, bool sorted);
 
@@ -102,13 +102,12 @@ namespace xcore
 
         static inline s32 sizeof_node() { return 4 * sizeof(void*); }
 
-	private:
+    private:
         struct history_t;
-        btree_indexer_t     m_idxr;
-        fsa_t*              m_node_alloc;
-        btree_ptr_kv_t*     m_kv;
+        btree_indexer_t m_idxr;
+        fsa_t*          m_node_alloc;
+        btree_ptr_kv_t* m_kv;
     };
-
 
 }; // namespace xcore
 

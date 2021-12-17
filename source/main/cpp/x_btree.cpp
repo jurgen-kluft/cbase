@@ -651,6 +651,7 @@ namespace xcore
                     // Null out the leaf from this node and check if this
                     // node has only 1 or no child left, if so we should 'unchain' it.
                     s32 const n = utils::set_child_null_and_check(node, childIndex);
+                    // Case 0x04000000 is a situation that should never occur
                     if (n == 0x03000100 || n == 0x04000000)
                     {
                         if (n == 0x03000100)
@@ -661,6 +662,9 @@ namespace xcore
 
                             // Remember the value
                             uptr otherValue = node->m_nodes[childIndex];
+
+                            // What about nodes that, after removal of a child have only one child
+                            // left. These nodes can also be moved up!
 
                             // Move up and delete nodes that only have 1 child
                             while (level > 0)

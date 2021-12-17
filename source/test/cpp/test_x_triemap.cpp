@@ -14,10 +14,6 @@
 
 namespace xcore
 {
-    const u16 POS_MASK        = 0x0FC0;
-    const u16 RUN_MASK        = 0x003F;
-    const u16 CHILD_TYPE_MASK = 0x3000;
-
     // Note:
     // Using a FSA allocator we can change the pointers into u32 indices.
     // Making the run maximum 32-bit and splitting off the run into its own u32.
@@ -41,46 +37,50 @@ namespace xcore
         enum
         {
             KEY_MAX_BITCNT = 64,
+            BRANCH_NUMBITS = 1,
             POS_BITCNT     = 6,
-            POS_SHIFT      = 6,
+            POS_SHIFT      = 0,
+            POS_MASK       = 0x3F,
             RUN_BITCNT     = 6,
             RUN_SHIFT      = 0
         };
         enum
         {
             CHILD_TYPE_BITCNT = 2,
-            CHILD_TYPE_SHIFT  = 12,
+            CHILD_TYPE_SHIFT  = 6,
             CHILD_TYPE_VALUE  = 0,
-            CHILD_TYPE_NODE   = 1
+            CHILD_TYPE_NODE   = 1,
+            CHILD_TYPE_CHILD  = 0x40,
+            CHILD_TYPE_MASK   = 0xC0
         };
 
         inline node_t()
-            : m_data(0)
+            : m_run(0)
+            , m_pos(0)
         {
             m_children[0] = nullptr;
             m_children[1] = nullptr;
         }
 
         static inline s32 run_max_numbits() { return KEY_MAX_BITCNT; }
-        static inline s32 branch_numbits() { return 1; }
 
-        inline s32   get_run_bitpos() const { return ((m_data & POS_MASK) >> POS_SHIFT); }
-        inline s32   get_run_bitlen() const { return ((m_data & RUN_MASK) >> RUN_SHIFT); }
+        inline s32   get_run_bitpos() const { return (m_pos & POS_MASK); }
+        inline s32   get_run_bitlen() const { return m_run; }
         inline key_t get_run_keymask() const { return (((key_t)1 << get_run_bitlen()) - 1) << (KEY_MAX_BITCNT - (get_run_bitpos() + get_run_bitlen())); }
         inline key_t get_run_keybits() const { return helper_get_run_keybits(m_key, get_run_bitpos(), get_run_bitlen()); }
-        inline s32   get_run_endpos() const { return get_run_bitpos() + get_run_bitlen() + branch_numbits(); } // The start pos for the child nodes
+        inline s32   get_run_endpos() const { return get_run_bitpos() + get_run_bitlen() + BRANCH_NUMBITS; } // The start pos for the child nodes
 
         // Which bit(s) determines the child index ?
-        inline s32  get_child_bit() const { return (KEY_MAX_BITCNT - (get_run_bitpos() + get_run_bitlen() + branch_numbits())); }
-        inline u8   get_child_type(s8 child) const { return (((m_data & CHILD_TYPE_MASK) >> CHILD_TYPE_SHIFT) >> child) & 1; }
+        inline s32  get_child_bit() const { return (KEY_MAX_BITCNT - (get_run_bitpos() + get_run_bitlen() + BRANCH_NUMBITS)); }
+        inline u8   get_child_type(s8 child) const { return (((m_pos & CHILD_TYPE_MASK) >> CHILD_TYPE_SHIFT) >> child) & 1; }
         inline void set_child_type(s8 child, u8 type)
         {
-            m_data = m_data & ~((u16)1 << (CHILD_TYPE_SHIFT + child));
-            m_data = m_data | ((u16)type << (CHILD_TYPE_SHIFT + child));
+            m_pos = m_pos & ~((u8)CHILD_TYPE_CHILD << child);
+            m_pos = m_pos | ((u8)type << (CHILD_TYPE_SHIFT + child));
         }
 
-        inline void set_run_bitpos(u32 pos) { m_data = (m_data & ~POS_MASK) | (((u16)pos << POS_SHIFT) & POS_MASK); }
-        inline void set_run_bitlen(u32 len) { m_data = (m_data & ~RUN_MASK) | (((u16)len << RUN_SHIFT) & RUN_MASK); }
+        inline void set_run_bitpos(u32 pos) { m_pos = (m_pos & CHILD_TYPE_MASK) | (pos & POS_MASK); }
+        inline void set_run_bitlen(u32 len) { m_run = len; }
         inline void set_run_bits(key_t bits) { m_key = bits; }
 
         inline s8 get_indexof_child(void* vvalue)
@@ -114,16 +114,21 @@ namespace xcore
 
         XCORE_CLASS_PLACEMENT_NEW_DELETE
 
+        // 32 bytes (can be 24 bytes if key == u32)
         key_t   m_key;
-        u16     m_data;
+        u8      m_run, m_pos;
         node_t* m_children[2];
+
+        /* 16 bytes (this is really the smallest we can get and with an 48 bits key size)
+        u8      m_key[6];
+        u8      m_run, m_pos;
+        u32     m_children[2];
+        */
     };
 
     // Virtual Memory Approach
     // Node array is using a virtual address range
     // Value array is using a virtual address range
-
-
 
     // A more optimized layout and size (16) would be:
     // struct
@@ -176,8 +181,8 @@ namespace xcore
         value_t* m_value;
         s32      m_num_values;
         s32      m_num_nodes;
-        fsa_t*    m_nodes;
-        fsa_t*    m_values;
+        fsa_t*   m_nodes;
+        fsa_t*   m_values;
     };
 
     node_t* xdtrie::branch_two_values(node_t* parent, value_t* v1, value_t* v2, s8 pos)
@@ -214,8 +219,8 @@ namespace xcore
                 }
 
                 parent = intnode;
-                l -= (node_t::run_max_numbits() + node_t::branch_numbits()); // The +1 is for the bit used for determining the branch (left=0, right=1)
-                p += (node_t::run_max_numbits() + node_t::branch_numbits()); // Move the position further by the running length and the branch bit
+                l -= (node_t::run_max_numbits() + node_t::BRANCH_NUMBITS); // The +1 is for the bit used for determining the branch (left=0, right=1)
+                p += (node_t::run_max_numbits() + node_t::BRANCH_NUMBITS); // Move the position further by the running length and the branch bit
             }
         }
 
@@ -686,7 +691,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
         {
             xdtrie trie(m_fsa);
 
-            const s32 numitems = 16;
+            const s32 numitems = 4096;
             key_t     keys[numitems];
             key_t     seed = 0;
             for (s32 i = 0; i < numitems; ++i)
@@ -737,7 +742,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
         {
             xdtrie trie(m_fsa);
 
-            const s32 numitems = 64;
+            const s32 numitems = 4096;
             key_t     keys[numitems];
             key_t     seed = 0;
             for (s32 i = 0; i < numitems; ++i)
