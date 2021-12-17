@@ -116,7 +116,9 @@ namespace xbase
 
             xcore::context_t::set_assert_handler(assert_handler);
             xcore::context_t::set_system_alloc(system_allocator);
-            xcore::context_t::set_stack_alloc(stack_allocator);
+            xcore::context_t::set_runtime_alloc(system_allocator);
+            xcore::context_t::set_frame_alloc(system_allocator);
+            xcore::context_t::set_local_alloc(stack_allocator);
             xcore::context_t::set_string_alloc(string_allocator);
             xcore::context_t::set_random(random_generator);
         }
@@ -125,12 +127,14 @@ namespace xbase
     void exit()
     {
         xcore::alloc_t*        system_allocator = xcore::context_t::system_alloc();
-        xcore::alloc_buffer_t* stack_allocator  = (xcore::alloc_buffer_t*)xcore::context_t::stack_alloc();
+        xcore::alloc_buffer_t* stack_allocator  = (xcore::alloc_buffer_t*)xcore::context_t::local_alloc();
         xcore::random_t*       random_generator = xcore::context_t::random();
         xcore::runes_alloc_t*  string_allocator = xcore::get_runes_alloc();
 
         xcore::context_t::set_system_alloc(nullptr);
-        xcore::context_t::set_stack_alloc(nullptr);
+        xcore::context_t::set_runtime_alloc(nullptr);
+        xcore::context_t::set_frame_alloc(nullptr);
+        xcore::context_t::set_local_alloc(nullptr);
         xcore::context_t::set_string_alloc(nullptr);
         xcore::context_t::set_random(nullptr);
 

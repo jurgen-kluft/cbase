@@ -18,23 +18,33 @@ namespace xcore
     // The thread context
     //
     //==============================================================================
+    /*
+    Actually as an allocator strategy we would like to have a system allocator that is
+    used by systems that are initializing, because this is a one time occurance.
+    For runtime allocation of objects, entities, containers etc.. we would use a runtime
+    allocator. Then we could still propose 2 temporary allocators, one for local functions
+    that need temporary memory and another for allocations that are 'frame/loop' based
+    allocations.
+    */
     class context_t
     {
     public:
         enum
         {
-            ASSERT_HANDLER   = 0,
-            HEAP_ALLOCATOR   = 1,
-            STACK_ALLOCATOR  = 2,
-            STRING_ALLOCATOR = 3,
-            RANDOM_GENERATOR = 4,
+            ASSERT_HANDLER    = 0,
+            SYSTEM_ALLOCATOR  = 1,
+            RUNTIME_ALLOCATOR = 2,
+            FRAME_ALLOCATOR   = 3,
+            LOCAL_ALLOCATOR   = 4,
+            STRING_ALLOCATOR  = 5,
+            RANDOM_GENERATOR  = 6,
         };
 
         static void init(s32 max_num_threads, s32 max_num_slots, alloc_t* allocator);
         static void exit(alloc_t* allocator);
 
-        static s32  register_thread();
-        static s32  thread_index();
+        static s32 register_thread();
+        static s32 thread_index();
 
         static asserthandler_t* assert_handler()
         {
@@ -48,7 +58,31 @@ namespace xcore
         {
             s32 const tidx = thread_index();
             alloc_t*  a;
-            get<alloc_t>(tidx, HEAP_ALLOCATOR, a);
+            get<alloc_t>(tidx, SYSTEM_ALLOCATOR, a);
+            return a;
+        }
+
+        static alloc_t* runtime_alloc()
+        {
+            s32 const      tidx = thread_index();
+            alloc_t* a;
+            get<alloc_t>(tidx, RUNTIME_ALLOCATOR, a);
+            return a;
+        }
+
+        static alloc_t* frame_alloc()
+        {
+            s32 const tidx = thread_index();
+            alloc_t*  a;
+            get<alloc_t>(tidx, FRAME_ALLOCATOR, a);
+            return a;
+        }
+
+        static alloc_t* local_alloc()
+        {
+            s32 const tidx = thread_index();
+            alloc_t*  a;
+            get<alloc_t>(tidx, LOCAL_ALLOCATOR, a);
             return a;
         }
 
@@ -57,14 +91,6 @@ namespace xcore
             s32 const      tidx = thread_index();
             runes_alloc_t* a;
             get<runes_alloc_t>(tidx, STRING_ALLOCATOR, a);
-            return a;
-        }
-
-        static alloc_t* stack_alloc()
-        {
-            s32 const tidx = thread_index();
-            alloc_t*  a;
-            get<alloc_t>(tidx, STACK_ALLOCATOR, a);
             return a;
         }
 
@@ -85,19 +111,31 @@ namespace xcore
         static void set_system_alloc(alloc_t* a)
         {
             s32 const tidx = thread_index();
-            set<alloc_t>(tidx, HEAP_ALLOCATOR, a);
+            set<alloc_t>(tidx, SYSTEM_ALLOCATOR, a);
+        }
+
+        static void set_runtime_alloc(alloc_t* a)
+        {
+            s32 const tidx = thread_index();
+            set<alloc_t>(tidx, RUNTIME_ALLOCATOR, a);
+        }
+
+        static void set_frame_alloc(alloc_t* a)
+        {
+            s32 const tidx = thread_index();
+            set<alloc_t>(tidx, FRAME_ALLOCATOR, a);
+        }
+
+        static void set_local_alloc(alloc_t* a)
+        {
+            s32 const tidx = thread_index();
+            set<alloc_t>(tidx, LOCAL_ALLOCATOR, a);
         }
 
         static void set_string_alloc(runes_alloc_t* a)
         {
             s32 const tidx = thread_index();
             set<runes_alloc_t>(tidx, STRING_ALLOCATOR, a);
-        }
-
-        static void set_stack_alloc(alloc_t* a)
-        {
-            s32 const tidx = thread_index();
-            set<alloc_t>(tidx, STACK_ALLOCATOR, a);
         }
 
         static void set_random(random_t* r)
