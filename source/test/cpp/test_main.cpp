@@ -33,6 +33,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsprintf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsscanf);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_ascii);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_utf);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, context_t);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xva);
 
