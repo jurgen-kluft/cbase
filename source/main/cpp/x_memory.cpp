@@ -30,7 +30,7 @@ namespace xcore
         s32 memcmp(const void* bufPtr1, const void* bufPtr2, u32 inLength) { return ::memcmp(bufPtr1, bufPtr2, inLength); }
 #endif
 
-        void memswap(void* inLHS, const void* inRHS, u32 inLength)
+        void memswap(void* inLHS, void* inRHS, u32 inLength)
         {
             u8* lhs = (u8*)inLHS;
             u8* rhs = (u8*)inRHS;

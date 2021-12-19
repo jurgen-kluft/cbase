@@ -2,7 +2,7 @@
 #define __XBASE_LIMITS_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
-#    pragma once
+#pragma once
 #endif
 
 namespace xcore
@@ -78,6 +78,7 @@ namespace xcore
 
         static type_t minimum() { return X_U8_MIN; }
         static type_t maximum() { return X_U8_MAX; }
+        static bool has_sign() { return false; }
     };
 
     template <> class limits_t<u16>
@@ -87,6 +88,7 @@ namespace xcore
 
         static type_t minimum() { return X_U16_MIN; }
         static type_t maximum() { return X_U16_MAX; }
+        static bool has_sign() { return false; }
     };
 
     template <> class limits_t<u32>
@@ -96,6 +98,7 @@ namespace xcore
 
         static type_t minimum() { return X_U32_MIN; }
         static type_t maximum() { return X_U32_MAX; }
+        static bool has_sign() { return false; }
     };
 
     template <> class limits_t<u64>
@@ -105,6 +108,7 @@ namespace xcore
 
         static type_t minimum() { return X_U64_MIN; }
         static type_t maximum() { return X_U64_MAX; }
+        static bool has_sign() { return false; }
     };
 
     template <> class limits_t<s8>
@@ -114,6 +118,7 @@ namespace xcore
 
         static type_t minimum() { return X_S8_MIN; }
         static type_t maximum() { return X_S8_MAX; }
+        static bool has_sign() { return true; }
     };
 
     template <> class limits_t<s16>
@@ -123,6 +128,7 @@ namespace xcore
 
         static type_t minimum() { return X_S16_MIN; }
         static type_t maximum() { return X_S16_MAX; }
+        static bool has_sign() { return true; }
     };
 
     template <> class limits_t<s32>
@@ -132,6 +138,7 @@ namespace xcore
 
         static type_t minimum() { return X_S32_MIN; }
         static type_t maximum() { return X_S32_MAX; }
+        static bool has_sign() { return true; }
     };
 
     template <> class limits_t<s64>
@@ -141,6 +148,7 @@ namespace xcore
 
         static type_t minimum() { return X_S64_MIN; }
         static type_t maximum() { return X_S64_MAX; }
+        static bool has_sign() { return true; }
     };
 
     template <> class limits_t<f32>
@@ -150,6 +158,7 @@ namespace xcore
 
         static type_t minimum() { return X_F32_MIN; }
         static type_t maximum() { return X_F32_MAX; }
+        static bool has_sign() { return true; }
     };
 
     template <> class limits_t<f64>
@@ -159,6 +168,7 @@ namespace xcore
 
         static type_t minimum() { return X_F64_MIN; }
         static type_t maximum() { return X_F64_MAX; }
+        static bool has_sign() { return true; }
     };
 
 }; // namespace xcore

@@ -6,6 +6,7 @@
 #endif
 
 #include "xbase/x_debug.h"
+#include "xbase/x_context.h"
 #include "xbase/x_memory.h"
 
 namespace xcore
@@ -52,6 +53,13 @@ namespace xcore
 
         virtual ~alloc_t() {}
     };
+
+    inline void* reallocate(alloc_t* alloc, void* ptr, xsize_t size, xsize_t new_size, u32 alignment = sizeof(void*)) {
+        void* newptr = alloc->allocate(new_size, alignment);
+        x_memcpy(newptr, ptr, size);
+        alloc->deallocate(ptr);
+        return newptr;
+    }
 
     // class new and delete
 #define XCORE_CLASS_PLACEMENT_NEW_DELETE                                    \
@@ -172,7 +180,7 @@ namespace xcore
     // Global new and delete
     template <typename T, typename... Args> T* xnew(Args... args)
     {
-        void* mem    = alloc_t::get_system()->allocate(sizeof(T));
+        void* mem    = context_t::runtime_alloc()->allocate(sizeof(T));
         T*    object = new (mem) T(args...);
         return object;
     }
@@ -180,7 +188,7 @@ namespace xcore
     template <typename T> void xdelete(T* p)
     {
         p->~T();
-        alloc_t::get_system()->deallocate(p);
+        context_t::runtime_alloc()->deallocate(p);
     }
 
     class alloc_buffer_t : public alloc_t

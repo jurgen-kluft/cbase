@@ -19,7 +19,7 @@ namespace xcore
         s16 m_levels;
     };
 
-    // The xbtree does not store the key, instead it relies on key retrieval through
+    // The btree does not store the key, instead it relies on key retrieval through
     // a proxy class. This allows the user to provide the key for a given value.
     class btree_idx_kv_t
     {

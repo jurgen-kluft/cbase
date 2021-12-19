@@ -7,25 +7,15 @@
 
 namespace xcore
 {
-    class asserthandler_t;
     class alloc_t;
+    class asserthandler_t;
     class runes_alloc_t;
     class stack_alloc_t;
     class random_t;
 
     //==============================================================================
-    //
-    // The thread context
-    //
+    // A context per thread
     //==============================================================================
-    /*
-    Actually as an allocator strategy we would like to have a system allocator that is
-    used by systems that are initializing, because this is a one time occurance.
-    For runtime allocation of objects, entities, containers etc.. we would use a runtime
-    allocator. Then we could still propose 2 temporary allocators, one for local functions
-    that need temporary memory and another for allocations that are 'frame/loop' based
-    allocations.
-    */
     class context_t
     {
     public:

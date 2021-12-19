@@ -2,13 +2,13 @@
 #define __XBASE_MEMORY_STD_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
-#    pragma once
+#pragma once
 #endif
 
 #include "xbase/x_debug.h"
 
 #ifndef X_NO_CUSTOM_UINT128
-#    include "xbase/private/x_uint128.h"
+#include "xbase/private/x_uint128.h"
 #endif
 
 namespace xcore
@@ -21,9 +21,11 @@ namespace xcore
         void  memset(void* inDest, u32 inValue, u32 inLength);
         void  memcpy(void* inDest, const void* inSrc, u32 inLength);
         s32   memcmp(const void* inLHS, const void* inRHS, u32 inLength);
-        void  memswap(void* inLHS, const void* inRHS, u32 inLength);
+        void  memswap(void* inLHS, void* inRHS, u32 inLength);
         void* memmove(void* inDest, const void* inSrc, u32 inLength);
-        inline void  memclr(void* inDest, u32 inLength) { memset(inDest, 0, inLength); }
+
+        template <class T> inline void memswap(T& inLHS, T& inRHS) { memswap(&inLHS, &inRHS, sizeof(T)); }
+        inline void                    memclr(void* inDest, u32 inLength) { memset(inDest, 0, inLength); }
 
         ///@name Pointer arithmetic
         inline void* ptr_add(void* ptr, s32 size) { return (void*)((xbyte*)ptr + size); }
@@ -122,7 +124,7 @@ namespace xcore
     inline void x_memclr(void* inDest, u32 inLength) { xmem::memclr(inDest, inLength); }
     inline void x_memcpy(void* inDest, const void* inSource, u32 inLength) { xmem::memcpy(inDest, inSource, inLength); }
     inline s32  x_memcmp(const void* inLHS, const void* inRHS, u32 inLength) { return xmem::memcmp(inLHS, inRHS, inLength); }
-    inline void x_memswap(void* inLHS, const void* inRHS, u32 inLength) { xmem::memswap(inLHS, inRHS, inLength); }
+    inline void x_memswap(void* inLHS, void* inRHS, u32 inLength) { xmem::memswap(inLHS, inRHS, inLength); }
 
     inline s32 x_memcmp2(const u16* inLHS, const u16* inRHS, u32 inLength)
     {
