@@ -16,7 +16,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbitfield);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbtree);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, buffer_t);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, carray_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xcontainers);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, darray_t);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdouble);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdtrie);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
