@@ -88,6 +88,7 @@ namespace xcore
             val |= val >> 1;
             return val + 1;
         }
+        template <class T> inline T next_power_of_two(T val) { return power_of_2_ceiling(val); }
 
     } // namespace math
 } // namespace xcore
