@@ -152,7 +152,7 @@ namespace xcore
     {
         darray_header_t* header = (darray_header_t*)((xbyte*)darray - sizeof(darray_header_t));
         if (lhs_index >= header->m_size || rhs_index >= header->m_size)
-            return nullptr;
+            return false;
         void const* lhs = ((xbyte const*)darray + lhs_index * sizeof_item);
         void const* rhs = ((xbyte const*)darray + rhs_index * sizeof_item);
         return x_memcmp(lhs, rhs, sizeof_item);

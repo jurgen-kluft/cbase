@@ -62,7 +62,7 @@ namespace xcore
         xbyte const* header = (xbyte const*)darray;
         return *((u32*)&header[darray_offset_capacity]);
     }
-    inline u32 __get_max_cap(void* darray)
+    inline u32 __get_cap_max(void* darray)
     {
         xbyte const* header = (xbyte const*)darray;
         return *((u32*)&header[darray_offset_max_capacity]);
@@ -81,7 +81,6 @@ namespace xcore
     template <typename T> inline bool set_size(T* darray, u32 size) { return __set_size((void*)darray, size); }
     template <typename T> inline u32  get_size(T* darray) { return __get_size((void*)darray); }
     template <typename T> inline bool set_cap(T*& darray, u32 new_capacity) { return __set_cap((void*&)darray, sizeof(T), new_capacity); }
-    template <typename T> inline u32  get_cap(T* darray) { return __get_cap((void*)darray); }
     template <typename T> inline u32  get_cap(T* darray) { return __get_cap((void*)darray); }
     template <typename T> inline u32  get_cap_max(T* darray) { return __get_cap_max((void*)darray); }
     template <typename T> inline bool add_item(T*& darray, T const& item)
