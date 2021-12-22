@@ -12,39 +12,39 @@ UNITTEST_SUITE_BEGIN(darray_t)
 
 		UNITTEST_TEST(create_destroy)
 		{
-			s32* darray = create_darray<s32>(128, 512, 4096);
-			destroy_darray(darray);
+			array_t<s32>* darray = array_t<s32>::create(128, 512, 4096);
+			array_t<s32>::destroy(darray);
 			CHECK_NULL(darray);
 		}
 	
 		UNITTEST_TEST(create_use_destroy)
 		{
-			s32* darray = create_darray<s32>(0, 512, 4096);
+			array_t<s32>* darray = array_t<s32>::create(0, 512, 4096);
 
-			CHECK_EQUAL(512, get_cap(darray));
+			CHECK_EQUAL(512, darray->cap_cur());
 
 			for (s32 i = 0; i < 512; i++)
-				add_item(darray, i);
-			CHECK_EQUAL(512, get_size(darray));
+				darray->add_item(i);
+			CHECK_EQUAL(512, darray->size());
 
-			destroy_darray(darray);
+			array_t<s32>::destroy(darray);
 			CHECK_NULL(darray);
 		}
 
 		UNITTEST_TEST(create_setcap_use_destroy)
 		{
-			s32* darray = create_darray<s32>(0, 512, 4096);
-			CHECK_EQUAL(512, get_cap(darray));
+			array_t<s32>* darray = array_t<s32>::create(0, 512, 4096);
+			CHECK_EQUAL(512, darray->cap_cur());
 			
-			set_cap(darray, 1024);
-			CHECK_EQUAL(1024, get_cap(darray));
-			CHECK_EQUAL(0, get_size(darray));
+			darray->set_capacity(1024);
+			CHECK_EQUAL(1024, darray->cap_cur());
+			CHECK_EQUAL(0, darray->size());
 
 			for (s32 i = 0; i < 1024; i++)
-				add_item(darray, i);
-			CHECK_EQUAL(1024, get_size(darray));
+				darray->add_item(i);
+			CHECK_EQUAL(1024, darray->size());
 
-			destroy_darray(darray);
+			array_t<s32>::destroy(darray);
 			CHECK_NULL(darray);
 		}
 	}

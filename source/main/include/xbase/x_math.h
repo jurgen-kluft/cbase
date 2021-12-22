@@ -88,6 +88,25 @@ namespace xcore
             val |= val >> 1;
             return val + 1;
         }
+        template <> inline u32 power_of_2_ceiling(u32 val)
+        {
+            val--;
+             val |= val >> 16;
+             val |= val >> 8;
+             val |= val >> 4;
+            val |= val >> 2;
+            val |= val >> 1;
+            return val + 1;
+        }
+        template <> inline u16 power_of_2_ceiling(u16 val)
+        {
+            val--;
+            val |= val >> 8;
+            val |= val >> 4;
+            val |= val >> 2;
+            val |= val >> 1;
+            return val + 1;
+        }
         template <class T> inline T next_power_of_two(T val) { return power_of_2_ceiling(val); }
 
     } // namespace math

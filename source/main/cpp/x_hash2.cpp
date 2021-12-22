@@ -7,11 +7,6 @@
 
 namespace xcore
 {
-    /* quick example:
-    string s="fjsakfdsjkf";
-    uint64_t hash=wyhash(s.c_str(), s.size(), 0, _wyp);
-    */
-
     typedef u8  uint8_t;
     typedef u32 uint32_t;
     typedef u64 uint64_t;
@@ -19,7 +14,7 @@ namespace xcore
 // protections that produce different results:
 // 1: normal valid behavior
 // 2: extra protection against entropy loss (probability=2^-63), aka. "blind multiplication"
-#define WYHASH_CONDOM 1
+#define WYHASH_PROTECTION 1
 
 // 0: normal version, slow on 32 bit systems
 // 1: faster on 32 bit systems but produces different results, incompatible with wy2u0k function
@@ -31,7 +26,7 @@ namespace xcore
     {
 #if (WYHASH_32BIT_MUM)
         uint64_t hh = (*A >> 32) * (*B >> 32), hl = (*A >> 32) * (uint32_t)*B, lh = (uint32_t)*A * (*B >> 32), ll = (uint64_t)(uint32_t)*A * (uint32_t)*B;
-#if (WYHASH_CONDOM > 1)
+#if (WYHASH_PROTECTION > 1)
         *A ^= _wyrot(hl) ^ hh;
         *B ^= _wyrot(lh) ^ ll;
 #else
@@ -44,7 +39,7 @@ namespace xcore
         lo = t + (rm1 << 32);
         c += lo < t;
         hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
-#if (WYHASH_CONDOM > 1)
+#if (WYHASH_PROTECTION > 1)
         *A ^= lo;
         *B ^= hi;
 #else
