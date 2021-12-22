@@ -42,6 +42,40 @@ namespace xcore
     // note: virtual memory can also create a darray that supports growing
     //
 
+    // Why not use a darray class instead of the C like stuff
+    template <typename T> 
+    class array_t
+    {
+    public:
+        virtual ~array_t();
+
+        virtual bool set_capacity(u32) = 0;
+
+        inline u32 size() const { return m_size; }
+        inline u32 cap_cur() const { return m_cap_cur; }
+        inline u32 cap_max() const { return m_cap_max; }
+
+        bool add_item(const T& item);
+        bool set_item(u32 index, const T& item);
+        T* get_item(u32 index);
+        T const* get_item(u32 index) const;
+        
+        inline T const* items() const { return m_size; }
+        inline T* items() { return m_size; }
+
+        T* operator[](s32 index);
+        T const* operator[](s32 index) const;
+
+    protected:
+        darray_t_() : size(0), cap_cur(0), cap_max(0), items(nullptr) {}
+
+        u32 m_size;
+        u32 m_cap_cur;
+        u32 m_cap_max;
+        T* m_items;
+    };
+
+
     const s32 darray_offset_size        = -4;
     const s32 darray_offset_capacity    = -8;
     const s32 darray_offset_max_capacity    = -12;
