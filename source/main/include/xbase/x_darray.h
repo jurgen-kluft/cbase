@@ -59,7 +59,7 @@ namespace xcore
 			}
 			return false;
 		}
-        T*       items() { return m_items; }
+        
 		T*       get_item(u32 index) { return &m_items[index]; }
         T const* get_item(u32 index) const { return &m_items[index]; }
 
