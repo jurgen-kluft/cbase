@@ -13,19 +13,20 @@ namespace xcore
     class main_runes_allocator : public runes_alloc_t
     {
     public:
-        alloc_t* m_allocator;
         s64 m_alloc_count;
 
-        main_runes_allocator(alloc_t* system_alloc)
-            : m_allocator(system_alloc)
-            , m_alloc_count(0)
+        main_runes_allocator()
+            : m_alloc_count(0)
         {
         }
 
         virtual runes_t allocate(s32 len, s32 cap, s32 type)
         {
+            len = (len + (8 - 1)) & ~(8 - 1);
             if (len > cap)
                 cap = len;
+            cap = (cap + (8 - 1)) & ~(8 - 1);
+            cap = cap + 7;
 
             s32 sizeofrune = 1;
             if (type == utf32::TYPE)
@@ -33,13 +34,27 @@ namespace xcore
             else if (type == utf16::TYPE)
                 sizeofrune = 2;
 
+            alloc_t* sysalloc = context_t::system_alloc();
+
             runes_t r;
-            r.m_type                         = type;
-            r.m_ascii.m_bos          = (ascii::prune)m_allocator->allocate(cap * sizeofrune, sizeof(void*));
-            r.m_ascii.m_end          = r.m_ascii.m_bos + len * sizeofrune;
-            r.m_ascii.m_eos          = r.m_ascii.m_bos + (cap - 1) * sizeofrune;
-            r.m_ascii.m_end[0]       = '\0';
-            r.m_ascii.m_end[cap - 1] = '\0';
+            r.m_type        = type;
+            r.m_ascii.m_bos = (ascii::prune)sysalloc->allocate((cap + 1) * sizeofrune, sizeof(void*));
+            r.m_ascii.m_str = r.m_ascii.m_bos;
+            r.m_ascii.m_end = r.m_ascii.m_bos + len * sizeofrune;
+            r.m_ascii.m_eos = r.m_ascii.m_bos + cap * sizeofrune;
+
+            switch (type)
+            {
+            case ascii::TYPE:
+                r.m_ascii.m_end[0] = '\0';
+                r.m_ascii.m_eos[0] = '\0';
+                break;
+            case utf32::TYPE:
+                r.m_utf32.m_end[0] = '\0';
+                r.m_utf32.m_eos[0] = '\0';
+                break;
+
+            }
 
             m_alloc_count++;
             return r;
@@ -50,7 +65,8 @@ namespace xcore
             if (r.m_ascii.m_bos != nullptr)
             {
                 m_alloc_count--;
-                m_allocator->deallocate(r.m_ascii.m_bos);
+                alloc_t* sysalloc = context_t::system_alloc();
+                sysalloc->deallocate(r.m_ascii.m_bos);
                 r = runes_t();
             }
         }
@@ -61,7 +77,7 @@ namespace xcore
         static runes_alloc_t* s_main_runes_alloc_ptr = nullptr;
         if (s_main_runes_alloc_ptr == nullptr)
         {
-            static main_runes_allocator s_main_runes_alloc(xcore::alloc_t::get_system());
+            static main_runes_allocator s_main_runes_alloc;
             s_main_runes_alloc_ptr = &s_main_runes_alloc;
         }
         return s_main_runes_alloc_ptr;

@@ -9,6 +9,10 @@
 
 namespace xcore
 {
+#ifdef TARGET_DEBUG
+    //#define USE_MALLOC_DBG
+#endif
+
     class x_allocator_win32_system : public alloc_t
     {
     public:
@@ -38,7 +42,7 @@ namespace xcore
 
         virtual void* v_allocate(u32 size, u32 alignment)
         {
-#ifdef TARGET_DEBUG
+#ifdef USE_MALLOC_DBG
             void* mem = _aligned_malloc_dbg(size, alignment, NULL, 0);
 #else
             void* mem = _aligned_malloc(size, alignment);
@@ -50,7 +54,7 @@ namespace xcore
         virtual u32 v_deallocate(void* ptr)
         {
             --mAllocationCount;
-#ifdef TARGET_DEBUG
+#ifdef USE_MALLOC_DBG
             _aligned_free_dbg(ptr);
 #else
             _aligned_free(ptr);
