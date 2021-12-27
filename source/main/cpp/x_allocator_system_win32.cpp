@@ -10,7 +10,7 @@
 namespace xcore
 {
 #ifdef TARGET_DEBUG
-    //#define USE_MALLOC_DBG
+    #define USE_MALLOC_DBG
 #endif
 
     class x_allocator_win32_system : public alloc_t
