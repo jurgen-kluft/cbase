@@ -75,7 +75,7 @@ namespace xcore
 	}
 
 	// find the bit position/index of the first bit from low to high
-	// If 'integer == 0' this function will return 0
+	// If 'integer == 0' this function will return 
 	inline s32 xfindFirstBit(u16 integer)
 	{
 		if (integer == 0)
