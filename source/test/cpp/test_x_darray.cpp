@@ -12,14 +12,14 @@ UNITTEST_SUITE_BEGIN(darray_t)
 
 		UNITTEST_TEST(create_destroy)
 		{
-			array_t<s32>* darray = array_t<s32>::create(128, 512, 4096);
+			array_t<s32>* darray = array_t<s32>::create(128, 512);
 			array_t<s32>::destroy(darray);
 			CHECK_NULL(darray);
 		}
 	
 		UNITTEST_TEST(create_use_destroy)
 		{
-			array_t<s32>* darray = array_t<s32>::create(0, 512, 4096);
+			array_t<s32>* darray = array_t<s32>::create(0, 512);
 
 			CHECK_EQUAL(512, darray->cap_cur());
 
@@ -33,7 +33,7 @@ UNITTEST_SUITE_BEGIN(darray_t)
 
 		UNITTEST_TEST(create_setcap_use_destroy)
 		{
-			array_t<s32>* darray = array_t<s32>::create(0, 512, 4096);
+			array_t<s32>* darray = array_t<s32>::create(0, 512);
 			CHECK_EQUAL(512, darray->cap_cur());
 			
 			darray->set_capacity(1024);

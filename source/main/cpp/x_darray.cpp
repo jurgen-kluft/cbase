@@ -3,11 +3,25 @@
 #include "xbase/x_debug.h"
 #include "xbase/x_context.h"
 #include "xbase/x_darray.h"
+#include "xbase/x_limits.h"
 #include "xbase/x_math.h"
 
 namespace xcore
 {
-    bool __set_capacity(void*& items, u32 sizeof_item, u32 cur_size, u32& cur_capacity, u32 new_capacity, u32 max_capacity)
+    class default_array_capacity_handler : public array_capacity_handler_t
+    {
+    public:
+        virtual bool set_capacity(void*& items, u32 sizeof_item, u32 cur_size, u32& cur_capacity, u32 new_capacity);
+        virtual u32  max_capacity() const { return limits_t<u32>::maximum() >> 1; }
+    };
+
+    array_capacity_handler_t* g_get_default_array_capacity_handler()
+    {
+        static default_array_capacity_handler s_default_array_capacity_handler;
+        return &s_default_array_capacity_handler;
+    }
+
+    bool default_array_capacity_handler::set_capacity(void*& items, u32 sizeof_item, u32 cur_size, u32& cur_capacity, u32 new_capacity)
     {
         if (new_capacity == cur_capacity)
             return true;
@@ -25,7 +39,7 @@ namespace xcore
         else if (new_capacity > cur_capacity)
         {
             ASSERT(cur_size <= cur_capacity);
-            ASSERT(new_capacity < max_capacity);
+            ASSERT(new_capacity < max_capacity());
 
             const u32 desired_size = sizeof_item * new_capacity;
             {
