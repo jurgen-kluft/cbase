@@ -38,6 +38,7 @@ namespace xcore
         }
 
         inline u32 size() const { return m_size; }
+        inline u32 set_size(u32 size) { m_size = size; }
         inline u32 cap_cur() const { return m_cap_cur; }
         inline u32 cap_max() const { return m_cap_max; }
 
