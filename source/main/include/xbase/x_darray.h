@@ -47,7 +47,7 @@ namespace xcore
         inline bool set_capacity(u32 capacity) { return m_capacity_handler->set_capacity((void*&)m_items, sizeof(T), m_size, m_cap_cur, capacity); }
 
         inline u32 size() const { return m_size; }
-        inline u32 set_size(u32 size) { m_size = size; }
+        inline void set_size(u32 size) { m_size = size; }
         inline u32 cap_cur() const { return m_cap_cur; }
         inline u32 cap_max() const { return m_capacity_handler->max_capacity(); }
 
