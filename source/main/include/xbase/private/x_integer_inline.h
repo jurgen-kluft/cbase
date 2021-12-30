@@ -262,7 +262,7 @@ namespace xcore
 	/**
 	 * count one bits in 32 bit word
 	 */
-	inline s32        xcountBits(u32 inInteger)
+	inline s8        xcountBits(u32 inInteger)
 	{
 		inInteger -= ((inInteger >> 1) & 0x55555555);
 		inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
@@ -275,7 +275,7 @@ namespace xcore
 	/**
 	 * count one bits in 64 bit word
 	 */
-	inline s32        xcountBits(u64 i)
+	inline s8        xcountBits(u64 i)
 	{
 		u32 high = (u64(i) >> 32) & 0xffffffff;
 		high -= ((high >> 1) & 0x55555555);

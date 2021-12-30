@@ -73,25 +73,25 @@ namespace xcore
     inline u32  xceilpo2(u32 integer);                  ///< Return the smallest power-of-two larger than integer
     inline u32  xfloorpo2(u32 integer);                 ///< Return the biggest power-of-two smaller than integer
     inline u32  xbitReverse(u32 integer);               ///< Reverse bits in 32 bit word
-    inline s32  xcountBits(u32 integer);                ///< count one bits in 32 bit word
-    inline s32  xcountBits(u64 integer);                ///< count one bits in 32 bit word
+    inline s8  xcountBits(u32 integer);                ///< count one bits in 32 bit word
+    inline s8  xcountBits(u64 integer);                ///< count one bits in 32 bit word
     inline s32  xilog2(u32 integer);                    ///< Log2 of an integer
-    inline s32  xcountTrailingZeros(u16 integer);       ///< find the number of trailing zeros in 32-bit v
-    inline s32  xcountLeadingZeros(u16 integer);        ///< find the number of leading zeros in 32-bit v
-    inline s32  xcountTrailingZeros(u32 integer);       ///< find the number of trailing zeros in 32-bit v
-    inline s32  xcountLeadingZeros(u32 integer);        ///< find the number of leading zeros in 32-bit v
-    inline s32  xcountTrailingZeros(u64 integer);       ///< find the number of trailing zeros in 64-bit v
-    inline s32  xcountLeadingZeros(u64 integer);        ///< find the number of leading zeros in 64-bit v
-    inline s32  xleastSignificantOneBit(u32 inInteger); ///< Return v but with only the Least Significant Bit "1"
+    inline s8  xcountTrailingZeros(u16 integer);       ///< find the number of trailing zeros in 32-bit v
+    inline s8  xcountLeadingZeros(u16 integer);        ///< find the number of leading zeros in 32-bit v
+    inline s8  xcountTrailingZeros(u32 integer);       ///< find the number of trailing zeros in 32-bit v
+    inline s8  xcountLeadingZeros(u32 integer);        ///< find the number of leading zeros in 32-bit v
+    inline s8  xcountTrailingZeros(u64 integer);       ///< find the number of trailing zeros in 64-bit v
+    inline s8  xcountLeadingZeros(u64 integer);        ///< find the number of leading zeros in 64-bit v
+    inline u32  xleastSignificantOneBit(u32 inInteger); ///< Return v but with only the Least Significant Bit "1"
     inline u32  xmostSignificantOneBit(u32 integer);    ///< Return v but with only the Most Significant Bit "1"
-    inline s32  xleastSignificantBit(u32 integer);      ///< Return the bit index of the Least Significant Bit "1"
-    inline s32  xmostSignificantBit(u32 integer);       ///< Return the bit index of the Most Significant Bit "1"
-    inline s32  xfindFirstBit(u16 integer);             ///< find the bit position/index of the first bit from low to high
-    inline s32  xfindLastBit(u16 integer);              ///< find the bit position/index of the first bit from high to low
-    inline s32  xfindFirstBit(u32 integer);             ///< find the bit position/index of the first bit from low to high
-    inline s32  xfindLastBit(u32 integer);              ///< find the bit position/index of the first bit from high to low
-    inline s32  xfindFirstBit(u64 integer);             ///< find the bit position/index of the first bit from low to high
-    inline s32  xfindLastBit(u64 integer);              ///< find the bit position/index of the first bit from high to low
+    inline s8  xleastSignificantBit(u32 integer);      ///< Return the bit index of the Least Significant Bit "1"
+    inline s8  xmostSignificantBit(u32 integer);       ///< Return the bit index of the Most Significant Bit "1"
+    inline s8  xfindFirstBit(u16 integer);             ///< find the bit position/index of the first bit from low to high
+    inline s8  xfindLastBit(u16 integer);              ///< find the bit position/index of the first bit from high to low
+    inline s8  xfindFirstBit(u32 integer);             ///< find the bit position/index of the first bit from low to high
+    inline s8  xfindLastBit(u32 integer);              ///< find the bit position/index of the first bit from high to low
+    inline s8  xfindFirstBit(u64 integer);             ///< find the bit position/index of the first bit from low to high
+    inline s8  xfindLastBit(u64 integer);              ///< find the bit position/index of the first bit from high to low
     inline u32  xrol32(u32 integer, u32 shift);         ///< Roll all the bits in integer to the left by shift number of bits
     inline u32  xror32(u32 integer, u32 shift);         ///< Roll all the bits in integer to the right by shift number of bits
 
