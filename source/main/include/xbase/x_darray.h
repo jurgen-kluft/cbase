@@ -32,8 +32,10 @@ namespace xcore
             void*       mem           = alloc->allocate(sizeof(array_t<T>), sizeof(void*));
             array_t<T>* array         = new (mem) array_t<T>();
             array->m_capacity_handler = capacity_handler;
+            array->m_cap_cur = 0;
+            array->m_size = 0;
             array->set_capacity(initial_capacity);
-            array->m_size = initial_size;
+            array->set_size(initial_size);
             return array;
         }
         static void destroy(array_t<T>*& a)
