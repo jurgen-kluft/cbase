@@ -41,17 +41,16 @@ namespace xcore
             ASSERT(cur_size <= cur_capacity);
             ASSERT(new_capacity < max_capacity());
 
-            const u32 desired_size = sizeof_item * new_capacity;
             {
                 void*    newitems;
                 alloc_t* alloc = context_t::runtime_alloc();
                 if (items == nullptr)
                 {
-                    newitems = alloc->allocate(desired_size);
+                    newitems = alloc->allocate(new_capacity*sizeof_item);
                 }
                 else
                 {
-                    newitems = reallocate(alloc, items, cur_size, desired_size);
+                    newitems = reallocate(alloc, items, cur_size*sizeof_item, new_capacity*sizeof_item);
                 }
 
                 if (!newitems)
