@@ -17,16 +17,22 @@ namespace xcore
 
     struct erunes_t
     {
-        enum
+        enum ecode
         {
-            eos = 0x01,
-            eof = 0x02,
-            eol = 0x04,
-            cr  = 0x08,
-            tab = 0x10,
+            eos  = 0x01,
+            eof  = 0x02,
+            eol  = 0x04,
+            cr   = 0x08,
+            tab  = 0x10,
+            eob  = 0x20, 
+            none = 0,
         };
         u8 m_erunes;
 
+        inline erunes_t()
+            : m_erunes(none)
+        {
+        }
         inline erunes_t(u8 r)
             : m_erunes(r)
         {
@@ -35,8 +41,10 @@ namespace xcore
             : m_erunes(r.m_erunes)
         {
         }
+        static erunes_t from_uchar32(uchar32 c);
 
         bool has(uchar32 c) const;
+        bool is(ecode c) const { return m_erunes == c; }
     };
 
     namespace ascii
@@ -250,8 +258,8 @@ namespace xcore
         uchar32 read();
         bool    write(uchar32 c);
 
-        bool scan(ptr_t& cursor, erunes_t special_chars) const; // scan until we reach one of the 'chars'
-        bool skip(ptr_t& cursor, erunes_t special_chars) const; // skip until we reach a character not part of 'chars'
+        bool scan(ptr_t& cursor, erunes_t special_chars, erunes_t& encountered) const; // scan until we reach one of the 'chars'
+        bool skip(ptr_t& cursor, erunes_t special_chars) const;                        // skip until we reach a character not part of 'chars'
 
         runes_t& operator+=(const ascii::crunes_t& str);
         runes_t& operator+=(const utf32::crunes_t& str);
@@ -266,7 +274,7 @@ namespace xcore
             utf16::runes_t m_utf16;
             utf32::runes_t m_utf32;
         };
-        s32      m_type;
+        s32 m_type;
     };
 
     struct crunes_t
@@ -274,7 +282,7 @@ namespace xcore
         struct ptr_t
         {
             ptr_t();
-            
+
             ptr_t(ascii::pcrune ptr)
                 : m_ascii(ptr)
             {
@@ -365,8 +373,8 @@ namespace xcore
         uchar32 peek() const;
         uchar32 read();
 
-        bool scan(ptr_t& cursor, erunes_t special_chars) const; // scan until we reach one of the 'chars'
-        bool skip(ptr_t& cursor, erunes_t special_chars) const; // skip until we reach a character not part of 'chars'
+        bool scan(ptr_t& cursor, erunes_t special_chars, erunes_t& encountered) const; // scan until we reach one of the 'chars'
+        bool skip(ptr_t& cursor, erunes_t special_chars) const;                        // skip until we reach a character not part of 'chars'
 
         crunes_t& operator=(crunes_t const& other);
 
@@ -377,7 +385,7 @@ namespace xcore
             utf16::crunes_t m_utf16;
             utf32::crunes_t m_utf32;
         };
-        s32      m_type;
+        s32 m_type;
     };
 
     class runes_alloc_t

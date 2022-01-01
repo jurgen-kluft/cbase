@@ -3219,6 +3219,20 @@ namespace xcore
 
     // ------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------
+    erunes_t erunes_t::from_uchar32(uchar32 c)
+    {
+        u8 e;
+        switch (c)
+        {
+            case cEOS: e = eos; break;
+            case cEOF: e = eof; break;
+            case cEOL: e = eol; break;
+            case cCR: e = cr; break;
+            case cTAB: e = tab; break;
+            default: e = 0; break;
+        }
+        return erunes_t(e);
+    }
 
     bool erunes_t::has(uchar32 c) const
     {
@@ -3509,7 +3523,7 @@ namespace xcore
         return false;
     }
 
-    bool runes_t::scan(runes_t::ptr_t& cursor, erunes_t special_chars) const
+    bool runes_t::scan(runes_t::ptr_t& cursor, erunes_t special_chars, erunes_t& encountered) const
     {
         uchar32 c;
         switch (m_type)
@@ -3520,6 +3534,7 @@ namespace xcore
                     c = *cursor.m_ascii;
                     if (special_chars.has(c))
                     {
+                        encountered = erunes_t::from_uchar32(c);
                         return true;
                     }
                     cursor.m_ascii++;
@@ -3531,6 +3546,7 @@ namespace xcore
                     c = utf::peek(cursor.m_utf8, m_utf8.m_end);
                     if (special_chars.has(c))
                     {
+                        encountered = erunes_t::from_uchar32(c);
                         return true;
                     }
                     utf::skip(cursor.m_utf8, m_utf8.m_bos, m_utf8.m_end, 1);
@@ -3542,6 +3558,7 @@ namespace xcore
                     c = utf::peek(cursor.m_utf16, m_utf16.m_end);
                     if (special_chars.has(c))
                     {
+                        encountered = erunes_t::from_uchar32(c);
                         return true;
                     }
                     utf::skip(cursor.m_utf16, m_utf16.m_bos, m_utf16.m_end, 1);
@@ -3553,13 +3570,15 @@ namespace xcore
                     c = utf::peek(cursor.m_utf32, m_utf32.m_end);
                     if (special_chars.has(c))
                     {
+                        encountered = erunes_t::from_uchar32(c);
                         return true;
                     }
                     utf::skip(cursor.m_utf32, m_utf32.m_bos, m_utf32.m_end, 1);
                 }
                 break;
         }
-        return false;
+        encountered = erunes_t(erunes_t::eob);
+        return true;
     }
 
     bool runes_t::skip(runes_t::ptr_t& cursor, erunes_t special_chars) const
@@ -3994,7 +4013,7 @@ namespace xcore
         return '\0';
     }
 
-    bool crunes_t::scan(crunes_t::ptr_t& cursor, erunes_t special_chars) const
+    bool crunes_t::scan(crunes_t::ptr_t& cursor, erunes_t special_chars, erunes_t& encountered) const
     {
         uchar32 c;
         switch (m_type)
@@ -4007,6 +4026,7 @@ namespace xcore
                         c = *cursor.m_ascii;
                         if (special_chars.has(c))
                         {
+                            encountered = erunes_t::from_uchar32(c);
                             return true;
                         }
                         cursor.m_ascii++;
@@ -4021,6 +4041,7 @@ namespace xcore
                         c = utf::peek(cursor.m_utf8, m_utf8.m_end);
                         if (special_chars.has(c))
                         {
+                            encountered = erunes_t::from_uchar32(c);
                             return true;
                         }
                         utf::skip(cursor.m_utf8, m_utf8.m_bos, m_utf8.m_end, 1);
@@ -4035,6 +4056,7 @@ namespace xcore
                         c = utf::peek(cursor.m_utf16, m_utf16.m_end);
                         if (special_chars.has(c))
                         {
+                            encountered = erunes_t::from_uchar32(c);
                             return true;
                         }
                         utf::skip(cursor.m_utf16, m_utf16.m_bos, m_utf16.m_end, 1);
@@ -4049,6 +4071,7 @@ namespace xcore
                         c = utf::peek(cursor.m_utf32, m_utf32.m_end);
                         if (special_chars.has(c))
                         {
+                            encountered = erunes_t::from_uchar32(c);
                             return true;
                         }
                         utf::skip(cursor.m_utf32, m_utf32.m_bos, m_utf32.m_end, 1);
@@ -4056,7 +4079,8 @@ namespace xcore
                 }
                 break;
         }
-        return false;
+        encountered = erunes_t(erunes_t::eob);
+        return true;
     }
 
     bool crunes_t::skip(crunes_t::ptr_t& cursor, erunes_t special_chars) const
