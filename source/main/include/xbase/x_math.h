@@ -18,17 +18,44 @@ namespace xcore
 
     namespace math
     {
-        template <class T> T minimum(T valA, T valB)
+        template <class T> T inline minimum(T valA, T valB)
         {
             if (valA < valB)
                 return valA;
             return valB;
         }
-        template <class T> T maximum(T valA, T valB)
+        template <class T> T inline minimum(T valA, T valB, T valC)
+        {
+            if (valA < valB)
+            {
+                if (valA < valC)
+                    return valA;
+            }
+            else if (valB < valC)
+            {
+                return valB;
+            }
+            return valB;
+        }
+
+        template <class T> T inline maximum(T valA, T valB)
         {
             if (valA < valB)
                 return valB;
             return valA;
+        }
+        template <class T> T inline maximum(T valA, T valB, T valC)
+        {
+            if (valA > valB)
+            {
+                if (valA > valC)
+                    return valA;
+            }
+            else if (valB > valC)
+            {
+                return valB;
+            }
+            return valC;
         }
 
         static inline s8 log2(u64 value)
@@ -53,7 +80,12 @@ namespace xcore
             return table[((value - (value >> 1)) * 0x07EDD5E59A4E28C2) >> 58];
         }
 
-        template <class T> T sign(T valA)
+        template <class T> T inline abs(T val)
+        {
+            return (val < 0) ? -val : val;
+        }
+
+        template <class T> T inline sign(T valA)
         {
             if (valA > 0)
                 return 1;
@@ -63,7 +95,7 @@ namespace xcore
                 return 0;
         }
 
-        template <class T> T clamp(T valA, T low, T high)
+        template <class T> T inline clamp(T valA, T low, T high)
         {
             if (valA < low)
                 return low;
