@@ -139,25 +139,25 @@ namespace xcore
 
         static s32 write_utf32(const utf32::crunes_t& str)
         {
-            const s32 maxlen = 252;
-            uchar16   str16[maxlen + 4];
+            const s32 maxlen = 255;
+            uchar32   str32[maxlen + 1];
 
             s32           l   = 0;
             utf32::pcrune src = str.m_str;
             utf32::pcrune end = str.m_end;
             while (src < end)
             {
-                uchar16* dst16 = (uchar16*)str16;
-                uchar16* end16 = dst16 + maxlen;
+                uchar32* dst32 = (uchar32*)str32;
+                uchar32* end32 = dst32 + maxlen;
                 s32      ll    = 0;
-                while (src < end && dst16 < end16)
+                while (src < end && dst32 < end32)
                 {
                     uchar32 c = *src++;
-                    write_utf16(c, dst16, end16);
+                    *dst32++ = c;
                     ll += 1;
                 }
-                str16[ll] = 0;
-                ::wprintf(L"%s", (const wchar_t*)str16);
+                str32[ll] = 0;
+                ::wprintf(L"%s", (const wchar_t*)str32);
                 l += ll;
             }
             return l;
@@ -250,6 +250,7 @@ namespace xcore
         {
             out_writer_t dstwriter;
             vzprintf(dstwriter, str, args);
+            dstwriter.flush();
             return 0;
         }
     };

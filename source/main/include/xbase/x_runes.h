@@ -710,6 +710,7 @@ namespace xcore
         void flush() { vflush(); }
 
     protected:
+        virtual ~irunes_writer_t(){}
         virtual bool vwrite(uchar32 c)           = 0;
         virtual bool vwrite(crunes_t const& str) = 0;
         virtual void vflush()                    = 0;
