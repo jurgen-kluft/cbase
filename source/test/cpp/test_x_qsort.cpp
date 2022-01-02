@@ -26,7 +26,7 @@ static s32 f32_compare(const void* const a, const void* const b, void*)
 	return 0;
 }
 
-UNITTEST_SUITE_BEGIN(xqsort)
+UNITTEST_SUITE_BEGIN(g_qsort)
 {
 	UNITTEST_FIXTURE(main)
 	{
@@ -70,7 +70,7 @@ UNITTEST_SUITE_BEGIN(xqsort)
 				69495124,43485847,17519345,66644428,85166464,10394800,39572871,37438296,89853126,74654252
 			};
 			s32 n = sizeof(number_list)/sizeof(xcore::s32);
-			xqsort(number_list, n, sizeof(xcore::s32), s32_compare);
+			g_qsort(number_list, n, sizeof(xcore::s32), s32_compare);
 			for (s32 i=0; i<(n-1); ++i)
 				CHECK_TRUE(number_list[i] <= number_list[i+1]);
 		}
@@ -111,7 +111,7 @@ UNITTEST_SUITE_BEGIN(xqsort)
 			};
 			s32 n = sizeof(float_list)/sizeof(xcore::f32);
 
-			xqsort(float_list, n, sizeof(xcore::f32), f32_compare);
+			g_qsort(float_list, n, sizeof(xcore::f32), f32_compare);
 			for (s32 i=0; i<(n-1); ++i)
 				CHECK_TRUE(float_list[i] <= float_list[i+1]);
 		}

@@ -60,7 +60,7 @@ namespace xcore
 		}
 	}
 
-	void xqsort(void *a, s32 n, s32 es, s32 (*cmp)(const void* const, const void* const, void*), void* data)
+	void g_qsort(void *a, s32 n, s32 es, s32 (*cmp)(const void* const, const void* const, void*), void* data)
 	{
 		xbyte *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 		s32 d, r, swaptype, swap_cnt;
@@ -139,7 +139,7 @@ namespace xcore
 		__xqsort_VecSwap(pb, pn - r, r);
 
 		if ((r = (s32)(pb - pa)) > es)
-			xqsort((xbyte*)a, r / es, es, cmp, data);
+			g_qsort((xbyte*)a, r / es, es, cmp, data);
 	
 		if ((r = (s32)(pd - pc)) > es)
 		{ 

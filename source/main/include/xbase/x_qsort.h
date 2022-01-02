@@ -9,14 +9,26 @@
 
 namespace xcore
 {
-	//----------------------------------------------------------------------------------------------------------------
-	// Custom QuickSort
+    //----------------------------------------------------------------------------------------------------------------
+    // Custom QuickSort
 
-	extern void xqsort(void *a,	// element_array
-		s32 n,					// element_count
-		s32 es,					// element_size
-		s32 (*cmp)(const void* const le, const void* const re, void* data),
-		void* data = 0);
+    extern void g_qsort(void *a,	// element_array
+        s32 n,					// element_count
+        s32 es,					// element_size
+        s32 (*cmp)(const void* const le, const void* const re, void* data),
+        void* data = 0);
+
+    inline s32 g_cmp_s32(const void* const _lhs, const void* const _rhs, void* data)
+    {
+        s32 const* const lhs = (s32 const*)_lhs;
+        s32 const* const rhs = (s32 const*)_rhs;
+        if (*lhs < *rhs)
+            return -1;
+        if (*lhs > *rhs)
+            return 1;
+        return 0;
+    };
+    
 
 };
 
