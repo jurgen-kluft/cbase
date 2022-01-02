@@ -376,7 +376,7 @@ namespace xcore
         INT64_SIZE = 8,
     };
 
-    s32 VSScanf(irunes_reader_t* reader, irunes_reader_t* fmt, const x_va_r_list& vr_args)
+    s32 VSScanf(irunes_reader_t* reader, irunes_reader_t* fmt, const va_r_list_t& vr_args)
     {
         s32 i        = 0;
         s32 w        = 0;
@@ -728,7 +728,7 @@ namespace xcore
 
     s32 sscanf(crunes_t & str, crunes_t const& fmt, X_VA_R_ARGS_16)
     {
-        x_va_r_list    vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+        va_r_list_t    vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
         runes_reader_t buf_reader(str);
         runes_reader_t fmt_reader(fmt);
         s32            scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
@@ -736,7 +736,7 @@ namespace xcore
 		return scanned;
     }
 
-    s32 vsscanf(crunes_t & str, crunes_t const& fmt, const x_va_r_list& vr_args)
+    s32 vsscanf(crunes_t & str, crunes_t const& fmt, const va_r_list_t& vr_args)
     {
         runes_reader_t buf_reader(str);
         runes_reader_t fmt_reader(fmt);

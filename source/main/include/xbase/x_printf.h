@@ -21,7 +21,7 @@ namespace xcore
     void printf(crunes_t const& format, X_VA_ARGS_16_DEF);
     void printf(crunes_t const& format, const va_list_t& args);
     s32  sscanf(crunes_t& str, crunes_t const& format, X_VA_R_ARGS_16_DEF);
-    s32  vsscanf(crunes_t& str, crunes_t const& format, const x_va_r_list& vr_args);
+    s32  vsscanf(crunes_t& str, crunes_t const& format, const va_r_list_t& vr_args);
 } // namespace xcore
 
 #endif ///< __XCORE_CHARS_H__

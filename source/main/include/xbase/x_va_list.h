@@ -393,7 +393,7 @@ namespace xcore
      * Author:
      *     Jurgen Kluft
      * Description:
-     *     x_va_r_list using va_r_t is a type safe implementation of 'pointer to argument'
+     *     va_r_list_t using va_r_t is a type safe implementation of 'pointer to argument'
      *     passing used by sscanf.
      *
      *<P>  The sscanf as we all know can be used as we have always done, there are no
@@ -547,29 +547,29 @@ namespace xcore
         uptr mRef[1];
     };
 
-    struct x_va_r_list
+    struct va_r_list_t
     {
-        x_va_r_list() : mLength(0) {}
-        x_va_r_list(va_r_t a1) : mLength(1) { mArg[0] = a1; }
-        x_va_r_list(va_r_t a1, va_r_t a2) : mLength(2)
+        va_r_list_t() : mLength(0) {}
+        va_r_list_t(va_r_t a1) : mLength(1) { mArg[0] = a1; }
+        va_r_list_t(va_r_t a1, va_r_t a2) : mLength(2)
         {
             mArg[0] = a1;
             mArg[1] = a2;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3) : mLength(3)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3) : mLength(3)
         {
             mArg[0] = a1;
             mArg[1] = a2;
             mArg[2] = a3;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4) : mLength(4)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4) : mLength(4)
         {
             mArg[0] = a1;
             mArg[1] = a2;
             mArg[2] = a3;
             mArg[3] = a4;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5) : mLength(5)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5) : mLength(5)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -577,7 +577,7 @@ namespace xcore
             mArg[3] = a4;
             mArg[4] = a5;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6) : mLength(6)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6) : mLength(6)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -586,7 +586,7 @@ namespace xcore
             mArg[4] = a5;
             mArg[5] = a6;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7) : mLength(7)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7) : mLength(7)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -596,7 +596,7 @@ namespace xcore
             mArg[5] = a6;
             mArg[6] = a7;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8) : mLength(8)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8) : mLength(8)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -607,7 +607,7 @@ namespace xcore
             mArg[6] = a7;
             mArg[7] = a8;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9) : mLength(9)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9) : mLength(9)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -619,7 +619,7 @@ namespace xcore
             mArg[7] = a8;
             mArg[8] = a9;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10) : mLength(10)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10) : mLength(10)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -632,7 +632,7 @@ namespace xcore
             mArg[8] = a9;
             mArg[9] = a10;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11) : mLength(11)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11) : mLength(11)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -646,7 +646,7 @@ namespace xcore
             mArg[9]  = a10;
             mArg[10] = a11;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12) : mLength(12)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12) : mLength(12)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -661,7 +661,7 @@ namespace xcore
             mArg[10] = a11;
             mArg[11] = a12;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13) : mLength(13)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13) : mLength(13)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -677,7 +677,7 @@ namespace xcore
             mArg[11] = a12;
             mArg[12] = a13;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14) : mLength(14)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14) : mLength(14)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -694,7 +694,7 @@ namespace xcore
             mArg[12] = a13;
             mArg[13] = a14;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15) : mLength(15)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15) : mLength(15)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -712,7 +712,7 @@ namespace xcore
             mArg[13] = a14;
             mArg[14] = a15;
         }
-        x_va_r_list(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15, va_r_t a16) : mLength(16)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15, va_r_t a16) : mLength(16)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
