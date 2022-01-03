@@ -23,8 +23,8 @@ namespace xcore
     {
         auto cmper = [](const void* _lhs, const void* _rhs, void* data) 
         {
-            s32 const* const lhs = (s32 const*)_lhs;
-            s32 const* const rhs = (s32 const*)_rhs;
+            T const* const lhs = (T const*)_lhs;
+            T const* const rhs = (T const*)_rhs;
             if (*lhs < *rhs)
                 return -1;
             if (*lhs > *rhs)
