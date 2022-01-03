@@ -60,7 +60,7 @@ namespace xcore
 		}
 	}
 
-	void g_qsort(void *a, s32 n, s32 es, s32 (*cmp)(const void* const, const void* const, void*), void* data)
+	void g_qsort(void *a, s32 n, s32 es, s32 (*cmp)(const void*, const void*, void*), void* data)
 	{
 		xbyte *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 		s32 d, r, swaptype, swap_cnt;
