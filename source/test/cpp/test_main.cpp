@@ -22,7 +22,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdtrie);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xfloat);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, guid_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, hibitset_t);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, hbb_t);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmap_and_set);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xqsort);

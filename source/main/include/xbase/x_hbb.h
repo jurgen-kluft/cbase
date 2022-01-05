@@ -22,13 +22,14 @@ namespace xcore
     // level 3, bits= 16, dwords= 1, bytes= 4
     // total: 65536 + 2048 + 64 + 4 = 67652 bytes
 
-    class hibitset_t
+    class hbb_t
     {
     public:
-        inline hibitset_t() : m_numbits(0), m_maxlevel(0) {}
+        inline hbb_t() : m_numbits(0), m_maxlevel(0) {}
 
         void init(u32* bits, u32 maxbits);
         void init(alloc_t* alloc, u32 maxbits);
+        void resize(alloc_t* alloc, u32 maxbits);
 
         void release(alloc_t* alloc);
 
