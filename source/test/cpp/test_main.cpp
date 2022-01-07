@@ -25,7 +25,7 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, guid_t);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, hbb_t);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmap_and_set);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xqsort);
+UNITTEST_SUITE_DECLARE(xCoreUnitTest, g_qsort);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xrange);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, singleton_t);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, xslice);

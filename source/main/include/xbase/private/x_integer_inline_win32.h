@@ -122,4 +122,37 @@ namespace xcore
 		return 63 - xcountLeadingZeros(integer);
 	}
 
+
+    /**
+     * count one bits in 32 bit word
+     */
+    inline s8        xcountBits(u8 inInteger)
+    {
+		u16 i16 = inInteger;
+		return (s8)__popcnt16(i16);
+    }
+
+    /**
+     * count one bits in 32 bit word
+     */
+    inline s8        xcountBits(u16 inInteger)
+    {
+		return (s8)__popcnt16(inInteger);
+    }
+
+    /**
+     * count one bits in 32 bit word
+     */
+    inline s8        xcountBits(u32 inInteger)
+    {
+		return (s8)__popcnt(inInteger);
+    }
+
+    /**
+     * count one bits in 64 bit word
+     */
+    inline s8        xcountBits(u64 inInteger)
+    {
+		return (s8)__popcnt64(inInteger);
+    }
 }
