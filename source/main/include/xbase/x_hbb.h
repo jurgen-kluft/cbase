@@ -2,7 +2,7 @@
 #define __X_HIERARCHICAL_BITSET_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
-#    pragma once
+#pragma once
 #endif
 
 namespace xcore
@@ -14,15 +14,18 @@ namespace xcore
     //  4/  128/   4KB/128KB/   4MB/128MB ( * ~1.5)
 
     // Example:
-    // When you initialize a hbb_t with maxbits = 512Kbit the
-    // size_in_dwords() function will return 16913, or 67652 bytes.
-    // level 0, bits= 524288, dwords= 16384, bytes= 65536
-    // level 1, bits= 16384, dwords= 512, bytes= 2048
-    // level 2, bits= 512, dwords= 16, bytes= 64
-    // level 3, bits= 16, dwords= 1, bytes= 4
-    // total: 65536 + 2048 + 64 + 4 = 67652 bytes
+    // When you initialize a hbb_t with maxbits = 480010 the
+    // size_in_dwords() function will return (480010+31) / 32 = 15001, or 60004 bytes.
+    // level 0, bits= 480010, dwords= 15001, bytes = 60004
+    // level 1, bits= 15001, dwords= 469, bytes = 1876
+    // level 2, bits= 469, dwords= 15, bytes = 60
+    // level 3, bits= 15, dwords= 1, bytes= 4
+    // total: 60004 + 1876 + 60 + 4 + 12 = 61956 bytes
 
-    struct hbb_t { u32* m_hbb; };
+    struct hbb_t
+    {
+        u32* m_hbb;
+    };
     static u32 sizeof_hbb(u32 maxbits); // To know how many u32 to allocate
 
     static void init(hbb_t hbb, u32 numbits);
@@ -41,17 +44,16 @@ namespace xcore
     static bool upper(hbb_t hbb, u32 pivot, u32& bit); // First 0 or 1 equal to or greater than @pivot
     static bool lower(hbb_t hbb, u32 pivot, u32& bit); // First 0 or 1 equal to or lesser than @pivot
 
+    // can be in .cpp (not public)
     enum
     {
         AllBitsSet = 0xffffffff
     };
-
-    //  3 bits; maximum number of levels = 7
-    // 29 bits; maximum number of bits 
-
-    // m_hbb[0] = num-levels(3 bits), num-bits(29 bits)
-    // m_hbb[1:1] = level 1 array, u32[1]
-    // m_hbb[2:34] = level 0 array, u32[32]        
+    // each level -> u32[level len]
+    // m_hbb[0] = num-bits (level 1 len = 1)
+    // m_hbb[1] = level 2 len(5 bits), level 3 len(10 bits), level 4 len(15 bits)
+    // m_hbb[2] = level 5 len(20 bits)
+    static u32 sizeof_level(hbb_t hbb, s8 level);
 
 }; // namespace xcore
 
