@@ -54,7 +54,7 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 			hbb_t hbb = { bitmap };
 			u32 config;
 			CHECK_TRUE(sizeof_hbb(maxbits, config) < 4096);
-			init(hbb, maxbits, config);
+			init(hbb, maxbits, config, 0);
 			reset(hbb, config, maxbits, 0);
 
 			CHECK_EQUAL(false, is_set(hbb, config, maxbits, 10));
@@ -70,7 +70,7 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 			hbb_t hbb = { bitmap };
 			u32 config;
 			CHECK_TRUE(sizeof_hbb(maxbits, config) < 4096);
-			init(hbb, maxbits, config);
+			init(hbb, maxbits, config, 0);
 			reset(hbb, config, maxbits, 0);
 
 			u32 b1;
@@ -94,7 +94,7 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 			hbb_t hbb = { bitmap };
 			u32 config;
 			CHECK_TRUE(sizeof_hbb(maxbits, config) < 4096);
-			init(hbb, maxbits, config);
+			init(hbb, maxbits, config, 0);
 			reset(hbb, config, maxbits, 0);
 
 			for (s32 b=0; b<1024; b++)
@@ -119,7 +119,7 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 			hbb_t hbb = { bitmap };
 			u32 config;
 			CHECK_TRUE(sizeof_hbb(maxbits, config) < 4096);
-			init(hbb, maxbits, config);
+			init(hbb, maxbits, config, 0);
 			reset(hbb, config, maxbits, 0);
 
 			// Should not be able to find any '1'
