@@ -29,23 +29,23 @@ namespace xcore
         return size;
     }
 
-	static inline u32 s_level_bits(u32 config, s8 level)
-	{
-		config = config >> 5;
-		s32 numbits = 32 - (config & 0x1F);
-		while (level > 0)
-		{
-			config = config >> 5;
-			numbits = (numbits << 5) - (config & 0x1F);
-			level -= 1;
-		}
-		return numbits;
-	}
+    static inline u32 s_level_bits(u32 config, s8 level)
+    {
+        config      = config >> 5;
+        s32 numbits = 32 - (config & 0x1F);
+        while (level > 0)
+        {
+            config  = config >> 5;
+            numbits = (numbits << 5) - (config & 0x1F);
+            level -= 1;
+        }
+        return numbits;
+    }
 
     static u32* s_level_ptr(hbb_t hbb, u32 config, s8 level)
     {
         if (level <= 1)
-            return hbb.m_hbb + level;
+            return hbb + level;
 
         ASSERT(level < (s8)(config & 0x1F));
         s32 size   = 1;
@@ -57,7 +57,7 @@ namespace xcore
             offset += size;
             level -= 1;
         }
-        return hbb.m_hbb + offset;
+        return hbb + offset;
     }
 
     // level 3 = (15001 + 31) / 32 = 469 * 32 = 15008 - 15001 = rest 7
@@ -66,7 +66,7 @@ namespace xcore
     // level 0 = 1
     u32 sizeof_hbb(u32 maxbits, u32& config)
     {
-		ASSERT(maxbits <= (1<<25));
+        ASSERT(maxbits <= (1 << 25));
         config               = (((((maxbits + 31) / 32) * 32) - maxbits) & 0x1F);
         s32 number_of_levels = 1;
         s32 total_num_dwords = 1;
@@ -83,7 +83,7 @@ namespace xcore
         return total_num_dwords;
     }
 
-    void init(hbb_t hbb, u32 maxbits, u32 config)
+    static void s_init(hbb_t hbb, u32 maxbits, u32 config)
     {
         // set the rest part of each level to '0'
         s8 const maxlevel = (config & 0x1F);
@@ -101,14 +101,24 @@ namespace xcore
         }
     }
 
+    void init(hbb_t hbb, u32 maxbits, u32 config, s8 bits)
+    {
+        u32 const ndwords = sizeof_hbb(maxbits, config);
+        x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * 4);
+        if (bits == 1)
+        {
+            s_init(hbb, maxbits, config);
+        }
+    }
+
     void init(hbb_t& hbb, u32 maxbits, u32& config, s8 bits, alloc_t* alloc)
     {
         u32 const ndwords = sizeof_hbb(maxbits, config);
-        hbb.m_hbb         = (u32*)alloc->allocate(ndwords * 4, sizeof(u32));
-        x_memset(hbb.m_hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * 4);
+        hbb               = (u32*)alloc->allocate(ndwords * 4, sizeof(u32));
+        x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * 4);
         if (bits == 1)
         {
-            init(hbb, config, maxbits);
+            s_init(hbb, maxbits, config);
         }
     }
 
@@ -116,8 +126,8 @@ namespace xcore
     {
         if (alloc != nullptr)
         {
-            alloc->deallocate(hbb.m_hbb);
-            hbb.m_hbb = nullptr;
+            alloc->deallocate(hbb);
+            hbb = nullptr;
         }
     }
 
@@ -126,10 +136,10 @@ namespace xcore
         u32       c;
         u32 const size = sizeof_hbb(maxbits, c);
         ASSERT(c == config);
-        x_memset(hbb.m_hbb, bits == 0 ? 0 : 0xFFFFFFFF, size * 4);
+        x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, size * 4);
         if (bits == 1)
         {
-            init(hbb, config, maxbits);
+            s_init(hbb, maxbits, config);
         }
     }
 
@@ -188,7 +198,7 @@ namespace xcore
 
     bool is_empty(hbb_t hbb)
     {
-        u32 const* level0 = hbb.m_hbb;
+        u32 const* level0 = hbb;
         return level0[0] == 0;
     }
 
