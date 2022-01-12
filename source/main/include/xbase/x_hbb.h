@@ -1,5 +1,5 @@
-#ifndef __X_HIERARCHICAL_BITSET_H__
-#define __X_HIERARCHICAL_BITSET_H__
+#ifndef __X_HIERARCHICAL_BIT_BUFFER_H__
+#define __X_HIERARCHICAL_BIT_BUFFER_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -43,4 +43,4 @@ namespace xcore
 
 }; // namespace xcore
 
-#endif /// __X_HIERARCHICAL_BITSET_H__
+#endif /// __X_HIERARCHICAL_BIT_BUFFER_H__
