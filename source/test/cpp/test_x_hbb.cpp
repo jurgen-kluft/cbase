@@ -39,7 +39,7 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 				{
 					u32 config;
 					u32 maxbits = 1024 * 1024 * x - i;
-					u32 number_of_dwords = sizeof_hbb(maxbits, config);
+					u32 number_of_dwords = g_sizeof_hbb(maxbits, config);
 					u32 numbits = s_level_bits(config, (config & 0x1F) - 1);
 					CHECK_EQUAL(maxbits, numbits);
 				}
@@ -53,13 +53,13 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 			u32 const maxbits = 8192;
 			hbb_t hbb = { bitmap };
 			u32 config;
-			CHECK_TRUE(sizeof_hbb(maxbits, config) < 4096);
-			init(hbb, maxbits, config, 0);
-			reset(hbb, config, maxbits, 0);
+			CHECK_TRUE(g_sizeof_hbb(maxbits, config) < 4096);
+			g_hbb_init(hbb, maxbits, config, 0);
+			g_hbb_reset(hbb, config, maxbits, 0);
 
-			CHECK_EQUAL(false, is_set(hbb, config, maxbits, 10));
-			set(hbb, config, maxbits, 10);
-			CHECK_EQUAL(true, is_set(hbb, config, maxbits, 10));
+			CHECK_EQUAL(false, g_hbb_is_set(hbb, config, maxbits, 10));
+			g_hbb_set(hbb, config, maxbits, 10);
+			CHECK_EQUAL(true, g_hbb_is_set(hbb, config, maxbits, 10));
 		}
 
 		UNITTEST_TEST(set_and_is_set_many)
@@ -69,20 +69,20 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 			u32 const maxbits = 8192;
 			hbb_t hbb = { bitmap };
 			u32 config;
-			CHECK_TRUE(sizeof_hbb(maxbits, config) < 4096);
-			init(hbb, maxbits, config, 0);
-			reset(hbb, config, maxbits, 0);
+			CHECK_TRUE(g_sizeof_hbb(maxbits, config) < 4096);
+			g_hbb_init(hbb, maxbits, config, 0);
+			g_hbb_reset(hbb, config, maxbits, 0);
 
 			u32 b1;
-			CHECK_FALSE(find(hbb, config, maxbits, b1));
+			CHECK_FALSE(g_hbb_find(hbb, config, maxbits, b1));
 
 			for (s32 b=0; b<1024; b++)
 			{
-				set(hbb, config, maxbits, b);
-				CHECK_TRUE(find(hbb, config, maxbits, b1));
+				g_hbb_set(hbb, config, maxbits, b);
+				CHECK_TRUE(g_hbb_find(hbb, config, maxbits, b1));
 				CHECK_EQUAL(b, b1);
-				clr(hbb, config, maxbits, b);
-				CHECK_FALSE(find(hbb, config, maxbits, b1));
+				g_hbb_clr(hbb, config, maxbits, b);
+				CHECK_FALSE(g_hbb_find(hbb, config, maxbits, b1));
 			}
 		}
 
@@ -93,21 +93,21 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 			u32 const maxbits = 8192;
 			hbb_t hbb = { bitmap };
 			u32 config;
-			CHECK_TRUE(sizeof_hbb(maxbits, config) < 4096);
-			init(hbb, maxbits, config, 0);
-			reset(hbb, config, maxbits, 0);
+			CHECK_TRUE(g_sizeof_hbb(maxbits, config) < 4096);
+			g_hbb_init(hbb, maxbits, config, 0);
+			g_hbb_reset(hbb, config, maxbits, 0);
 
 			for (s32 b=0; b<1024; b++)
 			{
-				set(hbb, config, maxbits, b);
+				g_hbb_set(hbb, config, maxbits, b);
 			}
 
 			for (s32 b=0; b<1024; b++)
 			{
 				u32 free_bit;
-				find(hbb, config, maxbits, free_bit);
+				g_hbb_find(hbb, config, maxbits, free_bit);
 				CHECK_EQUAL(b, free_bit);
-				clr(hbb, config, maxbits, b);
+				g_hbb_clr(hbb, config, maxbits, b);
 			}
 		}
 
@@ -118,18 +118,18 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 			u32 const maxbits = 8192;
 			hbb_t hbb = { bitmap };
 			u32 config;
-			CHECK_TRUE(sizeof_hbb(maxbits, config) < 4096);
-			init(hbb, maxbits, config, 0);
-			reset(hbb, config, maxbits, 0);
+			CHECK_TRUE(g_sizeof_hbb(maxbits, config) < 4096);
+			g_hbb_init(hbb, maxbits, config, 0);
+			g_hbb_reset(hbb, config, maxbits, 0);
 
-			// Should not be able to find any '1'
+			// Should not be able to g_hbb_find any '1'
 			u32 free_bit;
-			CHECK_EQUAL(false, find(hbb, config, maxbits, free_bit));
+			CHECK_EQUAL(false, g_hbb_find(hbb, config, maxbits, free_bit));
 
 			for (s32 b=1024-1; b>=0; --b)
 			{
-				set(hbb, config, maxbits, b);
-				find(hbb, config, maxbits, free_bit);
+				g_hbb_set(hbb, config, maxbits, b);
+				g_hbb_find(hbb, config, maxbits, free_bit);
 				CHECK_EQUAL(b, free_bit);
 			}
 		}

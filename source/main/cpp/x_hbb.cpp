@@ -13,7 +13,7 @@ namespace xcore
         AllBitsSet = 0xffffffff
     };
 
-    u32 sizeof_level(hbb_t hbb, u32 config, s8 level)
+    static u32 s_sizeof_level(hbb_t hbb, u32 config, s8 level)
     {
         if (level == 0)
             return 1;
@@ -64,7 +64,7 @@ namespace xcore
     // level 2 = (469 + 31) / 32 = 15 * 32 = 480 - 469 = rest 11
     // level 1 = (15 + 31) / 32 = 1 * 32 = 32 - 15 = rest 17
     // level 0 = 1
-    u32 sizeof_hbb(u32 maxbits, u32& config)
+    u32 g_sizeof_hbb(u32 maxbits, u32& config)
     {
         ASSERT(maxbits <= (1 << 25));
         config               = (((((maxbits + 31) / 32) * 32) - maxbits) & 0x1F);
@@ -90,7 +90,7 @@ namespace xcore
 
         for (s32 i = maxlevel - 1; i >= 0; --i)
         {
-            u32 const numdwords = sizeof_level(hbb, config, i);
+            u32 const numdwords = s_sizeof_level(hbb, config, i);
             u32*      plevel    = s_level_ptr(hbb, config, i);
             plevel              = plevel + (numdwords - 1); // goto last dword
 
@@ -101,9 +101,9 @@ namespace xcore
         }
     }
 
-    void init(hbb_t hbb, u32 maxbits, u32 config, s8 bits)
+    void g_hbb_init(hbb_t hbb, u32 maxbits, u32 config, s8 bits)
     {
-        u32 const ndwords = sizeof_hbb(maxbits, config);
+        u32 const ndwords = g_sizeof_hbb(maxbits, config);
         x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * 4);
         if (bits == 1)
         {
@@ -111,9 +111,9 @@ namespace xcore
         }
     }
 
-    void init(hbb_t& hbb, u32 maxbits, u32& config, s8 bits, alloc_t* alloc)
+    void g_hbb_init(hbb_t& hbb, u32 maxbits, u32& config, s8 bits, alloc_t* alloc)
     {
-        u32 const ndwords = sizeof_hbb(maxbits, config);
+        u32 const ndwords = g_sizeof_hbb(maxbits, config);
         hbb               = (u32*)alloc->allocate(ndwords * 4, sizeof(u32));
         x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * 4);
         if (bits == 1)
@@ -122,7 +122,7 @@ namespace xcore
         }
     }
 
-    void release(hbb_t& hbb, alloc_t* alloc)
+    void g_hbb_release(hbb_t& hbb, alloc_t* alloc)
     {
         if (alloc != nullptr)
         {
@@ -131,10 +131,10 @@ namespace xcore
         }
     }
 
-    void reset(hbb_t hbb, u32 config, u32 maxbits, s8 bits)
+    void g_hbb_reset(hbb_t hbb, u32 config, u32 maxbits, s8 bits)
     {
         u32       c;
-        u32 const size = sizeof_hbb(maxbits, c);
+        u32 const size = g_sizeof_hbb(maxbits, c);
         ASSERT(c == config);
         x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, size * 4);
         if (bits == 1)
@@ -143,7 +143,7 @@ namespace xcore
         }
     }
 
-    void set(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
+    void g_hbb_set(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
     {
         // set bit in full level, then avalanche up if necessary
         s8 i = (config & 0x1F) - 1;
@@ -165,7 +165,7 @@ namespace xcore
         }
     }
 
-    void clr(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
+    void g_hbb_clr(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
     {
         // clear bit in level 0, then avalanche up if necessary
         s8 i = (config & 0x1F) - 1;
@@ -188,7 +188,7 @@ namespace xcore
         }
     }
 
-    bool is_set(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
+    bool g_hbb_is_set(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
     {
         u32 const* level      = s_level_ptr(hbb, config, (config & 0x1F) - 1);
         u32 const  dwordIndex = bit / 32;
@@ -196,13 +196,13 @@ namespace xcore
         return ((level[dwordIndex] >> dwordBit) & 1) == 1;
     }
 
-    bool is_empty(hbb_t hbb)
+    bool g_hbb_is_empty(hbb_t hbb)
     {
         u32 const* level0 = hbb;
         return level0[0] == 0;
     }
 
-    bool find(hbb_t hbb, u32 config, u32 maxbits, u32& bit)
+    bool g_hbb_find(hbb_t hbb, u32 config, u32 maxbits, u32& bit)
     {
         s8 const maxlevel = config & 0x1F;
 
@@ -224,7 +224,7 @@ namespace xcore
         return true;
     }
 
-    bool upper(hbb_t hbb, u32 config, u32 maxbits, u32 pivot, u32& bit)
+    bool g_hbb_upper(hbb_t hbb, u32 config, u32 maxbits, u32 pivot, u32& bit)
     {
         // Start at bottom level and move up finding a 'set' bit
         u32 iw = (pivot / 32); // The index of a 32-bit word in level 0
@@ -282,7 +282,7 @@ namespace xcore
         return false;
     }
 
-    bool lower(hbb_t hbb, u32 config, u32 maxbits, u32 pivot, u32& bit)
+    bool g_hbb_lower(hbb_t hbb, u32 config, u32 maxbits, u32 pivot, u32& bit)
     {
         if (pivot == 0)
             return false;
