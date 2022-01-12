@@ -114,8 +114,8 @@ namespace xcore
     void g_hbb_init(hbb_t& hbb, u32 maxbits, u32& config, s8 bits, alloc_t* alloc)
     {
         u32 const ndwords = g_sizeof_hbb(maxbits, config);
-        hbb               = (u32*)alloc->allocate(ndwords * 4, sizeof(u32));
-        x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * 4);
+        hbb               = (u32*)alloc->allocate(ndwords * sizeof(u32), sizeof(u32));
+        x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * sizeof(u32));
         if (bits == 1)
         {
             s_init(hbb, maxbits, config);
