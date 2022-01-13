@@ -13,61 +13,44 @@ namespace xcore
         AllBitsSet = 0xffffffff
     };
 
-    static u32 s_sizeof_level(hbb_t hbb, u32 config, s8 level)
+    // level n -> max-offset (max bits at that level)
+    // level 0 -> 0          (32 bits)
+    // level 1 -> 1          (1024 bits)
+    // level 2 -> 33         (32768 bits)
+    // level 3 -> 1057       (1048576 bits)
+    // level 4 -> 33825      (33554432 bits)
+
+    struct hbb_header_t
     {
-        if (level == 0)
-            return 1;
+        u32 m_maxbits;
+        u16 m_numlevels;
+        // u16   m_offset_level0;
+        // u16   m_offset_level1;
+        u16 m_offset_level[3];
 
-        ASSERT(level < (s8)(config & 0x1F));
-        s32 size = 1;
-        while (level >= 1)
-        {
-            config = config >> 5;
-            size   = size * 32 - (config & 0x1F);
-            level -= 1;
+        inline u32* get_level_ptr(u8 level)
+        {            
+            u32 offset;
+            switch (level)
+            {
+                case 0: offset = 0; break;
+                case 1: offset = 1; break;
+                case 2:
+                case 3:
+                case 4: offset = m_offset_level[level - 2]; break;
+                default: ASSERT(false); break;
+            }
+            return ((u32*)this) + offset + (sizeof(hbb_header_t) / sizeof(u32));
         }
-        return size;
-    }
-
-    static inline u32 s_level_bits(u32 config, s8 level)
-    {
-        config      = config >> 5;
-        s32 numbits = 32 - (config & 0x1F);
-        while (level > 0)
-        {
-            config  = config >> 5;
-            numbits = (numbits << 5) - (config & 0x1F);
-            level -= 1;
-        }
-        return numbits;
-    }
-
-    static u32* s_level_ptr(hbb_t hbb, u32 config, s8 level)
-    {
-        if (level <= 1)
-            return hbb + level;
-
-        ASSERT(level < (s8)(config & 0x1F));
-        s32 size   = 1;
-        s32 offset = 1;
-        while (level > 1)
-        {
-            config = config >> 5;
-            size   = size * 32 - (config & 0x1F);
-            offset += size;
-            level -= 1;
-        }
-        return hbb + offset;
-    }
+    };
 
     // level 3 = (15001 + 31) / 32 = 469 * 32 = 15008 - 15001 = rest 7
     // level 2 = (469 + 31) / 32 = 15 * 32 = 480 - 469 = rest 11
     // level 1 = (15 + 31) / 32 = 1 * 32 = 32 - 15 = rest 17
     // level 0 = 1
-    u32 g_sizeof_hbb(u32 maxbits, u32& config)
+    u32 g_sizeof_hbb(u32 maxbits)
     {
         ASSERT(maxbits <= (1 << 25));
-        config               = (((((maxbits + 31) / 32) * 32) - maxbits) & 0x1F);
         s32 number_of_levels = 1;
         s32 total_num_dwords = 1;
         u32 level_num_dwords = ((maxbits + 31) / 32);
@@ -76,49 +59,55 @@ namespace xcore
             total_num_dwords += level_num_dwords;
             number_of_levels += 1;
             u32 const rest   = (((level_num_dwords + 31) / 32) * 32) - level_num_dwords;
-            config           = (config << 5) | (rest & 0x1F);
             level_num_dwords = ((level_num_dwords + 31) / 32);
         }
-        config = (config << 5) | (number_of_levels & 0x1F);
-        return total_num_dwords;
+        return (sizeof(hbb_header_t)/sizeof(u32)) + total_num_dwords;
     }
 
-    static void s_init(hbb_t hbb, u32 maxbits, u32 config)
+    static void g_init_hbb(hbb_header_t* hdr, u32 maxbits)
     {
-        // set the rest part of each level to '0'
-        s8 const maxlevel = (config & 0x1F);
+        ASSERT(maxbits <= (1 << 25));
+        hdr->m_maxbits = maxbits;
 
-        for (s32 i = maxlevel - 1; i >= 0; --i)
+        s8  levels                = 0;
+        u16 numdwords_per_level[] = {0, 0, 0, 0, 0, 0};
+        while (maxbits > 1)
         {
-            u32 const numdwords = s_sizeof_level(hbb, config, i);
-            u32*      plevel    = s_level_ptr(hbb, config, i);
-            plevel              = plevel + (numdwords - 1); // goto last dword
-
-            // compute mask
-            u32 const mask = 0xFFFFFFFF >> ((numdwords * 32) - maxbits);
-            *plevel        = *plevel & mask;
-            maxbits        = numdwords;
+            numdwords_per_level[levels] = ((maxbits + 31) / 32);
+            maxbits                     = numdwords_per_level[levels];
+            levels += 1;
         }
+
+        hdr->m_numlevels       = levels;
+        hdr->m_offset_level[0] = (levels > 2) ? numdwords_per_level[levels - 3] : 0;
+        hdr->m_offset_level[1] = (levels > 3) ? numdwords_per_level[levels - 4] : 0;
+        hdr->m_offset_level[2] = (levels > 4) ? numdwords_per_level[levels - 5] : 0;
     }
 
-    void g_hbb_init(hbb_t hbb, u32 maxbits, u32 config, s8 bits)
+    static void s_init(hbb_t hbb, u32 maxbits)
     {
-        u32 const ndwords = g_sizeof_hbb(maxbits, config);
-        x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * 4);
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        g_init_hbb(hdr, maxbits);
+    }
+
+    void g_hbb_init(hbb_t hbb, u32 maxbits, s8 bits)
+    {
+        u32 const ndwords = g_sizeof_hbb(maxbits);
+        x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * sizeof(u32));
         if (bits == 1)
         {
-            s_init(hbb, maxbits, config);
+            s_init(hbb, maxbits);
         }
     }
 
     void g_hbb_init(hbb_t& hbb, u32 maxbits, u32& config, s8 bits, alloc_t* alloc)
     {
-        u32 const ndwords = g_sizeof_hbb(maxbits, config);
+        u32 const ndwords = g_sizeof_hbb(maxbits);
         hbb               = (u32*)alloc->allocate(ndwords * sizeof(u32), sizeof(u32));
         x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, ndwords * sizeof(u32));
         if (bits == 1)
         {
-            s_init(hbb, maxbits, config);
+            s_init(hbb, maxbits);
         }
     }
 
@@ -131,25 +120,24 @@ namespace xcore
         }
     }
 
-    void g_hbb_reset(hbb_t hbb, u32 config, u32 maxbits, s8 bits)
+    void g_hbb_reset(hbb_t hbb, u32 maxbits, s8 bits)
     {
-        u32       c;
-        u32 const size = g_sizeof_hbb(maxbits, c);
-        ASSERT(c == config);
+        u32 const size = g_sizeof_hbb(maxbits);
         x_memset(hbb, bits == 0 ? 0 : 0xFFFFFFFF, size * 4);
         if (bits == 1)
         {
-            s_init(hbb, maxbits, config);
+            s_init(hbb, maxbits);
         }
     }
 
-    void g_hbb_set(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
+    void g_hbb_set(hbb_t hbb, u32 config, u32 bit)
     {
         // set bit in full level, then avalanche up if necessary
-        s8 i = (config & 0x1F) - 1;
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        s8 i = hdr->m_numlevels - 1;
         while (i >= 0)
         {
-            u32*      level      = s_level_ptr(hbb, config, i);
+            u32*      level      = hdr->get_level_ptr(i);
             u32 const dwordIndex = bit / 32;
             u32 const dwordBit   = 1 << (bit & 31);
             u32 const dword0     = level[dwordIndex];
@@ -165,13 +153,14 @@ namespace xcore
         }
     }
 
-    void g_hbb_clr(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
+    void g_hbb_clr(hbb_t hbb, u32 bit)
     {
         // clear bit in level 0, then avalanche up if necessary
-        s8 i = (config & 0x1F) - 1;
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        s8 i = hdr->m_numlevels - 1;
         while (i >= 0)
         {
-            u32*      level      = s_level_ptr(hbb, config, i);
+            u32*      level      = hdr->get_level_ptr(i);
             u32 const dwordIndex = bit / 32;
             u32 const dwordBit   = 1 << (bit & 31);
             u32 const dword0     = level[dwordIndex];
@@ -188,9 +177,10 @@ namespace xcore
         }
     }
 
-    bool g_hbb_is_set(hbb_t hbb, u32 config, u32 maxbits, u32 bit)
+    bool g_hbb_is_set(hbb_t hbb, u32 bit)
     {
-        u32 const* level      = s_level_ptr(hbb, config, (config & 0x1F) - 1);
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        u32 const* level      = hdr->get_level_ptr(hdr->m_numlevels - 1);
         u32 const  dwordIndex = bit / 32;
         u32 const  dwordBit   = bit & 31;
         return ((level[dwordIndex] >> dwordBit) & 1) == 1;
@@ -202,9 +192,10 @@ namespace xcore
         return level0[0] == 0;
     }
 
-    bool g_hbb_find(hbb_t hbb, u32 config, u32 maxbits, u32& bit)
+    bool g_hbb_find(hbb_t hbb, u32& bit)
     {
-        s8 const maxlevel = config & 0x1F;
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        s8 const maxlevel = hdr->m_numlevels;
 
         // Start at top level and find a '1' bit and move down
         u32 dwordIndex = 0;
@@ -212,7 +203,7 @@ namespace xcore
         s32 i          = 0;
         while (i < maxlevel)
         {
-            u32 const* level = s_level_ptr(hbb, config, i);
+            u32 const* level = hdr->get_level_ptr(i);
             dwordIndex       = (dwordIndex * 32) + dwordBit;
             u32 dword0       = level[dwordIndex];
             if (dword0 == 0)
@@ -224,7 +215,7 @@ namespace xcore
         return true;
     }
 
-    bool g_hbb_upper(hbb_t hbb, u32 config, u32 maxbits, u32 pivot, u32& bit)
+    bool g_hbb_upper(hbb_t hbb, u32 config, u32 pivot, u32& bit)
     {
         // Start at bottom level and move up finding a 'set' bit
         u32 iw = (pivot / 32); // The index of a 32-bit word in level 0
@@ -243,10 +234,11 @@ namespace xcore
             im = ~((1 << ib) - 1);
         }
 
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
         s32 il = (config & 0x1F) - 1;
         while (il >= 0)
         {
-            u32 const* level = s_level_ptr(hbb, config, il);
+            u32 const* level = hdr->get_level_ptr(il);
             u32        w     = level[iw] & im;
             if (w != 0)
             {
@@ -282,7 +274,7 @@ namespace xcore
         return false;
     }
 
-    bool g_hbb_lower(hbb_t hbb, u32 config, u32 maxbits, u32 pivot, u32& bit)
+    bool g_hbb_lower(hbb_t hbb, u32 config, u32 pivot, u32& bit)
     {
         if (pivot == 0)
             return false;
@@ -301,10 +293,11 @@ namespace xcore
             im = ((1 << ib) - 1);
         }
 
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
         s32 il = (config & 0x1F) - 1;
         while (il >= 0)
         {
-            u32 const* level = s_level_ptr(hbb, config, il);
+            u32 const* level = hdr->get_level_ptr(il);
             u32        w     = level[iw] & im;
             if (w != 0)
             {
@@ -339,6 +332,37 @@ namespace xcore
             }
         };
         return false;
+    }
+
+    hbb_iter_t g_hbb_iterator(hbb_t& hbb, u32 start, u32 end)
+    {
+        hbb_iter_t iter;
+        iter.m_end    = end;
+        iter.m_index  = start;
+        iter.m_hbb    = hbb;
+
+        // Find the first set bit, starting from 'start'
+        if (!g_hbb_is_set(hbb, start))
+        {
+            if (!g_hbb_upper(iter.m_hbb, start, iter.m_index))
+            {
+                iter.m_index = end;
+            }
+        }
+        return iter;
+    }
+
+    void hbb_iter_t::next()
+    {
+        u32 index;
+        if (!g_hbb_upper(m_hbb, m_index, index))
+        {
+            m_index = m_end;
+        }
+        else
+        {
+            m_index = index;
+        }
     }
 
 }; // namespace xcore
