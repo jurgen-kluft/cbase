@@ -51,16 +51,14 @@ namespace xcore
     u32 g_sizeof_hbb(u32 maxbits)
     {
         ASSERT(maxbits <= (1 << 25));
-        s32 number_of_levels = 1;
-        s32 total_num_dwords = 1;
+        s32 total_num_dwords = 0;
         u32 level_num_dwords = ((maxbits + 31) / 32);
         while (level_num_dwords > 1)
         {
             total_num_dwords += level_num_dwords;
-            number_of_levels += 1;
-            u32 const rest   = (((level_num_dwords + 31) / 32) * 32) - level_num_dwords;
             level_num_dwords = ((level_num_dwords + 31) / 32);
         }
+        total_num_dwords += level_num_dwords;
         return (sizeof(hbb_header_t) / sizeof(u32)) + total_num_dwords;
     }
 
@@ -79,11 +77,13 @@ namespace xcore
             maxbits = numdwords_per_level[levels];
             levels += 1;
         }
+        for (s32 i=levels-1; i>=0; --i)
+            numdwords_per_level[i] += numdwords_per_level[i+1];
 
         hdr->m_numlevels       = levels;
-        hdr->m_offset_level[0] = (levels > 2) ? numdwords_per_level[levels - 3] : 0;
-        hdr->m_offset_level[1] = (levels > 3) ? numdwords_per_level[levels - 4] : 0;
-        hdr->m_offset_level[2] = (levels > 4) ? numdwords_per_level[levels - 5] : 0;
+        hdr->m_offset_level[0] = (levels > 2) ? numdwords_per_level[levels - 2] : 0;
+        hdr->m_offset_level[1] = (levels > 3) ? numdwords_per_level[levels - 3] : 0;
+        hdr->m_offset_level[2] = (levels > 4) ? numdwords_per_level[levels - 4] : 0;
 
         return levels_numdwords;
     }
