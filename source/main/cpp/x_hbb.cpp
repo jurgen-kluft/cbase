@@ -26,9 +26,9 @@ namespace xcore
         s16 m_numlevels;
         // u16   m_offset_level0;
         // u16   m_offset_level1;
-		
-		// if levels == 1 or levels == 2 then 'u16 m_offset_level[1]'
-        u16 m_offset_level[3]; 
+
+        // if levels == 1 or levels == 2 then 'u16 m_offset_level[1]'
+        u16 m_offset_level[3];
 
         inline u32* get_level_ptr(s16 level)
         {
@@ -64,8 +64,8 @@ namespace xcore
             case 5: // fall through
             case 4: total_num_dwords += 3; break;
             case 3: total_num_dwords += 2; break;
-			case 2: // fall through
-			case 1: total_num_dwords += 2; break;
+            case 2: // fall through
+            case 1: total_num_dwords += 2; break;
             default: ASSERT(false); break;
         }
         return total_num_dwords;
@@ -115,7 +115,7 @@ namespace xcore
         if (bits != 0)
         { // set the rest part of each level to '0'
             s16 const maxlevel = hdr->m_numlevels;
-            s16       level    = maxlevel-1;
+            s16       level    = maxlevel - 1;
             while (level >= 0)
             {
                 u32 const numdwords = ((maxbits + 31) / 32);
@@ -126,7 +126,7 @@ namespace xcore
                 u32 const mask = 0xFFFFFFFF >> ((numdwords * 32) - maxbits);
                 *plevel        = *plevel & mask;
                 maxbits        = numdwords;
-				level -= 1;
+                level -= 1;
             }
         }
     }
@@ -151,6 +151,89 @@ namespace xcore
     {
         hbb_header_t* hdr = (hbb_header_t*)hbb;
         g_hbb_init(hbb, hdr->m_maxbits, bits);
+    }
+
+    void g_hbb_resize(hbb_t hbb, u32 maxbits, s8 bits, alloc_t* alloc)
+    {
+        if (hbb == nullptr)
+        {
+            g_hbb_init(hbb, maxbits, bits, alloc);
+        }
+        else
+        {
+            hbb_header_t* src = (hbb_header_t*)hbb;
+            if (maxbits > src->m_maxbits)
+            {
+                hbb_t h = nullptr;
+                g_hbb_init(hbb, maxbits, bits, alloc);
+
+                bits = (bits != 0) ? 0xFFFFFFFF : 0;
+
+                // Copy the level data
+                hbb_header_t* dst         = (hbb_header_t*)h;
+                s16           dst_level   = dst->m_numlevels - 1;
+                s16           src_level   = src->m_numlevels - 1;
+                u32           dst_maxbits = dst->m_maxbits;
+                u32           src_maxbits = src->m_maxbits;
+                while (src_level >= 0)
+                {
+                    // Number of words of the src level
+                    u32 const  srcndwords = (src_maxbits + 31) / 32;
+                    u32 const  dstndwords = (dst_maxbits + 31) / 32;
+                    u32 const* srcdata = src->get_level_ptr(src_level);
+                    u32*       dstdata = dst->get_level_ptr(dst_level);
+                    for (u32 i = 0; i < srcndwords; ++i)
+                        dstdata[i] = srcdata[i];
+                    
+                    // Fill the rest
+                    for (u32 i = srcndwords; i < dstndwords; ++i)
+                        dstdata[i] = bits;
+                    src_maxbits = srcndwords;
+                    dst_maxbits = dstndwords;
+                    src_level -= 1;
+                    dst_level -= 1;
+                }
+
+                // Now it can happen that the new hbb suddenly has more levels
+                // If that happens we need take src level 0 and see if it is not 0, if so
+                // we need to set that as a bit one level higher in the dst.
+                if (dst_level >= 0)
+                {
+                    while (dst_level >= 0)
+                    {
+                        u32 const  dstndwords = (dst_maxbits + 31) / 32;
+                        u32* dstdata = dst->get_level_ptr(dst_level);
+                        for (u32 i = 0; i < dstndwords; ++i)
+                            dstdata[i] = bits;
+                        // Mask out the tail if any
+                        u32 const mask = 0xFFFFFFFF >> ((dstndwords * 32) - dst_maxbits);
+                        dstdata[dstndwords - 1] &= mask;
+                        dst_maxbits = dstndwords;
+                        dst_level -= 1;
+                    }
+
+                    u32 const* srcdata = src->get_level_ptr(0);
+                    u32 * dstdata = dst->get_level_ptr(dst->m_numlevels - src->m_numlevels - 1);
+                    if (*srcdata == 0)
+                    {
+                        *dstdata &= 0xFFFFFFFE;
+                    }
+                    else
+                    {
+                        *dstdata |= 0x00000001;
+                    }
+                    
+                }
+
+                g_hbb_release(hbb, alloc);
+                hbb = h;
+            }
+            else if (maxbits < src->m_maxbits)
+            {
+                // TODO: Hmmm, we need to shrink, how do we do that?
+
+            }
+        }
     }
 
     void g_hbb_set(hbb_t hbb, u32 bit)
@@ -240,11 +323,11 @@ namespace xcore
 
     bool g_hbb_upper(hbb_t hbb, u32 pivot, u32& bit)
     {
-		hbb_header_t* hdr = (hbb_header_t*)hbb;
-		if (pivot >= hdr->m_maxbits)
-			return false;
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        if (pivot >= hdr->m_maxbits)
+            return false;
 
-		// Start at bottom level and move up finding a 'set' bit
+        // Start at bottom level and move up finding a 'set' bit
         u32 iw = (pivot / 32); // The index of a 32-bit word in bottom level
         u32 ib = (pivot & 31); // The bit number in that 32-bit word
         u32 im;
@@ -261,15 +344,15 @@ namespace xcore
             im = ~((1 << ib) - 1);
         }
 
-        s16           il  = hdr->m_numlevels - 1;
+        s16 il = hdr->m_numlevels - 1;
         while (il >= 0)
         {
             u32 const* level = hdr->get_level_ptr(il);
             u32        w     = level[iw] & im;
             if (w != 0)
             {
-				iw = (iw * 32) + xfindFirstBit(w);
-				if (il == (hdr->m_numlevels-1))
+                iw = (iw * 32) + xfindFirstBit(w);
+                if (il == (hdr->m_numlevels - 1))
                 {
                     bit = iw;
                     return true;
@@ -287,8 +370,8 @@ namespace xcore
                 // Go up a level and move one unit in the direction of upper
                 il -= 1;
                 ib = (iw & 31);
-				iw = (iw / 32);
-				ib += 1;
+                iw = (iw / 32);
+                ib += 1;
                 if (ib == 32)
                 {
                     iw += 1;
@@ -302,8 +385,8 @@ namespace xcore
 
     bool g_hbb_lower(hbb_t hbb, u32 pivot, u32& bit)
     {
-		hbb_header_t* hdr = (hbb_header_t*)hbb;
-		if (pivot>=hdr->m_maxbits)
+        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        if (pivot >= hdr->m_maxbits)
             return false;
 
         // Start at bottom level and move up leve finding a 'set' bit
@@ -320,15 +403,15 @@ namespace xcore
             im = ((1 << ib) - 1);
         }
 
-        s16           il  = hdr->m_numlevels - 1;
+        s16 il = hdr->m_numlevels - 1;
         while (il >= 0)
         {
             u32 const* level = hdr->get_level_ptr(il);
             u32        w     = level[iw] & im;
             if (w != 0)
             {
-				iw = (iw * 32) + xfindFirstBit(w);
-				if (il == (hdr->m_numlevels-1))
+                iw = (iw * 32) + xfindFirstBit(w);
+                if (il == (hdr->m_numlevels - 1))
                 {
                     bit = iw;
                     return true;
@@ -345,8 +428,8 @@ namespace xcore
                 // Go up a level and move one unit in the direction of lower
                 il -= 1;
                 ib = (iw & 31);
-				iw = (iw / 32);
-				if (ib == 0)
+                iw = (iw / 32);
+                if (ib == 0)
                 {
                     iw -= 1;
                     im = 0xffffffff;
@@ -364,8 +447,8 @@ namespace xcore
     {
         hbb_iter_t iter;
         iter.m_cur = start;
-		iter.m_end = end;
-		iter.m_hbb = hbb;
+        iter.m_end = end;
+        iter.m_hbb = hbb;
 
         // Find the first set bit, starting from 'start'
         if (!g_hbb_is_set(hbb, start))
