@@ -22,6 +22,16 @@ UNITTEST_SUITE_BEGIN(hbb_t)
 		{
 			CHECK_TRUE(g_sizeof_hbb(1024) == 35);
 			CHECK_TRUE(g_sizeof_hbb(8192) == (256 + 8 + 1 + 2));
+
+			clear_bitmap();
+
+			hbb_t hbb = { bitmap };
+			g_hbb_init(hbb, 256, 1);
+			CHECK_TRUE(hbb[2] == 0x000000FF);
+
+			g_hbb_init(hbb, 248, 1);
+			CHECK_TRUE(hbb[2] == 0x000000FF);
+			CHECK_TRUE(hbb[2+1+7] == 0x00FFFFFF);
 		}
 
         UNITTEST_TEST(set_and_is_set)

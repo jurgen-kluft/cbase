@@ -111,7 +111,7 @@ namespace xcore
         u32 const     ndwords = s_hbb_init(hdr, maxbits);
 
         u32 fill = (bits != 0) ? 0xFFFFFFFF : 0;
-        x_memset((u8*)hbb + sizeof(hbb_header_t), fill, ndwords * sizeof(u32));
+        x_memset(hdr->get_level_ptr(0), fill, ndwords * sizeof(u32));
         if (bits != 0)
         { // set the rest part of each level to '0'
             s16 const maxlevel = hdr->m_numlevels;
