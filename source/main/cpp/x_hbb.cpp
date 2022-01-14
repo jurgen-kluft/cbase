@@ -115,8 +115,8 @@ namespace xcore
         if (bits != 0)
         { // set the rest part of each level to '0'
             s16 const maxlevel = hdr->m_numlevels;
-            s16       level    = 0;
-            while (level < maxlevel)
+            s16       level    = maxlevel-1;
+            while (level >= 0)
             {
                 u32 const numdwords = ((maxbits + 31) / 32);
                 u32*      plevel    = hdr->get_level_ptr(level);
@@ -126,6 +126,7 @@ namespace xcore
                 u32 const mask = 0xFFFFFFFF >> ((numdwords * 32) - maxbits);
                 *plevel        = *plevel & mask;
                 maxbits        = numdwords;
+				level -= 1;
             }
         }
     }
