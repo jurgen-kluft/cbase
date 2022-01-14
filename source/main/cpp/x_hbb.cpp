@@ -23,43 +23,52 @@ namespace xcore
     struct hbb_header_t
     {
         u32 m_maxbits;
-        u16 m_numlevels;
+        s16 m_numlevels;
         // u16   m_offset_level0;
         // u16   m_offset_level1;
-        u16 m_offset_level[3];
+		
+		// if levels == 1 or levels == 2 then 'u16 m_offset_level[1]'
+        u16 m_offset_level[3]; 
 
-        inline u32* get_level_ptr(u8 level)
+        inline u32* get_level_ptr(s16 level)
         {
             u32 offset;
             switch (level)
             {
-                case 0: offset = 0; break;
-                case 1: offset = 1; break;
+                case 0: offset = 2 + 0; break;
+                case 1: offset = 2 + 1; break;
                 case 2:
                 case 3:
                 case 4: offset = m_offset_level[level - 2]; break;
                 default: ASSERT(false); break;
             }
-            return ((u32*)this) + offset + (sizeof(hbb_header_t) / sizeof(u32));
+            return ((u32*)this) + offset;
         }
     };
 
-    // level 3 = (15001 + 31) / 32 = 469 * 32 = 15008 - 15001 = rest 7
-    // level 2 = (469 + 31) / 32 = 15 * 32 = 480 - 469 = rest 11
-    // level 1 = (15 + 31) / 32 = 1 * 32 = 32 - 15 = rest 17
-    // level 0 = 1
     u32 g_sizeof_hbb(u32 maxbits)
     {
         ASSERT(maxbits <= (1 << 25));
         s32 total_num_dwords = 0;
         u32 level_num_dwords = ((maxbits + 31) / 32);
+        s32 levels           = 1;
         while (level_num_dwords > 1)
         {
             total_num_dwords += level_num_dwords;
             level_num_dwords = ((level_num_dwords + 31) / 32);
+            levels += 1;
         }
         total_num_dwords += level_num_dwords;
-        return (sizeof(hbb_header_t) / sizeof(u32)) + total_num_dwords;
+        switch (levels)
+        {
+            case 5: // fall through
+            case 4: total_num_dwords += 3; break;
+            case 3: total_num_dwords += 2; break;
+			case 2: // fall through
+			case 1: total_num_dwords += 2; break;
+            default: ASSERT(false); break;
+        }
+        return total_num_dwords;
     }
 
     static u32 s_hbb_init(hbb_header_t* hdr, u32 maxbits)
@@ -67,24 +76,32 @@ namespace xcore
         ASSERT(maxbits <= (1 << 25));
         hdr->m_maxbits = maxbits;
 
-        s8  levels                = 0;
-        u32 levels_numdwords      = 0;
-        u16 numdwords_per_level[] = {0, 0, 0, 0, 0, 0};
+        s8  levels           = 0;
+        u32 levels_numdwords = 0;
+        u16 size_per_level[] = {0, 0, 0, 0, 0, 0};
         while (maxbits > 1)
         {
-            numdwords_per_level[levels] = ((maxbits + 31) / 32);
-            levels_numdwords += numdwords_per_level[levels];
-            maxbits = numdwords_per_level[levels];
+            size_per_level[levels] = ((maxbits + 31) / 32);
+            levels_numdwords += size_per_level[levels];
+            maxbits = size_per_level[levels];
             levels += 1;
         }
-        for (s32 i=levels-1; i>=0; --i)
-            numdwords_per_level[i] += numdwords_per_level[i+1];
 
-        hdr->m_numlevels       = levels;
-        hdr->m_offset_level[0] = (levels > 2) ? numdwords_per_level[levels - 2] : 0;
-        hdr->m_offset_level[1] = (levels > 3) ? numdwords_per_level[levels - 3] : 0;
-        hdr->m_offset_level[2] = (levels > 4) ? numdwords_per_level[levels - 4] : 0;
-
+        hdr->m_numlevels = levels;
+        if (levels > 2)
+        {
+            hdr->m_offset_level[0] = (size_per_level[levels - 2] + 2);
+            if (levels > 3)
+            {
+                hdr->m_offset_level[1] = (hdr->m_offset_level[0] + size_per_level[levels - 3]) + 1;
+                if (levels > 4)
+                    hdr->m_offset_level[2] = (hdr->m_offset_level[1] + size_per_level[levels - 4]);
+            }
+        }
+        else
+        {
+            hdr->m_offset_level[0] = 0;
+        }
         return levels_numdwords;
     }
 
@@ -97,8 +114,8 @@ namespace xcore
         x_memset((u8*)hbb + sizeof(hbb_header_t), fill, ndwords * sizeof(u32));
         if (bits != 0)
         { // set the rest part of each level to '0'
-            s8 const maxlevel = hdr->m_numlevels;
-            s16      level    = 0;
+            s16 const maxlevel = hdr->m_numlevels;
+            s16       level    = 0;
             while (level < maxlevel)
             {
                 u32 const numdwords = ((maxbits + 31) / 32);
@@ -139,7 +156,7 @@ namespace xcore
     {
         // set bit in full level, then avalanche up if necessary
         hbb_header_t* hdr = (hbb_header_t*)hbb;
-        s8            i   = hdr->m_numlevels - 1;
+        s16           i   = hdr->m_numlevels - 1;
         while (i >= 0)
         {
             u32*      level      = hdr->get_level_ptr(i);
@@ -162,7 +179,7 @@ namespace xcore
     {
         // clear bit in level 0, then avalanche up if necessary
         hbb_header_t* hdr = (hbb_header_t*)hbb;
-        s8            i   = hdr->m_numlevels - 1;
+        s16           i   = hdr->m_numlevels - 1;
         while (i >= 0)
         {
             u32*      level      = hdr->get_level_ptr(i);
@@ -200,12 +217,12 @@ namespace xcore
     bool g_hbb_find(hbb_t hbb, u32& bit)
     {
         hbb_header_t* hdr      = (hbb_header_t*)hbb;
-        s8 const      maxlevel = hdr->m_numlevels;
+        s16 const     maxlevel = hdr->m_numlevels;
 
         // Start at top level and find a '1' bit and move down
         u32 dwordIndex = 0;
         u32 dwordBit   = 0;
-        s32 i          = 0;
+        s16 i          = 0;
         while (i < maxlevel)
         {
             u32 const* level = hdr->get_level_ptr(i);
@@ -222,8 +239,12 @@ namespace xcore
 
     bool g_hbb_upper(hbb_t hbb, u32 pivot, u32& bit)
     {
-        // Start at bottom level and move up finding a 'set' bit
-        u32 iw = (pivot / 32); // The index of a 32-bit word in level 0
+		hbb_header_t* hdr = (hbb_header_t*)hbb;
+		if (pivot >= hdr->m_maxbits)
+			return false;
+
+		// Start at bottom level and move up finding a 'set' bit
+        u32 iw = (pivot / 32); // The index of a 32-bit word in bottom level
         u32 ib = (pivot & 31); // The bit number in that 32-bit word
         u32 im;
 
@@ -239,24 +260,23 @@ namespace xcore
             im = ~((1 << ib) - 1);
         }
 
-        hbb_header_t* hdr = (hbb_header_t*)hbb;
-        s32           il  = hdr->m_numlevels - 1;
+        s16           il  = hdr->m_numlevels - 1;
         while (il >= 0)
         {
             u32 const* level = hdr->get_level_ptr(il);
             u32        w     = level[iw] & im;
             if (w != 0)
             {
-                if (il == 0)
+				iw = (iw * 32) + xfindFirstBit(w);
+				if (il == (hdr->m_numlevels-1))
                 {
-                    bit = (iw * 32) + xfindFirstBit(w);
+                    bit = iw;
                     return true;
                 }
                 else
                 {
                     // Go down
                     il += 1;
-                    iw = (iw * 32) + xfindFirstBit(w);
                     ib = 0;
                     im = 0xffffffff;
                 }
@@ -265,9 +285,9 @@ namespace xcore
             {
                 // Go up a level and move one unit in the direction of upper
                 il -= 1;
-                iw = (iw / 32);
                 ib = (iw & 31);
-                ib += 1;
+				iw = (iw / 32);
+				ib += 1;
                 if (ib == 32)
                 {
                     iw += 1;
@@ -281,10 +301,11 @@ namespace xcore
 
     bool g_hbb_lower(hbb_t hbb, u32 pivot, u32& bit)
     {
-        if (pivot == 0)
+		hbb_header_t* hdr = (hbb_header_t*)hbb;
+		if (pivot>=hdr->m_maxbits)
             return false;
 
-        // Start at bottom level and move up finding a 'set' bit
+        // Start at bottom level and move up leve finding a 'set' bit
         u32 iw = (pivot / 32); // The index of a 32-bit word in level 0
         u32 ib = (pivot & 31); // The bit number in that 32-bit word
         u32 im;
@@ -298,24 +319,23 @@ namespace xcore
             im = ((1 << ib) - 1);
         }
 
-        hbb_header_t* hdr = (hbb_header_t*)hbb;
-        s32           il  = hdr->m_numlevels - 1;
+        s16           il  = hdr->m_numlevels - 1;
         while (il >= 0)
         {
             u32 const* level = hdr->get_level_ptr(il);
             u32        w     = level[iw] & im;
             if (w != 0)
             {
-                if (il == 0)
+				iw = (iw * 32) + xfindFirstBit(w);
+				if (il == (hdr->m_numlevels-1))
                 {
-                    bit = (iw * 32) + xfindFirstBit(w);
+                    bit = iw;
                     return true;
                 }
                 else
                 {
                     // Go down
                     il += 1;
-                    iw = (iw * 32) + xfindFirstBit(w);
                     im = 0xffffffff;
                 }
             }
@@ -323,9 +343,9 @@ namespace xcore
             {
                 // Go up a level and move one unit in the direction of lower
                 il -= 1;
-                iw = (iw / 32);
                 ib = (iw & 31);
-                if (ib == 0)
+				iw = (iw / 32);
+				if (ib == 0)
                 {
                     iw -= 1;
                     im = 0xffffffff;
@@ -342,9 +362,9 @@ namespace xcore
     hbb_iter_t g_hbb_iterator(hbb_t hbb, u32 start, u32 end)
     {
         hbb_iter_t iter;
-        iter.m_end = end;
         iter.m_cur = start;
-        iter.m_hbb = hbb;
+		iter.m_end = end;
+		iter.m_hbb = hbb;
 
         // Find the first set bit, starting from 'start'
         if (!g_hbb_is_set(hbb, start))
@@ -359,15 +379,8 @@ namespace xcore
 
     void hbb_iter_t::next()
     {
-        u32 index;
-        if (!g_hbb_upper(m_hbb, m_cur, index))
-        {
+        if (!g_hbb_upper(m_hbb, m_cur, m_cur))
             m_cur = m_end;
-        }
-        else
-        {
-            m_cur = index;
-        }
     }
 
 }; // namespace xcore
