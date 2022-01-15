@@ -1,3 +1,4 @@
+#include "xbase/x_context.h"
 #include "xbase/x_hbb.h"
 #include "xbase/x_memory.h"
 #include "xunittest/xunittest.h"
@@ -11,28 +12,28 @@ UNITTEST_SUITE_BEGIN(hbb_t)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        static u32 bitmap[4096];
+        static u32 bitmap[8192];
         static void clear_bitmap()
         {
-            for (s32 i=0; i<4096; ++i)
+            for (s32 i=0; i<8192; ++i)
                 bitmap[i] = 0;
         }
 
-		UNITTEST_TEST(some_sizes)
-		{
-			CHECK_TRUE(g_sizeof_hbb(1024) == 35);
-			CHECK_TRUE(g_sizeof_hbb(8192) == (256 + 8 + 1 + 2));
+        UNITTEST_TEST(some_sizes)
+        {
+            CHECK_TRUE(g_sizeof_hbb(1024) == 35);
+            CHECK_TRUE(g_sizeof_hbb(8192) == (256 + 8 + 1 + 2));
 
-			clear_bitmap();
+            clear_bitmap();
 
-			hbb_t hbb = { bitmap };
-			g_hbb_init(hbb, 256, 1);
-			CHECK_TRUE(hbb[2] == 0x000000FF);
+            hbb_t hbb = { bitmap };
+            g_hbb_init(hbb, 256, 1);
+            CHECK_TRUE(hbb[2] == 0x000000FF);
 
-			g_hbb_init(hbb, 248, 1);
-			CHECK_TRUE(hbb[2] == 0x000000FF);
-			CHECK_TRUE(hbb[2+1+7] == 0x00FFFFFF);
-		}
+            g_hbb_init(hbb, 248, 1);
+            CHECK_TRUE(hbb[2] == 0x000000FF);
+            CHECK_TRUE(hbb[2+1+7] == 0x00FFFFFF);
+        }
 
         UNITTEST_TEST(set_and_is_set)
         {
@@ -118,40 +119,67 @@ UNITTEST_SUITE_BEGIN(hbb_t)
             }
         }
 
-		UNITTEST_TEST(iterator)
-		{
-			clear_bitmap();
+        UNITTEST_TEST(iterator)
+        {
+            clear_bitmap();
 
-			u32 const maxbits = 8192;
-			hbb_t hbb = { bitmap };
-			CHECK_TRUE(g_sizeof_hbb(maxbits) < 4096);
-			g_hbb_init(hbb, maxbits, 0);
-			g_hbb_reset(hbb, 0);
+            u32 const maxbits = 8192;
+            hbb_t hbb = { bitmap };
+            CHECK_TRUE(g_sizeof_hbb(maxbits) < 4096);
+            g_hbb_init(hbb, maxbits, 0);
+            g_hbb_reset(hbb, 0);
 
-			u32 const numbits = 2500;
-			for (s32 b=0; b < numbits; b += 5)
-			{
-				g_hbb_set(hbb, b);
-				u32 free_bit;
-				g_hbb_find(hbb, free_bit);
-				CHECK_EQUAL(b, free_bit);
-				g_hbb_clr(hbb, b);
-			}
+            u32 const numbits = 2500;
+            for (s32 b=0; b < numbits; b += 5)
+            {
+                g_hbb_set(hbb, b);
+                u32 free_bit;
+                g_hbb_find(hbb, free_bit);
+                CHECK_EQUAL(b, free_bit);
+                g_hbb_clr(hbb, b);
+            }
 
-			for (s32 b=0; b < numbits; b += 5)
-			{
-				g_hbb_set(hbb, b);
-			}
+            for (s32 b=0; b < numbits; b += 5)
+            {
+                g_hbb_set(hbb, b);
+            }
 
-			s32 i = 0;
-			hbb_iter_t iter = g_hbb_iterator(hbb, 0, maxbits);
-			while (!iter.end())
-			{
-				CHECK_TRUE(iter.m_cur == i);
-				i += 5;
-				iter.next();
-			}
-		}
+            s32 i = 0;
+            hbb_iter_t iter = g_hbb_iterator(hbb, 0, maxbits);
+            while (!iter.end())
+            {
+                CHECK_TRUE(iter.m_cur == i);
+                i += 5;
+                iter.next();
+            }
+        }
+
+        UNITTEST_TEST(resize)
+        {
+            clear_bitmap();
+
+            u32 const maxbits = 1024;            
+            CHECK_TRUE(g_sizeof_hbb(maxbits) == 35);
+
+            hbb_t hbb = nullptr;
+            alloc_t* alloc = context_t::system_alloc();
+            g_hbb_init(hbb, maxbits, 0, alloc);
+
+            u32 const numbits = 1024;
+            for (s32 b=0; b < numbits; b++)
+            {
+                g_hbb_set(hbb, b);
+            }
+
+            g_hbb_resize(hbb, 8192, 0, alloc);
+
+            for (s32 b=0; b < numbits; b++)
+            {
+                CHECK_TRUE(g_hbb_is_set(hbb, b));
+            }
+
+            g_hbb_release(hbb, alloc);
+        }
     }
 }
 UNITTEST_SUITE_END

@@ -49,7 +49,7 @@ namespace xcore
     u32 g_sizeof_hbb(u32 maxbits)
     {
         ASSERT(maxbits <= (1 << 25));
-        s32 total_num_dwords = 0;
+        s32 total_num_dwords = 1;
         u32 level_num_dwords = ((maxbits + 31) / 32);
         s32 levels           = 1;
         while (level_num_dwords > 1)
@@ -58,7 +58,6 @@ namespace xcore
             level_num_dwords = ((level_num_dwords + 31) / 32);
             levels += 1;
         }
-        total_num_dwords += level_num_dwords;
         switch (levels)
         {
             case 5: // fall through
@@ -90,7 +89,7 @@ namespace xcore
         hdr->m_numlevels = levels;
         if (levels > 2)
         {
-            hdr->m_offset_level[0] = (size_per_level[levels - 2] + 2);
+            hdr->m_offset_level[0] = (size_per_level[levels - 2] + 1 + 2);
             if (levels > 3)
             {
                 hdr->m_offset_level[1] = (hdr->m_offset_level[0] + size_per_level[levels - 3]) + 1;
@@ -105,28 +104,36 @@ namespace xcore
         return levels_numdwords;
     }
 
+    static void s_hbb_mask(hbb_header_t* hdr)
+    {
+        u32       maxbits  = hdr->m_maxbits;
+        s16 const maxlevel = hdr->m_numlevels;
+        s16       level    = maxlevel - 1;
+        while (level >= 0)
+        {
+            u32 const numdwords = ((maxbits + 31) / 32);
+            u32*      plevel    = hdr->get_level_ptr(level);
+            plevel              = plevel + (numdwords - 1); // goto last dword
+
+            // compute mask
+            u32 const mask = 0xFFFFFFFF >> ((numdwords * 32) - maxbits);
+            *plevel        = *plevel & mask;
+            maxbits        = numdwords;
+            level -= 1;
+        }
+    }
+
     void g_hbb_init(hbb_t hbb, u32 maxbits, s8 bits)
     {
         hbb_header_t* hdr     = (hbb_header_t*)hbb;
         u32 const     ndwords = s_hbb_init(hdr, maxbits);
-
-        u32 fill = (bits != 0) ? 0xFFFFFFFF : 0;
-        x_memset(hdr->get_level_ptr(0), fill, ndwords * sizeof(u32));
-        if (bits != 0)
-        { // set the rest part of each level to '0'
-            s16 const maxlevel = hdr->m_numlevels;
-            s16       level    = maxlevel - 1;
-            while (level >= 0)
+        if (bits >= 0)
+        {
+            u32 fill = (bits != 0) ? 0xFFFFFFFF : 0;
+            x_memset(hdr->get_level_ptr(0), fill, ndwords * sizeof(u32));
+            if (bits != 0)
             {
-                u32 const numdwords = ((maxbits + 31) / 32);
-                u32*      plevel    = hdr->get_level_ptr(level);
-                plevel              = plevel + (numdwords - 1); // goto last dword
-
-                // compute mask
-                u32 const mask = 0xFFFFFFFF >> ((numdwords * 32) - maxbits);
-                *plevel        = *plevel & mask;
-                maxbits        = numdwords;
-                level -= 1;
+                s_hbb_mask(hdr);
             }
         }
     }
@@ -153,7 +160,7 @@ namespace xcore
         g_hbb_init(hbb, hdr->m_maxbits, bits);
     }
 
-    void g_hbb_resize(hbb_t hbb, u32 maxbits, s8 bits, alloc_t* alloc)
+    void g_hbb_resize(hbb_t& hbb, u32 maxbits, s8 bits, alloc_t* alloc)
     {
         if (hbb == nullptr)
         {
@@ -165,9 +172,9 @@ namespace xcore
             if (maxbits > src->m_maxbits)
             {
                 hbb_t h = nullptr;
-                g_hbb_init(hbb, maxbits, bits, alloc);
+                g_hbb_init(h, maxbits, -1, alloc);
 
-                bits = (bits != 0) ? 0xFFFFFFFF : 0;
+                u32 const fill = (bits != 0) ? 0xFFFFFFFF : 0;
 
                 // Copy the level data
                 hbb_header_t* dst         = (hbb_header_t*)h;
@@ -180,49 +187,60 @@ namespace xcore
                     // Number of words of the src level
                     u32 const  srcndwords = (src_maxbits + 31) / 32;
                     u32 const  dstndwords = (dst_maxbits + 31) / 32;
-                    u32 const* srcdata = src->get_level_ptr(src_level);
-                    u32*       dstdata = dst->get_level_ptr(dst_level);
+                    u32 const* srcdata    = src->get_level_ptr(src_level);
+                    u32*       dstdata    = dst->get_level_ptr(dst_level);
                     for (u32 i = 0; i < srcndwords; ++i)
                         dstdata[i] = srcdata[i];
-                    
+
                     // Fill the rest
                     for (u32 i = srcndwords; i < dstndwords; ++i)
-                        dstdata[i] = bits;
+                        dstdata[i] = fill;
+
                     src_maxbits = srcndwords;
                     dst_maxbits = dstndwords;
                     src_level -= 1;
                     dst_level -= 1;
                 }
 
-                // Now it can happen that the new hbb suddenly has more levels
-                // If that happens we need take src level 0 and see if it is not 0, if so
-                // we need to set that as a bit one level higher in the dst.
+                // Now it can happen that dst has more levels than src
                 if (dst_level >= 0)
                 {
                     while (dst_level >= 0)
                     {
-                        u32 const  dstndwords = (dst_maxbits + 31) / 32;
-                        u32* dstdata = dst->get_level_ptr(dst_level);
+                        u32 const dstndwords = (dst_maxbits + 31) / 32;
+                        u32*      dstdata    = dst->get_level_ptr(dst_level);
                         for (u32 i = 0; i < dstndwords; ++i)
-                            dstdata[i] = bits;
-                        // Mask out the tail if any
-                        u32 const mask = 0xFFFFFFFF >> ((dstndwords * 32) - dst_maxbits);
-                        dstdata[dstndwords - 1] &= mask;
+                            dstdata[i] = fill;
                         dst_maxbits = dstndwords;
                         dst_level -= 1;
                     }
 
+                    if (fill != 0)
+                    {
+                        s_hbb_mask(dst);
+                    }
+
                     u32 const* srcdata = src->get_level_ptr(0);
-                    u32 * dstdata = dst->get_level_ptr(dst->m_numlevels - src->m_numlevels - 1);
+                    dst_level          = (dst->m_numlevels - src->m_numlevels) - 1;
                     if (*srcdata == 0)
                     {
-                        *dstdata &= 0xFFFFFFFE;
+                        while (dst_level >= 0)
+                        {
+                            u32* dstdata = dst->get_level_ptr(dst_level);
+                            *dstdata &= 0xFFFFFFFE;
+                            dst_level -= 1;
+                        }
                     }
                     else
                     {
-                        *dstdata |= 0x00000001;
+                        // hmmm, we need to propogate up
+                        while (dst_level >= 0)
+                        {
+                            u32* dstdata = dst->get_level_ptr(dst_level);
+                            *dstdata |= 0x00000001;
+                            dst_level -= 1;
+                        }
                     }
-                    
                 }
 
                 g_hbb_release(hbb, alloc);
@@ -231,7 +249,6 @@ namespace xcore
             else if (maxbits < src->m_maxbits)
             {
                 // TODO: Hmmm, we need to shrink, how do we do that?
-
             }
         }
     }
