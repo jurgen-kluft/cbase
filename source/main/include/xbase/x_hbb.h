@@ -43,11 +43,11 @@ namespace xcore
     extern hbb_iter_t g_hbb_iterator(hbb_t hbb, u32 start, u32 end); // Iterate over all '1' bits from start to end
     extern void       g_hbb_set(hbb_t hbb, u32 bit);
     extern void       g_hbb_clr(hbb_t hbb, u32 bit);
-    extern bool       g_hbb_is_set(hbb_t hbb, u32 bit);
-    extern bool       g_hbb_is_empty(hbb_t hbb);
-    extern bool       g_hbb_find(hbb_t hbb, u32& bit);
-    extern bool       g_hbb_upper(hbb_t hbb, u32 pivot, u32& bit); // First 1 equal to or greater than @pivot
-    extern bool       g_hbb_lower(hbb_t hbb, u32 pivot, u32& bit); // First 1 equal to or lesser than @pivot
+    extern bool       g_hbb_is_set(hbb_t const hbb, u32 bit);
+    extern bool       g_hbb_is_empty(hbb_t const hbb);
+    extern bool       g_hbb_find(hbb_t const hbb, u32& bit);
+    extern bool       g_hbb_upper(hbb_t const hbb, u32 pivot, u32& bit); // First 1 equal to or greater than @pivot
+    extern bool       g_hbb_lower(hbb_t const hbb, u32 pivot, u32& bit); // First 1 equal to or lesser than @pivot
 
 }; // namespace xcore
 

@@ -44,6 +44,21 @@ namespace xcore
             }
             return ((u32*)this) + offset;
         }
+
+        inline u32 const* get_level_ptr(s16 level) const
+        {
+            u32 offset;
+            switch (level)
+            {
+                case 0: offset = 2 + 0; break;
+                case 1: offset = 2 + 1; break;
+                case 2:
+                case 3:
+                case 4: offset = m_offset_level[level - 2]; break;
+                default: ASSERT(false); break;
+            }
+            return ((u32 const*)this) + offset;
+        }
     };
 
     u32 g_sizeof_hbb(u32 maxbits)
@@ -300,25 +315,26 @@ namespace xcore
         }
     }
 
-    bool g_hbb_is_set(hbb_t hbb, u32 bit)
+    bool g_hbb_is_set(hbb_t const hbb, u32 bit)
     {
-        hbb_header_t* hdr        = (hbb_header_t*)hbb;
-        u32 const*    level      = hdr->get_level_ptr(hdr->m_numlevels - 1);
-        u32 const     dwordIndex = bit / 32;
-        u32 const     dwordBit   = bit & 31;
+        hbb_header_t const* hdr        = (hbb_header_t const*)hbb;
+        u32 const*          level      = hdr->get_level_ptr(hdr->m_numlevels - 1);
+        u32 const           dwordIndex = bit / 32;
+        u32 const           dwordBit   = bit & 31;
         return ((level[dwordIndex] >> dwordBit) & 1) == 1;
     }
 
-    bool g_hbb_is_empty(hbb_t hbb)
+    bool g_hbb_is_empty(hbb_t const hbb)
     {
-        u32 const* level0 = hbb;
+        hbb_header_t const* hdr    = (hbb_header_t const*)hbb;
+        u32 const*          level0 = hdr->get_level_ptr(0);
         return level0[0] == 0;
     }
 
-    bool g_hbb_find(hbb_t hbb, u32& bit)
+    bool g_hbb_find(hbb_t const hbb, u32& bit)
     {
-        hbb_header_t* hdr      = (hbb_header_t*)hbb;
-        s16 const     maxlevel = hdr->m_numlevels;
+        hbb_header_t const* hdr      = (hbb_header_t const*)hbb;
+        s16 const           maxlevel = hdr->m_numlevels;
 
         // Start at top level and find a '1' bit and move down
         u32 dwordIndex = 0;
@@ -338,9 +354,9 @@ namespace xcore
         return true;
     }
 
-    bool g_hbb_upper(hbb_t hbb, u32 pivot, u32& bit)
+    bool g_hbb_upper(hbb_t const hbb, u32 pivot, u32& bit)
     {
-        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        hbb_header_t const* hdr = (hbb_header_t const*)hbb;
         if (pivot >= hdr->m_maxbits)
             return false;
 
@@ -400,9 +416,9 @@ namespace xcore
         return false;
     }
 
-    bool g_hbb_lower(hbb_t hbb, u32 pivot, u32& bit)
+    bool g_hbb_lower(hbb_t const hbb, u32 pivot, u32& bit)
     {
-        hbb_header_t* hdr = (hbb_header_t*)hbb;
+        hbb_header_t const* hdr = (hbb_header_t const*)hbb;
         if (pivot >= hdr->m_maxbits)
             return false;
 
