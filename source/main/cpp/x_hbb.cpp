@@ -144,8 +144,11 @@ namespace xcore
         u32 const     ndwords = s_hbb_init(hdr, maxbits);
         if (bits >= 0)
         {
-            u32 fill = (bits != 0) ? 0xFFFFFFFF : 0;
-            x_memset(hdr->get_level_ptr(0), fill, ndwords * sizeof(u32));
+            u32 const fill = (bits != 0) ? 0xFFFFFFFF : 0;
+            u32* data = hdr->get_level_ptr(0);
+            for (u32 i = 0; i < ndwords; ++i)
+                data[i] = fill;
+
             if (bits != 0)
             {
                 s_hbb_mask(hdr);
