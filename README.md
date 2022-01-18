@@ -11,6 +11,7 @@ Cross platform base library
   - console
   - debug (assert)
   - endian
+  - hierarchical bitset (hbb_t)
   - integer
   - limits
   - log
