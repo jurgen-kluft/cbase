@@ -16,9 +16,8 @@ namespace xcore
     class alloc_t
     {
     public:
-        static void init_system();
-        static void exit_system();
-
+        static void     init_system();
+        static void     exit_system();
         static alloc_t* get_system();
 
         void* allocate(u32 size, u32 alignment) { return v_allocate(size, alignment); }
@@ -54,7 +53,8 @@ namespace xcore
         virtual ~alloc_t() {}
     };
 
-    inline void* reallocate(alloc_t* alloc, void* ptr, u32 size, u32 new_size, u32 alignment = sizeof(void*)) {
+    inline void* reallocate(alloc_t* alloc, void* ptr, u32 size, u32 new_size, u32 alignment = sizeof(void*))
+    {
         void* newptr = alloc->allocate(new_size, alignment);
         x_memcpy(newptr, ptr, size);
         alloc->deallocate(ptr);
@@ -271,9 +271,9 @@ namespace xcore
 
     public:
         inline inplace_t() {}
-        
-        allocinplace_t allocator() const { return allocinplace_t((xbyte*)m_memory, (u64)SIZE * 8); }
-        inline u64 size() const { return (u64)SIZE * 8; }
+
+        allocinplace_t               allocator() const { return allocinplace_t((xbyte*)m_memory, (u64)SIZE * 8); }
+        inline u64                   size() const { return (u64)SIZE * 8; }
         template <class T> inline T* object() { return (T*)(m_memory); }
     };
 
@@ -343,6 +343,13 @@ namespace xcore
         u32   m_countof;
         u32   m_freelist;
         u32   m_freeindex;
+    };
+
+    // framed allocator
+    class fralloc_t : public alloc_t
+    {
+    public:
+
     };
 
 }; // namespace xcore
