@@ -54,13 +54,13 @@ namespace xcore
 
         static alloc_t* runtime_alloc()
         {
-            s32 const      tidx = thread_index();
-            alloc_t* a;
+            s32 const tidx = thread_index();
+            alloc_t*  a;
             get<alloc_t>(tidx, RUNTIME_ALLOCATOR, a);
             return a;
         }
 
-        static alloc_t* frame_alloc()
+        static alloc_t* frame_allocator()
         {
             s32 const tidx = thread_index();
             alloc_t*  a;
@@ -75,6 +75,14 @@ namespace xcore
             get<alloc_t>(tidx, LOCAL_ALLOCATOR, a);
             return a;
         }
+
+        static alloc_t* global_alloc() { return runtime_alloc(); }  // application life-time allocations
+        static alloc_t* heap_alloc() { return runtime_alloc(); }    // long life-time allocations
+        static alloc_t* frame_alloc() { return frame_allocator(); } // specific duration tagged allocations
+        static alloc_t* stack_alloc() { return local_alloc(); }     // function life-time allocations
+
+        class gpu_alloc_t;
+        static gpu_alloc_t* gpu_alloc() { return nullptr; } // GPU resource allocations?
 
         static runes_alloc_t* string_alloc()
         {
