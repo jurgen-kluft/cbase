@@ -498,6 +498,7 @@ namespace xcore
     bool           is_float(crunes_t const& str);
     bool           is_GUID(crunes_t const& str);
     inline bool    is_space(uchar32 c) { return ((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
+    inline bool    is_whitespace(uchar32 c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v'; }
     inline bool    is_upper(uchar32 c) { return ((c >= 'A') && (c <= 'Z')); }
     inline bool    is_lower(uchar32 c) { return ((c >= 'a') && (c <= 'z')); }
     inline bool    is_alpha(uchar32 c) { return (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }

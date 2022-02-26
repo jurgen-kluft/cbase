@@ -926,6 +926,8 @@ namespace xcore
 #    define X_ALIGN_BEGIN(a) __declspec(align(a))
 #    define X_ALIGN_END(a)
 
+#    define ALIGNOF(t) __alignof(t)
+
 #    define X_OFFSET_OF(type, member) (X_SIZE) & reinterpret_cast<const volatile char&>((((type*)0)->member))
 
 #    pragma inline_depth(255)
@@ -1015,6 +1017,8 @@ namespace xcore
 #    define X_ALIGN_END(a) __attribute__((aligned(a)))
 
 #    define X_OFFSET_OF(type, member) (X_SIZE) & reinterpret_cast<const volatile char&>((((type*)0)->member))
+
+#    define ALIGNOF(t) __alignof(t)
 
 #    define X_THREAD_LOCAL __declspec(thread)
 #    define X_FINAL        final
