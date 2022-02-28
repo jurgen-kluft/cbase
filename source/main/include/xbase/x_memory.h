@@ -18,8 +18,8 @@ namespace xcore
     namespace xmem
     {
 
-        void  memset(void* inDest, u32 inValue, u32 inLength);
-        void  memcpy(void* inDest, const void* inSrc, u32 inLength);
+        void*  memset(void* inDest, u32 inValue, uptr inLength);
+        void*  memcpy(void* inDest, const void* inSrc, uptr inLength);
         s32   memcmp(const void* inLHS, const void* inRHS, u32 inLength);
         void  memswap(void* inLHS, void* inRHS, u32 inLength);
         void* memmove(void* inDest, const void* inSrc, u32 inLength);
