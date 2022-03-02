@@ -13,13 +13,22 @@
 
 namespace xcore
 {
+    template <typename T> inline void set(T* p, T v1) { p[0] = v1; }
+    template <typename T> inline void set(T* p, T v1, T v2) { p[0] = v1; p[1] = v2; }
+    template <typename T> inline void set(T* p, T v1, T v2, T v3) { p[0] = v1; p[1] = v2; p[2] = v3; }
+    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; }
+    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; }
+    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5, T v6) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; }
+    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; }
+    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7, T v8) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; p[7] = v8; }
+
     ///@description:	Interface/Utility class for MemSet, MemClear, MemCopy, MemMove
     ///@note:			In DEBUG these functions should perform sanity checks on the source and destination memory blocks
     namespace xmem
     {
 
-        void*  memset(void* inDest, u32 inValue, uptr inLength);
-        void*  memcpy(void* inDest, const void* inSrc, uptr inLength);
+        void* memset(void* inDest, u32 inValue, uptr inLength);
+        void* memcpy(void* inDest, const void* inSrc, uptr inLength);
         s32   memcmp(const void* inLHS, const void* inRHS, u32 inLength);
         void  memswap(void* inLHS, void* inRHS, u32 inLength);
         void* memmove(void* inDest, const void* inSrc, u32 inLength);
