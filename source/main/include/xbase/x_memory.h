@@ -22,6 +22,14 @@ namespace xcore
     template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; }
     template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7, T v8) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; p[7] = v8; }
 
+    template<typename T, s32 N>
+    inline void copy(T(&dst)[N], T const (&src)[N])
+    {
+        for (s32 i = 0; i < N; i++)
+            dst[i] = src[i];
+    }
+
+
     ///@description:	Interface/Utility class for MemSet, MemClear, MemCopy, MemMove
     ///@note:			In DEBUG these functions should perform sanity checks on the source and destination memory blocks
     namespace xmem
