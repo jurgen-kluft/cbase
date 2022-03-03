@@ -8,69 +8,70 @@
 namespace xcore
 {
 
-	class counter_writer_t : public irunes_writer_t
-	{
-		s32                 m_runes_count;
+    class counter_writer_t : public irunes_writer_t
+    {
+        s32 m_runes_count;
 
     public:
-		inline counter_writer_t() : m_runes_count(0) {}
+        inline counter_writer_t()
+            : m_runes_count(0)
+        {
+        }
 
-        inline s32          count() const { return m_runes_count; }
+        inline s32 count() const { return m_runes_count; }
 
-		virtual bool        vwrite(uchar32 c)
-		{
-			m_runes_count += 1;
-			return true;
-		}
-		
-		virtual bool        vwrite(crunes_t const& runes)
-		{
+        virtual bool vwrite(uchar32 c)
+        {
+            m_runes_count += 1;
+            return true;
+        }
+
+        virtual bool vwrite(crunes_t const& runes)
+        {
             runes_reader_t reader(runes);
             while (!reader.at_end())
             {
                 reader.skip();
                 m_runes_count += 1;
             }
-			return true;
-		}
+            return true;
+        }
 
-		virtual void vflush()
-		{
-		}
-	};
+        virtual void vflush() {}
+    };
 
     class console_writer_t : public irunes_writer_t
-	{
-		runez_t<utf32::rune, 64> m_write_to_console_cache;
+    {
+        runez_t<utf32::rune, 64> m_write_to_console_cache;
 
     public:
-		inline console_writer_t() {}
+        inline console_writer_t() {}
 
-		virtual bool        vwrite(uchar32 c)
-		{
+        virtual bool vwrite(uchar32 c)
+        {
             if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
                 vflush();
             m_write_to_console_cache += c;
-			return true;
-		}
-		
-		virtual bool        vwrite(crunes_t const& runes)
-		{
-            vflush();
-			console->write(runes);
-			return true;
-		}
+            return true;
+        }
 
-		virtual void vflush()
-		{
+        virtual bool vwrite(crunes_t const& runes)
+        {
+            vflush();
+            console->write(runes);
+            return true;
+        }
+
+        virtual void vflush()
+        {
             if (m_write_to_console_cache.size() > 0)
             {
                 crunes_t cachestr = m_write_to_console_cache;
                 console->write(cachestr);
                 m_write_to_console_cache.reset();
-			}
-		}
-	};
+            }
+        }
+    };
 
 //==============================================================================
 // DEFINES
@@ -141,7 +142,8 @@ namespace xcore
             u32 lsw;
         };
 
-        union {
+        union
+        {
             f64  value;
             u32d parts;
         };
@@ -155,7 +157,8 @@ namespace xcore
             u32 msw;
         };
 
-        union {
+        union
+        {
             f64  value;
             u32d parts;
         };
@@ -247,12 +250,34 @@ namespace xcore
      * prec    - how many digits of precision
      *------------------------------------------------------------------------------
      */
-    static void dtoa(irunes_writer_t* writer, f64 fpnum, char cvt, s32 width, s32 prec)
+    static void sDtoA(char const* str, char*& cursor, char const* end, f64 fpnum, char cvt, s32 width, s32 prec)
     {
         static const f64 powTable[] = {1, 10, 10e1, 10e2, 10e3, 10e4, 10e5, 10e6, 10e7, 10e8, 10e9, 10e10, 10e11, 10e12, 10e13, 10e14, 10e15, 10e16, 10e17, 10e18, 10e19, 10e20, 10e21, 10e22, 10e23};
 
-        ASSERT(writer);
+        ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
         ASSERT(prec >= 0);
+
+        if (xf64::isInfinite(fpnum))
+        {
+            if (fpnum < 0)
+                *cursor++ = '-';
+            const char* str = "Inf";
+            *cursor++       = str[0];
+            *cursor++       = str[1];
+            *cursor++       = str[2];
+            *cursor++       = '\0';
+            return;
+        }
+
+        if (xf64::isNAN(fpnum))
+        {
+            const char* nan = "NaN";
+            *cursor++       = nan[0];
+            *cursor++       = nan[1];
+            *cursor++       = nan[2];
+            *cursor++       = '\0';
+            return;
+        }
 
         char  fwork[WORKSIZE];
         char* fw = fwork;
@@ -266,25 +291,8 @@ namespace xcore
         // setup exponent part
         char  ework[16];
         char* eworkend = &ework[sizeof(ework) - 1];
-        ;
         char* ew = eworkend;
         *ew      = '\0';
-
-        if (xf64::isInfinite(fpnum))
-        {
-            if (fpnum < 0)
-                writer->write('-');
-			crunes_t str("Inf", 3);
-            writer->write(str);
-            return;
-        }
-
-        if (xf64::isNAN(fpnum))
-        {
-            crunes_t str("NaN", 3);
-            writer->write(str);
-            return;
-        }
 
         // grab sign & make non-negative
         s32 is_neg = fpnum < 0;
@@ -590,22 +598,24 @@ namespace xcore
         s32 const pad      = width - fmtwidth;
 
         for (s32 i = 0; pad > 0 && i < pad; ++i)
-            writer->write(' ');
+            *cursor++ = ' ';
 
         if (is_neg)
         {
-            writer->write('-');
+            *cursor++ = '-';
         }
-		crunes_t workstr(iw, iwidth);
-        writer->write(workstr);
+
+        for (s32 i = 0; i < iwidth; ++i)
+            *cursor++ = iw[i];
+
         if (showdot)
         {
-            writer->write('.'); 
-			crunes_t fworkstr(fwork, fwidth);
-			writer->write(fworkstr);
+            *cursor++ = '.';
+            for (s32 i = 0; i < fwidth; ++i)
+                *cursor++ = fwork[i];
         }
-		crunes_t eworkstr(ew, ewidth);
-		writer->write(eworkstr);
+        for (s32 i = 0; i < ewidth; ++i)
+            *cursor++ = ew[i];
     }
 
     /**
@@ -626,30 +636,30 @@ namespace xcore
 #define is_digit(c) ((u32)to_digit(c) >= 0 && ((u32)to_digit(c) <= 9))
 #define to_char(n) ((u32)((n) + '0'))
 
-	static void ReverseCharStr(char* str, char* end)
-	{
-		// Reverse work buffer
-		char* head = str;
-		char* tail = end - 1;
-		while (head < tail)
-		{
-			char t = *head;
-			*head = *tail;
-			*tail = t;
-			head += 1;
-			tail -= 1;
-		}
-	}
+    static void ReverseCharStr(char* str, char* end)
+    {
+        // Reverse work buffer
+        char* head = str;
+        char* tail = end - 1;
+        while (head < tail)
+        {
+            char t = *head;
+            *head  = *tail;
+            *tail  = t;
+            head += 1;
+            tail -= 1;
+        }
+    }
 
-    static void ULtoA(u32 val, irunes_writer_t* writer, s32 base, bool octzero, char const* xdigs)
+    static void sULtoA(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, char const* xdigs)
     {
         uchar32 c;
         s32     sval;
 
-        ASSERT(writer);
+        ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
 
-		char  work[WORKSIZE];
-		char* w = &work[WORKSIZE];
+        char  work[WORKSIZE];
+        char* w = &work[WORKSIZE];
 
         switch (base)
         {
@@ -662,8 +672,8 @@ namespace xcore
                 if (val > SPF_LONG_MAX)
                 {
                     c = to_char(val % 10);
-					w -= 1;
-					*w = c;
+                    w -= 1;
+                    *w   = c;
                     sval = (s32)(val / 10);
                 }
                 else
@@ -674,9 +684,9 @@ namespace xcore
                 do
                 {
                     c = to_char(sval % 10);
-					w -= 1;
-					*w = c;
-					sval /= 10;
+                    w -= 1;
+                    *w = c;
+                    sval /= 10;
                 } while (sval != 0);
 
                 break;
@@ -685,21 +695,21 @@ namespace xcore
                 do
                 {
                     c = to_char(val & 7);
-					w -= 1;
-					*w = c;
+                    w -= 1;
+                    *w = c;
                     val >>= 3;
                 } while (val);
-				if (octzero && c != '0')
-				{
-					*w-- = '0';
-				}
+                if (octzero && c != '0')
+                {
+                    *w-- = '0';
+                }
                 break;
 
             case 16:
                 do
                 {
-					w -= 1;
-					*w = xdigs[val & 15];
+                    w -= 1;
+                    *w = xdigs[val & 15];
                     val >>= 4;
                 } while (val);
 
@@ -710,21 +720,25 @@ namespace xcore
                 break;
         }
 
-		//ReverseCharStr(w, &work[WORKSIZE]);
-		crunes_t workstr(w, &work[WORKSIZE]);
-		writer->write(workstr);
+        const char* str = w;
+        while (str < &work[WORKSIZE])
+        {
+            *cursor++ = *str++;
+            if (cursor >= end)
+                break;
+        }
     }
 
     /**
      * Same as above but for u64
      */
-    static void UQtoA(u64 val, irunes_writer_t* writer, s32 base, bool octzero, char const* xdigs)
+    static void sUQtoA(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, char const* xdigs)
     {
         uchar32 c;
         s64     sval;
 
-		char  work[WORKSIZE];
-		char* w = &work[WORKSIZE];
+        char  work[WORKSIZE];
+        char* w = &work[WORKSIZE];
 
         switch (base)
         {
@@ -737,8 +751,8 @@ namespace xcore
                 if (val > ((~(u64)0) >> 1))
                 {
                     c = to_char(val % 10);
-					w -= 1;
-					*w = c;
+                    w -= 1;
+                    *w   = c;
                     sval = (s64)(val / 10);
                 }
                 else
@@ -749,9 +763,9 @@ namespace xcore
                 do
                 {
                     c = to_char(sval % 10);
-					w -= 1;
-					*w = c;
-					sval /= 10;
+                    w -= 1;
+                    *w = c;
+                    sval /= 10;
                 } while (sval != 0);
 
                 break;
@@ -760,17 +774,17 @@ namespace xcore
                 do
                 {
                     c = to_char(val & 7);
-					w -= 1;
-					*w = c;
-					val >>= 3;
+                    w -= 1;
+                    *w = c;
+                    val >>= 3;
                 } while (val);
 
-				if (octzero && c != '0')
-				{
-					c = '0';
-					w -= 1;
-					*w = c;
-				}
+                if (octzero && c != '0')
+                {
+                    c = '0';
+                    w -= 1;
+                    *w = c;
+                }
 
                 break;
 
@@ -778,9 +792,9 @@ namespace xcore
                 do
                 {
                     c = xdigs[val & 15];
-					w -= 1;
-					*w = c;
-					val >>= 4;
+                    w -= 1;
+                    *w = c;
+                    val >>= 4;
                 } while (val);
 
                 break;
@@ -789,33 +803,72 @@ namespace xcore
                 /* oops */
                 break;
         }
-	
-		crunes_t workstr(w, &work[WORKSIZE]);
-		writer->write(workstr);
-	}
 
-    static s32 boolToStr(u32 _boolean, irunes_writer_t* writer, bool yesNo, xcore::s32 flags)
+        const char* str = w;
+        while (str < &work[WORKSIZE])
+        {
+            *cursor++ = *str++;
+            if (cursor >= end)
+                break;
+        }
+    }
+
+    static const char* sBooleanStrs[] = {"false", "true", "FALSE", "TRUE", "False", "True", "no", "yes", "NO", "YES", "No", "Yes"};
+    static const char* boolAsAsciiStr(u32 _boolean, bool yesNo, xcore::s32 flags)
     {
-        const char* t[] = {"false", "true", "FALSE", "TRUE", "False", "True", "no", "yes", "NO", "YES", "No", "Yes"};
-        s32         i   = yesNo ? 6 : 0;
+        s32 i = yesNo ? 6 : 0;
         if (flags & CAMELCASE)
             i += 4;
         else if (flags & UPPERCASE)
             i += 2;
-
         i += (_boolean == 0) ? 0 : 1;
+        return (ascii::pcrune)sBooleanStrs[i];
+    }
 
-        s32           len = 0;
-        ascii::pcrune src = (ascii::pcrune)t[i];
-        while (*src != '\0')
-        {
-            uchar32 c = *src++;
-            writer->write(c);
-            len += 1;
-        }
+    s32 itoa(s64 value, char* dst, char const* end, s32 radix) 
+    {
+        const char* start = dst;
+        sULtoA(value, start, dst, end, radix, false, nullptr); 
+        return (s32)(dst - start);
+    }
+
+    s32 utoa(u64 value, char* dst, char const* end, s32 radix) 
+    {
+        const char* start = dst;
+        sUQtoA(value, start, dst, end, radix, false, nullptr); 
+        return (s32)(dst - start);
+    }
+
+    s32 ftoa(f32 value, char* dst, char const* end) 
+    { 
+        const char* start = dst;
+        f64 f = (f64)value;
+        sDtoA(start, dst, end, f, 0, 0, 0);
+        s32 len = (s32)(dst - start);
         return len;
     }
 
+    s32 dtoa(f64 value, char* dst, char const* end) 
+    { 
+        const char* start = dst;
+        sDtoA(start, dst, end, value, 0, 0, 0);
+        s32 len = (s32)(dst - start);
+        return len;
+    }
+
+    s32 btoa(bool value, char* dst, char const* end) 
+    { 
+        const char* boolstr = boolAsAsciiStr(value?1:0, false, 0);
+        s32        len     = 0;
+        while (*boolstr)
+        {
+            *dst++ = *boolstr++;
+            len++;
+            if (dst >= end)
+                break;
+        }
+        return len; 
+    }
 
     static void PadBuffer(irunes_writer_t* writer, s32 howMany, char with)
     {
@@ -900,18 +953,18 @@ namespace xcore
         ASSERT(writer != NULL);
         ASSERT(buffer != NULL);
 
-        uchar32     ch;        ///< character
-        s32         n;         ///< handy integer (short term usage)
-		irunes_writer_t* cp = NULL; ///< handy char pointer (short term usage)
-        s32         flags;     ///< flags as above
-        s32         width;     ///< width from format (%8d), or 0
-        s32         prec;      ///< precision from format (%.3d), or -1
-        char        sign;      ///< sign prefix (' ', '+', '-', or \0)
-        f64         _double;   ///< f64 precision arguments %[eEfgG]
-        s32         base;      ///< base for [diouxX] conversion
-        s32         dprec;     ///< a copy of prec if [diouxX], 0 otherwise
-        s32         realsz;    ///< field size expanded by dprec, sign, etc
-        s32         size;      ///< size of converted field or string
+        uchar32          ch;        ///< character
+        s32              n;         ///< handy integer (short term usage)
+        irunes_writer_t* cp = NULL; ///< handy char pointer (short term usage)
+        s32              flags;     ///< flags as above
+        s32              width;     ///< width from format (%8d), or 0
+        s32              prec;      ///< precision from format (%.3d), or -1
+        char             sign;      ///< sign prefix (' ', '+', '-', or \0)
+        f64              _double;   ///< f64 precision arguments %[eEfgG]
+        s32              base;      ///< base for [diouxX] conversion
+        s32              dprec;     ///< a copy of prec if [diouxX], 0 otherwise
+        s32              realsz;    ///< field size expanded by dprec, sign, etc
+        s32              size;      ///< size of converted field or string
 
         /// Initialize variables
         char const* xdigs    = NULL; // digits for [xX] conversion
@@ -919,7 +972,7 @@ namespace xcore
         u64         uqval    = 0;    // %q integers
         s32         argindex = 0;
 
-        //CharBufferToCharWriter copy_to_writer(writer);
+        // CharBufferToCharWriter copy_to_writer(writer);
 
         /// Scan the format for conversions (`%' character).
         for (;;)
@@ -1112,29 +1165,29 @@ namespace xcore
                     // right-adjusting zero padding
                     {
                         dtoa(buffer, _double, (char)ch, width, prec);
-						size = (s32)buffer->count();
+                        size = (s32)buffer->count();
                     }
 
                     // check whether we have to pad or not
                     if (flags & ZEROPAD)
                     {
-						runes_t bufstr = buffer->get_current();
-						runes_reader_t bufreader(bufstr);
-						runes_writer_t bufwriter(bufstr);
-						while (!bufreader.at_end())
-						{
-							uchar32 c = bufreader.read();
-							if (c != ' ')
-								break;
-							bufwriter.write('0');
-						}
+                        runes_t        bufstr = buffer->get_current();
+                        runes_reader_t bufreader(bufstr);
+                        runes_writer_t bufwriter(bufstr);
+                        while (!bufreader.at_end())
+                        {
+                            uchar32 c = bufreader.read();
+                            if (c != ' ')
+                                break;
+                            bufwriter.write('0');
+                        }
                     }
 
                     // Copy 'buffer' to 'writer'
-					{
-						runes_t bufferstr = buffer->get_current();
-						writer->write(bufferstr);
-					}
+                    {
+                        runes_t bufferstr = buffer->get_current();
+                        writer->write(bufferstr);
+                    }
 
                     if (flags & LADJUST)
                         PadBuffer(writer, -width - size, ' ');
@@ -1198,7 +1251,7 @@ namespace xcore
                     if (args[argindex].isPCRunes())
                     {
                         crunes_t src = (crunes_t)args[argindex];
-						buffer->write(src);
+                        buffer->write(src);
                     }
 
                     size = (s32)buffer->count();
@@ -1272,24 +1325,24 @@ namespace xcore
                     // ``The result of converting a zero value with an
                     // explicit precision of zero is no characters.''
                     // -- ANSI X3J11
-					{
-						if (flags & QUADINT)
-						{
-							if (uqval != 0 || prec != 0)
-							{
-								UQtoA(uqval, buffer, base, bool((flags & ALT) != 0), xdigs);
-								size = (s32)buffer->count();
-							}
-						}
-						else
-						{
-							if (ulval != 0 || prec != 0)
-							{
-								ULtoA(ulval, buffer, base, bool((flags & ALT) != 0), xdigs);
-								size = (s32)buffer->count();
-							}
-						}
-					}
+                    {
+                        if (flags & QUADINT)
+                        {
+                            if (uqval != 0 || prec != 0)
+                            {
+                                UQtoA(uqval, buffer, base, bool((flags & ALT) != 0), xdigs);
+                                size = (s32)buffer->count();
+                            }
+                        }
+                        else
+                        {
+                            if (ulval != 0 || prec != 0)
+                            {
+                                ULtoA(ulval, buffer, base, bool((flags & ALT) != 0), xdigs);
+                                size = (s32)buffer->count();
+                            }
+                        }
+                    }
                     break;
 
                 default: // "%?" prints ?, unless ? is NUL
@@ -1334,14 +1387,14 @@ namespace xcore
             // prefix
             if (sign)
             {
-				writer->write(sign);
+                writer->write(sign);
             }
             else
             {
                 if (flags & HEXPREFIX)
                 {
-					writer->write('0');
-					writer->write(ch);
+                    writer->write('0');
+                    writer->write(ch);
                 }
             }
 
@@ -1353,8 +1406,8 @@ namespace xcore
             PadBuffer(writer, dprec - size, '0');
 
             // write the integer number
-			crunes_t bufferstr = buffer->get_current();
-			writer->write(bufferstr);
+            crunes_t bufferstr = buffer->get_current();
+            writer->write(bufferstr);
 
             // left-adjusting padding (always blank)
             if (flags & LADJUST)
@@ -1367,29 +1420,29 @@ namespace xcore
 
     s32 cprintf(crunes_t const& format, X_VA_ARGS_16)
     {
-        va_list_t                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-		return vcprintf(format, args);
+        va_list_t args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+        return vcprintf(format, args);
     }
 
     s32 vcprintf(crunes_t const& format, const va_list_t& args)
     {
-		counter_writer_t writer;
+        counter_writer_t writer;
         vzprintf(writer, format, args);
-		return writer.count();
+        return writer.count();
     }
 
     void sprintf(runes_t& str, crunes_t const& format, X_VA_ARGS_16)
     {
-        va_list_t                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-		vsprintf(str, format, args);
+        va_list_t args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+        vsprintf(str, format, args);
     }
 
     void vsprintf(runes_t& str, crunes_t const& format, const va_list_t& args)
     {
-		runes_writer_t dstwriter(str);
+        runes_writer_t dstwriter(str);
         vzprintf(dstwriter, format, args);
-		str = dstwriter.get_current();
-	}
+        str = dstwriter.get_current();
+    }
 
     void zprintf(irunes_writer_t& dst, crunes_t const& format, X_VA_ARGS_16)
     {
@@ -1400,27 +1453,23 @@ namespace xcore
     void vzprintf(irunes_writer_t& dst, crunes_t const& format, const va_list_t& args)
     {
         runez_t<utf32::rune, WORKSIZE> scratchbuffer;
-        runes_writer_t scratch(scratchbuffer);
-        runes_reader_t runesreader(format);
+        runes_writer_t                 scratch(scratchbuffer);
+        runes_reader_t                 runesreader(format);
         VSPrintf_internal(&dst, &runesreader, &scratch, args);
     }
 
-    void printf(crunes_t const& str)
-	{
-		return console->write(str);
-	}
+    void printf(crunes_t const& str) { return console->write(str); }
 
     void printf(crunes_t const& format, X_VA_ARGS_16)
     {
-        va_list_t                                   args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-		printf(format, args);
+        va_list_t args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
+        printf(format, args);
     }
 
     void printf(crunes_t const& format, const va_list_t& args)
     {
-		console_writer_t dstwriter;
+        console_writer_t dstwriter;
         vzprintf(dstwriter, format, args);
-	}
-
+    }
 
 }; // namespace xcore

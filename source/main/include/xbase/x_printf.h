@@ -9,8 +9,6 @@
 
 namespace xcore
 {
-    // TODO: remove the runes_raw_writer_t and runes_reader_t stuff, just use runes_t and crunes_t
-
     s32  cprintf(crunes_t const& format, X_VA_ARGS_16_DEF);
     s32  vcprintf(crunes_t const& format, const va_list_t& args);
     void sprintf(runes_t& dst, crunes_t const& format, X_VA_ARGS_16_DEF);
@@ -22,6 +20,13 @@ namespace xcore
     void printf(crunes_t const& format, const va_list_t& args);
     s32  sscanf(crunes_t& str, crunes_t const& format, X_VA_R_ARGS_16_DEF);
     s32  vsscanf(crunes_t& str, crunes_t const& format, const va_r_list_t& vr_args);
+
+    s32 itoa(s64 value, char* dst, char const* end, s32 radix);
+    s32 utoa(u64 value, char* dst, char const* end, s32 radix);
+    s32 ftoa(f32 value, char* dst, char const* end);
+    s32 dtoa(f64 value, char* dst, char const* end);
+    s32 btoa(bool value, char* dst, char const* end);
+    
 } // namespace xcore
 
 #endif ///< __XCORE_CHARS_H__
