@@ -10,7 +10,7 @@ namespace xcore
 
     class counter_writer_t : public irunes_writer_t
     {
-        s32 m_runes_count;
+        s64 m_runes_count;
 
     public:
         inline counter_writer_t()
@@ -18,7 +18,7 @@ namespace xcore
         {
         }
 
-        inline s32 count() const { return m_runes_count; }
+        inline s64 count() const { return m_runes_count; }
 
         virtual bool vwrite(uchar32 c)
         {
@@ -28,7 +28,7 @@ namespace xcore
 
         virtual bool vwrite(const char* str, const char* end)
         {
-            m_runes_count += end - str;
+            m_runes_count += (end - str);
             return true;
         }
 
@@ -606,7 +606,7 @@ namespace xcore
         }
 
         // arrange everything in returned string
-        s32 const showdot  = cvt != 'g' || fwidth > 0;
+        s32 const showdot  = fwidth > 0;
         s32 const fmtwidth = is_neg + iwidth + showdot + fwidth + ewidth;
         s32 const pad      = width - fmtwidth;
 
@@ -733,10 +733,10 @@ namespace xcore
                 break;
         }
 
-        const char* str = w;
-        while (str < &work[WORKSIZE])
+        const char* src = w;
+        while (src < &work[WORKSIZE])
         {
-            *cursor++ = *str++;
+            *cursor++ = *src++;
             if (cursor >= end)
                 break;
         }
@@ -817,10 +817,10 @@ namespace xcore
                 break;
         }
 
-        const char* str = w;
-        while (str < &work[WORKSIZE])
+        const char* src = w;
+        while (src < &work[WORKSIZE])
         {
-            *cursor++ = *str++;
+            *cursor++ = *src++;
             if (cursor >= end)
                 break;
         }
@@ -838,49 +838,50 @@ namespace xcore
         return (ascii::pcrune)sBooleanStrs[i];
     }
 
-    s32 itoa(s64 value, char* dst, char const* end, s32 radix)
+    char* itoa(s64 value, char* dst, char const* end, s32 radix)
     {
         const char* start = dst;
-        sULtoA(value, start, dst, end, radix, false, nullptr);
-        return (s32)(dst - start);
+		if (value < 0 && dst < end)
+        {
+            *dst++ = '-';
+            value = -value;
+        }
+        sUQtoA(value, start, dst, end, radix, false, nullptr);
+        return dst;
     }
 
-    s32 utoa(u64 value, char* dst, char const* end, s32 radix)
+    char* utoa(u64 value, char* dst, char const* end, s32 radix)
     {
         const char* start = dst;
         sUQtoA(value, start, dst, end, radix, false, nullptr);
-        return (s32)(dst - start);
+        return dst;
     }
 
-    s32 ftoa(f32 value, char* dst, char const* end)
+    char* ftoa(f32 value, char* dst, char const* end)
     {
         const char* start = dst;
         f64         f     = (f64)value;
-        sDtoA(start, dst, end, f, 0, 0, 0);
-        s32 len = (s32)(dst - start);
-        return len;
+        sDtoA(start, dst, end, f, 'f', 0, 0);
+        return dst;
     }
 
-    s32 dtoa(f64 value, char* dst, char const* end)
+    char* dtoa(f64 value, char* dst, char const* end)
     {
         const char* start = dst;
-        sDtoA(start, dst, end, value, 0, 0, 0);
-        s32 len = (s32)(dst - start);
-        return len;
+        sDtoA(start, dst, end, value, 'f', 0, 0);
+        return dst;
     }
 
-    s32 btoa(bool value, char* dst, char const* end)
+    char* btoa(bool value, char* dst, char const* end)
     {
         const char* boolstr = sBoolAsAsciiStr(value ? 1 : 0, false, 0);
-        s32         len     = 0;
         while (*boolstr)
         {
             *dst++ = *boolstr++;
-            len++;
             if (dst >= end)
                 break;
         }
-        return len;
+        return dst;
     }
 
     static void PadBuffer(irunes_writer_t* writer, s32 howMany, char with)
@@ -1460,7 +1461,7 @@ namespace xcore
     {
         counter_writer_t writer;
         vzprintf(writer, format, args);
-        return writer.count();
+        return (s32)writer.count();
     }
 
     void sprintf(runes_t& str, crunes_t const& format, X_VA_ARGS_16)
