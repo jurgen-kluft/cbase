@@ -24,7 +24,7 @@ namespace xcore
             eol  = 0x04,
             cr   = 0x08,
             tab  = 0x10,
-            eob  = 0x20, 
+            eob  = 0x20,
             none = 0,
         };
         u8 m_erunes;
@@ -707,14 +707,16 @@ namespace xcore
     {
     public:
         bool write(uchar32 c) { return vwrite(c); }
+        bool write(const char* str, const char* end) { return vwrite(str, end); }
         bool write(crunes_t const& str) { return vwrite(str); }
         void flush() { vflush(); }
 
     protected:
-        virtual ~irunes_writer_t(){}
-        virtual bool vwrite(uchar32 c)           = 0;
-        virtual bool vwrite(crunes_t const& str) = 0;
-        virtual void vflush()                    = 0;
+        virtual ~irunes_writer_t() {}
+        virtual bool vwrite(uchar32 c)                        = 0;
+        virtual bool vwrite(const char* str, const char* end) = 0;
+        virtual bool vwrite(crunes_t const& str)              = 0;
+        virtual void vflush()                                 = 0;
     };
 
     class runes_writer_t : public irunes_writer_t
@@ -734,6 +736,7 @@ namespace xcore
 
     protected:
         virtual bool vwrite(uchar32 c);
+        virtual bool vwrite(const char* str, const char* end);
         virtual bool vwrite(crunes_t const& str);
         virtual void vflush();
 

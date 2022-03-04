@@ -4356,6 +4356,52 @@ namespace xcore
         return false;
     }
 
+    bool runes_writer_t::vwrite(const char* str, const char* end)
+    {
+        if (!at_end(m_cursor, m_runes))
+        {
+            uchar32        c;
+            switch (m_runes.m_type)
+            {
+                case ascii::TYPE:
+                    while (str<end && !at_end(m_cursor, m_runes))
+                    {
+                        c = *str;
+                        m_cursor.m_ascii[0] = (ascii::rune)c;
+                        m_cursor.m_ascii += 1;
+                        m_count += 1;
+                    }
+                    return true;
+                case utf8::TYPE:
+                    while (str<end && !at_end(m_cursor, m_runes))
+                    {
+                        c = *str;
+                        utf::write(c, m_runes.m_utf8, m_cursor.m_utf8);
+                        m_count += 1;
+                    }
+                    return true;
+                case utf16::TYPE:
+                    while (str<end && !at_end(m_cursor, m_runes))
+                    {
+                        c = *str;
+                        utf::write(c, m_runes.m_utf16, m_cursor.m_utf16);
+                        m_count += 1;
+                    }
+                    return true;
+                case utf32::TYPE:
+                    while (str<end && !at_end(m_cursor, m_runes))
+                    {
+                        c = *str;
+                        m_cursor.m_utf32[0] = c;
+                        m_cursor.m_utf32 += 1;
+                        m_count += 1;
+                    }
+                    return true;
+            }
+        }
+        return false;
+    }
+
     bool runes_writer_t::vwrite(crunes_t const& str)
     {
         if (!at_end(m_cursor, m_runes))

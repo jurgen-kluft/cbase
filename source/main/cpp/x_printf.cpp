@@ -26,6 +26,12 @@ namespace xcore
             return true;
         }
 
+        virtual bool vwrite(const char* str, const char* end)
+        {
+            m_runes_count += end - str;
+            return true;
+        }
+
         virtual bool vwrite(crunes_t const& runes)
         {
             runes_reader_t reader(runes);
@@ -52,6 +58,13 @@ namespace xcore
             if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
                 vflush();
             m_write_to_console_cache += c;
+            return true;
+        }
+
+        virtual bool vwrite(const char* str, const char* end)
+        {
+            vflush();
+            console->write(str, end);
             return true;
         }
 
@@ -291,8 +304,8 @@ namespace xcore
         // setup exponent part
         char  ework[16];
         char* eworkend = &ework[sizeof(ework) - 1];
-        char* ew = eworkend;
-        *ew      = '\0';
+        char* ew       = eworkend;
+        *ew            = '\0';
 
         // grab sign & make non-negative
         s32 is_neg = fpnum < 0;
@@ -814,7 +827,7 @@ namespace xcore
     }
 
     static const char* sBooleanStrs[] = {"false", "true", "FALSE", "TRUE", "False", "True", "no", "yes", "NO", "YES", "No", "Yes"};
-    static const char* boolAsAsciiStr(u32 _boolean, bool yesNo, xcore::s32 flags)
+    static const char* sBoolAsAsciiStr(u32 _boolean, bool yesNo, xcore::s32 flags)
     {
         s32 i = yesNo ? 6 : 0;
         if (flags & CAMELCASE)
@@ -825,41 +838,41 @@ namespace xcore
         return (ascii::pcrune)sBooleanStrs[i];
     }
 
-    s32 itoa(s64 value, char* dst, char const* end, s32 radix) 
+    s32 itoa(s64 value, char* dst, char const* end, s32 radix)
     {
         const char* start = dst;
-        sULtoA(value, start, dst, end, radix, false, nullptr); 
+        sULtoA(value, start, dst, end, radix, false, nullptr);
         return (s32)(dst - start);
     }
 
-    s32 utoa(u64 value, char* dst, char const* end, s32 radix) 
+    s32 utoa(u64 value, char* dst, char const* end, s32 radix)
     {
         const char* start = dst;
-        sUQtoA(value, start, dst, end, radix, false, nullptr); 
+        sUQtoA(value, start, dst, end, radix, false, nullptr);
         return (s32)(dst - start);
     }
 
-    s32 ftoa(f32 value, char* dst, char const* end) 
-    { 
+    s32 ftoa(f32 value, char* dst, char const* end)
+    {
         const char* start = dst;
-        f64 f = (f64)value;
+        f64         f     = (f64)value;
         sDtoA(start, dst, end, f, 0, 0, 0);
         s32 len = (s32)(dst - start);
         return len;
     }
 
-    s32 dtoa(f64 value, char* dst, char const* end) 
-    { 
+    s32 dtoa(f64 value, char* dst, char const* end)
+    {
         const char* start = dst;
         sDtoA(start, dst, end, value, 0, 0, 0);
         s32 len = (s32)(dst - start);
         return len;
     }
 
-    s32 btoa(bool value, char* dst, char const* end) 
-    { 
-        const char* boolstr = boolAsAsciiStr(value?1:0, false, 0);
-        s32        len     = 0;
+    s32 btoa(bool value, char* dst, char const* end)
+    {
+        const char* boolstr = sBoolAsAsciiStr(value ? 1 : 0, false, 0);
+        s32         len     = 0;
         while (*boolstr)
         {
             *dst++ = *boolstr++;
@@ -867,7 +880,7 @@ namespace xcore
             if (dst >= end)
                 break;
         }
-        return len; 
+        return len;
     }
 
     static void PadBuffer(irunes_writer_t* writer, s32 howMany, char with)
@@ -971,8 +984,6 @@ namespace xcore
         u32         ulval    = 0;    // integer arguments %[diouxX]
         u64         uqval    = 0;    // %q integers
         s32         argindex = 0;
-
-        // CharBufferToCharWriter copy_to_writer(writer);
 
         /// Scan the format for conversions (`%' character).
         for (;;)
@@ -1164,7 +1175,10 @@ namespace xcore
 
                     // right-adjusting zero padding
                     {
-                        dtoa(buffer, _double, (char)ch, width, prec);
+                        char  ascii_buffer[WORKSIZE];
+                        char* ascii_cursor = ascii_buffer;
+                        sDtoA(ascii_buffer, ascii_cursor, &ascii_buffer[WORKSIZE - 1], _double, (char)ch, width, prec);
+                        // dtoa(buffer, _double, (char)ch, width, prec);
                         size = (s32)buffer->count();
                     }
 
@@ -1259,24 +1273,36 @@ namespace xcore
                     break;
 
                 case 'B':
-                    ulval = ((bool)args[argindex++]) ? 1 : 0;
-                    size  = boolToStr(ulval, buffer, false, ((flags & ALT) != 0) ? CAMELCASE : UPPERCASE);
-                    break;
+                {
+                    ulval                = ((bool)args[argindex++]) ? 1 : 0;
+                    const char* bool_str = sBoolAsAsciiStr(ulval, false, ((flags & ALT) != 0) ? CAMELCASE : UPPERCASE);
+                    size                 = buffer->write(bool_str);
+                }
+                break;
 
                 case 'b':
-                    ulval = ((bool)args[argindex++]) ? 1 : 0;
-                    size  = boolToStr(ulval, buffer, false, ((flags & ALT) != 0) ? CAMELCASE : 0);
-                    break;
+                {
+                    ulval                = ((bool)args[argindex++]) ? 1 : 0;
+                    const char* bool_str = sBoolAsAsciiStr(ulval, false, ((flags & ALT) != 0) ? CAMELCASE : 0);
+                    size                 = buffer->write(bool_str);
+                }
+                break;
 
                 case 'Y':
-                    ulval = ((bool)args[argindex++]) ? 1 : 0;
-                    size  = boolToStr(ulval, buffer, true, ((flags & ALT) != 0) ? CAMELCASE : UPPERCASE);
-                    break;
+                {
+                    ulval                = ((bool)args[argindex++]) ? 1 : 0;
+                    const char* bool_str = sBoolAsAsciiStr(ulval, true, ((flags & ALT) != 0) ? CAMELCASE : UPPERCASE);
+                    size                 = buffer->write(bool_str);
+                }
+                break;
 
                 case 'y':
-                    ulval = ((bool)args[argindex++]) ? 1 : 0;
-                    size  = boolToStr(ulval, buffer, true, ((flags & ALT) != 0) ? CAMELCASE : 0);
-                    break;
+                {
+                    ulval                = ((bool)args[argindex++]) ? 1 : 0;
+                    const char* bool_str = sBoolAsAsciiStr(ulval, true, ((flags & ALT) != 0) ? CAMELCASE : 0);
+                    size                 = buffer->write(bool_str);
+                }
+                break;
 
                 case 'U':
                     flags |= LONGINT;
@@ -1330,7 +1356,10 @@ namespace xcore
                         {
                             if (uqval != 0 || prec != 0)
                             {
-                                UQtoA(uqval, buffer, base, bool((flags & ALT) != 0), xdigs);
+                                char  ascii_buffer[WORKSIZE];
+                                char* ascii_cursor = ascii_buffer;
+                                sUQtoA(uqval, ascii_buffer, ascii_cursor, &ascii_buffer[WORKSIZE-1], base, bool((flags & ALT) != 0), xdigs);
+                                buffer->write(ascii_buffer, ascii_cursor);
                                 size = (s32)buffer->count();
                             }
                         }
@@ -1338,7 +1367,10 @@ namespace xcore
                         {
                             if (ulval != 0 || prec != 0)
                             {
-                                ULtoA(ulval, buffer, base, bool((flags & ALT) != 0), xdigs);
+                                char  ascii_buffer[WORKSIZE];
+                                char* ascii_cursor = ascii_buffer;
+                                sULtoA(ulval, ascii_buffer, ascii_cursor, &ascii_buffer[WORKSIZE-1], base, bool((flags & ALT) != 0), xdigs);
+                                buffer->write(ascii_buffer, ascii_cursor);
                                 size = (s32)buffer->count();
                             }
                         }

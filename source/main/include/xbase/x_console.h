@@ -81,6 +81,12 @@ namespace xcore
             write(r.m_ascii);
         }
 
+        inline void write(const char* str, const char* end)
+        {
+            crunes_t r(str, end);
+            write(r.m_ascii);
+        }
+
         virtual void writeLine() = 0;
 
         inline void writeLine(bool _value)
