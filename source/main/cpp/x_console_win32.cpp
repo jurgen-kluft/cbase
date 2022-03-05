@@ -32,13 +32,13 @@ namespace xcore
             return true;
         }
 
-		virtual bool        vwrite(const char* str, const char* end)
-		{
-			vflush();
+        virtual bool        vwrite(const char* str, const char* end)
+        {
+            vflush();
 
-			ascii::crunes_t src(str, end);
-			return write_ascii(src)!=0;
-		}
+            ascii::crunes_t src(str, end);
+            return write_ascii(src)!=0;
+        }
 
         virtual bool        vwrite(crunes_t const& str)
         {
@@ -203,7 +203,7 @@ namespace xcore
                 case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16);
                 case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32);
                 default: //@todo: UTF-8
-					break;
+                    break;
             }
             return 0;
         }

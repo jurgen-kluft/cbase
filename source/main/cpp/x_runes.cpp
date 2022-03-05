@@ -1455,20 +1455,39 @@ namespace xcore
     {
         s32 strlen(pcrune str, pcrune eos)
         {
-            ascii::pcrune end = str;
+            pcrune end = str;
             if (eos == nullptr)
             {
-                while (*end != ascii::TERMINATOR)
+                while (*end != TERMINATOR)
                     end++;
             }
             else
             {
-                while (*end != ascii::TERMINATOR && end < eos)
+                while (*end != TERMINATOR && end < eos)
                     end++;
             }
             return (s32)(end - str);
         }
     } // namespace ascii
+
+    namespace utf8
+    {
+        s32 strlen(pcrune str, pcrune eos)
+        {
+            pcrune end = str;
+            if (eos == nullptr)
+            {
+                while (*end != TERMINATOR)
+                    end++;
+            }
+            else
+            {
+                while (*end != TERMINATOR && end < eos)
+                    end++;
+            }
+            return (s32)(end - str);
+        }
+    } // namespace utf8
 
     typedef runes_t::ptr_t  rptr_t;
     typedef crunes_t::ptr_t cptr_t;

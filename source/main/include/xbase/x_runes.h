@@ -86,6 +86,7 @@ namespace xcore
             }
             pcrune m_bos, m_str, m_end, m_eos;
         };
+        // return length of string in bytes (for ascii this also means number of characters)
         s32 strlen(pcrune str, pcrune eos = nullptr);
     } // namespace ascii
     namespace utf8
@@ -111,6 +112,9 @@ namespace xcore
             }
             pcrune m_bos, m_str, m_end, m_eos;
         };
+
+        // return length of string in bytes (for utf8 this means number of bytes and NOT characters)
+        s32 strlen(pcrune str, pcrune eos = nullptr);
     } // namespace utf8
     namespace utf16
     {

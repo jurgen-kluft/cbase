@@ -25,6 +25,14 @@ namespace xcore
             return true;
         }
 
+		virtual bool        vwrite(const char* str, const char* end)
+		{
+			vflush();
+
+			ascii::crunes_t src(str, end);
+			return write_ascii(src)!=0;
+		}
+
         virtual bool        vwrite(crunes_t const& str)
         {
             vflush();
