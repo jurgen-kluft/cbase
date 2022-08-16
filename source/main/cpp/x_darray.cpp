@@ -6,7 +6,7 @@
 #include "xbase/x_limits.h"
 #include "xbase/x_math.h"
 
-namespace xcore
+namespace ncore
 {
     class default_array_capacity_handler : public array_capacity_handler_t
     {
@@ -71,4 +71,4 @@ namespace xcore
         return true;
     }
 
-}; // namespace xcore
+}; // namespace ncore

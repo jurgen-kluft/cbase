@@ -2,7 +2,7 @@
 #include "xbase/x_range.h"
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 
 UNITTEST_SUITE_BEGIN(xrange)

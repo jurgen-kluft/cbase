@@ -1,11 +1,11 @@
-#ifndef __XBASE_RANGE_H__
-#define __XBASE_RANGE_H__
+#ifndef __CBASE_RANGE_H__
+#define __CBASE_RANGE_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
 #endif
 
-namespace xcore
+namespace ncore
 {
 	template<typename T>
 	class range_iter_t;

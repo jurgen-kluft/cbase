@@ -2,14 +2,14 @@
 #include "xbase/x_context.h"
 #include "xbase/x_debug.h"
 
-#ifdef X_ASSERT
+#ifdef D_ASSERT
 #include "xbase/x_console.h"
 #include "xbase/x_log.h"
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
 
-namespace xcore
+namespace ncore
 {
     //==============================================================================
     // Default input func
@@ -54,7 +54,7 @@ namespace xcore
     //     messageString        - Additional string containing information about the 
     //                            assert.
     // Returns:
-    //     bool - xTRUE when the program should be halted, xFALSE other wise
+    //     bool - xTRUE when the program should be halted, False other wise
     // Description:
     //     This function is call when an assert happens.
     // See Also:
@@ -67,7 +67,7 @@ namespace xcore
         // Call handle_assert() on that object and return
         asserthandler_t* handler = context_t::assert_handler();
 
-        if (handler == NULL)
+        if (handler == nullptr)
             handler = asserthandler_t::sGetDefaultAssertHandler();
 
         return handler->handle_assert(flags, fileName, lineNumber, exprString, messageString);
@@ -81,7 +81,7 @@ namespace xcore
         //
         if ((flags & asserthandler_t::XDB_FLAG_IGNORE) != 0) 
         {
-            return xFALSE;
+            return False;
         }
 
         //
@@ -90,11 +90,11 @@ namespace xcore
         flags |= asserthandler_t::XDB_FLAG_IGNORE;
 
         //
-        // Survive NULL entries
+        // Survive nullptr entries
         //
-        if(fileName      == NULL) fileName      = "Unknown";
-        if(exprString    == NULL) exprString    = "Unknown";
-        if(messageString == NULL) messageString = "Unknown";
+        if(fileName      == nullptr) fileName      = "Unknown";
+        if(exprString    == nullptr) exprString    = "Unknown";
+        if(messageString == nullptr) messageString = "Unknown";
 
         //
         // Create the report to print
@@ -113,14 +113,14 @@ namespace xcore
         //
         // Default: Skip this assert
         //
-        return xFALSE;
+        return False;
     }
 
 };
 
 #else
 
-namespace xcore
+namespace ncore
 {
     class xassert_release : public asserthandler_t
     {

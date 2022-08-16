@@ -1,5 +1,5 @@
-#ifndef __XBASE_LOG_H__
-#define __XBASE_LOG_H__
+#ifndef __CBASE_LOG_H__
+#define __CBASE_LOG_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -7,15 +7,15 @@
 
 #include "xbase/x_runes.h"
 
-namespace xcore
+namespace ncore
 {
     // Forward declares
     class va_list_t;
     class logger_t;
 
-#define X_LOG
+#define D_LOG
 
-#ifdef X_LOG
+#ifdef D_LOG
 
     struct log_info_t
     {
@@ -28,43 +28,43 @@ namespace xcore
 
     ///< In a multi-threaded environment the user needs to call this to set a delegate that can
     ///< return a log_info_t per thread. The default one only works in a single threaded environment.
-    void x_SetGetLogInfo(log_info_t::_delegate* Function);
+    void g_SetGetLogInfo(log_info_t::_delegate* Function);
 
-    void __x_LogMessage(const char* channel, const char* message);
-    void __x_LogWarning(const char* channel, const char* message);
-    void __x_LogError(const char* channel, const char* message);
-    void __x_LogMessage(const char* channel, const char* messageFormat, const va_list_t& formatVars);
-    void __x_LogWarning(const char* channel, const char* messageFormat, const va_list_t& formatVars);
-    void __x_LogError(const char* channel, const char* messageFormat, const va_list_t& formatVars);
+    void __LogMessage(const char* channel, const char* message);
+    void __LogWarning(const char* channel, const char* message);
+    void __LogError(const char* channel, const char* message);
+    void __LogMessage(const char* channel, const char* messageFormat, const va_list_t& formatVars);
+    void __LogWarning(const char* channel, const char* messageFormat, const va_list_t& formatVars);
+    void __LogError(const char* channel, const char* messageFormat, const va_list_t& formatVars);
 
-    void x_LogPush(const char* fileName, s32 lineNum);
-    void x_LogFlush(void);
+    void __LogPush(const char* fileName, s32 lineNum);
+    void __LogFlush(void);
 
-#define x_LogMessage                      \
-    xcore::x_LogPush(__FILE__, __LINE__); \
-    xcore::__x_LogMessage
-#define x_LogWarning                      \
-    xcore::x_LogPush(__FILE__, __LINE__); \
-    xcore::__x_LogWarning
-#define x_LogError                        \
-    xcore::x_LogPush(__FILE__, __LINE__); \
-    xcore::__x_LogError
+#define D_LogMessage                      \
+    ncore::__LogPush(__FILE__, __LINE__); \
+    ncore::__LogMessage
+#define D_LogWarning                      \
+    ncore::__LogPush(__FILE__, __LINE__); \
+    ncore::__LogWarning
+#define D_LogError                        \
+    ncore::__LogPush(__FILE__, __LINE__); \
+    ncore::__LogError
 #else
-    inline void x_LogPush(const char* fileName, s32 lineNum) {}
-    inline void x_LogFlush(void) {}
+    inline void __LogPush(const char* fileName, s32 lineNum) {}
+    inline void __LogFlush(void) {}
 
-    inline void __x_LogFake(const char* channel, const char* message) {}
-    inline void __x_LogFake(const char* channel, const char* messageFormat, const va_list_t& formatVars) {}
+    inline void __LogFake(const char* channel, const char* message) {}
+    inline void __LogFake(const char* channel, const char* messageFormat, const va_list_t& formatVars) {}
 
-#define x_LogMessage xcore::__x_LogFake
-#define x_LogWarning xcore::__x_LogFake
-#define x_LogError xcore::__x_LogFake
+#define D_LogMessage ncore::__LogFake
+#define D_LogWarning ncore::__LogFake
+#define D_LogError ncore::__LogFake
 #endif
 
     class log_t
     {
     public:
-        enum ELevel
+        enum elevel
         {
             INFO      = 0,
             WARNING   = 1,
@@ -82,28 +82,28 @@ namespace xcore
         static void flush();
         static void clear();
 
-        static logger_t* redirect(ELevel inLevel, logger_t* inLogger);
+        static logger_t* redirect(elevel inLevel, logger_t* inLogger);
 
-        static void write(ELevel inLevel, bool _value);
-        static void write(ELevel inLevel, s32 _value);
-        static void write(ELevel inLevel, s64 _value);
-        static void write(ELevel inLevel, u32 _value);
-        static void write(ELevel inLevel, u64 _value);
-        static void write(ELevel inLevel, f32 _value);
-        static void write(ELevel inLevel, f64 _value);
-        static void write(ELevel inLevel, const crunes_t& str);
-        static void write(ELevel inLevel, const crunes_t& format, const va_list_t& arguments);
+        static void write(elevel inLevel, bool _value);
+        static void write(elevel inLevel, s32 _value);
+        static void write(elevel inLevel, s64 _value);
+        static void write(elevel inLevel, u32 _value);
+        static void write(elevel inLevel, u64 _value);
+        static void write(elevel inLevel, f32 _value);
+        static void write(elevel inLevel, f64 _value);
+        static void write(elevel inLevel, const crunes_t& str);
+        static void write(elevel inLevel, const crunes_t& format, const va_list_t& arguments);
 
-        static void writeLine(ELevel inLevel);
-        static void writeLine(ELevel inLevel, bool _value);
-        static void writeLine(ELevel inLevel, s32 _value);
-        static void writeLine(ELevel inLevel, s64 _value);
-        static void writeLine(ELevel inLevel, u32 _value);
-        static void writeLine(ELevel inLevel, u64 _value);
-        static void writeLine(ELevel inLevel, f32 _value);
-        static void writeLine(ELevel inLevel, f64 _value);
-        static void writeLine(ELevel inLevel, const crunes_t& str);
-        static void writeLine(ELevel inLevel, const crunes_t& format, const va_list_t& arguments);
+        static void writeLine(elevel inLevel);
+        static void writeLine(elevel inLevel, bool _value);
+        static void writeLine(elevel inLevel, s32 _value);
+        static void writeLine(elevel inLevel, s64 _value);
+        static void writeLine(elevel inLevel, u32 _value);
+        static void writeLine(elevel inLevel, u64 _value);
+        static void writeLine(elevel inLevel, f32 _value);
+        static void writeLine(elevel inLevel, f64 _value);
+        static void writeLine(elevel inLevel, const crunes_t& str);
+        static void writeLine(elevel inLevel, const crunes_t& format, const va_list_t& arguments);
     };
 
     /**
@@ -143,8 +143,8 @@ namespace xcore
         virtual void writeLine(const crunes_t& format, const va_list_t& arguments) = 0;
     };
 
-}; // namespace xcore
+}; // namespace ncore
 
 #include "private/x_log_to_console.h"
 
-#endif ///< END __XBASE_LOG_H__
+#endif ///< END __CBASE_LOG_H__

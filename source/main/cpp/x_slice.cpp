@@ -2,7 +2,7 @@
 #include "xbase/x_slice.h"
 #include "xbase/x_integer.h"
 
-namespace xcore
+namespace ncore
 {
 	// ============================================================================
 	// SLICE DATA
@@ -10,25 +10,25 @@ namespace xcore
 
 	slice_data_t::slice_data_t()
 	{
-		mAllocator = NULL;
+		mAllocator = nullptr;
 		mRefCount = 0;
 		mItemCount = 0;
 		mItemSize = 1;
-		mData = NULL;
+		mData = nullptr;
 	}
 
 	slice_data_t::slice_data_t(s32 item_count, s32 item_size)
 	{
-		mAllocator = NULL;
+		mAllocator = nullptr;
 		mRefCount = 0;
 		mItemCount = item_count;
 		mItemSize = item_size;
-		mData = NULL;
+		mData = nullptr;
 	}
 
-	slice_data_t::slice_data_t(xbyte *data, s32 item_count, s32 item_size)
+	slice_data_t::slice_data_t(u8 *data, s32 item_count, s32 item_size)
 	{
-		mAllocator = NULL;
+		mAllocator = nullptr;
 		mRefCount = 0;
 		mItemCount = item_count;
 		mItemSize = item_size;
@@ -77,7 +77,7 @@ namespace xcore
 			data->mRefCount = 1;
 			data->mItemCount = to-from;
 			data->mItemSize = mItemSize;
-			data->mData = (xbyte*)mAllocator->allocate(data->mItemSize * data->mItemCount, sizeof(void *));
+			data->mData = (u8*)mAllocator->allocate(data->mItemSize * data->mItemCount, sizeof(void *));
 		}
 		return data;
 	}
@@ -89,8 +89,8 @@ namespace xcore
 			if (to > mItemCount)
 			{
 				s32 const to_itemcount = to;
-				xbyte* data = (xbyte *)mAllocator->allocate((to_itemcount * mItemSize), sizeof(void *));
-				xmem::memcpy(data, mData, to_itemcount * mItemSize);
+				u8* data = (u8 *)mAllocator->allocate((to_itemcount * mItemSize), sizeof(void *));
+				nmem::memcpy(data, mData, to_itemcount * mItemSize);
 				mItemCount = to_itemcount;
 			}
 		}
@@ -101,17 +101,17 @@ namespace xcore
 		if (mAllocator != nullptr)
 		{
 			s32 const to_itemcount = mItemCount + count;
-			xbyte* data = (xbyte*)mAllocator->allocate((to_itemcount * mItemSize), sizeof(void *));
+			u8* data = (u8*)mAllocator->allocate((to_itemcount * mItemSize), sizeof(void *));
 			s32 const head2copy = at * mItemSize;
 			s32 const gap2skip = count * mItemSize;
 			s32 const tail2copy = (mItemCount - at) * mItemSize;
 			if (head2copy > 0)
 			{
-				xmem::memcpy(data, this->mData, head2copy);
+				nmem::memcpy(data, this->mData, head2copy);
 			}
 			if (tail2copy > 0)
 			{
-				xmem::memcpy(data + head2copy + gap2skip, this->mData + head2copy, tail2copy);
+				nmem::memcpy(data + head2copy + gap2skip, this->mData + head2copy, tail2copy);
 			}
 			mItemCount += count;
 			mAllocator->deallocate(this->mData);
@@ -125,17 +125,17 @@ namespace xcore
 		{
 			s32 const to_itemsize = mItemSize;
 			s32 const to_itemcount = mItemCount - count;
-			xbyte* data = (xbyte*)mAllocator->allocate((to_itemcount * to_itemsize), sizeof(void *));
+			u8* data = (u8*)mAllocator->allocate((to_itemcount * to_itemsize), sizeof(void *));
 			s32 const head2copy = at * mItemSize;
 			s32 const gap2close = count * mItemSize;
 			s32 const tail2copy = (mItemCount - at) * mItemSize - gap2close;
 			if (head2copy > 0)
 			{
-				xmem::memcpy(data, this->mData, head2copy);
+				nmem::memcpy(data, this->mData, head2copy);
 			}
 			if (tail2copy > 0)
 			{
-				xmem::memcpy(data + head2copy, this->mData + head2copy + gap2close, tail2copy);
+				nmem::memcpy(data + head2copy, this->mData + head2copy + gap2close, tail2copy);
 			}
 			mItemCount -= count;
 			mAllocator->deallocate(this->mData);
@@ -146,7 +146,7 @@ namespace xcore
 	slice_data_t *slice_data_t::alloc(alloc_t *allocator, s32 &to_itemcount, s32 &to_itemsize)
 	{
 		slice_data_t *data = (slice_data_t *)allocator->allocate(sizeof(slice_data_t), sizeof(void *));
-		data->mData = (xbyte *)allocator->allocate((to_itemcount * to_itemsize), sizeof(void *));
+		data->mData = (u8 *)allocator->allocate((to_itemcount * to_itemsize), sizeof(void *));
 		data->mRefCount = 1;
 		data->mItemCount = to_itemcount;
 		data->mItemSize = to_itemsize;

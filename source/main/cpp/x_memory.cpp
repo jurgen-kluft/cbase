@@ -1,12 +1,12 @@
 #include "xbase/x_memory.h"
 
-namespace xcore
+namespace ncore
 {
 	namespace xmem
 	{
 #define	wsize	sizeof(u32)
 #define	wmask	(wsize - 1)
-		void* memcpy(void* dst0, const void* src0, uptr length)
+		void* memcpy(void* dst0, const void* src0, ptr_t length)
 		{
 			// Copy a block of memory, handling overlap.
 			// This is the routine that actually implements
@@ -14,7 +14,7 @@ namespace xcore
 
 			char *dst = (char *)dst0;
 			const char *src = (const char *)src0;
-			uptr t;
+			ptr_t t;
 
 			if (length == 0 || dst == src)		/* nothing to do */
 				goto done;
@@ -29,13 +29,13 @@ namespace xcore
 				/*
 				* Copy forward.
 				*/
-				t = (uptr)src;	/* only need low bits */
-				if ((t | (uptr)dst) & wmask) {
+				t = (ptr_t)src;	/* only need low bits */
+				if ((t | (ptr_t)dst) & wmask) {
 					/*
 					* Try to align operands.  This cannot be done
 					* unless the low bits match.
 					*/
-					if ((t ^ (uptr)dst) & wmask || length < wsize)
+					if ((t ^ (ptr_t)dst) & wmask || length < wsize)
 						t = length;
 					else
 						t = wsize - (t & wmask);
@@ -57,9 +57,9 @@ namespace xcore
 				*/
 				src += length;
 				dst += length;
-				t = (uptr)src;
-				if ((t | (uptr)dst) & wmask) {
-					if ((t ^ (uptr)dst) & wmask || length <= wsize)
+				t = (ptr_t)src;
+				if ((t | (ptr_t)dst) & wmask) {
+					if ((t ^ (ptr_t)dst) & wmask || length <= wsize)
 						t = length;
 					else
 						t &= wmask;
@@ -75,10 +75,10 @@ namespace xcore
 			return (dst0);
 		}
 
-        void* memset(void* dest, u32 c, uptr n) 
+        void* memset(void* dest, u32 c, ptr_t n) 
 		{
 			unsigned char *s = (unsigned char *)dest;
-			uptr k;
+			ptr_t k;
 
 			// Fill head and tail with minimal branching. Each
 			// conditional ensures that all the subsequently used
@@ -98,7 +98,7 @@ namespace xcore
 			// already took care of any head/tail that get cut off
 			// by the alignment.
 
-			k = -(uptr)s & 3;
+			k = -(ptr_t)s & 3;
 			s += k;
 			n -= k;
 			n &= -4;
@@ -361,6 +361,6 @@ namespace xcore
 #endif
             return (u64*)((u8*)(inDest) + 8);
         }
-    } // namespace xcore
+    } // namespace ncore
 
-} // namespace xcore
+} // namespace ncore

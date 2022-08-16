@@ -1,6 +1,6 @@
 
 
-namespace xcore
+namespace ncore
 {
 	// TODO: Optimize this using intrinsics
 

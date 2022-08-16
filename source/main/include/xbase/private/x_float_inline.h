@@ -74,11 +74,11 @@ namespace xf32
     inline bool    isFinite(f32 inNumber)                  { return bool(!isInfinite(inNumber) && !isNAN(inNumber)); }
     inline bool    isRational(f32 inNumber)                { return bool((bin(inNumber) & FF_EXPONENT_MASK) != FF_EXPONENT_MASK); }
 #else
-    inline bool    isPositiveInfinite(f32 inNumber)        { return xFALSE;}
-    inline bool    isNegativeInfinite(f32 inNumber)        { return xFALSE;}
+    inline bool    isPositiveInfinite(f32 inNumber)        { return False;}
+    inline bool    isNegativeInfinite(f32 inNumber)        { return False;}
 
-    inline bool    isInfinite(f32 inNumber)                { return xFALSE;}
-    inline bool    isNAN(f32 inNumber)                     { return xFALSE;}
+    inline bool    isInfinite(f32 inNumber)                { return False;}
+    inline bool    isNAN(f32 inNumber)                     { return False;}
     inline bool    isFinite(f32 inNumber)                  { return xTRUE;}
     inline bool    isRational(f32 inNumber)                { return xTRUE;}
 #endif

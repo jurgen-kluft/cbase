@@ -5,7 +5,7 @@
 #include "xbase/x_int64.h"
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(__xint64)
 {

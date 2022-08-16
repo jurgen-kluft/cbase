@@ -1,11 +1,11 @@
-#ifndef __XBASE_LIMITS_H__
-#define __XBASE_LIMITS_H__
+#ifndef __CBASE_LIMITS_H__
+#define __CBASE_LIMITS_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
 #define X_U8_MIN (0)
 #define X_U8_MAX (255)
@@ -171,6 +171,6 @@ namespace xcore
         static bool has_sign() { return true; }
     };
 
-}; // namespace xcore
+}; // namespace ncore
 
-#endif ///< END __XBASE_LIMITS_H__
+#endif ///< END __CBASE_LIMITS_H__

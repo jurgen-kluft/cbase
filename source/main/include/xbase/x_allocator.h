@@ -1,5 +1,5 @@
-#ifndef __XBASE_ALLOCATOR_H__
-#define __XBASE_ALLOCATOR_H__
+#ifndef __CBASE_ALLOCATOR_H__
+#define __CBASE_ALLOCATOR_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -9,7 +9,7 @@
 #include "xbase/x_context.h"
 #include "xbase/x_memory.h"
 
-namespace xcore
+namespace ncore
 {
     class buffer_t;
 
@@ -63,38 +63,38 @@ namespace xcore
 
     // class new and delete
 #define XCORE_CLASS_PLACEMENT_NEW_DELETE                                    \
-    void* operator new(xcore::xsize_t num_bytes, void* mem) { return mem; } \
+    void* operator new(ncore::uint_t num_bytes, void* mem) { return mem; } \
     void  operator delete(void* mem, void*) {}                              \
-    void* operator new(xcore::xsize_t num_bytes) noexcept { return NULL; }  \
+    void* operator new(ncore::uint_t num_bytes) noexcept { return nullptr; }  \
     void  operator delete(void* mem) {}
 
 #define XCORE_CLASS_NEW_DELETE(get_allocator_func, align)                   \
-    void* operator new(xcore::xsize_t num_bytes, void* mem) { return mem; } \
+    void* operator new(ncore::uint_t num_bytes, void* mem) { return mem; } \
     void  operator delete(void* mem, void*) {}                              \
-    void* operator new(xcore::xsize_t num_bytes)                            \
+    void* operator new(ncore::uint_t num_bytes)                            \
     {                                                                       \
-        ASSERT(num_bytes < (xcore::xsize_t)2 * 1024 * 1024 * 1024);         \
+        ASSERT(num_bytes < (ncore::uint_t)2 * 1024 * 1024 * 1024);         \
         return get_allocator_func()->allocate((u32)num_bytes, align);       \
     }                                                                       \
     void operator delete(void* mem) { get_allocator_func()->deallocate(mem); }
 
 #define XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator_func, align)       \
-    void* operator new[](xcore::xsize_t num_bytes)                    \
+    void* operator new[](ncore::uint_t num_bytes)                    \
     {                                                                 \
-        ASSERT(num_bytes < (xcore::xsize_t)2 * 1024 * 1024 * 1024);   \
+        ASSERT(num_bytes < (ncore::uint_t)2 * 1024 * 1024 * 1024);   \
         return get_allocator_func()->allocate((u32)num_bytes, align); \
     }                                                                 \
     void operator delete[](void* mem) { get_allocator_func()->deallocate(mem); }
 
     // helper functions
-    inline void* x_advance_ptr(void* ptr, xsize_t size) { return (void*)((uptr)ptr + size); }
-    inline void* x_align_ptr(void* ptr, u32 alignment) { return (void*)(((uptr)ptr + (alignment - 1)) & ~((uptr)alignment - 1)); }
-    inline uptr  x_diff_ptr(void* ptr, void* next_ptr) { return (uptr)((uptr)next_ptr - (uptr)ptr); }
-    inline bool  x_is_in_range(void* buffer, xsize_t size, void* ptr)
+    inline void* x_advance_ptr(void* ptr, uint_t size) { return (void*)((ptr_t)ptr + size); }
+    inline void* x_align_ptr(void* ptr, u32 alignment) { return (void*)(((ptr_t)ptr + (alignment - 1)) & ~((ptr_t)alignment - 1)); }
+    inline ptr_t  x_diff_ptr(void* ptr, void* next_ptr) { return (ptr_t)((ptr_t)next_ptr - (ptr_t)ptr); }
+    inline bool  x_is_in_range(void* buffer, uint_t size, void* ptr)
     {
-        uptr begin  = (uptr)buffer;
-        uptr end    = begin + size;
-        uptr cursor = (uptr)ptr;
+        ptr_t begin  = (ptr_t)buffer;
+        ptr_t end    = begin + size;
+        ptr_t cursor = (ptr_t)ptr;
         return cursor >= begin && cursor < end;
     }
 
@@ -193,17 +193,17 @@ namespace xcore
 
     class alloc_buffer_t : public alloc_t
     {
-        static inline xbyte* align_ptr(xbyte* ptr, uptr align) { return (xbyte*)(((uptr)ptr + (align - 1)) & ~(align - 1)); }
+        static inline u8* align_ptr(u8* ptr, ptr_t align) { return (u8*)(((ptr_t)ptr + (align - 1)) & ~(align - 1)); }
 
-        xbyte* m_base;
-        xbyte* m_ptr;
-        xbyte* m_end;
+        u8* m_base;
+        u8* m_ptr;
+        u8* m_end;
         s64    m_cnt;
 
     public:
-        alloc_buffer_t(xbyte* buffer, s64 length);
+        alloc_buffer_t(u8* buffer, s64 length);
 
-        xbyte* data() { return m_base; }
+        u8* data() { return m_base; }
 
         XCORE_CLASS_PLACEMENT_NEW_DELETE
 
@@ -212,7 +212,7 @@ namespace xcore
         {
             if (m_ptr < m_end && align_ptr(m_ptr + size, align) <= m_end)
             {
-                xbyte* storage = m_ptr;
+                u8* storage = m_ptr;
                 m_ptr          = align_ptr(m_ptr + size, sizeof(void*));
                 m_cnt += 1;
                 return storage;
@@ -243,12 +243,12 @@ namespace xcore
     // Allocate a one or more objects in-place
     class allocinplace_t : public alloc_t
     {
-        xbyte* m_base;
-        xbyte* m_data;
+        u8* m_base;
+        u8* m_data;
         u64    m_size;
 
     public:
-        inline allocinplace_t(xbyte* data, u64 size)
+        inline allocinplace_t(u8* data, u64 size)
             : m_base(data)
             , m_data(data)
             , m_size(size)
@@ -272,7 +272,7 @@ namespace xcore
     public:
         inline inplace_t() {}
 
-        allocinplace_t               allocator() const { return allocinplace_t((xbyte*)m_memory, (u64)SIZE * 8); }
+        allocinplace_t               allocator() const { return allocinplace_t((u8*)m_memory, (u64)SIZE * 8); }
         inline u64                   size() const { return (u64)SIZE * 8; }
         template <class T> inline T* object() { return (T*)(m_memory); }
     };
@@ -357,6 +357,6 @@ namespace xcore
         extern void       end(tag_id_t id);
     };
 
-}; // namespace xcore
+}; // namespace ncore
 
-#endif ///< __XBASE_ALLOCATOR_H__
+#endif ///< __CBASE_ALLOCATOR_H__

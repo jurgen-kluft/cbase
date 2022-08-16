@@ -2,12 +2,12 @@
 
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 static s32 s32_compare(const void* const a, const void* const b, void*)
 {
-	const xcore::s32* aa = (const xcore::s32*)a;
-	const xcore::s32* bb = (const xcore::s32*)b;
+	const ncore::s32* aa = (const ncore::s32*)a;
+	const ncore::s32* bb = (const ncore::s32*)b;
 	if (*aa < *bb)
 		return -1;
 	else if (*aa > *bb)
@@ -17,8 +17,8 @@ static s32 s32_compare(const void* const a, const void* const b, void*)
 
 static s32 f32_compare(const void* const a, const void* const b, void*)
 {
-	const xcore::f32* aa = (const xcore::f32*)a;
-	const xcore::f32* bb = (const xcore::f32*)b;
+	const ncore::f32* aa = (const ncore::f32*)a;
+	const ncore::f32* bb = (const ncore::f32*)b;
 	if (*aa < *bb)
 		return -1;
 	else if (*aa > *bb)
@@ -37,7 +37,7 @@ UNITTEST_SUITE_BEGIN(g_qsort)
 
 		UNITTEST_TEST(sort_s32)
 		{
-			xcore::s32 number_list[] =
+			ncore::s32 number_list[] =
 			{
 				20418437,89940142,35222807,15452193,39873965,57665325,25892441, 8795529, 2391726,11735384,
 				94704581,89539275,97839662,43642375,86605077,56392381,83561822,34804288,51057740,26513622,
@@ -69,15 +69,15 @@ UNITTEST_SUITE_BEGIN(g_qsort)
 				12352412, 5578758,81339043,18607844,18848471,64523704,64196796,21016454,59427976,79996321,
 				69495124,43485847,17519345,66644428,85166464,10394800,39572871,37438296,89853126,74654252
 			};
-			s32 n = sizeof(number_list)/sizeof(xcore::s32);
-			g_qsort(number_list, n, sizeof(xcore::s32), s32_compare);
+			s32 n = sizeof(number_list)/sizeof(ncore::s32);
+			g_qsort(number_list, n, sizeof(ncore::s32), s32_compare);
 			for (s32 i=0; i<(n-1); ++i)
 				CHECK_TRUE(number_list[i] <= number_list[i+1]);
 		}
 
 		UNITTEST_TEST(sort_f32)
 		{
-			xcore::f32 float_list[] =
+			ncore::f32 float_list[] =
 			{
 				0.20418437f,0.89940142f,0.35222807f,0.15452193f,0.39873965f,0.57665325f,0.25892441f,0.08795529f,0.02391726f,0.11735384f,
 				0.94704581f,0.89539275f,0.97839662f,0.43642375f,0.86605077f,0.56392381f,0.83561822f,0.34804288f,0.51057740f,0.26513622f,
@@ -109,9 +109,9 @@ UNITTEST_SUITE_BEGIN(g_qsort)
 				0.12352412f,0.05578758f,0.81339043f,0.18607844f,0.18848471f,0.64523704f,0.64196796f,0.21016454f,0.59427976f,0.79996321f,
 				0.69495124f,0.43485847f,0.17519345f,0.66644428f,0.85166464f,0.10394800f,0.39572871f,0.37438296f,0.89853126f,0.74654252f
 			};
-			s32 n = sizeof(float_list)/sizeof(xcore::f32);
+			s32 n = sizeof(float_list)/sizeof(ncore::f32);
 
-			g_qsort(float_list, n, sizeof(xcore::f32), f32_compare);
+			g_qsort(float_list, n, sizeof(ncore::f32), f32_compare);
 			for (s32 i=0; i<(n-1); ++i)
 				CHECK_TRUE(float_list[i] <= float_list[i+1]);
 		}

@@ -4,9 +4,9 @@
 
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
-extern xcore::alloc_t* gTestAllocator;
+extern ncore::alloc_t* gTestAllocator;
 
 s32				compare_s32(void const* p1, void const* p2)
 {
@@ -37,12 +37,12 @@ UNITTEST_SUITE_BEGIN(xtree)
         {
             tree_t::node_t node;
 
-            tree_t::node_t* left_ptr = (tree_t::node_t*)((uptr)0 - (uptr)1);
+            tree_t::node_t* left_ptr = (tree_t::node_t*)((ptr_t)0 - (ptr_t)1);
             node.set_left(left_ptr);
             
             CHECK_EQUAL(left_ptr, node.get_left());
 
-            tree_t::node_t* right_ptr = (tree_t::node_t*)((uptr)0 - (uptr)2);
+            tree_t::node_t* right_ptr = (tree_t::node_t*)((ptr_t)0 - (ptr_t)2);
             node.set_right(right_ptr);
             CHECK_EQUAL(right_ptr, node.get_right());
 
@@ -98,7 +98,7 @@ UNITTEST_SUITE_BEGIN(xtree)
             tree_t::node_t nh;
             tree_t::node_t ni;
 
-            const char* result = NULL;
+            const char* result = nullptr;
 
             bool inserted;
             inserted = tree.insert(&a, &na);
@@ -441,7 +441,7 @@ UNITTEST_SUITE_BEGIN(xtree)
             tree_t::node_t nh;
             tree_t::node_t ni;
 
-            const char* result = NULL;
+            const char* result = nullptr;
 
             bool inserted;
             inserted = tree.insert(&a, &na);

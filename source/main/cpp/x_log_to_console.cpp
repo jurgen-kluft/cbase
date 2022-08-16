@@ -3,7 +3,7 @@
 #include "xbase/x_log.h"
 #include "xbase/x_console.h"
 
-namespace xcore
+namespace ncore
 {
 	void				xlog_to_console_imp::initialize()
 	{

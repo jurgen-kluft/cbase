@@ -8,7 +8,7 @@
 #include "xbase/private/x_int128.h"
 #include "xbase/private/x_uint128.h"
 
-namespace xcore 
+namespace ncore 
 {
 	const __xuint128	__xuint128::Zero;
 	const __xuint128	__xuint128::One((u32)1);

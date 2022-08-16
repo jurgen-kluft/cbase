@@ -14,7 +14,7 @@
 
 #include "xbase/private/x_int128.h"
 
-namespace xcore {
+namespace ncore {
 
 	const __xint128	__xint128::Zero;
 	const __xint128	__xint128::One((u32)1);

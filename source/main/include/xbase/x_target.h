@@ -1,16 +1,16 @@
-#ifndef __X_BASE_TARGET_H__
-#define __X_BASE_TARGET_H__
+#ifndef __D_BASE_TARGET_H__
+#define __D_BASE_TARGET_H__
 
-namespace xcore
+namespace ncore
 {
     // Hardware enumeration
     enum eplatform
     {
-        X_PLATFORM_NONE = 0,
-        X_PLATFORM_PC   = (1 << 0),
-        X_PLATFORM_MAC  = (1 << 1),
-        X_PLATFORM_ALL  = (1 << 15),
-        X_PLATFORM_PAD  = 0xffffffff
+        PLATFORM_NONE = 0,
+        PLATFORM_PC   = (1 << 0),
+        PLATFORM_MAC  = (1 << 1),
+        PLATFORM_ALL  = (1 << 15),
+        PLATFORM_PAD  = 0xffffffff
     };
 
 #if defined(TARGET_PC)
@@ -84,31 +84,31 @@ namespace xcore
 #elif defined(TARGET_LINUX)
     #if defined(TARGET_DEBUG)
         #if defined(TARGET_DEV)
-            #define TARGET_LINUX_DEV_DEBUG
+            #define TARGET_LINUD_DEV_DEBUG
         #elif defined(TARGET_RETAIL)
-            #define TARGET_LINUX_RETAIL_DEBUG
+            #define TARGET_LINUD_RETAIL_DEBUG
         #elif defined(TARGET_TEST)
-            #define TARGET_LINUX_TEST_DEBUG
+            #define TARGET_LINUD_TEST_DEBUG
         #else
             #error "TARGET_DEBUG must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
         #endif
     #elif defined(TARGET_RELEASE)
         #if defined(TARGET_DEV)
-            #define TARGET_LINUX_DEV_RELEASE
+            #define TARGET_LINUD_DEV_RELEASE
         #elif defined(TARGET_RETAIL)
-            #define TARGET_LINUX_RETAIL_RELEASE
+            #define TARGET_LINUD_RETAIL_RELEASE
         #elif defined(TARGET_TEST)
-            #define TARGET_LINUX_TEST_RELEASE
+            #define TARGET_LINUD_TEST_RELEASE
         #else
             #error "TARGET_RELEASE must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
         #endif
     #elif defined(TARGET_FINAL)
         #if defined(TARGET_DEV)
-            #define TARGET_LINUX_DEV_FINAL
+            #define TARGET_LINUD_DEV_FINAL
         #elif defined(TARGET_RETAIL)
-            #define TARGET_LINUX_RETAIL_FINAL
+            #define TARGET_LINUD_RETAIL_FINAL
         #elif defined(TARGET_TEST)
-            #define TARGET_LINUX_TEST_FINAL
+            #define TARGET_LINUD_TEST_FINAL
         #else
             #error "TARGET_FINAL must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
         #endif
@@ -142,9 +142,9 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_DEBUG
 #        define TARGET_TEST
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -159,7 +159,7 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_DEV
 #        define TARGET_TEST
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -175,7 +175,7 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_RELEASE
 #        define TARGET_TEST
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -190,9 +190,9 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_DEBUG
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -206,7 +206,7 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_DEV
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -221,7 +221,7 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_RELEASE
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -236,9 +236,9 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_FINAL
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -252,9 +252,9 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_CLIENT
 #        define TARGET_DEBUG
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -268,7 +268,7 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_CLIENT
 #        define TARGET_DEV
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -283,9 +283,9 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_CLIENT
 #        define TARGET_RELEASE
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -299,9 +299,9 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_CLIENT
 #        define TARGET_RELEASE
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -315,9 +315,9 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_RETAIL
 #        define TARGET_DEBUG
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -331,7 +331,7 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_RETAIL
 #        define TARGET_DEV
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -346,9 +346,9 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_RETAIL
 #        define TARGET_RELEASE
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -362,9 +362,9 @@ namespace xcore
 #        define TARGET_64BIT
 #        define TARGET_RETAIL
 #        define TARGET_FINAL
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -379,9 +379,9 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_DEBUG
 #        define TARGET_TEST
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -395,7 +395,7 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_DEV
 #        define TARGET_TEST
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -410,7 +410,7 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_RELEASE
 #        define TARGET_TEST
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -424,9 +424,9 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_DEVKIT
 #        define TARGET_DEBUG
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -439,7 +439,7 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_DEVKIT
 #        define TARGET_DEV
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -453,7 +453,7 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_DEVKIT
 #        define TARGET_RELEASE
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -467,7 +467,7 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_RETAIL
 #        define TARGET_FINAL
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -481,9 +481,9 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_CLIENT
 #        define TARGET_DEBUG
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -496,7 +496,7 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_CLIENT
 #        define TARGET_DEV
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -510,7 +510,7 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_CLIENT
 #        define TARGET_RELEASE
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -524,7 +524,7 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_CLIENT
 #        define TARGET_FINAL
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -538,9 +538,9 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_RETAIL
 #        define TARGET_DEBUG
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -553,9 +553,9 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_RETAIL
 #        define TARGET_DEV
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
-#        define X_DEBUG
+#        define D_DEBUG
 #    endif
 #endif
 
@@ -568,7 +568,7 @@ namespace xcore
 #        define TARGET_PC
 #        define TARGET_RETAIL
 #        define TARGET_FINAL
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 #    endif
 #endif
@@ -583,12 +583,12 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_MFC
 #        define TARGET_DEBUG
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define TARGET_EDITOR
 #        define VALID_TARGET
-//#define X_USE_NATIVE_NEW_AND_DELETE
+//#define D_USE_NATIVE_NEW_AND_DELETE
 //#define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
-#        define X_EXCEPTIONS
+#        define D_EXCEPTIONS
 #    endif
 #endif
 
@@ -602,12 +602,12 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_MFC
 #        define TARGET_DEV
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define TARGET_EDITOR
 #        define VALID_TARGET
-//#define X_USE_NATIVE_NEW_AND_DELETE
+//#define D_USE_NATIVE_NEW_AND_DELETE
 //#define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
-#        define X_EXCEPTIONS
+#        define D_EXCEPTIONS
 #    endif
 #endif
 
@@ -621,12 +621,12 @@ namespace xcore
 #        define TARGET_DEVKIT
 #        define TARGET_MFC
 #        define TARGET_RELEASE
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define TARGET_EDITOR
 #        define VALID_TARGET
-//#define X_USE_NATIVE_NEW_AND_DELETE
+//#define D_USE_NATIVE_NEW_AND_DELETE
 //#define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
-#        define X_EXCEPTIONS
+#        define D_EXCEPTIONS
 #    endif
 #endif
 
@@ -639,24 +639,24 @@ namespace xcore
 #    ifdef _MSC_VER // and we are using the Microsoft compiler...
 #        undef TARGET_PC
 #        define TARGET_PC
-#        define TARGET_PLATFORM X_PLATFORM_PC
+#        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 
 #        ifdef _DEBUG
 #            define TARGET_DEBUG
-#            define X_DEBUG
+#            define D_DEBUG
 #        else
 #            define TARGET_DEV
 #        endif
 #    elif defined(__APPLE__) && defined(__clang__)
 #        undef TARGET_MAC
 #        define TARGET_MAC
-#        define TARGET_PLATFORM X_PLATFORM_MAC
+#        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
 
 #        ifdef _DEBUG
 #            define TARGET_DEBUG
-#            define X_DEBUG
+#            define D_DEBUG
 #        else
 #            define TARGET_DEV
 #        endif
@@ -785,8 +785,8 @@ namespace xcore
 
 #ifdef MULTIPLE_TARGETS
 #    pragma message(TARGET_FULL_DESCR_STR)
-#    error x_target, error; Multiple target specification definition macros were detected.
-#    error x_target, error; The compilation environment must define only one of the macros listed in x_targets.h
+#    error error; Multiple target specification definition macros were detected.
+#    error error; The compilation environment must define only one of the macros listed in x_targets.h
 #endif
 
     //
@@ -865,12 +865,12 @@ namespace xcore
 #    error x_target, error; This compiler is not supported for TARGET_UNKNOWN
 #endif
 
-#undef X_CHAR_BIT
+#undef D_CHAR_BIT
 
 /// This one is for Windows; Microsoft Developer Studio Visual C/C++ Compiler
 #if defined(COMPILER_MSVC)
-#    define X_NO_CUSTOM_INT64
-#    define X_NO_CUSTOM_UINT64
+#    define D_NO_CUSTOM_INT64
+#    define D_NO_CUSTOM_UINT64
     class __xint128;
     class __xuint128;
     class __xint256;
@@ -885,93 +885,93 @@ namespace xcore
         };
     };
 
-//#define X_NO_PARTIAL_TEMPLATE
-#    define X_CACHE_LINE_SIZE 32
-#    define X_CHAR_BIT        8
-#    define X_IEEE_FLOATS
-#    define X_USE_PRAGMA_ONCE
-#    define X_STD_CALL     __stdcall
-#    define X_C_DECL       __cdecl
+//#define D_NO_PARTIAL_TEMPLATE
+#    define D_CACHE_LINE_SIZE 32
+#    define D_CHAR_BIT        8
+#    define D_IEEE_FLOATS
+#    define D_USE_PRAGMA_ONCE
+#    define D_STD_CALL     __stdcall
+#    define D_C_DECL       __cdecl
 #    define f_inline       __forceinline
 #    define f_noinline     __declspec(noinline)
-#    define X_FORCE_INLINE __forceinline
-#    define X_BOOL         signed long
-#    define X_BYTE         unsigned char
-#    define X_WCHAR        unsigned short
-#    define X_INT8         char
-#    define X_INT16        short
-#    define X_INT32        int
-#    define X_INT64        signed __int64
-#    define X_UINT64       unsigned __int64
-#    define X_INT128       __xint128
-#    define X_UINT128      __xuint128
-#    define X_INT256       __xint256
-#    define X_UINT256      __xuint256
+#    define D_FORCE_INLINE __forceinline
+#    define D_BOOL         signed long
+#    define D_BYTE         unsigned char
+#    define D_WCHAR        unsigned short
+#    define D_INT8         char
+#    define D_INT16        short
+#    define D_INT32        int
+#    define D_INT64        signed __int64
+#    define D_UINT64       unsigned __int64
+#    define D_INT128       __xint128
+#    define D_UINT128      __xuint128
+#    define D_INT256       __xint256
+#    define D_UINT256      __xuint256
 #    ifdef TARGET_64BIT
-#        define X_SIZE              unsigned __int64
-#        define X_INT               __int64
-#        define X_PTR_SIZED_INT     __int64
-#        define X_ALIGNMENT_DEFAULT 8
+#        define D_SIZE              unsigned __int64
+#        define D_INT               __int64
+#        define D_PTR_SIZED_INT     __int64
+#        define D_ALIGNMENT_DEFAULT 8
 #    else
-#        define X_SIZE              unsigned int
-#        define X_INT               int
-#        define X_PTR_SIZED_INT     int
-#        define X_ALIGNMENT_DEFAULT 4
+#        define D_SIZE              unsigned int
+#        define D_INT               int
+#        define D_PTR_SIZED_INT     int
+#        define D_ALIGNMENT_DEFAULT 4
 #    endif
-#    define X_LITTLE_ENDIAN 4321
-#    define X_FLOAT         float
-#    define X_DOUBLE        double
-#    define X_ALIGNMENT(a)  __declspec(align(a))
+#    define D_LITTLE_ENDIAN 4321
+#    define D_FLOAT         float
+#    define D_DOUBLE        double
+#    define D_ALIGNMENT(a)  __declspec(align(a))
 
-#    define X_ALIGN_BEGIN(a) __declspec(align(a))
-#    define X_ALIGN_END(a)
+#    define D_ALIGN_BEGIN(a) __declspec(align(a))
+#    define D_ALIGN_END(a)
 
 #    define ALIGNOF(t) __alignof(t)
 
-#    define X_OFFSET_OF(type, member) (X_SIZE) & reinterpret_cast<const volatile char&>((((type*)0)->member))
+#    define D_OFFSET_OF(type, member) (D_SIZE) & reinterpret_cast<const volatile char&>((((type*)0)->member))
 
 #    pragma inline_depth(255)
 
-#    define X_THREAD_LOCAL __declspec(thread)
-#    define X_FINAL        final
+#    define D_THREAD_LOCAL __declspec(thread)
+#    define D_FINAL        final
 
 /// disable useless warnings
 #    pragma warning(disable : 4800)
 
 #elif defined(COMPILER_CLANG)
-#    define X_NO_CUSTOM_INT64
-#    define X_NO_CUSTOM_UINT64
+#    define D_NO_CUSTOM_INT64
+#    define D_NO_CUSTOM_UINT64
     class __xint128;
     class __xuint128;
     class __xint256;
     class __xuint256;
 
 #    define __NO_PARTIAL_TEMPLATE__
-#    define X_CACHE_LINE_SIZE 32
-#    define X_CHAR_BIT        8
-#    define X_USE_PRAGMA_ONCE
-#    define X_STD_CALL         __stdcall
-#    define X_C_DECL           __cdecl
+#    define D_CACHE_LINE_SIZE 32
+#    define D_CHAR_BIT        8
+#    define D_USE_PRAGMA_ONCE
+#    define D_STD_CALL         __stdcall
+#    define D_C_DECL           __cdecl
 #    define f_inline           __attribute__((always_inline))
 #    define f_noinline         __attribute__((noinline))
-#    define X_FORCE_INLINE     __attribute__((always_inline))
-#    define X_FORCE_INLINE_SPU __attribute__((always_inline))
+#    define D_FORCE_INLINE     __attribute__((always_inline))
+#    define D_FORCE_INLINE_SPU __attribute__((always_inline))
 
-#    define X_BOOL    unsigned int
-#    define X_BYTE    unsigned char
-#    define X_WCHAR   unsigned short
-#    define X_INT8    char
-#    define X_INT16   short
-#    define X_INT32   int
-#    define X_INT64   signed long
-#    define X_UINT64  unsigned long
-#    define X_INT128  __xint128
-#    define X_UINT128 __xuint128
-#    define X_INT256  __xint256
-#    define X_UINT256 __xuint256
+#    define D_BOOL    unsigned int
+#    define D_BYTE    unsigned char
+#    define D_WCHAR   unsigned short
+#    define D_INT8    char
+#    define D_INT16   short
+#    define D_INT32   int
+#    define D_INT64   signed long
+#    define D_UINT64  unsigned long
+#    define D_INT128  __xint128
+#    define D_UINT128 __xuint128
+#    define D_INT256  __xint256
+#    define D_UINT256 __xuint256
 
-    template <bool> struct xCompileTimeAssert;
-    template <> struct xCompileTimeAssert<true>
+    template <bool> struct CompileTimeAssert;
+    template <> struct CompileTimeAssert<true>
     {
         enum
         {
@@ -980,74 +980,60 @@ namespace xcore
     };
 
 #    ifdef TARGET_64BIT
-#        define X_SIZE              unsigned long
-#        define X_INT               signed long
-#        define X_PTR_SIZED_INT     signed long
-#        define X_ALIGNMENT_DEFAULT 8
+#        define D_SIZE              unsigned long
+#        define D_INT               signed long
+#        define D_PTR_SIZED_INT     signed long
+#        define D_ALIGNMENT_DEFAULT 8
 #    else
-#        define X_SIZE              unsigned int
-#        define X_INT               signed int
-#        define X_PTR_SIZED_INT     int
-#        define X_ALIGNMENT_DEFAULT 4
+#        define D_SIZE              unsigned int
+#        define D_INT               signed int
+#        define D_PTR_SIZED_INT     int
+#        define D_ALIGNMENT_DEFAULT 4
 #    endif
 
     static inline void TestTypeSizes()
     {
-        xCompileTimeAssert<sizeof(X_SIZE) == sizeof(void*)>();
-        xCompileTimeAssert<sizeof(X_PTR_SIZED_INT) == sizeof(void*)>();
+        CompileTimeAssert<sizeof(D_SIZE) == sizeof(void*)>();
+        CompileTimeAssert<sizeof(D_PTR_SIZED_INT) == sizeof(void*)>();
 
-        xCompileTimeAssert<sizeof(int) == 4>();
-        xCompileTimeAssert<sizeof(short int) == 2>();
-        xCompileTimeAssert<sizeof(long int) == 8>();
+        CompileTimeAssert<sizeof(int) == 4>();
+        CompileTimeAssert<sizeof(short int) == 2>();
+        CompileTimeAssert<sizeof(long int) == 8>();
 
-        xCompileTimeAssert<sizeof(X_BOOL) == 4>();
-        xCompileTimeAssert<sizeof(X_INT8) == 1>();
-        xCompileTimeAssert<sizeof(X_INT16) == 2>();
-        xCompileTimeAssert<sizeof(X_INT32) == 4>();
-        xCompileTimeAssert<sizeof(X_INT64) == 8>();
-        xCompileTimeAssert<sizeof(X_UINT64) == 8>();
+        CompileTimeAssert<sizeof(D_BOOL) == 4>();
+        CompileTimeAssert<sizeof(D_INT8) == 1>();
+        CompileTimeAssert<sizeof(D_INT16) == 2>();
+        CompileTimeAssert<sizeof(D_INT32) == 4>();
+        CompileTimeAssert<sizeof(D_INT64) == 8>();
+        CompileTimeAssert<sizeof(D_UINT64) == 8>();
     }
 
-#    define X_LITTLE_ENDIAN 4321
-#    define X_FLOAT         float
-#    define X_DOUBLE        double
-#    define X_ALIGNMENT(a)  __attribute__((aligned(a)))
+#    define D_LITTLE_ENDIAN 4321
+#    define D_FLOAT         float
+#    define D_DOUBLE        double
+#    define D_ALIGNMENT(a)  __attribute__((aligned(a)))
 
-#    define X_ALIGN_BEGIN(a)
-#    define X_ALIGN_END(a) __attribute__((aligned(a)))
+#    define D_ALIGN_BEGIN(a)
+#    define D_ALIGN_END(a) __attribute__((aligned(a)))
 
-#    define X_OFFSET_OF(type, member) (X_SIZE) & reinterpret_cast<const volatile char&>((((type*)0)->member))
+#    define D_OFFSET_OF(type, member) (D_SIZE) & reinterpret_cast<const volatile char&>((((type*)0)->member))
 
-#    define ALIGNOF(t) __alignof(t)
+#    define D_ALIGNOF(t) __alignof(t)
 
-#    define X_THREAD_LOCAL __declspec(thread)
-#    define X_FINAL        final
+#    define D_THREAD_LOCAL __declspec(thread)
+#    define D_FINAL        final
 
 #else
 #    error x_target, error; no compiler selected
 #endif
 
-#if (!defined(X_BIG_ENDIAN) && !defined(X_LITTLE_ENDIAN))
+#if (!defined(D_BIG_ENDIAN) && !defined(D_LITTLE_ENDIAN))
 #    error x_target, error; endian is not defined.
 #endif
 
-#if (defined(X_BIG_ENDIAN) && defined(X_LITTLE_ENDIAN))
+#if (defined(D_BIG_ENDIAN) && defined(D_LITTLE_ENDIAN))
 #    error x_target, error; both endian specifications are defined!
 #endif
-
-    enum x_memalign
-    {
-        X_MEMALIGN_PC    = 8,
-        X_MEMALIGN_MACOS = 8,
-#if defined(TARGET_PC)
-        X_MEMALIGN = X_MEMALIGN_PC,
-#elif defined(TARGET_MAC)
-        X_MEMALIGN = X_MEMALIGN_MACOS,
-#else
-#    error x_target, error; need to have X_MEMALIGN defined
-#endif
-        X__PAD = 0xffffffff
-    };
 
     // Multi-threading configuration
 
@@ -1069,11 +1055,11 @@ namespace xcore
     //  handle configuration specific options
     //
 
-#if !defined(X_DEBUG)
-#    undef X_ASSERT
+#if !defined(D_DEBUG)
+#    undef D_ASSERT
 #else
-#    ifndef X_ASSERT
-#        define X_ASSERT
+#    ifndef D_ASSERT
+#        define D_ASSERT
 #    endif
 #endif
 
@@ -1081,25 +1067,25 @@ namespace xcore
     // 64 bit constant support
     //
 
-#ifndef X_CONSTANT_64
+#ifndef D_CONSTANT_64
 /// Assume compiler needs/accepts standard prefix for int64 types (long long)
-#    define X_CONSTANT_64(x) x##LL
+#    define D_CONSTANT_64(x) x##LL
 #endif
 
-#ifndef X_CONSTANT_U64
+#ifndef D_CONSTANT_U64
 /// Assume compiler needs/accepts standard prefix for uint64 types (unsigned long long)
-#    define X_CONSTANT_U64(x) x##ULL
+#    define D_CONSTANT_U64(x) x##ULL
 #endif
 
     //
     // unsigned 32 bit constant support
     //
 
-#ifndef X_CONSTANT_S32
-#    define X_CONSTANT_S32(x) x##L
+#ifndef D_CONSTANT_S32
+#    define D_CONSTANT_S32(x) x##L
 #endif
-#ifndef X_CONSTANT_U32
-#    define X_CONSTANT_U32(x) x##UL
+#ifndef D_CONSTANT_U32
+#    define D_CONSTANT_U32(x) x##UL
 #endif
 
     //==============================================================================
@@ -1110,30 +1096,28 @@ namespace xcore
     // DOM-IGNORE-BEGIN
     //==============================================================================
 
-#ifndef NULL
-#    define NULL 0
+#ifndef nullptr
+#    define nullptr 0
 #endif
 
-    typedef unsigned X_INT8  u8;
-    typedef unsigned X_INT16 u16;
-    typedef unsigned X_INT32 u32;
-    typedef X_UINT64         u64;
-    typedef X_UINT128        u128;
-    typedef X_UINT256        u256;
-    typedef signed X_INT8    s8;
-    typedef signed X_INT16   s16;
-    typedef signed X_INT32   s32;
-    typedef X_INT64          s64;
-    typedef X_INT128         s128;
-    typedef X_INT256         s256;
-    typedef X_FLOAT          f32;
-    typedef X_DOUBLE         f64;
-    typedef X_BYTE           xbyte;
-    typedef X_BOOL           xbool32;
-    typedef X_SIZE           xsize_t;
-    typedef X_INT            xint_t;
-    typedef X_PTR_SIZED_INT  uptr;
-    typedef X_WCHAR          wchar;
+    typedef unsigned D_INT8  u8;
+    typedef unsigned D_INT16 u16;
+    typedef unsigned D_INT32 u32;
+    typedef D_UINT64         u64;
+    typedef D_UINT128        u128;
+    typedef D_UINT256        u256;
+    typedef signed D_INT8    s8;
+    typedef signed D_INT16   s16;
+    typedef signed D_INT32   s32;
+    typedef D_INT64          s64;
+    typedef D_INT128         s128;
+    typedef D_INT256         s256;
+    typedef D_FLOAT          f32;
+    typedef D_DOUBLE         f64;
+    typedef D_SIZE           uint_t;
+    typedef D_INT            int_t;
+    typedef D_PTR_SIZED_INT  ptr_t;
+    typedef D_WCHAR          wchar;
     
     //==============================================================================
     // ASCII + UTF 8, 16, 32
@@ -1149,63 +1133,81 @@ namespace xcore
     {
     public:
         virtual ~writer_t() {}
-        virtual s64 write(xbyte const*, s64) = 0;
+        virtual s64 write(u8 const*, s64) = 0;
     };
 
     class reader_t
     {
     public:
         virtual ~reader_t() {}
-        virtual s64 read(xbyte*, s64) = 0;
+        virtual s64 read(u8*, s64) = 0;
     };
 
     //==============================================================================
     // KB, MB, GB, TB values
     //==============================================================================
-    const u64 xKB  = (u64)1024;
-    const u64 xMB  = (u64)1024 * 1024;
-    const u64 xGB  = (u64)1024 * 1024 * 1024;
-    const u64 xTB  = (u64)1024 * 1024 * 1024 * 1024;
+    const u64 cKB  = (u64)1024;
+    const u64 cMB  = (u64)1024 * 1024;
+    const u64 cGB  = (u64)1024 * 1024 * 1024;
+    const u64 cTB  = (u64)1024 * 1024 * 1024 * 1024;
+
+    //==============================================================================
+    // Memory Alignment
+    //==============================================================================
+
+    enum ememalign
+    {
+        MEMALIGN_PC    = 8,
+        MEMALIGN_MACOS = 8,
+#if defined(TARGET_PC)
+        MEMALIGN = MEMALIGN_PC,
+#elif defined(TARGET_MAC)
+        MEMALIGN = MEMALIGN_MACOS,
+#else
+#    error x_target, error unknown platform
+#endif
+        D__PAD = 0xffffffff
+    };
 
     //==============================================================================
     // Min/Max values
     //==============================================================================
 
-    const u8 xU8Min = (u8)0x00;  ///< minimum value of a u8.
-    const u8 xU8Max = (u8)0xFF;  ///< maximum value of a u8.
-    const s8 xS8Min = (s8)-0x80; ///< minimum value of a s8.
-    const s8 xS8Max = (s8)0x7F;  ///< maximum value of a s8.
+    const u8 cU8Min = (u8)0x00;  ///< minimum value of a u8.
+    const u8 cU8Max = (u8)0xFF;  ///< maximum value of a u8.
+    const s8 cS8Min = (s8)-0x80; ///< minimum value of a s8.
+    const s8 cS8Max = (s8)0x7F;  ///< maximum value of a s8.
 
-    const u16 xU16Min = (u16)0x0000;  ///< minimum value of a u16
-    const u16 xU16Max = (u16)0xFFFF;  ///< maximum value of a u16.
-    const s16 xS16Min = (s16)-0x8000; ///< minimum value of a s16.
-    const s16 xS16Max = (s16)0x7FFF;  ///< maximum value of a s16.
+    const u16 cU16Min = (u16)0x0000;  ///< minimum value of a u16
+    const u16 cU16Max = (u16)0xFFFF;  ///< maximum value of a u16.
+    const s16 cS16Min = (s16)-0x8000; ///< minimum value of a s16.
+    const s16 cS16Max = (s16)0x7FFF;  ///< maximum value of a s16.
 
-    const u32 xU32Min = (u32)0x00000000; ///< minimum value of a u32.
-    const u32 xU32Max = (u32)0xFFFFFFFF; ///< maximum value of a u32.
-    const s32 xS32Min = (s32)0x80000000; ///< minimum value of a s32.
-    const s32 xS32Max = (s32)0x7FFFFFFF; ///< maximum value of a s32.
+    const u32 cU32Min = (u32)0x00000000; ///< minimum value of a u32.
+    const u32 cU32Max = (u32)0xFFFFFFFF; ///< maximum value of a u32.
+    const s32 cS32Min = (s32)0x80000000; ///< minimum value of a s32.
+    const s32 cS32Max = (s32)0x7FFFFFFF; ///< maximum value of a s32.
 
-    const u64 xU64Min = (u64)0x0000000000000000ull; ///< minimum value of a u64.
-    const u64 xU64Max = (u64)0xFFFFFFFFFFFFFFFFull; ///< maximum value of a u64.
-    const s64 xS64Min = (s64)0x8000000000000000ll;  ///< minimum value of a s64.
-    const s64 xS64Max = (s64)0x7FFFFFFFFFFFFFFFll;  ///< maximum value of a s64.
+    const u64 cU64Min = (u64)0x0000000000000000ull; ///< minimum value of a u64.
+    const u64 cU64Max = (u64)0xFFFFFFFFFFFFFFFFull; ///< maximum value of a u64.
+    const s64 cS64Min = (s64)0x8000000000000000ll;  ///< minimum value of a s64.
+    const s64 cS64Max = (s64)0x7FFFFFFFFFFFFFFFll;  ///< maximum value of a s64.
 
-    const f32 xF32Min = (f32)1.175494351e-38f; ///< minimum value of a f32.
-    const f32 xF32Max = (f32)3.402823466e+38f; ///< maximum value of a f32.
-    const f32 xF32Eps = (f32)0.0001f;          ///< default epsilon generally good to check values in the range [0 - 1], normalisations, dot products and such.
+    const f32 cF32Min = (f32)1.175494351e-38f; ///< minimum value of a f32.
+    const f32 cF32Max = (f32)3.402823466e+38f; ///< maximum value of a f32.
+    const f32 cF32Eps = (f32)0.0001f;          ///< default epsilon generally good to check values in the range [0 - 1], normalisations, dot products and such.
 
-    const f64 xF64Min = (f64)2.2250738585072014e-308; ///< minimum value of a f64.
-    const f64 xF64Max = (f64)1.7976931348623158e+308; ///< maximum value of a f64.
+    const f64 cF64Min = (f64)2.2250738585072014e-308; ///< minimum value of a f64.
+    const f64 cF64Max = (f64)1.7976931348623158e+308; ///< maximum value of a f64.
 
     //==============================================================================
     //  HANDLE BOOL
     //==============================================================================
-    const bool xTrue  = true;  ///< the value of True to true
-    const bool xFalse = false; ///< the value of False to false
-    const bool xTRUE  = true;  ///< the value of True to true
-    const bool xFALSE = false; ///< the value of False to false
+    const bool True  = true;  ///< the value of True to true
+    const bool False = false; ///< the value of False to false
+    const bool TRUE  = true;  ///< the value of True to true
+    const bool FALSE = false; ///< the value of False to false
 
-}; // namespace xcore
+}; // namespace ncore
 
 #endif

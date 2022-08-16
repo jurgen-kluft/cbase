@@ -3,15 +3,15 @@
 #include "xbase/x_base.h"
 #include "xbase/x_buffer.h"
 
-namespace xcore
+namespace ncore
 {
-    alloc_buffer_t::alloc_buffer_t(xbyte* buffer, s64 length) : m_base(buffer), m_ptr(buffer), m_end(buffer + length), m_cnt(0) {}
+    alloc_buffer_t::alloc_buffer_t(u8* buffer, s64 length) : m_base(buffer), m_ptr(buffer), m_end(buffer + length), m_cnt(0) {}
 
     void* allocinplace_t::v_allocate(u32 size, u32 align)
     {
         ASSERT(size <= m_size);
         void* ptr = m_data;
-        m_data    = (xbyte*)((u64)m_data + (u64)(align - 1) & ~((u64)align - 1));
+        m_data    = (u8*)((u64)m_data + (u64)(align - 1) & ~((u64)align - 1));
         m_data    = m_data + (size + (align - 1) & ~(align - 1));
         ASSERT(m_data <= (m_base + m_size));
         return ptr;
@@ -27,7 +27,7 @@ namespace xcore
         return index;
     }
 
-    static inline xbyte* get_item_ptr(void* array_item, u32 index, u32 sizeof_item) { return (xbyte*)array_item + (index * sizeof_item); }
+    static inline u8* get_item_ptr(void* array_item, u32 index, u32 sizeof_item) { return (u8*)array_item + (index * sizeof_item); }
 
     dexed_array_t::dexed_array_t(void* array_item, u32 sizeof_item, u32 countof_item) : m_data(array_item), m_sizeof(sizeof_item), m_countof(countof_item) {}
 
@@ -103,4 +103,4 @@ namespace xcore
     }
 
     void fsadexed_array_t::v_release() {}
-}; // namespace xcore
+}; // namespace ncore

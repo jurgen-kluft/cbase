@@ -12,7 +12,7 @@
 
 #include "xunittest/xunittest.h"
 
-namespace xcore
+namespace ncore
 {
     // Note:
     // Using a FSA allocator we can change the pointers into u32 indices.
@@ -532,9 +532,9 @@ namespace xcore
         return false;
     }
 
-}; // namespace xcore
+}; // namespace ncore
 
-namespace xcore
+namespace ncore
 {
     class xfsa_test : public fsa_t
     {
@@ -591,10 +591,10 @@ namespace xcore
 
         XCORE_CLASS_PLACEMENT_NEW_DELETE
     };
-} // namespace xcore
+} // namespace ncore
 
-extern xcore::alloc_t* gTestAllocator;
-using namespace xcore;
+extern ncore::alloc_t* gTestAllocator;
+using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(xdtrie)
 {

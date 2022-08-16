@@ -7,7 +7,7 @@
 #include "xbase/x_integer.h"
 #include "xbase/x_allocator.h"
 
-namespace xcore
+namespace ncore
 {
 #ifdef TARGET_DEBUG
     #define USE_MALLOC_DBG
@@ -43,7 +43,7 @@ namespace xcore
         virtual void* v_allocate(u32 size, u32 alignment)
         {
 #ifdef USE_MALLOC_DBG
-            void* mem = _aligned_malloc_dbg(size, alignment, NULL, 0);
+            void* mem = _aligned_malloc_dbg(size, alignment, nullptr, 0);
 #else
             void* mem = _aligned_malloc(size, alignment);
 #endif
@@ -70,7 +70,7 @@ namespace xcore
             mAllocationCount  = 0;
         }
 
-        void* operator new(xsize_t num_bytes, void* mem) { return mem; }
+        void* operator new(uint_t num_bytes, void* mem) { return mem; }
         void  operator delete(void* pMem, void*) {}
 
         s32 mInitialized;
@@ -96,6 +96,6 @@ namespace xcore
 
     alloc_t* alloc_t::get_system() { return &sSystemAllocator; }
 
-}; // namespace xcore
+}; // namespace ncore
 
 #endif

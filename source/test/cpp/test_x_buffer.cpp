@@ -3,7 +3,7 @@
 #include "xbase/x_runes.h"
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(buffer_t)
 {
@@ -14,8 +14,8 @@ UNITTEST_SUITE_BEGIN(buffer_t)
 
         UNITTEST_TEST(test_xbuffer32)
         {
-            xbytes<32> buf1;
-            xbytes<32> buf2;
+            u8s<32> buf1;
+            u8s<32> buf2;
             buf1.reset(1);
             buf2.reset(2);
 
@@ -32,7 +32,7 @@ UNITTEST_SUITE_BEGIN(buffer_t)
 
         UNITTEST_TEST(test_xbinary_reader)
         {
-            xbytes<2048>   buffer;
+            u8s<2048>   buffer;
             binary_writer_t writer = buffer.writer();
 
             CHECK_EQUAL(0, writer.skip(16));
@@ -53,7 +53,7 @@ UNITTEST_SUITE_BEGIN(buffer_t)
             crunes_t    chars(cctext);
             cbuffer_t    text(chars);
 
-            xbytes<32> bytes;
+            u8s<32> bytes;
             bytes.writer().write_data(text);
             writer.write_data(text);
             writer.write_data(bytes);
@@ -100,7 +100,7 @@ UNITTEST_SUITE_BEGIN(buffer_t)
             CHECK_EQUAL(9.0, the_f64);
 
             s32        len = chars.size();
-            xbytes<32> rdata;
+            u8s<32> rdata;
             buffer_t    rdatalen = rdata(0, len);
             reader.read_data(rdatalen);
 			CHECK_EQUAL(rdatalen.size(), len);

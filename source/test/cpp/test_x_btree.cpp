@@ -4,11 +4,11 @@
 
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
-extern xcore::alloc_t* gTestAllocator;
+extern ncore::alloc_t* gTestAllocator;
 
-namespace xcore
+namespace ncore
 {
     class xobjects : public fsadexed_t
     {
@@ -114,21 +114,21 @@ namespace xcore
         XCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 
-} // namespace xcore
+} // namespace ncore
 
 UNITTEST_SUITE_BEGIN(xbtree)
 {
     UNITTEST_FIXTURE(btree32)
     {
-        xcore::xobjects*  nodes  = nullptr;
-        xcore::xobjects* values = nullptr;
-        xcore::xvalue_kv* value_kv = nullptr;
+        ncore::xobjects*  nodes  = nullptr;
+        ncore::xobjects* values = nullptr;
+        ncore::xvalue_kv* value_kv = nullptr;
 
         UNITTEST_FIXTURE_SETUP()
         {
-            nodes  = gTestAllocator->construct<xcore::xobjects>();
-            values = gTestAllocator->construct<xcore::xobjects>();
-            value_kv = gTestAllocator->construct<xcore::xvalue_kv>(values);
+            nodes  = gTestAllocator->construct<ncore::xobjects>();
+            values = gTestAllocator->construct<ncore::xobjects>();
+            value_kv = gTestAllocator->construct<ncore::xvalue_kv>(values);
         }
 
         UNITTEST_FIXTURE_TEARDOWN()

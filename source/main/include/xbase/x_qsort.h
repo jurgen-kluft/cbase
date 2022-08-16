@@ -1,5 +1,5 @@
-#ifndef __XBASE_QUICK_SORT_H__
-#define __XBASE_QUICK_SORT_H__
+#ifndef __CBASE_QUICK_SORT_H__
+#define __CBASE_QUICK_SORT_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
@@ -7,7 +7,7 @@
 
 #include "xbase/x_debug.h"
 
-namespace xcore
+namespace ncore
 {
     //----------------------------------------------------------------------------------------------------------------
     // Custom QuickSort
@@ -37,4 +37,4 @@ namespace xcore
 
 };
 
-#endif // __XBASE_QUICK_SORT_H__
+#endif // __CBASE_QUICK_SORT_H__

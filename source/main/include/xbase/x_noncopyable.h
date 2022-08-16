@@ -1,11 +1,11 @@
-#ifndef __XBASE_NONCOPYABLE_H__
-#define __XBASE_NONCOPYABLE_H__
+#ifndef __CBASE_NONCOPYABLE_H__
+#define __CBASE_NONCOPYABLE_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
     /**
      * @class noncopyable_t
@@ -30,6 +30,6 @@ namespace xcore
         noncopyable_t() {}
         ~noncopyable_t() {}
     };
-} // namespace xcore
+} // namespace ncore
 
-#endif // __XBASE_NONCOPYABLE_H__
+#endif // __CBASE_NONCOPYABLE_H__

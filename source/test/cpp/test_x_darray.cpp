@@ -1,7 +1,7 @@
 #include "xbase/x_darray.h"
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(darray_t)
 {

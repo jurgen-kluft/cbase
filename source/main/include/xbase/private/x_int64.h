@@ -1,5 +1,5 @@
-#ifndef __XBASE_64_BIT_SIGNED_INTEGER_H__
-#define __XBASE_64_BIT_SIGNED_INTEGER_H__
+#ifndef __CBASE_64_BIT_SIGNED_INTEGER_H__
+#define __CBASE_64_BIT_SIGNED_INTEGER_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -8,7 +8,7 @@
 
 #include "xbase/x_debug.h"
 
-namespace xcore
+namespace ncore
 {
 	class __xuint64;
 
@@ -185,4 +185,4 @@ namespace xcore
 };
 
 #endif
-#endif	///< __XBASE_64_BIT_SIGNED_INTEGER_H__
+#endif	///< __CBASE_64_BIT_SIGNED_INTEGER_H__

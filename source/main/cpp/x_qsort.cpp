@@ -6,14 +6,14 @@
 //==============================================================================
 // xCore namespace
 //==============================================================================
-namespace xcore
+namespace ncore
 {
 	//----------------------------------------------------------------------------------------------------------------
 	// Custom QuickSort
 	namespace __xqsort
 	{
-		static inline xbyte*			sMed3(xbyte*, xbyte*, xbyte*, s32(*)(const void* const, const void* const, void*), void*);
-		static inline void				sSwapFunc(xbyte*, xbyte*, s32, s32);
+		static inline u8*			sMed3(u8*, u8*, u8*, s32(*)(const void* const, const void* const, void*), void*);
+		static inline void				sSwapFunc(u8*, u8*, s32, s32);
 
 		#define __xqsort_MIN(a, b)	(a) < (b) ? a : b
 
@@ -31,14 +31,14 @@ namespace xcore
 		// Determine the swap functionality to use
 		// single byte copy
 		// 4-byte copy
-		#define __xqsort_SWAPINIT(a, es) swaptype = (((xbyte*)a - (xbyte*)0) % sizeof(u32) || es % sizeof(u32)) ? 2 : es == sizeof(u32)? 0 : 1;
+		#define __xqsort_SWAPINIT(a, es) swaptype = (((u8*)a - (u8*)0) % sizeof(u32) || es % sizeof(u32)) ? 2 : es == sizeof(u32)? 0 : 1;
 
-		static inline void sSwapFunc(xbyte* a, xbyte* b, s32 n, s32 swaptype)
+		static inline void sSwapFunc(u8* a, u8* b, s32 n, s32 swaptype)
 		{
 			if (swaptype <= 1) 
 				__xqsort_SwapCode(u32, a, b, n)
 			else
-				__xqsort_SwapCode(xbyte, a, b, n)
+				__xqsort_SwapCode(u8, a, b, n)
 		}
 
 		#define __xqsort_Swap(a, b)							\
@@ -54,7 +54,7 @@ namespace xcore
 
 		#define __xqsort_VecSwap(a, b, n) 	if ((n) > 0) __xqsort::sSwapFunc(a, b, n, swaptype)
 
-		static inline xbyte* sMed3(xbyte* a, xbyte* b, xbyte* c, s32 (*cmp)(const void* const, const void* const, void*), void*data)
+		static inline u8* sMed3(u8* a, u8* b, u8* c, s32 (*cmp)(const void* const, const void* const, void*), void*data)
 		{
 			return cmp(a, b, data) < 0 ? (cmp(b, c, data) < 0 ? b : (cmp(a, c, data) < 0 ? c : a )) : (cmp(b, c, data) > 0 ? b : (cmp(a, c, data) < 0 ? a : c ));
 		}
@@ -62,23 +62,23 @@ namespace xcore
 
 	void g_qsort(void *a, s32 n, s32 es, s32 (*cmp)(const void*, const void*, void*), void* data)
 	{
-		xbyte *pa, *pb, *pc, *pd, *pl, *pm, *pn;
+		u8 *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 		s32 d, r, swaptype, swap_cnt;
 	loop:	
 		__xqsort_SWAPINIT(a, es);
 		swap_cnt = 0;
 		if (n < 7)
 		{
-			for (pm = (xbyte*) a + es; pm < (xbyte*) a + n * es; pm += es)
-				for (pl = pm; pl > (xbyte*) a && cmp(pl - es, pl, data) > 0; pl -= es)
+			for (pm = (u8*) a + es; pm < (u8*) a + n * es; pm += es)
+				for (pl = pm; pl > (u8*) a && cmp(pl - es, pl, data) > 0; pl -= es)
 					__xqsort_Swap(pl, pl - es);
 			return;
 		}
-		pm = (xbyte*) a + (n / 2) * es;
+		pm = (u8*) a + (n / 2) * es;
 		if (n > 7)
 		{
-			pl = (xbyte*) a;
-			pn = (xbyte*) a + (n - 1) * es;
+			pl = (u8*) a;
+			pn = (u8*) a + (n - 1) * es;
 			if (n > 40)
 			{
 				d = (n / 8) * es;
@@ -88,12 +88,12 @@ namespace xcore
 			}
 			pm = __xqsort::sMed3(pl, pm, pn, cmp, data);
 		}
-		__xqsort_Swap((xbyte*) a, pm);
-		pa = pb = (xbyte*) a + es;
-		pc = pd = (xbyte*) a + (n - 1) * es;
+		__xqsort_Swap((u8*) a, pm);
+		pa = pb = (u8*) a + es;
+		pc = pd = (u8*) a + (n - 1) * es;
 		for (;;)
 		{
-			while (pb <= pc && (r = cmp(pb, (xbyte*)a, data)) <= 0)
+			while (pb <= pc && (r = cmp(pb, (u8*)a, data)) <= 0)
 			{
 				if (r == 0)
 				{
@@ -104,7 +104,7 @@ namespace xcore
 				pb += es;
 			}
 
-			while (pb <= pc && (r = cmp(pc, (xbyte*)a, data)) >= 0)
+			while (pb <= pc && (r = cmp(pc, (u8*)a, data)) >= 0)
 			{
 				if (r == 0)
 				{
@@ -126,20 +126,20 @@ namespace xcore
 
 		if (swap_cnt == 0)	// Switch to insertion sort
 		{
-			for (pm = (xbyte*) a + es; pm < (xbyte*) a + n * es; pm += es)
-				for (pl = pm; pl > (xbyte*) a && cmp(pl - es, pl, data) > 0; pl -= es)
+			for (pm = (u8*) a + es; pm < (u8*) a + n * es; pm += es)
+				for (pl = pm; pl > (u8*) a && cmp(pl - es, pl, data) > 0; pl -= es)
 					__xqsort_Swap(pl, pl - es);
 			return;
 		}
 
-		pn = (xbyte*) a + n * es;
-		r = (s32)(__xqsort_MIN(pa - (xbyte*)a, pb - pa));
-		__xqsort_VecSwap((xbyte*)a, pb - r, r);
+		pn = (u8*) a + n * es;
+		r = (s32)(__xqsort_MIN(pa - (u8*)a, pb - pa));
+		__xqsort_VecSwap((u8*)a, pb - r, r);
 		r = (s32)(__xqsort_MIN(pd - pc, pn - pd - es));
 		__xqsort_VecSwap(pb, pn - r, r);
 
 		if ((r = (s32)(pb - pa)) > es)
-			g_qsort((xbyte*)a, r / es, es, cmp, data);
+			g_qsort((u8*)a, r / es, es, cmp, data);
 	
 		if ((r = (s32)(pd - pc)) > es)
 		{ 

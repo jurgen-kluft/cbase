@@ -10,7 +10,7 @@
 #include "xbase/private/x_int64.h"
 #include "xbase/private/x_uint64.h"
 
-namespace xcore
+namespace ncore
 {
 
 	const __xuint64	__xuint64::Zero;
@@ -357,7 +357,7 @@ namespace xcore
 		if (tempDivisor == Zero)
 		{
 			//force a Divide by Zero exception
-			ASSERTS(xFALSE, "Division by zero");
+			ASSERTS(False, "Division by zero");
 		}
 		else if (tempDividend == Zero)
 		{

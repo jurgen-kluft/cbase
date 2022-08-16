@@ -1,11 +1,11 @@
-#ifndef __XCORE_BINARY_SEARCH_H__
-#define __XCORE_BINARY_SEARCH_H__
+#ifndef __CCORE_BINARY_SEARCH_H__
+#define __CCORE_BINARY_SEARCH_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
 	typedef	s32		(*compare_predicate_fn)(const void* inItem, const void* inData, s32 inIndex);
 
@@ -17,4 +17,4 @@ namespace xcore
 	extern u32		x_UpperBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate);
 };
 
-#endif	///< __XCORE_BINARY_SEARCH_H__
+#endif	///< __CCORE_BINARY_SEARCH_H__

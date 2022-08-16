@@ -5,7 +5,7 @@
 #include "xbase/x_random.h"
 #include "xbase/x_runes.h"
 
-namespace xcore
+namespace ncore
 {
     typedef u8  uint8_t;
     typedef u32 uint32_t;
@@ -61,36 +61,36 @@ namespace xcore
     static inline uint64_t _wyr8(const uint8_t* p)
     {
         uint64_t v;
-        xmem::memcpy(&v, p, 8);
+        nmem::memcpy(&v, p, 8);
         return v;
     }
     static inline uint64_t _wyr4(const uint8_t* p)
     {
         uint32_t v;
-        xmem::memcpy(&v, p, 4);
+        nmem::memcpy(&v, p, 4);
         return v;
     }
 #else
     static inline uint64_t _wyr8(const uint8_t* p)
     {
         uint64_t v;
-        xmem::memcpy(&v, p, 8);
+        nmem::memcpy(&v, p, 8);
         return (((v >> 56) & 0xff) | ((v >> 40) & 0xff00) | ((v >> 24) & 0xff0000) | ((v >> 8) & 0xff000000) | ((v << 8) & 0xff00000000) | ((v << 24) & 0xff0000000000) | ((v << 40) & 0xff000000000000) | ((v << 56) & 0xff00000000000000));
     }
     static inline uint64_t _wyr4(const uint8_t* p)
     {
         uint32_t v;
-        xmem::memcpy(&v, p, 4);
+        nmem::memcpy(&v, p, 4);
         return (((v >> 24) & 0xff) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | ((v << 24) & 0xff000000));
     }
 #endif
-    static inline uint64_t _wyr3(const uint8_t* p, xsize_t k) { return (((uint64_t)p[0]) << 16) | (((uint64_t)p[k >> 1]) << 8) | p[k - 1]; }
+    static inline uint64_t _wyr3(const uint8_t* p, uint_t k) { return (((uint64_t)p[0]) << 16) | (((uint64_t)p[k >> 1]) << 8) | p[k - 1]; }
 
 #define _likely_(a) (a)
 #define _unlikely_(a) (a)
 
     // wyhash main function
-    static inline uint64_t wyhash(const void* key, xsize_t len, uint64_t seed, const uint64_t* secret)
+    static inline uint64_t wyhash(const void* key, uint_t len, uint64_t seed, const uint64_t* secret)
     {
         const uint8_t* p = (const uint8_t*)key;
         seed ^= *secret;
@@ -112,7 +112,7 @@ namespace xcore
         }
         else
         {
-            xsize_t i = len;
+            uint_t i = len;
             if (_unlikely_(i > 48))
             {
                 uint64_t see1 = seed, see2 = seed;
@@ -185,21 +185,21 @@ namespace xcore
     {
         uint8_t c[] = {15,  23,  27,  29,  30,  39,  43,  45,  46,  51,  53,  54,  57,  58,  60,  71,  75,  77,  78,  83,  85,  86,  89,  90,  92,  99,  101, 102, 105, 106, 108, 113, 114, 116, 120,
                        135, 139, 141, 142, 147, 149, 150, 153, 154, 156, 163, 165, 166, 169, 170, 172, 177, 178, 180, 184, 195, 197, 198, 201, 202, 204, 209, 210, 212, 216, 225, 226, 228, 232, 240};
-        for (xsize_t i = 0; i < 4; i++)
+        for (uint_t i = 0; i < 4; i++)
         {
             uint8_t ok;
             do
             {
                 ok        = 1;
                 secret[i] = 0;
-                for (xsize_t j = 0; j < 64; j += 8)
+                for (uint_t j = 0; j < 64; j += 8)
                     secret[i] |= ((uint64_t)c[wyrand(&seed) % sizeof(c)]) << j;
                 if (secret[i] % 2 == 0)
                 {
                     ok = 0;
                     continue;
                 }
-                for (xsize_t j = 0; j < i; j++)
+                for (uint_t j = 0; j < i; j++)
                 {
                     // manual popcount
                     uint64_t x = secret[j] ^ secret[i];
@@ -267,4 +267,4 @@ namespace xcore
     }
     */
 
-} // namespace xcore
+} // namespace ncore

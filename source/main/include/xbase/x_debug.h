@@ -1,5 +1,5 @@
-#ifndef __XBASE_DEBUG_H__
-#define __XBASE_DEBUG_H__
+#ifndef __CBASE_DEBUG_H__
+#define __CBASE_DEBUG_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -12,7 +12,7 @@
 //==============================================================================
 // xCore namespace
 //==============================================================================
-namespace xcore
+namespace ncore
 {
     //==============================================================================
     // The debug API
@@ -24,7 +24,7 @@ namespace xcore
 
         enum EDebugFlags
         {
-            XDB_FLAG_IGNORE = 1 << 1,
+            DB_FLAG_IGNORE = 1 << 1,
         };
         virtual bool handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) = 0;
 
@@ -50,84 +50,84 @@ namespace xcore
     //     This is the main entry of an assert, beyond this it will be dispatched to
     //     the x_debug object associated with the current thread.
     // See Also:
-    //     ASSERTS XVERIFY
+    //     ASSERTS DVERIFY
     //------------------------------------------------------------------------------
-#ifdef X_ASSERT
+#ifdef D_ASSERT
     extern bool xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
 #endif
 
 //==============================================================================
-// XBREAK & XNOP
+// D_BREAK & D_NOP
 //==============================================================================
 // This two macros are use mainly for debugging. The nop is used more to
 // separate a block of code from another. Very useful when looking at the
 // assembly code.
 //==============================================================================
-#ifdef XBREAK
-#undef XBREAK
+#ifdef D_BREAK
+#undef D_BREAK
 #endif
 
 //------------------------------------------------------------------------------
 // Summary:
 //     Stop the program with a break point.
 // Description:
-//     The macro XBREAK will cause a debugger breakpoint if possible on any given
+//     The macro D_BREAK will cause a debugger breakpoint if possible on any given
 //     platform.  If a breakpoint cannot be caused, then a divide by zero will be
-//     forced.  Note that the XBREAK macro is highly platform specific.  The
-//     implementation of XBREAK on some platforms prevents it from being used
+//     forced.  Note that the D_BREAK macro is highly platform specific.  The
+//     implementation of D_BREAK on some platforms prevents it from being used
 //     syntactically as an expression.  It can only be used as a statement.
 // See Also:
 //     NOP ASSERT
 //------------------------------------------------------------------------------
 #if defined(TARGET_PC) && defined(COMPILER_DEFAULT)
-#define XBREAK          \
+#define D_BREAK          \
     {                   \
         __debugbreak(); \
     }
 #endif
 
 #if defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
-#define XBREAK            \
+#define D_BREAK            \
     {                     \
         __builtin_trap(); \
     }
 #endif
 
-#if !defined(XBREAK)
-#error Unknown Platform/Compiler configuration for XBREAK
+#if !defined(D_BREAK)
+#error Unknown Platform/Compiler configuration for D_BREAK
 #endif
 
 //------------------------------------------------------------------------------
-#ifdef XNOP
-#undef XNOP
+#ifdef D_NOP
+#undef D_NOP
 #endif
 
     //------------------------------------------------------------------------------
     // Summary:
-    //     Sets a XNOP operation in the code assembly.
+    //     Sets a D_NOP operation in the code assembly.
     // Description:
-    //     Sets a XNOP operation in the code assembly. This is commonly used for
+    //     Sets a D_NOP operation in the code assembly. This is commonly used for
     //     debugging. By adding nops allows to see the assembly clearly in code.
     // See Also:
     //     BREAK
     //------------------------------------------------------------------------------
 
 #if defined(TARGET_PC) && defined(COMPILER_DEFAULT)
-#define XNOP                \
+#define D_NOP                \
     {                       \
         __emit(0x00000000); \
     }
 #endif
 
 #if defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
-#define XNOP      \
+#define D_NOP      \
     {             \
         __asm nop \
     }
 #endif
 
-#if !defined(XNOP)
-#error Unknown Platform/Compiler configuration for XNOP
+#if !defined(D_NOP)
+#error Unknown Platform/Compiler configuration for D_NOP
 #endif
 
 //==============================================================================
@@ -135,9 +135,9 @@ namespace xcore
 //==============================================================================
 //
 //  Most of the run-time validations are one form or another of an ASSERT.  So,
-//  for lack of a better name, the presence of the compile time macro X_ASSERT
+//  for lack of a better name, the presence of the compile time macro D_ASSERT
 //  activates the optional run-time validations.  (And, of course, the absence
-//  of X_ASSERT deactivates them.)
+//  of D_ASSERT deactivates them.)
 //
 //  The following macros and functions are all designed to perform validation of
 //  expected conditions at run-time.  Each takes an expression as the first
@@ -146,22 +146,22 @@ namespace xcore
 //      ASSERT  (expr)
 //      ASSERTS (expr, message)
 //
-//      XVERIFY  (expr)
-//      XVERIFYS (expr, message)
+//      DVERIFY  (expr)
+//      DVERIFYS (expr, message)
 //
-//  The macros ASSERT and ASSERTS completely evaporate in when X_ASSERT is not
-//  defined.  Macros XVERIFY and XVERIFYS, lacking X_ASSERT, still evaluate the
+//  The macros ASSERT and ASSERTS completely evaporate in when D_ASSERT is not
+//  defined.  Macros DVERIFY and DVERIFYS, lacking D_ASSERT, still evaluate the
 //  expression, but do not validate the result.  Consider:
 //
-//      ASSERT(CriticalInitialization());    // EVIL without X_ASSERT!
-//      XVERIFY(CriticalInitialization());    // Safe without X_ASSERT.
+//      ASSERT(CriticalInitialization());    // EVIL without D_ASSERT!
+//      DVERIFY(CriticalInitialization());    // Safe without D_ASSERT.
 //
-//  The ASSERTS and XVERIFYS macros accept a message string to assist problem
+//  The ASSERTS and DVERIFYS macros accept a message string to assist problem
 //  diagnosis.  Upon a run-time failure, the message is displayed.  For example:
 //
 //      ASSERTS(Radius >= 0.0f, "Radius must be non-negative.");
 //
-//  To place formatted strings within ASSERTS and XVERIFYS, use the xstring_tmp class
+//  To place formatted strings within ASSERTS and DVERIFYS, use the xstring_tmp class
 //  from x_string.h.  For example:
 //
 //      pFile = x_fopen(fileName, "rt");
@@ -169,8 +169,8 @@ namespace xcore
 //
 //  Available options:
 //
-//    - As previously mentioned, the macro X_ASSERT enables the validation
-//      macros.  X_ASSERT should be always be present in debug configurations.
+//    - As previously mentioned, the macro D_ASSERT enables the validation
+//      macros.  D_ASSERT should be always be present in debug configurations.
 //
 //==============================================================================
 #ifdef ASSERT
@@ -181,109 +181,109 @@ namespace xcore
 #undef ASSERTS
 #endif
 
-#ifdef XVERIFY
-#undef XVERIFY
+#ifdef DVERIFY
+#undef DVERIFY
 #endif
 
-#ifdef XVERIFYS
-#undef XVERIFYS
+#ifdef DVERIFYS
+#undef DVERIFYS
 #endif
 
-#ifdef X_ASSERT
+#ifdef D_ASSERT
 
 #ifndef SPU
 
-#define XVERIFY(expr)                                                                               \
+#define DVERIFY(expr)                                                                               \
     do                                                                                              \
     {                                                                                               \
-        static xcore::u32 sAssertFlags = 0;                                                         \
-        if (!((expr) != 0) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL)) \
-            XBREAK;                                                                                 \
+        static ncore::u32 sAssertFlags = 0;                                                         \
+        if (!((expr) != 0) && ncore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
+            D_BREAK;                                                                                 \
     } while (0)
-#define XVERIFYS(expr, str)                                                                        \
+#define DVERIFYS(expr, str)                                                                        \
     do                                                                                             \
     {                                                                                              \
-        static xcore::u32 sAssertFlags = 0;                                                        \
-        if (!((expr) != 0) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
-            XBREAK;                                                                                \
+        static ncore::u32 sAssertFlags = 0;                                                        \
+        if (!((expr) != 0) && ncore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
+            D_BREAK;                                                                                \
     } while (0)
-#define XBOUNDS(v, l, h)                                                                                                                \
+#define DBOUNDS(v, l, h)                                                                                                                \
     do                                                                                                                                  \
     {                                                                                                                                   \
-        static xcore::u32 sAssertFlags = 0;                                                                                             \
-        if (!((v) >= (l) && (v) <= (h)) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #v ">=" #l " && " #v "<=" #h, NULL)) \
-            XBREAK;                                                                                                                     \
+        static ncore::u32 sAssertFlags = 0;                                                                                             \
+        if (!((v) >= (l) && (v) <= (h)) && ncore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #v ">=" #l " && " #v "<=" #h, nullptr)) \
+            D_BREAK;                                                                                                                     \
     } while (0)
 
-#define XASSERTCT(expr) \
+#define DASSERTCT(expr) \
     do                  \
     {                   \
-    } while (xcore::xCompileTimeAssert<(expr) != 0>::OK);
-#define XASSERTSL(level, expr, str)                                                                                                      \
+    } while (ncore::xCompileTimeAssert<(expr) != 0>::OK);
+#define DASSERTSL(level, expr, str)                                                                                                      \
     do                                                                                                                                   \
     {                                                                                                                                    \
-        static xcore::u32 sAssertFlags = 0;                                                                                              \
-        if (xcore::xChooseDebugLevel(level) && ((expr) == false) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
-            XBREAK;                                                                                                                      \
+        static ncore::u32 sAssertFlags = 0;                                                                                              \
+        if (ncore::xChooseDebugLevel(level) && ((expr) == false) && ncore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
+            D_BREAK;                                                                                                                      \
     } while (0)
-#define XASSERTL(level, expr)                                                                                                             \
+#define DASSERTL(level, expr)                                                                                                             \
     do                                                                                                                                    \
     {                                                                                                                                     \
-        static xcore::u32 sAssertFlags = 0;                                                                                               \
-        if (xcore::xChooseDebugLevel(level) && ((expr) == false) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL)) \
-            XBREAK;                                                                                                                       \
+        static ncore::u32 sAssertFlags = 0;                                                                                               \
+        if (ncore::xChooseDebugLevel(level) && ((expr) == false) && ncore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
+            D_BREAK;                                                                                                                       \
     } while (0)
-#define XASSERT(expr)                                                                               \
+#define DASSERT(expr)                                                                               \
     do                                                                                              \
     {                                                                                               \
-        static xcore::u32 sAssertFlags = 0;                                                         \
-        if (!((expr) != 0) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, NULL)) \
-            XBREAK;                                                                                 \
+        static ncore::u32 sAssertFlags = 0;                                                         \
+        if (!((expr) != 0) && ncore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
+            D_BREAK;                                                                                 \
     } while (0)
-#define XASSERTS(expr, str)                                                                        \
+#define DASSERTS(expr, str)                                                                        \
     do                                                                                             \
     {                                                                                              \
-        static xcore::u32 sAssertFlags = 0;                                                        \
-        if (!((expr) != 0) && xcore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
-            XBREAK;                                                                                \
+        static ncore::u32 sAssertFlags = 0;                                                        \
+        if (!((expr) != 0) && ncore::xAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
+            D_BREAK;                                                                                \
     } while (0)
 
-#define ASSERTCT(expr) XASSERTCT(expr)
-#define ASSERTSL(level, expr, str) XASSERTSL(level, expr, str)
-#define ASSERTL(level, expr) XASSERTL(level, expr)
-#define ASSERT(expr) XASSERT(expr)
-#define ASSERT_OPEN_RANGE(_i, _min, _max) XASSERT(_i >= _min && _i<_max)
-#define ASSERTS(expr, str) XASSERTS(expr, str)
+#define ASSERTCT(expr) DASSERTCT(expr)
+#define ASSERTSL(level, expr, str) DASSERTSL(level, expr, str)
+#define ASSERTL(level, expr) DASSERTL(level, expr)
+#define ASSERT(expr) DASSERT(expr)
+#define ASSERT_OPEN_RANGE(_i, _min, _max) DASSERT(_i >= _min && _i<_max)
+#define ASSERTS(expr, str) DASSERTS(expr, str)
 
 #else
 
-#define XVERIFY(expr)
-#define XVERIFYS(expr, str)
-#define XBOUNDS(v, l, h)
+#define DVERIFY(expr)
+#define DVERIFYS(expr, str)
+#define DBOUNDS(v, l, h)
 
-#define XASSERTCT(expr)
-#define XASSERTSL(level, expr, str)
-#define XASSERTL(level, expr)
-#define XASSERT(expr)
-#define XASSERTS(expr, str)
+#define DASSERTCT(expr)
+#define DASSERTSL(level, expr, str)
+#define DASSERTL(level, expr)
+#define DASSERT(expr)
+#define DASSERTS(expr, str)
 
-#define ASSERTCT(expr) XASSERTCT(expr)
-#define ASSERTSL(level, expr, str) XASSERTSL(level, expr, str)
-#define ASSERTL(level, expr) XASSERTL(level, expr)
-#define ASSERT(expr) XASSERT(expr)
-#define ASSERT_OPEN_RANGE(_i, _min, _max) XASSERT(_i >= _min && _i<_max)
-#define ASSERTS(expr, str) XASSERTS(expr, str)
+#define ASSERTCT(expr) DASSERTCT(expr)
+#define ASSERTSL(level, expr, str) DASSERTSL(level, expr, str)
+#define ASSERTL(level, expr) DASSERTL(level, expr)
+#define ASSERT(expr) DASSERT(expr)
+#define ASSERT_OPEN_RANGE(_i, _min, _max) DASSERT(_i >= _min && _i<_max)
+#define ASSERTS(expr, str) DASSERTS(expr, str)
 
 #endif
 
 #else
 
 #if defined(TARGET_PC) && defined(COMPILER_DEFAULT)
-#define XASSERTCT(expr)
-#define XASSERT(expr) (void(0))
-#define XASSERTS(expr, str) (void(0))
-#define XASSERTSL(level, expr, str) (void(0))
-#define XASSERTL(level, expr) (void(0))
+#define DASSERTCT(expr)
+#define DASSERT(expr) (void(0))
+#define DASSERTS(expr, str) (void(0))
+#define DASSERTSL(level, expr, str) (void(0))
+#define DASSERTL(level, expr) (void(0))
 #define ASSERTCT(expr)
 #define ASSERT(expr) (void(0))
 #define ASSERT_OPEN_RANGE(_i, _min, _max) (void(0))
@@ -291,11 +291,11 @@ namespace xcore
 #define ASSERTSL(level, expr, str) (void(0))
 #define ASSERTL(level, expr) (void(0))
 #elif defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
-#define XASSERTCT(expr)
-#define XASSERT(expr) (void(0))
-#define XASSERTS(expr, str) (void(0))
-#define XASSERTSL(level, expr, str) (void(0))
-#define XASSERTL(level, expr) (void(0))
+#define DASSERTCT(expr)
+#define DASSERT(expr) (void(0))
+#define DASSERTS(expr, str) (void(0))
+#define DASSERTSL(level, expr, str) (void(0))
+#define DASSERTL(level, expr) (void(0))
 #define ASSERTCT(expr)
 #define ASSERT(expr) (void(0))
 #define ASSERT_OPEN_RANGE(_i, _min, _max) (void(0))
@@ -306,15 +306,12 @@ namespace xcore
 #error Unknown target/compiler configuration for defining assert
 #endif
 
-#define XVERIFY(expr) (expr)
-#define XVERIFYS(expr, str) (expr)
-#define XBOUNDS(v, l, h)
+#define DVERIFY(expr) (expr)
+#define DVERIFYS(expr, str) (expr)
+#define DBOUNDS(v, l, h)
 
 #endif
 
-    //==============================================================================
-    // END xCore namespace
-    //==============================================================================
-}; // namespace xcore
+}; // namespace ncore
 
-#endif /// __XBASE_DEBUG_H__
+#endif /// __CBASE_DEBUG_H__

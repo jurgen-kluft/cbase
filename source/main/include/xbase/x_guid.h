@@ -5,7 +5,7 @@
 #pragma once 
 #endif
 
-namespace xcore
+namespace ncore
 {
 	struct runes_t;
 	struct crunes_t;

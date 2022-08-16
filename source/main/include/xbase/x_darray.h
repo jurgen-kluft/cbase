@@ -1,5 +1,5 @@
-#ifndef __XBASE_DARRAY_H__
-#define __XBASE_DARRAY_H__
+#ifndef __CBASE_DARRAY_H__
+#define __CBASE_DARRAY_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -7,7 +7,7 @@
 
 #include "xbase/x_allocator.h"
 
-namespace xcore
+namespace ncore
 {
     class array_capacity_handler_t
     {
@@ -113,6 +113,6 @@ namespace xcore
         u32                       m_cap_cur;
     };
 
-}; // namespace xcore
+}; // namespace ncore
 
-#endif // __XBASE_CARRAY_H__
+#endif // __CBASE_CARRAY_H__

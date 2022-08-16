@@ -3,7 +3,7 @@
 
 #include "xbase/private/x_log_to_console.h"
 
-namespace xcore
+namespace ncore
 {
 	static log_info_t	x_ST_LogInfo;	///< Single-Thread log info
 	log_info_t&			x_GetLogInfo_ST()
@@ -32,7 +32,7 @@ namespace xcore
 		logger_t* old = log_t::sLogger[inLevel];
 		log_t::sLogger[inLevel] = inLogger;
 		if (old == &sLogDefaultToConsole)
-			return NULL;
+			return nullptr;
 		return old;
 	}
 
@@ -52,7 +52,7 @@ namespace xcore
 	{
 		for (s32 i=0; i<COUNT; ++i)
 		{
-			if (sLogger[i]!=NULL)
+			if (sLogger[i]!=nullptr)
 				sLogger[i] = &sLogDefaultToConsole;
 		}
 	}
@@ -60,7 +60,7 @@ namespace xcore
 	void				log_t::clear()
 	{
 		for (s32 i=0; i<COUNT; ++i)
-			if (sLogger[i]!=NULL)
+			if (sLogger[i]!=nullptr)
 				sLogger[i]->clear();
 	}
 
@@ -167,7 +167,7 @@ namespace xcore
 	}
 
 	
-	#ifdef X_LOG
+	#ifdef D_LOG
 
 	//==============================================================================
 	//==============================================================================

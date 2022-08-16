@@ -1,5 +1,5 @@
-#ifndef __XBASE_MEMORY_STD_H__
-#define __XBASE_MEMORY_STD_H__
+#ifndef __CBASE_MEMORY_STD_H__
+#define __CBASE_MEMORY_STD_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -11,7 +11,7 @@
 #include "xbase/private/x_uint128.h"
 #endif
 
-namespace xcore
+namespace ncore
 {
     template <typename T> inline void set(T* p, T v1) { p[0] = v1; }
     template <typename T> inline void set(T* p, T v1, T v2) { p[0] = v1; p[1] = v2; }
@@ -29,14 +29,12 @@ namespace xcore
             dst[i] = src[i];
     }
 
-
     ///@description:	Interface/Utility class for MemSet, MemClear, MemCopy, MemMove
     ///@note:			In DEBUG these functions should perform sanity checks on the source and destination memory blocks
-    namespace xmem
+    namespace nmem
     {
-
-        void* memset(void* inDest, u32 inValue, uptr inLength);
-        void* memcpy(void* inDest, const void* inSrc, uptr inLength);
+        void* memset(void* inDest, u32 inValue, ptr_t inLength);
+        void* memcpy(void* inDest, const void* inSrc, ptr_t inLength);
         s32   memcmp(const void* inLHS, const void* inRHS, u32 inLength);
         void  memswap(void* inLHS, void* inRHS, u32 inLength);
         void* memmove(void* inDest, const void* inSrc, u32 inLength);
@@ -45,20 +43,20 @@ namespace xcore
         inline void                    memclr(void* inDest, u32 inLength) { memset(inDest, 0, inLength); }
 
         ///@name Pointer arithmetic
-        inline void* ptr_add(void* ptr, s32 size) { return (void*)((xbyte*)ptr + size); }
+        inline void* ptr_add(void* ptr, s32 size) { return (void*)((u8*)ptr + size); }
         inline void* ptr_add_clamp(void* ptr, s32 size, void* lower, void* upper)
         {
-            void* p = (void*)((xbyte*)ptr + size);
+            void* p = (void*)((u8*)ptr + size);
             if (p < lower)
                 p = lower;
             else if (p > upper)
                 p = upper;
             return p;
         }
-        inline void* ptr_align(void* ptr, u32 alignment) { return (void*)(((X_PTR_SIZED_INT)ptr + (X_PTR_SIZED_INT)(alignment - 1)) & ~((X_PTR_SIZED_INT)(alignment - 1))); }
+        inline void* ptr_align(void* ptr, u32 alignment) { return (void*)(((ptr_t)ptr + (ptr_t)(alignment - 1)) & ~((ptr_t)(alignment - 1))); }
         inline s32   ptr_diff(void* ptr, void* other)
         {
-            X_PTR_SIZED_INT d = (xbyte*)other - (xbyte*)ptr;
+            ptr_t d = (u8*)other - (u8*)ptr;
             return (s32)d;
         }
 
@@ -128,22 +126,22 @@ namespace xcore
         {
             return (((u64)inB0) | (((u64)inB1) << 8) | (((u64)inB2) << 16) | (((u64)inB3) << 24) | (((u64)inB4) << 32) | (((u64)inB5) << 40) | (((u64)inB6) << 48) | (((u64)inB7) << 56));
         }
-    }; // namespace xmem
+    }; // namespace nmem
 
-    template <class T> inline void x_swap(T& a, T& b)
+    template <class T> inline void g_swap(T& a, T& b)
     {
         const T c(a);
         a = b;
         b = c;
     }
 
-    inline void x_memset(void* inDest, u32 inValue, u32 inLength) { xmem::memset(inDest, inValue, inLength); }
-    inline void x_memclr(void* inDest, u32 inLength) { xmem::memclr(inDest, inLength); }
-    inline void x_memcpy(void* inDest, const void* inSource, u32 inLength) { xmem::memcpy(inDest, inSource, inLength); }
-    inline s32  x_memcmp(const void* inLHS, const void* inRHS, u32 inLength) { return xmem::memcmp(inLHS, inRHS, inLength); }
-    inline void x_memswap(void* inLHS, void* inRHS, u32 inLength) { xmem::memswap(inLHS, inRHS, inLength); }
+    inline void g_memset(void* inDest, u32 inValue, u32 inLength) { nmem::memset(inDest, inValue, inLength); }
+    inline void g_memclr(void* inDest, u32 inLength) { nmem::memclr(inDest, inLength); }
+    inline void g_memcpy(void* inDest, const void* inSource, u32 inLength) { nmem::memcpy(inDest, inSource, inLength); }
+    inline s32  g_memcmp(const void* inLHS, const void* inRHS, u32 inLength) { return nmem::memcmp(inLHS, inRHS, inLength); }
+    inline void g_memswap(void* inLHS, void* inRHS, u32 inLength) { nmem::memswap(inLHS, inRHS, inLength); }
 
-    inline s32 x_memcmp2(const u16* inLHS, const u16* inRHS, u32 inLength)
+    inline s32 g_memcmp2(const u16* inLHS, const u16* inRHS, u32 inLength)
     {
         for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
         {
@@ -154,7 +152,7 @@ namespace xcore
         }
         return 0;
     }
-    inline s32 x_memcmp4(const u32* inLHS, const u32* inRHS, u32 inLength)
+    inline s32 g_memcmp4(const u32* inLHS, const u32* inRHS, u32 inLength)
     {
         for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
         {
@@ -165,7 +163,7 @@ namespace xcore
         }
         return 0;
     }
-    inline s32 x_memcmp8(const u64* inLHS, const u64* inRHS, u32 inLength)
+    inline s32 g_memcmp8(const u64* inLHS, const u64* inRHS, u32 inLength)
     {
         for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
         {
@@ -177,37 +175,37 @@ namespace xcore
         return 0;
     }
 
-    inline void x_memzero(void* inBlock, s32 inLength) { x_memset(inBlock, 0, inLength); }
-    inline void x_memcopy2(u16* inDest, const u16* inSource, u32 inLength)
+    inline void g_memzero(void* inBlock, s32 inLength) { g_memset(inBlock, 0, inLength); }
+    inline void g_memcopy2(u16* inDest, const u16* inSource, u32 inLength)
     {
         for (u32 i = 0; i < inLength; i++)
             *inDest++ = *inSource++;
     }
     ///< Copy <inLength> aligned 16-bit integers from <inSource> to <inDest>
-    inline void x_memcopy4(u32* inDest, const u32* inSource, u32 inLength)
+    inline void g_memcopy4(u32* inDest, const u32* inSource, u32 inLength)
     {
         for (u32 i = 0; i < inLength; i++)
             *inDest++ = *inSource++;
     }
     ///< Copy <inLength> aligned 32-bit integers from <inSource> to <inDest>
-    inline void x_memcopy8(u64* inDest, const u64* inSource, u32 inLength)
+    inline void g_memcopy8(u64* inDest, const u64* inSource, u32 inLength)
     {
         for (u32 i = 0; i < inLength; i++)
             *inDest++ = *inSource++;
     }
     ///< Copy <inLength> aligned 64-bit integers from <inSource> to <inDest>
-    inline void x_memcopy16(u128* inDest, const u128* inSource, u32 inLength)
+    inline void g_memcopy16(u128* inDest, const u128* inSource, u32 inLength)
     {
         for (u32 i = 0; i < inLength; i++)
             *inDest++ = *inSource++;
     }
     ///< Copy <inLength> aligned 128-bit integers from <inSource> to <inDest>
 
-    inline void* x_memmove(void* inDest, const void* inSource, u32 inLength) { return xmem::memmove(inDest, inSource, inLength); }
-    inline void  x_memcopy(void* inDest, const void* inSource, u32 inLength) { x_memcpy(inDest, inSource, inLength); }
-    inline s32   x_memcompare(const void* inBlock1, const void* inBlock2, u32 inLength) { return x_memcmp(inBlock1, inBlock2, inLength); }
+    inline void* g_memmove(void* inDest, const void* inSource, u32 inLength) { return nmem::memmove(inDest, inSource, inLength); }
+    inline void  g_memcopy(void* inDest, const void* inSource, u32 inLength) { g_memcpy(inDest, inSource, inLength); }
+    inline s32   g_memcompare(const void* inBlock1, const void* inBlock2, u32 inLength) { return g_memcmp(inBlock1, inBlock2, inLength); }
     ///< Return the result of the lexicographical compare between memory block <inBlock1> and <inBlock2> of length <inLength>, return <0 if inBlock1<inBlock2, >0 if inBlock1>inBlock2 and 0 if inBlock1==inBlock2
-    inline bool x_memequal(const void* inBlock1, const void* inBlock2, u32 inLength) { return (x_memcompare(inBlock1, inBlock2, inLength) == 0); }
+    inline bool g_memequal(const void* inBlock1, const void* inBlock2, u32 inLength) { return (g_memcompare(inBlock1, inBlock2, inLength) == 0); }
 
-} // namespace xcore
+} // namespace ncore
 #endif ///< __X_MEMORY_STD_H__

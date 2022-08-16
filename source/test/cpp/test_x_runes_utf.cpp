@@ -5,9 +5,9 @@
 #include "xbase/x_runes.h"
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
-extern xcore::alloc_t* gTestAllocator;
+extern ncore::alloc_t* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xstring_utf)
 {

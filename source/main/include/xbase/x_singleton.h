@@ -1,5 +1,5 @@
-#ifndef __XBASE_SINGLETON_H__
-#define __XBASE_SINGLETON_H__
+#ifndef __CBASE_SINGLETON_H__
+#define __CBASE_SINGLETON_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
@@ -9,7 +9,7 @@
 
 #include "xbase/x_noncopyable.h"
 
-namespace xcore
+namespace ncore
 {
 	//
 	// This policy controls how an object is instantiated
@@ -47,7 +47,7 @@ namespace xcore
 		template <class T>
 		static void singleton_create(T*& ptr)
 		{
-			static xcore::s64 _memblock[ ((((sizeof(T)+2*T::SINGLETON_ALIGNMENT-1)/T::SINGLETON_ALIGNMENT) * T::SINGLETON_ALIGNMENT) + 7) / 8 ];
+			static ncore::s64 _memblock[ ((((sizeof(T)+2*T::SINGLETON_ALIGNMENT-1)/T::SINGLETON_ALIGNMENT) * T::SINGLETON_ALIGNMENT) + 7) / 8 ];
 			X_PTR_SIZED_INT const a = T::SINGLETON_ALIGNMENT;
 			void* mem = (void*)(((X_PTR_SIZED_INT)_memblock + (a-1)) & ~(a-1));
 			ptr = new (mem) T();
@@ -57,7 +57,7 @@ namespace xcore
 		static void singleton_destroy(T*& ptr)
 		{
 			ptr->~T();
-			ptr = NULL;
+			ptr = nullptr;
 		}
 	};
 
@@ -99,7 +99,7 @@ namespace xcore
 			ptr->~T();
 			alloc_t* allocator = T::singleton_allocator();
 			allocator->deallocate(ptr);
-			ptr = NULL;
+			ptr = nullptr;
 		}
 	};
 
@@ -150,7 +150,7 @@ namespace xcore
 			{
 			case CREATE:
 				{
-					if (sSingleton == NULL)
+					if (sSingleton == nullptr)
 					{
 						T* _ptr;
 						InstantiationPolicy::singleton_create(_ptr);
@@ -166,10 +166,10 @@ namespace xcore
 				break;
 			case DESTROY:
 				{
-					if (sSingleton != NULL)
+					if (sSingleton != nullptr)
 					{
 						T* ptr = (T*)sSingleton;
-						sSingleton = NULL;
+						sSingleton = nullptr;
 						InstantiationPolicy::singleton_destroy(ptr);
 					}
 				}
@@ -192,4 +192,4 @@ namespace xcore
 
 };
 
-#endif	/// __XBASE_SINGLETON_H__
+#endif	/// __CBASE_SINGLETON_H__

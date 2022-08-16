@@ -3,7 +3,7 @@
 #include "xbase/x_hash.h"
 #include "xbase/x_runes.h"
 
-namespace xcore
+namespace ncore
 {
     static constexpr u64 PRIME64_1 = 11400714785074694791ULL;
     static constexpr u64 PRIME64_2 = 14029467366897019727ULL;
@@ -16,7 +16,7 @@ namespace xcore
 
     static u32 XXH_get32bits(const void* memPtr)
     {
-        xbyte const* bptr = (xbyte const*)memPtr;
+        u8 const* bptr = (u8 const*)memPtr;
         u32          val  = bptr[0];
         val               = val << 8 | bptr[1];
         val               = val << 8 | bptr[2];
@@ -26,7 +26,7 @@ namespace xcore
 
     static u64 XXH_get64bits(const void* memPtr)
     {
-        xbyte const* bptr = (xbyte const*)memPtr;
+        u8 const* bptr = (u8 const*)memPtr;
         u64          val  = bptr[0];
         val               = val << 8 | bptr[1];
         val               = val << 8 | bptr[2];
@@ -56,13 +56,13 @@ namespace xcore
 
     u64 XXH64(const void* input, u32 len, u64 seed = PRIME64_4)
     {
-        const xbyte* p    = (const xbyte*)input;
-        const xbyte* bEnd = p + len;
+        const u8* p    = (const u8*)input;
+        const u8* bEnd = p + len;
         u64          h64;
 
         if (len >= 32)
         {
-            const xbyte* const limit = bEnd - 32;
+            const u8* const limit = bEnd - 32;
             u64                v1    = seed + PRIME64_1 + PRIME64_2;
             u64                v2    = seed + PRIME64_2;
             u64                v3    = seed + 0;
@@ -125,11 +125,11 @@ namespace xcore
     }
 
     // ----------------------------------------------------------------------------
-    u64 calchash(xbyte const* data, u32 size) { return XXH64(data, size); }
+    u64 calchash(u8 const* data, u32 size) { return XXH64(data, size); }
 
-} // namespace xcore
+} // namespace ncore
 
-namespace xcore
+namespace ncore
 {
     // Paper: https://www.131002.net/siphash/siphash.pdf
 
@@ -176,7 +176,7 @@ namespace xcore
         return result;
     }
 
-    inline static void data_copy(const xbyte* src, const xbyte* end, xbyte* dst)
+    inline static void data_copy(const u8* src, const u8* end, u8* dst)
     {
         while (src < end)
             *dst++ = *src++;
@@ -190,7 +190,7 @@ namespace xcore
         reset(seed);
     }
 
-    void hashing_t::reset(const xbyte* seed)
+    void hashing_t::reset(const u8* seed)
     {
         ASSERT(seed);
         d_bufSize     = (0);
@@ -295,4 +295,4 @@ namespace xcore
         return hash.finalize();
     }
 
-}; // namespace xcore
+}; // namespace ncore

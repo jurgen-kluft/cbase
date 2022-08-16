@@ -1,5 +1,5 @@
-#ifndef __XBASE_SLICE_H__
-#define __XBASE_SLICE_H__
+#ifndef __CBASE_SLICE_H__
+#define __CBASE_SLICE_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -8,7 +8,7 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_debug.h"
 
-namespace xcore
+namespace ncore
 {
     struct slice_data_t;
 
@@ -54,7 +54,7 @@ namespace xcore
     {
         slice_data_t();
         slice_data_t(s32 item_count, s32 item_size);
-        slice_data_t(xbyte* data, s32 item_count, s32 item_size);
+        slice_data_t(u8* data, s32 item_count, s32 item_size);
 
         static slice_data_t sNull;
 
@@ -77,8 +77,8 @@ namespace xcore
         s32         mItemSize;  /// Size of one item
         s32         mDummy;
         alloc_t*    mAllocator;
-        xbyte*      mData;
+        u8*      mData;
     };
-} // namespace xcore
+} // namespace ncore
 
 #endif

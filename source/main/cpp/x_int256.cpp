@@ -15,7 +15,7 @@
 #include "xbase/private/x_int256.h"
 #include "xbase/private/x_uint256.h"
 
-namespace xcore {
+namespace ncore {
 
 	const __xint256	__xint256::Zero;
 	const __xint256	__xint256::One((u32)1);

@@ -1,4 +1,4 @@
-namespace xcore
+namespace ncore
 {
 	// find the number of trailing zeros in 16-bit value
 	// if 'v==0' this function returns 0

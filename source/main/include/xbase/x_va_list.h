@@ -1,5 +1,5 @@
-#ifndef __XBASE_CORE_VA_LIST_H__
-#define __XBASE_CORE_VA_LIST_H__
+#ifndef __CBASE_CORE_VA_LIST_H__
+#define __CBASE_CORE_VA_LIST_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -7,7 +7,7 @@
 
 #include "xbase/x_runes.h"
 
-namespace xcore
+namespace ncore
 {
     /**
      *------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ namespace xcore
      *     done, there are no changes in their use. The only main difference is that
      *     these functions have become 'type safe'. This means that if you have specified
      *     %s in the format string and have passed a variable which is NOT a string
-     *     then the printf code will not crash and it will display NULL. For some types
+     *     then the printf code will not crash and it will display nullptr. For some types
      *     type conversion is supported, like s32 to float, float to s32 etc.
      *
      *<CODE>
@@ -155,7 +155,7 @@ namespace xcore
 
         u16  mType;
         u16  mCap;
-        uptr mArg[4];
+        ptr_t mArg[4];
     };
 
     class va_list_t
@@ -367,7 +367,7 @@ namespace xcore
                 mArg[mLength++] = inArg1;
                 return xTRUE;
             }
-            return xFALSE;
+            return False;
         }
         void add(const va_list_t& inList)
         {
@@ -470,22 +470,22 @@ namespace xcore
         };
 
     public:
-        va_r_t() : mType(TYPE_EMPTY), mCap(0), mSize(0), mDummy(0) { mRef[0] = NULL; }
+        va_r_t() : mType(TYPE_EMPTY), mCap(0), mSize(0), mDummy(0) { mRef[0] = nullptr; }
         va_r_t(const va_r_t& c) : mType(c.mType), mCap(0), mSize(0), mDummy(0) { mRef[0] = c.mRef[0]; }
-        va_r_t(s8* inRef) : mType(TYPE_INT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u8* inRef) : mType(TYPE_UINT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(s16* inRef) : mType(TYPE_INT16), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u16* inRef) : mType(TYPE_UINT16), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(s32* inRef) : mType(TYPE_INT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u32* inRef) : mType(TYPE_UINT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(s32* inRef, s32 inCap) : mType(TYPE_INT32), mCap(inCap), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u32* inRef, s32 inCap) : mType(TYPE_UINT32), mCap(inCap), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(s64* inRef) : mType(TYPE_INT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(u64* inRef) : mType(TYPE_UINT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(bool* inRef) : mType(TYPE_BOOL), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(f32* inRef) : mType(TYPE_FLOAT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(f64* inRef) : mType(TYPE_FLOAT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
-        va_r_t(runes_t* inRef) : mType(TYPE_PRUNES), mCap(0), mSize(0), mDummy(0) { mRef[0] = (uptr)inRef; }
+        va_r_t(s8* inRef) : mType(TYPE_INT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(u8* inRef) : mType(TYPE_UINT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(s16* inRef) : mType(TYPE_INT16), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(u16* inRef) : mType(TYPE_UINT16), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(s32* inRef) : mType(TYPE_INT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(u32* inRef) : mType(TYPE_UINT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(s32* inRef, s32 inCap) : mType(TYPE_INT32), mCap(inCap), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(u32* inRef, s32 inCap) : mType(TYPE_UINT32), mCap(inCap), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(s64* inRef) : mType(TYPE_INT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(u64* inRef) : mType(TYPE_UINT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(bool* inRef) : mType(TYPE_BOOL), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(f32* inRef) : mType(TYPE_FLOAT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(f64* inRef) : mType(TYPE_FLOAT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t(runes_t* inRef) : mType(TYPE_PRUNES), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
 
         va_r_t& operator=(s8 rhs);
         va_r_t& operator=(u8 rhs);
@@ -544,7 +544,7 @@ namespace xcore
         u16  mCap;      // When PROP_ARRAY, this is the maximum capacity
         u16  mSize;     // When PROP_ARRAY, this is the final size
         u16  mDummy;
-        uptr mRef[1];
+        ptr_t mRef[1];
     };
 
     struct va_r_list_t
@@ -739,7 +739,7 @@ namespace xcore
                 mArg[mLength++] = inArg1;
                 return xTRUE;
             }
-            return xFALSE;
+            return False;
         }
 
         va_r_t operator[](s32 inIndex) const
@@ -777,6 +777,6 @@ namespace xcore
     const va_r_t &v1, const va_r_t &v2 = va_r_t::sEmpty, const va_r_t &v3 = va_r_t::sEmpty, const va_r_t &v4 = va_r_t::sEmpty, const va_r_t &v5 = va_r_t::sEmpty, const va_r_t &v6 = va_r_t::sEmpty, const va_r_t &v7 = va_r_t::sEmpty,                  \
                                    const va_r_t &v8 = va_r_t::sEmpty, const va_r_t &v9 = va_r_t::sEmpty, const va_r_t &v10 = va_r_t::sEmpty, const va_r_t &v11 = va_r_t::sEmpty, const va_r_t &v12 = va_r_t::sEmpty, const va_r_t &v13 = va_r_t::sEmpty, \
                                    const va_r_t &v14 = va_r_t::sEmpty, const va_r_t &v15 = va_r_t::sEmpty, const va_r_t &v16 = va_r_t::sEmpty
-}; // namespace xcore
+}; // namespace ncore
 
 #endif ///< END __X_CORE_VA_LIST_H__

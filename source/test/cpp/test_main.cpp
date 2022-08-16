@@ -42,10 +42,10 @@ UNITTEST_SUITE_DECLARE(xCoreUnitTest, xva);
 UNITTEST_SUITE_DECLARE(xCoreUnitTest, __xint64);
 #endif // X_NO_CUSTOM_INT64
 
-namespace xcore
+namespace ncore
 {
     // Our own assert handler
-    class UnitTestAssertHandler : public xcore::asserthandler_t
+    class UnitTestAssertHandler : public ncore::asserthandler_t
     {
     public:
         UnitTestAssertHandler()
@@ -61,16 +61,16 @@ namespace xcore
         }
 
 
-        xcore::s32		NumberOfAsserts;
+        ncore::s32		NumberOfAsserts;
     };
 
     class UnitTestAllocator : public UnitTest::Allocator
     {
-        xcore::alloc_t*	mAllocator;
+        ncore::alloc_t*	mAllocator;
     public:
-                        UnitTestAllocator(xcore::alloc_t* allocator)	{ mAllocator = allocator; }
-        virtual void*	Allocate(xsize_t size)								{ return mAllocator->allocate((u32)size, sizeof(void*)); }
-        virtual xsize_t	Deallocate(void* ptr)								{ return mAllocator->deallocate(ptr); }
+                        UnitTestAllocator(ncore::alloc_t* allocator)	{ mAllocator = allocator; }
+        virtual void*	Allocate(uint_t size)								{ return mAllocator->allocate((u32)size, sizeof(void*)); }
+        virtual uint_t	Deallocate(void* ptr)								{ return mAllocator->deallocate(ptr); }
     };
 
     class TestAllocator : public alloc_t
@@ -78,8 +78,6 @@ namespace xcore
         alloc_t*		mAllocator;
     public:
                             TestAllocator(alloc_t* allocator) : mAllocator(allocator) { }
-
-        virtual const char*	name() const										{ return "xbase unittest test heap allocator"; }
 
         virtual void*		v_allocate(u32 size, u32 alignment)
         {
@@ -95,33 +93,33 @@ namespace xcore
 
         virtual void		v_release()
         {
-            mAllocator = NULL;
+            mAllocator = nullptr;
         }
     };
 }
 
-xcore::alloc_t* gTestAllocator = NULL;
-xcore::UnitTestAssertHandler gAssertHandler;
+ncore::alloc_t* gTestAllocator = nullptr;
+ncore::UnitTestAssertHandler gAssertHandler;
 
 bool gRunUnitTest(UnitTest::TestReporter& reporter)
 {
     xbase::init();
 
 #ifdef TARGET_DEBUG
-    xcore::context_t::set_assert_handler(&gAssertHandler);
+    ncore::context_t::set_assert_handler(&gAssertHandler);
 #endif
-    xcore::console->write("Configuration: ");
-    xcore::console->setColor(xcore::console_t::YELLOW);
-    xcore::console->writeLine(TARGET_FULL_DESCR_STR);
-    xcore::console->setColor(xcore::console_t::NORMAL);
+    ncore::console->write("Configuration: ");
+    ncore::console->setColor(ncore::console_t::YELLOW);
+    ncore::console->writeLine(TARGET_FULL_DESCR_STR);
+    ncore::console->setColor(ncore::console_t::NORMAL);
 
-    xcore::alloc_t* systemAllocator = xcore::context_t::system_alloc();
-    xcore::UnitTestAllocator unittestAllocator( systemAllocator );
+    ncore::alloc_t* systemAllocator = ncore::context_t::system_alloc();
+    ncore::UnitTestAllocator unittestAllocator( systemAllocator );
     UnitTest::SetAllocator(&unittestAllocator);
 
-    xcore::TestAllocator testAllocator(systemAllocator);
+    ncore::TestAllocator testAllocator(systemAllocator);
     gTestAllocator = &testAllocator;
-    xcore::context_t::set_system_alloc(&testAllocator);
+    ncore::context_t::set_system_alloc(&testAllocator);
 
     int r = UNITTEST_SUITE_RUN(reporter, xCoreUnitTest);
     if (UnitTest::GetNumAllocations()!=0)
@@ -132,8 +130,8 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 
     gTestAllocator->release();
 
-    UnitTest::SetAllocator(NULL);
-    xcore::context_t::set_system_alloc(systemAllocator);
+    UnitTest::SetAllocator(nullptr);
+    ncore::context_t::set_system_alloc(systemAllocator);
 
     xbase::exit();
     return r==0;

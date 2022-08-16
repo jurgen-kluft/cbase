@@ -1,5 +1,5 @@
-#ifndef __XBASE_CARRAY_H__
-#define __XBASE_CARRAY_H__
+#ifndef __CBASE_CARRAY_H__
+#define __CBASE_CARRAY_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
@@ -9,13 +9,13 @@
 #include "xbase/x_memory.h"
 #include "xbase/x_allocator.h"
 
-namespace xcore
+namespace ncore
 {
 	class carray_t
 	{
 	public:
 		inline				carray_t() : mLength(0), mReservedItems(0), mSizeOfItem(0), mArray(0)		{ }
-		inline				carray_t(void* _array, s32 size_of_element, s32 number_of_elements) : mLength(0), mReservedItems(number_of_elements), mSizeOfItem(size_of_element), mArray((xbyte*)_array)	{ }
+		inline				carray_t(void* _array, s32 size_of_element, s32 number_of_elements) : mLength(0), mReservedItems(number_of_elements), mSizeOfItem(size_of_element), mArray((u8*)_array)	{ }
 
 		inline void			clear()									{ mLength = 0; }
 
@@ -27,9 +27,9 @@ namespace xcore
 		inline void			push_back(void const* item)				{ ASSERT(mLength<reserved()); x_memcpy(&mArray[mLength * mSizeOfItem], item, mSizeOfItem); mLength += 1; }
 		inline bool			pop_back(void * out_item)				{ if (mLength > 0) { --mLength; x_memcpy(out_item, &mArray[mLength * mSizeOfItem], mSizeOfItem); return true; } else { return false; } }
 
-		inline xbyte*		begin() const							{ return mArray; }
-		inline xbyte*		next(xbyte* current) const				{ ASSERT(x_is_in_range(mArray, mReservedItems * mSizeOfItem, current)); return current + mSizeOfItem; }
-		inline xbyte*		end() const								{ return &mArray[mLength * mSizeOfItem]; }
+		inline u8*		begin() const							{ return mArray; }
+		inline u8*		next(u8* current) const				{ ASSERT(x_is_in_range(mArray, mReservedItems * mSizeOfItem, current)); return current + mSizeOfItem; }
+		inline u8*		end() const								{ return &mArray[mLength * mSizeOfItem]; }
 
 		inline void*		operator [] (s32 index)					{ ASSERT(index<(s32)mLength); return &mArray[index * mSizeOfItem]; }
 		inline void const*	operator [] (s32 index) const			{ ASSERT(index<(s32)mLength); return &mArray[index * mSizeOfItem]; }
@@ -44,17 +44,17 @@ namespace xcore
 		s32					mLength;
 		s32					mReservedItems;
 		s32					mSizeOfItem;
-		xbyte*				mArray;
+		u8*				mArray;
 	};
 
 	inline void			carray_t::swap(s32 index_a, s32 index_b)
 	{
 		ASSERT (index_a < mLength && index_b < mLength);
-		xbyte* srca = &mArray[index_a * mSizeOfItem];
-		xbyte* srcb = &mArray[index_b * mSizeOfItem];
+		u8* srca = &mArray[index_a * mSizeOfItem];
+		u8* srcb = &mArray[index_b * mSizeOfItem];
 		for (s32 i = 0; i < mSizeOfItem; ++i)
 		{
-			xbyte tmp = srca[i];
+			u8 tmp = srca[i];
 			srca[i] = srcb[i];
 			srcb[i] = tmp;
 		}
@@ -66,7 +66,7 @@ namespace xcore
 		{
 			s32 const s = index + 1;
 			for (s32 i = s; i < mLength; ++i)
-				x_memcpy(&mArray[(i-1) * mSizeOfItem], &mArray[i * mSizeOfItem], mSizeOfItem);
+				g_memcpy(&mArray[(i-1) * mSizeOfItem], &mArray[i * mSizeOfItem], mSizeOfItem);
 			mLength--;
 		}
 	}
@@ -78,10 +78,10 @@ namespace xcore
 			mLength -= 1;
 			if (index < mLength)
 			{
-				x_memcpy(&mArray[index * mSizeOfItem], &mArray[mLength * mSizeOfItem], mSizeOfItem);
+				g_memcpy(&mArray[index * mSizeOfItem], &mArray[mLength * mSizeOfItem], mSizeOfItem);
 			}
 		}
 	}
 };
 
-#endif // __XBASE_CARRAY_H__
+#endif // __CBASE_CARRAY_H__

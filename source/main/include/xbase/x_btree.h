@@ -8,7 +8,7 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_integer.h"
 
-namespace xcore
+namespace ncore
 {
     struct btree_indexer_t
     {
@@ -109,6 +109,6 @@ namespace xcore
         btree_ptr_kv_t* m_kv;
     };
 
-}; // namespace xcore
+}; // namespace ncore
 
 #endif // __X_ALLOCATOR_BTREE_H__

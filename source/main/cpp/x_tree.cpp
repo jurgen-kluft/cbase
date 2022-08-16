@@ -3,7 +3,7 @@
 #include "xbase/x_tree.h"
 
 
-namespace xcore
+namespace ncore
 {
 	typedef s32(*cmp_f)(const void* p1, const void* p2);
 
@@ -232,7 +232,7 @@ namespace xcore
 	}
 
 	// Insert data pointer into a redblack tree.
-	// Returns a NULL pointer on success.  If a node matching "data"
+	// Returns a nullptr pointer on success.  If a node matching "data"
 	// already exists, a pointer to the existant node is returned.
 	bool tree_internal::tree_insert(tree_t* tree, void* data, tree_t::node_t* node_to_insert)
 	{
@@ -336,7 +336,7 @@ namespace xcore
 	}
 
 	// Look for a node matching key in tree.
-	// Returns a pointer to the node if found, else NULL.
+	// Returns a pointer to the node if found, else nullptr.
 	bool tree_internal::tree_find(tree_t* tree, void* key, tree_t::node_t*& found)
 	{
 		tree_t::node_t* node = rbfirst(tree);
@@ -351,7 +351,7 @@ namespace xcore
 			c = (c + 1) >> 1;
 			node = node->get_child(c);
 		}
-		found = (NULL);
+		found = (nullptr);
 		return false;
 	}
 
@@ -416,7 +416,7 @@ namespace xcore
 
 	// Test the integrity of the red-black tree
 	// @return: The depth of the tree
-	// @result: If any error it returns a description of the error in 'result', when no error it will be NULL
+	// @result: If any error it returns a description of the error in 'result', when no error it will be nullptr
 	s32 tree_internal::tree_validate(tree_t* tree, tree_t::node_t* root, const char*& result)
 	{
 		if (root == rbnil(tree))
@@ -469,7 +469,7 @@ namespace xcore
 		, m_size(0)
 	{
 		// We use a self-referencing sentinel node called nil to simplify the
-		// code by avoiding the need to check for NULL pointers.
+		// code by avoiding the need to check for nullptr pointers.
 		m_nill.set_parent(&m_nill);
 		m_nill.set_left(&m_nill);
 		m_nill.set_right(&m_nill);
@@ -517,7 +517,7 @@ namespace xcore
 	bool            tree_t::validate(const char*& error_str)
 	{
 		s32 depth = tree_internal::tree_validate(this, rbfirst(this), error_str);
-		return (error_str == NULL);
+		return (error_str == nullptr);
 	}
 
 	tree_t::iterator tree_t::iterate()

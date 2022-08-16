@@ -2,7 +2,7 @@
 #include "xbase/x_context.h"
 #include "xbase/x_debug.h"
 
-namespace xcore
+namespace ncore
 {
     // For xbase what would we like to have per thread:
     // - A global heap allocator (in a multi-threaded environment this one should be thread-safe)
@@ -57,4 +57,4 @@ namespace xcore
     }
 
 
-} // namespace xcore
+} // namespace ncore

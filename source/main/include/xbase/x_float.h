@@ -1,5 +1,5 @@
-#ifndef __XBASE_F32_FUNCTIONS_H__
-#define __XBASE_F32_FUNCTIONS_H__
+#ifndef __CBASE_F32_FUNCTIONS_H__
+#define __CBASE_F32_FUNCTIONS_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -7,7 +7,7 @@
 
 #include "xbase/x_debug.h"
 
-namespace xcore
+namespace ncore
 {
     namespace xf32
     {
@@ -120,6 +120,6 @@ namespace xcore
 
 #endif
 
-}; // namespace xcore
+}; // namespace ncore
 
-#endif ///< __XBASE_F32_FUNCTIONS_H__
+#endif ///< __CBASE_F32_FUNCTIONS_H__

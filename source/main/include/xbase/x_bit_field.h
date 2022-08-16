@@ -1,6 +1,6 @@
 // x_bit_field.h - xCore bitfield template - 
-#ifndef __XBASE_BITFIELD_H__
-#define __XBASE_BITFIELD_H__
+#ifndef __CBASE_BITFIELD_H__
+#define __CBASE_BITFIELD_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
@@ -8,7 +8,7 @@
 
 #include "xbase/x_debug.h"
 
-namespace xcore
+namespace ncore
 {
 	//------------------------------------------------------------------------------
 	// Author:
@@ -134,22 +134,22 @@ namespace xcore
 		field_t				bitfield;
 	};
 
-	#define XENUM_BEGIN(enum_name)				\
+	#define DENUM_BEGIN(enum_name)				\
 			class enum_name						\
 			{									\
 			public:								\
 				enum EEnum
 												
 
-	#define XENUM_END(enum_name)				\
+	#define DENUM_END(enum_name)				\
 				;								\
 				inline enum_name(EEnum _e) : e(_e){} \
 				EEnum e;						\
 			};
 
-	#define XENUM_DECLARE(enum_name)			\
+	#define DENUM_DECLARE(enum_name)			\
 			class enum_name;
 
 };
 
-#endif    /// __XBASE_BITFIELD_H__
+#endif    /// __CBASE_BITFIELD_H__

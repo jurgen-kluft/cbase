@@ -1,11 +1,11 @@
-#ifndef __XBASE_RANDOM_H__
-#define __XBASE_RANDOM_H__
+#ifndef __CBASE_RANDOM_H__
+#define __CBASE_RANDOM_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
 #endif
 
-namespace xcore
+namespace ncore
 {
 	class random_t
 	{
@@ -17,4 +17,4 @@ namespace xcore
 
 };
 
-#endif // __XBASE_RANDOM_H__
+#endif // __CBASE_RANDOM_H__

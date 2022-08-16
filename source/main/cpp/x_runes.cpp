@@ -7,7 +7,7 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
-namespace xcore
+namespace ncore
 {
 
     namespace utf
@@ -519,7 +519,7 @@ namespace xcore
             else
             {
                 uchar32 c = *str;
-                while (c != ascii::TERMINATOR && (end == NULL || str < end) && count > 0)
+                while (c != ascii::TERMINATOR && (end == nullptr || str < end) && count > 0)
                 {
                     str++;
                     count -= 1;
@@ -645,7 +645,7 @@ namespace xcore
             else
             {
                 uchar32 c = *str;
-                while (c != utf16::TERMINATOR && (end == NULL || str < end) && count > 0)
+                while (c != utf16::TERMINATOR && (end == nullptr || str < end) && count > 0)
                 {
                     s32 const l = sequence_sizeof_utf16(c);
                     if ((str + l) <= end)
@@ -681,7 +681,7 @@ namespace xcore
             else
             {
                 uchar32 c = *str;
-                while (c != utf32::TERMINATOR && (end == NULL || str < end) && count > 0)
+                while (c != utf32::TERMINATOR && (end == nullptr || str < end) && count > 0)
                 {
                     str++;
                     count -= 1;
@@ -796,7 +796,7 @@ namespace xcore
         uchar32 read(ascii::pcrune& str, ascii::pcrune end)
         {
             uchar32 c = ((uchar32)*str) & 0xFF;
-            if (c != utf32::TERMINATOR && (end == NULL || str < end))
+            if (c != utf32::TERMINATOR && (end == nullptr || str < end))
             {
                 str++;
             }
@@ -846,7 +846,7 @@ namespace xcore
         {
             uchar32 out_c;
             uchar16 c = *str;
-            if (c == utf16::TERMINATOR || (end != NULL && str >= end))
+            if (c == utf16::TERMINATOR || (end != nullptr && str >= end))
             {
                 out_c = utf32::TERMINATOR;
                 return out_c;
@@ -862,7 +862,7 @@ namespace xcore
                 l = 2;
             }
 
-            if (end == NULL || (str + l) <= end)
+            if (end == nullptr || (str + l) <= end)
             {
                 // @TODO: This needs to be fixed since the case where end==nullptr needs to be handled correctly
                 out_c = 0;
@@ -884,7 +884,7 @@ namespace xcore
         uchar32 read(utf32::pcrune& str, utf32::pcrune end)
         {
             uchar32 c = *str;
-            if (c != utf32::TERMINATOR && (end == NULL || str < end))
+            if (c != utf32::TERMINATOR && (end == nullptr || str < end))
             {
                 str++;
             }
@@ -1036,7 +1036,7 @@ namespace xcore
                 len = 2;
             }
 
-            if (cursor != NULL && len > 0)
+            if (cursor != nullptr && len > 0)
             {
                 if (len == 1 && cursor < end)
                 {
@@ -2590,9 +2590,9 @@ namespace xcore
     void removeSelection(runes_t& str, crunes_t const& selection)
     {
         //@note: treated as a mem move
-        xbyte* dst = (xbyte*)selection.m_ascii.m_str;
-        xbyte* src = (xbyte*)selection.m_ascii.m_end;
-        xbyte* end = (xbyte*)str.m_ascii.m_end;
+        u8* dst = (u8*)selection.m_ascii.m_str;
+        u8* src = (u8*)selection.m_ascii.m_end;
+        u8* end = (u8*)str.m_ascii.m_end;
         while (src < end)
         {
             *dst++ = *src++;
@@ -2603,9 +2603,9 @@ namespace xcore
     void keepOnlySelection(runes_t& str, crunes_t const& keep)
     {
         //@note: treated as a mem move
-        xbyte*       dst = (xbyte*)str.m_ascii.m_str;
-        xbyte*       src = (xbyte*)keep.m_ascii.m_str;
-        xbyte const* end = (xbyte const*)keep.m_ascii.m_end;
+        u8*       dst = (u8*)str.m_ascii.m_str;
+        u8*       src = (u8*)keep.m_ascii.m_str;
+        u8 const* end = (u8 const*)keep.m_ascii.m_end;
         while (src < end)
         {
             *dst++ = *src++;
@@ -2618,45 +2618,45 @@ namespace xcore
         runes_t str = crunes_to_runes(_str, _selection);
 
         // The logic here is based on memory copy, we do not consider characters
-        s32 const selected_len = (s32)((xbyte const*)str.m_ascii.m_end - (xbyte const*)str.m_ascii.m_str);
-        s32 const replace_len  = (s32)((xbyte const*)replace.m_ascii.m_end - (xbyte const*)replace.m_ascii.m_str);
+        s32 const selected_len = (s32)((u8 const*)str.m_ascii.m_end - (u8 const*)str.m_ascii.m_str);
+        s32 const replace_len  = (s32)((u8 const*)replace.m_ascii.m_end - (u8 const*)replace.m_ascii.m_str);
 
-        xbyte* end = NULL;
+        u8* end = nullptr;
         if (selected_len < replace_len)
         {
             // Move, expanding
             s32 move_len = replace_len - selected_len;
-            if (move_len > ((xbyte const*)str.m_ascii.m_eos - (xbyte*)str.m_ascii.m_end))
-                move_len = (s32)(((xbyte const*)str.m_ascii.m_eos - (xbyte*)str.m_ascii.m_end));
+            if (move_len > ((u8 const*)str.m_ascii.m_eos - (u8*)str.m_ascii.m_end))
+                move_len = (s32)(((u8 const*)str.m_ascii.m_eos - (u8*)str.m_ascii.m_end));
 
             // No matter what, push out anything at the end!
-            xbyte* dst = (xbyte*)((xbyte*)str.m_ascii.m_end + ((xbyte const*)str.m_ascii.m_eos - (xbyte*)str.m_ascii.m_end) - 1);
-            xbyte* src = (xbyte*)((xbyte*)dst - move_len);
-            while (dst > (xbyte*)str.m_ascii.m_end)
+            u8* dst = (u8*)((u8*)str.m_ascii.m_end + ((u8 const*)str.m_ascii.m_eos - (u8*)str.m_ascii.m_end) - 1);
+            u8* src = (u8*)((u8*)dst - move_len);
+            while (dst > (u8*)str.m_ascii.m_end)
                 *dst-- = *src--;
 
-            end = (xbyte*)_str.m_ascii.m_end + move_len; // Update str_end
+            end = (u8*)_str.m_ascii.m_end + move_len; // Update str_end
         }
         else if (selected_len > replace_len)
         {
             // Move, shrinking
             s32    move_len = selected_len - replace_len;
-            xbyte* dst      = (xbyte*)((xbyte*)str.m_ascii.m_end - move_len);
-            xbyte* src      = (xbyte*)(str.m_ascii.m_end);
-            while (src < (xbyte const*)str.m_ascii.m_eos)
+            u8* dst      = (u8*)((u8*)str.m_ascii.m_end - move_len);
+            u8* src      = (u8*)(str.m_ascii.m_end);
+            while (src < (u8 const*)str.m_ascii.m_eos)
                 *dst++ = *src++;
 
-            end = (xbyte*)_str.m_ascii.m_end - move_len; // Update str_end
+            end = (u8*)_str.m_ascii.m_end - move_len; // Update str_end
         }
         else
         {
-            end = (xbyte*)_str.m_ascii.m_end;
+            end = (u8*)_str.m_ascii.m_end;
         }
 
         // Replace
-        xbyte const* src     = (xbyte const*)replace.m_ascii.m_str;
-        xbyte const* src_end = (xbyte const*)replace.m_ascii.m_str + replace_len;
-        xbyte*       dst     = (xbyte*)str.m_ascii.m_str;
+        u8 const* src     = (u8 const*)replace.m_ascii.m_str;
+        u8 const* src_end = (u8 const*)replace.m_ascii.m_str + replace_len;
+        u8*       dst     = (u8*)str.m_ascii.m_str;
         while (src < src_end)
             *dst++ = *src++;
 
@@ -4468,4 +4468,4 @@ namespace xcore
 
     void runes_writer_t::vflush() {}
 
-} // namespace xcore
+} // namespace ncore

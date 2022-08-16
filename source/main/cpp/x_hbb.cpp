@@ -6,7 +6,7 @@
 
 #include "xbase/x_hbb.h"
 
-namespace xcore
+namespace ncore
 {
     enum
     {
@@ -503,4 +503,4 @@ namespace xcore
             m_cur = m_end;
     }
 
-}; // namespace xcore
+}; // namespace ncore

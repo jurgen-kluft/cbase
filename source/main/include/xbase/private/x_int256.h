@@ -1,5 +1,5 @@
-#ifndef __XBASE_256_BIT_SIGNED_INTEGER_H__
-#define __XBASE_256_BIT_SIGNED_INTEGER_H__
+#ifndef __CBASE_256_BIT_SIGNED_INTEGER_H__
+#define __CBASE_256_BIT_SIGNED_INTEGER_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -7,7 +7,7 @@
 
 #ifndef X_NO_CUSTOM_INT256
 
-namespace xcore
+namespace ncore
 {
 	// Forward declares
 	class __xint64;
@@ -164,4 +164,4 @@ namespace xcore
 };
 
 #endif
-#endif	///< __XBASE_256_BIT_SIGNED_INTEGER_H__
+#endif	///< __CBASE_256_BIT_SIGNED_INTEGER_H__

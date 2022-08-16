@@ -4,9 +4,9 @@
 
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
-extern xcore::alloc_t* gTestAllocator;
+extern ncore::alloc_t* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(xallocator)
 {
@@ -18,19 +18,19 @@ UNITTEST_SUITE_BEGIN(xallocator)
         UNITTEST_TEST(test_alignment)
         {
             void* ptr = gTestAllocator->allocate(200, 8);
-            CHECK_EQUAL(0, (uptr)ptr & (8 - 1));
+            CHECK_EQUAL(0, (ptr_t)ptr & (8 - 1));
             gTestAllocator->deallocate(ptr);
 
             ptr = gTestAllocator->allocate(200, 16);
-            CHECK_EQUAL(0, (uptr)ptr & (16 - 1));
+            CHECK_EQUAL(0, (ptr_t)ptr & (16 - 1));
             gTestAllocator->deallocate(ptr);
 
             ptr = gTestAllocator->allocate(200, 32);
-            CHECK_EQUAL(0, (uptr)ptr & (32 - 1));
+            CHECK_EQUAL(0, (ptr_t)ptr & (32 - 1));
             gTestAllocator->deallocate(ptr);
 
             ptr = gTestAllocator->allocate(200, 64);
-            CHECK_EQUAL(0, (uptr)ptr & (64 - 1));
+            CHECK_EQUAL(0, (ptr_t)ptr & (64 - 1));
             gTestAllocator->deallocate(ptr);
         }
 
@@ -70,7 +70,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
             CHECK_NOT_NULL(object2);
             CHECK_TRUE(3 == object2->mInteger);
             CHECK_TRUE(4.0 == object2->mFloat);
-            CHECK_TRUE((uptr)object2 % 4 == 0);
+            CHECK_TRUE((ptr_t)object2 % 4 == 0);
             delete object2;
         }
 
@@ -94,7 +94,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
             CHECK_TRUE(object3[1].mFloat = 3.0);
             CHECK_TRUE(object3[2].mInteger = 2);
             CHECK_TRUE(object3[2].mFloat = 3.0);
-            CHECK_EQUAL(0, (uptr)object3 % 32);
+            CHECK_EQUAL(0, (ptr_t)object3 % 32);
             delete[] object3;
         }
 
@@ -117,7 +117,7 @@ UNITTEST_SUITE_BEGIN(xallocator)
         UNITTEST_TEST(test_alloc_buffer)
         {
             inplace_t<256> inplace;
-            alloc_buffer_t sa(inplace.object<xbyte>(), inplace.size());
+            alloc_buffer_t sa(inplace.object<u8>(), inplace.size());
             test_object4* obj = sa.construct<test_object4>();
             sa.destruct<>(obj);
         }

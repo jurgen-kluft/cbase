@@ -75,8 +75,8 @@ namespace xf64
     inline bool		isFinite(f64 inNumber)  						{ return bool(!isInfinite(inNumber) && !isNAN(inNumber)); }
     inline bool		isRational(f64 inNumber)						{ return bool((bin(inNumber) & sDoubleIEEE.DD_EXPONENT_MASK) != sDoubleIEEE.DD_EXPONENT_MASK); }
 #else
-    inline bool		isInfinite(f64 inNumber)						{ return xFALSE; }
-    inline bool		isNAN(f64 inNumber)     						{ return xFALSE; }
+    inline bool		isInfinite(f64 inNumber)						{ return False; }
+    inline bool		isNAN(f64 inNumber)     						{ return False; }
     inline bool		isFinite(f64 inNumber)  						{ return xTRUE; }
     inline bool		isRational(f64 inNumber)						{ return xTRUE; }
 #endif

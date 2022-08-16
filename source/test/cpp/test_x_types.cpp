@@ -3,7 +3,7 @@
 
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(xtypes)
 {
@@ -30,7 +30,7 @@ UNITTEST_SUITE_BEGIN(xtypes)
 			CHECK_TRUE(sizeof(void*) == 8);
 #endif
 
-			CHECK_TRUE(sizeof(xbyte) == 1);
+			CHECK_TRUE(sizeof(u8) == 1);
 			CHECK_TRUE(sizeof(u8) == 1);
 			CHECK_TRUE(sizeof(s8) == 1);
 			CHECK_TRUE(sizeof(u16) == 2);
@@ -43,7 +43,7 @@ UNITTEST_SUITE_BEGIN(xtypes)
 			CHECK_TRUE(sizeof(s128) == 16);
 			CHECK_TRUE(sizeof(f32) == 4);
 			CHECK_TRUE(sizeof(f64) == 8);
-			CHECK_TRUE(sizeof(xbool32) == 4);
+			CHECK_TRUE(sizeof(bool32) == 4);
 			CHECK_TRUE(sizeof(bool) == 4 || sizeof(bool) == 1);
 
 			CHECK_TRUE(sizeof(uchar8)  == 1);

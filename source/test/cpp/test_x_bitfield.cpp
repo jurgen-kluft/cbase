@@ -1,7 +1,7 @@
 #include "xbase/x_bit_field.h"
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(xbitfield)
 {
@@ -184,14 +184,14 @@ UNITTEST_SUITE_BEGIN(xbitfield)
 		UNITTEST_FIXTURE_SETUP() {}
 		UNITTEST_FIXTURE_TEARDOWN() {}
 
-		XENUM_BEGIN(ETestEnum)
+		DENUM_BEGIN(ETestEnum)
 		{
 			TEST01 = 1<<1,
 			TEST02 = 1<<2,
 			TEST04 = 1<<4,
 			TEST08 = 1<<8,
 			TEST20 = 1<<20,
-		} XENUM_END(ETestEnum)
+		} DENUM_END(ETestEnum)
 
 
 		UNITTEST_TEST(xenum_instance)

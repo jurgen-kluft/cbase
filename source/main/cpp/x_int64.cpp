@@ -9,7 +9,7 @@
 #include "xbase/private/x_uint64.h"
 #include "xbase/private/x_int64.h"
 
-namespace xcore {
+namespace ncore {
 
 	const __xint64	__xint64::Zero;
 	const __xint64	__xint64::One((u32)1);
@@ -155,8 +155,8 @@ namespace xcore {
 		__xint64 B(_value);
 
 		// Correctly handle negative values
-		bool bANegative = xFALSE;
-		bool bBNegative = xFALSE;
+		bool bANegative = False;
+		bool bBNegative = False;
 		if (IsNegative())
 		{
 			bANegative = xTRUE;
@@ -411,7 +411,7 @@ namespace xcore {
 		ASSERT(nIndex >= 0 && nIndex < 96);
 
 		u32 dwBitMask = 0x80000000 >> (nIndex % 32);
-		if (_value == xFALSE)
+		if (_value == False)
 			dwBitMask = ~dwBitMask;
 		if (nIndex < 32)
 		{

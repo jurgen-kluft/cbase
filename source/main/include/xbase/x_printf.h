@@ -1,5 +1,5 @@
-#ifndef __XCORE_CHARS_H__
-#define __XCORE_CHARS_H__
+#ifndef __CCORE_CHARS_H__
+#define __CCORE_CHARS_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -7,7 +7,7 @@
 
 #include "xbase/x_va_list.h"
 
-namespace xcore
+namespace ncore
 {
     s32  cprintf(crunes_t const& format, X_VA_ARGS_16_DEF);
     s32  vcprintf(crunes_t const& format, const va_list_t& args);
@@ -27,6 +27,6 @@ namespace xcore
     char* dtoa(f64 value, char* dst, char const* end);
     char* btoa(bool value, char* dst, char const* end);
     
-} // namespace xcore
+} // namespace ncore
 
-#endif ///< __XCORE_CHARS_H__
+#endif ///< __CCORE_CHARS_H__

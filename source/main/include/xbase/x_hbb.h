@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
     class alloc_t;
 
@@ -49,6 +49,6 @@ namespace xcore
     extern bool       g_hbb_upper(hbb_t const hbb, u32 pivot, u32& bit); // First 1 equal to or greater than @pivot
     extern bool       g_hbb_lower(hbb_t const hbb, u32 pivot, u32& bit); // First 1 equal to or lesser than @pivot
 
-}; // namespace xcore
+}; // namespace ncore
 
 #endif /// __X_HIERARCHICAL_BIT_BUFFER_H__

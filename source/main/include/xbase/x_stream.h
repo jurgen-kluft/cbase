@@ -1,11 +1,11 @@
-#ifndef __XBASE_STREAM_H__
-#define __XBASE_STREAM_H__
+#ifndef __CBASE_STREAM_H__
+#define __CBASE_STREAM_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
 	class istream_t
 	{
@@ -23,9 +23,9 @@ namespace xcore
 		inline void close() { vclose(); }
 		inline void flush() { vflush(); }
 
-		inline s64 read(xbyte* data, s64 len) { return vread(data, len); }
-		inline s64 read0(xbyte const*& data, s64 len) { return vread0(data, len); }
-		inline s64 write(xbyte const* data, s64 len) { return vwrite(data, len); }
+		inline s64 read(u8* data, s64 len) { return vread(data, len); }
+		inline s64 read0(u8 const*& data, s64 len) { return vread0(data, len); }
+		inline s64 write(u8 const* data, s64 len) { return vwrite(data, len); }
 
 	protected:
 		virtual bool vcanSeek() const = 0;
@@ -38,11 +38,11 @@ namespace xcore
 		virtual void vsetLength(u64 length) = 0;
 		virtual s64  vsetPos(s64 pos) = 0;
 		virtual s64  vgetPos() const = 0;
-		virtual s64 vread(xbyte* buffer, s64 count) = 0;
-		virtual s64 vread0(xbyte const*& buffer, s64 count) = 0;
-		virtual s64 vwrite(const xbyte* buffer, s64 count) = 0;
+		virtual s64 vread(u8* buffer, s64 count) = 0;
+		virtual s64 vread0(u8 const*& buffer, s64 count) = 0;
+		virtual s64 vwrite(const u8* buffer, s64 count) = 0;
 	};
 
-} // namespace xcore
+} // namespace ncore
 
-#endif // __XBASE_STREAM_H__
+#endif // __CBASE_STREAM_H__

@@ -3,7 +3,7 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_btree.h"
 
-namespace xcore
+namespace ncore
 {
 
     // ######################################################################################################################################
@@ -490,24 +490,24 @@ namespace xcore
         inline node_t() {}
         inline bool is_empty() const { return m_nodes[0] == 0 && m_nodes[1] == 0 && m_nodes[2] == 0 && m_nodes[3] == 0; }
         inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = 0; }
-        uptr        m_nodes[4];
+        ptr_t        m_nodes[4];
         XCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 
-    static inline bool  is_null(uptr n) { return n == 0; }
-    static inline bool  is_node(uptr n) { return (n != 0) && ((n & 1) == 1); }
-    static inline bool  is_value(uptr n) { return (n != 0) && ((n & 1) == 0); }
-    static inline uptr  as_node(uptr n) { return ((uptr)n | 1); }
-    static inline uptr  as_value(uptr n) { return ((uptr)n); }
-    static inline void* as_value_ptr(uptr n)
+    static inline bool  is_null(ptr_t n) { return n == 0; }
+    static inline bool  is_node(ptr_t n) { return (n != 0) && ((n & 1) == 1); }
+    static inline bool  is_value(ptr_t n) { return (n != 0) && ((n & 1) == 0); }
+    static inline ptr_t  as_node(ptr_t n) { return ((ptr_t)n | 1); }
+    static inline ptr_t  as_value(ptr_t n) { return ((ptr_t)n); }
+    static inline void* as_value_ptr(ptr_t n)
     {
         ASSERT(is_value(n));
-        return (void*)((uptr)n);
+        return (void*)((ptr_t)n);
     }
-    static inline btree_ptr_t::node_t* as_node_ptr(uptr n)
+    static inline btree_ptr_t::node_t* as_node_ptr(ptr_t n)
     {
         ASSERT(is_node(n));
-        return (btree_ptr_t::node_t*)((uptr)n & ~(u64)1);
+        return (btree_ptr_t::node_t*)((ptr_t)n & ~(u64)1);
     }
 
     void btree_ptr_t::init(fsa_t* node_allocator, btree_ptr_kv_t* kv)
@@ -542,11 +542,11 @@ namespace xcore
         do
         {
             s32  childIndex = m_idxr.key_to_index(level, key);
-            uptr childPtr   = node->m_nodes[childIndex];
+            ptr_t childPtr   = node->m_nodes[childIndex];
             if (is_null(childPtr))
             {
                 m_kv->set_key(value, key);
-                node->m_nodes[childIndex] = as_value((uptr)value);
+                node->m_nodes[childIndex] = as_value((ptr_t)value);
                 return true;
             }
             else if (is_value(childPtr))
@@ -561,7 +561,7 @@ namespace xcore
                 // Create new node and add the existing item first and continue
                 node_t* newChildNode = m_node_alloc->construct<node_t>();
                 newChildNode->clear();
-                node->m_nodes[childIndex] = as_node((uptr)newChildNode);
+                node->m_nodes[childIndex] = as_node((ptr_t)newChildNode);
 
                 // Compute the child index of this already existing leaf one level up
                 // and insert this existing leaf there.
@@ -588,7 +588,7 @@ namespace xcore
     {
         struct utils
         {
-            static u32 get_counts(uptr n, s32 i) { return (n == 0) ? 0x01000000 : (((n & 1) == 1) ? 0x00010000 : (0x00000100 | i)); }
+            static u32 get_counts(ptr_t n, s32 i) { return (n == 0) ? 0x01000000 : (((n & 1) == 1) ? 0x00010000 : (0x00000100 | i)); }
 
             static u32 check(node_t* node)
             {
@@ -597,7 +597,7 @@ namespace xcore
                 c += get_counts(node->m_nodes[1], 1);
                 c += get_counts(node->m_nodes[2], 2);
                 c += get_counts(node->m_nodes[3], 3);
-                return (c & 0xFFFFFF00); // Return the counts [3:NULL][2:NODE][1:VALUE][0:0]
+                return (c & 0xFFFFFF00); // Return the counts [3:nullptr][2:NODE][1:VALUE][0:0]
             }
 
             static u32 set_child_null_and_check(node_t* node, s32& index)
@@ -614,7 +614,7 @@ namespace xcore
                 c += get_counts(node->m_nodes[index], index);
 
                 index = c & 0xFF;
-                return (c & 0xFFFFFF00); // Return the counts [3:NULL][2:NODE][1:VALUE][0:0]
+                return (c & 0xFFFFFF00); // Return the counts [3:nullptr][2:NODE][1:VALUE][0:0]
             }
         };
 
@@ -632,7 +632,7 @@ namespace xcore
 
             nodes[level]  = node;
             childs[level] = childIndex;
-            uptr nodePtr  = node->m_nodes[childIndex];
+            ptr_t nodePtr  = node->m_nodes[childIndex];
 
             if (is_null(nodePtr))
             {
@@ -661,7 +661,7 @@ namespace xcore
                             // that has more than 1 children.
 
                             // Remember the value
-                            uptr otherValue = node->m_nodes[childIndex];
+                            ptr_t otherValue = node->m_nodes[childIndex];
 
                             // What about nodes that, after removal of a child have only one child
                             // left. These nodes can also be moved up!
@@ -753,7 +753,7 @@ namespace xcore
         do
         {
             s32  childIndex = m_idxr.key_to_index(level, key);
-            uptr nodePtr    = node->m_nodes[childIndex];
+            ptr_t nodePtr    = node->m_nodes[childIndex];
             if (is_null(nodePtr))
             {
                 break;
@@ -813,7 +813,7 @@ namespace xcore
         s32           state = 0; // 0 = we are on target branch, -1 = we are on a lower-bound branch
         node_t const* node  = root;
         s8            childIndex;
-        uptr          childPtr;
+        ptr_t          childPtr;
         while (state == 0 && level < m_idxr.max_levels())
         {
             childIndex = m_idxr.key_to_index(level, key);
@@ -897,7 +897,7 @@ namespace xcore
         s32           state = 0; // 0 = we are on target branch, -1 = we are on a lower-bound branch
         node_t const* node  = root;
         s8            childIndex;
-        uptr          childPtr;
+        ptr_t          childPtr;
         while (state == 0 && level < m_idxr.max_levels())
         {
             childIndex = m_idxr.key_to_index(level, key);
@@ -970,4 +970,4 @@ namespace xcore
         return false;
     }
 
-} // namespace xcore
+} // namespace ncore

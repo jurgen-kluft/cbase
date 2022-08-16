@@ -1,5 +1,5 @@
-#ifndef __XBASE_XSTD_H__
-#define __XBASE_XSTD_H__
+#ifndef __CBASE_XSTD_H__
+#define __CBASE_XSTD_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
@@ -10,10 +10,10 @@
 //  XCORE GLOBAL PLACEMENT NEW
 //==============================================================================
 struct xcore_t {};
-inline void*	operator new(xcore::xsize_t num_bytes, void* mem, xcore_t module)			{ return mem; }
+inline void*	operator new(ncore::uint_t num_bytes, void* mem, xcore_t module)			{ return mem; }
 inline void		operator delete(void* p, void* mem, xcore_t module)							{}
 
-namespace xcore
+namespace ncore
 {
 	namespace xstd
 	{
@@ -24,7 +24,7 @@ namespace xcore
 
 		template<typename T> class xknown_type   { public: enum { isSystem = false, isIntegral = false, isFloat = false, isSigned = false }; };
 		template<>  class xknown_type<bool>     { public: enum { isSystem =  true, isIntegral = false, isFloat = false, isSigned = false }; };
-		template<>  class xknown_type<xbool32>   { public: enum { isSystem =  true, isIntegral =  true, isFloat = false, isSigned =  true }; };
+		template<>  class xknown_type<bool32>   { public: enum { isSystem =  true, isIntegral =  true, isFloat = false, isSigned =  true }; };
 		template<>  class xknown_type<u8>        { public: enum { isSystem =  true, isIntegral =  true, isFloat = false, isSigned = false }; };
 		template<>  class xknown_type<s8>        { public: enum { isSystem =  true, isIntegral =  true, isFloat = false, isSigned =  true }; };
 		template<>  class xknown_type<u16>       { public: enum { isSystem =  true, isIntegral =  true, isFloat = false, isSigned = false }; };
@@ -233,4 +233,4 @@ namespace xcore
 	}
 }
 
-#endif	///< __XBASE_XSTD_H__
+#endif	///< __CBASE_XSTD_H__

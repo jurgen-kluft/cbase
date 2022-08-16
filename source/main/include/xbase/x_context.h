@@ -1,11 +1,11 @@
-#ifndef __XBASE_THREAD_CONTEXT_H__
-#define __XBASE_THREAD_CONTEXT_H__
+#ifndef __CBASE_THREAD_CONTEXT_H__
+#define __CBASE_THREAD_CONTEXT_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
     class alloc_t;
     class asserthandler_t;
@@ -158,6 +158,6 @@ namespace xcore
         static s32    m_max_num_threads;
         static s32    m_max_num_slots;
     };
-} // namespace xcore
+} // namespace ncore
 
-#endif // __XBASE_THREAD_CONTEXT_H__
+#endif // __CBASE_THREAD_CONTEXT_H__

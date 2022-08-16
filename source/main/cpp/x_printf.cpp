@@ -5,7 +5,7 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
-namespace xcore
+namespace ncore
 {
 
     class counter_writer_t : public irunes_writer_t
@@ -363,7 +363,7 @@ namespace xcore
 
                 ffpart = fpart;
 
-                bool anySignificantInteger = xFALSE;
+                bool anySignificantInteger = False;
                 for (i = 0; i < prec; ++i)
                 {
                     ffpart = modf(ffpart * 10.0, &ifpart);
@@ -373,7 +373,7 @@ namespace xcore
                     // When the user is looking for higher precision we will do this
                     if (prec > DEFPREC)
                     {
-                        if (anySignificantInteger == xFALSE && ifpart == '0')
+                        if (anySignificantInteger == False && ifpart == '0')
                             prec++;
                         else
                             anySignificantInteger = xTRUE;
@@ -827,7 +827,7 @@ namespace xcore
     }
 
     static const char* sBooleanStrs[] = {"false", "true", "FALSE", "TRUE", "False", "True", "no", "yes", "NO", "YES", "No", "Yes"};
-    static const char* sBoolAsAsciiStr(u32 _boolean, bool yesNo, xcore::s32 flags)
+    static const char* sBoolAsAsciiStr(u32 _boolean, bool yesNo, ncore::s32 flags)
     {
         s32 i = yesNo ? 6 : 0;
         if (flags & CAMELCASE)
@@ -963,13 +963,13 @@ namespace xcore
 
     void VSPrintf_internal(irunes_writer_t* writer, irunes_reader_t* reader, runes_writer_t* buffer, const va_list_t& args)
     {
-        ASSERT(reader != NULL);
-        ASSERT(writer != NULL);
-        ASSERT(buffer != NULL);
+        ASSERT(reader != nullptr);
+        ASSERT(writer != nullptr);
+        ASSERT(buffer != nullptr);
 
         uchar32          ch;        ///< character
         s32              n;         ///< handy integer (short term usage)
-        irunes_writer_t* cp = NULL; ///< handy char pointer (short term usage)
+        irunes_writer_t* cp = nullptr; ///< handy char pointer (short term usage)
         s32              flags;     ///< flags as above
         s32              width;     ///< width from format (%8d), or 0
         s32              prec;      ///< precision from format (%.3d), or -1
@@ -981,7 +981,7 @@ namespace xcore
         s32              size;      ///< size of converted field or string
 
         /// Initialize variables
-        char const* xdigs    = NULL; // digits for [xX] conversion
+        char const* xdigs    = nullptr; // digits for [xX] conversion
         u32         ulval    = 0;    // integer arguments %[diouxX]
         u64         uqval    = 0;    // %q integers
         s32         argindex = 0;
@@ -1505,4 +1505,4 @@ namespace xcore
         vzprintf(dstwriter, format, args);
     }
 
-}; // namespace xcore
+}; // namespace ncore

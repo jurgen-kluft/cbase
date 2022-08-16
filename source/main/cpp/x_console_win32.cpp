@@ -15,7 +15,7 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_va_list.h"
 
-namespace xcore
+namespace ncore
 {
     class out_writer_t : public irunes_writer_t
     {
@@ -85,7 +85,7 @@ namespace xcore
                 len = 2;
             }
 
-            if (dest != NULL && len > 0)
+            if (dest != nullptr && len > 0)
             {
                 if (len == 1 && dest < end)
                 {
@@ -222,6 +222,6 @@ namespace xcore
         return &sConsoleOut;
     }
 
-}; // namespace xcore
+}; // namespace ncore
     
 #endif

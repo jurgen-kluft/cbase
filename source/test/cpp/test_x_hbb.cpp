@@ -3,7 +3,7 @@
 #include "xbase/x_memory.h"
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(hbb_t)
 {

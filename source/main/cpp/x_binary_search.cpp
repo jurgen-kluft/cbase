@@ -1,7 +1,7 @@
 #include "xbase/x_debug.h"
 #include "xbase/x_binary_search.h"
 
-namespace xcore
+namespace ncore
 {
     u32		x_BinarySearch(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
     {

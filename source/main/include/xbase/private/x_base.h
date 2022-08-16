@@ -1,13 +1,13 @@
-#ifndef __XBASE_H__
-#define __XBASE_H__
+#ifndef __CBASE_H__
+#define __CBASE_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
 #endif
 
-namespace xcore
+namespace ncore
 {
 	class alloc_t;
 	extern alloc_t*	x_GetXBaseAllocator();
 };
-#endif // __XBASE_H__
+#endif // __CBASE_H__

@@ -1,5 +1,5 @@
-#ifndef __X_BASE_MAP_H__
-#define __X_BASE_MAP_H__
+#ifndef __CBASE_MAP_H__
+#define __CBASE_MAP_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -10,7 +10,7 @@
 #include "xbase/x_hash.h"
 #include "xbase/x_btree.h"
 
-namespace xcore
+namespace ncore
 {
     template <typename K, typename V, typename H = hasher_t<K>> class map_t
     {
@@ -289,6 +289,6 @@ namespace xcore
         btree_ptr_t          m_tree;
     };
 
-}; // namespace xcore
+}; // namespace ncore
 
-#endif // __X_BASE_MAP_H__
+#endif // __CBASE_MAP_H__

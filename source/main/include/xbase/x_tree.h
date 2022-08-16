@@ -1,5 +1,5 @@
-#ifndef __XBASE_TREE_H__
-#define __XBASE_TREE_H__
+#ifndef __CBASE_TREE_H__
+#define __CBASE_TREE_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -7,8 +7,10 @@
 
 #include "xbase/x_allocator.h"
 
-namespace xcore
+namespace ncore
 {
+    // binary balanced search tree implemented using the red-black tree algorithm
+    // memory behaviour: 32 bytes per node
     class tree_t
     {
     public:
@@ -20,8 +22,8 @@ namespace xcore
         {
             inline			node_t() : data(0) { parent = link[0] = link[1] = nullptr; }
 
-            void *			get_data() const { uptr p = data & ~(uptr)0x1; return (void*)p; }
-            void			set_data(void * d) { data = (data & (uptr)0x1) | ((uptr)d & ~(uptr)0x1); }
+            void *			get_data() const { ptr_t p = data & ~(ptr_t)0x1; return (void*)p; }
+            void			set_data(void * d) { data = (data & (ptr_t)0x1) | ((ptr_t)d & ~(ptr_t)0x1); }
 
             node_t *		get_parent() const { return parent; }
 
@@ -33,12 +35,12 @@ namespace xcore
             node_t *		get_child(s32 child) const { return link[child&1]; }
             void			set_child(s32 child, node_t*n) { link[child&1] = n; }
 
-            bool			is_red() const { uptr p = data & (uptr)0x1; return p == RED; }
-            bool			is_black() const { uptr p = data & (uptr)0x1; return p == BLACK; }
-            void			set_red() { uptr p = data & (uptr)~0x1; data = p; }
-            void			set_black() { uptr p = data | (uptr)0x1; data = p; }
+            bool			is_red() const { ptr_t p = data & (ptr_t)0x1; return p == RED; }
+            bool			is_black() const { ptr_t p = data & (ptr_t)0x1; return p == BLACK; }
+            void			set_red() { ptr_t p = data & (ptr_t)~0x1; data = p; }
+            void			set_black() { ptr_t p = data | (ptr_t)0x1; data = p; }
             s32				get_color() const { s32 p = (s32)data & (s32)0x1; return p; }
-            void			set_color(s32 c) { uptr p = data & (uptr)~0x1; data = p | ((uptr)c & 0x1); }
+            void			set_color(s32 c) { ptr_t p = data & (ptr_t)~0x1; data = p | ((ptr_t)c & 0x1); }
 
             s32				get_parent_side() const
             {
@@ -51,7 +53,7 @@ namespace xcore
         protected:
             friend class tree_t;
 
-            uptr			data;		// User-defined content 
+            ptr_t			data;		// User-defined content 
             node_t *		parent;		// Parent
             node_t *		link[2];	// Left (0) and right (1) links 
         };

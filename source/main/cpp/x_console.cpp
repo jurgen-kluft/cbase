@@ -5,7 +5,7 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
-namespace xcore
+namespace ncore
 {
 #define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
     type::rune local_var_name##Buffer[size];               \
@@ -152,7 +152,7 @@ namespace xcore
     void xconsole_default::writeLine() { mOut->writeln(); }
 
     extern console_t::out_t* gGetDefaultConsoleOut();
-    console_t*              console = NULL;
+    console_t*              console = nullptr;
 
     void console_t::init_default_console()
     {
@@ -160,4 +160,4 @@ namespace xcore
         console = &sDefaultConsole;
     }
 
-}; // namespace xcore
+}; // namespace ncore

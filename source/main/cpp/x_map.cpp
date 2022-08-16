@@ -2,7 +2,7 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_map.h"
 
-namespace xcore
+namespace ncore
 {
 	static inline s32	calc_array_index(s8 child, u32 nodemap, u32 valuemap)
 	{

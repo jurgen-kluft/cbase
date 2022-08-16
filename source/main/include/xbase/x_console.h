@@ -3,8 +3,8 @@
  * Core Console for Input, Output and Error
  */
 
-#ifndef __XBASE_CONSOLE_H__
-#define __XBASE_CONSOLE_H__
+#ifndef __CBASE_CONSOLE_H__
+#define __CBASE_CONSOLE_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -13,7 +13,7 @@
 #include "xbase/x_va_list.h"
 #include "xbase/x_runes.h"
 
-namespace xcore
+namespace ncore
 {
     // Interface class, has specific (or configurable) implementations for different environments/platforms
 
@@ -149,6 +149,6 @@ namespace xcore
         }
     };
 
-}; // namespace xcore
+}; // namespace ncore
 
-#endif ///< __XBASE_CONSOLE_H__
+#endif ///< __CBASE_CONSOLE_H__

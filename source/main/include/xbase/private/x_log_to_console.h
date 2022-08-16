@@ -1,5 +1,5 @@
-#ifndef __XBASE_LOG_TO_CONSOLE_H__
-#define __XBASE_LOG_TO_CONSOLE_H__
+#ifndef __CBASE_LOG_TO_CONSOLE_H__
+#define __CBASE_LOG_TO_CONSOLE_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -8,7 +8,7 @@
 #include "xbase/x_log.h"
 #include "xbase/x_runes.h"
 
-namespace xcore
+namespace ncore
 {
 	class xlog_to_console_imp : public logger_t
 	{
@@ -42,4 +42,4 @@ namespace xcore
 	};
 };
 
-#endif	///< __XBASE_LOG_TO_CONSOLE_H__
+#endif	///< __CBASE_LOG_TO_CONSOLE_H__

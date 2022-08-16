@@ -1,11 +1,11 @@
-#ifndef __XBASE_RUNES_V2_H__
-#define __XBASE_RUNES_V2_H__
+#ifndef __CBASE_RUNES_V2_H__
+#define __CBASE_RUNES_V2_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
 #undef printf
 
@@ -749,6 +749,6 @@ namespace xcore
         s32            m_count;
     };
 
-}; // namespace xcore
+}; // namespace ncore
 
-#endif ///< __XBASE_RUNES2_H__
+#endif ///< __CBASE_RUNES2_H__

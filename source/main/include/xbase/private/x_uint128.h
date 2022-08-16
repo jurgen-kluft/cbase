@@ -4,8 +4,8 @@
 * xCore custom 128 bit unsigned integer.
 */
 
-#ifndef __XBASE_128_BIT_UNSIGNED_INTEGER_H__
-#define __XBASE_128_BIT_UNSIGNED_INTEGER_H__
+#ifndef __CBASE_128_BIT_UNSIGNED_INTEGER_H__
+#define __CBASE_128_BIT_UNSIGNED_INTEGER_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -17,7 +17,7 @@
 /**
  * xCore namespace
  */
-namespace xcore
+namespace ncore
 {
 
 	// Forward declares
@@ -233,4 +233,4 @@ namespace xcore
  */
 
 #endif
-#endif	///< __XBASE_128_BIT_UNSIGNED_INTEGER_H__
+#endif	///< __CBASE_128_BIT_UNSIGNED_INTEGER_H__

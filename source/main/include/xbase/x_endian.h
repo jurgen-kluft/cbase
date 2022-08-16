@@ -1,11 +1,11 @@
-#ifndef __XBASE_ENDIAN_H__
-#define __XBASE_ENDIAN_H__
+#ifndef __CBASE_ENDIAN_H__
+#define __CBASE_ENDIAN_H__
 #include "xbase/x_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 
 #endif
 
-namespace xcore
+namespace ncore
 {
 	/**
 	 * Summary:
@@ -89,4 +89,4 @@ namespace xcore
 
 };
 
-#endif ///< END __XBASE_ENDIAN_H__
+#endif ///< END __CBASE_ENDIAN_H__

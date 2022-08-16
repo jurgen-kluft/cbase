@@ -13,7 +13,7 @@
 #include "xbase/private/x_int256.h"
 #include "xbase/private/x_uint256.h"
 
-namespace xcore 
+namespace ncore 
 {
 	const __xuint256	__xuint256::Zero;
 	const __xuint256	__xuint256::One((u32)1);

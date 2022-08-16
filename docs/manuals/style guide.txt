@@ -12,7 +12,7 @@ For example:
 Most of the time the best practise is to put the classes into the namespace
 related to the package. For example:
 
-namespace xcore
+namespace ncore
 {
 	namespace xmemory {}
 	namespace xinput {}
@@ -21,10 +21,10 @@ namespace xcore
 }
 
 Some packages use the xcore namespace:
-- xallocator (namespace xcore)
-- xtime (namespace xcore)
+- xallocator (namespace ncore)
+- xtime (namespace ncore)
 - xtracker (namespace xmemory)
-- xrandom (namespace xcore)
+- xrandom (namespace ncore)
 
 --------------------------------------------------------------------------
 

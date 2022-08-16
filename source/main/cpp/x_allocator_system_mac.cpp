@@ -9,7 +9,7 @@
 #include "xbase/x_integer.h"
 #include "xbase/x_allocator.h"
 
-namespace xcore
+namespace ncore
 {
     void* mac_aligned_malloc(size_t size, size_t alignment)
     {
@@ -23,12 +23,12 @@ namespace xcore
         }
 
         void* p1; // original block
-        if ((p1 = malloc(size + 2*alignment)) == NULL)
-            return NULL;
+        if ((p1 = malloc(size + 2*alignment)) == nullptr)
+            return nullptr;
 
         void** p2; // aligned block
-        p2     = (void**)(((uptr)(p1) & ~(alignment - 1)));
-        p2     = (void**)(((uptr)(p2) + 2*alignment));
+        p2     = (void**)(((ptr_t)(p1) & ~(alignment - 1)));
+        p2     = (void**)(((ptr_t)(p2) + 2*alignment));
         p2[-2] = (void*)size;
         p2[-1] = p1;
         return (void*)p2;
@@ -113,6 +113,6 @@ namespace xcore
 
     alloc_t* alloc_t::get_system() { return &sSystemAllocator; }
 
-}; // namespace xcore
+}; // namespace ncore
 
 #endif

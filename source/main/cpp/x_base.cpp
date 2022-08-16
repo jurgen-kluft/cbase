@@ -8,7 +8,7 @@
 #include "xbase/x_random.h"
 #include "xbase/x_runes.h"
 
-namespace xcore
+namespace ncore
 {
     class main_runes_allocator : public runes_alloc_t
     {
@@ -100,68 +100,68 @@ namespace xcore
     void wyrand_t::reset(s64 inSeed) { m_seed = inSeed; }
     u32 wyrand_t::generate() { return (u32)wyrand(&m_seed); }
 
-} // namespace xcore
+} // namespace ncore
 
 namespace xbase
 {
-    void init(xcore::s32 number_of_threads, xcore::s32 temporary_allocator_size)
+    void init(ncore::s32 number_of_threads, ncore::s32 temporary_allocator_size)
     {
-        xcore::alloc_t::init_system();
-        xcore::console_t::init_default_console();
-		xcore::context_t::init(number_of_threads, 16, xcore::alloc_t::get_system());
-        xcore::context_t::register_thread(); // Should be called once from a created thread
+        ncore::alloc_t::init_system();
+        ncore::console_t::init_default_console();
+		ncore::context_t::init(number_of_threads, 16, ncore::alloc_t::get_system());
+        ncore::context_t::register_thread(); // Should be called once from a created thread
 
-#ifdef X_ASSERT
-        xcore::asserthandler_t* assert_handler = xcore::asserthandler_t::sGetDefaultAssertHandler();
+#ifdef D_ASSERT
+        ncore::asserthandler_t* assert_handler = ncore::asserthandler_t::sGetDefaultAssertHandler();
 #else
-        xcore::asserthandler_t* assert_handler = xcore::asserthandler_t::sGetReleaseAssertHandler();
-#endif // X_ASSERT
+        ncore::asserthandler_t* assert_handler = ncore::asserthandler_t::sGetReleaseAssertHandler();
+#endif // D_ASSERT
 
-        xcore::alloc_t*       system_allocator = xcore::alloc_t::get_system();
-        xcore::runes_alloc_t* string_allocator = xcore::get_runes_alloc();
+        ncore::alloc_t*       system_allocator = ncore::alloc_t::get_system();
+        ncore::runes_alloc_t* string_allocator = ncore::get_runes_alloc();
 
         // The assert handler, system and string allocator are thread safe
-        for (xcore::s32 i = 0; i < number_of_threads; i++)
+        for (ncore::s32 i = 0; i < number_of_threads; i++)
         {
-            const xcore::s32 slot = i;
+            const ncore::s32 slot = i;
 
-            xcore::xbyte* buffer_data = (xcore::xbyte*)system_allocator->allocate(temporary_allocator_size);
-            xcore::alloc_t*  stack_allocator  = xcore::alloc_t::get_system()->construct<xcore::alloc_buffer_t>(buffer_data, temporary_allocator_size);
-            xcore::random_t* random_generator = xcore::alloc_t::get_system()->construct<xcore::wyrand_t>();
-            random_generator->reset((xcore::s64)random_generator); // randomize the seed
+            ncore::u8* buffer_data = (ncore::u8*)system_allocator->allocate(temporary_allocator_size);
+            ncore::alloc_t*  stack_allocator  = ncore::alloc_t::get_system()->construct<ncore::alloc_buffer_t>(buffer_data, temporary_allocator_size);
+            ncore::random_t* random_generator = ncore::alloc_t::get_system()->construct<ncore::wyrand_t>();
+            random_generator->reset((ncore::s64)random_generator); // randomize the seed
 
-            xcore::context_t::set_assert_handler(assert_handler);
-            xcore::context_t::set_system_alloc(system_allocator);
-            xcore::context_t::set_runtime_alloc(system_allocator);
-            xcore::context_t::set_frame_alloc(system_allocator);
-            xcore::context_t::set_local_alloc(stack_allocator);
-            xcore::context_t::set_string_alloc(string_allocator);
-            xcore::context_t::set_random(random_generator);
+            ncore::context_t::set_assert_handler(assert_handler);
+            ncore::context_t::set_system_alloc(system_allocator);
+            ncore::context_t::set_runtime_alloc(system_allocator);
+            ncore::context_t::set_frame_alloc(system_allocator);
+            ncore::context_t::set_local_alloc(stack_allocator);
+            ncore::context_t::set_string_alloc(string_allocator);
+            ncore::context_t::set_random(random_generator);
         }
     }
 
     void exit()
     {
-        xcore::alloc_t*        system_allocator = xcore::context_t::system_alloc();
-        xcore::alloc_buffer_t* stack_allocator  = (xcore::alloc_buffer_t*)xcore::context_t::local_alloc();
-        xcore::random_t*       random_generator = xcore::context_t::random();
-        xcore::runes_alloc_t*  string_allocator = xcore::get_runes_alloc();
+        ncore::alloc_t*        system_allocator = ncore::context_t::system_alloc();
+        ncore::alloc_buffer_t* stack_allocator  = (ncore::alloc_buffer_t*)ncore::context_t::local_alloc();
+        ncore::random_t*       random_generator = ncore::context_t::random();
+        ncore::runes_alloc_t*  string_allocator = ncore::get_runes_alloc();
 
-        xcore::context_t::set_system_alloc(nullptr);
-        xcore::context_t::set_runtime_alloc(nullptr);
-        xcore::context_t::set_frame_alloc(nullptr);
-        xcore::context_t::set_local_alloc(nullptr);
-        xcore::context_t::set_string_alloc(nullptr);
-        xcore::context_t::set_random(nullptr);
+        ncore::context_t::set_system_alloc(nullptr);
+        ncore::context_t::set_runtime_alloc(nullptr);
+        ncore::context_t::set_frame_alloc(nullptr);
+        ncore::context_t::set_local_alloc(nullptr);
+        ncore::context_t::set_string_alloc(nullptr);
+        ncore::context_t::set_random(nullptr);
 
         system_allocator->deallocate(random_generator);
         system_allocator->deallocate(stack_allocator->data());
         system_allocator->deallocate(stack_allocator);
 
-        xcore::context_t::exit(system_allocator);
-        xcore::alloc_t::exit_system();
+        ncore::context_t::exit(system_allocator);
+        ncore::alloc_t::exit_system();
 
-        xcore::context_t::set_assert_handler(nullptr);
+        ncore::context_t::set_assert_handler(nullptr);
     }
 
 }; // namespace xbase

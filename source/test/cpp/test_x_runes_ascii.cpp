@@ -3,7 +3,7 @@
 #include "xbase/x_printf.h"
 #include "xunittest/xunittest.h"
 
-using namespace xcore;
+using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(xstring_ascii)
 {

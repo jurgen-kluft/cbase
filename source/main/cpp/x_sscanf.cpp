@@ -7,7 +7,7 @@
 
 // Shared code
 
-namespace xcore
+namespace ncore
 {
     // runes_reader_t -> rune_reader_t
     // CharWriter -> rune_writer_t
@@ -34,7 +34,7 @@ namespace xcore
     static bool MatchBoolStr(irunes_reader_t* str, bool& boolean)
     {
         bool        bval = false;
-        const char* bstr = NULL;
+        const char* bstr = nullptr;
         uchar32     c    = str->peek();
         if (is_equalfold(c, 't'))
         {
@@ -71,7 +71,7 @@ namespace xcore
         }
 
         boolean = bval;
-        if (bstr != NULL)
+        if (bstr != nullptr)
         {
             while (*bstr != '\0')
             {
@@ -109,7 +109,7 @@ namespace xcore
      */
     s64 StrToS64(irunes_reader_t* reader, s32 base)
     {
-        ASSERT(reader != NULL);
+        ASSERT(reader != nullptr);
         ASSERT(base > 2);
         ASSERT(base <= (26 + 26 + 10));
 
@@ -745,6 +745,6 @@ namespace xcore
         return scanned;
     }
 
-}; // namespace xcore
+}; // namespace ncore
 
 #endif // ifndef SPU

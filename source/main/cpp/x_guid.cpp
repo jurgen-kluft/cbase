@@ -5,7 +5,7 @@
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
 
-namespace xcore
+namespace ncore
 {
 	//-------------------------------------------------------------------------------
 
