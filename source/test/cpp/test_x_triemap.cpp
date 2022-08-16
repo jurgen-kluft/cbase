@@ -1,16 +1,16 @@
 #define TEST_TRIEMAP
 #ifdef TEST_TRIEMAP
 
-#include "xbase/x_target.h"
-#include "xbase/x_debug.h"
-#include "xbase/x_allocator.h"
-#include "xbase/x_random.h"
+#include "cbase/c_target.h"
+#include "cbase/c_debug.h"
+#include "cbase/c_allocator.h"
+#include "cbase/c_random.h"
 
-#include "xbase/x_integer.h"
-#include "xbase/x_runes.h"
-#include "xbase/x_printf.h"
+#include "cbase/c_integer.h"
+#include "cbase/c_runes.h"
+#include "cbase/c_printf.h"
 
-#include "xunittest/xunittest.h"
+#include "cunittest/xunittest.h"
 
 namespace ncore
 {
@@ -771,12 +771,12 @@ UNITTEST_SUITE_END
 
 #else
 
-#include "xbase\x_target.h"
-#include "xbase\x_allocator.h"
-#include "xbase\x_debug.h"
-#include "xbase\x_integer.h"
+#include "cbase\x_target.h"
+#include "cbase\x_allocator.h"
+#include "cbase\x_debug.h"
+#include "cbase\x_integer.h"
 
-#include "xunittest\xunittest.h"
+#include "cunittest\xunittest.h"
 
 UNITTEST_SUITE_BEGIN(xdtrie)
 {

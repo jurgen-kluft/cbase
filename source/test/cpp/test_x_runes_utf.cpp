@@ -1,9 +1,9 @@
-#include "xbase/x_allocator.h"
-#include "xbase/x_carray.h"
-#include "xbase/x_va_list.h"
-#include "xbase/x_runes.h"
-#include "xbase/x_runes.h"
-#include "xunittest/xunittest.h"
+#include "cbase/c_allocator.h"
+#include "cbase/c_carray.h"
+#include "cbase/c_va_list.h"
+#include "cbase/c_runes.h"
+#include "cbase/c_runes.h"
+#include "cunittest/xunittest.h"
 
 using namespace ncore;
 

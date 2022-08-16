@@ -1,0 +1,20 @@
+#ifndef __CCORE_BINARY_SEARCH_H__
+#define __CCORE_BINARY_SEARCH_H__
+#include "cbase/c_target.h"
+#ifdef USE_PRAGMA_ONCE
+#pragma once
+#endif
+
+namespace ncore
+{
+	typedef	s32		(*compare_predicate_fn)(const void* inItem, const void* inData, s32 inIndex);
+
+	// Exact search, behaves like x_LowerBound by returning the index to the lowest equal data (lower bound) and not
+	// just the first equal data that is encountered.
+	extern u32		x_BinarySearch(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate);
+
+	extern u32		x_LowerBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate);
+	extern u32		x_UpperBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate);
+};
+
+#endif	///< __CCORE_BINARY_SEARCH_H__

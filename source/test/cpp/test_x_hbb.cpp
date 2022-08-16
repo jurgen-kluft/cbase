@@ -1,7 +1,7 @@
-#include "xbase/x_context.h"
-#include "xbase/x_hbb.h"
-#include "xbase/x_memory.h"
-#include "xunittest/xunittest.h"
+#include "cbase/c_context.h"
+#include "cbase/c_hbb.h"
+#include "cbase/c_memory.h"
+#include "cunittest/xunittest.h"
 
 using namespace ncore;
 

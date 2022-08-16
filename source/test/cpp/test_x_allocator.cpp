@@ -1,8 +1,8 @@
-#include "xbase/x_allocator.h"
-#include "xbase/x_debug.h"
-#include "xbase/x_buffer.h"
+#include "cbase/c_allocator.h"
+#include "cbase/c_debug.h"
+#include "cbase/c_buffer.h"
 
-#include "xunittest/xunittest.h"
+#include "cunittest/xunittest.h"
 
 using namespace ncore;
 

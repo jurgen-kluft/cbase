@@ -1,6 +1,6 @@
-#include "xbase/x_target.h"
-#include "xbase/x_memory.h"
-#include "xunittest/xunittest.h"
+#include "cbase/c_target.h"
+#include "cbase/c_memory.h"
+#include "cunittest/xunittest.h"
 
 using namespace ncore;
 

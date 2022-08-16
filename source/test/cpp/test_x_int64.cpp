@@ -1,9 +1,9 @@
-#include "xbase/x_target.h"
+#include "cbase/c_target.h"
 
 #ifndef X_NO_CUSTOM_INT64
 
-#include "xbase/x_int64.h"
-#include "xunittest/xunittest.h"
+#include "cbase/c_int64.h"
+#include "cunittest/xunittest.h"
 
 using namespace ncore;
 

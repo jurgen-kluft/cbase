@@ -1,16 +1,21 @@
-package xbase
+package cbase
 
 // GetPackage returns the package object of 'xbase'
 // How could we put the base URL github.com and the
 // user 'jurgen-kluft' as a configuration var?
 
 import (
-	"github.com/jurgen-kluft/xcode/denv"
-	xunittest "github.com/jurgen-kluft/xunittest/package"
+	"github.com/jurgen-kluft/ccode/denv"
+	xunittest "github.com/jurgen-kluft/cunittest/package"
+)
+
+const (
+	repo_path = "github.com\\jurgen-kluft\\"
+	repo_name = "cbase"
 )
 
 func GetPackage() *denv.Package {
-	name := "xbase"
+	name := repo_name
 
 	// Dependencies
 	unittestpkg := xunittest.GetPackage()
@@ -19,10 +24,10 @@ func GetPackage() *denv.Package {
 	mainpkg := denv.NewPackage(name)
 
 	// library
-	mainlib := denv.SetupDefaultCppLibProject(name, "github.com\\jurgen-kluft\\"+name)
+	mainlib := denv.SetupDefaultCppLibProject(name, repo_path+name)
 
 	// unittest project
-	maintest := denv.SetupDefaultCppTestProject(name+"_test", "github.com\\jurgen-kluft\\"+name)
+	maintest := denv.SetupDefaultCppTestProject(name+"_test", repo_path+name)
 	maintest.Dependencies = append(maintest.Dependencies, unittestpkg.GetMainLib())
 	maintest.Dependencies = append(maintest.Dependencies, mainlib)
 

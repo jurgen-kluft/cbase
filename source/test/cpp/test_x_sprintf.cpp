@@ -1,11 +1,11 @@
-#include "xbase/x_runes.h"
-#include "xbase/x_printf.h"
+#include "cbase/c_runes.h"
+#include "cbase/c_printf.h"
 
 #if defined(TARGET_PS3)
 	#include <math.h>
 #endif
 
-#include "xunittest/xunittest.h"
+#include "cunittest/xunittest.h"
 
 using namespace ncore;
 

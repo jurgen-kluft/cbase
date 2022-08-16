@@ -1,5 +1,5 @@
-#include "xbase/x_double.h"
-#include "xunittest/xunittest.h"
+#include "cbase/c_double.h"
+#include "cunittest/xunittest.h"
 
 using namespace ncore;
 

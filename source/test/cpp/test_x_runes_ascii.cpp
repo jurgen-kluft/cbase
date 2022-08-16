@@ -1,7 +1,7 @@
-#include "xbase/x_va_list.h"
-#include "xbase/x_runes.h"
-#include "xbase/x_printf.h"
-#include "xunittest/xunittest.h"
+#include "cbase/c_va_list.h"
+#include "cbase/c_runes.h"
+#include "cbase/c_printf.h"
+#include "cunittest/xunittest.h"
 
 using namespace ncore;
 
