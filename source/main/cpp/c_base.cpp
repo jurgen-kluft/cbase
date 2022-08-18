@@ -102,7 +102,7 @@ namespace ncore
 
 } // namespace ncore
 
-namespace xbase
+namespace cbase
 {
     void init(ncore::s32 number_of_threads, ncore::s32 temporary_allocator_size)
     {
@@ -164,4 +164,4 @@ namespace xbase
         ncore::context_t::set_assert_handler(nullptr);
     }
 
-}; // namespace xbase
+}; // namespace cbase

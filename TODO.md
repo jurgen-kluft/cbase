@@ -11,7 +11,7 @@ Naming convention:
 - package starts with c (e.g. cbase, ccore, cstring, callocator, chash, crandom, cfilesystem)
 - namespaces start with n (e.g. ncore)
 - struct/class ends with _t (e.g. alloc_t)
-- global functions start with g (e.g. gmin, gmax, gpo2)
+- global functions start with g_ (e.g. g_min, g_max, g_po2)
 
 ## ccore (typeless/raw containers)
 

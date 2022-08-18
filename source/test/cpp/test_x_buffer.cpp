@@ -1,7 +1,7 @@
 #include "cbase/c_carray.h"
 #include "cbase/c_buffer.h"
 #include "cbase/c_runes.h"
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 

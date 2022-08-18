@@ -2,7 +2,7 @@
 #include "cbase/c_slice.h"
 #include "cbase/c_btree.h"
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 

@@ -5,7 +5,7 @@
 #pragma once 
 #endif
 
-namespace xbase
+namespace cbase
 {
 	extern void init(ncore::s32 number_of_threads=1, ncore::s32 temporary_allocator_size=8192);
 	extern void exit();

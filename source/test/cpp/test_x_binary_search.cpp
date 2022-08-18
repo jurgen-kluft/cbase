@@ -1,5 +1,5 @@
 #include "cbase/c_binary_search.h"
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 

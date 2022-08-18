@@ -10,7 +10,7 @@
 #include "cbase/c_runes.h"
 #include "cbase/c_printf.h"
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 namespace ncore
 {
@@ -776,7 +776,7 @@ UNITTEST_SUITE_END
 #include "cbase\x_debug.h"
 #include "cbase\x_integer.h"
 
-#include "cunittest\xunittest.h"
+#include "cunittest\cunittest.h"
 
 UNITTEST_SUITE_BEGIN(xdtrie)
 {

@@ -2,7 +2,7 @@
 #include "cbase/c_allocator.h"
 #include "cbase/c_tree.h"
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 

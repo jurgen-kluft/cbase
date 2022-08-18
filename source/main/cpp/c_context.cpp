@@ -4,7 +4,7 @@
 
 namespace ncore
 {
-    // For xbase what would we like to have per thread:
+    // For cbase what would we like to have per thread:
     // - A global heap allocator (in a multi-threaded environment this one should be thread-safe)
     // - A stack allocator (local to a function call)
     // - A local thread allocator (local to the thread)

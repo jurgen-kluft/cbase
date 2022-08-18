@@ -5,7 +5,7 @@
 	#include <math.h>
 #endif
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 

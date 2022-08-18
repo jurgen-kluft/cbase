@@ -1,5 +1,5 @@
 #include "cbase/c_endian.h"
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 

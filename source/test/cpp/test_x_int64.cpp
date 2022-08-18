@@ -3,7 +3,7 @@
 #ifndef X_NO_CUSTOM_INT64
 
 #include "cbase/c_int64.h"
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 

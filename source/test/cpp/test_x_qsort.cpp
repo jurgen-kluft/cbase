@@ -1,6 +1,6 @@
 #include "cbase/c_qsort.h"
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 

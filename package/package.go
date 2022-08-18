@@ -1,12 +1,8 @@
 package cbase
 
-// GetPackage returns the package object of 'xbase'
-// How could we put the base URL github.com and the
-// user 'jurgen-kluft' as a configuration var?
-
 import (
 	"github.com/jurgen-kluft/ccode/denv"
-	xunittest "github.com/jurgen-kluft/cunittest/package"
+	cunittest "github.com/jurgen-kluft/cunittest/package"
 )
 
 const (
@@ -18,9 +14,9 @@ func GetPackage() *denv.Package {
 	name := repo_name
 
 	// Dependencies
-	unittestpkg := xunittest.GetPackage()
+	unittestpkg := cunittest.GetPackage()
 
-	// The main (xbase) package
+	// The main (cbase) package
 	mainpkg := denv.NewPackage(name)
 
 	// library
