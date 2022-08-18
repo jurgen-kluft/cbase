@@ -1,5 +1,5 @@
-#ifndef __X_HIERARCHICAL_BIT_BUFFER_H__
-#define __X_HIERARCHICAL_BIT_BUFFER_H__
+#ifndef __C_HIERARCHICAL_BIT_BUFFER_H__
+#define __C_HIERARCHICAL_BIT_BUFFER_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once

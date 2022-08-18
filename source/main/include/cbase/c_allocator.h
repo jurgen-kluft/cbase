@@ -62,26 +62,26 @@ namespace ncore
     }
 
     // class new and delete
-#define XCORE_CLASS_PLACEMENT_NEW_DELETE                                    \
-    void* operator new(ncore::uint_t num_bytes, void* mem) { return mem; } \
-    void  operator delete(void* mem, void*) {}                              \
-    void* operator new(ncore::uint_t num_bytes) noexcept { return nullptr; }  \
+#define XCORE_CLASS_PLACEMENT_NEW_DELETE                                     \
+    void* operator new(ncore::uint_t num_bytes, void* mem) { return mem; }   \
+    void  operator delete(void* mem, void*) {}                               \
+    void* operator new(ncore::uint_t num_bytes) noexcept { return nullptr; } \
     void  operator delete(void* mem) {}
 
-#define XCORE_CLASS_NEW_DELETE(get_allocator_func, align)                   \
+#define XCORE_CLASS_NEW_DELETE(get_allocator_func, align)                  \
     void* operator new(ncore::uint_t num_bytes, void* mem) { return mem; } \
-    void  operator delete(void* mem, void*) {}                              \
+    void  operator delete(void* mem, void*) {}                             \
     void* operator new(ncore::uint_t num_bytes)                            \
-    {                                                                       \
+    {                                                                      \
         ASSERT(num_bytes < (ncore::uint_t)2 * 1024 * 1024 * 1024);         \
-        return get_allocator_func()->allocate((u32)num_bytes, align);       \
-    }                                                                       \
+        return get_allocator_func()->allocate((u32)num_bytes, align);      \
+    }                                                                      \
     void operator delete(void* mem) { get_allocator_func()->deallocate(mem); }
 
 #define XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator_func, align)       \
-    void* operator new[](ncore::uint_t num_bytes)                    \
+    void* operator new[](ncore::uint_t num_bytes)                     \
     {                                                                 \
-        ASSERT(num_bytes < (ncore::uint_t)2 * 1024 * 1024 * 1024);   \
+        ASSERT(num_bytes < (ncore::uint_t)2 * 1024 * 1024 * 1024);    \
         return get_allocator_func()->allocate((u32)num_bytes, align); \
     }                                                                 \
     void operator delete[](void* mem) { get_allocator_func()->deallocate(mem); }
@@ -89,7 +89,7 @@ namespace ncore
     // helper functions
     inline void* x_advance_ptr(void* ptr, uint_t size) { return (void*)((ptr_t)ptr + size); }
     inline void* x_align_ptr(void* ptr, u32 alignment) { return (void*)(((ptr_t)ptr + (alignment - 1)) & ~((ptr_t)alignment - 1)); }
-    inline ptr_t  x_diff_ptr(void* ptr, void* next_ptr) { return (ptr_t)((ptr_t)next_ptr - (ptr_t)ptr); }
+    inline ptr_t x_diff_ptr(void* ptr, void* next_ptr) { return (ptr_t)((ptr_t)next_ptr - (ptr_t)ptr); }
     inline bool  x_is_in_range(void* buffer, uint_t size, void* ptr)
     {
         ptr_t begin  = (ptr_t)buffer;
@@ -178,14 +178,14 @@ namespace ncore
     };
 
     // Global new and delete
-    template <typename T, typename... Args> T* xnew(Args... args)
+    template <typename T, typename... Args> T* g_New(Args... args)
     {
         void* mem    = context_t::runtime_alloc()->allocate(sizeof(T));
         T*    object = new (mem) T(args...);
         return object;
     }
 
-    template <typename T> void xdelete(T* p)
+    template <typename T> void g_Delete(T* p)
     {
         p->~T();
         context_t::runtime_alloc()->deallocate(p);
@@ -198,7 +198,7 @@ namespace ncore
         u8* m_base;
         u8* m_ptr;
         u8* m_end;
-        s64    m_cnt;
+        s64 m_cnt;
 
     public:
         alloc_buffer_t(u8* buffer, s64 length);
@@ -213,7 +213,7 @@ namespace ncore
             if (m_ptr < m_end && align_ptr(m_ptr + size, align) <= m_end)
             {
                 u8* storage = m_ptr;
-                m_ptr          = align_ptr(m_ptr + size, sizeof(void*));
+                m_ptr       = align_ptr(m_ptr + size, sizeof(void*));
                 m_cnt += 1;
                 return storage;
             }
@@ -245,7 +245,7 @@ namespace ncore
     {
         u8* m_base;
         u8* m_data;
-        u64    m_size;
+        u64 m_size;
 
     public:
         inline allocinplace_t(u8* data, u64 size)
@@ -352,10 +352,10 @@ namespace ncore
         // when you end a frame all memory in that frame is released
         // so for each tag should we use a virtual memory chunk that grows/shrinks?
 
-        typedef u32       tag_id_t;
-        extern tag_id_t   begin(const char* name);
-        extern void       end(tag_id_t id);
-    };
+        typedef u32     tag_id_t;
+        extern tag_id_t begin(const char* name);
+        extern void     end(tag_id_t id);
+    }; // namespace talloc
 
 }; // namespace ncore
 

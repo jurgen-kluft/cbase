@@ -1,40 +1,56 @@
 ================================ File Naming ============================
 
-x_{name}.cpp & x_{name}.h
+c_{name}.cpp & c_{name}.h
 
 For example:
-	x_console.cpp & x_console.h
-	x_console_wii.cpp
+	c_console.cpp & c_console.h
+	c_console_wii.cpp
 
---------------------------------------------------------------------------
+
 
 ================================ Namespaces ==============================
+
 Most of the time the best practise is to put the classes into the namespace
 related to the package. For example:
 
 namespace ncore
 {
-	namespace xmemory {}
-	namespace xinput {}
-	namespace xfilesystem {}
-	namespace xthreading {}
+	namespace nmem {}
+	namespace ninput {}
+	namespace nfilesystem {}
+	namespace nthreading {}
 }
 
-Some packages use the xcore namespace:
-- xallocator (namespace ncore)
-- xtime (namespace ncore)
-- xtracker (namespace xmemory)
-- xrandom (namespace ncore)
+Some packages use the ncore namespace:
+- callocator (namespace ncore)
+- ctime (namespace ncore)
+- ctracker (namespace nmem)
+- crandom (namespace ncore)
 
---------------------------------------------------------------------------
+================================ Functions in the ncore namespace =========================
+
+All functions in the ncore namespace should be prepended with 'g_', for example 'g_BinarySearch'.
+
+
+================================ Enums =========================
+
+Enums should be named like e{name}.
+
+
+================================ Classes and Structs =========================
+
+All classes and structs should be appended with '_t' to indicate it is a type.
+
+For classes that are prepended with 'c', this means that the class is 'const'.
+
 
 ================================ Interface classes =========================
 
 Interface classes naming convention:
 
-class xobject
+class object_t
 {
-	xiobject*		mImplementation;
+	iobject_t*		mImplementation;
 public:
 };
 
@@ -45,8 +61,10 @@ For base classes, the convention is to append '_base' although this indirectly
 means that the base class has either some data or some implementation and is not
 a pure interface/'base class'.
 
-class xobject_base
+class object_base_t
 
 
+================================ Defines =========================
 
---------------------------------------------------------------------------
+Nearly all defines should be prepended with D_ to indicate that it is a define.
+

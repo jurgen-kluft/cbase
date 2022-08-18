@@ -11,8 +11,6 @@
 namespace ncore
 {
 	//------------------------------------------------------------------------------
-	// Author:
-	//		Jurgen Kluft
 	// Description:
 	//		Bitfield template helper functions are used to allow easy access to flags 
 	//		and settings combined in a bitfield.

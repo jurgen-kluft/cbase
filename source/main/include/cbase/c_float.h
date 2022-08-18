@@ -9,7 +9,7 @@
 
 namespace ncore
 {
-    namespace xf32
+    namespace nf32
     {
         inline f32 abs(f32 inValue);
         inline f32 neg(f32 inNumber);
