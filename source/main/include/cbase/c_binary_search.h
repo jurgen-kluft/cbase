@@ -9,7 +9,7 @@ namespace ncore
 {
 	typedef	s32		(*compare_predicate_fn)(const void* inItem, const void* inData, s32 inIndex);
 
-	// Exact search, behaves like x_LowerBound by returning the index to the lowest equal data (lower bound) and not
+	// Exact search, behaves like g_LowerBound by returning the index to the lowest equal data (lower bound) and not
 	// just the first equal data that is encountered.
 	extern u32		g_BinarySearch(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate);
 

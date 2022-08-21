@@ -13,10 +13,10 @@ namespace ncore
     #define USE_MALLOC_DBG
 #endif
 
-    class x_allocator_win32_system : public alloc_t
+    class allocator_win32_system : public alloc_t
     {
     public:
-        x_allocator_win32_system()
+        allocator_win32_system()
             : mInitialized(0)
             , mDefaultAlignment(sizeof(void*))
             , mAllocationCount(0)
@@ -78,7 +78,7 @@ namespace ncore
         u64 mAllocationCount;
     };
 
-    x_allocator_win32_system sSystemAllocator;
+    allocator_win32_system sSystemAllocator;
     void                     alloc_t::init_system()
     {
         if (!sSystemAllocator.isInitialized())

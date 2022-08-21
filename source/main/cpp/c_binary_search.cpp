@@ -3,7 +3,7 @@
 
 namespace ncore
 {
-    u32		x_BinarySearch(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
+    u32		g_BinarySearch(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
     {
         // Do a binary search on the data to obtain the index of the found item
         s32 r;
@@ -48,7 +48,7 @@ namespace ncore
         return mid;
     }
 
-    u32		x_LowerBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
+    u32		g_LowerBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
     {
         // Do a binary search on the data to obtain the lowest index of a lesser-or-equal (LTE) item
         s32 r;
@@ -92,7 +92,7 @@ namespace ncore
         return mid;
     }
 
-    u32		x_UpperBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
+    u32		g_UpperBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
     {
         // Do a binary search on the data to obtain the highest index of a greater-or-equal (GTE) item
         s32 r;
