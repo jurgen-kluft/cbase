@@ -7,20 +7,20 @@ namespace ncore
 {
     //==============================================================================
     // Integer cast and overflow detection
-    template <class FROM, class TO> TO xcast(FROM f) { return f; }
+    template <class FROM, class TO> TO ccast(FROM f) { return f; }
 
-    template <> u32 xcast(u64 f)
+    template <> u32 ccast(u64 f)
     {
         ASSERT(f < 0x100000000UL);
         return (u32)f;
     }
-    template <> s32 xcast(s64 f)
+    template <> s32 ccast(s64 f)
     {
         ASSERT(f >= xS32Min && f <= xS32Max);
         return (s32)f;
     }
 
-    namespace xuadrw
+    namespace nuadrw
     {
         /// ---------------------------------------------------------------------------------------
         /// Unaligned Data Reading/Writing
@@ -136,7 +136,7 @@ namespace ncore
             write_u32(ptr, (u32)((c >> 0) & 0xFFFFFFFF));
             write_u32(ptr + 4, (u32)((c >> 32) & 0xFFFFFFFF));
         }
-    } // namespace xuadrw
+    } // namespace nuadrw
 
     cbuffer_t::cbuffer_t(crunes_t const& str)
     {
@@ -193,7 +193,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += 1;
-            b = xuadrw::read_u8(ptr) != 0;
+            b = nuadrw::read_u8(ptr) != 0;
             return offset;
         }
         return -1;
@@ -206,7 +206,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_u8(ptr);
+            b = nuadrw::read_u8(ptr);
             return offset;
         }
         return -1;
@@ -219,7 +219,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_s8(ptr);
+            b = nuadrw::read_s8(ptr);
             return offset;
         }
         return -1;
@@ -232,7 +232,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_u16(ptr);
+            b = nuadrw::read_u16(ptr);
             return offset;
         }
         return -1;
@@ -245,7 +245,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_s16(ptr);
+            b = nuadrw::read_s16(ptr);
             return offset;
         }
         return -1;
@@ -258,7 +258,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_u32(ptr);
+            b = nuadrw::read_u32(ptr);
             return offset;
         }
         return -1;
@@ -271,7 +271,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_s32(ptr);
+            b = nuadrw::read_s32(ptr);
             return offset;
         }
         return -1;
@@ -284,7 +284,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_u64(ptr);
+            b = nuadrw::read_u64(ptr);
             return offset;
         }
         return -1;
@@ -297,7 +297,7 @@ namespace ncore
         {
             u8 const* ptr = (u8 const*)m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_s64(ptr);
+            b = nuadrw::read_s64(ptr);
             return offset;
         }
         return -1;
@@ -310,7 +310,7 @@ namespace ncore
         {
             u8 const* ptr = (u8 const*)m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_f32(ptr);
+            b = nuadrw::read_f32(ptr);
             return offset;
         }
         return -1;
@@ -323,7 +323,7 @@ namespace ncore
         {
             u8 const* ptr = (u8 const*)m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_f64(ptr);
+            b = nuadrw::read_f64(ptr);
             return offset;
         }
         return -1;
@@ -337,7 +337,7 @@ namespace ncore
         if (can_read(sizeof(b)))
         {
             u8 const* ptr = m_buffer + m_cursor;
-            b                = xuadrw::read_u16(ptr);
+            b                = nuadrw::read_u16(ptr);
         }
         return b;
     }
@@ -351,7 +351,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += 1;
-            b = xuadrw::read_u8(ptr) != 0;
+            b = nuadrw::read_u8(ptr) != 0;
         }
         return b;
     }
@@ -363,7 +363,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_u8(ptr);
+            b = nuadrw::read_u8(ptr);
         }
         return b;
     }
@@ -375,7 +375,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_s8(ptr);
+            b = nuadrw::read_s8(ptr);
         }
         return b;
     }
@@ -387,7 +387,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_u16(ptr);
+            b = nuadrw::read_u16(ptr);
         }
         return b;
     }
@@ -399,7 +399,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_s16(ptr);
+            b = nuadrw::read_s16(ptr);
         }
         return b;
     }
@@ -411,7 +411,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_u32(ptr);
+            b = nuadrw::read_u32(ptr);
         }
         return b;
     }
@@ -423,7 +423,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_s32(ptr);
+            b = nuadrw::read_s32(ptr);
         }
         return b;
     }
@@ -435,7 +435,7 @@ namespace ncore
         {
             u8 const* ptr = m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_u64(ptr);
+            b = nuadrw::read_u64(ptr);
         }
         return b;
     }
@@ -447,7 +447,7 @@ namespace ncore
         {
             u8 const* ptr = (u8 const*)m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_s64(ptr);
+            b = nuadrw::read_s64(ptr);
         }
         return b;
     }
@@ -459,7 +459,7 @@ namespace ncore
         {
             u8 const* ptr = (u8 const*)m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_f32(ptr);
+            b = nuadrw::read_f32(ptr);
         }
         return b;
     }
@@ -471,7 +471,7 @@ namespace ncore
         {
             u8 const* ptr = (u8 const*)m_buffer + m_cursor;
             m_cursor += sizeof(b);
-            b = xuadrw::read_f64(ptr);
+            b = nuadrw::read_f64(ptr);
         }
         return b;
     }
@@ -625,7 +625,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_u8(m_buffer + m_cursor, b);
+            nuadrw::write_u8(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -637,7 +637,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_s8(m_buffer + m_cursor, b);
+            nuadrw::write_s8(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -649,7 +649,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_u16(m_buffer + m_cursor, b);
+            nuadrw::write_u16(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -661,7 +661,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_s16(m_buffer + m_cursor, b);
+            nuadrw::write_s16(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -673,7 +673,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_u32(m_buffer + m_cursor, b);
+            nuadrw::write_u32(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -685,7 +685,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_s32(m_buffer + m_cursor, b);
+            nuadrw::write_s32(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -697,7 +697,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_u64(m_buffer + m_cursor, b);
+            nuadrw::write_u64(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -709,7 +709,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_s64(m_buffer + m_cursor, b);
+            nuadrw::write_s64(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -721,7 +721,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_f32(m_buffer + m_cursor, b);
+            nuadrw::write_f32(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
@@ -733,7 +733,7 @@ namespace ncore
         uint_t const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            xuadrw::write_f64(m_buffer + m_cursor, b);
+            nuadrw::write_f64(m_buffer + m_cursor, b);
             m_cursor += sizeof(b);
             return offset;
         }
