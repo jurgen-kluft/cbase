@@ -1,5 +1,5 @@
-#ifndef __X_GUID_H__
-#define __X_GUID_H__ 
+#ifndef __C_GUID_H__
+#define __C_GUID_H__ 
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE 
 #pragma once 

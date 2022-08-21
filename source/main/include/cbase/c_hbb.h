@@ -51,4 +51,4 @@ namespace ncore
 
 }; // namespace ncore
 
-#endif /// __X_HIERARCHICAL_BIT_BUFFER_H__
+#endif /// __C_HIERARCHICAL_BIT_BUFFER_H__

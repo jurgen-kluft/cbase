@@ -208,4 +208,4 @@ namespace ncore
     inline bool g_memequal(const void* inBlock1, const void* inBlock2, u32 inLength) { return (g_memcompare(inBlock1, inBlock2, inLength) == 0); }
 
 } // namespace ncore
-#endif ///< __X_MEMORY_STD_H__
+#endif ///< __C_MEMORY_STD_H__

@@ -779,4 +779,4 @@ namespace ncore
                                    const va_r_t &v14 = va_r_t::sEmpty, const va_r_t &v15 = va_r_t::sEmpty, const va_r_t &v16 = va_r_t::sEmpty
 }; // namespace ncore
 
-#endif ///< END __X_CORE_VA_LIST_H__
+#endif ///< END __C_CORE_VA_LIST_H__
