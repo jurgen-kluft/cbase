@@ -3,10 +3,10 @@
 
 namespace ncore
 {
-    u32		g_BinarySearch(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
+    s64		g_BinarySearch(const void* inItem, const void* inData, u64 inLength, compare_predicate_fn predicate)
     {
         // Do a binary search on the data to obtain the index of the found item
-        s32 r;
+        s8 r;
         r = predicate(inItem, inData, 0);
         if (r == -1)
             return -1;
@@ -19,8 +19,8 @@ namespace ncore
         else if (r == 0)
             return inLength-1;
 
-        s32 bounds[2] = {0, (s32)inLength};
-        s32 mid = bounds[1] / 2;
+        s64 bounds[2] = {0, (s64)inLength};
+        s64 mid = bounds[1] / 2;
         while (true)
         {
             r = predicate(inItem, inData, mid);
@@ -37,7 +37,7 @@ namespace ncore
             }
 
             bounds[(1-r)>>1] = mid;
-            u32 const distance = ((bounds[1] - bounds[0]) / 2);
+            s64 const distance = ((bounds[1] - bounds[0]) / 2);
             if (distance == 0)
             {
                 mid -= (1-r)>>1;
@@ -48,10 +48,10 @@ namespace ncore
         return mid;
     }
 
-    u32		g_LowerBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
+    s64		g_LowerBound(const void* inItem, const void* inData, u64 inLength, compare_predicate_fn predicate)
     {
         // Do a binary search on the data to obtain the lowest index of a lesser-or-equal (LTE) item
-        s32 r;
+        s8 r;
         r = predicate(inItem, inData, 0);
         if (r == -1)
             return 0;
@@ -62,8 +62,8 @@ namespace ncore
         if (r == 1)
             return inLength;
 
-        u32 bounds[2] = {0, inLength};
-        u32 mid = bounds[1] / 2;
+        s64 bounds[2] = {0, (s64)inLength};
+        s64 mid = bounds[1] / 2;
         while (true)
         {
             r = predicate(inItem, inData, mid);
@@ -80,7 +80,7 @@ namespace ncore
             }
 
             bounds[(1-r)>>1] = mid;
-            u32 const distance = ((bounds[1] - bounds[0]) / 2);
+            u64 const distance = ((bounds[1] - bounds[0]) / 2);
             if (distance == 0)
             {
                 mid -= (1-r)>>1;
@@ -92,10 +92,10 @@ namespace ncore
         return mid;
     }
 
-    u32		g_UpperBound(const void* inItem, const void* inData, u32 inLength, compare_predicate_fn predicate)
+    s64		g_UpperBound(const void* inItem, const void* inData, u64 inLength, compare_predicate_fn predicate)
     {
         // Do a binary search on the data to obtain the highest index of a greater-or-equal (GTE) item
-        s32 r;
+        s8 r;
         r = predicate(inItem, inData, 0);
         if (r == -1)
             return 0;
@@ -106,8 +106,8 @@ namespace ncore
         else if (r == 0)
             return inLength-1;
 
-        u32 bounds[2] = {0, inLength};
-        u32 mid = bounds[1] / 2;
+        s64 bounds[2] = {0, (s64)inLength};
+        s64 mid = bounds[1] / 2;
         while (true)
         {
             r = predicate(inItem, inData, mid);
@@ -124,7 +124,7 @@ namespace ncore
             }
 
             bounds[(1-r)>>1] = mid;
-            u32 const distance = ((bounds[1] - bounds[0]) / 2);
+            s64 const distance = ((bounds[1] - bounds[0]) / 2);
             if (distance == 0)
             {
                 mid -= (1-r)>>1;
