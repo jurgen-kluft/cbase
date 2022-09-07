@@ -350,7 +350,7 @@ namespace ncore
             u32 dword0       = level[dwordIndex];
             if (dword0 == 0)
                 return false;
-            dwordBit = xfindFirstBit(dword0);
+            dwordBit = math::findFirstBit(dword0);
             i += 1;
         }
         bit = (dwordIndex * 32) + dwordBit;
@@ -387,7 +387,7 @@ namespace ncore
             u32        w     = level[iw] & im;
             if (w != 0)
             {
-                iw = (iw * 32) + xfindFirstBit(w);
+                iw = (iw * 32) + math::findFirstBit(w);
                 if (il == (hdr->m_numlevels - 1))
                 {
                     bit = iw;
@@ -446,7 +446,7 @@ namespace ncore
             u32        w     = level[iw] & im;
             if (w != 0)
             {
-                iw = (iw * 32) + xfindFirstBit(w);
+                iw = (iw * 32) + math::findFirstBit(w);
                 if (il == (hdr->m_numlevels - 1))
                 {
                     bit = iw;

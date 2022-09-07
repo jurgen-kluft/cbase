@@ -12,7 +12,7 @@ namespace ncore
 		// items = (0 1 1 0 1 1 0 1) & (0 1 1 1) = 0 1 0 1
 		// index = countbits(0 1 0 1) = 2
 		u32 items = (nodemap | valuemap) & ((1<<child) - 1);
-		s32 index = xcountBits(items);
+        s32 index = math::countBits(items);
 		if (items == 0)
 			return -1;
 		return index;

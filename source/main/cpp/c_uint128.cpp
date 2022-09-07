@@ -1,5 +1,5 @@
 #include "cbase/c_target.h"
-#ifndef X_NO_CUSTOM_UINT128
+#ifndef D_NO_CUSTOM_UINT128
 
 #include "cbase/c_debug.h"
 #include "cbase/c_limits.h"
@@ -270,15 +270,15 @@ namespace ncore
 	__xuint128& __xuint128::operator-=(const __xuint128& _value)
 	{
 		u64 t = ((u64)m_LSB) - ((u64)_value.m_LSB);
-		s32 nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		s32 nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_LSB = (u32) (t);
 
 		t = ((u64)m_CSB) - ((u64)_value.m_CSB) - nCarry;
-		nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_CSB = (u32) (t);
 
 		t = ((u64)m_DSB) - ((u64)_value.m_DSB) - nCarry;
-		nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_DSB = (u32) (t);
 
 		t = ((u64)m_MSB) - ((u64)_value.m_MSB) - nCarry;

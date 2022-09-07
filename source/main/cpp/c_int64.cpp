@@ -159,12 +159,12 @@ namespace ncore {
 		bool bBNegative = False;
 		if (IsNegative())
 		{
-			bANegative = xTRUE;
+			bANegative = True;
 			Negate();
 		}
 		if (B.IsNegative())
 		{
-			bBNegative = xTRUE;
+			bBNegative = True;
 			B.Negate();
 		}
 
@@ -227,7 +227,7 @@ namespace ncore {
 	__xint64& __xint64::operator-=(const __xint64& _value)
 	{
 		u64 t = ((u64)m_LSB) - ((u64)_value.m_LSB);
-		s32 nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		s32 nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_LSB = (u32) (t);
 
 		t = ((u64)m_MSB) - ((u64)_value.m_MSB) - nCarry;

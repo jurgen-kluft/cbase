@@ -54,7 +54,7 @@ namespace ncore
     //     messageString        - Additional string containing information about the 
     //                            assert.
     // Returns:
-    //     bool - xTRUE when the program should be halted, False other wise
+    //     bool - True when the program should be halted, False other wise
     // Description:
     //     This function is call when an assert happens.
     // See Also:
@@ -79,7 +79,7 @@ namespace ncore
         //
         // handle flags
         //
-        if ((flags & asserthandler_t::XDB_FLAG_IGNORE) != 0) 
+        if ((flags & asserthandler_t::DB_FLAG_IGNORE) != 0) 
         {
             return False;
         }
@@ -87,7 +87,7 @@ namespace ncore
         //
         // next time ignore it
         //
-        flags |= asserthandler_t::XDB_FLAG_IGNORE;
+        flags |= asserthandler_t::DB_FLAG_IGNORE;
 
         //
         // Survive nullptr entries
@@ -108,7 +108,7 @@ namespace ncore
         //
         // Dump the scope info
         //
-        x_LogError("Assert", "%s(%d): %s; %s ", va_list_t(va_t(fileName), va_t(lineNumber), va_t(exprString), va_t(messageString)));
+        D_LogError("Assert", "%s(%d): %s; %s ", va_list_t(va_t(fileName), va_t(lineNumber), va_t(exprString), va_t(messageString)));
 
         //
         // Default: Skip this assert

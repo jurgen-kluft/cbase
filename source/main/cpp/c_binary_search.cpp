@@ -113,7 +113,7 @@ namespace ncore
             r = predicate(inItem, inData, mid);
             if (r == 0)
             {
-                if ((mid+1)<inLength && (predicate(inItem, inData, mid+1)==0))
+                if ((u64)(mid+1)<inLength && (predicate(inItem, inData, mid+1)==0))
                 {
                     r = 1;
                 }

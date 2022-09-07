@@ -4,7 +4,7 @@
 */
 
 #include "cbase/c_target.h"
-#ifndef X_NO_CUSTOM_INT256
+#ifndef D_NO_CUSTOM_INT256
 
 #include "cbase/c_debug.h"
 #include "cbase/c_limits.h"
@@ -329,31 +329,31 @@ namespace ncore {
 	__xint256& __xint256::operator-=(const __xint256& _value)
 	{
 		u64 t = ((u64)m_LSB) - ((u64)_value.m_LSB);
-		s32 nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		s32 nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_LSB = (u32) (t);
 
 		t = ((u64)m_ASB) - ((u64)_value.m_ASB) - nCarry;
-		nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_ASB = (u32) (t);
 
 		t = ((u64)m_BSB) - ((u64)_value.m_BSB) - nCarry;
-		nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_BSB = (u32) (t);
 
 		t = ((u64)m_CSB) - ((u64)_value.m_CSB) - nCarry;
-		nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_CSB = (u32) (t);
 
 		t = ((u64)m_DSB) - ((u64)_value.m_DSB) - nCarry;
-		nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_DSB = (u32) (t);
 
 		t = ((u64)m_ESB) - ((u64)_value.m_ESB) - nCarry;
-		nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_ESB = (u32) (t);
 
 		t = ((u64)m_FSB) - ((u64)_value.m_FSB) - nCarry;
-		nCarry = ((t&X_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
+		nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
 		m_FSB = (u32) (t);
 
 		t = ((u64)m_MSB) - ((u64)_value.m_MSB) - nCarry;

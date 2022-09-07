@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-#ifndef X_NO_CUSTOM_INT128
+#ifndef D_NO_CUSTOM_INT128
 
 namespace ncore
 {

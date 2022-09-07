@@ -1096,10 +1096,6 @@ namespace ncore
     // DOM-IGNORE-BEGIN
     //==============================================================================
 
-#ifndef nullptr
-#    define nullptr 0
-#endif
-
     typedef unsigned D_INT8  u8;
     typedef unsigned D_INT16 u16;
     typedef unsigned D_INT32 u32;

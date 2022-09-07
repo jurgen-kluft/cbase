@@ -56,7 +56,7 @@ namespace ncore
     inline void* reallocate(alloc_t* alloc, void* ptr, u32 size, u32 new_size, u32 alignment = sizeof(void*))
     {
         void* newptr = alloc->allocate(new_size, alignment);
-        x_memcpy(newptr, ptr, size);
+        nmem::memcpy(newptr, ptr, size);
         alloc->deallocate(ptr);
         return newptr;
     }

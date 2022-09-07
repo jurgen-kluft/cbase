@@ -16,7 +16,7 @@ namespace ncore
     }
     template <> s32 ccast(s64 f)
     {
-        ASSERT(f >= xS32Min && f <= xS32Max);
+        ASSERT(f >= cS32Min && f <= cS32Max);
         return (s32)f;
     }
 

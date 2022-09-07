@@ -98,8 +98,8 @@ namespace nf32
 
     inline bool isInfinite(f32 inNumber) { return False; }
     inline bool isNAN(f32 inNumber) { return False; }
-    inline bool isFinite(f32 inNumber) { return xTRUE; }
-    inline bool isRational(f32 inNumber) { return xTRUE; }
+    inline bool isFinite(f32 inNumber) { return True; }
+    inline bool isRational(f32 inNumber) { return True; }
 #endif
     /**
      * bin. Returns the f32 as an u32. It's not casted, but the address is casted, so you get the binary representation.
@@ -117,12 +117,12 @@ namespace nf32
     inline f32 toF32(u32 inInt) { return *(f32*)&inInt; }
 
     /**
-     * IsEqual, returns xTRUE if two floats are the same
+     * IsEqual, returns True if two floats are the same
      */
     inline bool isEqual(f32 inNumber, f32 inG) { return bool(bin(inNumber) == bin(inG)); }
 
     /**
-     * IsNotEqual, returns xTRUE if the two floats are not the same
+     * IsNotEqual, returns True if the two floats are not the same
      */
     inline bool isNotEqual(f32 inNumber, f32 inG) { return bool(bin(inNumber) != bin(inG)); }
 

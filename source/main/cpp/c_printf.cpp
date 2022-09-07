@@ -376,7 +376,7 @@ namespace ncore
                         if (anySignificantInteger == False && ifpart == '0')
                             prec++;
                         else
-                            anySignificantInteger = xTRUE;
+                            anySignificantInteger = True;
                     }
 
                     ++fwidth;

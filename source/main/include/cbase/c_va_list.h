@@ -365,7 +365,7 @@ namespace ncore
             if (mLength < 11)
             {
                 mArg[mLength++] = inArg1;
-                return xTRUE;
+                return True;
             }
             return False;
         }
@@ -470,7 +470,7 @@ namespace ncore
         };
 
     public:
-        va_r_t() : mType(TYPE_EMPTY), mCap(0), mSize(0), mDummy(0) { mRef[0] = nullptr; }
+        va_r_t() : mType(TYPE_EMPTY), mCap(0), mSize(0), mDummy(0) { mRef[0] = 0; }
         va_r_t(const va_r_t& c) : mType(c.mType), mCap(0), mSize(0), mDummy(0) { mRef[0] = c.mRef[0]; }
         va_r_t(s8* inRef) : mType(TYPE_INT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
         va_r_t(u8* inRef) : mType(TYPE_UINT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
@@ -737,7 +737,7 @@ namespace ncore
             if (mLength < 16)
             {
                 mArg[mLength++] = inArg1;
-                return xTRUE;
+                return True;
             }
             return False;
         }

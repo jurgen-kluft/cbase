@@ -22,7 +22,7 @@ namespace ncore
 
     void initialize_from_index(btree_indexer_t& keydexer, u32 const max_index, bool const sorted)
     {
-        s32 const maskbitcnt = (32 - xcountLeadingZeros(max_index) + 1) & 0x7ffffffe;
+        s32 const maskbitcnt = (32 - math::countLeadingZeros(max_index) + 1) & 0x7ffffffe;
 
         // Initialize key indexer to take 2 bits at a time from high-frequency to low-frequency.
         // Root   : level 0
@@ -47,8 +47,8 @@ namespace ncore
 
     void initialize_from_mask(btree_indexer_t& keydexer, u64 mask, bool sorted)
     {
-        s32 const trailbitcnt = xcountTrailingZeros(mask);
-        s32 const leadbitcnt  = xcountLeadingZeros(mask);
+        s32 const trailbitcnt = math::countTrailingZeros(mask);
+        s32 const leadbitcnt  = math::countLeadingZeros(mask);
         s32 const maskbitcnt  = 64 - trailbitcnt - leadbitcnt;
 
         // Initialize key indexer to take 2 bits at a time from high-frequency to low-frequency.

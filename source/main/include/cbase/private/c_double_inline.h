@@ -6,9 +6,9 @@ namespace xf64
     struct EDoubleIEEE
     {
         EDoubleIEEE()
-            :DD_FRACTION_MASK        (X_CONSTANT_U64(0x000FFFFFFFFFFFFF))
-            ,DD_EXPONENT_MASK        (X_CONSTANT_U64(0x7FF0000000000000))
-            ,DD_SIGN_MASK            (X_CONSTANT_U64(0x8000000000000000))
+            :DD_FRACTION_MASK        (D_CONSTANT_U64(0x000FFFFFFFFFFFFF))
+            ,DD_EXPONENT_MASK        (D_CONSTANT_U64(0x7FF0000000000000))
+            ,DD_SIGN_MASK            (D_CONSTANT_U64(0x8000000000000000))
             ,DD_EXPONENT_BIAS        ((1<<(11-1)) - 1)
             ,DD_MAX_EXPONENT_BIAS    ((1<<11) - 1)
             ,DD_GET_FRACTION_SHIFT    (0)
@@ -77,8 +77,8 @@ namespace xf64
 #else
     inline bool		isInfinite(f64 inNumber)						{ return False; }
     inline bool		isNAN(f64 inNumber)     						{ return False; }
-    inline bool		isFinite(f64 inNumber)  						{ return xTRUE; }
-    inline bool		isRational(f64 inNumber)						{ return xTRUE; }
+    inline bool		isFinite(f64 inNumber)  						{ return True; }
+    inline bool		isRational(f64 inNumber)						{ return True; }
 #endif
     /**
      * bin. Returns the f64 as an u64. It's not casted, but the address is casted, so you get the binary representation
@@ -99,12 +99,12 @@ namespace xf64
     inline u64        toU64(f64 inB)                                    { return (u64)(s64)inB; }
 
     /**
-     * IsEqual, returns xTRUE if two doubles are the same
+     * IsEqual, returns True if two doubles are the same
      */
     inline bool      isEqual(f64 inNumber, f64 inG)                    { return bool(bin(inNumber)==bin(inG)); }
 
     /**
-     * IsNotEqual, returns xTRUE if the two doubles are not the same
+     * IsNotEqual, returns True if the two doubles are not the same
      */
     inline bool      isNotEqual(f64 inNumber, f64 inG)                 { return bool(bin(inNumber)!=bin(inG)); }
 

@@ -1,9 +1,3 @@
-/**
-* @file Head file x_uint128.h
-*
-* xCore custom 128 bit unsigned integer.
-*/
-
 #ifndef __CBASE_128_BIT_UNSIGNED_INTEGER_H__
 #define __CBASE_128_BIT_UNSIGNED_INTEGER_H__
 #include "cbase/c_target.h"
@@ -11,7 +5,7 @@
 #pragma once
 #endif
 
-#ifndef X_NO_CUSTOM_UINT128
+#ifndef D_NO_CUSTOM_UINT128
 
 
 /**

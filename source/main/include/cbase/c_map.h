@@ -22,7 +22,7 @@ namespace ncore
                 m_allocator = alloc_t::get_system();
             }
             m_fsa = fsa_to_alloc_t(btree_ptr_t::sizeof_node(), m_allocator);
-            m_tree.init_from_mask(&m_fsa, &m_kv, xU64Max, false);
+            m_tree.init_from_mask(&m_fsa, &m_kv, cU64Max, false);
         }
 
         inline ~map_t() { m_tree.clear(m_root); }
@@ -166,7 +166,7 @@ namespace ncore
                 m_allocator = alloc_t::get_system();
             }
             m_fsa = fsa_to_alloc_t(btree_ptr_t::sizeof_node(), m_allocator);
-            m_tree.init_from_mask(&m_fsa, &m_kv, xU64Max, false);
+            m_tree.init_from_mask(&m_fsa, &m_kv, cU64Max, false);
         }
 
         ~set_t() { m_tree.clear(m_root); }
