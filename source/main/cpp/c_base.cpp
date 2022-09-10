@@ -88,6 +88,7 @@ namespace ncore
 	class wyrand_t : public random_t
 	{
 	public:
+        wyrand_t() : m_seed(0) {}
 		virtual				~wyrand_t() {}
 		virtual void		reset(s64 inSeed = 0);
 		virtual u32			generate();

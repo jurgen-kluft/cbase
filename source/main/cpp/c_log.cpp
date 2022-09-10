@@ -5,15 +5,15 @@
 
 namespace ncore
 {
-	static log_info_t	x_ST_LogInfo;	///< Single-Thread log info
-	log_info_t&			x_GetLogInfo_ST()
+	static log_info_t	g_ST_LogInfo;	///< Single-Thread log info
+	log_info_t&			g_GetLogInfo_ST()
 	{
-		return x_ST_LogInfo;
+		return g_ST_LogInfo;
 	}
 
-	static log_info_t::_delegate*	sGetLogInfoFunc = x_GetLogInfo_ST;
+	static log_info_t::_delegate*	sGetLogInfoFunc = g_GetLogInfo_ST;
 
-	void				x_SetGetLogInfo(log_info_t::_delegate* Function)
+	void				g_SetGetLogInfo(log_info_t::_delegate* Function)
 	{
 		sGetLogInfoFunc = Function;
 	}
@@ -197,7 +197,7 @@ namespace ncore
 	 *     __x_LogWarning, __x_LogError
 	 *------------------------------------------------------------------------------
 	 */
-	void __x_LogMessage(const char* channel, const char* msgFormat, const va_list_t& args)
+	void __LogMessage(const char* channel, const char* msgFormat, const va_list_t& args)
 	{
 		log_info_t& info = sGetLogInfoFunc();
 
@@ -212,9 +212,9 @@ namespace ncore
 			log_t::writeLine(log_t::INFO, msgformatrunes);
 	}
 
-	void __x_LogMessage(const char* channel, const char* message)
+	void __LogMessage(const char* channel, const char* message)
 	{
-		__x_LogMessage(channel, message, va_list_t());
+		__LogMessage(channel, message, va_list_t());
 	}
 
 	/**
@@ -237,7 +237,7 @@ namespace ncore
 	 *     __x_LogError, __x_LogMessage
 	 *------------------------------------------------------------------------------
 	 */
-	void __x_LogWarning(const char* channel, const char* msgFormat, const va_list_t& args)
+	void __LogWarning(const char* channel, const char* msgFormat, const va_list_t& args)
 	{
 		log_info_t& info = sGetLogInfoFunc();
 
@@ -252,9 +252,9 @@ namespace ncore
 			log_t::writeLine(log_t::WARNING, msgformatrunes);
 	}
 
-	void __x_LogWarning(const char* channel, const char* message)
+	void __LogWarning(const char* channel, const char* message)
 	{
-		__x_LogWarning(channel, message, va_list_t());
+		__LogWarning(channel, message, va_list_t());
 	}
 
     /**
@@ -277,7 +277,7 @@ namespace ncore
 	 *     __x_LogWarning, __x_LogMessage
 	 *------------------------------------------------------------------------------
 	 */
-	void __x_LogError(const char* channel, const char* msgFormat, const va_list_t& args)
+	void __LogError(const char* channel, const char* msgFormat, const va_list_t& args)
 	{
 		log_info_t& info = sGetLogInfoFunc();
 
@@ -292,14 +292,14 @@ namespace ncore
 			log_t::writeLine(log_t::ERROR, msgformatrunes);
 	}
 
-	void __x_LogError(const char* channel, const char* message)
+	void __LogError(const char* channel, const char* message)
 	{
-		__x_LogError(channel, message, va_list_t());
+		__LogError(channel, message, va_list_t());
 	}
 
 	//------------------------------------------------------------------------------
 
-	void x_LogFlush(void)
+	void __LogFlush(void)
 	{
 		log_t::flush();
 	}
@@ -317,7 +317,7 @@ namespace ncore
 	 *     The function log fileName and lineNum into current log_info_t.
 	 *------------------------------------------------------------------------------
 	 */
-	void x_LogPush(const char* fileName, s32 lineNum)
+	void __LogPush(const char* fileName, s32 lineNum)
 	{
 		log_info_t& info = sGetLogInfoFunc();
 		info.mLogLineNumber = lineNum;
