@@ -40,7 +40,7 @@ namespace ncore
     {
         size_t old_size = (size_t)((void**)ptr)[-2];
         void*  new_ptr  = mac_aligned_malloc(size, alignment);
-        memcpy(new_ptr, ptr, xmin(size, old_size));
+        memcpy(new_ptr, ptr, math::min(size, old_size));
         mac_aligned_free(ptr);
         return new_ptr;
     }

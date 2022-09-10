@@ -1,4 +1,3 @@
-// x_bit_field.h - xCore bitfield template - 
 #ifndef __CBASE_BITFIELD_H__
 #define __CBASE_BITFIELD_H__
 #include "cbase/c_target.h"
@@ -46,9 +45,10 @@ namespace ncore
 	//     like:
 	//
 	//<CODE [lang= "c++"]>
-	// 		xbfSet(mFlags, LINK_ALL);
-	// 		xbfToggle(mFlags, LINK_ROTATION);
-	// 		xbfClear(mFlags, VISIBLE);
+	// 		bits_t<EFlags> bits;
+	// 		bits.set(mFlags, LINK_ALL);
+	// 		bits.toggle(mFlags, LINK_ROTATION);
+	// 		bits.clear(mFlags, VISIBLE);
 	//</CODE>
 	//
 	//------------------------------------------------------------------------------

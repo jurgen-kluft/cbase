@@ -1204,6 +1204,9 @@ namespace ncore
     const bool TRUE  = true;  ///< the value of True to true
     const bool FALSE = false; ///< the value of False to false
 
+    #define D_FOR_I(__from, __to) for (s32 i=__from; i<__to; ++i)
+    #define D_FOR(__type, __var, __from, __to) for (__type __var=__from; __var<__to; ++__var)
+
 }; // namespace ncore
 
 #endif
