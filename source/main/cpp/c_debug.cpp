@@ -61,7 +61,7 @@ namespace ncore
     //     x_SetAssertHandler
     //------------------------------------------------------------------------------
 
-    bool xAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+    bool gAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
     {
         // From the thread context, get the assert handler
         // Call handle_assert() on that object and return
