@@ -14,7 +14,7 @@ namespace ncore
     //==============================================================================
     // Default input func
     //==============================================================================
-    class xassert_default : public asserthandler_t
+    class asserthandler_default_t : public asserthandler_t
     {
     public:
         bool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
@@ -22,12 +22,12 @@ namespace ncore
 
     asserthandler_t*	asserthandler_t::sGetDefaultAssertHandler()
     {
-        static xassert_default sAssertHandler;
+        static asserthandler_default_t sAssertHandler;
         asserthandler_t* handler = &sAssertHandler;
         return handler;		
     }
     
-    class xassert_release : public asserthandler_t
+    class asserthandler_release_t : public asserthandler_t
     {
     public:
         bool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
@@ -38,7 +38,7 @@ namespace ncore
 
     asserthandler_t*	asserthandler_t::sGetReleaseAssertHandler()
     {
-        static xassert_release sAssertHandler;
+        static asserthandler_release_t sAssertHandler;
         asserthandler_t* handler = &sAssertHandler;
         return handler;		
     }
@@ -74,7 +74,7 @@ namespace ncore
     }
 
 
-    bool xassert_default::handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+    bool asserthandler_default_t::handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
     {
         //
         // handle flags
@@ -122,7 +122,7 @@ namespace ncore
 
 namespace ncore
 {
-    class xassert_release : public asserthandler_t
+    class asserthandler_release_t : public asserthandler_t
     {
     public:
         bool	handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
@@ -133,7 +133,7 @@ namespace ncore
 
 	asserthandler_t*	asserthandler_t::sGetReleaseAssertHandler()
 	{
-		static xassert_release sAssertHandler;
+		static asserthandler_release_t sAssertHandler;
 		asserthandler_t* handler = &sAssertHandler;
 		return handler;		
 	}
