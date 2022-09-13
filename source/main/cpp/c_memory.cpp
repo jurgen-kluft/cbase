@@ -2,7 +2,7 @@
 
 namespace ncore
 {
-	namespace xmem
+	namespace nmem
 	{
 #define	wsize	sizeof(u32)
 #define	wmask	(wsize - 1)
