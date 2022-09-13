@@ -50,7 +50,7 @@ UNITTEST_SUITE_BEGIN(xdouble)
             CHECK_TRUE(xf64::positiveInfinity() + 1.0 == xf64::positiveInfinity());
             CHECK_TRUE(xf64::positiveInfinity() == (1.0 / xf64::positiveZero()));
             CHECK_TRUE(xf64::positiveInfinity() >= 0xffffffff);
-            CHECK_TRUE(xf64::bin(xf64::positiveInfinity()) == X_CONSTANT_64(0x7ff0000000000000));
+            CHECK_TRUE(xf64::bin(xf64::positiveInfinity()) == D_CONSTANT_64(0x7ff0000000000000));
         }
 
         UNITTEST_TEST(NegativeInfinity)
@@ -58,7 +58,7 @@ UNITTEST_SUITE_BEGIN(xdouble)
             CHECK_TRUE(xf64::negativeInfinity() - 1.0 == xf64::negativeInfinity());
             CHECK_TRUE(xf64::negativeInfinity() == (1.0 / xf64::negativeZero()));
             CHECK_TRUE(xf64::negativeInfinity() <= 0xffffffff);
-            CHECK_TRUE(xf64::bin(xf64::negativeInfinity()) == X_CONSTANT_64(0xfff0000000000000));
+            CHECK_TRUE(xf64::bin(xf64::negativeInfinity()) == D_CONSTANT_64(0xfff0000000000000));
         }
 #endif
         UNITTEST_TEST(PositiveMaximum)
@@ -143,14 +143,14 @@ UNITTEST_SUITE_BEGIN(xdouble)
 #ifdef IEEE_FLOATS
             CHECK_TRUE(xf64::bin(xf64::nan()) == xf64::bin(xf64::nan()+1.0));
 #endif
-            CHECK_TRUE(xf64::bin(1.0) == X_CONSTANT_64(0x3ff0000000000000));
-            CHECK_TRUE(xf64::bin(-2.0) == X_CONSTANT_64(0xc000000000000000));
+            CHECK_TRUE(xf64::bin(1.0) == D_CONSTANT_64(0x3ff0000000000000));
+            CHECK_TRUE(xf64::bin(-2.0) == D_CONSTANT_64(0xc000000000000000));
         }
 
         UNITTEST_TEST(Sbin)
         {
             CHECK_TRUE(xf64::sbin(0.0) == 0);
-            CHECK_TRUE(xf64::sbin(-2.0) == X_CONSTANT_64(0xc000000000000000));
+            CHECK_TRUE(xf64::sbin(-2.0) == D_CONSTANT_64(0xc000000000000000));
 #ifdef IEEE_FLOATS
             CHECK_TRUE(xf64::sbin(xf64::nan()) == xf64::sbin(xf64::nan()+1.0));
 #endif
@@ -159,8 +159,8 @@ UNITTEST_SUITE_BEGIN(xdouble)
         UNITTEST_TEST(ToF64)
         {
             CHECK_TRUE(xf64::toF64((u64)0) == 0.0);
-            CHECK_TRUE(xf64::toF64(X_CONSTANT_64(0x3ff0000000000000)) == 1.0);
-            CHECK_TRUE(xf64::toF64(X_CONSTANT_64(0xc000000000000000)) == -2.0);
+            CHECK_TRUE(xf64::toF64(D_CONSTANT_64(0x3ff0000000000000)) == 1.0);
+            CHECK_TRUE(xf64::toF64(D_CONSTANT_64(0xc000000000000000)) == -2.0);
         }
 
         UNITTEST_TEST(ToS64)
@@ -200,13 +200,13 @@ UNITTEST_SUITE_BEGIN(xdouble)
         UNITTEST_TEST(BinaryAnd)
         {
             CHECK_TRUE(xf64::binaryAnd(0.0,(u64)0) == 0.0);
-            CHECK_TRUE(xf64::binaryAnd(-2.0,(u64)0x10000000) == xf64::toF64(X_CONSTANT_64(0xc000000000000000)&0x10000000));
+            CHECK_TRUE(xf64::binaryAnd(-2.0,(u64)0x10000000) == xf64::toF64(D_CONSTANT_64(0xc000000000000000)&0x10000000));
         }
 
         UNITTEST_TEST(BinaryOr)
         {
             CHECK_TRUE(xf64::binaryOr(0.0,(s32)0) == 0.0);
-            CHECK_TRUE(xf64::binaryOr(-2.0,(s32)10) == xf64::toF64(X_CONSTANT_64(0xc000000000000000)|10));
+            CHECK_TRUE(xf64::binaryOr(-2.0,(s32)10) == xf64::toF64(D_CONSTANT_64(0xc000000000000000)|10));
         }
 
         UNITTEST_TEST(Fraction)
@@ -214,7 +214,7 @@ UNITTEST_SUITE_BEGIN(xdouble)
             CHECK_TRUE(xf64::fraction(0.0) == 0);
             CHECK_TRUE(xf64::fraction(-2.0) == 0);
             //0.15625f : 0x3fc4000000000000
-            CHECK_TRUE(xf64::fraction(0.15625f) == X_CONSTANT_64(0x0004000000000000));
+            CHECK_TRUE(xf64::fraction(0.15625f) == D_CONSTANT_64(0x0004000000000000));
         }
 
         UNITTEST_TEST(ExponentBinary)
@@ -234,7 +234,7 @@ UNITTEST_SUITE_BEGIN(xdouble)
         UNITTEST_TEST(SignMask)
         {
             CHECK_TRUE(xf64::signMask(1.0f) == 0);
-            CHECK_TRUE(xf64::signMask(-2.0f) == X_CONSTANT_64(0x8000000000000000));
+            CHECK_TRUE(xf64::signMask(-2.0f) == D_CONSTANT_64(0x8000000000000000));
             CHECK_TRUE(xf64::signMask(0.15625f) == 0);
         }
 

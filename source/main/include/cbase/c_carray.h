@@ -24,8 +24,8 @@ namespace ncore
 		inline bool			is_empty() const						{ return mLength == 0; }
 		inline bool			is_full() const							{ ASSERT(mLength <= reserved()); return mLength == mReservedItems; }
 
-		inline void			push_back(void const* item)				{ ASSERT(mLength<reserved()); x_memcpy(&mArray[mLength * mSizeOfItem], item, mSizeOfItem); mLength += 1; }
-		inline bool			pop_back(void * out_item)				{ if (mLength > 0) { --mLength; x_memcpy(out_item, &mArray[mLength * mSizeOfItem], mSizeOfItem); return true; } else { return false; } }
+		inline void			push_back(void const* item)				{ ASSERT(mLength<reserved()); nmem::memcpy(&mArray[mLength * mSizeOfItem], item, mSizeOfItem); mLength += 1; }
+		inline bool			pop_back(void * out_item)				{ if (mLength > 0) { --mLength; nmem::memcpy(out_item, &mArray[mLength * mSizeOfItem], mSizeOfItem); return true; } else { return false; } }
 
 		inline u8*		begin() const							{ return mArray; }
 		inline u8*		next(u8* current) const				{ ASSERT(x_is_in_range(mArray, mReservedItems * mSizeOfItem, current)); return current + mSizeOfItem; }

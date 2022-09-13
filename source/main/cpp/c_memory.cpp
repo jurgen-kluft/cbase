@@ -259,7 +259,7 @@ namespace ncore
 
         u16 const* readnative16(u16 const* inSrc, u16& outValue)
         {
-#ifdef X_LITTLE_ENDIAN
+#ifdef D_LITTLE_ENDIAN
             outValue = ((u32)((u8*)inSrc)[0]) | ((u32)((u8*)inSrc)[1] << 8);
 #else
         outValue = ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2]);
@@ -269,7 +269,7 @@ namespace ncore
 
         u32 const* readnative24(u32 const* inSrc, u32& outValue)
         {
-#ifdef X_LITTLE_ENDIAN
+#ifdef D_LITTLE_ENDIAN
             outValue = ((u32)((u8*)inSrc)[0]) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2] << 16);
 #else
         outValue = ((u32)((u8*)inSrc)[0] << 16) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2]);
@@ -279,7 +279,7 @@ namespace ncore
 
         u32 const* readnative32(u32 const* inSrc, u32& outValue)
         {
-#ifdef X_LITTLE_ENDIAN
+#ifdef D_LITTLE_ENDIAN
             outValue = ((u32)((u8*)inSrc)[0]) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2] << 16) | ((u32)((u8*)inSrc)[3] << 24);
 #else
         outValue = ((u32)((u8*)inSrc)[0] << 24) | ((u32)((u8*)inSrc)[1] << 16) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[3]);
@@ -289,7 +289,7 @@ namespace ncore
 
         u64 const* readnative64(u64 const* inSrc, u64& outValue)
         {
-#ifdef X_LITTLE_ENDIAN
+#ifdef D_LITTLE_ENDIAN
             outValue =
                 ((u64)((u8*)inSrc)[0]) | ((u64)((u8*)inSrc)[1] << 8) | ((u64)((u8*)inSrc)[2] << 16) | ((u64)((u8*)inSrc)[3] << 24) | ((u64)((u8*)inSrc)[4] << 32) | ((u64)((u8*)inSrc)[5] << 40) | ((u64)((u8*)inSrc)[6] << 48) | ((u64)((u8*)inSrc)[7] << 56);
 #else
@@ -301,7 +301,7 @@ namespace ncore
 
         u16* writenative16(u16* inDest, u16 inData)
         {
-#ifndef X_LITTLE_ENDIAN
+#ifndef D_LITTLE_ENDIAN
             ((u8*)inDest)[0] = (u8)((inData >> 8) & 0xFF);
             ((u8*)inDest)[1] = (u8)((inData >> 0) & 0xFF);
 #else
@@ -312,7 +312,7 @@ namespace ncore
         }
         u32* writenative24(u32* inDest, u32 inData)
         {
-#ifndef X_LITTLE_ENDIAN
+#ifndef D_LITTLE_ENDIAN
             ((u8*)inDest)[0] = (u8)((inData >> 16) & 0xFF);
             ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
             ((u8*)inDest)[2] = (u8)((inData >> 0) & 0xFF);
@@ -325,7 +325,7 @@ namespace ncore
         }
         u32* writenative32(u32* inDest, u32 inData)
         {
-#ifndef X_LITTLE_ENDIAN
+#ifndef D_LITTLE_ENDIAN
             ((u8*)inDest)[0] = (u8)((inData >> 24) & 0xFF);
             ((u8*)inDest)[1] = (u8)((inData >> 16) & 0xFF);
             ((u8*)inDest)[2] = (u8)((inData >> 8) & 0xFF);
@@ -340,7 +340,7 @@ namespace ncore
         }
         u64* writenative64(u64* inDest, u64 inData)
         {
-#ifndef X_LITTLE_ENDIAN
+#ifndef D_LITTLE_ENDIAN
             ((u8*)inDest)[0] = (u8)((inData >> 56) & 0xFF);
             ((u8*)inDest)[1] = (u8)((inData >> 48) & 0xFF);
             ((u8*)inDest)[2] = (u8)((inData >> 40) & 0xFF);

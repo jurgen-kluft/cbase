@@ -146,7 +146,7 @@ namespace ncore
         }
     }
 
-#if defined(X_BIG_ENDIAN)
+#if defined(D_BIG_ENDIAN)
     struct ieee_double_shape_type
     {
         struct u32d

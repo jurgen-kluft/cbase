@@ -57,7 +57,7 @@ namespace ncore
     }
 
 // read functions
-#if (X_LITTLE_ENDIAN)
+#if (D_LITTLE_ENDIAN)
     static inline uint64_t _wyr8(const uint8_t* p)
     {
         uint64_t v;

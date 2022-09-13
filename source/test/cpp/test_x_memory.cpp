@@ -228,12 +228,12 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			CHECK_EQUAL(1, b);
 		}
 
-		UNITTEST_TEST(x_memcpy)
+		UNITTEST_TEST(nmem::memcpy)
 		{
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5 };
 			char buffer2[] = { 1,2,3,4,5,6,7,8,9,10 };
 
-			x_memcpy(buffer2, buffer1, 5);
+			nmem::memcpy(buffer2, buffer1, 5);
 
 			char buffer3[] = { 6,7,8,9,10,6,7,8,9,10 };
 
