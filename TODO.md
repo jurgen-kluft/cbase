@@ -8,28 +8,11 @@ Using Go to manage our packages and dependencies and generating Visual Studio pr
 
 Naming convention:
 
-- package starts with c (e.g. cbase, ccore, cstring, callocator, chash, crandom, cfilesystem)
-- namespaces start with n (e.g. ncore)
-- struct/class ends with _t (e.g. alloc_t)
-- global functions start with g_ (e.g. g_min, g_max, g_po2)
-
-## ccore (typeless/raw containers)
-
-- ~~list~~ DONE
-- ~~array~~ DONE
-- ~~stack~~ DONE
-- ~~queue~~ DONE
-- ~~map~~ DONE
-- ~~set~~ DONE
-
-## cgenerics
-
-- ``list<T>``
-- ``array<T>``
-- ``stack<T>``
-- ``queue<T>``
-- ``map<K,V>``
-- ``set<V>``
+- DONE -> package starts with c (e.g. cbase, ccore, cstring, callocator, chash, crandom, cfilesystem)
+- DONE -> namespaces start with n (e.g. ncore)
+- DONE -> struct/class ends with _t (e.g. alloc_t)
+- DONE -> global functions start with g_ (e.g. g_min, g_max, g_po2)
+- restyle __xint64, __xint128, ...
 
 ## cstring (Alpha)
 
@@ -37,7 +20,7 @@ string class (utf32)
 
 ## callocator
 
-The package nvmem contains a virtual memory allocator.
+The package csuperalloc contains a virtual memory allocator.
 Also, split of debugging allocators like memento to cdealloc
 
 ## catomic
@@ -115,6 +98,8 @@ Progress = Alpha
 Progress = v1.0
 
 ## ctext
+
+Does contain a working 'manual' parser class.
 
 - parsing/tokenizer
   - XML

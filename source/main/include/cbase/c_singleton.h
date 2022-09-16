@@ -48,8 +48,8 @@ namespace ncore
 		static void singleton_create(T*& ptr)
 		{
 			static ncore::s64 _memblock[ ((((sizeof(T)+2*T::SINGLETON_ALIGNMENT-1)/T::SINGLETON_ALIGNMENT) * T::SINGLETON_ALIGNMENT) + 7) / 8 ];
-			X_PTR_SIZED_INT const a = T::SINGLETON_ALIGNMENT;
-			void* mem = (void*)(((X_PTR_SIZED_INT)_memblock + (a-1)) & ~(a-1));
+			ptr_t const a = T::SINGLETON_ALIGNMENT;
+			void* mem = (void*)(((ptr_t)_memblock + (a-1)) & ~(a-1));
 			ptr = new (mem) T();
 		}
 

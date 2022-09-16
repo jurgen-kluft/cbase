@@ -218,17 +218,17 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 			CHECK_EQUAL(0x08090a01, r2);
 		}
 
-		UNITTEST_TEST(x_swap)
+		UNITTEST_TEST(swap)
 		{
 			u32 a=1, b=2;
 			CHECK_EQUAL(1, a);
 			CHECK_EQUAL(2, b);
-			x_swap(a,b);
+			nmem::memswap(a,b);
 			CHECK_EQUAL(2, a);
 			CHECK_EQUAL(1, b);
 		}
 
-		UNITTEST_TEST(nmem::memcpy)
+		UNITTEST_TEST(memcpy)
 		{
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5 };
 			char buffer2[] = { 1,2,3,4,5,6,7,8,9,10 };
@@ -237,7 +237,7 @@ UNITTEST_SUITE_BEGIN(xmemory_std)
 
 			char buffer3[] = { 6,7,8,9,10,6,7,8,9,10 };
 
-			CHECK_TRUE(x_memcmp(buffer2, buffer3, 10) == 0);
+			CHECK_TRUE(nmem::memcmp(buffer2, buffer3, 10) == 0);
 		}
 	}
 }

@@ -190,7 +190,7 @@ namespace ncore
         // Determine the length of the run (pos = start position (from msb to lsb))
         key_t const mask = (0xFFFFFFFFFFFFFFFFUL >> pos);
         key_t const diff = (v1->m_key ^ v2->m_key) & mask;
-        s32 const   len  = xcountLeadingZeros(diff) - pos;
+        s32 const   len  = math::countLeadingZeros(diff) - pos;
 
         s32     p    = pos;
         s32     l    = len;
@@ -310,7 +310,7 @@ namespace ncore
                     s32 const   pos  = n->get_run_bitpos();
                     key_t const mask = n->get_run_keymask();
                     key_t const diff = n->get_run_keybits() ^ (key & mask);
-                    s32 const   len  = xcountLeadingZeros(diff) - pos;
+                    s32 const   len  = math::countLeadingZeros(diff) - pos;
 
                     sn->set_run_bitpos(pos);
                     sn->set_run_bitlen(len);

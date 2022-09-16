@@ -4,7 +4,7 @@
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
-#ifndef X_NO_CUSTOM_INT64
+#ifndef D_NO_CUSTOM_INT64
 
 #include "cbase/c_debug.h"
 

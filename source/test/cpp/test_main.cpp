@@ -6,40 +6,41 @@
 #include "cunittest/cunittest.h"
 #include "cunittest/private/ut_ReportAssert.h"
 
-UNITTEST_SUITE_LIST(xCoreUnitTest);
+UNITTEST_SUITE_LIST(cUnitTest);
 
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xinteger);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtypes);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xallocator);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbinary_search);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbitfield);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xbtree);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, buffer_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, carray_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, darray_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdouble);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xdtrie);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xendian);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xfloat);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, guid_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, hbb_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmap_and_set);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xmemory_std);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, g_qsort);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xrange);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, singleton_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xslice);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsprintf);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xsscanf);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_ascii);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xstring_utf);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xtree);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, context_t);
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, xva);
+UNITTEST_SUITE_DECLARE(cUnitTest, xinteger);
+UNITTEST_SUITE_DECLARE(cUnitTest, xtypes);
+UNITTEST_SUITE_DECLARE(cUnitTest, xallocator);
+UNITTEST_SUITE_DECLARE(cUnitTest, xbinary_search);
+UNITTEST_SUITE_DECLARE(cUnitTest, xbitfield);
+UNITTEST_SUITE_DECLARE(cUnitTest, xbtree);
+UNITTEST_SUITE_DECLARE(cUnitTest, buffer_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, carray_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, darray_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, xdouble);
+UNITTEST_SUITE_DECLARE(cUnitTest, xdtrie);
+UNITTEST_SUITE_DECLARE(cUnitTest, xendian);
+UNITTEST_SUITE_DECLARE(cUnitTest, xfloat);
+UNITTEST_SUITE_DECLARE(cUnitTest, guid_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, hbb_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, xmap_and_set);
+UNITTEST_SUITE_DECLARE(cUnitTest, xmemory_std);
+UNITTEST_SUITE_DECLARE(cUnitTest, g_qsort);
+UNITTEST_SUITE_DECLARE(cUnitTest, xrange);
+UNITTEST_SUITE_DECLARE(cUnitTest, singleton_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, xslice);
+UNITTEST_SUITE_DECLARE(cUnitTest, span);
+UNITTEST_SUITE_DECLARE(cUnitTest, xsprintf);
+UNITTEST_SUITE_DECLARE(cUnitTest, xsscanf);
+UNITTEST_SUITE_DECLARE(cUnitTest, xstring_ascii);
+UNITTEST_SUITE_DECLARE(cUnitTest, xstring_utf);
+UNITTEST_SUITE_DECLARE(cUnitTest, xtree);
+UNITTEST_SUITE_DECLARE(cUnitTest, context_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, xva);
 
 
-#ifndef X_NO_CUSTOM_INT64
-UNITTEST_SUITE_DECLARE(xCoreUnitTest, __xint64);
+#ifndef D_NO_CUSTOM_INT64
+UNITTEST_SUITE_DECLARE(cUnitTest, __xint64);
 #endif // X_NO_CUSTOM_INT64
 
 namespace ncore
@@ -121,7 +122,7 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
     gTestAllocator = &testAllocator;
     ncore::context_t::set_system_alloc(&testAllocator);
 
-    int r = UNITTEST_SUITE_RUN(reporter, xCoreUnitTest);
+    int r = UNITTEST_SUITE_RUN(reporter, cUnitTest);
     if (UnitTest::GetNumAllocations()!=0)
     {
         reporter.reportFailure(__FILE__, __LINE__, "cunittest", "memory leaks detected!");

@@ -4,7 +4,7 @@
 */
 
 #include "cbase/c_target.h"
-#ifndef X_NO_CUSTOM_INT64
+#ifndef D_NO_CUSTOM_INT64
 #include "cbase/c_limits.h"
 #include "cbase/private/c_uint64.h"
 #include "cbase/private/c_int64.h"

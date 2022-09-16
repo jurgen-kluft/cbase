@@ -64,7 +64,7 @@ namespace ncore
 
         virtual u32 v_deallocate(void* p)
         {
-            x_memset(p, 0xDA, sizeof(node));
+            nmem::memset(p, 0xDA, sizeof(node));
             node* n = (node*)p;
             n->m_next   = m_freelist;
             m_freelist  = n;

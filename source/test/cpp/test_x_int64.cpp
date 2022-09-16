@@ -1,8 +1,8 @@
 #include "cbase/c_target.h"
 
-#ifndef X_NO_CUSTOM_INT64
+#ifndef D_NO_CUSTOM_INT64
 
-#include "cbase/c_int64.h"
+#include "cbase/private/c_int64.h"
 #include "cunittest/cunittest.h"
 
 using namespace ncore;

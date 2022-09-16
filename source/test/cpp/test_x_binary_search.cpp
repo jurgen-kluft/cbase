@@ -10,7 +10,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        static s32		sComparePredicate(const void* inItem, const void* inData, s32 inIndex)
+        static s8		sComparePredicate(const void* inItem, const void* inData, s64 inIndex)
         {
             s32 a = *(s32*)inItem;
 
@@ -24,7 +24,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             return 0;
         }
 
-        static s32		sCompareBigPredicate(const void* inItem, const void* inData, s32 inIndex)
+        static s8		sCompareBigPredicate(const void* inItem, const void* inData, s64 inIndex)
         {
             u64 a = *(u64*)inItem;
             u64* data = (u64*)inData;
@@ -50,7 +50,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             };
 
             s32 n = 1890;
-            s32 idx_of_n = x_BinarySearch(&n, sorted_random_number_list, sizeof(sorted_random_number_list)/sizeof(s32), sComparePredicate);
+            s32 idx_of_n = g_BinarySearch(&n, sorted_random_number_list, sizeof(sorted_random_number_list)/sizeof(s32), sComparePredicate);
 
             CHECK_EQUAL(sorted_random_number_list[idx_of_n], n);
         }
@@ -63,10 +63,10 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             };
 
             s32 n = 1890;
-            u32 idx_of_n = x_BinarySearch(&n, list, sizeof(list)/sizeof(s32), sComparePredicate);
+            u32 idx_of_n = g_BinarySearch(&n, list, sizeof(list)/sizeof(s32), sComparePredicate);
             CHECK_EQUAL(0xffffffff, idx_of_n);
             n = 18;
-            idx_of_n = x_BinarySearch(&n, list, sizeof(list)/sizeof(s32), sComparePredicate);
+            idx_of_n = g_BinarySearch(&n, list, sizeof(list)/sizeof(s32), sComparePredicate);
             CHECK_EQUAL(0xffffffff, idx_of_n);
         }
 
@@ -84,7 +84,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             for (s32 i=0; i<7; ++i)
             {
                 s32 n = sorted_random_number_list[i];
-                s32 idx_of_n = x_BinarySearch(&n, sorted_random_number_list, sizeof(sorted_random_number_list)/sizeof(s32), sComparePredicate);
+                s32 idx_of_n = g_BinarySearch(&n, sorted_random_number_list, sizeof(sorted_random_number_list)/sizeof(s32), sComparePredicate);
                 CHECK_EQUAL(i, idx_of_n);
             }
         }
@@ -99,7 +99,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             for (s32 i=0; i<7; ++i)
             {
                 u64 n = sorted_random_number_list[i];
-                s32 idx_of_n = x_BinarySearch(&n, sorted_random_number_list, sizeof(sorted_random_number_list)/sizeof(u64), sCompareBigPredicate);
+                s32 idx_of_n = g_BinarySearch(&n, sorted_random_number_list, sizeof(sorted_random_number_list)/sizeof(u64), sCompareBigPredicate);
                 CHECK_EQUAL(i, idx_of_n);
             }
         }
@@ -121,7 +121,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             for (s32 i=0; i<N; ++i)
             {
                 s32 n = sorted_random_number_list[i];
-                s32 idx_of_n = x_LowerBound(&n, sorted_random_number_list, N, sComparePredicate);
+                s32 idx_of_n = g_LowerBound(&n, sorted_random_number_list, N, sComparePredicate);
 
                 s32 l = i;
                 while ((l>0) && (sorted_random_number_list[l-1] == n)) --l;
@@ -146,7 +146,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             for (s32 i=0; i<N; ++i)
             {
                 s32 n = sorted_random_number_list[i];
-                s32 idx_of_n = x_LowerBound(&n, sorted_random_number_list, N, sComparePredicate);
+                s32 idx_of_n = g_LowerBound(&n, sorted_random_number_list, N, sComparePredicate);
 
                 s32 l = i;
                 while ((l>0) && (sorted_random_number_list[l-1] == n)) --l;
@@ -170,7 +170,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             for (s32 i=0; i<N; ++i)
             {
                 s32 n = sorted_random_number_list[i];
-                s32 idx_of_n = x_UpperBound(&n, sorted_random_number_list, N, sComparePredicate);
+                s32 idx_of_n = g_UpperBound(&n, sorted_random_number_list, N, sComparePredicate);
 
                 s32 l = i;
                 while (((l+1) < (sizeof(sorted_random_number_list)/sizeof(u32))) && (sorted_random_number_list[l+1] == n)) ++l;
@@ -195,7 +195,7 @@ UNITTEST_SUITE_BEGIN(xbinary_search)
             for (s32 i=0; i<N; ++i)
             {
                 s32 n = sorted_random_number_list[i];
-                s32 idx_of_n = x_UpperBound(&n, sorted_random_number_list, N, sComparePredicate);
+                s32 idx_of_n = g_UpperBound(&n, sorted_random_number_list, N, sComparePredicate);
 
                 s32 l = i;
                 while (((l+1) < (sizeof(sorted_random_number_list)/sizeof(u32))) && (sorted_random_number_list[l+1] == n)) ++l;

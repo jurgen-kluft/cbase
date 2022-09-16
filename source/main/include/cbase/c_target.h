@@ -876,8 +876,8 @@ namespace ncore
     class __xint256;
     class __xuint256;
 
-    template <bool> struct xCompileTimeAssert;
-    template <> struct xCompileTimeAssert<true>
+    template <bool> struct CompileTimeAssert;
+    template <> struct CompileTimeAssert<true>
     {
         enum
         {

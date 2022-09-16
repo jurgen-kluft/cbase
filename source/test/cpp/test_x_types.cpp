@@ -43,7 +43,6 @@ UNITTEST_SUITE_BEGIN(xtypes)
 			CHECK_TRUE(sizeof(s128) == 16);
 			CHECK_TRUE(sizeof(f32) == 4);
 			CHECK_TRUE(sizeof(f64) == 8);
-			CHECK_TRUE(sizeof(bool32) == 4);
 			CHECK_TRUE(sizeof(bool) == 4 || sizeof(bool) == 1);
 
 			CHECK_TRUE(sizeof(uchar8)  == 1);
