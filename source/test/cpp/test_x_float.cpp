@@ -326,22 +326,12 @@ UNITTEST_SUITE_BEGIN(xfloat)
 			CHECK_EQUAL(nf32::sign(-2.0f, 0.5f),-1);
 			CHECK_EQUAL(nf32::sign(0.15625f, 0.5),0);
 			CHECK_EQUAL(nf32::sign(nf32::negativeZero(), 0.1f),0);
-
-			// this will break psp release compiling
-			// not compile errors, just break the compiler
-			// TODO: fix it
-			//CHECK_EQUAL(nf32::sign(0.1f, nf32::positiveZero()),1);
 		}
 
 		UNITTEST_TEST(IsZero)
 		{
 			CHECK_FALSE(nf32::isZero(0.0001f));
 			CHECK_TRUE(nf32::isZero(nf32::negativeZero()));
-
-			// this will break psp release compiling
-			// not compile errors, just break the compiler
-			// TODO: fix it
-			//CHECK_TRUE(nf32::isZero(nf32::positiveZero()));
 		}
 
 		UNITTEST_TEST(IsNearZero)

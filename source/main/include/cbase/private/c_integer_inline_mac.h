@@ -2,10 +2,8 @@
 
 namespace ncore
 {
-    // TODO: Optimize this using intrinsics
     namespace math
     {
-
         // find the number of trailing zeros in 16-bit value
         // if 'v==0' this function returns 0
         inline s8 countTrailingZeros(u16 integer)
@@ -133,10 +131,12 @@ namespace ncore
          */
         inline s8 countBits(u8 inInteger)
         {
-            inInteger -= ((inInteger >> 1) & 0x55555555);
-            inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
-            inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
-            return (s8)(inInteger & 0x0000003f);
+            // inInteger -= ((inInteger >> 1) & 0x55555555);
+            // inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
+            // inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
+            // return (s8)(inInteger & 0x0000003f);
+            u32 i = inInteger;
+            return __builtin_popcount(i);
         }
 
         /**
@@ -144,11 +144,13 @@ namespace ncore
          */
         inline s8 countBits(u16 inInteger)
         {
-            inInteger -= ((inInteger >> 1) & 0x55555555);
-            inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
-            inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
-            inInteger += (inInteger >> 8);
-            return (s8)(inInteger & 0x0000003f);
+            // inInteger -= ((inInteger >> 1) & 0x55555555);
+            // inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
+            // inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
+            // inInteger += (inInteger >> 8);
+            // return (s8)(inInteger & 0x0000003f);
+            u32 i = inInteger;
+            return __builtin_popcount(i);
         }
 
         /**
@@ -156,12 +158,14 @@ namespace ncore
          */
         inline s8 countBits(u32 inInteger)
         {
-            inInteger -= ((inInteger >> 1) & 0x55555555);
-            inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
-            inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
-            inInteger += (inInteger >> 8);
-            inInteger += (inInteger >> 16);
-            return (s8)(inInteger & 0x0000003f);
+            // inInteger -= ((inInteger >> 1) & 0x55555555);
+            // inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
+            // inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
+            // inInteger += (inInteger >> 8);
+            // inInteger += (inInteger >> 16);
+            // return (s8)(inInteger & 0x0000003f);
+            u32 i = inInteger;
+            return __builtin_popcount(i);
         }
 
         /**
@@ -169,19 +173,21 @@ namespace ncore
          */
         inline s8 countBits(u64 inInteger)
         {
-            u32 high = (u64(inInteger) >> 32) & 0xffffffff;
-            high -= ((high >> 1) & 0x55555555);
-            high = (((high >> 2) & 0x33333333) + (high & 0x33333333));
-            high = (((high >> 4) + high) & 0x0f0f0f0f);
-            high += (high >> 8);
-            high += (high >> 16);
-            u32 low = inInteger & 0xffffffff;
-            low -= ((low >> 1) & 0x55555555);
-            low = (((low >> 2) & 0x33333333) + (low & 0x33333333));
-            low = (((low >> 4) + low) & 0x0f0f0f0f);
-            low += (low >> 8);
-            low += (low >> 16);
-            return (s8)(low & 0x0000003f) + (s8)(high & 0x0000003f);
+            // u32 high = (u64(inInteger) >> 32) & 0xffffffff;
+            // high -= ((high >> 1) & 0x55555555);
+            // high = (((high >> 2) & 0x33333333) + (high & 0x33333333));
+            // high = (((high >> 4) + high) & 0x0f0f0f0f);
+            // high += (high >> 8);
+            // high += (high >> 16);
+            // u32 low = inInteger & 0xffffffff;
+            // low -= ((low >> 1) & 0x55555555);
+            // low = (((low >> 2) & 0x33333333) + (low & 0x33333333));
+            // low = (((low >> 4) + low) & 0x0f0f0f0f);
+            // low += (low >> 8);
+            // low += (low >> 16);
+            // return (s8)(low & 0x0000003f) + (s8)(high & 0x0000003f);
+            u64 i = inInteger;
+            return __builtin_popcountll(i);
         }
     } // namespace math
 } // namespace ncore
