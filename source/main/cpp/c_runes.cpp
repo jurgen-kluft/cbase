@@ -1892,15 +1892,32 @@ namespace ncore
         return sel;
     }
 
-    crunes_t selectOverlap(const crunes_t& lstr, const crunes_t& rstr)
+    crunes_t selectOverlap(const crunes_t& _lstr, const crunes_t& _rstr)
     {
-        // Find the last character of 'lstr' in 'rstr'
-        // When found start to expand the string in 'lstr' to the left
-        // while keep checking if 'rstr' also contains that character
+        cptr_t  lend    = get_end(_lstr);
+        cptr_t  rend    = get_end(_rstr);
 
-        ASSERT(false); // TODO
+        crunes_t lstr(_lstr);
+        while (!lstr.is_empty())
+        {
+            cptr_t  lcursor = get_begin(lstr);
+            cptr_t  rcursor = get_begin(_rstr);
+    
+            uchar32 lc, rc;
+            do
+            {
+                lc = read(lstr, lcursor);
+                rc = read(_rstr, rcursor);
+            } while (lc == rc && lcursor < lend && rcursor < rend);
 
-        return lstr;
+            if (lc == rc && lcursor == lend && rcursor <= rend) 
+            {
+                return crunes_t(lstr.m_ascii.m_bos, lstr.m_ascii.m_str, lstr.m_ascii.m_end, lstr.m_ascii.m_eos, lstr.m_type);
+            }
+            lstr.read();
+        }
+
+        return nothing_found(_lstr);
     }
 
     s32 compare(crunes_t const& _lstr, crunes_t const& _rstr, bool _casesensitive)
