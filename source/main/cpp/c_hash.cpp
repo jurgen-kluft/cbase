@@ -17,24 +17,24 @@ namespace ncore
     static u32 XXH_get32bits(const void* memPtr)
     {
         u8 const* bptr = (u8 const*)memPtr;
-        u32          val  = bptr[0];
-        val               = val << 8 | bptr[1];
-        val               = val << 8 | bptr[2];
-        val               = val << 8 | bptr[3];
+        u32       val  = bptr[0];
+        val            = val << 8 | bptr[1];
+        val            = val << 8 | bptr[2];
+        val            = val << 8 | bptr[3];
         return val;
     }
 
     static u64 XXH_get64bits(const void* memPtr)
     {
         u8 const* bptr = (u8 const*)memPtr;
-        u64          val  = bptr[0];
-        val               = val << 8 | bptr[1];
-        val               = val << 8 | bptr[2];
-        val               = val << 8 | bptr[3];
-        val               = val << 8 | bptr[4];
-        val               = val << 8 | bptr[5];
-        val               = val << 8 | bptr[6];
-        val               = val << 8 | bptr[7];
+        u64       val  = bptr[0];
+        val            = val << 8 | bptr[1];
+        val            = val << 8 | bptr[2];
+        val            = val << 8 | bptr[3];
+        val            = val << 8 | bptr[4];
+        val            = val << 8 | bptr[5];
+        val            = val << 8 | bptr[6];
+        val            = val << 8 | bptr[7];
         return val;
     }
 
@@ -58,15 +58,15 @@ namespace ncore
     {
         const u8* p    = (const u8*)input;
         const u8* bEnd = p + len;
-        u64          h64;
+        u64       h64;
 
         if (len >= 32)
         {
             const u8* const limit = bEnd - 32;
-            u64                v1    = seed + PRIME64_1 + PRIME64_2;
-            u64                v2    = seed + PRIME64_2;
-            u64                v3    = seed + 0;
-            u64                v4    = seed - PRIME64_1;
+            u64             v1    = seed + PRIME64_1 + PRIME64_2;
+            u64             v2    = seed + PRIME64_2;
+            u64             v3    = seed + 0;
+            u64             v4    = seed - PRIME64_1;
 
             do
             {
@@ -127,6 +127,85 @@ namespace ncore
     // ----------------------------------------------------------------------------
     u64 calchash(u8 const* data, u32 size) { return XXH64(data, size); }
 
+    u64 strhash(const char* str)
+    {
+        s32 i = 0;
+        while (*str != 0)
+        {
+            i++;
+        }
+        return XXH64(str, i);
+    }
+
+    u64 strhash64_lowercase(const char* str)
+    {
+        hashing_t hash;
+        hash.reset();
+
+        char buffer[32];
+        s32  i = 0;
+        while (*str != 0)
+        {
+            buffer[i++] = *str++;
+            if (i == 32)
+            {
+                hash.hash(buffer, i * sizeof(char));
+                i = 0;
+            }
+        }
+        if (i > 0)
+        {
+            hash.hash(buffer, i * sizeof(char));
+        }
+        return hash.finalize();
+    }
+
+    static u32 hash64_to_hash32(u64 key)
+    {
+        key = (~key) + (key << 18); // key = (key << 18) - key - 1;
+        key = key ^ (key >> 31);
+        key = key * 21; // key = (key + (key << 2)) + (key << 4);
+        key = key ^ (key >> 11);
+        key = key + (key << 6);
+        key = key ^ (key >> 22);
+        return (u32)key;
+    }
+
+    u32 strhash32(const char* str)
+    {
+        s32 i = 0;
+        while (*str != 0)
+        {
+            i++;
+        }
+        u64 const hash64 = XXH64(str, i);
+        return hash64_to_hash32(hash64);
+    }
+
+    u32 strhash32_lowercase(const char* str)
+    {
+        hashing_t hash;
+        hash.reset();
+
+        char buffer[32];
+        s32  i = 0;
+        while (*str != 0)
+        {
+            buffer[i++] = *str++;
+            if (i == 32)
+            {
+                hash.hash(buffer, i * sizeof(char));
+                i = 0;
+            }
+        }
+        if (i > 0)
+        {
+            hash.hash(buffer, i * sizeof(char));
+        }
+        u64 const hash64 = hash.finalize();
+        return hash64_to_hash32(hash64);
+    }
+
 } // namespace ncore
 
 namespace ncore
@@ -182,7 +261,15 @@ namespace ncore
             *dst++ = *src++;
     }
 
-    hashing_t::hashing_t() : d_v0(0), d_v1(0), d_v2(0), d_v3(0), d_bufSize(0), d_totalLength(0) {}
+    hashing_t::hashing_t()
+        : d_v0(0)
+        , d_v1(0)
+        , d_v2(0)
+        , d_v3(0)
+        , d_bufSize(0)
+        , d_totalLength(0)
+    {
+    }
 
     void hashing_t::reset()
     {
@@ -276,9 +363,11 @@ namespace ncore
         hashing_t hash;
         hash.reset();
 
+        // TODO deal correctly with ASCII, UTF8, UTF16 and UTF32
+
         runes_reader_t reader(strdata);
-        uchar32 buffer[32];
-        s32 i = 0;
+        uchar32        buffer[32];
+        s32            i = 0;
         while (!reader.at_end())
         {
             buffer[i++] = reader.read();

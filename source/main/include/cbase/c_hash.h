@@ -37,6 +37,11 @@ namespace ncore
     };
 
     u64 calchash(u8 const* data, u32 size);
+    u64 strhash(const char* str);
+    u64 strhash_lowercase(const char* str);
+    u32 strhash32(const char* str);
+    u32 strhash32_lowercase(const char* str);
+    
     u64 calchash(crunes_t const& str);
 
     template <typename K> class hasher_t
