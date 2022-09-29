@@ -198,6 +198,10 @@ namespace ncore
                 : m_utf32(ptr)
             {
             }
+            ptr_t(const ptr_t& other) 
+                : m_ascii(other.m_ascii)
+            {
+            }
 
             ptr_t& operator=(const ptr_t& other)
             {
@@ -301,6 +305,10 @@ namespace ncore
             }
             ptr_t(utf32::pcrune ptr)
                 : m_utf32(ptr)
+            {
+            }
+            ptr_t(const ptr_t& other) 
+                : m_ascii(other.m_ascii)
             {
             }
 

@@ -1,7 +1,7 @@
 #include "cbase/c_target.h"
 #ifdef TARGET_PC
 
-#include <string>
+#include <string.h>
 
 #include "cbase/c_memory.h"
 #include "cbase/c_integer.h"
@@ -22,6 +22,7 @@ namespace ncore
             , mAllocationCount(0)
         {
         }
+        ~allocator_win32_system() {}
 
         void init()
         {
@@ -42,10 +43,14 @@ namespace ncore
 
         virtual void* v_allocate(u32 size, u32 alignment)
         {
+#ifdef COMPILER_MSVC
 #ifdef USE_MALLOC_DBG
             void* mem = _aligned_malloc_dbg(size, alignment, nullptr, 0);
 #else
             void* mem = _aligned_malloc(size, alignment);
+#endif
+#else
+            void* mem = nullptr;
 #endif
             ++mAllocationCount;
             return mem;
@@ -54,10 +59,12 @@ namespace ncore
         virtual u32 v_deallocate(void* ptr)
         {
             --mAllocationCount;
+#ifdef COMPILER_MSVC
 #ifdef USE_MALLOC_DBG
             _aligned_free_dbg(ptr);
 #else
             _aligned_free(ptr);
+#endif
 #endif
             return 0;
         }
@@ -69,9 +76,6 @@ namespace ncore
             mDefaultAlignment = 0;
             mAllocationCount  = 0;
         }
-
-        void* operator new(uint_t num_bytes, void* mem) { return mem; }
-        void  operator delete(void* pMem, void*) {}
 
         s32 mInitialized;
         s32 mDefaultAlignment;

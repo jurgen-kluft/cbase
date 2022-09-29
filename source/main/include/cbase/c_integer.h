@@ -104,8 +104,10 @@ namespace ncore
 //==============================================================================
 #include "cbase/private/c_integer_inline.h"
 
-#if defined TARGET_PC
+#if defined TARGET_PC && defined COMPILER_MSVC
 #include "cbase/private/c_integer_inline_win32.h"
+#elif defined TARGET_PC && defined COMPILER_CLANG
+#include "cbase/private/c_integer_inline_generic.h"
 #elif defined TARGET_MAC
 #include "cbase/private/c_integer_inline_mac.h"
 #else

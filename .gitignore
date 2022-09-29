@@ -16,7 +16,7 @@ tags
 !*.h
 !*.inl
 
-!*.build
+!*.zig
 
 !*.go
 

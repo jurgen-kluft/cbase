@@ -795,7 +795,7 @@ namespace ncore
         if (can_write(buf.size()))
         {
             uint_t const n = buf.size();
-            write(n);
+            write((u64)n);
             u8*       dst = (u8*)m_buffer + m_cursor;
             u8 const* src = buf.m_const;
             for (uint_t i = 0; i < n; i++)
@@ -815,7 +815,7 @@ namespace ncore
         if (can_write(4 + 8 + size))
         {
             write(str.m_type);
-            write(size);
+            write((u64)size);
 
             char* dststr = (char*)m_buffer + m_cursor;
             while (srcstr < srcend)

@@ -38,11 +38,7 @@ namespace ncore
         inline s8 countLeadingZeros(u32 v) { return (s8)::__lzcnt(v); }
         // find the number of leading zeros in 64-bit v
         // if 'v==0' this function returns 64
-        inline s8 countLeadingZeros(u64 v)
-        {
-            return (s8)::__lzcnt64(v);
-            ;
-        }
+        inline s8 countLeadingZeros(u64 v) { return (s8)::__lzcnt64(v); }
 
         // Return v but with only the Least Significant Bit "1"
         inline u32 leastSignificantOneBit(u32 integer) { return (integer ^ (integer & (integer - 1))); }

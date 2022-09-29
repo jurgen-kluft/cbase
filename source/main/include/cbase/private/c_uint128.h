@@ -73,8 +73,8 @@ namespace ncore
 		 */
 		__xuint128& 			operator++();
 		__xuint128& 			operator--();
-		__xuint128	 			operator++(s32)											{ __xuint128 r(*this); r++; return r; }
-		__xuint128 				operator--(s32)											{ __xuint128 r(*this); r--; return r; }
+		__xuint128	 			operator++(s32)											{ __xuint128 r(*this); ++r; return r; }
+		__xuint128 				operator--(s32)											{ __xuint128 r(*this); --r; return r; }
 		__xuint128& 			operator*=(const __xuint128& value);
 		__xuint128& 			operator/=(const __xuint128& value);
 		__xuint128& 			operator+=(const __xuint128& value);

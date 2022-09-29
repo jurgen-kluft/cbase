@@ -376,6 +376,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_DEBUG
 #        define TARGET_TEST
@@ -392,6 +393,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_DEV
 #        define TARGET_TEST
@@ -407,6 +409,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_RELEASE
 #        define TARGET_TEST
@@ -422,6 +425,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_DEBUG
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -437,6 +441,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_DEV
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -451,6 +456,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_RELEASE
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -465,6 +471,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_RETAIL
 #        define TARGET_FINAL
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -479,6 +486,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_CLIENT
 #        define TARGET_DEBUG
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -494,6 +502,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_CLIENT
 #        define TARGET_DEV
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -508,6 +517,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_CLIENT
 #        define TARGET_RELEASE
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -522,6 +532,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_CLIENT
 #        define TARGET_FINAL
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -536,6 +547,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_RETAIL
 #        define TARGET_DEBUG
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -551,6 +563,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_RETAIL
 #        define TARGET_DEV
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -566,6 +579,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_RETAIL
 #        define TARGET_FINAL
 #        define TARGET_PLATFORM PLATFORM_PC
@@ -580,6 +594,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_MFC
 #        define TARGET_DEBUG
@@ -599,6 +614,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_MFC
 #        define TARGET_DEV
@@ -618,6 +634,7 @@ namespace ncore
 #        define MULTIPLE_TARGETS
 #    else
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_DEVKIT
 #        define TARGET_MFC
 #        define TARGET_RELEASE
@@ -639,6 +656,7 @@ namespace ncore
 #    ifdef _MSC_VER // and we are using the Microsoft compiler...
 #        undef TARGET_PC
 #        define TARGET_PC
+#        define TARGET_64BIT
 #        define TARGET_PLATFORM PLATFORM_PC
 #        define VALID_TARGET
 
@@ -651,6 +669,7 @@ namespace ncore
 #    elif defined(__APPLE__) && defined(__clang__)
 #        undef TARGET_MAC
 #        define TARGET_MAC
+#        define TARGET_64BIT
 #        define TARGET_PLATFORM PLATFORM_MAC
 #        define VALID_TARGET
 
@@ -805,9 +824,8 @@ namespace ncore
 #undef COMPILER_VERSION
 
 #ifdef TARGET_PC
+#    define TARGET_OS_WINDOWS
 #    ifdef _MSC_VER
-
-#        define TARGET_OS_WINDOWS
 
     // 1200      == VC++ 6.0
     // 1200-1202 == VC++ 4
@@ -849,6 +867,10 @@ namespace ncore
 #        else
 #            error x_target, error; Unknown _MSVC_VER compiler version
 #        endif
+#    elif defined(__clang__)
+#        define COMPILER_CLANG
+#        define COMPILER_DEFAULT
+#        define COMPILER_VERSION 7
 #    else
 #        error x_target, error; This compiler is not supported for TARGET_PC
 #    endif
@@ -963,8 +985,8 @@ namespace ncore
 #    define D_INT8    char
 #    define D_INT16   short
 #    define D_INT32   int
-#    define D_INT64   signed long
-#    define D_UINT64  unsigned long
+#    define D_INT64   signed long long
+#    define D_UINT64  unsigned long long
 #    define D_INT128  __xint128
 #    define D_UINT128 __xuint128
 #    define D_INT256  __xint256
@@ -980,9 +1002,9 @@ namespace ncore
     };
 
 #    ifdef TARGET_64BIT
-#        define D_SIZE              unsigned long
-#        define D_INT               signed long
-#        define D_PTR_SIZED_INT     signed long
+#        define D_SIZE              unsigned long long
+#        define D_INT               signed long long
+#        define D_PTR_SIZED_INT     signed long long
 #        define D_ALIGNMENT_DEFAULT 8
 #    else
 #        define D_SIZE              unsigned int
@@ -990,23 +1012,6 @@ namespace ncore
 #        define D_PTR_SIZED_INT     int
 #        define D_ALIGNMENT_DEFAULT 4
 #    endif
-
-    static inline void TestTypeSizes()
-    {
-        CompileTimeAssert<sizeof(D_SIZE) == sizeof(void*)>();
-        CompileTimeAssert<sizeof(D_PTR_SIZED_INT) == sizeof(void*)>();
-
-        CompileTimeAssert<sizeof(int) == 4>();
-        CompileTimeAssert<sizeof(short int) == 2>();
-        CompileTimeAssert<sizeof(long int) == 8>();
-
-        CompileTimeAssert<sizeof(D_BOOL) == 4>();
-        CompileTimeAssert<sizeof(D_INT8) == 1>();
-        CompileTimeAssert<sizeof(D_INT16) == 2>();
-        CompileTimeAssert<sizeof(D_INT32) == 4>();
-        CompileTimeAssert<sizeof(D_INT64) == 8>();
-        CompileTimeAssert<sizeof(D_UINT64) == 8>();
-    }
 
 #    define D_LITTLE_ENDIAN 4321
 #    define D_FLOAT         float

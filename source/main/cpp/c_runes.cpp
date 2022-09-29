@@ -2734,6 +2734,7 @@ namespace ncore
         replaceSelection(_str, selected, _replace);
     }
 
+    // TODO implementations of 'insert'
     void insert(runes_t& str, crunes_t const& insert) {}
     void insert(runes_t& str, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment) {}
     void insert(runes_t& str, crunes_t const& selection, crunes_t const& insert) {}
