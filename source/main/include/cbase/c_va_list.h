@@ -12,7 +12,7 @@ namespace ncore
     /**
      *------------------------------------------------------------------------------
      * Author:
-     *     Jurgen Kluft
+     *     Jurgen
      * Description:
      *     va_list_t using va_t is a type safe implementation of the variable argument
      *     functionality that is provided by C/C++. The disadvantage of the variable
@@ -391,7 +391,7 @@ namespace ncore
     /**
      *------------------------------------------------------------------------------
      * Author:
-     *     Jurgen Kluft
+     *     Jurgen
      * Description:
      *     va_r_list_t using va_r_t is a type safe implementation of 'pointer to argument'
      *     passing used by sscanf.

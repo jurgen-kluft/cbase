@@ -1,7 +1,15 @@
 #include "cbase/c_target.h"
 #ifdef TARGET_PC
 
+#ifdef TARGET_DEBUG
+#define USE_MALLOC_DBG
+#endif
+
 #include <string.h>
+
+#ifdef USE_MALLOC_DBG
+#    include <crtdbg.h>
+#endif
 
 #include "cbase/c_memory.h"
 #include "cbase/c_integer.h"
@@ -9,10 +17,6 @@
 
 namespace ncore
 {
-#ifdef TARGET_DEBUG
-    #define USE_MALLOC_DBG
-#endif
-
     class allocator_win32_system : public alloc_t
     {
     public:
