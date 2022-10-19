@@ -1,4 +1,5 @@
 const std = @import("std");
+const ArrayList = std.ArrayList;
 
 pub fn build(b: *std.build.Builder) void {
     const target = b.standardTargetOptions(.{});
@@ -7,6 +8,26 @@ pub fn build(b: *std.build.Builder) void {
     const cbaselib = b.addStaticLibrary("cbase", null);
     cbaselib.setTarget(target);
     cbaselib.setBuildMode(mode);
+
+    var coreflags = ArrayList([]const u8).init(b.allocator);
+    defer coreflags.deinit();
+
+    coreflags.append("strict-prototypes");
+    try coreflags.append("write-strings");
+    try coreflags.append("no-missing-field-initializers");
+    try coreflags.append("no-shift-count-overflow");
+    try coreflags.append("no-unused-parameter");
+
+    try coreflags.append("TARGET_RELEASE");
+    try coreflags.append("TARGET_TEST");
+    try coreflags.append("NDEBUG");
+
+    if (cbaselib.target.isWindows()) {    
+        try coreflags.append("PLATFORM_PC");
+    } else if (cbaselib.target.isDarwin()) {
+        try coreflags.append("PLATFORM_MAC");
+    }
+
     cbaselib.linkLibCpp();
     cbaselib.addIncludeDir("source/main/include");
     cbaselib.force_pic = true;
@@ -52,11 +73,9 @@ pub fn build(b: *std.build.Builder) void {
         "-Wno-shift-count-overflow",
         "-Wno-unused-parameter",
         "-DTARGET_RELEASE",
-        "-DTARGET_DEV",
+        "-DTARGET_TEST",
         "-DNDEBUG",
-        "-DTARGET_PC",
    });
-
 
     const cunittestlib = b.addStaticLibrary("cunittest", null);
     cunittestlib.setTarget(target);
@@ -96,11 +115,14 @@ pub fn build(b: *std.build.Builder) void {
         "-Wno-shift-count-overflow",
         "-Wno-unused-parameter",
         "-DTARGET_RELEASE",
-        "-DTARGET_DEV",
+        "-DTARGET_TEST",
         "-DNDEBUG",
-        "-DTARGET_PC",
    });
-
+    if (cunittestlib.target.isWindows()) {    
+        cunittestlib.defineCMacro("PLATFORM_PC", null);
+    } else if (cunittestlib.target.isDarwin()) {
+        cunittestlib.defineCMacro("PLATFORM_MAC", null);
+    }
 
     const cbase_test = b.addExecutable("cbase-test", null);
     cbase_test.setTarget(target);
@@ -113,6 +135,7 @@ pub fn build(b: *std.build.Builder) void {
     cbase_test.addIncludeDir("source/test/include");
     cbase_test.addIncludeDir("../cunittest/source/main/include");
     cbase_test.addCSourceFiles(&.{
+        "../cunittest/source/main/cpp/entry/ut_Entry_Mac.cpp",
         "source/test/cpp/test_main.cpp",
         "source/test/cpp/test_span.cpp",
         "source/test/cpp/test_x_allocator.cpp",
@@ -150,9 +173,14 @@ pub fn build(b: *std.build.Builder) void {
         "-Wno-shift-count-overflow",
         "-Wno-unused-parameter",
         "-DTARGET_RELEASE",
-        "-DTARGET_DEV",
+        "-DTARGET_TEST",
         "-DNDEBUG",
-        "-DTARGET_PC",
+        "-DTARGET_MAC",
     });
+    if (cbase_test.target.isWindows()) {    
+        cbase_test.defineCMacro("PLATFORM_PC", null);
+    } else if (cbase_test.target.isDarwin()) {
+        cbase_test.defineCMacro("PLATFORM_MAC", null);
+    }
 
 }

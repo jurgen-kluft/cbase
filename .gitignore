@@ -5,6 +5,7 @@
 vendor/
 t2-output/
 target/
+zig-cache/
 tags
 
 #except the following files

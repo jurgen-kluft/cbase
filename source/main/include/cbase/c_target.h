@@ -961,6 +961,9 @@ namespace ncore
 #    pragma warning(disable : 4800)
 
 #elif defined(COMPILER_CLANG)
+
+#pragma message "clang compiler"
+
 #    define D_NO_CUSTOM_INT64
 #    define D_NO_CUSTOM_UINT64
     class __xint128;
@@ -985,8 +988,8 @@ namespace ncore
 #    define D_INT8    char
 #    define D_INT16   short
 #    define D_INT32   int
-#    define D_INT64   signed long long
-#    define D_UINT64  unsigned long long
+#    define D_INT64   signed long 
+#    define D_UINT64  unsigned long 
 #    define D_INT128  __xint128
 #    define D_UINT128 __xuint128
 #    define D_INT256  __xint256
@@ -1002,9 +1005,9 @@ namespace ncore
     };
 
 #    ifdef TARGET_64BIT
-#        define D_SIZE              unsigned long long
-#        define D_INT               signed long long
-#        define D_PTR_SIZED_INT     signed long long
+#        define D_SIZE              unsigned long 
+#        define D_INT               signed long 
+#        define D_PTR_SIZED_INT     signed long 
 #        define D_ALIGNMENT_DEFAULT 8
 #    else
 #        define D_SIZE              unsigned int
