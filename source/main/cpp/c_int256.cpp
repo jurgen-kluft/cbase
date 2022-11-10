@@ -1,9 +1,4 @@
-/**
-* @file HwInt256.cpp
-* Core custom 256 bit signed integer
-*/
-
-#include "cbase/c_target.h"
+#include "cbase/private/c_int256.h"
 #ifndef D_NO_CUSTOM_INT256
 
 #include "cbase/c_debug.h"
@@ -12,16 +7,14 @@
 #include "cbase/private/c_uint64.h"
 #include "cbase/private/c_int128.h"
 #include "cbase/private/c_uint128.h"
-#include "cbase/private/c_int256.h"
 #include "cbase/private/c_uint256.h"
 
 namespace ncore {
 
-	const __xint256	__xint256::Zero;
-	const __xint256	__xint256::One((u32)1);
+	const s256	s256::Zero;
+	const s256	s256::One((u32)1);
 
-
-	__xint256::__xint256()
+	s256::s256()
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -34,11 +27,11 @@ namespace ncore {
 	}
 
 
-	__xint256::__xint256(s16 value)
+	s256::s256(s16 value)
 	{
 		if (value < 0)
 		{
-			*this = __xint256((u16)-value);
+			*this = s256((u16)-value);
 			TwosComplement();
 		}
 		else
@@ -54,7 +47,7 @@ namespace ncore {
 		}
 	}
 
-	__xint256::__xint256(u16 value)
+	s256::s256(u16 value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -66,11 +59,11 @@ namespace ncore {
 		m_LSB = value;
 	}
 
-	__xint256::__xint256(s32 value)
+	s256::s256(s32 value)
 	{
 		if (value < 0)
 		{
-			*this = __xint256((u32)-value);
+			*this = s256((u32)-value);
 			TwosComplement();
 		}
 		else
@@ -86,7 +79,7 @@ namespace ncore {
 		}
 	}
 
-	__xint256::__xint256(u32 value)
+	s256::s256(u32 value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -98,11 +91,11 @@ namespace ncore {
 		m_LSB = value;
 	}
 
-	__xint256::__xint256(const s64& value)
+	s256::s256(const s64& value)
 	{
 		if (value < 0)
 		{
-			*this = __xint256(u64(-value));
+			*this = s256(u64(-value));
 			TwosComplement();
 		}
 		else
@@ -118,7 +111,7 @@ namespace ncore {
 		}
 	}
 
-	__xint256::__xint256(const u64& value)
+	s256::s256(const u64& value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -130,11 +123,11 @@ namespace ncore {
 		m_LSB = value&0xFFFFFFFF;
 	}
 
-	__xint256::__xint256(const s128& value)
+	s256::s256(const s128& value)
 	{
 		if (value < 0)
 		{
-			*this = __xint256(u128(-value));
+			*this = s256(u128(-value));
 			TwosComplement();
 		}
 		else
@@ -150,7 +143,7 @@ namespace ncore {
 		}
 	}
 
-	__xint256::__xint256(const u128& value)
+	s256::s256(const u128& value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -162,17 +155,17 @@ namespace ncore {
 		m_LSB = ((s32)value);
 	}
 
-	__xint256::__xint256(const __xint256& value)
+	s256::s256(const s256& value)
 	{
 		*this = value;
 	}
 
-	__xint256::__xint256(const __xuint256& value)
+	s256::s256(const u256& value)
 	{
 		*this = value;
 	}
 
-	__xint256::__xint256(u32 b255_224, u32 b223_192, u32 b191_160, u32 b159_128, u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0)
+	s256::s256(u32 b255_224, u32 b223_192, u32 b191_160, u32 b159_128, u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0)
 		:m_MSB(b255_224)
 		,m_FSB(b223_192)
 		,m_ESB(b191_160)
@@ -184,7 +177,7 @@ namespace ncore {
 	{
 	}
 
-	__xint256& __xint256::operator=(const __xint256& value)
+	s256& s256::operator=(const s256& value)
 	{
 		m_MSB = value.m_MSB;
 		m_FSB = value.m_FSB;
@@ -197,7 +190,7 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint256& __xint256::operator=(const __xuint256& value)
+	s256& s256::operator=(const u256& value)
 	{
 		m_MSB = value.m_MSB;
 		m_FSB = value.m_FSB;
@@ -210,29 +203,29 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint256 operator-(const __xint256& value)
+	s256 operator-(const s256& value)
 	{
-		__xint256 rVal(value);
+		s256 rVal(value);
 		rVal.operator~();
 		return rVal;
 	}
 
-	__xint256& __xint256::operator++()
+	s256& s256::operator++()
 	{
 		*this = *this + One;
 		return *this;
 	}
 
-	__xint256& __xint256::operator--()
+	s256& s256::operator--()
 	{
 		*this = *this - One;
 		return *this;
 	}
 
-	__xint256& __xint256::operator*=(const __xint256& value)
+	s256& s256::operator*=(const s256& value)
 	{
-		__xint256 A(*this);
-		__xint256 B(value);
+		s256 A(*this);
+		s256 B(value);
 
 		// Correctly handle negative values
 		bool bANegative = false;
@@ -248,7 +241,7 @@ namespace ncore {
 			B.Negate();
 		}
 
-		__xint256 result;
+		s256 result;
 		for (s32 i=0; i<NUM_INT32; i++)
 		{
 			for (s32 j=0; (i+j)<NUM_INT32; j++)
@@ -263,15 +256,15 @@ namespace ncore {
 
 				s32 s = (i+j)*32;
 				if (r1!=0)
-					result += __xint256(r1) << s;
+					result += s256(r1) << s;
 				s += 16;
 				if (r2!=0)
-					result += __xint256(r2) << s;
+					result += s256(r2) << s;
 				if (r4!=0)
-					result += __xint256(r4) << s;
+					result += s256(r4) << s;
 				s += 16;
 				if (r3!=0)
-					result += __xint256(r3) << s;
+					result += s256(r3) << s;
 			}
 		}
 
@@ -282,16 +275,16 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint256& __xint256::operator/=(const __xint256& value)
+	s256& s256::operator/=(const s256& value)
 	{
-		__xint256 Remainder;
-		__xint256 Quotient;
+		s256 Remainder;
+		s256 Quotient;
 		Modulus(value, Quotient, Remainder);
 		*this = Quotient;
 		return *this;
 	}
 
-	__xint256& __xint256::operator+=(const __xint256& _value)
+	s256& s256::operator+=(const s256& _value)
 	{
 		u64 t = ((u64)m_LSB) + ((u64)_value.m_LSB);
 		s32 nCarry = (t > 0xFFFFFFFF);
@@ -326,7 +319,7 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint256& __xint256::operator-=(const __xint256& _value)
+	s256& s256::operator-=(const s256& _value)
 	{
 		u64 t = ((u64)m_LSB) - ((u64)_value.m_LSB);
 		s32 nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
@@ -362,9 +355,9 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint256 __xint256::operator~() const
+	s256 s256::operator~() const
 	{
-		__xint256 rVal;
+		s256 rVal;
 
 		rVal.m_MSB = ~m_MSB;
 		rVal.m_FSB = ~m_FSB;
@@ -378,7 +371,7 @@ namespace ncore {
 		return rVal;
 	}
 
-	void __xint256::Negate()
+	void s256::Negate()
 	{
 		if (IsPositive())
 			TwosComplement();
@@ -386,17 +379,17 @@ namespace ncore {
 			InverseTwosComplement();
 	}
 
-	bool __xint256::IsNegative() const
+	bool s256::IsNegative() const
 	{
 		return bool((m_MSB & 0x80000000) != 0);
 	}
 
-	bool __xint256::IsPositive() const
+	bool s256::IsPositive() const
 	{
 		return bool((m_MSB & 0x80000000) == 0);
 	}
 
-	void __xint256::TwosComplement()
+	void s256::TwosComplement()
 	{
 		m_MSB = ~m_MSB;
 		m_FSB = ~m_FSB;
@@ -409,7 +402,7 @@ namespace ncore {
 		operator++();
 	}
 
-	void __xint256::InverseTwosComplement()
+	void s256::InverseTwosComplement()
 	{
 		operator--();
 		m_MSB = ~m_MSB;
@@ -422,9 +415,9 @@ namespace ncore {
 		m_LSB = ~m_LSB;
 	}
 
-	__xint256 __xint256::operator>>(s32 nShift) const
+	s256 s256::operator>>(s32 nShift) const
 	{
-		__xint256 rVal;
+		s256 rVal;
 
 		if (nShift > 0)
 		{
@@ -466,9 +459,9 @@ namespace ncore {
 		return rVal;
 	}
 
-	__xint256 __xint256::operator<<(s32 nShift) const
+	s256 s256::operator<<(s32 nShift) const
 	{
-		__xint256 rVal;
+		s256 rVal;
 
 		if (nShift > 0)
 		{
@@ -528,19 +521,19 @@ namespace ncore {
 		return rVal;
 	}
 
-	__xint256& __xint256::operator>>=(s32 nShift)
+	s256& s256::operator>>=(s32 nShift)
 	{
 		*this = (*this >> nShift);
 		return *this;
 	}
 
-	__xint256& __xint256::operator<<=(s32 nShift)
+	s256& s256::operator<<=(s32 nShift)
 	{
 		*this = (*this << nShift);
 		return *this;
 	}
 
-	bool __xint256::IsBitSet(s32 nIndex) const
+	bool s256::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -549,7 +542,7 @@ namespace ncore {
 		return bool((mUInt32[dwBitIndex] & dwBitMask) != 0);
 	}
 
-	void __xint256::SetBit(s32 nIndex, bool value)
+	void s256::SetBit(s32 nIndex, bool value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -562,41 +555,41 @@ namespace ncore {
 			mUInt32[dwBitIndex] = mUInt32[dwBitIndex] & ~dwBitMask;
 	}
 
-	__xint256& __xint256::operator^=(const __xint256& value)
+	s256& s256::operator^=(const s256& value)
 	{
 		for (s32 i=0; i<NUM_INT32; ++i)
 			mUInt32[i] = mUInt32[i] ^ value.mUInt32[i];
 		return *this;
 	}
 
-	__xint256& __xint256::operator|=(const __xint256& value)
+	s256& s256::operator|=(const s256& value)
 	{
 		for (s32 i=0; i<NUM_INT32; ++i)
 			mUInt32[i] = mUInt32[i] | value.mUInt32[i];
 		return *this;
 	}
 
-	__xint256& __xint256::operator&=(const __xint256& value)
+	s256& s256::operator&=(const s256& value)
 	{
 		for (s32 i=0; i<NUM_INT32; ++i)
 			mUInt32[i] = mUInt32[i] & value.mUInt32[i];
 		return *this;
 	}
 
-	__xint256& __xint256::operator%=(const __xint256& value)
+	s256& s256::operator%=(const s256& value)
 	{
-		__xint256 Remainder;
-		__xint256 Quotient;
+		s256 Remainder;
+		s256 Quotient;
 		Modulus(value, Quotient, Remainder);
 		*this = Remainder;
 		return *this;
 	}
 
-	void __xint256::Modulus(const __xint256& divisor, __xint256& Quotient, __xint256& Remainder) const
+	void s256::Modulus(const s256& divisor, s256& Quotient, s256& Remainder) const
 	{
 		//Correctly handle negative values
-		__xint256 tempDividend(*this);
-		__xint256 tempDivisor(divisor);
+		s256 tempDividend(*this);
+		s256 tempDivisor(divisor);
 
 		bool bDividendNegative = false;
 		bool bDivisorNegative = false;
@@ -646,7 +639,7 @@ namespace ncore {
 		}
 	}
 
-	s32	__xint256::Compare(const __xint256& other) const
+	s32	s256::Compare(const s256& other) const
 	{
 		if (this == &other)
 			return 0;
@@ -673,11 +666,11 @@ namespace ncore {
 		return 0;
 	}
 
-	__xint256::operator s32() const
+	s256::operator s32() const
 	{
 		if (IsNegative())
 		{
-			__xint256 t(*this);
+			s256 t(*this);
 			t.Negate();
 			return -t;
 		}
@@ -688,18 +681,18 @@ namespace ncore {
 		}
 	}
 
-	__xint256::operator u32() const
+	s256::operator u32() const
 	{
 		ASSERT(m_ASB == 0 && m_BSB == 0 && m_CSB == 0 && m_DSB == 0 && m_ESB == 0 && m_FSB == 0 && m_MSB == 0);
 		ASSERT(!IsNegative());
 		return m_LSB;
 	}
 
-	__xint256::operator s64() const
+	s256::operator s64() const
 	{
 		if (IsNegative())
 		{
-			__xint256 t(*this);
+			s256 t(*this);
 			t.Negate();
 			return -t;
 		}
@@ -710,7 +703,7 @@ namespace ncore {
 		}
 	}
 
-	__xint256::operator u64() const
+	s256::operator u64() const
 	{
 		ASSERT(m_ASB == 0 && m_BSB == 0 && m_CSB == 0 && m_DSB == 0 && m_ESB == 0 && m_FSB == 0 && m_MSB == 0);
 		ASSERT(!IsNegative());

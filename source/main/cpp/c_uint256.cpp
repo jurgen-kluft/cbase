@@ -1,9 +1,4 @@
-/**
-* @file HwUInt256.cpp
-* Core custom 256 bit unsigned integer
-*/
-
-#include "cbase/c_target.h"
+#include "cbase/private/c_uint256.h"
 #ifndef D_NO_CUSTOM_UINT256
 #include "cbase/c_debug.h"
 #include "cbase/private/c_int64.h"
@@ -11,14 +6,13 @@
 #include "cbase/private/c_int128.h"
 #include "cbase/private/c_uint128.h"
 #include "cbase/private/c_int256.h"
-#include "cbase/private/c_uint256.h"
 
 namespace ncore 
 {
-	const __xuint256	__xuint256::Zero;
-	const __xuint256	__xuint256::One((u32)1);
+	const u256	u256::Zero;
+	const u256	u256::One((u32)1);
 
-	__xuint256::__xuint256()
+	u256::u256()
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -30,7 +24,7 @@ namespace ncore
 		m_LSB = 0;
 	}
 
-	__xuint256::__xuint256(s8 value)
+	u256::u256(s8 value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -42,7 +36,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint256::__xuint256(u8 value)
+	u256::u256(u8 value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -54,7 +48,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint256::__xuint256(s16 value)
+	u256::u256(s16 value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -66,7 +60,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint256::__xuint256(u16 value)
+	u256::u256(u16 value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -78,7 +72,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint256::__xuint256(s32 value)
+	u256::u256(s32 value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -90,7 +84,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint256::__xuint256(u32 value)
+	u256::u256(u32 value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -102,7 +96,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint256::__xuint256(const s64& value)
+	u256::u256(const s64& value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -114,7 +108,7 @@ namespace ncore
 		m_LSB = value&0xFFFFFFFF;
 	}
 
-	__xuint256::__xuint256(const u64& value)
+	u256::u256(const u64& value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -126,7 +120,7 @@ namespace ncore
 		m_LSB = value&0xFFFFFFFF;
 	}
 
-	__xuint256::__xuint256(const s128& value)
+	u256::u256(const s128& value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -138,7 +132,7 @@ namespace ncore
 		m_LSB = ((u32)value);
 	}
 
-	__xuint256::__xuint256(const u128& value)
+	u256::u256(const u128& value)
 	{
 		m_MSB = 0;
 		m_FSB = 0;
@@ -150,17 +144,17 @@ namespace ncore
 		m_LSB = (u32)value;
 	}
 
-	__xuint256::__xuint256(const __xint256& value)
+	u256::u256(const s256& value)
 	{
 		*this = value;
 	}
 
-	__xuint256::__xuint256(const __xuint256& value)
+	u256::u256(const u256& value)
 	{
 		*this = value;
 	}
 
-	__xuint256::__xuint256(u32 b255_224, u32 b223_192, u32 b191_160, u32 b159_128, u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0)
+	u256::u256(u32 b255_224, u32 b223_192, u32 b191_160, u32 b159_128, u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0)
 		:m_MSB(b255_224)
 		,m_FSB(b223_192)
 		,m_ESB(b191_160)
@@ -172,7 +166,7 @@ namespace ncore
 	{
 	}
 
-	__xuint256& __xuint256::operator=(const __xint256& value)
+	u256& u256::operator=(const s256& value)
 	{
 		m_MSB = value.m_MSB;
 		m_FSB = value.m_FSB;
@@ -186,7 +180,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator=(const __xuint256& value)
+	u256& u256::operator=(const u256& value)
 	{
 		m_MSB = value.m_MSB;
 		m_FSB = value.m_FSB;
@@ -200,24 +194,24 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator++()
+	u256& u256::operator++()
 	{
 		*this = *this + One;
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator--()
+	u256& u256::operator--()
 	{
 		*this = *this - One;
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator*=(const __xuint256& value)
+	u256& u256::operator*=(const u256& value)
 	{
-		__xuint256 A(*this);
-		__xuint256 B(value);
+		u256 A(*this);
+		u256 B(value);
 
-		__xuint256 result;
+		u256 result;
 		for (s32 i=0; i<NUM_INT32; i++)
 		{
 			for (s32 j=0; (i+j)<NUM_INT32; j++)
@@ -232,15 +226,15 @@ namespace ncore
 
 				s32 s = (i+j)*32;
 				if (r1!=0)
-					result += __xuint256(r1) << s;
+					result += u256(r1) << s;
 				s += 16;
 				if (r2!=0)
-					result += __xuint256(r2) << s;
+					result += u256(r2) << s;
 				if (r4!=0)
-					result += __xuint256(r4) << s;
+					result += u256(r4) << s;
 				s += 16;
 				if (r3!=0)
-					result += __xuint256(r3) << s;
+					result += u256(r3) << s;
 			}
 		}
 
@@ -248,16 +242,16 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator/=(const __xuint256& value)
+	u256& u256::operator/=(const u256& value)
 	{
-		__xuint256 Remainder;
-		__xuint256 Quotient;
+		u256 Remainder;
+		u256 Quotient;
 		Modulus(value, Quotient, Remainder);
 		*this = Quotient;
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator+=(const __xuint256& _value)
+	u256& u256::operator+=(const u256& _value)
 	{
 		u64 t = ((u64)m_LSB) + ((u64)_value.m_LSB);
 		s32 nCarry = (t > 0xFFFFFFFF);
@@ -292,7 +286,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator-=(const __xuint256& _value)
+	u256& u256::operator-=(const u256& _value)
 	{
 		u64 t = ((u64)m_LSB) - ((u64)_value.m_LSB);
 		s32 nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
@@ -327,9 +321,9 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint256 __xuint256::operator~() const
+	u256 u256::operator~() const
 	{
-		__xuint256 rVal;
+		u256 rVal;
 
 		rVal.m_MSB = ~m_MSB;
 		rVal.m_FSB = ~m_FSB;
@@ -343,9 +337,9 @@ namespace ncore
 		return rVal;
 	}
 
-	__xuint256 __xuint256::operator>>(s32 nShift) const
+	u256 u256::operator>>(s32 nShift) const
 	{
-		__xuint256 rVal;
+		u256 rVal;
 
 		if (nShift > 0)
 		{
@@ -387,9 +381,9 @@ namespace ncore
 		return rVal;
 	}
 
-	__xuint256 __xuint256::operator<<(s32 nShift) const
+	u256 u256::operator<<(s32 nShift) const
 	{
-		__xuint256 rVal;
+		u256 rVal;
 
 		if (nShift > 0)
 		{
@@ -449,19 +443,19 @@ namespace ncore
 		return rVal;
 	}
 
-	__xuint256& __xuint256::operator>>=(s32 nShift)
+	u256& u256::operator>>=(s32 nShift)
 	{
 		*this = (*this >> nShift);
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator<<=(s32 nShift)
+	u256& u256::operator<<=(s32 nShift)
 	{
 		*this = (*this << nShift);
 		return *this;
 	}
 
-	bool __xuint256::IsBitSet(s32 nIndex) const
+	bool u256::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -470,7 +464,7 @@ namespace ncore
 		return bool((mUInt32[dwBitIndex] & dwBitMask) != 0);
 	}
 
-	void __xuint256::SetBit(s32 nIndex, bool value)
+	void u256::SetBit(s32 nIndex, bool value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -484,41 +478,41 @@ namespace ncore
 
 	}
 
-	__xuint256& __xuint256::operator^=(const __xuint256& value)
+	u256& u256::operator^=(const u256& value)
 	{
 		for (s32 i=0; i<NUM_INT32; ++i)
 			mUInt32[i] = mUInt32[i] ^ value.mUInt32[i];
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator|=(const __xuint256& value)
+	u256& u256::operator|=(const u256& value)
 	{
 		for (s32 i=0; i<NUM_INT32; ++i)
 			mUInt32[i] = mUInt32[i] | value.mUInt32[i];
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator&=(const __xuint256& value)
+	u256& u256::operator&=(const u256& value)
 	{
 		for (s32 i=0; i<NUM_INT32; ++i)
 			mUInt32[i] = mUInt32[i] & value.mUInt32[i];
 		return *this;
 	}
 
-	__xuint256& __xuint256::operator%=(const __xuint256& value)
+	u256& u256::operator%=(const u256& value)
 	{
-		__xuint256 Remainder;
-		__xuint256 Quotient;
+		u256 Remainder;
+		u256 Quotient;
 		Modulus(value, Quotient, Remainder);
 		*this = Remainder;
 		return *this;
 	}
 
-	void __xuint256::Modulus(const __xuint256& divisor, __xuint256& Quotient, __xuint256& Remainder) const
+	void u256::Modulus(const u256& divisor, u256& Quotient, u256& Remainder) const
 	{
 		// Correctly handle negative values
-		const __xuint256& tempDividend = *this;
-		__xuint256 tempDivisor(divisor);
+		const u256& tempDividend = *this;
+		u256 tempDivisor(divisor);
 
 		// Handle the special case's
 		if (tempDivisor == Zero)
@@ -548,7 +542,7 @@ namespace ncore
 		}
 	}
 
-	s32 __xuint256::Compare(const __xuint256& value) const
+	s32 u256::Compare(const u256& value) const
 	{
 		if (this == &value)
 			return 0;
@@ -560,25 +554,25 @@ namespace ncore
 		return 0;
 	}
 
-	__xuint256::operator s32() const
+	u256::operator s32() const
 	{
 		ASSERT(m_ASB == 0 && m_BSB == 0 && m_CSB == 0 && m_DSB == 0 && m_ESB == 0 && m_FSB == 0 && m_MSB == 0 && ((m_LSB & 0x80000000) == 0));
 		return (s32) m_LSB;
 	}
 
-	__xuint256::operator u32() const
+	u256::operator u32() const
 	{
 		ASSERT(m_ASB == 0 && m_BSB == 0 && m_CSB == 0 && m_DSB == 0 && m_ESB == 0 && m_FSB == 0 && m_MSB == 0);
 		return m_LSB;
 	}
 
-	__xuint256::operator s64() const
+	u256::operator s64() const
 	{
 		ASSERT(m_BSB == 0 && m_CSB == 0 && m_DSB == 0 && m_ESB == 0 && m_FSB == 0 && m_MSB == 0 && ((m_ASB & 0x80000000) == 0));
 		return (((s64) m_ASB) << 32) + m_LSB;
 	}
 
-	__xuint256::operator u64() const
+	u256::operator u64() const
 	{
 		ASSERT(m_BSB == 0 && m_CSB == 0 && m_DSB == 0 && m_ESB == 0 && m_FSB == 0 && m_MSB == 0);
 		return (((u64) m_ASB) << 32) + m_LSB;

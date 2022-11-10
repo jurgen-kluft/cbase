@@ -893,10 +893,10 @@ namespace ncore
 #if defined(COMPILER_MSVC)
 #    define D_NO_CUSTOM_INT64
 #    define D_NO_CUSTOM_UINT64
-    class __xint128;
-    class __xuint128;
-    class __xint256;
-    class __xuint256;
+    class s128;
+    class u128;
+    class s256;
+    class u256;
 
     template <bool> struct CompileTimeAssert;
     template <> struct CompileTimeAssert<true>
@@ -925,10 +925,10 @@ namespace ncore
 #    define D_INT32        int
 #    define D_INT64        signed __int64
 #    define D_UINT64       unsigned __int64
-#    define D_INT128       __xint128
-#    define D_UINT128      __xuint128
-#    define D_INT256       __xint256
-#    define D_UINT256      __xuint256
+#    define D_INT128       s128
+#    define D_UINT128      u128
+#    define D_INT256       s256
+#    define D_UINT256      u256
 #    ifdef TARGET_64BIT
 #        define D_SIZE              unsigned __int64
 #        define D_INT               __int64
@@ -966,10 +966,10 @@ namespace ncore
 
 #    define D_NO_CUSTOM_INT64
 #    define D_NO_CUSTOM_UINT64
-    class __xint128;
-    class __xuint128;
-    class __xint256;
-    class __xuint256;
+    class s128;
+    class u128;
+    class s256;
+    class u256;
 
 #    define __NO_PARTIAL_TEMPLATE__
 #    define D_CACHE_LINE_SIZE 32
@@ -990,10 +990,10 @@ namespace ncore
 #    define D_INT32   int
 #    define D_INT64   signed long 
 #    define D_UINT64  unsigned long 
-#    define D_INT128  __xint128
-#    define D_UINT128 __xuint128
-#    define D_INT256  __xint256
-#    define D_UINT256 __xuint256
+#    define D_INT128  s128
+#    define D_UINT128 u128
+#    define D_INT256  s256
+#    define D_UINT256 u256
 
     template <bool> struct CompileTimeAssert;
     template <> struct CompileTimeAssert<true>

@@ -10,13 +10,11 @@
 namespace ncore
 {
 	// Forward declares
-	class __xint64;
-	class __xuint64;
-	class __xint128;
-	class __xuint128;
-	class __xuint256;
+	class s128;
+	class u128;
+	class u256;
 
-	class __xint256
+	class s256
 	{
 		enum ESettings
 		{
@@ -30,55 +28,43 @@ namespace ncore
 		};
 
 	public:
-								/** 
-								 *  Constructors
-								 */
-								__xint256();
-		explicit				__xint256(s8 value);
-		explicit				__xint256(u8 value);
-		explicit				__xint256(s16 value);
-		explicit				__xint256(u16 value);
-		explicit				__xint256(s32 value);
-		explicit				__xint256(u32 value);
-		explicit				__xint256(const s64& value);
-		explicit				__xint256(const u64& value);
-		explicit				__xint256(const s128& value);
-		explicit				__xint256(const u128& value);
-								__xint256(const __xint256& value);
-								__xint256(const __xuint256& value);
-								__xint256(u32 b255_224, u32 b223_192, u32 b191_160, u32 b159_128, u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0);
+								s256();
+		explicit				s256(s8 value);
+		explicit				s256(u8 value);
+		explicit				s256(s16 value);
+		explicit				s256(u16 value);
+		explicit				s256(s32 value);
+		explicit				s256(u32 value);
+		explicit				s256(const s64& value);
+		explicit				s256(const u64& value);
+		explicit				s256(const s128& value);
+		explicit				s256(const u128& value);
+								s256(const s256& value);
+								s256(const u256& value);
+								s256(u32 b255_224, u32 b223_192, u32 b191_160, u32 b159_128, u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0);
 
-		/** 
-		 *  Arithmetic operators
-		 */
-		__xint256&				operator=(const __xint256& value);
-		__xint256&				operator=(const __xuint256& value);
-		__xint256& 				operator++();
-		__xint256& 				operator--();
-		__xint256	 			operator++(s32)											{ __xint256 r(*this); (*this)++; return r; }
-		__xint256 				operator--(s32)											{ __xint256 r(*this); (*this)--; return r; }
-		__xint256& 				operator*=(const __xint256& value);
-		__xint256& 				operator/=(const __xint256& value);
-		__xint256& 				operator+=(const __xint256& value);
-		__xint256& 				operator-=(const __xint256& value);
-		__xint256& 				operator%=(const __xint256& value);
-		friend __xint256  		operator-(const __xint256& value);
-		__xint256  				operator~() const;
+		s256&				operator=(const s256& value);
+		s256&				operator=(const u256& value);
+		s256& 				operator++();
+		s256& 				operator--();
+		s256	 			operator++(s32)											{ s256 r(*this); (*this)++; return r; }
+		s256 				operator--(s32)											{ s256 r(*this); (*this)--; return r; }
+		s256& 				operator*=(const s256& value);
+		s256& 				operator/=(const s256& value);
+		s256& 				operator+=(const s256& value);
+		s256& 				operator-=(const s256& value);
+		s256& 				operator%=(const s256& value);
+		friend s256  		operator-(const s256& value);
+		s256  				operator~() const;
 
-		/**
-		 *  Misc operators
-		 */
-		__xint256  				operator>>(s32 nShift) const;
-		__xint256  				operator<<(s32 nShift) const;
-		__xint256& 				operator>>=(s32 nShift);
-		__xint256& 				operator<<=(s32 nShift);
-		__xint256& 				operator^=(const __xint256& value);
-		__xint256& 				operator|=(const __xint256& value);
-		__xint256& 				operator&=(const __xint256& value);
+		s256  				operator>>(s32 nShift) const;
+		s256  				operator<<(s32 nShift) const;
+		s256& 				operator>>=(s32 nShift);
+		s256& 				operator<<=(s32 nShift);
+		s256& 				operator^=(const s256& value);
+		s256& 				operator|=(const s256& value);
+		s256& 				operator&=(const s256& value);
 
-	                         	/**
-	                         	 *  Operators to convert back to basic types.
-	                          	 */
 								operator s32() const;
 								operator u32() const;
 								operator s64() const;
@@ -87,9 +73,6 @@ namespace ncore
 		inline u32&				operator [] (s32 index)									{ return mUInt32[index]; }
 		inline u32				operator [] (s32 index) const							{ return mUInt32[index]; }
 
-		/**
-		 *  Misc operators
-		 */
 		void 					SetBit(s32 nIndex, bool value);
 		bool 					IsBitSet(s32 nIndex) const;
 
@@ -98,21 +81,18 @@ namespace ncore
 		bool 					IsNegative() const;
 		bool 					IsPositive() const;
 
-		void 					Modulus(const __xint256& Divisor, __xint256& Quotient, __xint256& Remainder) const;
-		s32						Compare(const __xint256& other) const;
+		void 					Modulus(const s256& Divisor, s256& Quotient, s256& Remainder) const;
+		s32						Compare(const s256& other) const;
 
-		static const __xint256	Zero;
-		static const __xint256	One;
+		static const s256	Zero;
+		static const s256	One;
 
 	protected:
 		void					TwosComplement();
 		void					InverseTwosComplement();
 
-		friend class __xuint256;
+		friend class u256;
 
-		/**
-		 *  Actual member data variables
-		 */
 		union
 		{
 			struct
@@ -137,30 +117,30 @@ namespace ncore
 		};
 	};
 
-	inline __xint256	operator+(const __xint256& lhs, const __xint256& rhs) { __xint256 r(lhs); r+=rhs; return r; }
-	inline __xint256	operator-(const __xint256& lhs, const __xint256& rhs) { __xint256 r(lhs); r-=rhs; return r; }
-	inline __xint256  	operator*(const __xint256& lhs, const __xint256& rhs) { __xint256 r(lhs); r*=rhs; return r; }
-	inline __xint256  	operator/(const __xint256& lhs, const __xint256& rhs) { __xint256 r(lhs); r/=rhs; return r; }
-	inline __xint256  	operator%(const __xint256& lhs, const __xint256& rhs) { __xint256 r(lhs); r%=rhs; return r; }
-	inline __xint256  	operator^(const __xint256& lhs, const __xint256& rhs) { __xint256 r(lhs); r^=rhs; return r; }
-	inline __xint256  	operator|(const __xint256& lhs, const __xint256& rhs) { __xint256 r(lhs); r|=rhs; return r; }
-	inline __xint256  	operator&(const __xint256& lhs, const __xint256& rhs) { __xint256 r(lhs); r&=rhs; return r; }
+	inline s256	    operator+(const s256& lhs, const s256& rhs) { s256 r(lhs); r+=rhs; return r; }
+	inline s256	    operator-(const s256& lhs, const s256& rhs) { s256 r(lhs); r-=rhs; return r; }
+	inline s256  	operator*(const s256& lhs, const s256& rhs) { s256 r(lhs); r*=rhs; return r; }
+	inline s256  	operator/(const s256& lhs, const s256& rhs) { s256 r(lhs); r/=rhs; return r; }
+	inline s256  	operator%(const s256& lhs, const s256& rhs) { s256 r(lhs); r%=rhs; return r; }
+	inline s256  	operator^(const s256& lhs, const s256& rhs) { s256 r(lhs); r^=rhs; return r; }
+	inline s256  	operator|(const s256& lhs, const s256& rhs) { s256 r(lhs); r|=rhs; return r; }
+	inline s256  	operator&(const s256& lhs, const s256& rhs) { s256 r(lhs); r&=rhs; return r; }
 
-	inline __xint256	operator+(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r+=__xint256(rhs); return r; }
-	inline __xint256	operator-(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r-=__xint256(rhs); return r; }
-	inline __xint256  	operator*(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r*=__xint256(rhs); return r; }
-	inline __xint256  	operator/(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r/=__xint256(rhs); return r; }
-	inline __xint256  	operator%(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r%=__xint256(rhs); return r; }
-	inline __xint256  	operator^(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r^=__xint256(rhs); return r; }
-	inline __xint256  	operator|(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r|=__xint256(rhs); return r; }
-	inline __xint256  	operator&(const __xint256& lhs, s32 rhs) { __xint256 r(lhs); r&=__xint256(rhs); return r; }
+	inline s256	    operator+(const s256& lhs, s32 rhs) { s256 r(lhs); r+=s256(rhs); return r; }
+	inline s256	    operator-(const s256& lhs, s32 rhs) { s256 r(lhs); r-=s256(rhs); return r; }
+	inline s256  	operator*(const s256& lhs, s32 rhs) { s256 r(lhs); r*=s256(rhs); return r; }
+	inline s256  	operator/(const s256& lhs, s32 rhs) { s256 r(lhs); r/=s256(rhs); return r; }
+	inline s256  	operator%(const s256& lhs, s32 rhs) { s256 r(lhs); r%=s256(rhs); return r; }
+	inline s256  	operator^(const s256& lhs, s32 rhs) { s256 r(lhs); r^=s256(rhs); return r; }
+	inline s256  	operator|(const s256& lhs, s32 rhs) { s256 r(lhs); r|=s256(rhs); return r; }
+	inline s256  	operator&(const s256& lhs, s32 rhs) { s256 r(lhs); r&=s256(rhs); return r; }
 
-	inline bool		operator<(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) == -1); }
-	inline bool		operator>(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) == 1); }
-	inline bool		operator<=(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) != 1); }
-	inline bool		operator>=(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) != -1); }
-	inline bool		operator==(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) == 0); }
-	inline bool		operator!=(const __xint256& lhs, const __xint256& rhs) { return bool(lhs.Compare(rhs) != 0); }
+	inline bool		operator<(const s256& lhs, const s256& rhs) { return bool(lhs.Compare(rhs) == -1); }
+	inline bool		operator>(const s256& lhs, const s256& rhs) { return bool(lhs.Compare(rhs) == 1); }
+	inline bool		operator<=(const s256& lhs, const s256& rhs) { return bool(lhs.Compare(rhs) != 1); }
+	inline bool		operator>=(const s256& lhs, const s256& rhs) { return bool(lhs.Compare(rhs) != -1); }
+	inline bool		operator==(const s256& lhs, const s256& rhs) { return bool(lhs.Compare(rhs) == 0); }
+	inline bool		operator!=(const s256& lhs, const s256& rhs) { return bool(lhs.Compare(rhs) != 0); }
 };
 
 #endif

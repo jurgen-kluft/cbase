@@ -1,5 +1,5 @@
-#include "cbase/c_target.h"
-#ifndef D_NO_CUSTOM_INT128
+#include "cbase/private/c_int128.h"
+//#ifndef D_NO_CUSTOM_INT128
 
 #include "cbase/c_debug.h"
 #include "cbase/c_limits.h"
@@ -7,15 +7,12 @@
 #include "cbase/private/c_uint64.h"
 #include "cbase/private/c_uint128.h"
 
-#include "cbase/private/c_int128.h"
-
 namespace ncore {
 
-	const __xint128	__xint128::Zero;
-	const __xint128	__xint128::One((u32)1);
+	const s128	s128::Zero;
+	const s128	s128::One((u32)1);
 
-
-	__xint128::__xint128()
+	s128::s128()
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -24,11 +21,11 @@ namespace ncore {
 	}
 
 
-	__xint128::__xint128(s16 value)
+	s128::s128(s16 value)
 	{
 		if (value < 0)
 		{
-			*this = __xint128((u16)-value);
+			*this = s128((u16)-value);
 			TwosComplement();
 		}
 		else
@@ -40,7 +37,7 @@ namespace ncore {
 		}
 	}
 
-	__xint128::__xint128(u16 value)
+	s128::s128(u16 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -48,11 +45,11 @@ namespace ncore {
 		m_LSB = value;
 	}
 
-	__xint128::__xint128(s32 value)
+	s128::s128(s32 value)
 	{
 		if (value < 0)
 		{
-			*this = __xint128((u32)-value);
+			*this = s128((u32)-value);
 			TwosComplement();
 		}
 		else
@@ -64,7 +61,7 @@ namespace ncore {
 		}
 	}
 
-	__xint128::__xint128(u32 value)
+	s128::s128(u32 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -72,11 +69,11 @@ namespace ncore {
 		m_LSB = value;
 	}
 
-	__xint128::__xint128(const s64& value)
+	s128::s128(const s64& value)
 	{
 		if (value < 0)
 		{
-			*this = __xint128(u64(-value));
+			*this = s128(u64(-value));
 			TwosComplement();
 		}
 		else
@@ -88,11 +85,11 @@ namespace ncore {
 		}
 	}
 
-	__xint128::__xint128(const s64& high, const s64& low)
+	s128::s128(const s64& high, const s64& low)
 	{
 		if (high < 0)
 		{
-			*this = __xint128(u64(-high), u64(-low));
+			*this = s128(u64(-high), u64(-low));
 			TwosComplement();
 		}
 		else
@@ -104,7 +101,7 @@ namespace ncore {
 		}
 	}
 
-	__xint128::__xint128(const u64& value)
+	s128::s128(const u64& value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -112,7 +109,7 @@ namespace ncore {
 		m_LSB = (u32)value;
 	}
 
-	__xint128::__xint128(const u64& high, const u64& low)
+	s128::s128(const u64& high, const u64& low)
 	{
 		m_MSB = high>>32;
 		m_DSB = (u32)high;
@@ -120,12 +117,12 @@ namespace ncore {
 		m_LSB = (u32)low;
 	}
 
-	__xint128::__xint128(const __xint128& value)
+	s128::s128(const s128& value)
 	{
 		*this = value;
 	}
 
-	__xint128::__xint128(const __xuint128& value)
+	s128::s128(const u128& value)
 	{
 		m_MSB = value.m_MSB;
 		m_DSB = value.m_DSB;
@@ -133,7 +130,7 @@ namespace ncore {
 		m_LSB = value.m_LSB;
 	}
 
-	__xint128::__xint128(u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0)
+	s128::s128(u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0)
 	{
 		m_MSB = (b127_96);
 		m_DSB = (b95_64);
@@ -141,7 +138,7 @@ namespace ncore {
 		m_LSB = (b31_0);
 	}
 
-	__xint128& __xint128::operator=(const __xint128& value)
+	s128& s128::operator=(const s128& value)
 	{
 		m_MSB = value.m_MSB;
 		m_DSB = value.m_DSB;
@@ -151,14 +148,14 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128 operator-(const __xint128& value)
+	s128 operator-(const s128& value)
 	{
-		__xint128 rVal(value);
+		s128 rVal(value);
 		rVal.Negate();
 		return rVal;
 	}
 
-	__xint128& __xint128::operator++()
+	s128& s128::operator++()
 	{
 		++m_LSB;
 		if (m_LSB==0)
@@ -176,7 +173,7 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128& __xint128::operator--()
+	s128& s128::operator--()
 	{
 		--m_LSB;
 		if (m_LSB==0)
@@ -194,10 +191,10 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128& __xint128::operator*=(const __xint128& value)
+	s128& s128::operator*=(const s128& value)
 	{
-		__xint128 A(*this);
-		__xint128 B(value);
+		s128 A(*this);
+		s128 B(value);
 
 		// Correctly handle negative values
 		bool bANegative = false;
@@ -213,7 +210,7 @@ namespace ncore {
 			B.Negate();
 		}
 
-		__xint128 result;
+		s128 result;
 		for (s32 i=0; i<NUM_INT32; i++)
 		{
 			for (s32 j=0; (i+j)<NUM_INT32; j++)
@@ -228,15 +225,15 @@ namespace ncore {
 
 				s32 s = (i+j)*32;
 				if (r1!=0)
-					result += __xint128(r1) << s;
+					result += s128(r1) << s;
 				s += 16;
 				if (r2!=0)
-					result += __xint128(r2) << s;
+					result += s128(r2) << s;
 				if (r4!=0)
-					result += __xint128(r4) << s;
+					result += s128(r4) << s;
 				s += 16;
 				if (r3!=0)
-					result += __xint128(r3) << s;
+					result += s128(r3) << s;
 			}
 		}
 
@@ -247,16 +244,16 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128& __xint128::operator/=(const __xint128& value)
+	s128& s128::operator/=(const s128& value)
 	{
-		__xint128 Remainder;
-		__xint128 Quotient;
+		s128 Remainder;
+		s128 Quotient;
 		Modulus(value, Quotient, Remainder);
 		*this = Quotient;
 		return *this;
 	}
 
-	__xint128& __xint128::operator+=(const __xint128& _value)
+	s128& s128::operator+=(const s128& _value)
 	{
 		u64 t = ((u64)m_LSB) + ((u64)_value.m_LSB);
 		s32 nCarry = (t > 0xFFFFFFFF);
@@ -275,7 +272,7 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128& __xint128::operator-=(const __xint128& _value)
+	s128& s128::operator-=(const s128& _value)
 	{
 		u64 t = ((u64)m_LSB) - ((u64)_value.m_LSB);
 		s32 nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
@@ -295,9 +292,9 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128 operator~(const __xint128& value)
+	s128 operator~(const s128& value)
 	{
-		__xint128 rVal;
+		s128 rVal;
 		rVal.m_MSB = ~value.m_MSB;
 		rVal.m_DSB = ~value.m_DSB;
 		rVal.m_CSB = ~value.m_CSB;
@@ -305,13 +302,13 @@ namespace ncore {
 		return rVal;
 	}
 
-	void __xint128::Abs()
+	void s128::Abs()
 	{
 		if (IsNegative())
 			InverseTwosComplement();
 	}
 
-	void __xint128::Negate()
+	void s128::Negate()
 	{
 		if (IsPositive())
 			TwosComplement();
@@ -319,17 +316,17 @@ namespace ncore {
 			InverseTwosComplement();
 	}
 
-	bool __xint128::IsNegative() const
+	bool s128::IsNegative() const
 	{
 		return bool((m_MSB & 0x80000000) != 0);
 	}
 
-	bool __xint128::IsPositive() const
+	bool s128::IsPositive() const
 	{
 		return bool((m_MSB & 0x80000000) == 0);
 	}
 
-	void __xint128::TwosComplement()
+	void s128::TwosComplement()
 	{
 		m_MSB = ~m_MSB;
 		m_DSB = ~m_DSB;
@@ -338,7 +335,7 @@ namespace ncore {
 		operator++();
 	}
 
-	void __xint128::InverseTwosComplement()
+	void s128::InverseTwosComplement()
 	{
 		operator--();
 		m_MSB = ~m_MSB;
@@ -347,9 +344,9 @@ namespace ncore {
 		m_LSB = ~m_LSB;
 	}
 
-	__xint128 __xint128::operator>>(s32 nShift) const
+	s128 s128::operator>>(s32 nShift) const
 	{
-		__xint128 rVal;
+		s128 rVal;
 		if (nShift > 0)
 		{
 			if (nShift > NUM_BITS)
@@ -390,9 +387,9 @@ namespace ncore {
 		return rVal;
 	}
 
-	__xint128 __xint128::operator<<(s32 nShift) const
+	s128 s128::operator<<(s32 nShift) const
 	{
-		__xint128 rVal;
+		s128 rVal;
 		if (nShift > 0)
 		{
 			if (nShift > NUM_BITS)
@@ -451,19 +448,19 @@ namespace ncore {
 		return rVal;
 	}
 
-	__xint128& __xint128::operator>>=(s32 nShift)
+	s128& s128::operator>>=(s32 nShift)
 	{
 		*this = (*this >> nShift);
 		return *this;
 	}
 
-	__xint128& __xint128::operator<<=(s32 nShift)
+	s128& s128::operator<<=(s32 nShift)
 	{
 		*this = (*this << nShift);
 		return *this;
 	}
 
-	bool __xint128::IsBitSet(s32 nIndex) const
+	bool s128::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -472,7 +469,7 @@ namespace ncore {
 		return bool((mUInt32[dwBitIndex] & dwBitMask) != 0);
 	}
 
-	void __xint128::SetBit(s32 nIndex, bool value)
+	void s128::SetBit(s32 nIndex, bool value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -485,7 +482,7 @@ namespace ncore {
 			mUInt32[dwBitIndex] = mUInt32[dwBitIndex] & ~dwBitMask;
 	}
 
-	__xint128& __xint128::operator^=(const __xint128& value)
+	s128& s128::operator^=(const s128& value)
 	{
 		m_LSB ^= value.m_LSB;
 		m_CSB ^= value.m_CSB;
@@ -494,7 +491,7 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128& __xint128::operator|=(const __xint128& value)
+	s128& s128::operator|=(const s128& value)
 	{
 		m_LSB |= value.m_LSB;
 		m_CSB |= value.m_CSB;
@@ -503,7 +500,7 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128& __xint128::operator&=(const __xint128& value)
+	s128& s128::operator&=(const s128& value)
 	{
 		m_LSB &= value.m_LSB;
 		m_CSB &= value.m_CSB;
@@ -512,20 +509,20 @@ namespace ncore {
 		return *this;
 	}
 
-	__xint128& __xint128::operator%=(const __xint128& value)
+	s128& s128::operator%=(const s128& value)
 	{
-		__xint128 Remainder;
-		__xint128 Quotient;
+		s128 Remainder;
+		s128 Quotient;
 		Modulus(value, Quotient, Remainder);
 		*this = Remainder;
 		return *this;
 	}
 
-	void __xint128::Modulus(const __xint128& divisor, __xint128& Quotient, __xint128& Remainder) const
+	void s128::Modulus(const s128& divisor, s128& Quotient, s128& Remainder) const
 	{
 		//Correctly handle negative values
-		__xint128 tempDividend(*this);
-		__xint128 tempDivisor(divisor);
+		s128 tempDividend(*this);
+		s128 tempDivisor(divisor);
 		bool bDividendNegative = false;
 		bool bDivisorNegative = false;
 		if (tempDividend.IsNegative())
@@ -574,7 +571,7 @@ namespace ncore {
 		}
 	}
 
-	s32	__xint128::Compare(const __xint128& other) const
+	s32	s128::Compare(const s128& other) const
 	{
 		const bool thisPositive = IsPositive();
 		const bool otherPositive = other.IsPositive();
@@ -598,11 +595,11 @@ namespace ncore {
 		return 0;
 	}
 
-	__xint128::operator s32() const
+	s128::operator s32() const
 	{
 		if (IsNegative())
 		{
-			__xint128 t(*this);
+			s128 t(*this);
 			t.Negate();
 			return -t;
 		}
@@ -613,18 +610,18 @@ namespace ncore {
 		}
 	}
 
-	__xint128::operator u32() const
+	s128::operator u32() const
 	{
 		ASSERT(m_CSB == 0 && m_DSB == 0 && m_MSB == 0);
 		ASSERT(!IsNegative());
 		return m_LSB;
 	}
 
-	__xint128::operator s64() const
+	s128::operator s64() const
 	{
 		if (IsNegative())
 		{
-			__xint128 t(*this);
+			s128 t(*this);
 			t.Negate();
 			return -t;
 		}
@@ -635,7 +632,7 @@ namespace ncore {
 		}
 	}
 
-	__xint128::operator u64() const
+	s128::operator u64() const
 	{
 		ASSERT(m_MSB == 0 && m_DSB == 0);
 		ASSERT(!IsNegative());
@@ -643,4 +640,4 @@ namespace ncore {
 	}
 };
 
-#endif
+//#endif

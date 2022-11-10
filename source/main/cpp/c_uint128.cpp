@@ -1,4 +1,4 @@
-#include "cbase/c_target.h"
+#include "cbase/private/c_uint128.h"
 #ifndef D_NO_CUSTOM_UINT128
 
 #include "cbase/c_debug.h"
@@ -6,15 +6,14 @@
 #include "cbase/private/c_int64.h"
 #include "cbase/private/c_uint64.h"
 #include "cbase/private/c_int128.h"
-#include "cbase/private/c_uint128.h"
 
 namespace ncore 
 {
-	const __xuint128	__xuint128::Zero;
-	const __xuint128	__xuint128::One((u32)1);
-	const __xuint128	__xuint128::Max(__xuint128::MAX);
+	const u128	u128::Zero;
+	const u128	u128::One((u32)1);
+	const u128	u128::Max(u128::MAX);
 
-	__xuint128::__xuint128(EConstants c)
+	u128::u128(EConstants c)
 	{
 		switch (c)
 		{
@@ -33,7 +32,7 @@ namespace ncore
 		}
 	}
 
-	__xuint128::__xuint128()
+	u128::u128()
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -42,7 +41,7 @@ namespace ncore
 	}
 
 
-	__xuint128::__xuint128(s16 value)
+	u128::u128(s16 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -50,7 +49,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint128::__xuint128(u16 value)
+	u128::u128(u16 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -58,7 +57,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint128::__xuint128(s32 value)
+	u128::u128(s32 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -66,7 +65,7 @@ namespace ncore
 		m_LSB = value;
 	}
 
-	__xuint128::__xuint128(u32 value)
+	u128::u128(u32 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -75,7 +74,7 @@ namespace ncore
 	}
 
 
-	__xuint128::__xuint128(const s64& value)
+	u128::u128(const s64& value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -83,7 +82,7 @@ namespace ncore
 		m_LSB = (s32)value;
 	}
 
-	__xuint128::__xuint128(const u64& value)
+	u128::u128(const u64& value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -91,7 +90,7 @@ namespace ncore
 		m_LSB = (u32)value;
 	}
 
-	__xuint128::__xuint128(const u64& high, const u64& low)
+	u128::u128(const u64& high, const u64& low)
 	{
 		m_MSB = high>>32;
 		m_DSB = (u32)low;
@@ -99,7 +98,7 @@ namespace ncore
 		m_LSB = (u32)low;
 	}
 
-	__xuint128::__xuint128(const __xint128& value)
+	u128::u128(const s128& value)
 	{
 		m_MSB = value.m_MSB;
 		m_DSB = value.m_DSB;
@@ -107,7 +106,7 @@ namespace ncore
 		m_LSB = value.m_LSB;
 	}
 
-	__xuint128::__xuint128(const __xuint128& value)
+	u128::u128(const u128& value)
 	{
 		m_MSB = value.m_MSB;
 		m_DSB = value.m_DSB;
@@ -115,7 +114,7 @@ namespace ncore
 		m_LSB = value.m_LSB;
 	}
 
-	__xuint128::__xuint128(u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0)
+	u128::u128(u32 b127_96, u32 b95_64, u32 b63_32, u32 b31_0)
 		:m_MSB(b127_96)
 		,m_DSB(b95_64)
 		,m_CSB(b63_32)
@@ -123,7 +122,7 @@ namespace ncore
 	{
 	}
 
-	__xuint128& __xuint128::operator=(s8 value)
+	u128& u128::operator=(s8 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -133,7 +132,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator=(u8 value)
+	u128& u128::operator=(u8 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -143,7 +142,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator=(s16 value)
+	u128& u128::operator=(s16 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -153,7 +152,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator=(u16 value)
+	u128& u128::operator=(u16 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -163,7 +162,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator=(s32 value)
+	u128& u128::operator=(s32 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -172,7 +171,7 @@ namespace ncore
 
 		return *this;
 	}
-	__xuint128& __xuint128::operator=(u32 value)
+	u128& u128::operator=(u32 value)
 	{
 		m_MSB = 0;
 		m_DSB = 0;
@@ -182,7 +181,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator=(const __xuint128& value)
+	u128& u128::operator=(const u128& value)
 	{
 		m_MSB = value.m_MSB;
 		m_DSB = value.m_DSB;
@@ -192,24 +191,24 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator++()
+	u128& u128::operator++()
 	{
 		*this = *this + One;
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator--()
+	u128& u128::operator--()
 	{
 		*this = *this - One;
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator*=(const __xuint128& value)
+	u128& u128::operator*=(const u128& value)
 	{
-		__xuint128 A(*this);
-		__xuint128 B(value);
+		u128 A(*this);
+		u128 B(value);
 
-		__xuint128 result;
+		u128 result;
 		for (s32 i=0; i<NUM_INT32; i++)
 		{
 			for (s32 j=0; (i+j)<NUM_INT32; j++)
@@ -224,31 +223,31 @@ namespace ncore
 
 				s32 s = (i+j)*32;
 				if (r1!=0)
-					result += __xuint128(r1) << s;
+					result += u128(r1) << s;
 				s += 16;
 				if (r2!=0)
-					result += __xuint128(r2) << s;
+					result += u128(r2) << s;
 				if (r4!=0)
-					result += __xuint128(r4) << s;
+					result += u128(r4) << s;
 				s += 16;
 				if (r3!=0)
-					result += __xuint128(r3) << s;
+					result += u128(r3) << s;
 			}
 		}
 		*this = result;
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator/=(const __xuint128& value)
+	u128& u128::operator/=(const u128& value)
 	{
-		__xuint128 Remainder;
-		__xuint128 Quotient;
+		u128 Remainder;
+		u128 Quotient;
 		Modulus(value, Quotient, Remainder);
 		*this = Quotient;
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator+=(const __xuint128& _value)
+	u128& u128::operator+=(const u128& _value)
 	{
 		u64 t = ((u64)m_LSB) + ((u64)_value.m_LSB);
 		s32 nCarry = (t > 0xFFFFFFFF);
@@ -267,7 +266,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator-=(const __xuint128& _value)
+	u128& u128::operator-=(const u128& _value)
 	{
 		u64 t = ((u64)m_LSB) - ((u64)_value.m_LSB);
 		s32 nCarry = ((t&D_CONSTANT_64(0xFFFFFFFF00000000))!=0) ? 1 : 0;
@@ -287,9 +286,9 @@ namespace ncore
 
 	}
 
-	__xuint128 __xuint128::operator~() const
+	u128 u128::operator~() const
 	{
-		__xuint128 rVal;
+		u128 rVal;
 
 		rVal.m_MSB = ~m_MSB;
 		rVal.m_DSB = ~m_DSB;
@@ -299,9 +298,9 @@ namespace ncore
 		return rVal;
 	}
 
-	__xuint128 __xuint128::operator>>(s32 nShift) const
+	u128 u128::operator>>(s32 nShift) const
 	{
-		__xuint128 rVal;
+		u128 rVal;
 		if (nShift > 0)
 		{
 			if (nShift > NUM_BITS)
@@ -342,9 +341,9 @@ namespace ncore
 		return rVal;
 	}
 
-	__xuint128 __xuint128::operator<<(s32 nShift) const
+	u128 u128::operator<<(s32 nShift) const
 	{
-		__xuint128 rVal;
+		u128 rVal;
 		if (nShift > 0)
 		{
 			if (nShift > NUM_BITS)
@@ -403,19 +402,19 @@ namespace ncore
 		return rVal;
 	}
 
-	__xuint128& __xuint128::operator>>=(s32 nShift)
+	u128& u128::operator>>=(s32 nShift)
 	{
 		*this = (*this >> nShift);
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator<<=(s32 nShift)
+	u128& u128::operator<<=(s32 nShift)
 	{
 		*this = (*this << nShift);
 		return *this;
 	}
 
-	bool __xuint128::IsBitSet(s32 nIndex) const
+	bool u128::IsBitSet(s32 nIndex) const
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 		u32 dwBitMask = 0x80000000 >> (nIndex % 32);
@@ -423,7 +422,7 @@ namespace ncore
 		return bool((mUInt32[dwBitIndex] & dwBitMask) != 0);
 	}
 
-	void __xuint128::SetBit(s32 nIndex, bool value)
+	void u128::SetBit(s32 nIndex, bool value)
 	{
 		ASSERT(nIndex >= 0 && nIndex < NUM_BITS);
 
@@ -436,7 +435,7 @@ namespace ncore
 			mUInt32[dwBitIndex] = mUInt32[dwBitIndex] & ~dwBitMask;
 	}
 
-	__xuint128& __xuint128::operator^=(const __xuint128& value)
+	u128& u128::operator^=(const u128& value)
 	{
 		m_LSB ^= value.m_LSB;
 		m_CSB ^= value.m_CSB;
@@ -445,7 +444,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator|=(const __xuint128& value)
+	u128& u128::operator|=(const u128& value)
 	{
 		m_LSB |= value.m_LSB;
 		m_CSB |= value.m_CSB;
@@ -454,7 +453,7 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator&=(const __xuint128& value)
+	u128& u128::operator&=(const u128& value)
 	{
 		m_LSB &= value.m_LSB;
 		m_CSB &= value.m_CSB;
@@ -463,20 +462,20 @@ namespace ncore
 		return *this;
 	}
 
-	__xuint128& __xuint128::operator%=(const __xuint128& value)
+	u128& u128::operator%=(const u128& value)
 	{
-		__xuint128 Remainder;
-		__xuint128 Quotient;
+		u128 Remainder;
+		u128 Quotient;
 		Modulus(value, Quotient, Remainder);
 		*this = Remainder;
 		return *this;
 	}
 
-	void __xuint128::Modulus(const __xuint128& divisor, __xuint128& Quotient, __xuint128& Remainder) const
+	void u128::Modulus(const u128& divisor, u128& Quotient, u128& Remainder) const
 	{
 		// Correctly handle negative values
-		const __xuint128& tempDividend = *this;
-		__xuint128 tempDivisor(divisor);
+		const u128& tempDividend = *this;
+		u128 tempDivisor(divisor);
 
 		// Handle the special case's
 		if (tempDivisor == Zero)
@@ -506,7 +505,7 @@ namespace ncore
 		}
 	}
 
-	s32 __xuint128::Compare(const __xuint128& value) const
+	s32 u128::Compare(const u128& value) const
 	{
 		for (s32 i=0; i<NUM_INT32; i++)
 			if (mUInt32[i] != value.mUInt32[i])
@@ -515,24 +514,24 @@ namespace ncore
 		return 0;
 	}
 
-	__xuint128::operator s32() const
+	u128::operator s32() const
 	{
 		ASSERT(m_CSB == 0 && m_DSB == 0 && m_MSB == 0 && ((m_LSB & 0x80000000) == 0));
 		return (s32) m_LSB;
 	}
 
-	__xuint128::operator u32() const
+	u128::operator u32() const
 	{
 		return m_LSB;
 	}
 
-	__xuint128::operator s64() const
+	u128::operator s64() const
 	{
 		ASSERT(m_MSB == 0 && m_DSB == 0 && ((m_CSB & 0x80000000) == 0));
 		return (((s64) m_CSB) << 32) + m_LSB;
 	}
 
-	__xuint128::operator u64() const
+	u128::operator u64() const
 	{
 		return (((u64) m_CSB) << 32) + m_LSB;
 	}
