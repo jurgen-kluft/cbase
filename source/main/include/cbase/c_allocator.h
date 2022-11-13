@@ -32,6 +32,12 @@ namespace ncore
             return object;
         }
 
+        template <typename T, typename... Args> T* obtain_array(u32 count)
+        {
+            void* mem    = v_allocate(sizeof(T)*count, sizeof(void*));
+            return (T*)mem;
+        }
+
         template <typename T, typename... Args> T* placement(u32 EXTRA = 0, Args... args)
         {
             void* mem    = v_allocate(sizeof(T) + EXTRA, sizeof(void*));
@@ -42,6 +48,11 @@ namespace ncore
         template <typename T> void destruct(T* p)
         {
             p->~T();
+            v_deallocate(p);
+        }
+
+        template <typename T> void release_array(T* p)
+        {
             v_deallocate(p);
         }
 

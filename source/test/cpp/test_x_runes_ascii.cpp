@@ -5,7 +5,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(xstring_ascii)
+UNITTEST_SUITE_BEGIN(test_string_ascii)
 {
     UNITTEST_FIXTURE(main)
     {

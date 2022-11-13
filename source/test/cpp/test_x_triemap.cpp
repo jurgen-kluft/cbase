@@ -157,10 +157,10 @@ namespace ncore
     };
 
     // Trie data structure where every node can cover a range of bits (not only 1 bit)
-    class xdtrie
+    class dtrie_t
     {
     public:
-        inline xdtrie(fsa_t* fsa)
+        inline dtrie_t(fsa_t* fsa)
             : m_root(nullptr)
             , m_value(nullptr)
             , m_num_values(0)
@@ -185,7 +185,7 @@ namespace ncore
         fsa_t*   m_values;
     };
 
-    node_t* xdtrie::branch_two_values(node_t* parent, value_t* v1, value_t* v2, s8 pos)
+    node_t* dtrie_t::branch_two_values(node_t* parent, value_t* v1, value_t* v2, s8 pos)
     {
         // Determine the length of the run (pos = start position (from msb to lsb))
         key_t const mask = (0xFFFFFFFFFFFFFFFFUL >> pos);
@@ -249,7 +249,7 @@ namespace ncore
         return head;
     }
 
-    bool xdtrie::insert(key_t key, val_t value)
+    bool dtrie_t::insert(key_t key, val_t value)
     {
         // Before creating the first node (root) we wait until we have 2 elements
         if (m_root == nullptr)
@@ -378,7 +378,7 @@ namespace ncore
         return false;
     }
 
-    bool xdtrie::find(key_t key, val_t& value)
+    bool dtrie_t::find(key_t key, val_t& value)
     {
         if (m_value != nullptr)
         {
@@ -426,7 +426,7 @@ namespace ncore
         return false;
     }
 
-    bool xdtrie::remove(key_t key, val_t& value)
+    bool dtrie_t::remove(key_t key, val_t& value)
     {
         // Find the value by traversing the trie and keep track of parent
         //
@@ -536,7 +536,7 @@ namespace ncore
 
 namespace ncore
 {
-    class xfsa_test : public fsa_t
+    class fsa_test_t : public fsa_t
     {
     public:
         struct data_t
@@ -550,7 +550,7 @@ namespace ncore
         data_t  m_memory[8192];
         data_t* m_freelist;
 
-        inline xfsa_test()
+        inline fsa_test_t()
             : m_pivot(0)
             , m_capacity(8192)
             , m_freelist(nullptr)
@@ -596,13 +596,13 @@ namespace ncore
 extern ncore::alloc_t* gTestAllocator;
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(xdtrie)
+UNITTEST_SUITE_BEGIN(test_dtrie_t)
 {
     UNITTEST_FIXTURE(main)
     {
-        xfsa_test* m_fsa;
+        fsa_test_t* m_fsa;
 
-        UNITTEST_FIXTURE_SETUP() { m_fsa = gTestAllocator->construct<xfsa_test>(); }
+        UNITTEST_FIXTURE_SETUP() { m_fsa = gTestAllocator->construct<fsa_test_t>(); }
 
         UNITTEST_FIXTURE_TEARDOWN() { gTestAllocator->destruct(m_fsa); }
 
@@ -613,7 +613,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 
         UNITTEST_TEST(insert_find)
         {
-            xdtrie trie(m_fsa);
+            dtrie_t trie(m_fsa);
 
             key_t key1 = (key_t)0xABAB0ABC1F0000L;
             key_t key2 = (key_t)0xABAB0ABC0F0000L;
@@ -629,7 +629,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 
         UNITTEST_TEST(insert_find_1)
         {
-            xdtrie trie(m_fsa);
+            dtrie_t trie(m_fsa);
 
             key_t key1 = (key_t)0xABAB0ABC1F0000L;
             key_t key2 = (key_t)0xABAB0ABC0F0000L;
@@ -649,7 +649,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 
         UNITTEST_TEST(insert_find_2)
         {
-            xdtrie trie(m_fsa);
+            dtrie_t trie(m_fsa);
 
             key_t key1 = (key_t)0xABAB0ABC1F0000L;
             key_t key2 = (key_t)0xABAB0ABC0F0000L;
@@ -669,7 +669,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 
         UNITTEST_TEST(insert_max_run_len)
         {
-            xdtrie trie(m_fsa);
+            dtrie_t trie(m_fsa);
 
             key_t key1 = (key_t)0xAABBC0000F00L;
             key_t key2 = (key_t)0xAABBC0001F00L;
@@ -689,7 +689,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 
         UNITTEST_TEST(insert_many)
         {
-            xdtrie trie(m_fsa);
+            dtrie_t trie(m_fsa);
 
             const s32 numitems = 4096;
             key_t     keys[numitems];
@@ -717,7 +717,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 
         UNITTEST_TEST(insert_remove_3)
         {
-            xdtrie trie(m_fsa);
+            dtrie_t trie(m_fsa);
 
             key_t key1 = (key_t)0xABAB0ABC1F0000L;
             key_t key2 = (key_t)0xABAB0ABC0F0000L;
@@ -740,7 +740,7 @@ UNITTEST_SUITE_BEGIN(xdtrie)
 
         UNITTEST_TEST(insert_remove_many)
         {
-            xdtrie trie(m_fsa);
+            dtrie_t trie(m_fsa);
 
             const s32 numitems = 4096;
             key_t     keys[numitems];
@@ -778,7 +778,7 @@ UNITTEST_SUITE_END
 
 #include "cunittest\cunittest.h"
 
-UNITTEST_SUITE_BEGIN(xdtrie)
+UNITTEST_SUITE_BEGIN(dtrie_t)
 {
     UNITTEST_FIXTURE(main)
     {

@@ -30,8 +30,9 @@ namespace ncore
 		s32 k = 0;
 		s32 v = 1000;
 		mymap.insert(k, v);
-		mymap.find(k, v);
-		mymap.remove(k, v);
+		s32 const* f = nullptr;
+		mymap.find(k, f);
+		mymap.remove(k);
 	}
 
 	static void TestSet()

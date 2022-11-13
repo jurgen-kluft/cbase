@@ -3,7 +3,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(xbinary_search)
+UNITTEST_SUITE_BEGIN(test_binary_search)
 {
     UNITTEST_FIXTURE(main)
     {

@@ -7,7 +7,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(__xint64)
+UNITTEST_SUITE_BEGIN(test_int64)
 {
     UNITTEST_FIXTURE(main)
     {

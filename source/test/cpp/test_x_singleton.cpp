@@ -7,7 +7,7 @@ using namespace ncore;
 
 extern ncore::alloc_t* gTestAllocator;
 
-UNITTEST_SUITE_BEGIN(singleton_t)
+UNITTEST_SUITE_BEGIN(test_singleton_t)
 {
 
 	class test_singleton1 : public singleton_t<test_singleton1>

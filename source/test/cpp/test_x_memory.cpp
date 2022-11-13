@@ -4,7 +4,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(xmemory_std)
+UNITTEST_SUITE_BEGIN(test_memory_std)
 {
 	UNITTEST_FIXTURE(main)
 	{

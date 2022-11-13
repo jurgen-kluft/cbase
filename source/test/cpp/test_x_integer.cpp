@@ -3,7 +3,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(xinteger)
+UNITTEST_SUITE_BEGIN(test_integer)
 {
 	UNITTEST_FIXTURE(main)
 	{

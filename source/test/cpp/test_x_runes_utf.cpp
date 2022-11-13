@@ -9,7 +9,7 @@ using namespace ncore;
 
 extern ncore::alloc_t* gTestAllocator;
 
-UNITTEST_SUITE_BEGIN(xstring_utf)
+UNITTEST_SUITE_BEGIN(test_string_utf)
 {
     UNITTEST_FIXTURE(utf8)
     {

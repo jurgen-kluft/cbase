@@ -10,7 +10,7 @@ extern ncore::alloc_t* gTestAllocator;
 
 namespace ncore
 {
-    class xobjects : public fsadexed_t
+    class objects_t : public fsadexed_t
     {
         struct node
         {
@@ -27,7 +27,7 @@ namespace ncore
         s32   m_count;
 
     public:
-        inline xobjects() : m_direct(0), m_freelist(nullptr), m_count(0)
+        inline objects_t() : m_direct(0), m_freelist(nullptr), m_count(0)
         {
         }
 
@@ -92,12 +92,12 @@ namespace ncore
         u64 key;
     };
 
-    class xvalue_kv : public btree_idx_kv_t
+    class value_kv_t : public btree_idx_kv_t
     {
-        xobjects*		m_objects;
+        objects_t*		m_objects;
 
     public:
-        xvalue_kv(xobjects* objects) : m_objects(objects) {}
+        value_kv_t(objects_t* objects) : m_objects(objects) {}
 
         virtual u64 get_key(u32 value) const
         {
@@ -116,19 +116,19 @@ namespace ncore
 
 } // namespace ncore
 
-UNITTEST_SUITE_BEGIN(xbtree)
+UNITTEST_SUITE_BEGIN(test_btree)
 {
     UNITTEST_FIXTURE(btree32)
     {
-        ncore::xobjects*  nodes  = nullptr;
-        ncore::xobjects* values = nullptr;
-        ncore::xvalue_kv* value_kv = nullptr;
+        ncore::objects_t*  nodes  = nullptr;
+        ncore::objects_t* values = nullptr;
+        ncore::value_kv_t* value_kv = nullptr;
 
         UNITTEST_FIXTURE_SETUP()
         {
-            nodes  = gTestAllocator->construct<ncore::xobjects>();
-            values = gTestAllocator->construct<ncore::xobjects>();
-            value_kv = gTestAllocator->construct<ncore::xvalue_kv>(values);
+            nodes  = gTestAllocator->construct<ncore::objects_t>();
+            values = gTestAllocator->construct<ncore::objects_t>();
+            value_kv = gTestAllocator->construct<ncore::value_kv_t>(values);
         }
 
         UNITTEST_FIXTURE_TEARDOWN()
@@ -293,8 +293,8 @@ UNITTEST_SUITE_BEGIN(xbtree)
             XCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
-        static xobjects nodes;
-        static xobjects values;
+        static objects_t nodes;
+        static objects_t values;
 
         class myvalue_kv : public btree_ptr_kv_t
         {

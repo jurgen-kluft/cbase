@@ -47,54 +47,63 @@ namespace ncore
     template <typename K> class hasher_t
     {
     public:
+        bool is_hashable() const { return false; }
         u64 hash(K const& k) const { return 0; }
     };
 
     template <> class hasher_t<s32>
     {
     public:
-        u64 hash(s32 const& k) const { return calchash((const u8*)&k, sizeof(k)); }
+        bool is_hashable() const { return false; }
+        u64 hash(s32 const& k) const{ return (u64)k; }
     };
 
     template <> class hasher_t<u32>
     {
     public:
-        u64 hash(u32 const& k) const { return calchash((const u8*)&k, sizeof(k)); }
+        bool is_hashable() const { return false; }
+        u64 hash(u32 const& k) const{ return (u64)k; }
     };
 
     template <> class hasher_t<s64>
     {
     public:
-        u64 hash(s64 const& k) const { return calchash((const u8*)&k, sizeof(k)); }
+        bool is_hashable() const { return false; }
+        u64 hash(s64 const& k) const{ return (u64)k; }
     };
 
     template <> class hasher_t<u64>
     {
     public:
-        u64 hash(u64 const& k) const { return calchash((const u8*)&k, sizeof(k)); }
+        bool is_hashable() const { return false; }
+        u64 hash(u64 const& k) const{ return (u64)k; }
     };
 
     template <> class hasher_t<f32>
     {
     public:
-        u64 hash(f32 const& k) const { return calchash((const u8*)&k, sizeof(k)); }
+        bool is_hashable() const { return false; }
+        u64 hash(f32 const& k) const{ return (u64)k; }
     };
 
     template <> class hasher_t<f64>
     {
     public:
-        u64 hash(f64 const& k) const { return calchash((const u8*)&k, sizeof(k)); }
+        bool is_hashable() const { return false; }
+        u64 hash(f64 const& k) const{ return (u64)k; }
     };
 
     template <> class hasher_t<void*>
     {
     public:
-        u64 hash(void* const k) const { return calchash((const u8*)&k, sizeof(k)); }
+        bool is_hashable() const { return false; }
+        u64 hash(void* const k) const { return (u64)k; }
     };
 
     template <> class hasher_t<const char*>
     {
     public:
+        bool is_hashable() const { return true; }
         u64 hash(const char* const k) const 
         {
             const char* i = k;

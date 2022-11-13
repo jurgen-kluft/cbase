@@ -8,39 +8,38 @@
 
 UNITTEST_SUITE_LIST(cUnitTest);
 
-UNITTEST_SUITE_DECLARE(cUnitTest, xinteger);
-UNITTEST_SUITE_DECLARE(cUnitTest, xtypes);
-UNITTEST_SUITE_DECLARE(cUnitTest, xallocator);
-UNITTEST_SUITE_DECLARE(cUnitTest, xbinary_search);
-UNITTEST_SUITE_DECLARE(cUnitTest, xbitfield);
-UNITTEST_SUITE_DECLARE(cUnitTest, xbtree);
-UNITTEST_SUITE_DECLARE(cUnitTest, buffer_t);
-UNITTEST_SUITE_DECLARE(cUnitTest, carray_t);
-UNITTEST_SUITE_DECLARE(cUnitTest, darray_t);
-UNITTEST_SUITE_DECLARE(cUnitTest, xdouble);
-UNITTEST_SUITE_DECLARE(cUnitTest, xdtrie);
-UNITTEST_SUITE_DECLARE(cUnitTest, xendian);
-UNITTEST_SUITE_DECLARE(cUnitTest, xfloat);
-UNITTEST_SUITE_DECLARE(cUnitTest, guid_t);
-UNITTEST_SUITE_DECLARE(cUnitTest, hbb_t);
-UNITTEST_SUITE_DECLARE(cUnitTest, xmap_and_set);
-UNITTEST_SUITE_DECLARE(cUnitTest, xmemory_std);
-UNITTEST_SUITE_DECLARE(cUnitTest, g_qsort);
-UNITTEST_SUITE_DECLARE(cUnitTest, xrange);
-UNITTEST_SUITE_DECLARE(cUnitTest, singleton_t);
-UNITTEST_SUITE_DECLARE(cUnitTest, xslice);
-UNITTEST_SUITE_DECLARE(cUnitTest, span);
-UNITTEST_SUITE_DECLARE(cUnitTest, xsprintf);
-UNITTEST_SUITE_DECLARE(cUnitTest, xsscanf);
-UNITTEST_SUITE_DECLARE(cUnitTest, xstring_ascii);
-UNITTEST_SUITE_DECLARE(cUnitTest, xstring_utf);
-UNITTEST_SUITE_DECLARE(cUnitTest, xtree);
-UNITTEST_SUITE_DECLARE(cUnitTest, context_t);
-UNITTEST_SUITE_DECLARE(cUnitTest, xva);
-
+UNITTEST_SUITE_DECLARE(cUnitTest, test_integer);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_types);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_allocator);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_binary_search);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_bitfield);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_btree);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_buffer_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_carray_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_darray_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_double);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_dtrie);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_endian);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_float);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_guid_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_hbb_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_map_and_set);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_memory_std);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_qsort);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_range);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_singleton_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_slice);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_span);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_sprintf);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_sscanf);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_string_ascii);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_string_utf);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_tree);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_context_t);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_va);
 
 #ifndef D_NO_CUSTOM_INT64
-UNITTEST_SUITE_DECLARE(cUnitTest, __xint64);
+UNITTEST_SUITE_DECLARE(cUnitTest, test_int64);
 #endif // X_NO_CUSTOM_INT64
 
 namespace ncore

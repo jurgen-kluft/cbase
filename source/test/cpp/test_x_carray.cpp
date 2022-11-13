@@ -4,7 +4,7 @@
 using namespace ncore;
 
 
-UNITTEST_SUITE_BEGIN(carray_t)
+UNITTEST_SUITE_BEGIN(test_carray_t)
 {
 	UNITTEST_FIXTURE(main)
 	{

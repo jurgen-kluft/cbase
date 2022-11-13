@@ -8,7 +8,7 @@ using namespace ncore;
 
 extern ncore::alloc_t* gTestAllocator;
 
-UNITTEST_SUITE_BEGIN(xallocator)
+UNITTEST_SUITE_BEGIN(test_allocator)
 {
     UNITTEST_FIXTURE(main)
     {

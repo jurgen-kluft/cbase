@@ -26,7 +26,7 @@ static s32 f32_compare(const void* const a, const void* const b, void*)
 	return 0;
 }
 
-UNITTEST_SUITE_BEGIN(g_qsort)
+UNITTEST_SUITE_BEGIN(test_qsort)
 {
 	UNITTEST_FIXTURE(main)
 	{

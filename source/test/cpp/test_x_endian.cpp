@@ -3,7 +3,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(xendian)
+UNITTEST_SUITE_BEGIN(test_endian)
 {
     UNITTEST_FIXTURE(main)
     {
