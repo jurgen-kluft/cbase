@@ -109,13 +109,8 @@ namespace ncore
 
             T const index = (T)(delnode - m_nodes);
 
-            // Destructor of K
-            void* mem = (void*)(&m_keys[index]);
-            ((K*)mem)->~K();
-
-            // Destructor of V
-            mem = (void*)(&m_values[index]);
-            ((V*)mem)->~V();
+            cstd::destruct(&m_keys[index]);
+            cstd::destruct(&m_values[index]);
 
             m_size--;
         }
