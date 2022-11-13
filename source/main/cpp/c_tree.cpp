@@ -56,7 +56,7 @@ namespace ncore
         static tree_t::node_t* tree_successor(tree_t* tree, tree_t::node_t* node);
 
         static bool tree_insert(tree_t* tree, void const* key, void const* value);
-        static bool tree_find(tree_t* tree, void const* key, tree_t::node_t*& found);
+        static bool tree_find(tree_t const* tree, void const* key, tree_t::node_t*& found);
         static bool tree_clear(tree_t* tree, tree_t::node_t*& removed_node);
         static void tree_repair(tree_t* tree, tree_t::node_t* node);
         static void tree_remove(tree_t* tree, tree_t::node_t* node);
@@ -357,7 +357,7 @@ namespace ncore
 
     // Look for a node matching key in tree.
     // Returns a pointer to the node if found, else nullptr.
-    bool tree_internal_t::tree_find(tree_t* tree, void const* key, tree_t::node_t*& found)
+    bool tree_internal_t::tree_find(tree_t const* tree, void const* key, tree_t::node_t*& found)
     {
         tree_t::node_t* node = rbfirst(tree);
         while (node != rbnil(tree))
@@ -482,11 +482,18 @@ namespace ncore
         }
     }
 
-    tree_t::tree_t(tree_t::ctxt_t* ctxt)
-        : m_ctxt(ctxt)
+    tree_t::tree_t() 
+        : m_ctxt(nullptr)
         , m_nill(nullptr)
         , m_root(nullptr)
+    {}
+
+    void tree_t::init(tree_t::ctxt_t* ctxt)
     {
+        m_ctxt = ctxt;
+        m_nill = nullptr;
+        m_root = nullptr;
+        
         // We use a self-referencing sentinel node called nil to simplify the
         // code by avoiding the need to check for nullptr pointers.
         m_nill = m_ctxt->v_new_node(nullptr, nullptr);
@@ -514,7 +521,7 @@ namespace ncore
         }
         return result;
     }
-    bool tree_t::find(void const* key, node_t*& found)
+    bool tree_t::find(void const* key, node_t*& found) const
     {
         bool result = tree_internal_t::tree_find(this, key, found);
         return result;

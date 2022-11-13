@@ -596,7 +596,7 @@ namespace ncore
 extern ncore::alloc_t* gTestAllocator;
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_dtrie_t)
+UNITTEST_SUITE_BEGIN(test_dtrie)
 {
     UNITTEST_FIXTURE(main)
     {

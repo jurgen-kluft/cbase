@@ -8,7 +8,10 @@
 #include "cbase/c_allocator.h"
 #include "cbase/c_integer.h"
 #include "cbase/c_hash.h"
+#include "cbase/c_limits.h"
 #include "cbase/c_tree.h"
+#include "cbase/private/c_std.h"
+#include "cbase/private/c_map_internal.h"
 
 namespace ncore
 {
@@ -22,20 +25,23 @@ namespace ncore
         inline map_t(alloc_t* a = nullptr, u32 max_items = 65535)
             : m_allocator(a)
             , m_ctxt(nullptr)
+            , m_tree()
         {
             if (m_allocator == nullptr)
             {
                 m_allocator = alloc_t::get_system();
             }
 
-            if (max_items <= limits_t<u16>::max())
+            if (max_items <= limits_t<u16>::maximum())
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u16, K, u32, H>>(a, max_items);
             }
-            else if (max_items <= limits_t<u32>::max())
+            else if (max_items <= limits_t<u32>::maximum())
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, u32, H>>(a, max_items);
             }
+
+            m_tree.init(m_ctxt);
         }
 
         inline ~map_t()
@@ -45,14 +51,14 @@ namespace ncore
             m_allocator->destruct(m_ctxt);
         }
 
-        bool insert(K const& k, V const& v) { return m_tree.insert(&key, &v); }
-        bool remove(K const& k) { return m_tree.remove(&k); }
-        bool find(K const& k, V const*& v) const
+        bool insert(K const& key, V const& value) { return m_tree.insert(&key, &value); }
+        bool remove(K const& key) { return m_tree.remove(&key); }
+        bool find(K const& key, V const*& value) const
         {
-            node_t* found;
-            bool    result = m_tree.find(&k, found);
+            tree_t::node_t* found;
+            bool    result = m_tree.find(&key, found);
             if (found != nullptr)
-                v = (V const*)m_ctxt->v_get_value(found);
+                value= (V const*)m_ctxt->v_get_value(found);
             return result;
         }
 
@@ -68,20 +74,23 @@ namespace ncore
         inline set_t(alloc_t* a = nullptr, u32 max_items = 65535)
             : m_allocator(a)
             , m_ctxt(nullptr)
+            , m_tree()
         {
             if (m_allocator == nullptr)
             {
                 m_allocator = alloc_t::get_system();
             }
 
-            if (max_items <= limits_t<u16>::max())
+            if (max_items <= limits_t<u16>::maximum())
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u16, K, u8, H>>(a, max_items, false);
             }
-            else if (max_items <= limits_t<u32>::max())
+            else if (max_items <= limits_t<u32>::maximum())
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, u8, H>>(a, max_items, false);
             }
+
+            m_tree.init(m_ctxt);
         }
 
         ~set_t() { m_allocator->destruct(m_ctxt); }
@@ -90,7 +99,7 @@ namespace ncore
         bool contains(K const& key) const
         {
             tree_t::node_t* found  = nullptr;
-            bool            result = m_tree.find(key, found);
+            bool            result = m_tree.find(&key, found);
             return result;
         }
         bool remove(K const& key)
@@ -106,7 +115,5 @@ namespace ncore
     };
 
 }; // namespace ncore
-
-#include "cbase/private/c_map_internal.h"
 
 #endif // __CBASE_MAP_H__

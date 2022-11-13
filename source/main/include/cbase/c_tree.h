@@ -16,7 +16,9 @@ namespace ncore
         class ctxt_t;
         struct node_t;
 
-        tree_t(ctxt_t* ctxt);
+        tree_t();
+        
+        void init(ctxt_t* ctxt);
 
         enum node_e
         {
@@ -95,7 +97,7 @@ namespace ncore
         inline int_t capacity() const { return m_ctxt->v_capacity(); }
 
         bool clear(void const*& key); // Repeatedly call 'clear' until true is returned
-        bool find(void const* key, node_t*& found);
+        bool find(void const* key, node_t*& found) const;
         bool insert(void const* key, void const* value=nullptr);
         bool remove(void const* key);
 

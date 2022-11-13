@@ -4272,6 +4272,63 @@ namespace ncore
         return false;
     }
 
+    bool runes_reader_t::vread_line(crunes_t& line)
+    {
+        if (at_end())
+            return false;
+
+        line.m_type = m_runes.m_type;
+        switch (m_runes.m_type)
+        {
+            case ascii::TYPE:
+                line.m_ascii.m_bos = m_runes.m_ascii.m_bos;
+                line.m_ascii.m_str = m_cursor.m_ascii;
+                line.m_ascii.m_eos = m_runes.m_ascii.m_eos;
+                line.m_ascii.m_end = m_runes.m_ascii.m_end;
+                while (!at_end() && *m_cursor.m_ascii != '\n')
+                    m_cursor.m_ascii++;
+                if (!at_end())
+                    m_cursor.m_ascii++;
+                line.m_ascii.m_end = m_cursor.m_ascii;
+                break;
+            case utf8::TYPE:
+                line.m_utf8.m_bos = m_runes.m_utf8.m_bos;
+                line.m_utf8.m_str = m_cursor.m_utf8;
+                line.m_utf8.m_eos = m_runes.m_utf8.m_eos;
+                line.m_utf8.m_end = m_runes.m_utf8.m_end;
+                while (!at_end() && utf::peek(m_runes.m_utf8, m_cursor) != '\n')
+                    utf::read(m_runes.m_utf8, m_cursor.m_utf8);
+                if (!at_end())
+                    utf::read(m_runes.m_utf8, m_cursor.m_utf8);
+                line.m_utf8.m_end = m_cursor.m_utf8;
+                break;
+            case utf16::TYPE:
+                line.m_utf16.m_bos = m_runes.m_utf16.m_bos;
+                line.m_utf16.m_str = m_cursor.m_utf16;
+                line.m_utf16.m_eos = m_runes.m_utf16.m_eos;
+                line.m_utf16.m_end = m_runes.m_utf16.m_end;
+                while (!at_end() && utf::peek(m_runes.m_utf16, m_cursor) != '\n')
+                    utf::read(m_runes.m_utf16, m_cursor.m_utf16);
+                if (!at_end())
+                    utf::read(m_runes.m_utf16, m_cursor.m_utf16);
+                line.m_utf16.m_end = m_cursor.m_utf16;
+                break;
+            case utf32::TYPE:
+                line.m_utf32.m_bos = m_runes.m_utf32.m_bos;
+                line.m_utf32.m_str = m_cursor.m_utf32;
+                line.m_utf32.m_eos = m_runes.m_utf32.m_eos;
+                line.m_utf32.m_end = m_runes.m_utf32.m_end;
+                while (!at_end() && *m_cursor.m_utf32 != '\n')
+                    m_cursor.m_utf32++;
+                if (!at_end())
+                    m_cursor.m_utf32++;
+                line.m_utf32.m_end = m_cursor.m_utf32;
+                break;
+        }
+        
+        return true;
+    }
+
     void runes_reader_t::vskip(s32 c)
     {
         switch (m_runes.m_type)

@@ -8,6 +8,8 @@ namespace ncore
             T m_branches[3];
         };
 
+        XCORE_CLASS_PLACEMENT_NEW_DELETE
+
         map_tree_ctxt_t(alloc_t* allocator, u32 maxsize, bool has_values = true)
             : tree_t::ctxt_t()
             , m_max_size(maxsize)
@@ -43,7 +45,7 @@ namespace ncore
         virtual int_t v_capacity() const { return m_max_size; }
         virtual void  v_set_color(tree_t::node_t* node, tree_t::color_e color)
         {
-            T const   index = (T)(node - m_nodes);
+            T const   index = (T)((nodeT_t*)node - m_nodes);
             u32 const bit   = index & 31;
             u32 const word  = index >> 5;
             if (color == tree_t::RED)
@@ -53,48 +55,48 @@ namespace ncore
         }
         virtual tree_t::color_e v_get_color(tree_t::node_t const* node) const
         {
-            T const   index = (T)(node - m_nodes);
+            T const   index = (T)((nodeT_t*)node - m_nodes);
             u32 const bit   = index & 31;
             u32 const word  = index >> 5;
             return (m_colors[word] & (1 << bit)) ? tree_t::RED : tree_t::BLACK;
         }
         virtual void const* v_get_key(tree_t::node_t const* node) const
         {
-            T const index = (T)(node - m_nodes);
+            T const index = (T)((nodeT_t*)node - m_nodes);
             return (void const*)&m_keys[index];
         }
         virtual void const* v_get_value(tree_t::node_t const* node) const
         {
-            T const index = (T)(node - m_nodes);
+            T const index = (T)((nodeT_t*)node - m_nodes);
             return (void const*)&m_values[index];
         }
         virtual tree_t::node_t* v_get_node(tree_t::node_t const* n, tree_t::node_e ne) const
         {
-            T const  index = (T)(n - m_nodes);
+            T const  index = (T)((nodeT_t*)n - m_nodes);
             nodeT_t* node  = &m_nodes[index];
             return (tree_t::node_t*)&m_nodes[node->m_branches[ne]];
         }
         virtual void v_set_node(tree_t::node_t* n, tree_t::node_e ne, tree_t::node_t* set) const
         {
-            T const  index       = (T)(n - m_nodes);
+            T const  index       = (T)((nodeT_t*)n - m_nodes);
             nodeT_t* node        = &m_nodes[index];
-            node->m_branches[ne] = (T)(set - m_nodes);
+            node->m_branches[ne] = (T)((nodeT_t*)set - m_nodes);
         }
         virtual tree_t::node_t* v_new_node(void const* key, void const* value)
         {
             if (m_size >= m_max_size)
                 return nullptr;
             nodeT_t* newnode = m_freelist;
-            m_freelist       = &m_nodes[newnode->m_branch[0]];
+            m_freelist       = &m_nodes[newnode->m_branches[0]];
             T const index    = (T)(newnode - m_nodes);
 
             // Constructor K
-            void* mem = (void*)(&m_keys[index]);
-            new (mem) K(*(K*)data);
+            K* pkey = (K*)(&m_keys[index]);
+            cstd::copy_construct(pkey, *(K const*)key);
 
             // Constructor V
-            mem = (void*)(&m_values[index]);
-            new (mem) V(*(V*)value);
+            V* pvalue = (V*)(&m_values[index]);
+            cstd::copy_construct(pvalue, *(V const*)value);
 
             m_size++;
             return (tree_t::node_t*)newnode;
@@ -102,7 +104,7 @@ namespace ncore
         virtual void v_del_node(tree_t::node_t* node)
         {
             nodeT_t* delnode     = (nodeT_t*)node;
-            delnode->m_branch[0] = (T)(m_freelist - m_nodes);
+            delnode->m_branches[0] = (T)(m_freelist - m_nodes);
             m_freelist           = delnode;
 
             T const index = (T)(delnode - m_nodes);
@@ -119,8 +121,8 @@ namespace ncore
         }
         virtual s32 v_compare_nodes(tree_t::node_t const* node, tree_t::node_t const* other) const
         {
-            T const index  = (T)(node - m_nodes);
-            T const oindex = (T)(other - m_nodes);
+            T const index  = (T)((nodeT_t*)node - m_nodes);
+            T const oindex = (T)((nodeT_t*)other - m_nodes);
             if (m_keys[index] < m_keys[oindex])
                 return -1;
             else if (m_keys[index] > m_keys[oindex])
@@ -129,7 +131,7 @@ namespace ncore
         }
         virtual s32 v_compare_insert(void const* data, tree_t::node_t const* node) const
         {
-            T const  index = (T)(node - m_nodes);
+            T const  index = (T)((nodeT_t*)node - m_nodes);
             K const& key   = *(K const*)data;
             if (key < m_keys[index])
                 return -1;
@@ -138,14 +140,14 @@ namespace ncore
             return 0;
         }
 
-        u32        m_max_size;
-        u32        m_size;
-        alloc_t*   m_allocator;
-        nodeT_t*   m_nodes;
-        nodeT_t*   m_freelist; // points to the head of the list of free nodes
-        u32*       m_colors;
-        H::hash_t* m_hashes;
-        K*         m_keys;
-        V*         m_values;
+        u32      m_max_size;
+        u32      m_size;
+        alloc_t* m_allocator;
+        nodeT_t* m_nodes;
+        nodeT_t* m_freelist; // points to the head of the list of free nodes
+        u32*     m_colors;
+        u64*     m_hashes;
+        K*       m_keys;
+        V*       m_values;
     };
 } // namespace ncore

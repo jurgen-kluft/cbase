@@ -962,7 +962,7 @@ namespace ncore
 
 #elif defined(COMPILER_CLANG)
 
-#pragma message "clang compiler"
+/// #pragma message "clang compiler"
 
 #    define D_NO_CUSTOM_INT64
 #    define D_NO_CUSTOM_UINT64

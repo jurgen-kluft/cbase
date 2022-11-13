@@ -45,7 +45,7 @@ public:
         m_cap      = 32;
         m_nodes    = (node16_t*)m_allocator->allocate(sizeof(node16_t) * m_cap);
         m_freelist = m_nodes;
-        m_keys     = (void**)m_allocator->allocate(sizeof(void*) * m_cap);
+        m_keys     = (void const**)m_allocator->allocate(sizeof(void*) * m_cap);
         for (int_t i = 0; i < m_cap; ++i)
         {
             m_nodes[i].m_color       = tree_t::BLACK;
@@ -106,7 +106,7 @@ public:
     virtual s32 v_compare_insert(void const* key, tree_t::node_t const* node) const { return compare_s32(key, v_get_key(node)); }
 };
 
-UNITTEST_SUITE_BEGIN(xtree)
+UNITTEST_SUITE_BEGIN(test_tree)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -166,7 +166,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(void_tree)
         {
-            tree_t tree(ctxt);
+            tree_t tree;
+            tree.init(ctxt);
 
             s32 a = 1;
             s32 b = 2;
@@ -237,7 +238,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(void_tree_iterate_preorder)
         {
-            tree_t tree(ctxt);
+            tree_t tree;
+            tree.init(ctxt);
 
             s32 a = 1;
             s32 b = 2;
@@ -275,7 +277,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(void_tree_iterate_sortorder)
         {
-            tree_t tree(ctxt);
+            tree_t tree;
+            tree.init(ctxt);
 
             s32 a = 1;
             s32 b = 2;
@@ -313,7 +316,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
         {
-            tree_t tree(ctxt);
+            tree_t tree;
+            tree.init(ctxt);
 
             s32 a = 1;
             s32 b = 2;
@@ -351,7 +355,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(void_tree_iterate_postorder)
         {
-            tree_t tree(ctxt);
+            tree_t tree;
+            tree.init(ctxt);
 
             s32 a = 1;
             s32 b = 2;
@@ -390,7 +395,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(void_tree_search)
         {
-            tree_t tree(ctxt);
+            tree_t tree;
+            tree.init(ctxt);
 
             s32 a = 1;
             s32 b = 2;
@@ -431,7 +437,8 @@ UNITTEST_SUITE_BEGIN(xtree)
 
         UNITTEST_TEST(s32_tree)
         {
-            tree_t tree(ctxt);
+            tree_t tree;
+            tree.init(ctxt);
 
             s32 a(1);
             s32 b(2);

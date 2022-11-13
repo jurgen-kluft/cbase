@@ -668,7 +668,7 @@ namespace ncore
         bool    valid() const { return vvalid(); }
         uchar32 peek() const { return vpeek(); }
         bool    read(uchar32& c) { return vread(c); }
-        bool    read_line(uchar32*& begin, uchar32*& end) { return vread_line(begin, end); }
+        bool    read_line(crunes_t& line) { return vread_line(line); }
         void    skip(s32 c = 1) { vskip(c); }
 
         inline uchar32 read()
@@ -679,12 +679,12 @@ namespace ncore
         }
 
     protected:
-        virtual void    vreset()                                   = 0;
-        virtual bool    vvalid() const                             = 0;
-        virtual uchar32 vpeek() const                              = 0;
-        virtual bool    vread(uchar32& c)                          = 0;
-        virtual bool    vread_line(uchar32*& begin, uchar32*& end) = 0;
-        virtual void    vskip(s32 c)                               = 0;
+        virtual void    vreset()                   = 0;
+        virtual bool    vvalid() const             = 0;
+        virtual uchar32 vpeek() const              = 0;
+        virtual bool    vread(uchar32& c)          = 0;
+        virtual bool    vread_line(crunes_t& line) = 0;
+        virtual void    vskip(s32 c)               = 0;
     };
 
     class runes_reader_t : public irunes_reader_t
@@ -712,7 +712,7 @@ namespace ncore
         virtual void    vreset();
         virtual uchar32 vpeek() const;
         virtual bool    vread(uchar32& c);
-        virtual bool    vread_line(uchar32*& begin, uchar32*& end);
+        virtual bool    vread_line(crunes_t& line);
         virtual void    vskip(s32 c);
 
         crunes_t        m_runes;
