@@ -2,7 +2,7 @@
 #define __CBASE_SLICE_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#    pragma once
+#pragma once
 #endif
 
 #include "cbase/c_allocator.h"
@@ -18,67 +18,44 @@ namespace ncore
     struct slice_t
     {
         slice_t();
-        slice_t(alloc_t* allocator, s32 item_count, s32 item_size);
-        slice_t(slice_data_t* data, s32 from, s32 to);
 
-        static void alloc(slice_t& slice_t, alloc_t* allocator, s32 item_count, s32 item_size);
-        slice_t     construct(s32 _item_count, s32 _item_size) const;
-        s32         size() const;
-        s32         refcnt() const;
-        slice_t     obtain() const;
-        void        release();
-        void        resize(s32 count);
-        void        insert(s32 count);
-        void        remove(s32 count);
-        slice_t     view(s32 from, s32 to) const;
-        bool        split(s32 mid, slice_t& left, slice_t& right) const;
+        static void    allocate(slice_t& slice_t, alloc_t* allocator, s32 item_count, s32 item_size);
+        static slice_t duplicate(slice_t const& slice);
+        static bool    split(slice_t const& slice, s32 mid, slice_t& left, slice_t& right);
+        static slice_t join(slice_t const& sliceA, slice_t const& sliceB);
+
+        s32 size() const;
+        s32 from() const { return mFrom; }
+        s32 to() const { return mTo; }
+
+        slice_t view() const { return view(0, size()); }
+        slice_t view(s32 to) const { return view(0, to); }
+        slice_t view(s32 from, s32 to) const;
+
+        void insert(slice_t const& other);
+        void overwrite(slice_t const& other);
+        void remove(slice_t const& other);
 
         void*       begin();
         void const* begin() const;
         void*       end();
         void const* end() const;
-        void const* eos() const;
+        bool        next(void*& ptr) const;
+        bool        next(void const*& ptr) const;
         void*       at(s32 index);
         void const* at(s32 index) const;
+
+    protected:
+        friend class slice_data_t;
+
+        s32  refcnt() const;
+        void release();
 
         slice_data_t* mData;
         s32           mFrom;
         s32           mTo;
     };
 
-    // ----------------------------------------------------------------------------------------
-    //   SLICE REFERENCE COUNTED DATA
-    // ----------------------------------------------------------------------------------------
-
-    struct slice_data_t
-    {
-        slice_data_t();
-        slice_data_t(s32 item_count, s32 item_size);
-        slice_data_t(u8* data, s32 item_count, s32 item_size);
-
-        static slice_data_t sNull;
-
-        slice_data_t* incref();
-        slice_data_t* incref() const;
-        slice_data_t* decref();
-
-        // This function makes a new 'slice_data_t' with content copied from this
-        slice_data_t* copy(s32 from, s32 to);
-
-        // These functions do not 'reallocate' this
-        void resize(s32 from, s32 to);
-        void insert(s32 at, s32 count);
-        void remove(s32 at, s32 count);
-
-        static slice_data_t* alloc(alloc_t* allocator, s32& to_itemcount, s32& to_itemsize);
-
-        mutable s32 mRefCount;
-        s32         mItemCount; /// Count of total items
-        s32         mItemSize;  /// Size of one item
-        s32         mDummy;
-        alloc_t*    mAllocator;
-        u8*      mData;
-    };
 } // namespace ncore
 
 #endif

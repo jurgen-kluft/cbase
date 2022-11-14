@@ -40,6 +40,15 @@ namespace ncore
                 return 0;
         }
         template <class T> T clamp(T integerA, T low, T high); ///< Return the clamp value
+        
+        /// clamp sub-range inside of encompassing range
+        template <class T> void clampRange(T& subfrom, T& subto, T enfrom, T ento)
+        {
+            sort(subfrom, subto);
+            sort(enfrom, ento);
+            clamp(subfrom, enfrom, ento);
+            clamp(subto, enfrom, ento);
+        }
 
         inline u32  align(u32 integer, u32 alignment);     ///< Return the aligned value of integer
         inline u32  alignDown(u32 integer, u32 alignment); ///< Return the aligned value of integer
