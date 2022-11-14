@@ -4460,7 +4460,7 @@ namespace ncore
                 case ascii::TYPE:
                     while (str<end && !at_end(m_cursor, m_runes))
                     {
-                        c = *str;
+                        c = *str++;
                         m_cursor.m_ascii[0] = (ascii::rune)c;
                         m_cursor.m_ascii += 1;
                         m_count += 1;
@@ -4469,7 +4469,7 @@ namespace ncore
                 case utf8::TYPE:
                     while (str<end && !at_end(m_cursor, m_runes))
                     {
-                        c = *str;
+                        c = *str++;
                         utf::write(c, m_runes.m_utf8, m_cursor.m_utf8);
                         m_count += 1;
                     }
@@ -4477,7 +4477,7 @@ namespace ncore
                 case utf16::TYPE:
                     while (str<end && !at_end(m_cursor, m_runes))
                     {
-                        c = *str;
+                        c = *str++;
                         utf::write(c, m_runes.m_utf16, m_cursor.m_utf16);
                         m_count += 1;
                     }
@@ -4485,7 +4485,7 @@ namespace ncore
                 case utf32::TYPE:
                     while (str<end && !at_end(m_cursor, m_runes))
                     {
-                        c = *str;
+                        c = *str++;
                         m_cursor.m_utf32[0] = c;
                         m_cursor.m_utf32 += 1;
                         m_count += 1;

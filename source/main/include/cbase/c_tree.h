@@ -19,6 +19,7 @@ namespace ncore
         tree_t();
         
         void init(ctxt_t* ctxt);
+        void exit();
 
         enum node_e
         {
@@ -36,8 +37,8 @@ namespace ncore
         {
         public:
             virtual ~ctxt_t() {}
-            virtual int_t       v_size() const                                                 = 0;
-            virtual int_t       v_capacity() const                                             = 0;
+            virtual s32         v_size() const                                                 = 0;
+            virtual s32         v_capacity() const                                             = 0;
             virtual void        v_set_color(node_t* node, color_e color)                       = 0;
             virtual color_e     v_get_color(node_t const* node) const                          = 0;
             virtual void const* v_get_key(node_t const* node) const                            = 0;

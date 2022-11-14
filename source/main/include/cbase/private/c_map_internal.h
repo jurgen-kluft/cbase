@@ -16,6 +16,7 @@ namespace ncore
         {
             m_allocator = allocator;
             m_size      = 0;
+            m_freeindex = 0;
             m_nodes     = m_allocator->obtain_array<nodeT_t>(maxsize);
             m_colors    = m_allocator->obtain_array<u32>((maxsize + 31) >> 5);
             m_keys      = m_allocator->obtain_array<K>(maxsize);
@@ -30,6 +31,8 @@ namespace ncore
             {
                 m_hashes = m_allocator->obtain_array<u64>(maxsize);
             }
+
+            m_freelist = nullptr;
         }
 
         virtual ~map_tree_ctxt_t()
@@ -41,8 +44,8 @@ namespace ncore
             m_allocator->deallocate(m_values);
         }
 
-        virtual int_t v_size() const { return m_size; }
-        virtual int_t v_capacity() const { return m_max_size; }
+        virtual s32   v_size() const { return m_size; }
+        virtual s32   v_capacity() const { return m_max_size; }
         virtual void  v_set_color(tree_t::node_t* node, tree_t::color_e color)
         {
             T const   index = (T)((nodeT_t*)node - m_nodes);
@@ -86,26 +89,56 @@ namespace ncore
         {
             if (m_size >= m_max_size)
                 return nullptr;
-            nodeT_t* newnode = m_freelist;
-            m_freelist       = &m_nodes[newnode->m_branches[0]];
-            T const index    = (T)(newnode - m_nodes);
+
+            nodeT_t* newnode;
+            if (m_freelist != nullptr)
+            {
+                newnode    = m_freelist;
+                m_freelist = &m_nodes[newnode->m_branches[0]];
+            }
+            else
+            {
+                newnode = &m_nodes[m_freeindex];
+                newnode->m_branches[0] = limits_t<T>::maximum();
+                newnode->m_branches[1] = limits_t<T>::maximum();
+                newnode->m_branches[2] = limits_t<T>::maximum();
+                m_freeindex++;
+            }
+            T const index = (T)(newnode - m_nodes);
 
             // Constructor K
             K* pkey = (K*)(&m_keys[index]);
-            cstd::copy_construct(pkey, *(K const*)key);
+            if (key != nullptr) 
+            {
+                cstd::copy_construct(pkey, *(K const*)key);
+            }
+            else
+            {
+                cstd::construct(pkey);
+            }
 
             // Constructor V
             V* pvalue = (V*)(&m_values[index]);
-            cstd::copy_construct(pvalue, *(V const*)value);
+            if (value != nullptr)
+            {
+                cstd::copy_construct(pvalue, *(V const*)value);
+            }
+            else
+            {
+                cstd::construct(pvalue);
+            }
+
+            // Color
+            v_set_color((tree_t::node_t*)newnode, tree_t::RED);
 
             m_size++;
             return (tree_t::node_t*)newnode;
         }
         virtual void v_del_node(tree_t::node_t* node)
         {
-            nodeT_t* delnode     = (nodeT_t*)node;
+            nodeT_t* delnode       = (nodeT_t*)node;
             delnode->m_branches[0] = (T)(m_freelist - m_nodes);
-            m_freelist           = delnode;
+            m_freelist             = delnode;
 
             T const index = (T)(delnode - m_nodes);
 
@@ -113,6 +146,9 @@ namespace ncore
             cstd::destruct(&m_values[index]);
 
             m_size--;
+
+            if (m_size == 0)
+                m_freeindex = 0;
         }
         virtual s32 v_compare_nodes(tree_t::node_t const* node, tree_t::node_t const* other) const
         {
@@ -137,6 +173,7 @@ namespace ncore
 
         u32      m_max_size;
         u32      m_size;
+        u32      m_freeindex;
         alloc_t* m_allocator;
         nodeT_t* m_nodes;
         nodeT_t* m_freelist; // points to the head of the list of free nodes

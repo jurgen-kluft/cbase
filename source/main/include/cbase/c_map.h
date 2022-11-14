@@ -15,9 +15,6 @@
 
 namespace ncore
 {
-    // NOTE: it is possible to make a tree_t::ctxt_t (a 16 and a 32) per thread 
-    //       context and share that for all maps in the thread. This would require
-    //       a check in the map to see if it is not used/moved to another thread.
 
     template <typename K, typename V, typename H = hasher_t<K>> class map_t
     {
@@ -48,6 +45,7 @@ namespace ncore
         {
             void const* key;
             while (!m_tree.clear(key)) {}
+            m_tree.exit();
             m_allocator->destruct(m_ctxt);
         }
 
@@ -93,7 +91,11 @@ namespace ncore
             m_tree.init(m_ctxt);
         }
 
-        ~set_t() { m_allocator->destruct(m_ctxt); }
+        ~set_t() 
+        {
+            m_tree.exit();
+            m_allocator->destruct(m_ctxt); 
+        }
 
         bool insert(K const& key) { return m_tree.insert(&key, nullptr); }
         bool contains(K const& key) const

@@ -511,6 +511,15 @@ namespace ncore
         m_root->set_black(m_ctxt);
     }
 
+    void tree_t::exit()
+    {
+        m_ctxt->v_del_node(m_nill);
+        m_ctxt->v_del_node(m_root);
+        m_nill = nullptr;
+        m_root = nullptr;
+        m_ctxt = nullptr;
+    }
+
     bool tree_t::clear(void const*& key)
     {
         node_t* node;

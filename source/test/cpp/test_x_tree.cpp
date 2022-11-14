@@ -22,8 +22,8 @@ s32 compare_s32(void const* p1, void const* p2)
 class ctxt_tree_t : public tree_t::ctxt_t
 {
     alloc_t* m_allocator;
-    int_t    m_size;
-    int_t    m_cap;
+    s32      m_size;
+    s32      m_cap;
 
     struct node16_t
     {
@@ -59,8 +59,8 @@ public:
         m_nodes[m_cap - 1].m_branches[2] = 0xffff;
     }
 
-    virtual int_t           v_size() const { return m_size; }
-    virtual int_t           v_capacity() const { return m_cap; }
+    virtual s32             v_size() const { return m_size; }
+    virtual s32             v_capacity() const { return m_cap; }
     virtual void            v_set_color(tree_t::node_t* node, tree_t::color_e color) { ((node16_t*)node)->m_color = color; }
     virtual tree_t::color_e v_get_color(tree_t::node_t const* node) const { return (tree_t::color_e)((node16_t const*)node)->m_color; }
     virtual void const*     v_get_key(tree_t::node_t const* node) const
