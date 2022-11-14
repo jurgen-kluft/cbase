@@ -32,7 +32,6 @@ namespace ncore
         {
         }
         cbuffer_t(buffer_t const& buffer);
-        cbuffer_t(crunes_t const& str);
 
         inline uint_t size() const { return m_len; }
 
@@ -49,9 +48,7 @@ namespace ncore
 
         binary_reader_t reader() const;
 
-        static cbuffer_t from_ascii_string(const char* str);
-
-        uint_t      m_len;
+        uint_t    m_len;
         u8 const* m_const;
     };
 
@@ -71,7 +68,7 @@ namespace ncore
         }
 
         inline uint_t size() const { return m_len; }
-        inline u8*  data() { return m_mutable; }
+        inline u8*    data() { return m_mutable; }
 
         void reset(u8 fill);
         void clear();
@@ -156,7 +153,7 @@ namespace ncore
         binary_writer_t writer() const;
 
         uint_t m_len;
-        u8*  m_mutable;
+        u8*    m_mutable;
     };
 
     template <uint_t L> class u8s : public buffer_t
@@ -215,20 +212,20 @@ namespace ncore
         bool      can_read(uint_t number_of_bytes) const; // check if we still can read n number of bytes
         bool      at_end() const;
         bool      seek(uint_t cursor);
-        uint_t   pos() const;
+        uint_t    pos() const;
         void      reset();
-        uint_t   skip(uint_t);
-        uint_t   read(bool&);
-        uint_t   read(u8&);
-        uint_t   read(s8&);
-        uint_t   read(u16&);
-        uint_t   read(s16&);
-        uint_t   read(u32&);
-        uint_t   read(s32&);
-        uint_t   read(u64&);
-        uint_t   read(s64&);
-        uint_t   read(f32&);
-        uint_t   read(f64&);
+        uint_t    skip(uint_t);
+        uint_t    read(bool&);
+        uint_t    read(u8&);
+        uint_t    read(s8&);
+        uint_t    read(u16&);
+        uint_t    read(s16&);
+        uint_t    read(u32&);
+        uint_t    read(s32&);
+        uint_t    read(u64&);
+        uint_t    read(s64&);
+        uint_t    read(f32&);
+        uint_t    read(f64&);
         bool      read_bool();
         u8        read_u8();
         s8        read_s8();
@@ -249,8 +246,8 @@ namespace ncore
         uint_t view_crunes(crunes_t& out_str);
 
     protected:
-        uint_t      m_len;
-        uint_t      m_cursor;
+        uint_t    m_len;
+        uint_t    m_cursor;
         u8 const* m_buffer;
     };
 
@@ -289,13 +286,13 @@ namespace ncore
         buffer_t get_full_buffer() const;
         buffer_t get_current_buffer() const;
 
-        bool    can_write(uint_t num_bytes = 0) const;
-        bool    at_end() const;
-        bool    seek(uint_t cursor);
+        bool   can_write(uint_t num_bytes = 0) const;
+        bool   at_end() const;
+        bool   seek(uint_t cursor);
         uint_t pos() const;
 
         void            reset();
-        uint_t         skip(uint_t count);
+        uint_t          skip(uint_t count);
         binary_writer_t reserve(uint_t size); // For writing something in the future you can remember this place - size
         binary_writer_t range(uint_t from, uint_t to) const;
 
@@ -328,7 +325,7 @@ namespace ncore
     protected:
         uint_t m_len;
         uint_t m_cursor;
-        u8*  m_buffer;
+        u8*    m_buffer;
     };
 
     inline cbuffer_t::cbuffer_t(buffer_t const& buffer)

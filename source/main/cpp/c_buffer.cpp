@@ -5,20 +5,6 @@
 
 namespace ncore
 {
-    //==============================================================================
-    // Integer cast and overflow detection
-    template <class FROM, class TO> TO ccast(FROM f) { return f; }
-
-    template <> u32 ccast(u64 f)
-    {
-        ASSERT(f < 0x100000000UL);
-        return (u32)f;
-    }
-    template <> s32 ccast(s64 f)
-    {
-        ASSERT(f >= cS32Min && f <= cS32Max);
-        return (s32)f;
-    }
 
     namespace nuadrw
     {
@@ -137,20 +123,6 @@ namespace ncore
             write_u32(ptr + 4, (u32)((c >> 32) & 0xFFFFFFFF));
         }
     } // namespace nuadrw
-
-    cbuffer_t::cbuffer_t(crunes_t const& str)
-    {
-        m_const          = (u8 const*)str.m_ascii.m_str;
-        u8 const* end = (u8 const*)str.m_ascii.m_end;
-        m_len            = (end - m_const);
-    }
-
-    cbuffer_t cbuffer_t::from_ascii_string(const char* str)
-    {
-        s32       len = ascii::strlen((ascii::pcrune)str, nullptr);
-        cbuffer_t buffer((uint_t)len, (u8 const*)str);
-        return buffer;
-    }
 
     /// ---------------------------------------------------------------------------------------
     /// Binary Reader
