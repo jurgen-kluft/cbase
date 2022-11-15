@@ -18,11 +18,14 @@ namespace ncore
     struct slice_t
     {
         slice_t();
+        ~slice_t();
 
         static void    allocate(slice_t& slice_t, alloc_t* allocator, s32 item_count, s32 item_size);
         static slice_t duplicate(slice_t const& slice);
         static bool    split(slice_t const& slice, s32 mid, slice_t& left, slice_t& right);
         static slice_t join(slice_t const& sliceA, slice_t const& sliceB);
+
+        void release();
 
         s32 size() const;
         s32 from() const { return mFrom; }
@@ -46,10 +49,9 @@ namespace ncore
         void const* at(s32 index) const;
 
     protected:
-        friend class slice_data_t;
+        friend struct slice_data_t;
 
         s32  refcnt() const;
-        void release();
 
         slice_data_t* mData;
         s32           mFrom;

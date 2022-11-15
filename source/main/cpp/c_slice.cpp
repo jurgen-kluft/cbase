@@ -199,6 +199,16 @@ namespace ncore
         mFrom = 0;
         mTo   = 0;
     }
+    slice_t::~slice_t() 
+    {
+        if (mData != &slice_data_t::sNull)
+        {
+            mData->decref();
+        }
+        mData = nullptr;
+        mFrom = 0;
+        mTo   = 0;
+    }
 
     void slice_t::allocate(slice_t& slice, alloc_t* allocator, s32 item_count, s32 item_size)
     {
@@ -226,19 +236,11 @@ namespace ncore
         mTo   = 0;
     }
 
-    slice_t slice_t::view() const
-    {
-        slice_t slice;
-        slice.mData = mData->incref();
-        slice.mFrom = mFrom;
-        slice.mTo   = mTo;
-        return slice;
-    }
-
     slice_t slice_t::view(s32 from, s32 to) const
     {
         slice_t s;
-        if ((mFrom + from) < mTo && (mFrom + to) <= mTo)
+        math::clampRange(from, to, 0, (mTo - mFrom));
+        if (to > from)
         {
             s.mData = mData->incref();
             s.mFrom = mFrom + from;
