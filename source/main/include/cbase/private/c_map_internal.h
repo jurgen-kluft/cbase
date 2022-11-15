@@ -39,9 +39,11 @@ namespace ncore
         {
             m_allocator->deallocate(m_nodes);
             m_allocator->deallocate(m_colors);
-            m_allocator->deallocate(m_hashes);
             m_allocator->deallocate(m_keys);
-            m_allocator->deallocate(m_values);
+            if (m_hashes != nullptr)
+                m_allocator->deallocate(m_hashes);
+            if (m_values != nullptr)
+                m_allocator->deallocate(m_values);
         }
 
         virtual s32   v_size() const { return m_size; }
@@ -94,17 +96,27 @@ namespace ncore
             if (m_freelist != nullptr)
             {
                 newnode    = m_freelist;
-                m_freelist = &m_nodes[newnode->m_branches[0]];
+                u32 const freeindex = newnode->m_branches[0];
+                if (freeindex == limits_t<T>::maximum())
+                {
+                    m_freelist = nullptr;
+                }
+                else
+                {
+                    m_freelist = &m_nodes[freeindex];
+                }
             }
             else
             {
                 newnode = &m_nodes[m_freeindex];
-                newnode->m_branches[0] = limits_t<T>::maximum();
-                newnode->m_branches[1] = limits_t<T>::maximum();
-                newnode->m_branches[2] = limits_t<T>::maximum();
                 m_freeindex++;
             }
-            T const index = (T)(newnode - m_nodes);
+
+            newnode->m_branches[0] = limits_t<T>::maximum();
+            newnode->m_branches[1] = limits_t<T>::maximum();
+            newnode->m_branches[2] = limits_t<T>::maximum();
+            
+            T const index          = (T)(newnode - m_nodes);
 
             // Constructor K
             K* pkey = (K*)(&m_keys[index]);
@@ -137,8 +149,15 @@ namespace ncore
         virtual void v_del_node(tree_t::node_t* node)
         {
             nodeT_t* delnode       = (nodeT_t*)node;
-            delnode->m_branches[0] = (T)(m_freelist - m_nodes);
-            m_freelist             = delnode;
+            if (m_freelist == nullptr) 
+            {
+                delnode->m_branches[0] = limits_t<T>::maximum();
+            }
+            else
+            {
+                delnode->m_branches[0] = (T)(m_freelist - m_nodes);
+            }
+            m_freelist = delnode;
 
             T const index = (T)(delnode - m_nodes);
 

@@ -24,14 +24,28 @@ UNITTEST_SUITE_BEGIN(test_map_and_set)
         {
             map_t<s32, s32> map(gTestAllocator);
 
-			s32 k = 0;
-			s32 v = 1000;
-			s32 const* f = nullptr;
-			CHECK_TRUE(map.insert(k, v));
-
-			CHECK_TRUE(map.find(k, f));
-			CHECK_EQUAL(v, *f);
-			CHECK_TRUE(map.remove(k));
+            for (s32 v = 0; v < 1000; ++v)
+            {
+                s32        k = v+65536;
+                s32 const* f = nullptr;
+                CHECK_TRUE(map.insert(k, v));
+                CHECK_TRUE(map.find(k, f));
+                CHECK_EQUAL(v, *f);
+                CHECK_TRUE(map.remove(k));
+            }
+            for (s32 v = 0; v < 1000; ++v)
+            {
+                s32        k = v + 65536;
+                CHECK_TRUE(map.insert(k, v));
+            }
+            for (s32 v = 0; v < 1000; ++v)
+            {
+                s32        k = v + 65536;
+                s32 const* f = nullptr;
+                CHECK_TRUE(map.find(k, f));
+                CHECK_EQUAL(v, *f);
+                CHECK_TRUE(map.remove(k));
+            }
         }
     }
 

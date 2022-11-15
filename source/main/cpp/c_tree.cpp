@@ -545,6 +545,7 @@ namespace ncore
         if (removed_node == nullptr)
             return false;
         tree_internal_t::tree_remove(this, removed_node);
+        m_ctxt->v_del_node(removed_node);
         return true;
     }
 
