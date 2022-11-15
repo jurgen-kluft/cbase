@@ -12,7 +12,7 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        UNITTEST_TEST(test_xbuffer32)
+        UNITTEST_TEST(test_buffer32)
         {
             u8s<32> buf1;
             u8s<32> buf2;
@@ -30,7 +30,7 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             CHECK_FALSE(buf1 != buf2);
         }
 
-        UNITTEST_TEST(test_xbinary_reader)
+        UNITTEST_TEST(test_binary_reader)
         {
             u8s<2048>   buffer;
             binary_writer_t writer = buffer.writer();
@@ -50,14 +50,12 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
 			CHECK_EQUAL(59, writer.pos());
 
             const char* cctext = "this is the buffer";
-            crunes_t    chars(cctext);
-            cbuffer_t    text(chars);
+            cbuffer_t    text(ascii::strlen(cctext), (const u8*)cctext);
 
             u8s<32> bytes;
             bytes.writer().write_data(text);
             writer.write_data(text);
             writer.write_data(bytes);
-            writer.write_string(chars);
 
             binary_reader_t reader = (buffer.reader());
 
@@ -99,7 +97,7 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             CHECK_EQUAL(8.0, the_f32);
             CHECK_EQUAL(9.0, the_f64);
 
-            s32        len = chars.size();
+            s32         len = ascii::strlen(cctext);
             u8s<32> rdata;
             buffer_t    rdatalen = rdata(0, len);
             reader.read_data(rdatalen);
@@ -109,9 +107,6 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             reader.view_data(32, rviewdata);
 			CHECK_EQUAL(rviewdata.size(), 32);
 
-			crunes_t viewstr;
-            reader.view_crunes(viewstr);
-            CHECK_TRUE(chars == viewstr);
         }
     }
 }
