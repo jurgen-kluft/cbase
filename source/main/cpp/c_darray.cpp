@@ -4,7 +4,6 @@
 #include "cbase/c_context.h"
 #include "cbase/c_darray.h"
 #include "cbase/c_limits.h"
-#include "cbase/c_math.h"
 
 namespace ncore
 {
