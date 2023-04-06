@@ -34,7 +34,7 @@ namespace ncore
         void        next();
     };
 
-    extern u32        g_sizeof_hbb(u32 maxbits); // NOTE: sizeof returns the number of dwords to allocate
+    extern u32        g_sizeof_hbb(u32 maxbits); // NOTE: sizeof returns the number of u32 to allocate
     extern void       g_hbb_init(hbb_t hbb, u32 maxbits, s8 bits);
     extern void       g_hbb_init(hbb_t& hbb, u32 maxbits, s8 bits, alloc_t* alloc);
     extern void       g_hbb_reset(hbb_t hbb, s8 bits);
