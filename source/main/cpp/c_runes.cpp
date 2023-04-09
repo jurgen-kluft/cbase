@@ -9,7 +9,6 @@
 
 namespace ncore
 {
-
     namespace utf
     {
         static s32 countof_runes(ascii::pcrune str, ascii::pcrune end);

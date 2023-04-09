@@ -486,6 +486,7 @@ namespace ncore
         : m_ctxt(nullptr)
         , m_nill(nullptr)
         , m_root(nullptr)
+        , m_size(0)
     {}
 
     void tree_t::init(tree_t::ctxt_t* ctxt)
@@ -493,6 +494,7 @@ namespace ncore
         m_ctxt = ctxt;
         m_nill = nullptr;
         m_root = nullptr;
+        m_size = 0;
         
         // We use a self-referencing sentinel node called nil to simplify the
         // code by avoiding the need to check for nullptr pointers.
@@ -520,23 +522,33 @@ namespace ncore
         m_ctxt = nullptr;
     }
 
-    bool tree_t::clear(void const*& key)
+    bool tree_t::clear()
     {
-        node_t* node;
+        node_t* node = nullptr;
         bool result = tree_internal_t::tree_clear(this, node);
         if (node != nullptr)
         {
-            key = node->get_key(m_ctxt);
+            m_ctxt->v_del_node(node);
+            m_size--;
         }
         return result;
     }
+
     bool tree_t::find(void const* key, node_t*& found) const
     {
         bool result = tree_internal_t::tree_find(this, key, found);
         return result;
     }
 
-    bool tree_t::insert(void const* key, void const* value) { return tree_internal_t::tree_insert(this, key, value); }
+    bool tree_t::insert(void const* key, void const* value) 
+    { 
+        if (tree_internal_t::tree_insert(this, key, value))
+        {
+            m_size++;
+            return true;
+        }
+        return false;
+    }
 
     bool tree_t::remove(void const* key)
     {
@@ -546,6 +558,7 @@ namespace ncore
             return false;
         tree_internal_t::tree_remove(this, removed_node);
         m_ctxt->v_del_node(removed_node);
+        m_size--;
         return true;
     }
 

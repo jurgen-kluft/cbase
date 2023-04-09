@@ -43,8 +43,7 @@ namespace ncore
 
         inline ~map_t()
         {
-            void const* key;
-            while (!m_tree.clear(key)) {}
+            while (!m_tree.clear()) {}
             m_tree.exit();
             m_allocator->destruct(m_ctxt);
         }

@@ -145,7 +145,7 @@ namespace ncore
         {
 			char *p1 = (char *)inLHS;
 			char *p2 = (char *)inRHS;
-			ASSERT(((p1 < p2) && ((p1 + n) < p2)) || ((p2 < p1) && ((p2 + n) < p1)));
+			ASSERT(((p1 < p2) && ((p1 + n) <= p2)) || ((p2 < p1) && ((p2 + n) <= p1)));
             u8* lhs = (u8*)inLHS;
             u8* rhs = (u8*)inRHS;
             for (u32 i = 0; i < n; i++)

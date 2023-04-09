@@ -52,22 +52,25 @@ namespace ncore
         typedef char        rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const rune   TERMINATOR = '\0';
-        static const s32    TYPE       = 1;
+        static const rune   TERMINATOR   = '\0';
+        static const s32    TYPE         = 1;
+        static const u64    EMPTY_STRING = 0;
+
         struct runes_t
         {
-            prune m_bos; // Begin of stream
-            prune m_str; // Begin of string
-            prune m_end; // End of string (does not necessarily point at TERMINATOR)
-            prune m_eos; // End of stream, points to a TERMINATOR
+            runes_t() : m_bos(nullptr), m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
+            prune m_bos; // begin of string
+            prune m_str; // string
+            prune m_end; // end (does not necessarily point at TERMINATOR)
+            prune m_eos; // end of string, points to a TERMINATOR
         };
         struct crunes_t
         {
             crunes_t()
-                : m_bos("\0\0\0\0")
-                , m_str(m_bos)
-                , m_end(m_bos)
-                , m_eos(m_bos)
+                : m_bos((pcrune)&EMPTY_STRING)
+                , m_str((pcrune)&EMPTY_STRING)
+                , m_end((pcrune)&EMPTY_STRING)
+                , m_eos((pcrune)&EMPTY_STRING)
             {
             }
             crunes_t(pcrune str, s32 len)
@@ -86,28 +89,39 @@ namespace ncore
             }
             pcrune m_bos, m_str, m_end, m_eos;
         };
+
         // return length of string in bytes (for ascii this also means number of characters)
         s32 strlen(pcrune str, pcrune eos = nullptr);
     } // namespace ascii
+
     namespace utf8
     {
         typedef u8          rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const s32    TYPE       = 3;
-        static const rune   TERMINATOR = '\0';
+        static const s32    TYPE         = 3;
+        static const rune   TERMINATOR   = '\0';
+        static const u64    EMPTY_STRING = 0;
 
         struct runes_t
         {
+            runes_t() : m_bos(nullptr), m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
             prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t
         {
             crunes_t()
-                : m_bos((pcrune) "\0\0\0\0")
-                , m_str(m_bos)
-                , m_end(m_bos)
-                , m_eos(m_bos)
+                : m_bos((pcrune)&EMPTY_STRING)
+                , m_str((pcrune)&EMPTY_STRING)
+                , m_end((pcrune)&EMPTY_STRING)
+                , m_eos((pcrune)&EMPTY_STRING)
+            {
+            }
+            crunes_t(pcrune str, pcrune end)
+                : m_bos(str)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(end)
             {
             }
             pcrune m_bos, m_str, m_end, m_eos;
@@ -127,15 +141,23 @@ namespace ncore
 
         struct runes_t
         {
+            runes_t() : m_bos(nullptr), m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
             prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t
         {
             crunes_t()
                 : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(m_bos)
-                , m_end(m_bos)
-                , m_eos(m_bos)
+                , m_str((pcrune)&EMPTY_STRING)
+                , m_end((pcrune)&EMPTY_STRING)
+                , m_eos((pcrune)&EMPTY_STRING)
+            {
+            }
+            crunes_t(pcrune str, pcrune end)
+                : m_bos(str)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(end)
             {
             }
             pcrune m_bos, m_str, m_end, m_eos;
@@ -146,20 +168,22 @@ namespace ncore
         typedef u32         rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const s32    TYPE       = 4;
-        static const rune   TERMINATOR = '\0';
+        static const s32    TYPE         = 4;
+        static const rune   TERMINATOR   = '\0';
+        static const u64    EMPTY_STRING = 0;
 
         struct runes_t
         {
+            runes_t() : m_bos(nullptr), m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
             prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t
         {
             crunes_t()
-                : m_bos((pcrune) "\0\0\0\0")
-                , m_str(m_bos)
-                , m_end(m_bos)
-                , m_eos(m_bos)
+                : m_bos((pcrune)&EMPTY_STRING)
+                , m_str((pcrune)&EMPTY_STRING)
+                , m_end((pcrune)&EMPTY_STRING)
+                , m_eos((pcrune)&EMPTY_STRING)
             {
             }
             crunes_t(pcrune str, pcrune end)
@@ -610,7 +634,7 @@ namespace ncore
     public:
         enum
         {
-            SIZE = L + 1
+            SIZE = L
         };
         T m_run[SIZE];
         inline runez_t()
@@ -637,7 +661,7 @@ namespace ncore
     public:
         enum
         {
-            SIZE = L + 1
+            SIZE = L
         };
         T m_run[SIZE];
 

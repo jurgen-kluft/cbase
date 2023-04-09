@@ -16,7 +16,7 @@ UNITTEST_SUITE_BEGIN(test_memory_std)
 		{
 		}
 
-		UNITTEST_TEST(xmem_utils__memset)
+		UNITTEST_TEST(nmem_memset)
 		{
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5,88,88 };
 			CHECK_EQUAL(6, buffer1[0]);
@@ -42,7 +42,7 @@ UNITTEST_SUITE_BEGIN(test_memory_std)
 			CHECK_EQUAL(88, buffer1[11]);
 		}
 
-		UNITTEST_TEST(xmem_utils__memclr)
+		UNITTEST_TEST(nmem_memclr)
 		{
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5,88,88 };
 			CHECK_EQUAL(6, buffer1[0]);
@@ -68,7 +68,7 @@ UNITTEST_SUITE_BEGIN(test_memory_std)
 			CHECK_EQUAL(88, buffer1[11]);
 		}
 
-		UNITTEST_TEST(xmem_utils__memcpy)
+		UNITTEST_TEST(nmem_memcpy)
 		{
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5,88,88 };
 			char buffer2[] = { 1,2,3,4,5,6,7,8,9,10,99,99 };
@@ -94,7 +94,7 @@ UNITTEST_SUITE_BEGIN(test_memory_std)
 			CHECK_EQUAL(99, buffer2[11]);
 		}
 
-		UNITTEST_TEST(xmem_utils__memcmp)
+		UNITTEST_TEST(nmem_memcmp)
 		{
 			char buffer1[] = { 6,7,8,9,10,1,2,3,4,5,88,88 };
 			char buffer2[] = { 1,2,3,4,5,6,7,8,9,10,99,99 };
@@ -107,7 +107,7 @@ UNITTEST_SUITE_BEGIN(test_memory_std)
 			CHECK_TRUE(nmem::memcmp(&buffer1[5], buffer2, 5)==0);
 		}
 
-		UNITTEST_TEST(xmem_utils__memswap)
+		UNITTEST_TEST(nmem_memswap)
 		{
 			char buffer1[] = { 1,2,3,4,5,6,7,8,9,10,88,88 };
 			char buffer2[] = { 0,1,2,3,4,5,6,7,8, 9,99,99 };
@@ -130,7 +130,7 @@ UNITTEST_SUITE_BEGIN(test_memory_std)
 			CHECK_EQUAL(99, buffer2[11]);
 		}
 
-		UNITTEST_TEST(xmem_utils__memmove)
+		UNITTEST_TEST(nmem_memmove)
 		{
 			char buffer1[] = { 1,2,3,4,5,6,7,8,9,10,22,22,22,22,22,88,88 };
 			for (ncore::s32 i=1; i<=10; ++i)

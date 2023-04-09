@@ -17,7 +17,7 @@ namespace ncore
         struct node_t;
 
         tree_t();
-        
+
         void init(ctxt_t* ctxt);
         void exit();
 
@@ -94,12 +94,12 @@ namespace ncore
             node_t* m_it;
         };
 
-        inline int_t size() const { return m_ctxt->v_size(); }
+        inline int_t size() const { return m_size; }
         inline int_t capacity() const { return m_ctxt->v_capacity(); }
 
-        bool clear(void const*& key); // Repeatedly call 'clear' until true is returned
+        bool clear(); // Repeatedly call 'clear' until true is returned ()
         bool find(void const* key, node_t*& found) const;
-        bool insert(void const* key, void const* value=nullptr);
+        bool insert(void const* key, void const* value = nullptr);
         bool remove(void const* key);
 
         bool validate(const char*& error_str);
@@ -114,6 +114,7 @@ namespace ncore
         ctxt_t* m_ctxt;
         node_t* m_nill;
         node_t* m_root;
+        int_t   m_size;
     };
 
 } // namespace ncore

@@ -967,23 +967,23 @@ namespace ncore
         ASSERT(writer != nullptr);
         ASSERT(buffer != nullptr);
 
+        irunes_writer_t* cp = nullptr; ///< handy char pointer (short term usage)
+        f64              _double;   ///< f64 precision arguments %[eEfgG]
         uchar32          ch;        ///< character
         s32              n;         ///< handy integer (short term usage)
-        irunes_writer_t* cp = nullptr; ///< handy char pointer (short term usage)
         s32              flags;     ///< flags as above
         s32              width;     ///< width from format (%8d), or 0
         s32              prec;      ///< precision from format (%.3d), or -1
-        char             sign;      ///< sign prefix (' ', '+', '-', or \0)
-        f64              _double;   ///< f64 precision arguments %[eEfgG]
         s32              base;      ///< base for [diouxX] conversion
         s32              dprec;     ///< a copy of prec if [diouxX], 0 otherwise
         s32              realsz;    ///< field size expanded by dprec, sign, etc
         s32              size;      ///< size of converted field or string
+        char             sign;      ///< sign prefix (' ', '+', '-', or \0)
 
         /// Initialize variables
         char const* xdigs    = nullptr; // digits for [xX] conversion
-        u32         ulval    = 0;    // integer arguments %[diouxX]
         u64         uqval    = 0;    // %q integers
+        u32         ulval    = 0;    // integer arguments %[diouxX]
         s32         argindex = 0;
 
         /// Scan the format for conversions (`%' character).
@@ -1180,6 +1180,7 @@ namespace ncore
                         char* ascii_cursor = ascii_buffer;
                         sDtoA(ascii_buffer, ascii_cursor, &ascii_buffer[WORKSIZE - 1], _double, (char)ch, width, prec);
                         // dtoa(buffer, _double, (char)ch, width, prec);
+                        buffer->write(ascii_buffer, ascii_cursor);
                         size = (s32)buffer->count();
                     }
 

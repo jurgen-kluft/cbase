@@ -161,7 +161,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             clear_bitmap();
 
             u32 const maxbits = 1024;            
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == 35);
+            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == 32 + 1);
 
             hbb_t hbb;
             alloc_t* alloc = context_t::system_alloc();
