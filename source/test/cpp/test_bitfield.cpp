@@ -51,131 +51,131 @@ UNITTEST_SUITE_BEGIN(test_bitfield)
 
 		UNITTEST_TEST(isSet)
 		{
-			bits_t<u32> b1(TEST_BIT_20);
-			CHECK_EQUAL(TEST_BIT_20, b1.mField);
+			u32 b1 = (TEST_BIT_20);
+			CHECK_EQUAL(TEST_BIT_20, b1);
 
-			CHECK_FALSE(b1.is_set(TEST_BIT_00));
-			CHECK_TRUE(b1.is_set(TEST_BIT_20));
-			CHECK_FALSE(b1.is_set(TEST_BIT_21));
+			CHECK_FALSE(nflags::is_set(b1, TEST_BIT_00));
+			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_20));
+			CHECK_FALSE(nflags::is_set(b1, TEST_BIT_21));
 		}
 
 		UNITTEST_TEST(isAnySet)
 		{
-			bits_t<u32> b1(TEST_BITS);
-			CHECK_EQUAL(TEST_BITS, b1.mField);
+			u32 b1 = (TEST_BITS);
+			CHECK_EQUAL(TEST_BITS, b1);
 
-			CHECK_FALSE(b1.is_any_set((TEST_BIT_02 | TEST_BIT_03)));
-			CHECK_TRUE(b1.is_any_set((TEST_BIT_03 | TEST_BIT_04)));
-			CHECK_TRUE(b1.is_any_set((TEST_BIT_04 | TEST_BIT_05)));
-			CHECK_FALSE(b1.is_any_set((TEST_BIT_08 | TEST_BIT_09)));
+			CHECK_FALSE(nflags::is_any_set(b1, (TEST_BIT_02 | TEST_BIT_03)));
+			CHECK_TRUE(nflags::is_any_set(b1, (TEST_BIT_03 | TEST_BIT_04)));
+			CHECK_TRUE(nflags::is_any_set(b1, (TEST_BIT_04 | TEST_BIT_05)));
+			CHECK_FALSE(nflags::is_any_set(b1, (TEST_BIT_08 | TEST_BIT_09)));
 		}
 
 		UNITTEST_TEST(_isOnlySet)
 		{
-			bits_t<u32> b1(TEST_BITS);
-			CHECK_EQUAL(TEST_BITS, b1.mField);
+			u32 b1 = TEST_BITS;
+			CHECK_EQUAL(TEST_BITS, b1);
 
-			CHECK_TRUE (b1.is_only_set(((TEST_BIT_04 | TEST_BIT_05 | TEST_BIT_06 | TEST_BIT_07))));
-			CHECK_FALSE(b1.is_only_set(((TEST_BIT_03 | TEST_BIT_04))));
-			CHECK_FALSE(b1.is_only_set(((TEST_BIT_04 | TEST_BIT_05))));
-			CHECK_FALSE(b1.is_only_set(((TEST_BIT_08 | TEST_BIT_09))));
+			CHECK_TRUE (nflags::is_only_set(b1, ((TEST_BIT_04 | TEST_BIT_05 | TEST_BIT_06 | TEST_BIT_07))));
+			CHECK_FALSE(nflags::is_only_set(b1, ((TEST_BIT_03 | TEST_BIT_04))));
+			CHECK_FALSE(nflags::is_only_set(b1, ((TEST_BIT_04 | TEST_BIT_05))));
+			CHECK_FALSE(nflags::is_only_set(b1, ((TEST_BIT_08 | TEST_BIT_09))));
 		}
 
 		UNITTEST_TEST(_isCleared)
 		{
-			bits_t<u32> b1(TEST_BITS);
-			CHECK_EQUAL(TEST_BITS, b1.mField);
+			u32 b1 = (TEST_BITS);
+			CHECK_EQUAL(TEST_BITS, b1);
 
-			CHECK_TRUE (b1.is_cleared((TEST_BIT_00 | TEST_BIT_01 | TEST_BIT_02 | TEST_BIT_03)));
-			CHECK_FALSE(b1.is_cleared((TEST_BIT_04 | TEST_BIT_01 | TEST_BIT_02 | TEST_BIT_03)));
+			CHECK_TRUE (nflags::is_cleared(b1, (TEST_BIT_00 | TEST_BIT_01 | TEST_BIT_02 | TEST_BIT_03)));
+			CHECK_FALSE(nflags::is_cleared(b1, (TEST_BIT_04 | TEST_BIT_01 | TEST_BIT_02 | TEST_BIT_03)));
 		}
 
 		UNITTEST_TEST(_getState)
 		{
-			bits_t<u32> b1(TEST_BITS);
-			CHECK_EQUAL(TEST_BITS, b1.mField);
+			u32 b1(TEST_BITS);
+			CHECK_EQUAL(TEST_BITS, b1);
 
-			CHECK_TRUE (b1.get_state(TEST_BIT_04)==BITS_SET);
-			CHECK_FALSE(b1.get_state(TEST_BIT_03)==BITS_SET);
-			CHECK_TRUE(b1.get_state(TEST_BIT_03)==BITS_CLEARED);
-			CHECK_TRUE(b1.get_state((TEST_BIT_03|TEST_BIT_04))==BITS_MIXED);
+			CHECK_TRUE (nflags::get_state(b1, TEST_BIT_04)==nflags::BITS_SET);
+			CHECK_FALSE(nflags::get_state(b1, TEST_BIT_03)==nflags::BITS_SET);
+			CHECK_TRUE(nflags::get_state(b1, TEST_BIT_03)==nflags::BITS_CLEARED);
+			CHECK_TRUE(nflags::get_state(b1, (TEST_BIT_03|TEST_BIT_04))==nflags::BITS_MIXED);
 		}
 		
 		UNITTEST_TEST(set1)
 		{
-			bits_t<u32> b1 = 0;
-			CHECK_EQUAL(0, b1.mField);
+			u32 b1 = 0;
+			CHECK_EQUAL(0, b1);
 
-			b1.set(TEST_BIT_19);
-			CHECK_TRUE(b1.is_set(TEST_BIT_19));
-			b1.set(TEST_BIT_27);
-			CHECK_TRUE(b1.is_set(TEST_BIT_27));
+			nflags::set(b1, TEST_BIT_19);
+			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_19));
+			nflags::set(b1, TEST_BIT_27);
+			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_27));
 
-			b1.set((TEST_BIT_30|TEST_BIT_31));
-			CHECK_TRUE(b1.is_set((TEST_BIT_30)));
-			CHECK_TRUE(b1.is_set((TEST_BIT_31)));
-			CHECK_TRUE(b1.is_set((TEST_BIT_30|TEST_BIT_31)));
+			nflags::set(b1, (TEST_BIT_30|TEST_BIT_31));
+			CHECK_TRUE(nflags::is_set(b1, (TEST_BIT_30)));
+			CHECK_TRUE(nflags::is_set(b1, (TEST_BIT_31)));
+			CHECK_TRUE(nflags::is_set(b1, (TEST_BIT_30|TEST_BIT_31)));
 		}
 
 		UNITTEST_TEST(set2)
 		{
-			bits_t<u32> b1 = 0;
-			CHECK_EQUAL(0, b1.mField);
+			u32 b1 = 0;
+			CHECK_EQUAL(0, b1);
 
-			b1.set(TEST_BIT_04, TEST_BITS);
-			CHECK_TRUE(b1.is_set(TEST_BIT_04));
-			b1.set(TEST_BIT_05, TEST_BITS);
-			CHECK_TRUE(b1.is_set(TEST_BIT_05));
+			nflags::set(b1, TEST_BIT_04, TEST_BITS);
+			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_04));
+			nflags::set(b1, TEST_BIT_05, TEST_BITS);
+			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_05));
 
-			b1.set((u32)(TEST_BIT_06|TEST_BIT_07), (u32)TEST_BITS);
-			CHECK_TRUE(b1.is_set((TEST_BIT_06|TEST_BIT_07)));
+			nflags::set(b1, (u32)(TEST_BIT_06|TEST_BIT_07), (u32)TEST_BITS);
+			CHECK_TRUE(nflags::is_set(b1, (TEST_BIT_06|TEST_BIT_07)));
 
-			CHECK_TRUE(b1.is_cleared((TEST_BIT_04|TEST_BIT_05)));
+			CHECK_TRUE(nflags::is_cleared(b1, (TEST_BIT_04|TEST_BIT_05)));
 		}
 
 		UNITTEST_TEST(set3)
 		{
-			bits_t<u32> b1 = 0;
-			CHECK_EQUAL(0, b1.mField);
+			u32 b1 = 0;
+			CHECK_EQUAL(0, b1);
 
-			CHECK_TRUE(b1.is_cleared(TEST_BIT_10));
-			b1.test_set(TEST_BIT_10, true);
-			CHECK_TRUE(b1.is_set(TEST_BIT_10));
-			b1.test_set(TEST_BIT_10, false);
-			CHECK_TRUE(b1.is_cleared(TEST_BIT_10));
+			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_10));
+			nflags::test_set(b1, TEST_BIT_10, true);
+			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_10));
+			nflags::test_set(b1, TEST_BIT_10, false);
+			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_10));
 		}
 
 		UNITTEST_TEST(_clear)
 		{
-			bits_t<u32> b1(TEST_BITS);
-			b1.clear(TEST_BITS);
-			CHECK_EQUAL(0, b1.mField);
+			u32 b1(TEST_BITS);
+			nflags::clear(b1, TEST_BITS);
+			CHECK_EQUAL(0, b1);
 
-			b1.set(TEST_BIT_10);
-			CHECK_TRUE(b1.is_set(TEST_BIT_10));
-			b1.clear(TEST_BIT_10);
-			CHECK_TRUE(b1.is_cleared(TEST_BIT_10));
+			nflags::set(b1, TEST_BIT_10);
+			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_10));
+			nflags::clear(b1, TEST_BIT_10);
+			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_10));
 		}
 
 		UNITTEST_TEST(_clearAll) 
 		{
-			bits_t<u32> b1(TEST_BITS);
-			CHECK_EQUAL(TEST_BITS, b1.mField);
-			b1.clear_all();
-			CHECK_EQUAL(0, b1.mField);
+			u32 b1(TEST_BITS);
+			CHECK_EQUAL(TEST_BITS, b1);
+			nflags::clear_all(b1);
+			CHECK_EQUAL(0, b1);
 		}
 
 		UNITTEST_TEST(_toggle)
 		{
-			bits_t<u32> b1(TEST_BITS);
-			CHECK_EQUAL(TEST_BITS, b1.mField);
+			u32 b1(TEST_BITS);
+			CHECK_EQUAL(TEST_BITS, b1);
 
-			b1.toggle(TEST_BIT_08);
-			CHECK_NOT_EQUAL(TEST_BITS, b1.mField);
-			CHECK_TRUE(b1.is_set(TEST_BIT_05));
-			b1.toggle(TEST_BIT_08);
-			CHECK_EQUAL(TEST_BITS, b1.mField);
-			CHECK_TRUE(b1.is_cleared(TEST_BIT_08));
+			nflags::toggle(b1, TEST_BIT_08);
+			CHECK_NOT_EQUAL(TEST_BITS, b1);
+			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_05));
+			nflags::toggle(b1, TEST_BIT_08);
+			CHECK_EQUAL(TEST_BITS, b1);
+			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_08));
 		}
 	}
 
