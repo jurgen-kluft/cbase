@@ -22,17 +22,19 @@ pub fn build(b: *std.build.Builder) !void {
     try coreflags.append("-DTARGET_RELEASE");
     try coreflags.append("-DTARGET_TEST");
     try coreflags.append("-DNDEBUG");
+    if (cbaselib.target.isWindows()) {
+        try coreflags.append("-DTARGET_PC");
+    } else if (cbaselib.target.isDarwin()) {
+        try coreflags.append("-DTARGET_MAC");
+    }
 
     cbaselib.defineCMacro("TARGET_RELEASE", null);
     cbaselib.defineCMacro("TARGET_TEST", null);
     cbaselib.defineCMacro("NDEBUG", null);
-
     if (cbaselib.target.isWindows()) {
         cbaselib.defineCMacro("TARGET_PC", null);
-        try coreflags.append("-DTARGET_PC");
     } else if (cbaselib.target.isDarwin()) {
         cbaselib.defineCMacro("TARGET_MAC", null);
-        try coreflags.append("-DTARGET_MAC");
     }
 
     cbaselib.linkLibCpp();
@@ -52,9 +54,9 @@ pub fn build(b: *std.build.Builder) !void {
     cunittestlib.defineCMacro("TARGET_TEST", null);
     cunittestlib.defineCMacro("NDEBUG", null);
     if (cunittestlib.target.isWindows()) {
-        cunittestlib.defineCMacro("PLATFORM_PC", null);
+        cunittestlib.defineCMacro("TARGET_PC", null);
     } else if (cunittestlib.target.isDarwin()) {
-        cunittestlib.defineCMacro("PLATFORM_MAC", null);
+        cunittestlib.defineCMacro("TARGET_MAC", null);
     }
 
     try addSourceFilesFrom(b, cunittestlib, "../cunittest/source/main/cpp", coreflags.toOwnedSlice());
@@ -70,8 +72,17 @@ pub fn build(b: *std.build.Builder) !void {
     cbase_test.addIncludePath("source/main/include");
     cbase_test.addIncludePath("source/test/include");
     cbase_test.addIncludePath("../cunittest/source/main/include");
-    try addSourceFilesFrom(b, cbase_test, "source/test/cpp", coreflags.toOwnedSlice());
 
+    cbase_test.defineCMacro("TARGET_RELEASE", null);
+    cbase_test.defineCMacro("TARGET_TEST", null);
+    cbase_test.defineCMacro("NDEBUG", null);
+    if (cbase_test.target.isWindows()) {
+        cbase_test.defineCMacro("TARGET_PC", null);
+    } else if (cbase_test.target.isDarwin()) {
+        cbase_test.defineCMacro("TARGET_MAC", null);
+    }
+
+    try addSourceFilesFrom(b, cbase_test, "source/test/cpp", coreflags.toOwnedSlice());
 }
 
 // Add all .cpp files from the given path
