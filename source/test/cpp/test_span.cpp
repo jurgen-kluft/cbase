@@ -19,7 +19,7 @@ UNITTEST_SUITE_BEGIN(test_span)
         UNITTEST_TEST(test_c_array)
         {
             s32         integers[] = {0, 1, 2, 3};
-            span_t<s32> s(integers);
+            span_t<s32> s(as_span(integers));
             CHECK_EQUAL(4, TestSpan2(s));
         }
 

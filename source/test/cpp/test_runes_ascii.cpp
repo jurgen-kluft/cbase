@@ -33,7 +33,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             CHECK_EQUAL(0, compare(str, dst));
             CHECK_EQUAL(23, str.size());
 
-            runez_t<ascii::rune, 16> str2;
+            runez_t<ascii::rune, 17> str2;
             copy(str, str2);
 
             CHECK_EQUAL(16, str2.size());

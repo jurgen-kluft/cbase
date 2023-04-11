@@ -27,25 +27,26 @@ class ctxt_tree_t : public tree_t::ctxt_t
 
     struct node16_t
     {
+        s32 m_data;
         u16 m_color;
-        u16 m_data;
         u16 m_branches[3];
     };
 
     node16_t*    m_nodes;
     node16_t*    m_freelist;
-    void const** m_keys;
+    s32*         m_keys;
 
 public:
-    ctxt_tree_t() { m_allocator = gTestAllocator; }
+    ctxt_tree_t() {  }
 
-    void init()
+    void init(alloc_t* allocator)
     {
+        m_allocator = allocator;
         m_size     = 0;
         m_cap      = 32;
         m_nodes    = (node16_t*)m_allocator->allocate(sizeof(node16_t) * m_cap);
         m_freelist = m_nodes;
-        m_keys     = (void const**)m_allocator->allocate(sizeof(void*) * m_cap);
+        m_keys     = (s32*)m_allocator->allocate(sizeof(s32) * m_cap);
         for (int_t i = 0; i < m_cap; ++i)
         {
             m_nodes[i].m_color       = tree_t::BLACK;
@@ -57,6 +58,14 @@ public:
         m_nodes[m_cap - 1].m_branches[0] = 0xffff;
         m_nodes[m_cap - 1].m_branches[1] = 0xffff;
         m_nodes[m_cap - 1].m_branches[2] = 0xffff;
+    }
+
+    void exit()
+    {
+        m_allocator->deallocate(m_nodes);
+        m_nodes = nullptr;
+        m_allocator->deallocate(m_keys);
+        m_keys = nullptr;
     }
 
     virtual s32             v_size() const { return m_size; }
@@ -86,12 +95,13 @@ public:
             m_freelist = &m_nodes[node->m_branches[2]];
 
         u16 const index     = (u16)(node - m_nodes);
-        m_keys[index]       = key;
+        m_keys[index]       = key != nullptr ? *((const s32*)key) : 0;
         node->m_color       = tree_t::RED;
         node->m_data        = index;
         node->m_branches[0] = 0;
         node->m_branches[1] = 0;
         node->m_branches[2] = 0;
+        m_size++;
         return (tree_t::node_t*)node;
     }
     virtual void v_del_node(tree_t::node_t* node)
@@ -101,6 +111,7 @@ public:
         node16_t* n      = (node16_t*)node;
         n->m_branches[2] = (u16)(m_freelist - m_nodes);
         m_freelist       = n;
+        m_size--;
     }
     virtual s32 v_compare_nodes(tree_t::node_t const* node, tree_t::node_t const* other) const { return compare_s32(v_get_key(node), v_get_key(other)); }
     virtual s32 v_compare_insert(void const* key, tree_t::node_t const* node) const { return compare_s32(key, v_get_key(node)); }
@@ -113,14 +124,22 @@ UNITTEST_SUITE_BEGIN(test_tree)
         static ctxt_tree_t     ctxt_instance;
         static tree_t::ctxt_t* ctxt = &ctxt_instance;
 
-        UNITTEST_FIXTURE_SETUP() {}
-        UNITTEST_FIXTURE_TEARDOWN() {}
+        UNITTEST_FIXTURE_SETUP() 
+        {
+            ctxt_instance.init(gTestAllocator);
+        }
+        UNITTEST_FIXTURE_TEARDOWN() 
+        {
+            ctxt_instance.exit();
+        }
 
         UNITTEST_TEST(tree_node)
         {
-            tree_t::node_t* node  = ctxt->v_new_node(nullptr, nullptr);
-            tree_t::node_t* left  = ctxt->v_new_node(nullptr, nullptr);
-            tree_t::node_t* right = ctxt->v_new_node(nullptr, nullptr);
+            s32 const key = 0;
+
+            tree_t::node_t* node  = ctxt->v_new_node(&key, nullptr);
+            tree_t::node_t* left  = ctxt->v_new_node(&key, nullptr);
+            tree_t::node_t* right = ctxt->v_new_node(&key, nullptr);
 
             tree_t::node_t* left_ptr = left;
             node->set_left(ctxt, left_ptr);
@@ -230,8 +249,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
 
             CHECK_EQUAL(9, tree.size());
 
-            void const* data;
-            while (!tree.clear(data)) {}
+            while (!tree.clear()) {}
 
             CHECK_EQUAL(0, tree.size());
         }
@@ -272,7 +290,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             }
             CHECK_EQUAL(9, round);
 
-            while (!tree.clear(data)) {}
+            while (!tree.clear()) {}
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder)
@@ -311,7 +329,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             }
             CHECK_EQUAL(9, round);
 
-            while (!tree.clear(data)) {}
+            while (!tree.clear()) {}
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
@@ -350,7 +368,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             }
             CHECK_EQUAL(9, round);
 
-            while (!tree.clear(data)) {}
+            while (!tree.clear()) {}
         }
 
         UNITTEST_TEST(void_tree_iterate_postorder)
@@ -390,7 +408,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             }
             CHECK_EQUAL(9, round);
 
-            while (!tree.clear(data)) {}
+            while (!tree.clear()) {}
         }
 
         UNITTEST_TEST(void_tree_search)
@@ -432,7 +450,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             }
             CHECK_EQUAL(0, compare_s32(data, find));
 
-            while (!tree.clear(data)) {}
+            while (!tree.clear()) {}
         }
 
         UNITTEST_TEST(s32_tree)
@@ -475,7 +493,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             CHECK_FALSE(tree.find(&e, node));
 
             void const* data;
-            while (!tree.clear(data)) {}
+            while (!tree.clear()) {}
 
             CHECK_EQUAL(0, tree.size());
         }

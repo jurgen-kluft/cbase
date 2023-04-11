@@ -8,126 +8,58 @@
 
 namespace ncore
 {
-    enum
+    // level n -> offset                   (bits) (max bits at that level)
+    // level 0 -> 0                        (0) (32 bits)
+    // level 1 -> 1                        (0) (1_024 bits)
+    // level 2 -> 32+1                     (5) (32_768 bits)
+    // level 3 -> 1024+32+1                (11) (1_048_576 bits)
+    // level 4 -> 32768+1024+32+1          (16) (33_554_432 bits)
+
+    static inline u32 get_level_offset(hbb_hdr_t const& hdr, s8 level)
     {
-        AllBitsSet = 0xffffffff
-    };
-
-    // level n -> max-offset (max bits at that level)
-    // level 0 -> 0          (32 bits)
-    // level 1 -> 1          (1024 bits)
-    // level 2 -> 33         (32768 bits)
-    // level 3 -> 1057       (1048576 bits)
-    // level 4 -> 33825      (33554432 bits)
-
-    struct hbb_header_t
-    {
-        u32 m_maxbits;
-        s16 m_numlevels;
-        // u16   m_offset_level0;
-        // u16   m_offset_level1;
-
-        // if levels == 1 or levels == 2 then 'u16 m_offset_level[1]'
-        u16 m_offset_level[3];
-
-        inline u32* get_level_ptr(s16 level)
+        switch (level)
         {
-            u32 offset;
-            switch (level)
-            {
-                case 0: offset = 2 + 0; break;
-                case 1: offset = 2 + 1; break;
-                case 2:
-                case 3:
-                case 4: offset = m_offset_level[level - 2]; break;
-                default: ASSERT(false); break;
-            }
-            return ((u32*)this) + offset;
+            case 0: return 0; break;
+            case 1: return 1; break;
+            case 2: return (hdr.m_offset32 & 0x1f) + 2; break;
+            case 3: return (hdr.m_offset32 >> 5); break;
+            case 4: return hdr.m_offset4; break;
+            default: break;
         }
-
-        inline u32 const* get_level_ptr(s16 level) const
-        {
-            u32 offset;
-            switch (level)
-            {
-                case 0: offset = 2 + 0; break;
-                case 1: offset = 2 + 1; break;
-                case 2:
-                case 3:
-                case 4: offset = m_offset_level[level - 2]; break;
-                default: ASSERT(false); break;
-            }
-            return ((u32 const*)this) + offset;
-        }
-    };
-
-    u32 g_sizeof_hbb(u32 maxbits)
-    {
-        ASSERT(maxbits <= (1 << 25));
-        s32 total_num_dwords = 1;
-        u32 level_num_dwords = ((maxbits + 31) / 32);
-        s32 levels           = 1;
-        while (level_num_dwords > 1)
-        {
-            total_num_dwords += level_num_dwords;
-            level_num_dwords = ((level_num_dwords + 31) / 32);
-            levels += 1;
-        }
-        switch (levels)
-        {
-            case 5: // fall through
-            case 4: total_num_dwords += 3; break;
-            case 3: total_num_dwords += 2; break;
-            case 2: // fall through
-            case 1: total_num_dwords += 2; break;
-            default: ASSERT(false); break;
-        }
-        return total_num_dwords;
+        return 0xffffffff;
     }
 
-    static u32 s_hbb_init(hbb_header_t* hdr, u32 maxbits)
+    static u32 s_hbb_init(hbb_hdr_t& hdr, u32 maxbits)
     {
         ASSERT(maxbits <= (1 << 25));
-        hdr->m_maxbits = maxbits;
+        hdr.m_maxbits_numlevels = maxbits << 4;
 
         s8  levels           = 0;
-        u32 levels_numdwords = 0;
-        u16 size_per_level[] = {0, 0, 0, 0, 0, 0};
+        u16 size_per_level[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         while (maxbits > 1)
         {
-            size_per_level[levels] = ((maxbits + 31) / 32);
-            levels_numdwords += size_per_level[levels];
-            maxbits = size_per_level[levels];
+            maxbits = ((maxbits + 31) / 32);
+            size_per_level[5 + levels] = maxbits; // simulate we have 5 levels
             levels += 1;
         }
+        for (s32 i = 5 + levels - 1; i >= 5; --i)
+            size_per_level[i] += size_per_level[i + 1];
 
-        hdr->m_numlevels = levels;
-        if (levels > 2)
-        {
-            hdr->m_offset_level[0] = (size_per_level[levels - 2] + 1 + 2);
-            if (levels > 3)
-            {
-                hdr->m_offset_level[1] = (hdr->m_offset_level[0] + size_per_level[levels - 3]) + 1;
-                if (levels > 4)
-                    hdr->m_offset_level[2] = (hdr->m_offset_level[1] + size_per_level[levels - 4]);
-            }
-        }
-        else
-        {
-            hdr->m_offset_level[0] = 0;
-        }
-        return levels_numdwords;
+        hdr.m_maxbits_numlevels |= (levels & 0xf);
+        hdr.m_offset32 = ((size_per_level[levels + 2]) << 5) | ((size_per_level[levels + 3] - 2) & 0x1f);
+        hdr.m_offset4  = size_per_level[levels + 1];
+        return size_per_level[5];
     }
 
-    static void s_hbb_mask(hbb_header_t* hdr)
+    static void s_hbb_mask(hbb_hdr_t const& hdr, hbb_data_t hbb)
     {
-        u32       maxbits  = hdr->m_maxbits;
-        s16 const maxlevel = hdr->m_numlevels;
-        s16       level    = maxlevel - 1;
+        u32      maxbits  = hdr.get_max_bits();
+        s8 const maxlevel = hdr.get_num_levels();
+        s16      level    = maxlevel - 1;
         while (level >= 0)
         {
             u32 const numdwords = ((maxbits + 31) / 32);
-            u32*      plevel    = hdr->get_level_ptr(level);
+            u32*      plevel    = hbb + get_level_offset(hdr, level);
             plevel              = plevel + (numdwords - 1); // goto last dword
 
             // compute mask
@@ -138,32 +70,39 @@ namespace ncore
         }
     }
 
-    void g_hbb_init(hbb_t hbb, u32 maxbits, s8 bits)
+    u32 g_hbb_sizeof_data(u32 maxbits)
     {
-        hbb_header_t* hdr     = (hbb_header_t*)hbb;
-        u32 const     ndwords = s_hbb_init(hdr, maxbits);
+        hbb_hdr_t hdr;
+        return g_hbb_init(hdr, maxbits);
+    }
+
+    u32 g_hbb_init(hbb_hdr_t& hdr, u32 maxbits) { return s_hbb_init(hdr, maxbits); }
+
+    void g_hbb_init(const hbb_hdr_t& hdr, hbb_data_t hbb, s8 bits)
+    {
+        const u32 ndwords = hdr.get_num_dwords();
         if (bits >= 0)
         {
             u32 const fill = (bits != 0) ? 0xFFFFFFFF : 0;
-            u32* data = hdr->get_level_ptr(0);
+            u32*      data = hbb + get_level_offset(hdr, 0);
             for (u32 i = 0; i < ndwords; ++i)
                 data[i] = fill;
 
             if (bits != 0)
             {
-                s_hbb_mask(hdr);
+                s_hbb_mask(hdr, hbb);
             }
         }
     }
 
-    void g_hbb_init(hbb_t& hbb, u32 maxbits, s8 bits, alloc_t* alloc)
+    void g_hbb_init(hbb_hdr_t const& hdr, hbb_data_t& hbb, s8 bits, alloc_t* alloc)
     {
-        u32 const ndwords = g_sizeof_hbb(maxbits);
+        const u32 ndwords = hdr.get_num_dwords();
         hbb               = (u32*)alloc->allocate(ndwords * sizeof(u32), sizeof(u32));
-        g_hbb_init(hbb, maxbits, bits);
+        g_hbb_init(hdr, hbb, bits);
     }
 
-    void g_hbb_release(hbb_t& hbb, alloc_t* alloc)
+    void g_hbb_release(hbb_data_t& hbb, alloc_t* alloc)
     {
         if (alloc != nullptr)
         {
@@ -172,41 +111,38 @@ namespace ncore
         }
     }
 
-    void g_hbb_reset(hbb_t hbb, s8 bits)
-    {
-        hbb_header_t* hdr = (hbb_header_t*)hbb;
-        g_hbb_init(hbb, hdr->m_maxbits, bits);
-    }
+    void g_hbb_reset(const hbb_hdr_t& hdr, hbb_data_t hbb, s8 bits) { g_hbb_init(hdr, hbb, bits); }
 
-    void g_hbb_resize(hbb_t& hbb, u32 maxbits, s8 bits, alloc_t* alloc)
+    void g_hbb_resize(hbb_hdr_t& hdr, hbb_data_t& hbb, u32 maxbits, s8 bits, alloc_t* alloc)
     {
         if (hbb == nullptr)
         {
-            g_hbb_init(hbb, maxbits, bits, alloc);
+            g_hbb_init(hdr, hbb, bits, alloc);
         }
         else
         {
-            hbb_header_t* src = (hbb_header_t*)hbb;
-            if (maxbits > src->m_maxbits)
+            if (maxbits > hdr.get_max_bits())
             {
-                hbb_t h = nullptr;
-                g_hbb_init(h, maxbits, -1, alloc);
+                hbb_hdr_t src = hdr;
+
+                hbb_data_t h = nullptr;
+                g_hbb_init(hdr, maxbits);
+                g_hbb_init(hdr, h, -1, alloc);
 
                 u32 const fill = (bits != 0) ? 0xFFFFFFFF : 0;
 
                 // Copy the level data
-                hbb_header_t* dst         = (hbb_header_t*)h;
-                s16           dst_level   = dst->m_numlevels - 1;
-                s16           src_level   = src->m_numlevels - 1;
-                u32           dst_maxbits = dst->m_maxbits;
-                u32           src_maxbits = src->m_maxbits;
+                s16 dst_level   = hdr.get_num_levels() - 1;
+                s16 src_level   = src.get_num_levels() - 1;
+                u32 dst_maxbits = hdr.get_max_bits();
+                u32 src_maxbits = src.get_max_bits();
                 while (src_level >= 0)
                 {
                     // Number of words of the src level
                     u32 const  srcndwords = (src_maxbits + 31) / 32;
                     u32 const  dstndwords = (dst_maxbits + 31) / 32;
-                    u32 const* srcdata    = src->get_level_ptr(src_level);
-                    u32*       dstdata    = dst->get_level_ptr(dst_level);
+                    u32 const* srcdata    = hbb + get_level_offset(src, src_level);
+                    u32*       dstdata    = h + get_level_offset(hdr, dst_level);
                     for (u32 i = 0; i < srcndwords; ++i)
                         dstdata[i] = srcdata[i];
 
@@ -226,7 +162,7 @@ namespace ncore
                     while (dst_level >= 0)
                     {
                         u32 const dstndwords = (dst_maxbits + 31) / 32;
-                        u32*      dstdata    = dst->get_level_ptr(dst_level);
+                        u32*      dstdata    = h + get_level_offset(hdr, dst_level);
                         for (u32 i = 0; i < dstndwords; ++i)
                             dstdata[i] = fill;
                         dst_maxbits = dstndwords;
@@ -235,16 +171,16 @@ namespace ncore
 
                     if (fill != 0)
                     {
-                        s_hbb_mask(dst);
+                        s_hbb_mask(hdr, h);
                     }
 
-                    u32 const* srcdata = src->get_level_ptr(0);
-                    dst_level          = (dst->m_numlevels - src->m_numlevels) - 1;
+                    u32 const* srcdata = hbb + get_level_offset(src, 0);
+                    dst_level          = (hdr.get_num_levels() - src.get_num_levels()) - 1;
                     if (*srcdata == 0)
                     {
                         while (dst_level >= 0)
                         {
-                            u32* dstdata = dst->get_level_ptr(dst_level);
+                            u32* dstdata = h + get_level_offset(hdr, dst_level);
                             *dstdata &= 0xFFFFFFFE;
                             dst_level -= 1;
                         }
@@ -254,7 +190,7 @@ namespace ncore
                         // hmmm, we need to propogate up
                         while (dst_level >= 0)
                         {
-                            u32* dstdata = dst->get_level_ptr(dst_level);
+                            u32* dstdata = h + get_level_offset(hdr, dst_level);
                             *dstdata |= 0x00000001;
                             dst_level -= 1;
                         }
@@ -264,21 +200,20 @@ namespace ncore
                 g_hbb_release(hbb, alloc);
                 hbb = h;
             }
-            else if (maxbits < src->m_maxbits)
+            else if (maxbits < hdr.get_max_bits())
             {
                 // TODO: Hmmm, we need to shrink, how do we do that?
             }
         }
     }
 
-    void g_hbb_set(hbb_t hbb, u32 bit)
+    void g_hbb_set(const hbb_hdr_t& hdr, hbb_data_t hbb, u32 bit)
     {
         // set bit in full level, then avalanche up if necessary
-        hbb_header_t* hdr = (hbb_header_t*)hbb;
-        s16           i   = hdr->m_numlevels - 1;
+        s16 i = hdr.get_num_levels() - 1;
         while (i >= 0)
         {
-            u32*      level      = hdr->get_level_ptr(i);
+            u32*      level      = hbb + get_level_offset(hdr, i);
             u32 const dwordIndex = bit / 32;
             u32 const dwordBit   = 1 << (bit & 31);
             u32 const dword0     = level[dwordIndex];
@@ -294,14 +229,13 @@ namespace ncore
         }
     }
 
-    void g_hbb_clr(hbb_t hbb, u32 bit)
+    void g_hbb_clr(const hbb_hdr_t& hdr, hbb_data_t hbb, u32 bit)
     {
         // clear bit in level 0, then avalanche up if necessary
-        hbb_header_t* hdr = (hbb_header_t*)hbb;
-        s16           i   = hdr->m_numlevels - 1;
+        s16 i = hdr.get_num_levels() - 1;
         while (i >= 0)
         {
-            u32*      level      = hdr->get_level_ptr(i);
+            u32*      level      = hbb + get_level_offset(hdr, i);
             u32 const dwordIndex = bit / 32;
             u32 const dwordBit   = 1 << (bit & 31);
             u32 const dword0     = level[dwordIndex];
@@ -318,26 +252,23 @@ namespace ncore
         }
     }
 
-    bool g_hbb_is_set(hbb_t const hbb, u32 bit)
+    bool g_hbb_is_set(const hbb_hdr_t& hdr, hbb_data_t const hbb, u32 bit)
     {
-        hbb_header_t const* hdr        = (hbb_header_t const*)hbb;
-        u32 const*          level      = hdr->get_level_ptr(hdr->m_numlevels - 1);
-        u32 const           dwordIndex = bit / 32;
-        u32 const           dwordBit   = bit & 31;
+        u32 const* level      = hbb + get_level_offset(hdr, hdr.get_num_levels() - 1);
+        u32 const  dwordIndex = bit / 32;
+        u32 const  dwordBit   = bit & 31;
         return ((level[dwordIndex] >> dwordBit) & 1) == 1;
     }
 
-    bool g_hbb_is_empty(hbb_t const hbb)
+    bool g_hbb_is_empty(const hbb_hdr_t& hdr, hbb_data_t const hbb)
     {
-        hbb_header_t const* hdr    = (hbb_header_t const*)hbb;
-        u32 const*          level0 = hdr->get_level_ptr(0);
+        u32 const* level0 = hbb + get_level_offset(hdr, 0);
         return level0[0] == 0;
     }
 
-    bool g_hbb_find(hbb_t const hbb, u32& bit)
+    bool g_hbb_find(const hbb_hdr_t& hdr, hbb_data_t const hbb, u32& bit)
     {
-        hbb_header_t const* hdr      = (hbb_header_t const*)hbb;
-        s16 const           maxlevel = hdr->m_numlevels;
+        s16 const maxlevel = hdr.get_num_levels();
 
         // Start at top level and find a '1' bit and move down
         u32 dwordIndex = 0;
@@ -345,7 +276,7 @@ namespace ncore
         s16 i          = 0;
         while (i < maxlevel)
         {
-            u32 const* level = hdr->get_level_ptr(i);
+            u32 const* level = hbb + get_level_offset(hdr, i);
             dwordIndex       = (dwordIndex * 32) + dwordBit;
             u32 dword0       = level[dwordIndex];
             if (dword0 == 0)
@@ -357,10 +288,9 @@ namespace ncore
         return true;
     }
 
-    bool g_hbb_upper(hbb_t const hbb, u32 pivot, u32& bit)
+    bool g_hbb_upper(const hbb_hdr_t& hdr, hbb_data_t const hbb, u32 pivot, u32& bit)
     {
-        hbb_header_t const* hdr = (hbb_header_t const*)hbb;
-        if (pivot >= hdr->m_maxbits)
+        if (pivot >= hdr.get_max_bits())
             return false;
 
         // Start at bottom level and move up finding a 'set' bit
@@ -380,15 +310,15 @@ namespace ncore
             im = ~((1 << ib) - 1);
         }
 
-        s16 il = hdr->m_numlevels - 1;
+        s16 il = hdr.get_num_levels() - 1;
         while (il >= 0)
         {
-            u32 const* level = hdr->get_level_ptr(il);
+            u32 const* level = hbb + get_level_offset(hdr, il);
             u32        w     = level[iw] & im;
             if (w != 0)
             {
                 iw = (iw * 32) + math::findFirstBit(w);
-                if (il == (hdr->m_numlevels - 1))
+                if (il == (hdr.get_num_levels() - 1))
                 {
                     bit = iw;
                     return true;
@@ -419,10 +349,9 @@ namespace ncore
         return false;
     }
 
-    bool g_hbb_lower(hbb_t const hbb, u32 pivot, u32& bit)
+    bool g_hbb_lower(const hbb_hdr_t& hdr, hbb_data_t const hbb, u32 pivot, u32& bit)
     {
-        hbb_header_t const* hdr = (hbb_header_t const*)hbb;
-        if (pivot >= hdr->m_maxbits)
+        if (pivot >= hdr.get_max_bits())
             return false;
 
         // Start at bottom level and move up leve finding a 'set' bit
@@ -439,15 +368,15 @@ namespace ncore
             im = ((1 << ib) - 1);
         }
 
-        s16 il = hdr->m_numlevels - 1;
+        s16 il = hdr.get_num_levels() - 1;
         while (il >= 0)
         {
-            u32 const* level = hdr->get_level_ptr(il);
+            u32 const* level = hbb + get_level_offset(hdr, il);
             u32        w     = level[iw] & im;
             if (w != 0)
             {
                 iw = (iw * 32) + math::findFirstBit(w);
-                if (il == (hdr->m_numlevels - 1))
+                if (il == (hdr.get_num_levels() - 1))
                 {
                     bit = iw;
                     return true;
@@ -479,17 +408,18 @@ namespace ncore
         return false;
     }
 
-    hbb_iter_t g_hbb_iterator(hbb_t hbb, u32 start, u32 end)
+    hbb_iter_t g_hbb_iterator(const hbb_hdr_t& hdr, hbb_data_t hbb, u32 start, u32 end)
     {
         hbb_iter_t iter;
         iter.m_cur = start;
         iter.m_end = end;
         iter.m_hbb = hbb;
+        iter.m_hdr = hdr;
 
         // Find the first set bit, starting from 'start'
-        if (!g_hbb_is_set(hbb, start))
+        if (!g_hbb_is_set(hdr, hbb, start))
         {
-            if (!g_hbb_upper(iter.m_hbb, start, iter.m_cur))
+            if (!g_hbb_upper(iter.m_hdr, iter.m_hbb, start, iter.m_cur))
             {
                 iter.m_cur = end;
             }
@@ -499,7 +429,7 @@ namespace ncore
 
     void hbb_iter_t::next()
     {
-        if (!g_hbb_upper(m_hbb, m_cur, m_cur))
+        if (!g_hbb_upper(m_hdr, m_hbb, m_cur, m_cur))
             m_cur = m_end;
     }
 
