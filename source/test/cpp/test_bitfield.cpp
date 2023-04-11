@@ -106,12 +106,12 @@ UNITTEST_SUITE_BEGIN(test_bitfield)
 			u32 b1 = 0;
 			CHECK_EQUAL(0, b1);
 
-			nflags::set(b1, TEST_BIT_19);
+			b1 = nflags::set(b1, TEST_BIT_19);
 			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_19));
-			nflags::set(b1, TEST_BIT_27);
+			b1 = nflags::set(b1, TEST_BIT_27);
 			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_27));
 
-			nflags::set(b1, (TEST_BIT_30|TEST_BIT_31));
+			b1 = nflags::set(b1, (TEST_BIT_30|TEST_BIT_31));
 			CHECK_TRUE(nflags::is_set(b1, (TEST_BIT_30)));
 			CHECK_TRUE(nflags::is_set(b1, (TEST_BIT_31)));
 			CHECK_TRUE(nflags::is_set(b1, (TEST_BIT_30|TEST_BIT_31)));
@@ -122,12 +122,12 @@ UNITTEST_SUITE_BEGIN(test_bitfield)
 			u32 b1 = 0;
 			CHECK_EQUAL(0, b1);
 
-			nflags::set(b1, TEST_BIT_04, TEST_BITS);
+			b1 = nflags::set(b1, TEST_BIT_04, TEST_BITS);
 			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_04));
-			nflags::set(b1, TEST_BIT_05, TEST_BITS);
+			b1 = nflags::set(b1, TEST_BIT_05, TEST_BITS);
 			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_05));
 
-			nflags::set(b1, (u32)(TEST_BIT_06|TEST_BIT_07), (u32)TEST_BITS);
+			b1 = nflags::set(b1, (u32)(TEST_BIT_06|TEST_BIT_07), (u32)TEST_BITS);
 			CHECK_TRUE(nflags::is_set(b1, (TEST_BIT_06|TEST_BIT_07)));
 
 			CHECK_TRUE(nflags::is_cleared(b1, (TEST_BIT_04|TEST_BIT_05)));
@@ -139,21 +139,21 @@ UNITTEST_SUITE_BEGIN(test_bitfield)
 			CHECK_EQUAL(0, b1);
 
 			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_10));
-			nflags::test_set(b1, TEST_BIT_10, true);
+			b1 = nflags::test_set(b1, TEST_BIT_10, true);
 			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_10));
-			nflags::test_set(b1, TEST_BIT_10, false);
+			b1 = nflags::test_set(b1, TEST_BIT_10, false);
 			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_10));
 		}
 
 		UNITTEST_TEST(_clear)
 		{
 			u32 b1(TEST_BITS);
-			nflags::clear(b1, TEST_BITS);
+			b1 = nflags::clear(b1, TEST_BITS);
 			CHECK_EQUAL(0, b1);
 
-			nflags::set(b1, TEST_BIT_10);
+			b1 = nflags::set(b1, TEST_BIT_10);
 			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_10));
-			nflags::clear(b1, TEST_BIT_10);
+			b1 = nflags::clear(b1, TEST_BIT_10);
 			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_10));
 		}
 
@@ -170,10 +170,10 @@ UNITTEST_SUITE_BEGIN(test_bitfield)
 			u32 b1(TEST_BITS);
 			CHECK_EQUAL(TEST_BITS, b1);
 
-			nflags::toggle(b1, TEST_BIT_08);
+			b1 = nflags::toggle(b1, TEST_BIT_08);
 			CHECK_NOT_EQUAL(TEST_BITS, b1);
 			CHECK_TRUE(nflags::is_set(b1, TEST_BIT_05));
-			nflags::toggle(b1, TEST_BIT_08);
+			b1 = nflags::toggle(b1, TEST_BIT_08);
 			CHECK_EQUAL(TEST_BITS, b1);
 			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_08));
 		}

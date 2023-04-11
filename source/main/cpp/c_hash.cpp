@@ -146,7 +146,7 @@ namespace ncore
         s32  i = 0;
         while (*str != 0)
         {
-            buffer[i++] = *str++;
+            buffer[i++] = to_lower(*str++);
             if (i == 32)
             {
                 hash.hash(buffer, i * sizeof(char));
@@ -173,36 +173,13 @@ namespace ncore
 
     u32 strhash32(const char* str)
     {
-        s32 i = 0;
-        while (*str != 0)
-        {
-            i++;
-        }
-        u64 const hash64 = XXH64(str, i);
+        u64 const hash64 = strhash(str);
         return hash64_to_hash32(hash64);
     }
 
     u32 strhash32_lowercase(const char* str)
     {
-        hashing_t hash;
-        hash.reset();
-
-        char buffer[32];
-        s32  i = 0;
-        while (*str != 0)
-        {
-            buffer[i++] = *str++;
-            if (i == 32)
-            {
-                hash.hash(buffer, i * sizeof(char));
-                i = 0;
-            }
-        }
-        if (i > 0)
-        {
-            hash.hash(buffer, i * sizeof(char));
-        }
-        u64 const hash64 = hash.finalize();
+        u64 const hash64 = strhash_lowercase(str);
         return hash64_to_hash32(hash64);
     }
 

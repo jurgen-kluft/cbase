@@ -3,6 +3,7 @@
 #include "cbase/c_debug.h"
 #include "cbase/c_integer.h"
 #include "cbase/c_console.h"
+#include "cbase/c_memory.h"
 #include "cbase/c_va_list.h"
 #include "cbase/c_runes.h"
 #include "cbase/c_printf.h"
@@ -1467,6 +1468,41 @@ namespace ncore
             }
             return (s32)(end - str);
         }
+
+        s32 compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2)
+        {
+            if (end1 == nullptr)
+            {
+                end1 = str1;
+                while (*end1 != TERMINATOR)
+                    end1++;
+            }
+            if (end2 == nullptr)
+            {
+                end2 = str2;
+                while (*end2 != TERMINATOR)
+                    end2++;
+            }
+            const s32 len1 = (s32)(end1 - str1);
+            const s32 len2 = (s32)(end2 - str2);
+            const s32 len = len1 < len2 ? len1 : len2;
+            const s32 result = nmem::memcmp(str1, str2, len);
+            if (result == 0)
+            {
+                if (len1 < len2)
+                    return -1;
+                else if (len1 > len2)
+                    return 1;
+            }
+            return result;
+        }
+
+        s32 compare(pcrune left, pcrune right)
+        {
+            return compare(left, right, nullptr, nullptr);
+        }
+
+
     } // namespace ascii
 
     namespace utf8

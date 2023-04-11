@@ -92,6 +92,10 @@ namespace ncore
 
         // return length of string in bytes (for ascii this also means number of characters)
         s32 strlen(pcrune str, pcrune eos = nullptr);
+        
+        s32 compare(pcrune left, pcrune right);
+        s32 compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2);
+
     } // namespace ascii
 
     namespace utf8
