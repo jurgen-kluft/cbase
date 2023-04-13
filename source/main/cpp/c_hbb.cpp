@@ -55,7 +55,7 @@ namespace ncore
     {
         u32      maxbits  = hdr.get_max_bits();
         s8 const maxlevel = hdr.get_num_levels();
-        s16      level    = maxlevel - 1;
+        s8       level    = maxlevel - 1;
         while (level >= 0)
         {
             u32 const numdwords = ((maxbits + 31) / 32);
@@ -132,8 +132,8 @@ namespace ncore
                 u32 const fill = (bits != 0) ? 0xFFFFFFFF : 0;
 
                 // Copy the level data
-                s16 dst_level   = hdr.get_num_levels() - 1;
-                s16 src_level   = src.get_num_levels() - 1;
+                s8  dst_level   = hdr.get_num_levels() - 1;
+                s8  src_level   = src.get_num_levels() - 1;
                 u32 dst_maxbits = hdr.get_max_bits();
                 u32 src_maxbits = src.get_max_bits();
                 while (src_level >= 0)
@@ -210,7 +210,7 @@ namespace ncore
     void g_hbb_set(const hbb_hdr_t& hdr, hbb_data_t hbb, u32 bit)
     {
         // set bit in full level, then avalanche up if necessary
-        s16 i = hdr.get_num_levels() - 1;
+        s8 i = hdr.get_num_levels() - 1;
         while (i >= 0)
         {
             u32*      level      = hbb + get_level_offset(hdr, i);
@@ -232,7 +232,7 @@ namespace ncore
     void g_hbb_clr(const hbb_hdr_t& hdr, hbb_data_t hbb, u32 bit)
     {
         // clear bit in level 0, then avalanche up if necessary
-        s16 i = hdr.get_num_levels() - 1;
+        s8 i = hdr.get_num_levels() - 1;
         while (i >= 0)
         {
             u32*      level      = hbb + get_level_offset(hdr, i);
@@ -268,12 +268,12 @@ namespace ncore
 
     bool g_hbb_find(const hbb_hdr_t& hdr, hbb_data_t const hbb, u32& bit)
     {
-        s16 const maxlevel = hdr.get_num_levels();
+        s8 const maxlevel = hdr.get_num_levels();
 
         // Start at top level and find a '1' bit and move down
         u32 dwordIndex = 0;
         u32 dwordBit   = 0;
-        s16 i          = 0;
+        s8  i          = 0;
         while (i < maxlevel)
         {
             u32 const* level = hbb + get_level_offset(hdr, i);
@@ -310,7 +310,7 @@ namespace ncore
             im = ~((1 << ib) - 1);
         }
 
-        s16 il = hdr.get_num_levels() - 1;
+        s8 il = hdr.get_num_levels() - 1;
         while (il >= 0)
         {
             u32 const* level = hbb + get_level_offset(hdr, il);
@@ -368,7 +368,7 @@ namespace ncore
             im = ((1 << ib) - 1);
         }
 
-        s16 il = hdr.get_num_levels() - 1;
+        s8 il = hdr.get_num_levels() - 1;
         while (il >= 0)
         {
             u32 const* level = hbb + get_level_offset(hdr, il);

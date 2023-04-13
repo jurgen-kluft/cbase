@@ -36,10 +36,12 @@ namespace ncore
         }
         hbb_hdr_t(u32 maxbits, s8 numlevels)
             : m_maxbits_numlevels((maxbits << 4) | numlevels)
+            , m_offset32(0)
+            , m_offset4(0)
         {
         }
 
-        inline s32 get_max_bits() const { return m_maxbits_numlevels >> 4; }
+        inline u32 get_max_bits() const { return m_maxbits_numlevels >> 4; }
         inline s8  get_num_levels() const { return m_maxbits_numlevels & 0xF; }
         inline u32 get_num_dwords() const
         {
