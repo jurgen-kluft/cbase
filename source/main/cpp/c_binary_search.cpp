@@ -8,7 +8,7 @@ namespace ncore
         s64 bounds[2] = {0, (s64)inLength - 1};
         while (bounds[0] <= bounds[1])
         {
-            const s32 mid = (bounds[0] + bounds[1]) >> 1;
+            const s64 mid = (bounds[0] + bounds[1]) >> 1;
             const s8  r   = predicate(inItem, inData, mid);
             bounds[(1 - r) >> 1] = mid + r;
             if (r == 0)
