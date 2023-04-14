@@ -15,23 +15,29 @@
 namespace ncore
 {
     typedef const u8* dynkey_t;
-    typedef u32       dynval_t;
+    typedef const u8* dynval_t;
 
     // Trie data structure where the key is a variable length byte array.
 
     struct dynnode_t // 12 bytes
     {
-        u32 m_branch[2]; // 0: left, 1: right (the top byte is reserved)
-        u32 m_bit_key;   // top-byte (8 bits) : key-offset (24 bits)
+        inline bool is_node() const { return (m_branch[0] & 0x80000000) == 0; }
+        inline bool is_value() const { return (m_branch[0] & 0x80000000) != 0; }
 
-        // we can hold a maximum of 2^24 keys, since we use 24 bits to store the offset to the key
-        // the maximum key length is 256 bytes (is 2048 bits)
-        // so the bit index requires at least 11 bits to store
+        inline u32  branch(s32 i) const { return (m_branch[i] & 0x00ffffff); }
+        inline u32  key() const { return (m_bit_key & 0x00ffffff); }
+        inline u32  key_len() const { return (m_bit_key & 0xff000000) >> 24; }
+        inline s32  bit() const { return (node->m_branch[0] & 0x7f000000) >> 16 | (node->m_branch[1] & 0x7f000000) >> 24; }
+
+        inline void set_branch(s32 i, s32 branch) { m_branch[i] = (m_branch[i] & 0xff000000) | (branch & 0x00ffffff); }
+        inline void set_bit(s16 bit) { m_branch[0] = (m_branch[0] & 0x00ffffff) | ((bit & 0x0000007f) << 24); m_branch[1] = (m_branch[1] & 0x00ffffff) | ((bit & 0x00003f80) << (1+16)); }
+        inline void set_key(s32 key, s8 keylen) { m_bit_key = (m_bit_key & 0xff000000) | (key & 0x00ffffff); m_bit_key = (m_bit_key & 0x00ffffff) | ((keylen & 0x000000ff) << 24); }
+
+        u32 m_branch[2]; // left/right (node or value (1 bit) : bit-index (7 bits) : 'node or value'-index (24 bits))
+        u32 m_bit_key;   // key-len (8 bits) : key-index (24 bits)
     };
 
-    static s32  findfirst_bit_range(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start, s32 bit_end);
-    static s32  findfirst_bit_open(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start);
-    static bool compare_bit_range(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start, s32 bit_end);
+    static s32 findfirst_bit_range(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start, s32 bit_end, dynkey_t nullkey);
 
     class dyntrie_t
     {
@@ -51,12 +57,16 @@ namespace ncore
         bool remove(s8 keylen, dynkey_t key, dynval_t& value);
 
     protected:
+        const char m_nullkey[256];
         dynnode_t* m_root;
         dynval_t*  m_value;
         s32        m_num_values;
         s32        m_num_nodes;
-        fsa_t*     m_nodes;
-        fsa_t*     m_values;
+
+        fsadexed_t* m_nodes;  // the nodes
+        // key/value are stored in pairs
+        fsadexed_t* m_keys;   // pointers to keys
+        fsadexed_t* m_values; // pointers to values
     };
 
     bool dyntrie_t::insert(s8 keylen, dynkey_t key, dynval_t value)
@@ -75,6 +85,84 @@ namespace ncore
         }
 
         // go through the tree to find a place to insert the new key or find a key that is the same as the incoming key
+        // this mainly means to find the first bit that is different between two keys and to insert a node for that bit
+    }
+
+    static s32 get_bit(s8 keylen, dynkey_t key, s32 bit)
+    {
+        s32 byte = bit >> 3;
+        s32 bit  = bit & 0x07;
+        return (key[byte] & (1 << bit)) != 0 ? 1 : 0;
+    }
+
+    static bool keys_are_identical(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2)
+    {
+        if (keylen1 != keylen2)
+            return false;
+
+        for (s32 i = 0; i < keylen1; ++i)
+        {
+            if (key1[i] != key2[i])
+                return false;
+        }
+
+        return true;
+    }
+
+    bool dyntrie_t::find(s8 keylen, dynkey_t key, dynval_t& value)
+    {
+        if (m_root == nullptr)
+            return false;
+
+        dynnode_t* node      = m_root;
+        s32        bit_start = 0;
+        while (true)
+        {
+            s32 bit_end     = node->bit();
+            s32 bit_key     = node->key();
+            s32 bit_key_len = node->key_len();
+            s32 bit_key_end = bit_key + bit_key_len;
+
+            s32 bit_diff = findfirst_bit_range(keylen, key, bit_key_len, m_keys->idx2obj<const char*>(bit_key), bit_start, bit_key_end, m_nullkey);
+            if (bit_diff == bit_key_end + 1)
+            {
+                const s32 branch = get_bit(keylen, key, bit_diff);
+                if (node->is_value(branch))
+                {
+                    dynkey_t k = m_key->idx2obj<dynkey_t>(node->branch(branch));
+
+                    // check if the incoming and the stored key are the same
+                    if (keys_are_identical(keylen, key, bit_key_len, k))
+                    {
+                        value = m_value[node->branch(branch)];
+                        return true;
+                    }
+                    else
+                    {   // keys are not the same so we need to insert a new node
+                        // TODO: insert a new node
+                        return false;
+                    }
+                }
+                else // branch is a node, so we need to continue the search
+                {
+                    node = m_nodes->idx2obj<dynnode_t>(node->branch(branch));
+                    bit_start = bit_diff + 1;
+                }
+            }
+            else
+            {
+                // we have found a bit that is within the [bit_start, bit_end] range and so
+                // we need to insert a node before this node
+
+                dynnode_t* new_node = m_nodes->construct<dynnode_t>();
+                new_node->set_key(keylen, key);
+                new_node->set_bit(bit_diff);
+                
+                // figure out left/right of 'node' and set the new node's branches
+
+                return true;                
+            }
+        }
     }
 
 }; // namespace ncore
@@ -134,7 +222,11 @@ UNITTEST_SUITE_END
 
 namespace ncore
 {
-    static s32 findfirst_bit_range(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start, s32 bit_end)
+    // nullkey is used to compare the key outside the range of a key
+    // return:
+    // - bit_end + 1 if the two keys are equal in the range
+    // - bit_start + n if the two keys are different in the range and the n-th bit is different
+    static s32 findfirst_bit_range(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start, s32 bit_end, dynkey_t nullkey)
     {
         // first we make sure that the key with the smaller length is key1
         if (keylen1 > keylen2)
@@ -143,20 +235,18 @@ namespace ncore
             g_swap(key1, key2);
         }
 
-        if (bit_start > keylen1 * 8)
-        {
-            bit_start = keylen1 * 8;
-            bit_end   = bit_start;
-        }
-        else
-        {
-            if (bit_end > keylen1 * 8)
-                bit_end = keylen1 * 8;
-        }
-
-        // check if start and end are on the same byte
         s32 byte_start = bit_start >> 3;
         s32 byte_end   = bit_end >> 3;
+        if (byte_start > keylen1)
+        {
+            key1 = nullkey;
+        }
+        if (byte_start > keylen2)
+        {
+            key2 = nullkey;
+        }
+        if (key1 == nullkey && key2 == nullkey)
+            return bit_end + 1;
 
         // start and end are in the same byte
         if (byte_start == byte_end)
@@ -164,14 +254,13 @@ namespace ncore
             const u8 byte1 = key1[byte_start];
             const u8 byte2 = key2[byte_start];
             const u8 mask  = (0xFF >> (bit_start & 7)) & (0xFF << (7 - (bit_end & 7)));
-
             if ((byte1 & mask) == (byte2 & mask))
-                return bit_end;
+                return bit_end + 1;
 
             return bit_start + g_findfirst_bit((byte1 ^ byte2) & mask);
         }
 
-        if (bit_start & 7 != 0)
+        // start and end are not in the same byte
         {
             const u8 byte1 = key1[byte_start];
             const u8 byte2 = key2[byte_start];
@@ -180,20 +269,40 @@ namespace ncore
             {
                 return bit_start + g_findfirst_bit((byte1 ^ byte2) & mask);
             }
-            byte_start += 1;
-            bit_start = (byte_start << 3);
         }
 
-        while (byte_start < byte_end)
+        // see if there are bytes between start and end
+        // are we going outside any of the keys?
+        if (byte_end < keylen1 && byte_end < keylen2)
         {
-            const u8 byte1 = key1[byte_start];
-            const u8 byte2 = key2[byte_start];
-            if (byte1 != byte2)
+            while (++byte_start < byte_end)
             {
-                return bit_start + g_findfirst_bit(byte1 ^ byte2);
+                const u8 byte1 = key1[byte_start];
+                const u8 byte2 = key2[byte_start];
+                if (byte1 != byte2)
+                {
+                    return (byte_start << 3) + g_findfirst_bit(byte1 ^ byte2);
+                }
             }
-            byte_start += 1;
-            bit_start += 8;
+        }
+        else
+        {
+            // here we will check key1 and key2 for going outside and switch to nullkey
+            while (++byte_start < byte_end)
+            {
+                if (key1 != nullkey && (byte_start >= keylen1))
+                    key1 = nullkey;
+                if (key2 != nullkey && (byte_start >= keylen2))
+                    key2 = nullkey;
+                if (key1 == nullkey && key2 == nullkey)
+                    return bit_end + 1;
+                const u8 byte1 = key1[byte_start];
+                const u8 byte2 = key2[byte_start];
+                if (byte1 != byte2)
+                {
+                    return (byte_start << 3) + g_findfirst_bit(byte1 ^ byte2);
+                }
+            }
         }
 
         {
@@ -202,118 +311,10 @@ namespace ncore
             const u8 mask  = 0xFF << (7 - (bit_end & 7));
             if ((byte1 & mask) != (byte2 & mask))
             {
-                return bit_start + g_findfirst_bit((byte1 ^ byte2) & mask);
+                return (byte_end << 3) + g_findfirst_bit((byte1 ^ byte2) & mask);
             }
         }
 
         return bit_end + 1;
     }
-
-    static s32 findfirst_bit_open(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start)
-    {
-        if (keylen1 > keylen2)
-        {
-            g_swap(keylen1, keylen2);
-            g_swap(key1, key2);
-        }
-
-        if (bit_start > keylen1 * 8)
-            return keylen1 * 8;
-
-        // compute bit_end for correct termination
-        const s32 bit_end = keylen1 * 8;
-
-        s32 bit_index = bit_start;
-        while (bit_index < bit_end)
-        {
-            const s32 byte_index = bit_index >> 3;
-            const u8  byte1      = key1[byte_index];
-            const u8  byte2      = key2[byte_index];
-            if (byte1 != byte2)
-            {
-                u8 mask = 0x80 >> (bit_index & 7);
-                while (mask != 0 && (byte1 & mask) == (byte2 & mask))
-                {
-                    ++bit_index;
-                    mask >>= 1;
-                }
-                return bit_index;
-            }
-            bit_index += 8;
-        }
-    }
-
-    static bool compare_bit_range(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start, s32 bit_end)
-    {
-        // first we make sure that the key with the smaller length is key1
-        if (keylen1 > keylen2)
-        {
-            g_swap(keylen1, keylen2);
-            g_swap(key1, key2);
-        }
-
-        if (bit_start > keylen1 * 8)
-        {
-            bit_start = keylen1 * 8;
-            bit_end   = bit_start;
-        }
-        else
-        {
-            if (bit_end > keylen1 * 8)
-                bit_end = keylen1 * 8;
-        }
-
-        s32 byte_start = bit_start >> 3;
-        s32 byte_end   = bit_end >> 3;
-
-        // start and end are in the same byte
-        if (byte_start == byte_end)
-        {
-            const u8 byte1 = key1[byte_start];
-            const u8 byte2 = key2[byte_start];
-            const u8 mask  = (0xFF >> (bit_start & 7)) & (0xFF << (7 - (bit_end & 7)));
-            return (byte1 & mask) == (byte2 & mask);
-        }
-
-        // start and end are not in the same byte
-        u8 byte1 = key1[byte_start];
-        u8 byte2 = key2[byte_start];
-        u8 mask  = 0xFF >> (bit_start & 7);
-        if ((byte1 & mask) != (byte2 & mask))
-            return false;
-
-        byte1 = key1[byte_end];
-        byte2 = key2[byte_end];
-        mask  = 0xFF << (7 - (bit_end & 7));
-        if ((byte1 & mask) != (byte2 & mask))
-            return false;
-
-        // see if there are bytes between start and end
-        while (++byte_start < byte_end)
-        {
-            if (key1[byte_start] != key2[byte_start])
-                return false;
-        }
-
-        return true;
-    }
-
-    dynnode_t* dyntrie_t::branch_two_values(dynnode_t* parent, dynval_t* v1, dynval_t* v2, s8 pos)
-    {
-        const s32 byte_index = pos >> 3;
-        const u8  mask       = 0x80 >> (pos & 7);
-        const u8  byte1      = v1->key[byte_index];
-        const u8  byte2      = v2->key[byte_index];
-        if ((byte1 & mask) == (byte2 & mask))
-        {
-            if (pos < v1->keylen * 8)
-            {
-                dynnode_t* node = m_nodes->alloc<dynnode_t>();
-                node->parent    = parent;
-                node->pos       = pos;
-                node->value     = nullptr;
-                node->child1    = branch_two_values(node, v1, v2, pos + 1);
-                node->child2    = branch_two_values(node, v1, v2, pos + 1);
-                ++m_num_nodes return false;
-            }
-        }
+} // namespace ncore
