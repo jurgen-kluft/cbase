@@ -1,12 +1,13 @@
 #include "cbase/c_allocator.h"
 #include "cbase/c_slice.h"
 #include "cbase/c_btree.h"
+#include "cbase/test_allocator.h"
 
 #include "cunittest/cunittest.h"
 
 using namespace ncore;
 
-extern ncore::alloc_t* gTestAllocator;
+
 
 namespace ncore
 {
@@ -120,22 +121,24 @@ UNITTEST_SUITE_BEGIN(test_btree)
 {
     UNITTEST_FIXTURE(btree32)
     {
+        UNITTEST_ALLOCATOR;
+
         ncore::objects_t*  nodes  = nullptr;
         ncore::objects_t* values = nullptr;
         ncore::value_kv_t* value_kv = nullptr;
 
         UNITTEST_FIXTURE_SETUP()
         {
-            nodes  = gTestAllocator->construct<ncore::objects_t>();
-            values = gTestAllocator->construct<ncore::objects_t>();
-            value_kv = gTestAllocator->construct<ncore::value_kv_t>(values);
+            nodes  = Allocator->construct<ncore::objects_t>();
+            values = Allocator->construct<ncore::objects_t>();
+            value_kv = Allocator->construct<ncore::value_kv_t>(values);
         }
 
         UNITTEST_FIXTURE_TEARDOWN()
         {
-            gTestAllocator->destruct(nodes);
-            gTestAllocator->destruct(values);
-            gTestAllocator->destruct(value_kv);
+            Allocator->destruct(nodes);
+            Allocator->destruct(values);
+            Allocator->destruct(value_kv);
         }
 
         UNITTEST_TEST(init)
@@ -314,8 +317,9 @@ UNITTEST_SUITE_BEGIN(test_btree)
 
         static myvalue_kv value_kv;
 
-        UNITTEST_FIXTURE_SETUP() {}
+        UNITTEST_ALLOCATOR;
 
+        UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
         UNITTEST_TEST(init)
@@ -331,10 +335,10 @@ UNITTEST_SUITE_BEGIN(test_btree)
             btree_ptr_t tree;
             tree.init_from_mask(&nodes, &value_kv, 0xFF, true);
 
-            myvalue* v1 = gTestAllocator->construct<myvalue>();
+            myvalue* v1 = Allocator->construct<myvalue>();
             v1->m_value = 1.0f;
             v1->m_key   = 0;
-            myvalue* v2 = gTestAllocator->construct<myvalue>();
+            myvalue* v2 = Allocator->construct<myvalue>();
             v2->m_value = 2.0f;
             v2->m_key   = 0;
 
@@ -351,8 +355,8 @@ UNITTEST_SUITE_BEGIN(test_btree)
             void* vv2;
             CHECK_TRUE(tree.rem(root, v2->m_key, vv2));
 
-            gTestAllocator->destruct<myvalue>((myvalue*)v2);
-            gTestAllocator->destruct<myvalue>((myvalue*)v1);
+            Allocator->destruct<myvalue>((myvalue*)v2);
+            Allocator->destruct<myvalue>((myvalue*)v1);
 
             tree.clear(root);
         }

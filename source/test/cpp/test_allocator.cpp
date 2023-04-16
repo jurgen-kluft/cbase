@@ -1,37 +1,40 @@
 #include "cbase/c_allocator.h"
 #include "cbase/c_debug.h"
 #include "cbase/c_buffer.h"
+#include "cbase/test_allocator.h"
 
 #include "cunittest/cunittest.h"
 
 using namespace ncore;
 
-extern ncore::alloc_t* gTestAllocator;
+
 
 UNITTEST_SUITE_BEGIN(test_allocator)
 {
     UNITTEST_FIXTURE(main)
     {
+        UNITTEST_ALLOCATOR;
+
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
         UNITTEST_TEST(test_alignment)
         {
-            void* ptr = gTestAllocator->allocate(200, 8);
+            void* ptr = Allocator->allocate(200, 8);
             CHECK_EQUAL(0, (ptr_t)ptr & (8 - 1));
-            gTestAllocator->deallocate(ptr);
+            Allocator->deallocate(ptr);
 
-            ptr = gTestAllocator->allocate(200, 16);
+            ptr = Allocator->allocate(200, 16);
             CHECK_EQUAL(0, (ptr_t)ptr & (16 - 1));
-            gTestAllocator->deallocate(ptr);
+            Allocator->deallocate(ptr);
 
-            ptr = gTestAllocator->allocate(200, 32);
+            ptr = Allocator->allocate(200, 32);
             CHECK_EQUAL(0, (ptr_t)ptr & (32 - 1));
-            gTestAllocator->deallocate(ptr);
+            Allocator->deallocate(ptr);
 
-            ptr = gTestAllocator->allocate(200, 64);
+            ptr = Allocator->allocate(200, 64);
             CHECK_EQUAL(0, (ptr_t)ptr & (64 - 1));
-            gTestAllocator->deallocate(ptr);
+            Allocator->deallocate(ptr);
         }
 
         struct test_object1
@@ -44,7 +47,7 @@ UNITTEST_SUITE_BEGIN(test_allocator)
 
         UNITTEST_TEST(_DCORE_CLASS_PLACEMENT_NEW_DELETE)
         {
-            void*         object1_tmp = gTestAllocator->allocate(sizeof(test_object1), 4);
+            void*         object1_tmp = Allocator->allocate(sizeof(test_object1), 4);
             test_object1* object1     = new (object1_tmp) test_object1;
             CHECK_NOT_NULL(object1);
             CHECK_TRUE(1 == object1->mInteger);
@@ -52,7 +55,7 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             delete object1;
             CHECK_TRUE(1 == object1->mInteger);
             CHECK_TRUE(2.0 == object1->mFloat);
-            gTestAllocator->deallocate(object1_tmp);
+            Allocator->deallocate(object1_tmp);
         }
 
         struct test_object2
@@ -60,7 +63,7 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             test_object2() : mInteger(3), mFloat(4.0) {}
             s32             mInteger;
             f32             mFloat;
-            static alloc_t* get_allocator() { return gTestAllocator; }
+            static alloc_t* get_allocator() { return Allocator; }
             DCORE_CLASS_NEW_DELETE(get_allocator, 16)
         };
 
@@ -79,7 +82,7 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             test_object3() : mInteger(2), mFloat(3.0) {}
             s32             mInteger;
             f32             mFloat;
-            static alloc_t* get_allocator() { return gTestAllocator; }
+            static alloc_t* get_allocator() { return Allocator; }
             DCORE_CLASS_ARRAY_NEW_DELETE(get_allocator, 32)
             DCORE_CLASS_PLACEMENT_NEW_DELETE
         };
@@ -103,15 +106,15 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             test_object4() : mInteger(2), mFloat(3.0) {}
             s32             mInteger;
             f32             mFloat;
-            static alloc_t* get_allocator() { return gTestAllocator; }
+            static alloc_t* get_allocator() { return Allocator; }
 
             DCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
         UNITTEST_TEST(test_construct)
         {
-            test_object4* obj = gTestAllocator->construct<test_object4>();
-            gTestAllocator->destruct<test_object4>(obj);
+            test_object4* obj = Allocator->construct<test_object4>();
+            Allocator->destruct<test_object4>(obj);
         }
 
         UNITTEST_TEST(test_alloc_buffer)

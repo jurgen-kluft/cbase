@@ -1,12 +1,11 @@
 #include "cbase/c_target.h"
 #include "cbase/c_allocator.h"
 #include "cbase/c_tree.h"
+#include "cbase/test_allocator.h"
 
 #include "cunittest/cunittest.h"
 
 using namespace ncore;
-
-extern ncore::alloc_t* gTestAllocator;
 
 s32 compare_s32(void const* p1, void const* p2)
 {
@@ -124,9 +123,11 @@ UNITTEST_SUITE_BEGIN(test_tree)
         static ctxt_tree_t     ctxt_instance;
         static tree_t::ctxt_t* ctxt = &ctxt_instance;
 
+        UNITTEST_ALLOCATOR;
+
         UNITTEST_FIXTURE_SETUP() 
         {
-            ctxt_instance.init(gTestAllocator);
+            ctxt_instance.init(Allocator);
         }
         UNITTEST_FIXTURE_TEARDOWN() 
         {

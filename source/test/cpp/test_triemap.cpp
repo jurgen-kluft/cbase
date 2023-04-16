@@ -10,6 +10,8 @@
 #include "cbase/c_runes.h"
 #include "cbase/c_printf.h"
 
+#include "cbase/test_allocator.h"
+
 #include "cunittest/cunittest.h"
 
 namespace ncore
@@ -593,7 +595,7 @@ namespace ncore
     };
 } // namespace ncore
 
-extern ncore::alloc_t* gTestAllocator;
+
 using namespace ncore;
 
 UNITTEST_SUITE_BEGIN(test_dtrie)
@@ -602,9 +604,10 @@ UNITTEST_SUITE_BEGIN(test_dtrie)
     {
         fsa_test_t* m_fsa;
 
-        UNITTEST_FIXTURE_SETUP() { m_fsa = gTestAllocator->construct<fsa_test_t>(); }
+        UNITTEST_ALLOCATOR;
 
-        UNITTEST_FIXTURE_TEARDOWN() { gTestAllocator->destruct(m_fsa); }
+        UNITTEST_FIXTURE_SETUP() { m_fsa = Allocator->construct<fsa_test_t>(); }
+        UNITTEST_FIXTURE_TEARDOWN() { Allocator->destruct(m_fsa); }
 
         UNITTEST_TEST(trienode1)
         {

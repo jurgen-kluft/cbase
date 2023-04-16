@@ -292,6 +292,10 @@ namespace ncore
                     { // keys are not the same so we need to insert a new node
 
                         // TODO: insert a new node
+                        // create a new node
+                        // set the new node's key to the key of the current node
+                        
+
 
                         return false;
                     }

@@ -3,19 +3,17 @@
 #include "cbase/c_va_list.h"
 #include "cbase/c_runes.h"
 #include "cbase/c_runes.h"
+#include "cbase/test_allocator.h"
+
 #include "cunittest/cunittest.h"
 
 using namespace ncore;
-
-extern ncore::alloc_t* gTestAllocator;
 
 UNITTEST_SUITE_BEGIN(test_string_utf)
 {
     UNITTEST_FIXTURE(utf8)
     {
-        UNITTEST_FIXTURE_SETUP() {}
-
-        UNITTEST_FIXTURE_TEARDOWN() {}
+        UNITTEST_ALLOCATOR;
 
         UNITTEST_TEST(type_size_checks)
         {
@@ -190,10 +188,6 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
 
     UNITTEST_FIXTURE(utf32)
     {
-        UNITTEST_FIXTURE_SETUP() {}
-
-        UNITTEST_FIXTURE_TEARDOWN() {}
-
         UNITTEST_TEST(type_size_checks)
         {
             CHECK_EQUAL(1, sizeof(uchar));
