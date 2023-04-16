@@ -7,8 +7,6 @@
 #include "cbase/c_debug.h"
 #include "cbase/c_allocator.h"
 
-#include "cbase/c_noncopyable.h"
-
 namespace ncore
 {
 	//
@@ -137,7 +135,7 @@ namespace ncore
 	* @endcode
 	*/
 	template <class T, class InstantiationPolicy=heap_instantiation_t>
-	class singleton_t : private InstantiationPolicy, private noncopyable_t
+	class singleton_t : private InstantiationPolicy
 	{
 		enum EAction { CREATE, GET, DESTROY };
 		static T*			handler(EAction action)
