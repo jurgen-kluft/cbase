@@ -81,7 +81,7 @@ namespace ncore
             return index;
         }
 
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
 
         virtual void v_release() {}
     };
@@ -111,7 +111,7 @@ namespace ncore
             n->key = key;
         }
 
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 
 } // namespace ncore
@@ -290,7 +290,7 @@ UNITTEST_SUITE_BEGIN(test_btree)
         public:
             u64 m_key;
             f32 m_value;
-            XCORE_CLASS_PLACEMENT_NEW_DELETE
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
         static objects_t nodes;

@@ -39,10 +39,10 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             test_object1() : mInteger(1), mFloat(2.0) {}
             s32 mInteger;
             f32 mFloat;
-            XCORE_CLASS_PLACEMENT_NEW_DELETE
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
-        UNITTEST_TEST(_XCORE_CLASS_PLACEMENT_NEW_DELETE)
+        UNITTEST_TEST(_DCORE_CLASS_PLACEMENT_NEW_DELETE)
         {
             void*         object1_tmp = gTestAllocator->allocate(sizeof(test_object1), 4);
             test_object1* object1     = new (object1_tmp) test_object1;
@@ -61,10 +61,10 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             s32             mInteger;
             f32             mFloat;
             static alloc_t* get_allocator() { return gTestAllocator; }
-            XCORE_CLASS_NEW_DELETE(get_allocator, 16)
+            DCORE_CLASS_NEW_DELETE(get_allocator, 16)
         };
 
-        UNITTEST_TEST(_XCORE_CLASS_NEW_DELETE)
+        UNITTEST_TEST(_DCORE_CLASS_NEW_DELETE)
         {
             test_object2* object2 = new test_object2;
             CHECK_NOT_NULL(object2);
@@ -80,8 +80,8 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             s32             mInteger;
             f32             mFloat;
             static alloc_t* get_allocator() { return gTestAllocator; }
-            XCORE_CLASS_ARRAY_NEW_DELETE(get_allocator, 32)
-            XCORE_CLASS_PLACEMENT_NEW_DELETE
+            DCORE_CLASS_ARRAY_NEW_DELETE(get_allocator, 32)
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
         UNITTEST_TEST(test_placement_new)
@@ -105,7 +105,7 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             f32             mFloat;
             static alloc_t* get_allocator() { return gTestAllocator; }
 
-            XCORE_CLASS_PLACEMENT_NEW_DELETE
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
         };
 
         UNITTEST_TEST(test_construct)

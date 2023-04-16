@@ -93,7 +93,7 @@ namespace ncore
 		virtual void		reset(s64 inSeed = 0);
 		virtual u32			generate();
 
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
 	private:
 		u64			m_seed;
 	};

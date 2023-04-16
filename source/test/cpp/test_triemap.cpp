@@ -112,7 +112,7 @@ namespace ncore
             set_child_type(child, CHILD_TYPE_NODE);
         }
 
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
 
         // 32 bytes (can be 24 bytes if key == u32)
         key_t   m_key;
@@ -153,7 +153,7 @@ namespace ncore
         }
         key_t m_key;
         val_t m_value;
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 
     // Trie data structure where every node can cover a range of bits (not only 1 bit)
@@ -589,7 +589,7 @@ namespace ncore
 
         virtual void v_release() {}
 
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 } // namespace ncore
 

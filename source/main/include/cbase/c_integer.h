@@ -40,7 +40,7 @@ namespace ncore
                 return 0;
         }
         template <class T> T clamp(T integerA, T low, T high); ///< Return the clamp value
-        
+
         /// clamp sub-range inside of encompassing range
         template <class T> void clampRange(T& subfrom, T& subto, T enfrom, T ento)
         {
@@ -70,19 +70,21 @@ namespace ncore
         inline u32  ceilpo2(u32 integer);                 ///< Return the smallest power-of-two larger than integer
         inline u32  floorpo2(u32 integer);                ///< Return the biggest power-of-two smaller than integer
         inline u32  next_power_of_two(u32 val) { return ceilpo2(val); }
-        inline u32  bitReverse(u32 integer);              ///< Reverse bits in 32 bit word
-        inline s8   countBits(u8 integer);                ///< count one bits in 8 bit word
-        inline s8   countBits(u16 integer);               ///< count one bits in 16 bit word
-        inline s8   countBits(u32 integer);               ///< count one bits in 32 bit word
-        inline s8   countBits(u64 integer);               ///< count one bits in 32 bit word
+        inline u32  bitReverse(u32 integer); ///< Reverse bits in 32 bit word
+        inline s8   countBits(u8 integer);   ///< count one bits in 8 bit word
+        inline s8   countBits(u16 integer);  ///< count one bits in 16 bit word
+        inline s8   countBits(u32 integer);  ///< count one bits in 32 bit word
+        inline s8   countBits(u64 integer);  ///< count one bits in 32 bit word
 
-		inline s8 ilog2(u32 integer); ///< Log2 of a 32-bit integer
-		inline s8 ilog2(s32 integer) { return ilog2((u32)integer); }
-		inline s8 ilog2(u64 integer); ///< Log2 of a 64-bit integer
-		inline s8 ilog2(s64 integer) { return ilog2((u64)integer); }
+        inline s8 ilog2(u32 integer); ///< Log2 of a 32-bit integer
+        inline s8 ilog2(s32 integer) { return ilog2((u32)integer); }
+        inline s8 ilog2(u64 integer); ///< Log2 of a 64-bit integer
+        inline s8 ilog2(s64 integer) { return ilog2((u64)integer); }
 
-        inline s8  countTrailingZeros(u16 integer);       ///< find the number of trailing zeros in 32-bit v
-        inline s8  countLeadingZeros(u16 integer);        ///< find the number of leading zeros in 32-bit v
+        inline s8  countTrailingZeros(u8 integer);        ///< find the number of trailing zeros in 8-bit v
+        inline s8  countLeadingZeros(u8 integer);         ///< find the number of trailing zeros in 8-bit v
+        inline s8  countTrailingZeros(u16 integer);       ///< find the number of trailing zeros in 16-bit v
+        inline s8  countLeadingZeros(u16 integer);        ///< find the number of leading zeros in 16-bit v
         inline s8  countTrailingZeros(u32 integer);       ///< find the number of trailing zeros in 32-bit v
         inline s8  countLeadingZeros(u32 integer);        ///< find the number of leading zeros in 32-bit v
         inline s8  countTrailingZeros(u64 integer);       ///< find the number of trailing zeros in 64-bit v
@@ -91,6 +93,8 @@ namespace ncore
         inline u32 mostSignificantOneBit(u32 integer);    ///< Return v but with only the Most Significant Bit "1"
         inline s8  leastSignificantBit(u32 integer);      ///< Return the bit index of the Least Significant Bit "1"
         inline s8  mostSignificantBit(u32 integer);       ///< Return the bit index of the Most Significant Bit "1"
+        inline s8  findFirstBit(u8 integer);              ///< find the bit position/index of the first bit from low to high
+        inline s8  findLastBit(u8 integer);               ///< find the bit position/index of the first bit from high to low
         inline s8  findFirstBit(u16 integer);             ///< find the bit position/index of the first bit from low to high
         inline s8  findLastBit(u16 integer);              ///< find the bit position/index of the first bit from high to low
         inline s8  findFirstBit(u32 integer);             ///< find the bit position/index of the first bit from low to high

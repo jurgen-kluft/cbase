@@ -7,41 +7,41 @@
 
 namespace ncore
 {
-#define X_U8_MIN (0)
-#define X_U8_MAX (255)
+#define D_U8_MIN (0)
+#define D_U8_MAX (255)
 
-#define X_U16_MIN (0)
-#define X_U16_MAX (65535)
+#define D_U16_MIN (0)
+#define D_U16_MAX (65535)
 
-#define X_U32_MIN (0)
-#define X_U32_MAX (D_CONSTANT_U32(4294967295))
+#define D_U32_MIN (0)
+#define D_U32_MAX (D_CONSTANT_U32(4294967295))
 
-#define X_U64_MIN (D_CONSTANT_U64(0))
-#define X_U64_MAX (D_CONSTANT_U64(18446744073709551615))
+#define D_U64_MIN (D_CONSTANT_U64(0))
+#define D_U64_MAX (D_CONSTANT_U64(18446744073709551615))
 
-#define X_S8_MIN -(128)
-#define X_S8_MAX (127)
+#define D_S8_MIN -(128)
+#define D_S8_MAX (127)
 
-#define X_S16_MIN -(32768)
-#define X_S16_MAX (32767)
+#define D_S16_MIN -(32768)
+#define D_S16_MAX (32767)
 
-#define X_S32_MIN (0x80000000L)
-#define X_S32_MAX (2147483647)
+#define D_S32_MIN (0x80000000L)
+#define D_S32_MAX (2147483647)
 
-#define X_S64_MIN (0x8000000000000000LL)
-#define X_S64_MAX (D_CONSTANT_64(9223372036854775807))
+#define D_S64_MIN (0x8000000000000000LL)
+#define D_S64_MAX (D_CONSTANT_64(9223372036854775807))
 
-#define X_F32_MIN -3.402823466e+38f
-#define X_F32_MAX 3.402823466e+38f
+#define D_F32_MIN -3.402823466e+38f
+#define D_F32_MAX 3.402823466e+38f
 
-#define X_F64_MIN -1.7976931348623158e+308
-#define X_F64_MAX 1.7976931348623158e+308
+#define D_F64_MIN -1.7976931348623158e+308
+#define D_F64_MAX 1.7976931348623158e+308
 
-#define X_XBYTE_MIN X_U8_MIN
-#define X_XBYTE_MAX X_U8_MAX
+#define D_BYTE_MIN D_U8_MIN
+#define D_BYTE_MAX D_U8_MAX
 
-#define X_XWCHAR_MIN U16_MIN
-#define X_XWCHAR_MAX U16_MAX
+#define D_WCHAR_MIN U16_MIN
+#define D_WCHAR_MAX U16_MAX
 
     /**
      * Description:
@@ -76,8 +76,8 @@ namespace ncore
     public:
         typedef u8 type_t;
 
-        static type_t minimum() { return X_U8_MIN; }
-        static type_t maximum() { return X_U8_MAX; }
+        static type_t minimum() { return D_U8_MIN; }
+        static type_t maximum() { return D_U8_MAX; }
         static bool has_sign() { return false; }
     };
 
@@ -86,8 +86,8 @@ namespace ncore
     public:
         typedef u16 type_t;
 
-        static type_t minimum() { return X_U16_MIN; }
-        static type_t maximum() { return X_U16_MAX; }
+        static type_t minimum() { return D_U16_MIN; }
+        static type_t maximum() { return D_U16_MAX; }
         static bool has_sign() { return false; }
     };
 
@@ -96,8 +96,8 @@ namespace ncore
     public:
         typedef u32 type_t;
 
-        static type_t minimum() { return X_U32_MIN; }
-        static type_t maximum() { return X_U32_MAX; }
+        static type_t minimum() { return D_U32_MIN; }
+        static type_t maximum() { return D_U32_MAX; }
         static bool has_sign() { return false; }
     };
 
@@ -106,8 +106,8 @@ namespace ncore
     public:
         typedef u64 type_t;
 
-        static type_t minimum() { return X_U64_MIN; }
-        static type_t maximum() { return X_U64_MAX; }
+        static type_t minimum() { return D_U64_MIN; }
+        static type_t maximum() { return D_U64_MAX; }
         static bool has_sign() { return false; }
     };
 
@@ -116,8 +116,8 @@ namespace ncore
     public:
         typedef s8 type_t;
 
-        static type_t minimum() { return X_S8_MIN; }
-        static type_t maximum() { return X_S8_MAX; }
+        static type_t minimum() { return D_S8_MIN; }
+        static type_t maximum() { return D_S8_MAX; }
         static bool has_sign() { return true; }
     };
 
@@ -126,8 +126,8 @@ namespace ncore
     public:
         typedef s16 type_t;
 
-        static type_t minimum() { return X_S16_MIN; }
-        static type_t maximum() { return X_S16_MAX; }
+        static type_t minimum() { return D_S16_MIN; }
+        static type_t maximum() { return D_S16_MAX; }
         static bool has_sign() { return true; }
     };
 
@@ -136,8 +136,8 @@ namespace ncore
     public:
         typedef s32 type_t;
 
-        static type_t minimum() { return X_S32_MIN; }
-        static type_t maximum() { return X_S32_MAX; }
+        static type_t minimum() { return D_S32_MIN; }
+        static type_t maximum() { return D_S32_MAX; }
         static bool has_sign() { return true; }
     };
 
@@ -146,8 +146,8 @@ namespace ncore
     public:
         typedef s64 type_t;
 
-        static type_t minimum() { return X_S64_MIN; }
-        static type_t maximum() { return X_S64_MAX; }
+        static type_t minimum() { return D_S64_MIN; }
+        static type_t maximum() { return D_S64_MAX; }
         static bool has_sign() { return true; }
     };
 
@@ -156,8 +156,8 @@ namespace ncore
     public:
         typedef f32 type_t;
 
-        static type_t minimum() { return X_F32_MIN; }
-        static type_t maximum() { return X_F32_MAX; }
+        static type_t minimum() { return D_F32_MIN; }
+        static type_t maximum() { return D_F32_MAX; }
         static bool has_sign() { return true; }
     };
 
@@ -166,8 +166,8 @@ namespace ncore
     public:
         typedef f64 type_t;
 
-        static type_t minimum() { return X_F64_MIN; }
-        static type_t maximum() { return X_F64_MAX; }
+        static type_t minimum() { return D_F64_MIN; }
+        static type_t maximum() { return D_F64_MAX; }
         static bool has_sign() { return true; }
     };
 

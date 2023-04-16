@@ -89,7 +89,7 @@ namespace ncore
         inline bool is_empty() const { return m_nodes[0] == Null && m_nodes[1] == Null && m_nodes[2] == Null && m_nodes[3] == Null; }
         inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = Null; }
         u32         m_nodes[4];
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 
     static inline bool is_null(u32 const i) { return i == Null; }
@@ -491,7 +491,7 @@ namespace ncore
         inline bool is_empty() const { return m_nodes[0] == 0 && m_nodes[1] == 0 && m_nodes[2] == 0 && m_nodes[3] == 0; }
         inline void clear() { m_nodes[0] = m_nodes[1] = m_nodes[2] = m_nodes[3] = 0; }
         ptr_t        m_nodes[4];
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
     };
 
     static inline bool  is_null(ptr_t n) { return n == 0; }

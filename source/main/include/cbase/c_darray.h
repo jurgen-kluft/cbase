@@ -21,7 +21,7 @@ namespace ncore
     template <typename T> class array_t
     {
     public:
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
 
         static array_t<T>* create(u32 initial_size, u32 initial_capacity, array_capacity_handler_t* capacity_handler = nullptr)
         {

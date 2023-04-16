@@ -24,7 +24,7 @@ UNITTEST_SUITE_BEGIN(test_singleton_t)
 		{
 			return 64;
 		}
-		XCORE_CLASS_NEW_DELETE(singleton_allocator, 64)
+		DCORE_CLASS_NEW_DELETE(singleton_allocator, 64)
 
 		int			mInteger;
 	};
@@ -35,7 +35,7 @@ UNITTEST_SUITE_BEGIN(test_singleton_t)
 		test_singleton2() : mInteger(22) {}
 
 		enum { SINGLETON_ALIGNMENT = 128 };
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 
 		int			mInteger;
 	};

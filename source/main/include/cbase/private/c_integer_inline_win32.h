@@ -7,6 +7,14 @@ namespace ncore
     {
         // find the number of trailing zeros in 16-bit value
         // if 'v==0' this function returns 0
+        inline s8 countTrailingZeros(u8 v)
+        {
+            unsigned long result;
+            ::_BitScanForward(&result, v);
+            return (s8)result;
+        }
+        // find the number of trailing zeros in 16-bit value
+        // if 'v==0' this function returns 0
         inline s8 countTrailingZeros(u16 v)
         {
             unsigned long result;
@@ -30,6 +38,9 @@ namespace ncore
             return (s8)result;
         }
 
+        // find the number of leading zeros in 8-bit v
+        // if 'v==0' this function returns 8
+        inline s8 countLeadingZeros(u8 v) { return (s8)::__lzcnt(v); }
         // find the number of leading zeros in 16-bit v
         // if 'v==0' this function returns 16
         inline s8 countLeadingZeros(u16 v) { return (s8)::__lzcnt16(v); }
@@ -66,6 +77,19 @@ namespace ncore
             s32 c = 31 - countLeadingZeros(integer);
             return c;
         }
+
+        // find the bit position/index of the first bit from low to high
+        // If 'integer == 0' this function will return -1
+        inline s8 findFirstBit(u8 integer)
+        {
+            if (integer == 0)
+                return -1;
+            return countTrailingZeros(integer);
+        }
+
+        // find the bit position/index of the first bit from high to low
+        // If 'integer == 0' this function will return -1
+        inline s8 findLastBit(u8 integer) { return 7 - countLeadingZeros(integer); }
 
         // find the bit position/index of the first bit from low to high
         // If 'integer == 0' this function will return

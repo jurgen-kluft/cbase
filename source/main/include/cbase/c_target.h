@@ -963,7 +963,7 @@ namespace ncore
 
 #elif defined(COMPILER_CLANG)
 
-#pragma message "clang compiler"
+// #pragma message "clang compiler"
 
 #    define D_NO_CUSTOM_INT64
 #    define D_NO_CUSTOM_UINT64
@@ -983,6 +983,20 @@ namespace ncore
 #    define D_FORCE_INLINE     __attribute__((always_inline))
 #    define D_FORCE_INLINE_SPU __attribute__((always_inline))
 
+#ifdef TARGET_OS_MAC
+#    define D_BOOL    unsigned int
+#    define D_BYTE    unsigned char
+#    define D_WCHAR   unsigned short
+#    define D_INT8    char
+#    define D_INT16   short
+#    define D_INT32   int
+#    define D_INT64   signed long
+#    define D_UINT64  unsigned long
+#    define D_INT128  s128
+#    define D_UINT128 u128
+#    define D_INT256  s256
+#    define D_UINT256 u256
+#else
 #    define D_BOOL    unsigned int
 #    define D_BYTE    unsigned char
 #    define D_WCHAR   unsigned short
@@ -995,6 +1009,7 @@ namespace ncore
 #    define D_UINT128 u128
 #    define D_INT256  s256
 #    define D_UINT256 u256
+#endif
 
     template <bool> struct CompileTimeAssert;
     template <> struct CompileTimeAssert<true>
@@ -1006,14 +1021,14 @@ namespace ncore
     };
 
 #    ifdef TARGET_64BIT
-#        define D_SIZE              unsigned long long
-#        define D_INT               signed long long
-#        define D_PTR_SIZED_INT     signed long long
+#        define D_SIZE              D_UINT64
+#        define D_INT               D_INT64
+#        define D_PTR_SIZED_INT     D_INT64
 #        define D_ALIGNMENT_DEFAULT 8
 #    else
-#        define D_SIZE              unsigned int
-#        define D_INT               signed int
-#        define D_PTR_SIZED_INT     int
+#        define D_SIZE              D_UINT32
+#        define D_INT               D_INT32
+#        define D_PTR_SIZED_INT     D_INT32
 #        define D_ALIGNMENT_DEFAULT 4
 #    endif
 

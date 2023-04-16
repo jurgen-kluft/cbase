@@ -4,6 +4,34 @@ namespace ncore
     {
         // find the number of trailing zeros in 16-bit value
         // if 'v==0' this function returns 0
+        inline s8 countTrailingZeros(u8 integer)
+        {
+            s8 count = 0;
+            if ((integer & 0x0F) == 0)
+            {
+                count += 4;
+                integer = integer >> 4;
+            }
+            if ((integer & 0x03) == 0)
+            {
+                count += 2;
+                integer = integer >> 2;
+            }
+            if ((integer & 0x01) == 0)
+            {
+                count += 1;
+                integer = integer >> 1;
+                ;
+            }
+            if ((integer & 0x01) == 1)
+            {
+                return count;
+            }
+            return 0;
+        }
+
+        // find the number of trailing zeros in 16-bit value
+        // if 'v==0' this function returns 0
         inline s8 countTrailingZeros(u16 integer)
         {
             s8 count = 0;
@@ -114,6 +142,35 @@ namespace ncore
             return 0;
         }
 
+        // find the number of leading zeros in 16-bit v
+        // if 'v==0' this function returns 16
+        inline s8 countLeadingZeros(u8 integer)
+        {
+            if (integer == 0)
+                return 8;
+
+            s8 count = 0;
+            if ((integer & 0xF0) == 0)
+            {
+                count += 4;
+                integer = integer << 4;
+            }
+            if ((integer & 0xC0) == 0)
+            {
+                count += 2;
+                integer = integer << 2;
+            }
+            if ((integer & 0x80) == 0)
+            {
+                count += 1;
+                integer = integer << 1;
+            }
+            if ((integer & 0x80) == 0)
+            {
+                count += 1;
+            }
+            return count;
+        }
         // find the number of leading zeros in 16-bit v
         // if 'v==0' this function returns 16
         inline s8 countLeadingZeros(u16 integer)
@@ -258,6 +315,14 @@ namespace ncore
             s8 c = 31 - countLeadingZeros(integer);
             return c;
         }
+
+        // find the bit position/index of the first bit from low to high
+        // If 'integer == 0' this function will return 0
+        inline s8 findFirstBit(u8 integer) { return countTrailingZeros(integer); }
+
+        // find the bit position/index of the first bit from high to low
+        // If 'integer == 0' this function will return -1
+        inline s8 findLastBit(u8 integer) { return 7 - countLeadingZeros(integer); }
 
         // find the bit position/index of the first bit from low to high
         // If 'integer == 0' this function will return 0

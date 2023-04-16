@@ -8,7 +8,7 @@ namespace ncore
             T m_branches[3];
         };
 
-        XCORE_CLASS_PLACEMENT_NEW_DELETE
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
 
         map_tree_ctxt_t(alloc_t* allocator, u32 maxsize, bool has_values = true)
             : tree_t::ctxt_t()
