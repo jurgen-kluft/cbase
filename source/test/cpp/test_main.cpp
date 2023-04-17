@@ -52,7 +52,7 @@ namespace ncore
 
         virtual bool handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
         {
-            UnitTest::reportAssert(exprString, fileName, lineNumber);
+            UnitTest::ReportAssert(exprString, fileName, lineNumber);
             NumberOfAsserts++;
             return false;
         }
