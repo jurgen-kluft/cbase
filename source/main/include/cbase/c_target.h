@@ -836,6 +836,11 @@ namespace ncore
     // 1600      == VC++ 10.0 (Visual Studio 2010)
     // 1700      == VC++ 11.0 (Visual Studio 2012)
     // 1800      == VC++ 12.0 (Visual Studio 2013)
+    // 1900      == VC++ 14.0 (Visual Studio 2015)
+    // 1910      == VC++ 14.1 (Visual Studio 2017)
+    // 1911      == VC++ 14.11 (Visual Studio 2017 15.3)
+    // 1912      == VC++ 14.12 (Visual Studio 2017 15.5)
+    // 1920      == VC++ 14.20 (Visual Studio 2019 16.0)
 
 #        if _MSC_VER < 1400
 #        elif _MSC_VER == 1400
@@ -861,10 +866,18 @@ namespace ncore
 #            define COMPILER_MSVC
 #            define COMPILER_DEFAULT
 #            define COMPILER_VERSION 2015
-#        elif _MSC_VER >= 1911
+#        elif _MSC_VER >= 1911 && _MSC_VER < 1920
 #            define COMPILER_MSVC
 #            define COMPILER_DEFAULT
 #            define COMPILER_VERSION 2017
+#        elif _MSC_VER >= 1920 && _MSC_VER < 1930
+#            define COMPILER_MSVC
+#            define COMPILER_DEFAULT
+#            define COMPILER_VERSION 2019
+#        elif _MSC_VER >= 1930 && _MSC_VER < 1940
+#            define COMPILER_MSVC
+#            define COMPILER_DEFAULT
+#            define COMPILER_VERSION 2022
 #        else
 #            error x_target, error; Unknown _MSVC_VER compiler version
 #        endif
@@ -872,6 +885,10 @@ namespace ncore
 #        define COMPILER_CLANG
 #        define COMPILER_DEFAULT
 #        define COMPILER_VERSION 7
+#    elif defined(__GNUC__)
+#        define COMPILER_GCC
+#        define COMPILER_DEFAULT
+#        define COMPILER_VERSION 4
 #    else
 #        error x_target, error; This compiler is not supported for TARGET_PC
 #    endif
@@ -881,6 +898,11 @@ namespace ncore
 #        define COMPILER_CLANG
 #        define COMPILER_DEFAULT
 #        define COMPILER_VERSION 7
+#    elif defined(__GNUC__)
+#        define TARGET_OS_MAC
+#        define COMPILER_GCC
+#        define COMPILER_DEFAULT
+#        define COMPILER_VERSION 4
 #    else
 #        error x_target, error; This compiler is not supported for TARGET_MAC
 #    endif
