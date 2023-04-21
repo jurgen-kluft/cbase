@@ -10,342 +10,350 @@ UNITTEST_SUITE_BEGIN(test_double)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
+        UNITTEST_TEST(Pow) 
+        {
+            f64 x = 3.0;
+            u32 n = 5;
+            f64 r = math::powd(x, n);
+            CHECK_TRUE(r == 243.0);
+        }
+
         UNITTEST_TEST(Abs)
         {
             f32 a = 1.0, b = 0.0, c = -1.0;
-            CHECK_TRUE(xf64::abs(a) == 1.0);
-            CHECK_TRUE(xf64::abs(b) == 0.0);
-            CHECK_TRUE(xf64::abs(c) == 1.0);
+            CHECK_TRUE(math::abs(a) == 1.0);
+            CHECK_TRUE(math::abs(b) == 0.0);
+            CHECK_TRUE(math::abs(c) == 1.0);
         }
 
         UNITTEST_TEST(Neg)
         {
             f32 a = 1.0, b = 0.0, c = -1.0;
-            CHECK_TRUE(xf64::neg(a) == -1.0);
-            CHECK_TRUE(xf64::neg(b) == 0.0);
-            CHECK_TRUE(xf64::neg(c) == 1.0);
+            CHECK_TRUE(math::neg(a) == -1.0);
+            CHECK_TRUE(math::neg(b) == 0.0);
+            CHECK_TRUE(math::neg(c) == 1.0);
         }
 
         UNITTEST_TEST(PositiveZero)
         {
-            CHECK_TRUE(1.0 / xf64::positiveZero() >= 1.0);
-            CHECK_TRUE(xf64::positiveZero() == -1.0 * -1.0 * 0.0);
+            CHECK_TRUE(1.0 / math::positiveZero() >= 1.0);
+            CHECK_TRUE(math::positiveZero() == -1.0 * -1.0 * 0.0);
         }
 
         UNITTEST_TEST(NegativeZero)
         {
-            CHECK_TRUE(xf64::negativeZero() == -1.0 * 0.0);
-            CHECK_TRUE(1.0 / xf64::negativeZero() <= -1.0);
-            CHECK_TRUE(xf64::negativeZero() * xf64::negativeZero() == xf64::positiveZero());
-            CHECK_TRUE(1.0 / (xf64::negativeZero()*xf64::negativeZero()) >= 1.0);
+            CHECK_TRUE(math::negativeZero() == -1.0 * 0.0);
+            CHECK_TRUE(1.0 / math::negativeZero() <= -1.0);
+            CHECK_TRUE(math::negativeZero() * math::negativeZero() == math::positiveZero());
+            CHECK_TRUE(1.0 / (math::negativeZero()*math::negativeZero()) >= 1.0);
         }
 #ifdef IEEE_FLOATS
         UNITTEST_TEST(Nan)
         {
-            CHECK_TRUE(xf64::nan() != xf64::nan());
+            CHECK_TRUE(math::nan() != math::nan());
         }
 
         UNITTEST_TEST(PositiveInfinity)
         {
-            CHECK_TRUE(xf64::positiveInfinity() + 1.0 == xf64::positiveInfinity());
-            CHECK_TRUE(xf64::positiveInfinity() == (1.0 / xf64::positiveZero()));
-            CHECK_TRUE(xf64::positiveInfinity() >= 0xffffffff);
-            CHECK_TRUE(xf64::bin(xf64::positiveInfinity()) == D_CONSTANT_64(0x7ff0000000000000));
+            CHECK_TRUE(math::positiveInfinity() + 1.0 == math::positiveInfinity());
+            CHECK_TRUE(math::positiveInfinity() == (1.0 / math::positiveZero()));
+            CHECK_TRUE(math::positiveInfinity() >= 0xffffffff);
+            CHECK_TRUE(math::bin(math::positiveInfinity()) == D_CONSTANT_64(0x7ff0000000000000));
         }
 
         UNITTEST_TEST(NegativeInfinity)
         {
-            CHECK_TRUE(xf64::negativeInfinity() - 1.0 == xf64::negativeInfinity());
-            CHECK_TRUE(xf64::negativeInfinity() == (1.0 / xf64::negativeZero()));
-            CHECK_TRUE(xf64::negativeInfinity() <= 0xffffffff);
-            CHECK_TRUE(xf64::bin(xf64::negativeInfinity()) == D_CONSTANT_64(0xfff0000000000000));
+            CHECK_TRUE(math::negativeInfinity() - 1.0 == math::negativeInfinity());
+            CHECK_TRUE(math::negativeInfinity() == (1.0 / math::negativeZero()));
+            CHECK_TRUE(math::negativeInfinity() <= 0xffffffff);
+            CHECK_TRUE(math::bin(math::negativeInfinity()) == D_CONSTANT_64(0xfff0000000000000));
         }
 #endif
         UNITTEST_TEST(PositiveMaximum)
         {
-            CHECK_TRUE(xf64::positiveMaximum() == xf64::positiveMaximum());
-            CHECK_TRUE(xf64::positiveMaximum() >= 0xffffffff);
-            CHECK_TRUE(xf64::positiveMaximum() >= 9999.9);
+            CHECK_TRUE(math::positiveMaximum() == math::positiveMaximum());
+            CHECK_TRUE(math::positiveMaximum() >= 0xffffffff);
+            CHECK_TRUE(math::positiveMaximum() >= 9999.9);
         }
 
         UNITTEST_TEST(NegativeMaximum)
         {
-            CHECK_TRUE(xf64::negativeMaximum() == xf64::negativeMaximum());
-            CHECK_TRUE(xf64::negativeMaximum() <= 0xffffffff);
-            CHECK_TRUE(xf64::negativeMaximum() <= 0x000fffff);
-            CHECK_TRUE(xf64::negativeMaximum() <= 0.1);
+            CHECK_TRUE(math::negativeMaximum() == math::negativeMaximum());
+            CHECK_TRUE(math::negativeMaximum() <= 0xffffffff);
+            CHECK_TRUE(math::negativeMaximum() <= 0x000fffff);
+            CHECK_TRUE(math::negativeMaximum() <= 0.1);
         }
 
         UNITTEST_TEST(PositiveMinimum)
         {
-            CHECK_TRUE(xf64::positiveMinimum() == xf64::positiveMinimum());
-            CHECK_TRUE(xf64::positiveMinimum() > 0.0);
-            CHECK_TRUE(xf64::positiveMinimum() <= 1.0);
-            CHECK_TRUE(xf64::positiveMinimum() > xf64::positiveZero());
+            CHECK_TRUE(math::positiveMinimum() == math::positiveMinimum());
+            CHECK_TRUE(math::positiveMinimum() > 0.0);
+            CHECK_TRUE(math::positiveMinimum() <= 1.0);
+            CHECK_TRUE(math::positiveMinimum() > math::positiveZero());
         }
 
         UNITTEST_TEST(NegativeMinimum)
         {
-            CHECK_TRUE(xf64::negativeMinimum() == xf64::negativeMinimum());
-            CHECK_TRUE(xf64::negativeMinimum() < 0.0);
-            CHECK_TRUE(xf64::negativeMinimum() < xf64::negativeZero());
-            CHECK_TRUE(xf64::negativeMinimum() > -0.1);
+            CHECK_TRUE(math::negativeMinimum() == math::negativeMinimum());
+            CHECK_TRUE(math::negativeMinimum() < 0.0);
+            CHECK_TRUE(math::negativeMinimum() < math::negativeZero());
+            CHECK_TRUE(math::negativeMinimum() > -0.1);
         }
 
         UNITTEST_TEST(PositiveMinimumDEN)
         {
-            CHECK_TRUE(xf64::positiveMinimumDEN() > 0.0);
-            CHECK_TRUE(xf64::positiveMinimumDEN() < xf64::positiveMinimum());
+            CHECK_TRUE(math::positiveMinimumDEN() > 0.0);
+            CHECK_TRUE(math::positiveMinimumDEN() < math::positiveMinimum());
         }
 
         UNITTEST_TEST(NegativeMinimumDEN)
         {
-            CHECK_TRUE(xf64::negativeMinimumDEN() < 0.0);
-            CHECK_TRUE(xf64::negativeMinimumDEN() > xf64::negativeMinimum());
+            CHECK_TRUE(math::negativeMinimumDEN() < 0.0);
+            CHECK_TRUE(math::negativeMinimumDEN() > math::negativeMinimum());
         }
 #ifdef IEEE_FLOATS
         UNITTEST_TEST(IsInfinite)
         {
-            CHECK_FALSE(xf64::isInfinite(0.0));
-            CHECK_FALSE(xf64::isInfinite(999.0));
-            CHECK_TRUE(xf64::isInfinite(xf64::negativeInfinity()));
-            CHECK_TRUE(xf64::isInfinite(xf64::positiveInfinity()));
+            CHECK_FALSE(math::isInfinite(0.0));
+            CHECK_FALSE(math::isInfinite(999.0));
+            CHECK_TRUE(math::isInfinite(math::negativeInfinity()));
+            CHECK_TRUE(math::isInfinite(math::positiveInfinity()));
         }
 
         UNITTEST_TEST(IsNAN)
         {
-            CHECK_FALSE(xf64::isNAN(0.0));
-            CHECK_FALSE(xf64::isNAN(999.0));
-            CHECK_TRUE(xf64::isNAN(xf64::nan()));
-            CHECK_TRUE(xf64::isNAN(xf64::nan()-1.0));
-            CHECK_FALSE(xf64::isNAN(xf64::negativeInfinity()));
+            CHECK_FALSE(math::isNAN(0.0));
+            CHECK_FALSE(math::isNAN(999.0));
+            CHECK_TRUE(math::isNAN(math::nan()));
+            CHECK_TRUE(math::isNAN(math::nan()-1.0));
+            CHECK_FALSE(math::isNAN(math::negativeInfinity()));
         }
 
         UNITTEST_TEST(IsFinite)
         {
-            CHECK_TRUE(xf64::isFinite(0.0));
-            CHECK_TRUE(xf64::isFinite(999.0));
-            CHECK_FALSE(xf64::isFinite(xf64::negativeInfinity()));
-            CHECK_FALSE(xf64::isFinite(xf64::nan()));
+            CHECK_TRUE(math::isFinite(0.0));
+            CHECK_TRUE(math::isFinite(999.0));
+            CHECK_FALSE(math::isFinite(math::negativeInfinity()));
+            CHECK_FALSE(math::isFinite(math::nan()));
         }
 
         UNITTEST_TEST(IsRational)
         {
-            CHECK_TRUE(xf64::isRational(0.0));
-            CHECK_TRUE(xf64::isRational(999.0));
-            CHECK_FALSE(xf64::isRational(xf64::negativeInfinity()));
-            CHECK_FALSE(xf64::isRational(xf64::nan()));
+            CHECK_TRUE(math::isRational(0.0));
+            CHECK_TRUE(math::isRational(999.0));
+            CHECK_FALSE(math::isRational(math::negativeInfinity()));
+            CHECK_FALSE(math::isRational(math::nan()));
         }
 #endif
         UNITTEST_TEST(Bin)
         {
-            CHECK_TRUE(xf64::bin(0.0) == 0);
+            CHECK_TRUE(math::bin(0.0) == 0);
 #ifdef IEEE_FLOATS
-            CHECK_TRUE(xf64::bin(xf64::nan()) == xf64::bin(xf64::nan()+1.0));
+            CHECK_TRUE(math::bin(math::nan()) == math::bin(math::nan()+1.0));
 #endif
-            CHECK_TRUE(xf64::bin(1.0) == D_CONSTANT_64(0x3ff0000000000000));
-            CHECK_TRUE(xf64::bin(-2.0) == D_CONSTANT_64(0xc000000000000000));
+            CHECK_TRUE(math::bin(1.0) == D_CONSTANT_64(0x3ff0000000000000));
+            CHECK_TRUE(math::bin(-2.0) == D_CONSTANT_64(0xc000000000000000));
         }
 
         UNITTEST_TEST(Sbin)
         {
-            CHECK_TRUE(xf64::sbin(0.0) == 0);
-            CHECK_TRUE(xf64::sbin(-2.0) == D_CONSTANT_64(0xc000000000000000));
+            CHECK_TRUE(math::sbin(0.0) == 0);
+            CHECK_TRUE(math::sbin(-2.0) == D_CONSTANT_64(0xc000000000000000));
 #ifdef IEEE_FLOATS
-            CHECK_TRUE(xf64::sbin(xf64::nan()) == xf64::sbin(xf64::nan()+1.0));
+            CHECK_TRUE(math::sbin(math::nan()) == math::sbin(math::nan()+1.0));
 #endif
         }
 
         UNITTEST_TEST(ToF64)
         {
-            CHECK_TRUE(xf64::toF64((u64)0) == 0.0);
-            CHECK_TRUE(xf64::toF64(D_CONSTANT_64(0x3ff0000000000000)) == 1.0);
-            CHECK_TRUE(xf64::toF64(D_CONSTANT_64(0xc000000000000000)) == -2.0);
+            CHECK_TRUE(math::toF64((u64)0) == 0.0);
+            CHECK_TRUE(math::toF64(D_CONSTANT_64(0x3ff0000000000000)) == 1.0);
+            CHECK_TRUE(math::toF64(D_CONSTANT_64(0xc000000000000000)) == -2.0);
         }
 
         UNITTEST_TEST(ToS64)
         {
-            CHECK_TRUE(xf64::toS64(0.0) == 0);
-            CHECK_TRUE(xf64::toS64(-2.0) == (s64)-2);
-            CHECK_TRUE(xf64::toS64(2000.0) == (s64)2000);
+            CHECK_TRUE(math::toS64(0.0) == 0);
+            CHECK_TRUE(math::toS64(-2.0) == (s64)-2);
+            CHECK_TRUE(math::toS64(2000.0) == (s64)2000);
         }
 
         UNITTEST_TEST(ToU64)
         {
-            CHECK_TRUE(xf64::toU64(0.0) == 0);
-            CHECK_TRUE(xf64::toU64(20.0) == (u64)20);
+            CHECK_TRUE(math::toU64(0.0) == 0);
+            CHECK_TRUE(math::toU64(20.0) == (u64)20);
         }
 
         UNITTEST_TEST(IsEqual)
         {
-            CHECK_FALSE(xf64::isEqual(0.0001,0.0));
-            CHECK_TRUE(xf64::isEqual(20.0,20.000));
-            CHECK_TRUE(xf64::isEqual(xf64::negativeZero(),-0.0));
+            CHECK_FALSE(math::isEqual(0.0001,0.0));
+            CHECK_TRUE(math::isEqual(20.0,20.000));
+            CHECK_TRUE(math::isEqual(math::negativeZero(),-0.0));
 
 #ifdef IEEE_FLOATS
-            CHECK_TRUE(xf64::isEqual(xf64::nan(),xf64::nan()));
+            CHECK_TRUE(math::isEqual(math::nan(),math::nan()));
 #endif
         }
 
         UNITTEST_TEST(IsNotEqual)
         {
-            CHECK_TRUE(xf64::isNotEqual(0.0001,0.0));
-            CHECK_FALSE(xf64::isNotEqual(20.0,20.000));
-            CHECK_FALSE(xf64::isNotEqual(xf64::negativeZero(),-0.0));
+            CHECK_TRUE(math::isNotEqual(0.0001,0.0));
+            CHECK_FALSE(math::isNotEqual(20.0,20.000));
+            CHECK_FALSE(math::isNotEqual(math::negativeZero(),-0.0));
 #ifdef IEEE_FLOATS
-            CHECK_FALSE(xf64::isNotEqual(xf64::nan(),xf64::nan()));
+            CHECK_FALSE(math::isNotEqual(math::nan(),math::nan()));
 #endif
         }
 
         UNITTEST_TEST(BinaryAnd)
         {
-            CHECK_TRUE(xf64::binaryAnd(0.0,(u64)0) == 0.0);
-            CHECK_TRUE(xf64::binaryAnd(-2.0,(u64)0x10000000) == xf64::toF64(D_CONSTANT_64(0xc000000000000000)&0x10000000));
+            CHECK_TRUE(math::binaryAnd(0.0,(u64)0) == 0.0);
+            CHECK_TRUE(math::binaryAnd(-2.0,(u64)0x10000000) == math::toF64(D_CONSTANT_64(0xc000000000000000)&0x10000000));
         }
 
         UNITTEST_TEST(BinaryOr)
         {
-            CHECK_TRUE(xf64::binaryOr(0.0,(s32)0) == 0.0);
-            CHECK_TRUE(xf64::binaryOr(-2.0,(s32)10) == xf64::toF64(D_CONSTANT_64(0xc000000000000000)|10));
+            CHECK_TRUE(math::binaryOr(0.0,(s32)0) == 0.0);
+            CHECK_TRUE(math::binaryOr(-2.0,(s32)10) == math::toF64(D_CONSTANT_64(0xc000000000000000)|10));
         }
 
         UNITTEST_TEST(Fraction)
         {
-            CHECK_TRUE(xf64::fraction(0.0) == 0);
-            CHECK_TRUE(xf64::fraction(-2.0) == 0);
+            CHECK_TRUE(math::fraction(0.0) == 0);
+            CHECK_TRUE(math::fraction(-2.0) == 0);
             //0.15625f : 0x3fc4000000000000
-            CHECK_TRUE(xf64::fraction(0.15625f) == D_CONSTANT_64(0x0004000000000000));
+            CHECK_TRUE(math::fraction(0.15625f) == D_CONSTANT_64(0x0004000000000000));
         }
 
         UNITTEST_TEST(ExponentBinary)
         {
-            CHECK_TRUE(xf64::exponentBinary(0.0) == 0);
-            CHECK_TRUE(xf64::exponentBinary(-2.0) == (s32)1024);
-            CHECK_TRUE(xf64::exponentBinary(0.15625) == (s32)(0x3fc));
+            CHECK_TRUE(math::exponentBinary(0.0) == 0);
+            CHECK_TRUE(math::exponentBinary(-2.0) == (s32)1024);
+            CHECK_TRUE(math::exponentBinary(0.15625) == (s32)(0x3fc));
         }
 
         UNITTEST_TEST(Exponent)
         {
-            CHECK_TRUE(xf64::exponent(1.0) == 0);
-            CHECK_TRUE(xf64::exponent(-2.0) == (s32)1);
-            CHECK_TRUE(xf64::exponent(0.15625) == (s32)(0x37c - 0x37f));
+            CHECK_TRUE(math::exponent(1.0) == 0);
+            CHECK_TRUE(math::exponent(-2.0) == (s32)1);
+            CHECK_TRUE(math::exponent(0.15625) == (s32)(0x37c - 0x37f));
         }
 
         UNITTEST_TEST(SignMask)
         {
-            CHECK_TRUE(xf64::signMask(1.0f) == 0);
-            CHECK_TRUE(xf64::signMask(-2.0f) == D_CONSTANT_64(0x8000000000000000));
-            CHECK_TRUE(xf64::signMask(0.15625f) == 0);
+            CHECK_TRUE(math::signMask(1.0f) == 0);
+            CHECK_TRUE(math::signMask(-2.0f) == D_CONSTANT_64(0x8000000000000000));
+            CHECK_TRUE(math::signMask(0.15625f) == 0);
         }
 
         UNITTEST_TEST(SignBit)
         {
-            CHECK_EQUAL(xf64::signBit(1.0), 0);
-            CHECK_EQUAL(xf64::signBit(-2.0),1);
-            CHECK_EQUAL(xf64::signBit(0.15625),0);
+            CHECK_EQUAL(math::signBit(1.0), 0);
+            CHECK_EQUAL(math::signBit(-2.0),1);
+            CHECK_EQUAL(math::signBit(0.15625),0);
         }
 
         UNITTEST_TEST(SignBitSigned)
         {
-            CHECK_EQUAL(xf64::signBitSigned(1.0), 0);
-            CHECK_EQUAL(xf64::signBitSigned(-2.0),-1);
-            CHECK_EQUAL(xf64::signBitSigned(0.15625),0);
-            CHECK_EQUAL(xf64::signBitSigned(xf64::positiveZero()),0);
-            CHECK_EQUAL(xf64::signBitSigned(xf64::negativeZero()),-1);
+            CHECK_EQUAL(math::signBitSigned(1.0), 0);
+            CHECK_EQUAL(math::signBitSigned(-2.0),-1);
+            CHECK_EQUAL(math::signBitSigned(0.15625),0);
+            CHECK_EQUAL(math::signBitSigned(math::positiveZero()),0);
+            CHECK_EQUAL(math::signBitSigned(math::negativeZero()),-1);
         }
 
         UNITTEST_TEST(Sign)
         {
-            CHECK_EQUAL(xf64::sign(1.0), 1);
-            CHECK_EQUAL(xf64::sign(-2.0),-1);
-            CHECK_EQUAL(xf64::sign(0.15625),1);
-            CHECK_EQUAL(xf64::sign(xf64::positiveZero()),0);
-            CHECK_EQUAL(xf64::sign(xf64::negativeZero()),0);
+            CHECK_EQUAL(math::sign(1.0), 1);
+            CHECK_EQUAL(math::sign(-2.0),-1);
+            CHECK_EQUAL(math::sign(0.15625),1);
+            CHECK_EQUAL(math::sign(math::positiveZero()),0);
+            CHECK_EQUAL(math::sign(math::negativeZero()),0);
         }
 
         UNITTEST_TEST(Sign2)
         {
-            CHECK_EQUAL(xf64::sign(1.0, 0.5), 1);
-            CHECK_EQUAL(xf64::sign(-2.0, 0.5),-1);
-            CHECK_EQUAL(xf64::sign(0.15625, 0.5),0);
-            CHECK_EQUAL(xf64::sign(0.1, xf64::positiveZero()),1);
-            CHECK_EQUAL(xf64::sign(xf64::negativeZero(), 0.1),0);
+            CHECK_EQUAL(math::sign(1.0, 0.5), 1);
+            CHECK_EQUAL(math::sign(-2.0, 0.5),-1);
+            CHECK_EQUAL(math::sign(0.15625, 0.5),0);
+            CHECK_EQUAL(math::sign(0.1, math::positiveZero()),1);
+            CHECK_EQUAL(math::sign(math::negativeZero(), 0.1),0);
         }
 
         UNITTEST_TEST(IsNearZero)
         {
-            CHECK_FALSE(xf64::isNearZero(0.0001));
-            CHECK_TRUE(xf64::isNearZero(0.0001, -1));
-            CHECK_TRUE(xf64::isNearZero(xf64::positiveMinimum()));
-            CHECK_TRUE(xf64::isNearZero(xf64::negativeMinimum()));
+            CHECK_FALSE(math::isNearZero(0.0001));
+            CHECK_TRUE(math::isNearZero(0.0001, -1));
+            CHECK_TRUE(math::isNearZero(math::positiveMinimum()));
+            CHECK_TRUE(math::isNearZero(math::negativeMinimum()));
         }
 
         UNITTEST_TEST(IsNear)
         {
-            CHECK_FALSE(xf64::isNear(0.0001, 0.0, -80));
-            CHECK_TRUE(xf64::isNear(0.0001, 0.0f, -1));
-            CHECK_FALSE(xf64::isNear(1.0001, 1.0, -80));
-            CHECK_TRUE(xf64::isNear(1.0001, 1.0, -1));
-            CHECK_TRUE(xf64::isNear(xf64::positiveMinimum(), 0.0f, -80));
-            CHECK_TRUE(xf64::isNear(xf64::negativeMinimum(), 0.0f, -80));
+            CHECK_FALSE(math::isNear(0.0001, 0.0, -80));
+            CHECK_TRUE(math::isNear(0.0001, 0.0f, -1));
+            CHECK_FALSE(math::isNear(1.0001, 1.0, -80));
+            CHECK_TRUE(math::isNear(1.0001, 1.0, -1));
+            CHECK_TRUE(math::isNear(math::positiveMinimum(), 0.0f, -80));
+            CHECK_TRUE(math::isNear(math::negativeMinimum(), 0.0f, -80));
         }
 
         UNITTEST_TEST(RoundToInt)
         {
-            CHECK_EQUAL(xf64::roundToInt(0.5), 1);
-            CHECK_EQUAL(xf64::roundToInt(0.4), 0);
-            CHECK_EQUAL(xf64::roundToInt(14.0/3.0), 5);
+            CHECK_EQUAL(math::roundToInt(0.5), 1);
+            CHECK_EQUAL(math::roundToInt(0.4), 0);
+            CHECK_EQUAL(math::roundToInt(14.0/3.0), 5);
         }
 
         UNITTEST_TEST(Squared)
         {
-            CHECK_TRUE(xf64::squared(0.5) == 0.25);
-            CHECK_TRUE(xf64::squared(0.4) == 0.4 * 0.4);
-            CHECK_TRUE(xf64::squared(0.1) == 0.1 * 0.1);
-            CHECK_TRUE(xf64::squared(14.0/3.0) == (14.0 / 3.0) * (14.0 / 3.0));
+            CHECK_TRUE(math::squared(0.5) == 0.25);
+            CHECK_TRUE(math::squared(0.4) == 0.4 * 0.4);
+            CHECK_TRUE(math::squared(0.1) == 0.1 * 0.1);
+            CHECK_TRUE(math::squared(14.0/3.0) == (14.0 / 3.0) * (14.0 / 3.0));
         }
 
         UNITTEST_TEST(OneOver)
         {
-            CHECK_TRUE(xf64::oneOver(0.5) == 1.0f/0.5);
-            CHECK_TRUE(xf64::oneOver(0.4) == 1.0f/0.4);
-            CHECK_TRUE(xf64::oneOver(0.1) == 1.0f/0.1);
-            CHECK_TRUE(xf64::oneOver(14.0/3.0) == 1.0/(14.0 / 3.0));
+            CHECK_TRUE(math::oneOver(0.5) == 1.0f/0.5);
+            CHECK_TRUE(math::oneOver(0.4) == 1.0f/0.4);
+            CHECK_TRUE(math::oneOver(0.1) == 1.0f/0.1);
+            CHECK_TRUE(math::oneOver(14.0/3.0) == 1.0/(14.0 / 3.0));
         }
 
         UNITTEST_TEST(IsZero)
         {
-            CHECK_FALSE(xf64::isZero(0.0001));
-            CHECK_TRUE(xf64::isZero(xf64::positiveZero()));
-            CHECK_TRUE(xf64::isZero(xf64::negativeZero()));
+            CHECK_FALSE(math::isZero(0.0001));
+            CHECK_TRUE(math::isZero(math::positiveZero()));
+            CHECK_TRUE(math::isZero(math::negativeZero()));
         }
 
         UNITTEST_TEST(IsPositive)
         {
-            CHECK_FALSE(xf64::isPositive(0.0));
-            CHECK_TRUE(xf64::isPositive(1.0));
-            CHECK_FALSE(xf64::isPositive(-2.0));
+            CHECK_FALSE(math::isPositive(0.0));
+            CHECK_TRUE(math::isPositive(1.0));
+            CHECK_FALSE(math::isPositive(-2.0));
         }
 
         UNITTEST_TEST(IsNegative)
         {
-            CHECK_FALSE(xf64::isNegative(0.0));
-            CHECK_FALSE(xf64::isNegative(1.0));
-            CHECK_TRUE(xf64::isNegative(-2.0));
+            CHECK_FALSE(math::isNegative(0.0));
+            CHECK_FALSE(math::isNegative(1.0));
+            CHECK_TRUE(math::isNegative(-2.0));
         }
 
         UNITTEST_TEST(IsLessPositive)
         {
-            CHECK_TRUE(xf64::isLessPositive(0.1, 1.0));
-            CHECK_FALSE(xf64::isLessPositive(1.0, 0.1));
-            CHECK_TRUE(xf64::isLessPositive(xf64::positiveMinimum(),0.0001));
+            CHECK_TRUE(math::isLessPositive(0.1, 1.0));
+            CHECK_FALSE(math::isLessPositive(1.0, 0.1));
+            CHECK_TRUE(math::isLessPositive(math::positiveMinimum(),0.0001));
         }
 
         UNITTEST_TEST(IsGreater)
         {
-            CHECK_FALSE(xf64::isGreater(0.1, 1.0));
-            CHECK_TRUE(xf64::isGreater(1.0, 0.1));
-            CHECK_FALSE(xf64::isGreater(xf64::positiveMinimum(),0.0001));
+            CHECK_FALSE(math::isGreater(0.1, 1.0));
+            CHECK_TRUE(math::isGreater(1.0, 0.1));
+            CHECK_FALSE(math::isGreater(math::positiveMinimum(),0.0001));
         }
     }
 }

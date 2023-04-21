@@ -50,6 +50,23 @@ namespace ncore
             clamp(subto, enfrom, ento);
         }
 
+        // integer power function
+        template <typename T> T ipow(T x, u32 y)
+        {
+            T temp   = x;
+            T result = 1;
+            while (y > 0)
+            {
+                if ((y & 1) == 1)
+                {
+                    result *= temp;
+                }
+                y    = y >> 1;
+                temp = temp * temp;
+            }
+            return result;
+        }
+
         inline u32  align(u32 integer, u32 alignment);     ///< Return the aligned value of integer
         inline u32  alignDown(u32 integer, u32 alignment); ///< Return the aligned value of integer
         inline s32  alignUp(s32 integer, s32 alignment);   ///< Return the aligned value of integer

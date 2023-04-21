@@ -9,7 +9,7 @@
 
 namespace ncore
 {
-    namespace nf32
+    namespace math
     {
         inline f32 abs(f32 inValue);
         inline f32 neg(f32 inNumber);
@@ -99,25 +99,14 @@ namespace ncore
         inline bool isNegative(f32 inNumber);
         inline bool isLessPositive(f32 inLHS, f32 inRHS);
         inline bool isGreater(f32 inLHS, f32 inRHS);
-    }; // namespace xf32
+    }; 
 
-//==============================================================================
-// INLINES
-//==============================================================================
 #include "private/c_float_inline.h"
 
-//==============================================================================
-// INLINE PC
-//==============================================================================
 #if defined TARGET_PC
 #    include "private/c_float_inline_win32.h"
-
-//==============================================================================
-// INLINE OSX
-//==============================================================================
 #elif defined TARGET_MAC
 #    include "private/c_float_inline_mac.h"
-
 #endif
 
 }; // namespace ncore

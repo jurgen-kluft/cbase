@@ -9,7 +9,7 @@
 
 namespace ncore
 {
-    namespace xf64
+    namespace math
     {
         inline f64 abs(f64 inNumber);
         inline f64 neg(f64 inNumber);

@@ -1,7 +1,7 @@
 /**
  * IEEE 754 description
  */
-namespace xf64
+namespace math
 {
     struct EDoubleIEEE
     {
@@ -44,6 +44,24 @@ namespace xf64
      * @return  This funtion returns a negated number
      */
     inline f64			neg(f64 inNumber)								{ return -inNumber; }
+
+    
+    // double power function
+    inline f64 powd(double x, u32 y)
+    {
+        f64 temp   = x;
+        f64 result = 1;
+        while (y > 0)
+        {
+            if ((y & 1) == 1)
+            {
+                result *= temp;
+            }
+            y    = y >> 1;
+            temp = temp * temp;
+        }
+        return result;
+    }
 
     /**
      * Limits and const values

@@ -1,4 +1,4 @@
-namespace xf64
+namespace math
 {
 	/**
      * Function IsLessPositive. 

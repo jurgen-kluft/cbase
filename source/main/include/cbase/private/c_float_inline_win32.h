@@ -1,4 +1,4 @@
-namespace nf32
+namespace math
 {
     inline s32 toS32(f32 inNumber)
     {

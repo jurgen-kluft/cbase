@@ -15,7 +15,7 @@ enum EFloatIEEE
     FF_EXPONENT_BIAS      = 127
 };
 
-namespace nf32
+namespace math
 {
     inline f32 abs(f32 inValue) { return (inValue < 0.0f) ? -inValue : inValue; }
     inline f32 neg(f32 inNumber) { return -inNumber; }
@@ -25,6 +25,23 @@ namespace nf32
     {
         ASSERTS(low <= high, "Error: low > high");
         return number < low ? low : (number > high ? high : number);
+    }
+
+    // float power function
+    f32 powf(f32 x, u32 y)
+    {
+        f32 temp   = x;
+        f32 result = 1;
+        while (y > 0)
+        {
+            if ((y & 1) == 1)
+            {
+                result *= temp;
+            }
+            y    = y >> 1;
+            temp = temp * temp;
+        }
+        return result;
     }
 
     inline f32 positiveZero()

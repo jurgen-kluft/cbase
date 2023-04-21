@@ -270,7 +270,7 @@ namespace ncore
         ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
         ASSERT(prec >= 0);
 
-        if (xf64::isInfinite(fpnum))
+        if (math::isInfinite(fpnum))
         {
             if (fpnum < 0)
                 *cursor++ = '-';
@@ -282,7 +282,7 @@ namespace ncore
             return;
         }
 
-        if (xf64::isNAN(fpnum))
+        if (math::isNAN(fpnum))
         {
             const char* nan = "NaN";
             *cursor++       = nan[0];
