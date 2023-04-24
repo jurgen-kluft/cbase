@@ -2043,4 +2043,18 @@ namespace ncore
         format_to(str, 128, "{:14}", false);
     }
 
+    bool format_to(ascii::prune str, ascii::prune end, ascii::prune fmt, va_list_t args)
+    {
+        return false;
+    }
+    bool format_to(utf16::prune str, utf16::prune end, utf16::prune fmt, va_list_t args)
+    {
+        return false;
+    }
+    bool format_to(utf32::prune str, utf32::prune end, utf32::prune fmt, va_list_t args)
+    {
+        return false;
+    }
+
+
 } // namespace ncore
