@@ -1348,9 +1348,7 @@ namespace ncore
             {
                 len = 3;
             }
-            else if (c < 0xe000)
-            {
-            }
+            else if (c < 0xe000) {}
             else if (c < 0x010000)
             {
                 len = 3;
@@ -1483,9 +1481,9 @@ namespace ncore
                 while (*end2 != TERMINATOR)
                     end2++;
             }
-            const s32 len1 = (s32)(end1 - str1);
-            const s32 len2 = (s32)(end2 - str2);
-            const s32 len = len1 < len2 ? len1 : len2;
+            const s32 len1   = (s32)(end1 - str1);
+            const s32 len2   = (s32)(end2 - str2);
+            const s32 len    = len1 < len2 ? len1 : len2;
             const s32 result = nmem::memcmp(str1, str2, len);
             if (result == 0)
             {
@@ -1497,11 +1495,253 @@ namespace ncore
             return result;
         }
 
-        s32 compare(pcrune left, pcrune right)
+        s32 compare(pcrune left, pcrune right) { return compare(left, right, nullptr, nullptr); }
+
+        void reverse(char* str, char* end)
         {
-            return compare(left, right, nullptr, nullptr);
+            // Reverse work buffer
+            char* head = str;
+            char* tail = end - 1;
+            while (head < tail)
+            {
+                char t = *head;
+                *head  = *tail;
+                *tail  = t;
+                head += 1;
+                tail -= 1;
+            }
         }
 
+        static char toChar(s8 val)
+        {
+            ASSERT(val >= 0 && val < 10);
+            return "0123456789??????"[val & 0xf];
+        }
+
+        static char toHexChar(s8 val, bool lowercase)
+        {
+            ASSERT(val >= 0 && val < 16);
+            if (lowercase)
+                return "0123456789abcdef"[val& 0xf];
+            return "0123456789ABCDEF"[val& 0xf];
+        }
+
+        static s32 divmod10(u32 value, s8& remainder)
+        {
+            const u32 q = (value / 10) * 10;
+            remainder   = (s8)(value - q);
+            return (s32)(q);
+        }
+
+        static s32 divmod10(s32 value, s8& remainder)
+        {
+            const s32 q = (value / 10) * 10;
+            remainder   = (s8)(value - q);
+            return q;
+        }
+
+        bool asStr(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        {
+            ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
+
+            if ((end - cursor) < 10)
+                return false;
+
+            uchar32 c;
+            s32     sval;
+            s8      mod;
+
+            char* w = cursor + 10;
+
+            switch (base)
+            {
+                case 10:
+                    // On many machines, unsigned arithmetic is harder than
+                    // signed arithmetic, so we do at most one unsigned mod and
+                    // divide; this is sufficient to reduce the range of
+                    // the incoming value to where signed arithmetic works.
+
+                    if (val > ((~(u32)0) >> 1))
+                    {
+                        sval = divmod10(val, mod);
+                        c    = toChar(mod);
+                        w -= 1;
+                        *w = c;
+                    }
+                    else
+                    {
+                        sval = (s32)val;
+                    }
+
+                    do
+                    {
+                        sval = divmod10(val, mod);
+                        c    = toChar(mod);
+                        w -= 1;
+                        *w = c;
+                    } while (sval != 0);
+
+                    break;
+
+                case 8:
+                    do
+                    {
+                        c = toChar(val & 7);
+                        w -= 1;
+                        *w = c;
+                        val >>= 3;
+                    } while (val);
+                    if (octzero && c != '0')
+                    {
+                        *w-- = '0';
+                    }
+                    break;
+
+                case 16:
+                    do
+                    {
+                        w -= 1;
+                        *w = toHexChar(val & 15, lowercase);
+                        val >>= 4;
+                    } while (val);
+
+                    break;
+
+                default:
+                    /* oops */
+                    break;
+            }
+
+            // The conversion might not use all 10 characters, so we need to
+            // move the characters down to the bottom of the buffer.
+            const char* we = cursor + 10;
+            while (w < we)
+                *cursor++ = *w++;
+            return true;
+        }
+
+        bool asStr(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        {
+            ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
+
+            if ((end - cursor) < 11)
+                return false;
+
+            if (val < 0)
+            {
+                *cursor++ = '-';
+                val       = -val;
+            }
+            return asStr((u32)val, str, cursor, end, base, octzero, lowercase);
+        }
+
+        static s64 divmod10(u64 value, s8& remainder)
+        {
+            const u64 q = (value / 10) * 10;
+            remainder   = (s8)(value - q);
+            return (s64)(q);
+        }
+
+        static s64 divmod10(s64 value, s8& remainder)
+        {
+            const s64 q = (value / 10) * 10;
+            remainder   = (s8)(value - q);
+            return q;
+        }
+
+        bool asStr(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        {
+            uchar32 c;
+            s64     sval;
+            s8      mod;
+
+            if ((end - cursor) < 20)
+                return false;
+
+            char* w = cursor + 20;
+
+            switch (base)
+            {
+                case 10:
+                    // On many machines, unsigned arithmetic is harder than
+                    // signed arithmetic, so we do at most one unsigned mod and
+                    // divide; this is sufficient to reduce the range of
+                    // the incoming value to where signed arithmetic works.
+
+                    if (val > ((~(u64)0) >> 1))
+                    {
+                        sval = divmod10(val, mod);
+                        c    = toChar((s32)mod);
+                        *--w = c;
+                    }
+                    else
+                    {
+                        sval = (s64)val;
+                    }
+
+                    do
+                    {
+                        sval = divmod10(sval, mod);
+                        c    = toChar(sval % 10);
+                        *--w = c;
+                    } while (sval != 0);
+
+                    break;
+
+                case 8:
+                    do
+                    {
+                        c    = toChar(val & 7);
+                        *--w = c;
+                        val >>= 3;
+                    } while (val);
+
+                    if (octzero && c != '0')
+                    {
+                        c    = '0';
+                        *--w = c;
+                    }
+
+                    break;
+
+                case 16:
+                    do
+                    {
+                        c    = toHexChar(val & 15, lowercase);
+                        *--w = c;
+                        val >>= 4;
+                    } while (val);
+
+                    break;
+
+                default:
+                    /* oops */
+                    break;
+            }
+
+            // The conversion might not use all 10 characters, so we need to
+            // move the characters down to the bottom of the buffer.
+            const char* we = cursor + 10;
+            while (w < we)
+                *cursor++ = *w++;
+
+            return true;
+        }
+
+        bool asStr(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        {
+            ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
+
+            if ((end - cursor) < 11)
+                return false;
+
+            if (val < 0)
+            {
+                *cursor++ = '-';
+                val       = -val;
+            }
+            return asStr((u64)val, str, cursor, end, base, octzero, lowercase);
+        }
 
     } // namespace ascii
 
@@ -1929,15 +2169,15 @@ namespace ncore
 
     crunes_t selectOverlap(const crunes_t& _lstr, const crunes_t& _rstr)
     {
-        cptr_t  lend    = get_end(_lstr);
-        cptr_t  rend    = get_end(_rstr);
+        cptr_t lend = get_end(_lstr);
+        cptr_t rend = get_end(_rstr);
 
         crunes_t lstr(_lstr);
         while (!lstr.is_empty())
         {
-            cptr_t  lcursor = get_begin(lstr);
-            cptr_t  rcursor = get_begin(_rstr);
-    
+            cptr_t lcursor = get_begin(lstr);
+            cptr_t rcursor = get_begin(_rstr);
+
             uchar32 lc, rc;
             do
             {
@@ -1945,7 +2185,7 @@ namespace ncore
                 rc = read(_rstr, rcursor);
             } while (lc == rc && lcursor < lend && rcursor < rend);
 
-            if (lc == rc && lcursor == lend && rcursor <= rend) 
+            if (lc == rc && lcursor == lend && rcursor <= rend)
             {
                 return crunes_t(lstr.m_ascii.m_bos, lstr.m_ascii.m_str, lstr.m_ascii.m_end, lstr.m_ascii.m_eos, lstr.m_type);
             }
@@ -2692,7 +2932,7 @@ namespace ncore
         else if (selected_len > replace_len)
         {
             // Move, shrinking
-            s32    move_len = selected_len - replace_len;
+            s32 move_len = selected_len - replace_len;
             u8* dst      = (u8*)((u8*)str.m_ascii.m_end - move_len);
             u8* src      = (u8*)(str.m_ascii.m_end);
             while (src < (u8 const*)str.m_ascii.m_eos)
@@ -4244,12 +4484,12 @@ namespace ncore
     }
     runes_reader_t::runes_reader_t(crunes_t const& runes)
     {
-        m_runes.m_type = runes.m_type;
-        m_runes.m_ascii.m_bos  = runes.m_ascii.m_str;
-        m_runes.m_ascii.m_eos  = runes.m_ascii.m_eos;
-        m_runes.m_ascii.m_str  = runes.m_ascii.m_str;
-        m_runes.m_ascii.m_end  = runes.m_ascii.m_end;
-        m_cursor       = m_runes.m_ascii.m_str;
+        m_runes.m_type        = runes.m_type;
+        m_runes.m_ascii.m_bos = runes.m_ascii.m_str;
+        m_runes.m_ascii.m_eos = runes.m_ascii.m_eos;
+        m_runes.m_ascii.m_str = runes.m_ascii.m_str;
+        m_runes.m_ascii.m_end = runes.m_ascii.m_end;
+        m_cursor              = m_runes.m_ascii.m_str;
     }
 
     crunes_t runes_reader_t::get_source() const
@@ -4360,7 +4600,7 @@ namespace ncore
                 line.m_utf32.m_end = m_cursor.m_utf32;
                 break;
         }
-        
+
         return true;
     }
 
@@ -4398,7 +4638,7 @@ namespace ncore
         reader.m_runes.m_ascii.m_eos = m_runes.m_ascii.m_eos;
         reader.m_runes.m_ascii.m_str = from.m_ascii;
         reader.m_runes.m_ascii.m_end = to.m_ascii;
-        reader.m_cursor      = from;
+        reader.m_cursor              = from;
         return reader;
     }
 
@@ -4489,20 +4729,20 @@ namespace ncore
     {
         if (!at_end(m_cursor, m_runes))
         {
-            uchar32        c;
+            uchar32 c;
             switch (m_runes.m_type)
             {
                 case ascii::TYPE:
-                    while (str<end && !at_end(m_cursor, m_runes))
+                    while (str < end && !at_end(m_cursor, m_runes))
                     {
-                        c = *str++;
+                        c                   = *str++;
                         m_cursor.m_ascii[0] = (ascii::rune)c;
                         m_cursor.m_ascii += 1;
                         m_count += 1;
                     }
                     return true;
                 case utf8::TYPE:
-                    while (str<end && !at_end(m_cursor, m_runes))
+                    while (str < end && !at_end(m_cursor, m_runes))
                     {
                         c = *str++;
                         utf::write(c, m_runes.m_utf8, m_cursor.m_utf8);
@@ -4510,7 +4750,7 @@ namespace ncore
                     }
                     return true;
                 case utf16::TYPE:
-                    while (str<end && !at_end(m_cursor, m_runes))
+                    while (str < end && !at_end(m_cursor, m_runes))
                     {
                         c = *str++;
                         utf::write(c, m_runes.m_utf16, m_cursor.m_utf16);
@@ -4518,9 +4758,9 @@ namespace ncore
                     }
                     return true;
                 case utf32::TYPE:
-                    while (str<end && !at_end(m_cursor, m_runes))
+                    while (str < end && !at_end(m_cursor, m_runes))
                     {
-                        c = *str++;
+                        c                   = *str++;
                         m_cursor.m_utf32[0] = c;
                         m_cursor.m_utf32 += 1;
                         m_count += 1;

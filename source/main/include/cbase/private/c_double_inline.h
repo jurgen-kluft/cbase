@@ -47,20 +47,31 @@ namespace math
 
     
     // double power function
-    inline f64 powd(double x, u32 y)
+    inline f64 powd(double x, u32 p)
     {
-        f64 temp   = x;
-        f64 result = 1;
-        while (y > 0)
+        if (p == 0)
+            return 1.0;
+        if (x == 0.0)
+            return 0.0;
+
+        if (p < 0)
         {
-            if ((y & 1) == 1)
-            {
-                result *= temp;
-            }
-            y    = y >> 1;
-            temp = temp * temp;
+            p = -p;
+            x = 1.0 / x;
         }
-        return result;
+
+        f64 r = 1.0;
+        while (true)
+        {
+            if (p & 1)
+                r *= x;
+
+            if ((p >>= 1) == 0)
+                return r;
+
+            x *= x;
+        }
+
     }
 
     /**

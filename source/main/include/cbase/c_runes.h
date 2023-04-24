@@ -2,7 +2,7 @@
 #define __CBASE_RUNES_V2_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 namespace ncore
@@ -58,7 +58,13 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t() : m_bos(nullptr), m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
+            runes_t()
+                : m_bos(nullptr)
+                , m_str(nullptr)
+                , m_end(nullptr)
+                , m_eos(nullptr)
+            {
+            }
             prune m_bos; // begin of string
             prune m_str; // string
             prune m_end; // end (does not necessarily point at TERMINATOR)
@@ -92,9 +98,18 @@ namespace ncore
 
         // return length of string in bytes (for ascii this also means number of characters)
         s32 strlen(pcrune str, pcrune eos = nullptr);
-        
+
         s32 compare(pcrune left, pcrune right);
         s32 compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2);
+
+        void reverse(char* str, char* end);
+
+        // return false when there is not enough space in the output
+        // would need at least 10 characters for u32 and 20 for u64
+        bool asStr(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
+        bool asStr(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        bool asStr(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
+        bool asStr(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
 
     } // namespace ascii
 
@@ -109,7 +124,13 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t() : m_bos(nullptr), m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
+            runes_t()
+                : m_bos(nullptr)
+                , m_str(nullptr)
+                , m_end(nullptr)
+                , m_eos(nullptr)
+            {
+            }
             prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t
@@ -145,7 +166,13 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t() : m_bos(nullptr), m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
+            runes_t()
+                : m_bos(nullptr)
+                , m_str(nullptr)
+                , m_end(nullptr)
+                , m_eos(nullptr)
+            {
+            }
             prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t
@@ -178,7 +205,13 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t() : m_bos(nullptr), m_str(nullptr), m_end(nullptr), m_eos(nullptr) {}
+            runes_t()
+                : m_bos(nullptr)
+                , m_str(nullptr)
+                , m_end(nullptr)
+                , m_eos(nullptr)
+            {
+            }
             prune m_bos, m_str, m_end, m_eos;
         };
         struct crunes_t

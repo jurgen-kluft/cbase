@@ -7,7 +7,6 @@
 
 namespace ncore
 {
-
     class counter_writer_t : public irunes_writer_t
     {
         s64 m_runes_count;
@@ -118,33 +117,6 @@ namespace ncore
     //==============================================================================
     // FUNCTIONS
     //==============================================================================
-
-    // pow for f64
-    static f64 sPow(f64 x, s32 p)
-    {
-        if (p == 0)
-            return 1.0;
-        if (x == 0.0)
-            return 0.0;
-
-        if (p < 0)
-        {
-            p = -p;
-            x = 1.0 / x;
-        }
-
-        f64 r = 1.0;
-        while (true)
-        {
-            if (p & 1)
-                r *= x;
-
-            if ((p >>= 1) == 0)
-                return r;
-
-            x *= x;
-        }
-    }
 
 #if defined(D_BIG_ENDIAN)
     struct ieee_double_shape_type
@@ -327,7 +299,7 @@ namespace ncore
         {
             if (prec > 23)
             {
-                powprec = sPow(10.0, prec);
+                powprec = math::powd(10.0, prec);
             }
             else
             {
@@ -642,189 +614,11 @@ namespace ncore
      * writer   - writer for the destination string
      * base     - base of the number (10, 8, 16)
      * octzero  - flag to add to the oct numbers the 0 in front
-     * xdigs    - hexadecimal string array of number 0,1,2,3,4,5,9,A,or a, ..etc
+     * hexdigits    - hexadecimal string array of number 0,1,2,3,4,5,9,A,or a, ..etc
      *------------------------------------------------------------------------------
      */
 #define to_digit(c) ((c) - '0')
 #define is_digit(c) ((u32)to_digit(c) >= 0 && ((u32)to_digit(c) <= 9))
-#define to_char(n) ((u32)((n) + '0'))
-
-    static void ReverseCharStr(char* str, char* end)
-    {
-        // Reverse work buffer
-        char* head = str;
-        char* tail = end - 1;
-        while (head < tail)
-        {
-            char t = *head;
-            *head  = *tail;
-            *tail  = t;
-            head += 1;
-            tail -= 1;
-        }
-    }
-
-    static void sULtoA(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, char const* xdigs)
-    {
-        uchar32 c;
-        s32     sval;
-
-        ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
-
-        char  work[WORKSIZE];
-        char* w = &work[WORKSIZE];
-
-        switch (base)
-        {
-            case 10:
-                // On many machines, unsigned arithmetic is harder than
-                // signed arithmetic, so we do at most one unsigned mod and
-                // divide; this is sufficient to reduce the range of
-                // the incoming value to where signed arithmetic works.
-
-                if (val > SPF_LONG_MAX)
-                {
-                    c = to_char(val % 10);
-                    w -= 1;
-                    *w   = c;
-                    sval = (s32)(val / 10);
-                }
-                else
-                {
-                    sval = (s32)val;
-                }
-
-                do
-                {
-                    c = to_char(sval % 10);
-                    w -= 1;
-                    *w = c;
-                    sval /= 10;
-                } while (sval != 0);
-
-                break;
-
-            case 8:
-                do
-                {
-                    c = to_char(val & 7);
-                    w -= 1;
-                    *w = c;
-                    val >>= 3;
-                } while (val);
-                if (octzero && c != '0')
-                {
-                    *w-- = '0';
-                }
-                break;
-
-            case 16:
-                do
-                {
-                    w -= 1;
-                    *w = xdigs[val & 15];
-                    val >>= 4;
-                } while (val);
-
-                break;
-
-            default:
-                /* oops */
-                break;
-        }
-
-        const char* src = w;
-        while (src < &work[WORKSIZE])
-        {
-            *cursor++ = *src++;
-            if (cursor >= end)
-                break;
-        }
-    }
-
-    /**
-     * Same as above but for u64
-     */
-    static void sUQtoA(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, char const* xdigs)
-    {
-        uchar32 c;
-        s64     sval;
-
-        char  work[WORKSIZE];
-        char* w = &work[WORKSIZE];
-
-        switch (base)
-        {
-            case 10:
-                // On many machines, unsigned arithmetic is harder than
-                // signed arithmetic, so we do at most one unsigned mod and
-                // divide; this is sufficient to reduce the range of
-                // the incoming value to where signed arithmetic works.
-
-                if (val > ((~(u64)0) >> 1))
-                {
-                    c = to_char(val % 10);
-                    w -= 1;
-                    *w   = c;
-                    sval = (s64)(val / 10);
-                }
-                else
-                {
-                    sval = (s64)val;
-                }
-
-                do
-                {
-                    c = to_char(sval % 10);
-                    w -= 1;
-                    *w = c;
-                    sval /= 10;
-                } while (sval != 0);
-
-                break;
-
-            case 8:
-                do
-                {
-                    c = to_char(val & 7);
-                    w -= 1;
-                    *w = c;
-                    val >>= 3;
-                } while (val);
-
-                if (octzero && c != '0')
-                {
-                    c = '0';
-                    w -= 1;
-                    *w = c;
-                }
-
-                break;
-
-            case 16:
-                do
-                {
-                    c = xdigs[val & 15];
-                    w -= 1;
-                    *w = c;
-                    val >>= 4;
-                } while (val);
-
-                break;
-
-            default:
-                /* oops */
-                break;
-        }
-
-        const char* src = w;
-        while (src < &work[WORKSIZE])
-        {
-            *cursor++ = *src++;
-            if (cursor >= end)
-                break;
-        }
-    }
 
     static const char* sBooleanStrs[] = {"false", "true", "FALSE", "TRUE", "False", "True", "no", "yes", "NO", "YES", "No", "Yes"};
     static const char* sBoolAsAsciiStr(u32 _boolean, bool yesNo, ncore::s32 flags)
@@ -836,52 +630,6 @@ namespace ncore
             i += 2;
         i += (_boolean == 0) ? 0 : 1;
         return (ascii::pcrune)sBooleanStrs[i];
-    }
-
-    char* itoa(s64 value, char* dst, char const* end, s32 radix)
-    {
-        const char* start = dst;
-		if (value < 0 && dst < end)
-        {
-            *dst++ = '-';
-            value = -value;
-        }
-        sUQtoA(value, start, dst, end, radix, false, nullptr);
-        return dst;
-    }
-
-    char* utoa(u64 value, char* dst, char const* end, s32 radix)
-    {
-        const char* start = dst;
-        sUQtoA(value, start, dst, end, radix, false, nullptr);
-        return dst;
-    }
-
-    char* ftoa(f32 value, char* dst, char const* end)
-    {
-        const char* start = dst;
-        f64         f     = (f64)value;
-        sDtoA(start, dst, end, f, 'f', 0, 0);
-        return dst;
-    }
-
-    char* dtoa(f64 value, char* dst, char const* end)
-    {
-        const char* start = dst;
-        sDtoA(start, dst, end, value, 'f', 0, 0);
-        return dst;
-    }
-
-    char* btoa(bool value, char* dst, char const* end)
-    {
-        const char* boolstr = sBoolAsAsciiStr(value ? 1 : 0, false, 0);
-        while (*boolstr)
-        {
-            *dst++ = *boolstr++;
-            if (dst >= end)
-                break;
-        }
-        return dst;
     }
 
     static void PadBuffer(irunes_writer_t* writer, s32 howMany, char with)
@@ -967,24 +715,23 @@ namespace ncore
         ASSERT(writer != nullptr);
         ASSERT(buffer != nullptr);
 
-        irunes_writer_t* cp = nullptr; ///< handy char pointer (short term usage)
-        f64              _double;   ///< f64 precision arguments %[eEfgG]
-        uchar32          ch;        ///< character
-        s32              n;         ///< handy integer (short term usage)
-        s32              flags;     ///< flags as above
-        s32              width;     ///< width from format (%8d), or 0
-        s32              prec;      ///< precision from format (%.3d), or -1
-        s32              base;      ///< base for [diouxX] conversion
-        s32              dprec;     ///< a copy of prec if [diouxX], 0 otherwise
-        s32              realsz;    ///< field size expanded by dprec, sign, etc
-        s32              size;      ///< size of converted field or string
-        char             sign;      ///< sign prefix (' ', '+', '-', or \0)
+        f64     _double; ///< f64 precision arguments %[eEfgG]
+        uchar32 ch;      ///< character
+        s32     n;       ///< handy integer (short term usage)
+        s32     flags;   ///< flags as above
+        s32     width;   ///< width from format (%8d), or 0
+        s32     prec;    ///< precision from format (%.3d), or -1
+        s32     base;    ///< base for [diouxX] conversion
+        s32     dprec;   ///< a copy of prec if [diouxX], 0 otherwise
+        s32     realsz;  ///< field size expanded by dprec, sign, etc
+        s32     size;    ///< size of converted field or string
+        char    sign;    ///< sign prefix (' ', '+', '-', or \0)
 
         /// Initialize variables
-        char const* xdigs    = nullptr; // digits for [xX] conversion
-        u64         uqval    = 0;    // %q integers
-        u32         ulval    = 0;    // integer arguments %[diouxX]
-        s32         argindex = 0;
+        bool hexDigitsAsLowerCase = true; // digits for [xX] conversion
+        u64  uqval                = 0;    // %q integers
+        u32  ulval                = 0;    // integer arguments %[diouxX]
+        s32  argindex             = 0;
 
         /// Scan the format for conversions (`%' character).
         for (;;)
@@ -1179,7 +926,6 @@ namespace ncore
                         char  ascii_buffer[WORKSIZE];
                         char* ascii_cursor = ascii_buffer;
                         sDtoA(ascii_buffer, ascii_cursor, &ascii_buffer[WORKSIZE - 1], _double, (char)ch, width, prec);
-                        // dtoa(buffer, _double, (char)ch, width, prec);
                         buffer->write(ascii_buffer, ascii_cursor);
                         size = (s32)buffer->count();
                     }
@@ -1240,27 +986,17 @@ namespace ncore
                     // of printable characters, in an implementation-
                     // defined manner."
                     // -- ANSI X3J11
-#ifdef TARGET_PC
-                    uqval = (u64)args[argindex++];
-                    base  = 16;
-                    xdigs = "0123456789abcdef";
+
+                    uqval         = (u64)args[argindex++];
+                    base          = 16;
+                    hexDigitsAsLowerCase = true;
                     flags |= QUADINT; // | HEXPREFIX; Not prefixes
                     ch = 'x';
 
                     // make sure that the precision is at 8
                     if (prec < 0)
                         prec = 8;
-#else
-                    ulval = (u32)args[argindex++];
-                    base  = 16;
-                    xdigs = "0123456789abcdef";
-                    flags = (flags & ~QUADINT); // | HEXPREFIX; Not prefixes
-                    ch    = 'x';
 
-                    // make sure that the precision is at 8
-                    if (prec < 0)
-                        prec = 8;
-#endif
                     goto nosign;
 
                 case 's':
@@ -1319,10 +1055,10 @@ namespace ncore
                     base = 10;
                     goto nosign;
 
-                case 'X': xdigs = "0123456789ABCDEF"; goto hex;
+                case 'X': hexDigitsAsLowerCase = false; goto hex;
 
                 case 'x':
-                    xdigs = "0123456789abcdef";
+                    hexDigitsAsLowerCase = true;
                 hex:
                     if (flags & QUADINT || args[argindex].type() == va_t::TYPE_INT64 || args[argindex].type() == va_t::TYPE_UINT64)
                     {
@@ -1358,9 +1094,9 @@ namespace ncore
                         {
                             if (uqval != 0 || prec != 0)
                             {
-                                char  ascii_buffer[WORKSIZE];
+                                char  ascii_buffer[32];
                                 char* ascii_cursor = ascii_buffer;
-                                sUQtoA(uqval, ascii_buffer, ascii_cursor, &ascii_buffer[WORKSIZE-1], base, bool((flags & ALT) != 0), xdigs);
+                                ascii::asStr(uqval, ascii_buffer, ascii_cursor, &ascii_buffer[32 - 1], base, bool((flags & ALT) != 0), hexDigitsAsLowerCase);
                                 buffer->write(ascii_buffer, ascii_cursor);
                                 size = (s32)buffer->count();
                             }
@@ -1369,9 +1105,9 @@ namespace ncore
                         {
                             if (ulval != 0 || prec != 0)
                             {
-                                char  ascii_buffer[WORKSIZE];
+                                char  ascii_buffer[16];
                                 char* ascii_cursor = ascii_buffer;
-                                sULtoA(ulval, ascii_buffer, ascii_cursor, &ascii_buffer[WORKSIZE-1], base, bool((flags & ALT) != 0), xdigs);
+                                ascii::asStr(ulval, ascii_buffer, ascii_cursor, &ascii_buffer[16 - 1], base, bool((flags & ALT) != 0), hexDigitsAsLowerCase);
                                 buffer->write(ascii_buffer, ascii_cursor);
                                 size = (s32)buffer->count();
                             }

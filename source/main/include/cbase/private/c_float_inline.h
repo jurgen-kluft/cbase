@@ -28,20 +28,30 @@ namespace math
     }
 
     // float power function
-    f32 powf(f32 x, u32 y)
+    f32 powf(f32 x, u32 p)
     {
-        f32 temp   = x;
-        f32 result = 1;
-        while (y > 0)
+        if (p == 0)
+            return 1.0f;
+        if (x == 0.0f)
+            return 0.0f;
+
+        if (p < 0)
         {
-            if ((y & 1) == 1)
-            {
-                result *= temp;
-            }
-            y    = y >> 1;
-            temp = temp * temp;
+            p = -p;
+            x = 1.0f / x;
         }
-        return result;
+
+        f32 r = 1.0f;
+        while (true)
+        {
+            if (p & 1)
+                r *= x;
+
+            if ((p >>= 1) == 0)
+                return r;
+
+            x *= x;
+        }
     }
 
     inline f32 positiveZero()
