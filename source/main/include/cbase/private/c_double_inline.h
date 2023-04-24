@@ -47,7 +47,7 @@ namespace math
 
     
     // double power function
-    inline f64 powd(double x, u32 p)
+    inline f64 powd(double x, s32 p)
     {
         if (p == 0)
             return 1.0;

@@ -28,7 +28,7 @@ namespace math
     }
 
     // float power function
-    f32 powf(f32 x, u32 p)
+    f32 powf(f32 x, s32 p)
     {
         if (p == 0)
             return 1.0f;
