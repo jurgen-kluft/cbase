@@ -587,7 +587,7 @@ namespace ncore
 #endif
         USF_CPP14_CONSTEXPR BasicStringSpan(pointer str) noexcept
             : m_begin{str}
-            , m_end{str + internal::CharTraits<CharT>::length(str)}
+            , m_end{str + CharTraits<CharT>::length(str)}
         {
         }
 
@@ -1871,22 +1871,11 @@ namespace ncore
     // Character (CharT != char)
     template <typename CharT, typename std::enable_if<!std::is_same<CharT, char>::value, bool>::type = true> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const CharT arg) { return arg; }
 
-    // 8 bit signed integer
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int8_t arg) { return static_cast<int32_t>(arg); }
-
-    // 8 bit unsigned integer
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint8_t arg) { return static_cast<uint32_t>(arg); }
-
-    // 16 bit signed integer
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int16_t arg) { return static_cast<int32_t>(arg); }
-
-    // 16 bit unsigned integer
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint16_t arg) { return static_cast<uint32_t>(arg); }
-
-    // 32 bit signed integer
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int arg) { return static_cast<int32_t>(arg); }
-
-    // 32 bit unsigned integer
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const unsigned int arg) { return static_cast<uint32_t>(arg); }
 
 #if (__LONG_MAX__ != __LONG_LONG_MAX__)
@@ -1921,17 +1910,11 @@ namespace ncore
         return arg;
     }
 
-    // Pointer (void*)
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(void* arg) { return arg; }
-
-    // Pointer (const void*)
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const void* arg) { return arg; }
 
 #if !defined(USF_DISABLE_FLOAT_SUPPORT)
-    // Floating point (float)
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(float arg) { return static_cast<double>(arg); }
-
-    // Floating point (double)
     template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(double arg) { return arg; }
 #endif // !defined(USF_DISABLE_FLOAT_SUPPORT)
 
@@ -1974,7 +1957,7 @@ namespace ncore
             }
         }
 
-        // USF_ENFORCE(str_it < str.end(), std::runtime_error);
+        USF_ENFORCE(str_it < str.end(), std::runtime_error);
 
         str.remove_prefix(str_it - str.begin());
         fmt.remove_prefix(fmt_it - fmt.cbegin());
@@ -2010,7 +1993,7 @@ namespace ncore
     {
         auto str_begin = str.begin();
 
-        internal::parse_format_string(str, fmt);
+        parse_format_string(str, fmt);
 
         USF_ENFORCE(fmt.empty(), std::runtime_error);
 
