@@ -65,10 +65,18 @@ namespace ncore
                 , m_eos(nullptr)
             {
             }
+            // current implementation is 4 * sizeof(void*)
             prune m_bos; // begin of string
             prune m_str; // string
             prune m_end; // end (does not necessarily point at TERMINATOR)
             prune m_eos; // end of string, points to a TERMINATOR
+
+            // TODO: reduce the size, like (3 * sizeof(void*))
+            // prune m_bos; // begin of string
+            // s32   m_str; // &m_bos[m_end] -> string
+            // s32   m_end; // &m_bos[m_end], does not necessarily point at TERMINATOR
+            // s32   m_eos; // &m_bos[m_end], end of string, points to a TERMINATOR
+            // u32   m_flags; // type (ascii, utf-8, utf-16, utf-32)
         };
         struct crunes_t
         {

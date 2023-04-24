@@ -47,26 +47,31 @@ namespace ncore
 
 #    pragma intrinsic(_BitScanReverse, _BitScanReverse64)
 
-        int __builtin_clz(uint32_t value)
+        int __builtin_clz(u32 value)
         {
             unsigned long leading_zero = 0;
             return _BitScanReverse(&leading_zero, value) ? static_cast<int>(31 - leading_zero) : 32;
         }
 
-        int __builtin_clzll(uint64_t value)
+        int __builtin_clzll(u64 value)
         {
             unsigned long leading_zero = 0;
             return _BitScanReverse64(&leading_zero, value) ? static_cast<int>(63 - leading_zero) : 64;
         }
 #endif // defined(USF_COMPILER_MSVC)
 
-        constexpr uint32_t pow10_uint32_lut[]{1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+        constexpr u32 pow10_uint32_lut[]{1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
 
-        constexpr uint64_t pow10_uint64_lut[]{1,           10,           100,           1000,           10000,           100000,           1000000,           10000000,           100000000,           1000000000,
-                                              10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000, 10000000000000000000U};
+        constexpr u64 pow10_uint64_lut[]{1,           10,           100,           1000,           10000,           100000,           1000000,           10000000,           100000000,           1000000000,
+                                         10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000, 10000000000000000000U};
 
         constexpr char digits_hex_uppercase[]{"0123456789ABCDEF"};
         constexpr char digits_hex_lowercase[]{"0123456789abcdef"};
+
+        // Both the Integer and Float classes only 'generate' ascii, so why make most
+        // of those functions a template?
+
+        // TODO We could pass a 'writer' object to the functions which would reduce code bloat.
 
         class Integer
         {
@@ -76,17 +81,15 @@ namespace ncore
             // --------------------------------------------------------------------
 
             // -------- POWERS OF 10 ----------------------------------------------
-            static USF_CPP14_CONSTEXPR uint32_t pow10_uint32(const int index) noexcept
+            static USF_CPP14_CONSTEXPR u32 pow10_uint32(const int index) noexcept
             {
                 assert(index >= 0 && index < 10);
-
                 return pow10_uint32_lut[index];
             }
 
-            static USF_CPP14_CONSTEXPR uint64_t pow10_uint64(const int index) noexcept
+            static USF_CPP14_CONSTEXPR u64 pow10_uint64(const int index) noexcept
             {
                 assert(index >= 0 && index < 20);
-
                 return pow10_uint64_lut[index];
             }
 
@@ -95,7 +98,7 @@ namespace ncore
             // http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10
             // --------------------- ----------------------------------------------
 
-            static USF_CPP14_CONSTEXPR int count_digits_dec(const uint32_t n) noexcept
+            static USF_CPP14_CONSTEXPR int count_digits_dec(const u32 n) noexcept
             {
                 if (n < 10)
                     return 1;
@@ -113,11 +116,11 @@ namespace ncore
                 return t - (n < pow10_uint32_lut[t]) + 1;
             }
 
-            static USF_CPP14_CONSTEXPR int count_digits_dec(const uint64_t n) noexcept
+            static USF_CPP14_CONSTEXPR int count_digits_dec(const u64 n) noexcept
             {
-                if (n <= std::numeric_limits<uint32_t>::max())
+                if (n <= std::numeric_limits<u32>::max())
                 {
-                    return count_digits_dec(static_cast<uint32_t>(n));
+                    return count_digits_dec(static_cast<u32>(n));
                 }
 
                 // The algorithm below doesn't work when `n` is 0 because:
@@ -133,13 +136,13 @@ namespace ncore
                 return t - (n < pow10_uint64_lut[t]) + 1;
             }
 
-            static USF_CPP14_CONSTEXPR int count_digits_bin(const uint32_t n) noexcept
+            static USF_CPP14_CONSTEXPR int count_digits_bin(const u32 n) noexcept
             {
                 // The result of __builtin_clz() is undefined if `n` is 0.
                 return (n < 2) ? 1 : (32 - __builtin_clz(n));
             }
 
-            static USF_CPP14_CONSTEXPR int count_digits_bin(const uint64_t n) noexcept
+            static USF_CPP14_CONSTEXPR int count_digits_bin(const u64 n) noexcept
             {
                 // The result of __builtin_clzll() is undefined if `n` is 0.
                 return (n < 2) ? 1 : (64 - __builtin_clzll(n));
@@ -165,45 +168,19 @@ namespace ncore
                 return digits;
             }
 
-            // -------- FAST DIVIDE BY 10 -----------------------------------------
-            // Based on the code from Hacker's Delight:
-            // http://www.hackersdelight.org/divcMore.pdf
-            // --------------------- ----------------------------------------------
-            static USF_CPP14_CONSTEXPR uint32_t div10(const uint32_t n) noexcept
+            // -------- DIVIDE BY 10 WITH REMAINDER-------------------------------
+            static USF_CPP14_CONSTEXPR u32 moddiv10(const u32 n, s8& mod) noexcept
             {
-#if defined(__arm__)
-                uint32_t q = (n >> 1) + (n >> 2);
-                q += (q >> 4);
-                q += (q >> 8);
-                q += (q >> 16);
-                q >>= 3;
-
-                const uint32_t r = n - (q << 3) - (q << 1);
-
-                return q + ((r + 6) >> 4);
-                // return q + (r > 9);
-#else
-                return n / 10;
-#endif
+                const u32 div = (n / 10) * 10;
+                mod           = static_cast<s8>(n - div);
+                return div;
             }
 
-            static USF_CPP14_CONSTEXPR uint64_t div10(const uint64_t n) noexcept
+            static USF_CPP14_CONSTEXPR u64 moddiv10(const u64 n, s8& mod) noexcept
             {
-#if defined(__arm__)
-                uint64_t q = (n >> 1) + (n >> 2);
-                q += (q >> 4);
-                q += (q >> 8);
-                q += (q >> 16);
-                q += (q >> 32);
-                q >>= 3;
-
-                const uint64_t r = n - (q << 3) - (q << 1);
-
-                return q + ((r + 6) >> 4);
-                // return q + (r > 9);
-#else
-                return n / 10;
-#endif
+                const u64 div = (n / 10) * 10;
+                mod           = static_cast<s8>(n - div);
+                return div;
             }
 
             // -------- CONVERTERS ------------------------------------------------
@@ -218,97 +195,69 @@ namespace ncore
             // dst   ->      ^
 
             // -------- DECIMAL CONVERSION ----------------------------------------
-            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_dec(CharT* dst, uint32_t value) noexcept
+            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_dec(CharT* dst, u32 value) noexcept
             {
-                do
-                {
-                    const uint32_t v = value;
-                    value            = div10(value);
-                    *(--dst)         = static_cast<CharT>('0' + (v - (value * 10)));
-                } while (value);
+                u64 tmp = value;
+                convert_dec(dst, tmp);
             }
 
-            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_dec(CharT* dst, uint64_t value) noexcept
+            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_dec(CharT* dst, u64 value) noexcept
             {
-                while (value > std::numeric_limits<uint32_t>::max())
+                s8 mod;
+                do
                 {
-                    const uint64_t v = value;
-                    value            = div10(value);
-                    *(--dst)         = static_cast<CharT>('0' + (v - (value * 10)));
-                }
-
-                convert_dec(dst, static_cast<uint32_t>(value));
+                    value    = moddiv10(value, mod);
+                    *(--dst) = static_cast<CharT>("0123456789??????"[mod & 0xF]);
+                } while (value);
             }
 
             // -------- BINARY CONVERSION -----------------------------------------
-            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_bin(CharT* dst, uint32_t value) noexcept
+            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_bin(CharT* dst, u32 value) noexcept
+            {
+                u64 tmp = value;
+                convert_bin(dst, tmp);
+            }
+
+            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_bin(CharT* dst, u64 value) noexcept
             {
                 do
                 {
-                    const uint32_t v = value;
+                    *(--dst) = static_cast<CharT>('0' + (value & 0x1));
                     value >>= 1U;
-                    *(--dst) = static_cast<CharT>('0' + (v - (value << 1U)));
                 } while (value);
-            }
-
-            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_bin(CharT* dst, uint64_t value) noexcept
-            {
-                while (value > std::numeric_limits<uint32_t>::max())
-                {
-                    const uint64_t v = value;
-                    value >>= 1U;
-                    *(--dst) = static_cast<CharT>('0' + (v - (value << 1U)));
-                }
-
-                convert_bin(dst, static_cast<uint32_t>(value));
             }
 
             // -------- OCTAL CONVERSION ------------------------------------------
-            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_oct(CharT* dst, uint32_t value) noexcept
+            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_oct(CharT* dst, u32 value) noexcept
+            {
+                u64 tmp = value;
+                convert_oct(dst, tmp);
+            }
+
+            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_oct(CharT* dst, u64 value) noexcept
             {
                 do
                 {
-                    const uint32_t v = value;
+                    *(--dst) = static_cast<CharT>('0' + (value & 0x7));
                     value >>= 3U;
-                    *(--dst) = static_cast<CharT>('0' + (v - (value << 3U)));
                 } while (value);
-            }
-
-            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_oct(CharT* dst, uint64_t value) noexcept
-            {
-                while (value > std::numeric_limits<uint32_t>::max())
-                {
-                    const uint64_t v = value;
-                    value >>= 3U;
-                    *(--dst) = static_cast<CharT>('0' + (v - (value << 3U)));
-                }
-
-                convert_oct(dst, static_cast<uint32_t>(value));
             }
 
             // -------- HEXADECIMAL CONVERSION ------------------------------------
-            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_hex(CharT* dst, uint32_t value, const bool uppercase) noexcept
+            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_hex(CharT* dst, u32 value, const bool uppercase) noexcept
+            {
+                u64 tmp = value;
+                convert_hex(dst, tmp, uppercase);
+            }
+
+            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_hex(CharT* dst, u64 value, const bool uppercase) noexcept
             {
                 const char* digits = uppercase ? digits_hex_uppercase : digits_hex_lowercase;
                 do
                 {
-                    const uint32_t v = value;
+                    *(--dst) = static_cast<CharT>(digits[value & 0xF]);
                     value >>= 4U;
-                    *(--dst) = static_cast<CharT>(digits[v - (value << 4U)]);
                 } while (value);
-            }
-
-            template <typename CharT> static USF_CPP14_CONSTEXPR void convert_hex(CharT* dst, uint64_t value, const bool uppercase) noexcept
-            {
-                const char* digits = uppercase ? digits_hex_uppercase : digits_hex_lowercase;
-                while (value > std::numeric_limits<uint32_t>::max())
-                {
-                    const uint64_t v = value;
-                    value >>= 4U;
-                    *(--dst) = static_cast<CharT>(digits[v - (value << 4U)]);
-                }
-
-                convert_hex(dst, static_cast<uint32_t>(value), uppercase);
             }
         };
 
@@ -321,8 +270,8 @@ namespace ncore
 
             template <typename CharT> static USF_CPP14_CONSTEXPR int convert(CharT* const significand, int& exponent, double value, const bool format_fixed, const int precision) noexcept
             {
-                uint64_t ipart = 0;
-                uint64_t fpart = 0;
+                u64 ipart = 0;
+                u64 fpart = 0;
 
                 int ipart_digits = 0;
                 int fpart_digits = 0;
@@ -335,7 +284,7 @@ namespace ncore
 
                     value *= 1e19;
 
-                    fpart        = static_cast<uint64_t>(value);
+                    fpart        = static_cast<u64>(value);
                     fpart_digits = Integer::count_digits_dec(fpart);
 
                     exponent = fpart_digits - 20;
@@ -345,7 +294,7 @@ namespace ncore
                     // if(!format_fixed && precision > 19 - fpart_padding)
                     if (fpart_padding > 14 - precision)
                     {
-                        fpart        = static_cast<uint64_t>(value * static_cast<double>(Integer::pow10_uint64(fpart_padding)));
+                        fpart        = static_cast<u64>(value * static_cast<double>(Integer::pow10_uint64(fpart_padding)));
                         fpart_digits = Integer::count_digits_dec(fpart);
                     }
                 }
@@ -353,10 +302,10 @@ namespace ncore
                 {
                     // Positive exponent
 
-                    ipart        = static_cast<uint64_t>(value);
+                    ipart        = static_cast<u64>(value);
                     ipart_digits = Integer::count_digits_dec(ipart);
 
-                    fpart        = static_cast<uint64_t>((value - static_cast<double>(ipart)) * 1e14);
+                    fpart        = static_cast<u64>((value - static_cast<double>(ipart)) * 1e14);
                     fpart_digits = Integer::count_digits_dec(fpart);
 
                     exponent = ipart_digits - 1;
@@ -387,7 +336,7 @@ namespace ncore
                 {
                     if (ipart != 0)
                     {
-                        CharTraits<CharT>::assign(it, '0', fpart_padding);
+                        CharTraits::assign(it, '0', fpart_padding);
                     }
 
                     it += fpart_digits;
@@ -513,7 +462,7 @@ namespace ncore
             }
         };
 
-        template <typename CharT> class CharTraits
+        class CharTraits
         {
         public:
             // --------------------------------------------------------------------
@@ -589,7 +538,7 @@ namespace ncore
 #endif
             USF_CPP14_CONSTEXPR BasicStringSpan(pointer str) noexcept
                 : m_begin{str}
-                , m_end{str + CharTraits<CharT>::length(str)}
+                , m_end{str + CharTraits::length(str)}
             {
             }
 
@@ -763,7 +712,7 @@ namespace ncore
 #endif
             USF_CPP14_CONSTEXPR BasicStringView(const_pointer str) noexcept
                 : m_begin{str}
-                , m_end{str + CharTraits<CharT>::length(str)}
+                , m_end{str + CharTraits::length(str)}
             {
             }
 
@@ -879,42 +828,65 @@ namespace ncore
 
         using ByteStringView = BasicStringView<uint8_t>;
 
+        // This whole class is a template class mainly because of the iterator ???
+        // Why not give it an object that can do the character reading ???
+        // The same with BasicStringView and BasicStringSpan, there seems to be only
+        // an underlying requirement for a char reader and writer ???
         template <typename CharT> class ArgFormat
         {
+            enum Flags : u8
+            {
+                kNone         = (0U << 0U),
+                kEmpty        = (1U << 0U),
+                kAlignNone    = (0U << 1U),
+                kAlignLeft    = (1U << 1U),
+                kAlignRight   = (2U << 1U),
+                kAlignCenter  = (3U << 1U),
+                kAlignNumeric = (4U << 1U),
+                kAlignBitmask = kAlignLeft | kAlignRight | kAlignCenter | kAlignNumeric,
+                kSignNone     = (0U << 4U),
+                kSignMinus    = (1U << 4U),
+                kSignPlus     = (2U << 4U),
+                kSignSpace    = (3U << 4U),
+                kSignBitmask  = kSignMinus | kSignPlus | kSignSpace,
+                kHash         = (1U << 6U),
+                kUppercase    = (1U << 7U)
+            };
+
         public:
             using iterator       = CharT*;
             using const_iterator = const CharT*;
 
             enum class Align : u8
             {
-                kNone    = (0U << 1U),
-                kLeft    = (1U << 1U),
-                kRight   = (2U << 1U),
-                kCenter  = (3U << 1U),
-                kNumeric = (4U << 1U)
+                kNone    = kAlignNone,
+                kLeft    = kAlignLeft,
+                kRight   = kAlignRight,
+                kCenter  = kAlignCenter,
+                kNumeric = kAlignNumeric
             };
 
             enum class Sign : u8
             {
-                kNone  = (0U << 4U),
-                kMinus = (1U << 4U),
-                kPlus  = (2U << 4U),
-                kSpace = (3U << 4U)
+                kNone  = kSignNone,
+                kMinus = kSignMinus,
+                kPlus  = kSignPlus,
+                kSpace = kSignSpace
             };
 
             enum class Type : u8
             {
                 kNone,
-                kChar,
                 kIntegerDec,
                 kIntegerHex,
                 kIntegerOct,
                 kIntegerBin,
-                kPointer,
                 kFloatFixed,
                 kFloatScientific,
                 kFloatGeneral,
+                kPointer,
                 kString,
+                kChar,
                 kInvalid
             };
 
@@ -935,7 +907,7 @@ namespace ncore
                 if (*it >= '0' && *it <= '9')
                 {
                     // Index limited to `arg_count` value.
-                    m_index = static_cast<int8_t>(parse_positive_small_int(it, arg_count));
+                    m_index = static_cast<s8>(parse_positive_small_int(it, arg_count));
                 }
 
                 if (*it == ':' && *(it + 1) != '}')
@@ -999,12 +971,10 @@ namespace ncore
                         ++it;
                     }
 
-                    bool fill_zero = false;
-
                     // Parse fill zero flag
-                    if (*it == '0')
+                    const bool fill_zero = *it == '0';
+                    if (fill_zero)
                     {
-                        fill_zero = true;
                         ++it;
                     }
 
@@ -1023,7 +993,7 @@ namespace ncore
                         // Check for a missing/invalid precision specifier.
                         USF_ENFORCE(*it >= '0' && *it <= '9', std::runtime_error);
 
-                        m_precision = static_cast<int8_t>(parse_positive_small_int(it, 127));
+                        m_precision = static_cast<s8>(parse_positive_small_int(it, 127));
                     }
 
                     // Parse type
@@ -1032,31 +1002,21 @@ namespace ncore
                         switch (*it++)
                         {
                             case 'c': m_type = Type::kChar; break;
-
                             case 'd': m_type = Type::kIntegerDec; break;
-
                             case 'X': m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
                             case 'x': m_type = Type::kIntegerHex; break;
-
                             case 'o': m_type = Type::kIntegerOct; break;
-
                             case 'B': m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
                             case 'b': m_type = Type::kIntegerBin; break;
-
                             case 'P': m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
                             case 'p': m_type = Type::kPointer; break;
-
                             case 'F': m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
                             case 'f': m_type = Type::kFloatFixed; break;
-
                             case 'E': m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
                             case 'e': m_type = Type::kFloatScientific; break;
-
                             case 'G': m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
                             case 'g': m_type = Type::kFloatGeneral; break;
-
                             case 's': m_type = Type::kString; break;
-
                             default: m_type = Type::kInvalid; break;
                         }
 
@@ -1139,7 +1099,7 @@ namespace ncore
                     if (al != Align::kLeft && al != Align::kNumeric)
                     {
                         // None (default right), Right or Center alignment
-                        CharTraits<CharT>::assign(it, fill_char(), fill_count);
+                        CharTraits::assign(it, fill_char(), fill_count);
                     }
 
                     write_sign(it, negative);
@@ -1147,7 +1107,7 @@ namespace ncore
 
                     if (al == Align::kNumeric)
                     {
-                        CharTraits<CharT>::assign(it, fill_char(), fill_count);
+                        CharTraits::assign(it, fill_char(), fill_count);
                     }
                 }
 
@@ -1201,34 +1161,6 @@ namespace ncore
             }
 
         private:
-            // --------------------------------------------------------------------
-            // PRIVATE DEFINITIONS
-            // --------------------------------------------------------------------
-
-            enum Flags : u8
-            {
-                kNone = (0U << 0U),
-
-                kEmpty = (1U << 0U),
-
-                kAlignNone    = (0U << 1U),
-                kAlignLeft    = (1U << 1U),
-                kAlignRight   = (2U << 1U),
-                kAlignCenter  = (3U << 1U),
-                kAlignNumeric = (4U << 1U),
-                kAlignBitmask = (7U << 1U),
-
-                kSignNone    = (0U << 4U),
-                kSignMinus   = (1U << 4U),
-                kSignPlus    = (2U << 4U),
-                kSignSpace   = (3U << 4U),
-                kSignBitmask = (3U << 4U),
-
-                kHash = (1U << 6U),
-
-                kUppercase = (1U << 7U)
-            };
-
             // --------------------------------------------------------------------
             // PRIVATE MEMBER FUNCTIONS
             // --------------------------------------------------------------------
@@ -1297,13 +1229,10 @@ namespace ncore
                 assert(max_value < 256);
 
                 int value = 0;
-
                 do
                 {
                     value = (value * 10) + static_cast<int>(*it++ - '0');
-
-                    // Check for overflow
-                    USF_ENFORCE(value <= max_value, std::runtime_error);
+                    USF_ENFORCE(value <= max_value, std::runtime_error); // Check for overflow
                 } while (*it >= '0' && *it <= '9');
 
                 return static_cast<u8>(value);
@@ -1325,14 +1254,16 @@ namespace ncore
             // PRIVATE MEMBER VARIABLES
             // --------------------------------------------------------------------
 
-            CharT  m_fill_char = ' ';
-            Type   m_type      = Type::kNone;
-            u8     m_flags     = Flags::kEmpty;
-            u8     m_width     = 0;
-            int8_t m_precision = -1;
-            int8_t m_index     = -1;
+            CharT m_fill_char = ' ';
+            Type  m_type      = Type::kNone;
+            u8    m_flags     = Flags::kEmpty;
+            u8    m_width     = 0;
+            s8    m_precision = -1;
+            s8    m_index     = -1;
         };
 
+        // Again, this class seems to be a template class mainly because of the
+        // 'format' function
         template <typename CharT> class Argument
         {
         public:
@@ -1369,7 +1300,7 @@ namespace ncore
             {
             }
 
-            constexpr Argument(const uint32_t value) noexcept
+            constexpr Argument(const u32 value) noexcept
                 : m_uint32(value)
                 , m_type_id(TypeId::kUint32)
             {
@@ -1381,7 +1312,7 @@ namespace ncore
             {
             }
 
-            constexpr Argument(const uint64_t value) noexcept
+            constexpr Argument(const u64 value) noexcept
                 : m_uint64(value)
                 , m_type_id(TypeId::kUint64)
             {
@@ -1441,7 +1372,7 @@ namespace ncore
                 }
                 else if (format.type_is_integer())
                 {
-                    format_integer(it, end, format, static_cast<uint32_t>(value));
+                    format_integer(it, end, format, static_cast<u32>(value));
                 }
                 else
                 {
@@ -1459,7 +1390,7 @@ namespace ncore
 
                     const int fill_after = format.write_alignment(it, end, 1, false);
                     *it++                = value;
-                    CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
+                    CharTraits::assign(it, format.fill_char(), fill_after);
                 }
                 else if (format.type_is_integer())
                 {
@@ -1520,7 +1451,7 @@ namespace ncore
                     USF_CONTRACT_VIOLATION(std::runtime_error);
                 }
 
-                CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
+                CharTraits::assign(it, format.fill_char(), fill_after);
             }
 
             static USF_CPP14_CONSTEXPR void format_pointer(iterator& it, const_iterator end, const Format& format, const std::uintptr_t value)
@@ -1528,15 +1459,15 @@ namespace ncore
                 if (format.type_is_none() || format.type_is_pointer())
                 {
 #if defined(USF_TARGET_64_BITS)
-                    const auto ivalue = static_cast<uint64_t>(value);
+                    const auto ivalue = static_cast<u64>(value);
 #else
-                    const auto ivalue = static_cast<uint32_t>(value);
+                    const auto ivalue = static_cast<u32>(value);
 #endif
                     const auto digits     = Integer::count_digits_hex(ivalue);
                     const auto fill_after = format.write_alignment(it, end, digits, false);
                     it += digits;
                     Integer::convert_hex(it, ivalue, format.uppercase());
-                    CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
+                    CharTraits::assign(it, format.fill_char(), fill_after);
                 }
                 else
                 {
@@ -1574,8 +1505,8 @@ namespace ncore
                         {
                             union
                             {
-                                double   d;
-                                uint64_t i;
+                                double d;
+                                u64    i;
                             };
                         };
 
@@ -1647,12 +1578,12 @@ namespace ncore
                                     *it++ = '.';
 
                                     int zero_digits = -exponent - 1;
-                                    CharTraits<CharT>::assign(it, '0', zero_digits);
-                                    CharTraits<CharT>::copy(it, significand, significand_size);
+                                    CharTraits::assign(it, '0', zero_digits);
+                                    CharTraits::copy(it, significand, significand_size);
 
                                     // Padding is needed if conversion function removes trailing zeros.
                                     zero_digits = precision - zero_digits - significand_size;
-                                    CharTraits<CharT>::assign(it, '0', zero_digits);
+                                    CharTraits::assign(it, '0', zero_digits);
                                 }
                                 else
                                 {
@@ -1665,8 +1596,8 @@ namespace ncore
                                     {
                                         // [SIGNIFICAND]<0><.><0>
 
-                                        CharTraits<CharT>::copy(it, significand, significand_size);
-                                        CharTraits<CharT>::assign(it, '0', ipart_digits - significand_size);
+                                        CharTraits::copy(it, significand, significand_size);
+                                        CharTraits::assign(it, '0', ipart_digits - significand_size);
 
                                         if (precision > 0 || format.hash())
                                         {
@@ -1675,21 +1606,21 @@ namespace ncore
 
                                         if (precision > 0)
                                         {
-                                            CharTraits<CharT>::assign(it, '0', precision);
+                                            CharTraits::assign(it, '0', precision);
                                         }
                                     }
                                     else
                                     {
                                         // SIGNIFICAND[0:x].SIGNIFICAND[x:N]<0>
 
-                                        CharTraits<CharT>::copy(it, significand, ipart_digits);
+                                        CharTraits::copy(it, significand, ipart_digits);
                                         *it++ = '.';
 
                                         const int copy_size = significand_size - ipart_digits;
-                                        CharTraits<CharT>::copy(it, significand + ipart_digits, copy_size);
+                                        CharTraits::copy(it, significand + ipart_digits, copy_size);
 
                                         // Padding is needed if conversion function removes trailing zeros.
-                                        CharTraits<CharT>::assign(it, '0', precision - copy_size);
+                                        CharTraits::assign(it, '0', precision - copy_size);
                                     }
                                 }
                             }
@@ -1710,14 +1641,14 @@ namespace ncore
                                     *it++ = '.';
 
                                     const int copy_size = significand_size - 1;
-                                    CharTraits<CharT>::copy(it, significand + 1, copy_size);
-                                    CharTraits<CharT>::assign(it, '0', precision - copy_size);
+                                    CharTraits::copy(it, significand + 1, copy_size);
+                                    CharTraits::assign(it, '0', precision - copy_size);
                                 }
 
                                 write_float_exponent(it, exponent, format.uppercase());
                             }
 
-                            CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
+                            CharTraits::assign(it, format.fill_char(), fill_after);
 
                             // it += sprintf(it, "[%s] Size:%d Exponent:%d Precision:%d Fixed:%d->", significand, significand_size, exponent, precision, int(format_fixed));
                         }
@@ -1787,7 +1718,7 @@ namespace ncore
                 if (precision > 0)
                 {
                     *it++ = '.';
-                    CharTraits<CharT>::assign(it, '0', precision);
+                    CharTraits::assign(it, '0', precision);
                 }
 
                 if (format.type_is_float_scientific())
@@ -1798,7 +1729,7 @@ namespace ncore
                     *it++ = '0';
                 }
 
-                CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
+                CharTraits::assign(it, format.fill_char(), fill_after);
             }
 #endif // !defined(USF_DISABLE_FLOAT_SUPPORT)
 
@@ -1821,8 +1752,8 @@ namespace ncore
             {
                 const int fill_after = format.write_alignment(it, end, str_length, negative);
 
-                CharTraits<CharT>::copy(it, str, str_length);
-                CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
+                CharTraits::copy(it, str, str_length);
+                CharTraits::assign(it, format.fill_char(), fill_after);
             }
 
             // --------------------------------------------------------------------
@@ -1850,9 +1781,9 @@ namespace ncore
                 bool           m_bool;
                 CharT          m_char;
                 int32_t        m_int32;
-                uint32_t       m_uint32;
+                u32            m_uint32;
                 int64_t        m_int64;
-                uint64_t       m_uint64;
+                u64            m_uint64;
                 std::uintptr_t m_pointer;
 #if !defined(USF_DISABLE_FLOAT_SUPPORT)
                 double m_float;
@@ -1872,12 +1803,12 @@ namespace ncore
         // Character (CharT != char)
         template <typename CharT, typename std::enable_if<!std::is_same<CharT, char>::value, bool>::type = true> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const CharT arg) { return arg; }
 
-        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int8_t arg) { return static_cast<int32_t>(arg); }
-        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint8_t arg) { return static_cast<uint32_t>(arg); }
+        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const s8 arg) { return static_cast<int32_t>(arg); }
+        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint8_t arg) { return static_cast<u32>(arg); }
         template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int16_t arg) { return static_cast<int32_t>(arg); }
-        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint16_t arg) { return static_cast<uint32_t>(arg); }
+        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint16_t arg) { return static_cast<u32>(arg); }
         template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int arg) { return static_cast<int32_t>(arg); }
-        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const unsigned int arg) { return static_cast<uint32_t>(arg); }
+        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const unsigned int arg) { return static_cast<u32>(arg); }
 
 #if (__LONG_MAX__ != __LONG_LONG_MAX__)
 
@@ -1885,7 +1816,7 @@ namespace ncore
         template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const long int arg) { return static_cast<int32_t>(arg); }
 
         // 32 bit unsigned integer
-        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const unsigned long int arg) { return static_cast<uint32_t>(arg); }
+        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const unsigned long int arg) { return static_cast<u32>(arg); }
 
 #endif // (__LONG_MAX__ != __LONG_LONG_MAX__)
 
@@ -1901,11 +1832,11 @@ namespace ncore
         }
 
         // 64 bit unsigned integer
-        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint64_t arg)
+        template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const u64 arg)
         {
-            if (arg <= std::numeric_limits<uint32_t>::max())
+            if (arg <= std::numeric_limits<u32>::max())
             {
-                return static_cast<uint32_t>(arg);
+                return static_cast<u32>(arg);
             }
 
             return arg;
@@ -2029,6 +1960,14 @@ namespace ncore
             return basic_format_to(BasicStringSpan<CharT>(str, str_count), fmt, args...).end();
         }
 
+        // There is really NO need to make all of the above using templates, the only 2 'smart' objects you need are:
+        //   - string reader
+        //   - string writer
+        //
+        // And we basically already have this with crunes_t and runes_t.
+        // 
+
+
         // ----------------------------------------------------------------------------
         // Formats a char string
         // ---------------------------------------------------------------------------
@@ -2044,10 +1983,7 @@ namespace ncore
             format_to(str, 128, "{:14}", false);
         }
 
-        bool to(ascii::prune str, ascii::prune end, ascii::prune fmt, arg_t a, arg_t b, arg_t c, arg_t d, arg_t e, arg_t f, arg_t g, arg_t h, arg_t i, arg_t j, arg_t k, arg_t l)
-        {
-
-        }
+        bool to(ascii::prune str, ascii::prune end, ascii::prune fmt, arg_t a, arg_t b, arg_t c, arg_t d, arg_t e, arg_t f, arg_t g, arg_t h, arg_t i, arg_t j, arg_t k, arg_t l) {}
 
     } // namespace fmt
 } // namespace ncore
