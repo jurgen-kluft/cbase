@@ -17,7 +17,501 @@ namespace ncore
 #define USF_CPP14_CONSTEXPR constexpr
 #define USF_ALWAYS_INLINE inline
 
-    class CharTraits
+#define USF_CONTRACT_VIOLATION(except) static_cast<void>(0)
+#define USF_FALLTHROUGH /*fall through*/
+#define USF_ENFORCE(cond, except) ((!!(cond)) ? static_cast<void>(0) : USF_CONTRACT_VIOLATION(except))
+
+// ----------------------------------------------------------------------------
+// Compiler version detection
+// ----------------------------------------------------------------------------
+
+// MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
+// MSVC++ 14.1 _MSC_VER >= 1910 (Visual Studio 2017)
+#if defined(_MSC_VER) && !defined(__clang__)
+#    define USF_COMPILER_MSVC
+#    define USF_MSVC_VERSION (_MSC_VER / 10 - 10 * (5 + (_MSC_VER < 1900)))
+#    if (USF_MSVC_VERSION < 140)
+#        error usflib requires MSVC++ 14.0 or greater
+#    endif
+// Note: VC14.0/1900 (VS2015) lacks too much from C++14.
+#    define USF_CPLUSPLUS (_MSC_VER <= 1900 ? 201103L : _MSVC_LANG)
+#endif
+
+    // ----------------------------------------------------------------------------
+// Missing intrinsic functions definition for MSVC
+// ----------------------------------------------------------------------------
+#if defined(USF_COMPILER_MSVC)
+#    include <intrin.h>
+
+#    pragma intrinsic(_BitScanReverse, _BitScanReverse64)
+
+    int __builtin_clz(uint32_t value)
+    {
+        unsigned long leading_zero = 0;
+        return _BitScanReverse(&leading_zero, value) ? static_cast<int>(31 - leading_zero) : 32;
+    }
+
+    int __builtin_clzll(uint64_t value)
+    {
+        unsigned long leading_zero = 0;
+        return _BitScanReverse64(&leading_zero, value) ? static_cast<int>(63 - leading_zero) : 64;
+    }
+#endif // defined(USF_COMPILER_MSVC)
+
+    constexpr uint32_t pow10_uint32_lut[]{1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+
+    constexpr uint64_t pow10_uint64_lut[]{1,           10,           100,           1000,           10000,           100000,           1000000,           10000000,           100000000,           1000000000,
+                                          10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000, 10000000000000000000U};
+
+    constexpr char digits_hex_uppercase[]{"0123456789ABCDEF"};
+    constexpr char digits_hex_lowercase[]{"0123456789abcdef"};
+
+    class Integer
+    {
+    public:
+        // --------------------------------------------------------------------
+        // PUBLIC STATIC FUNCTIONS
+        // --------------------------------------------------------------------
+
+        // -------- POWERS OF 10 ----------------------------------------------
+        static USF_CPP14_CONSTEXPR uint32_t pow10_uint32(const int index) noexcept
+        {
+            assert(index >= 0 && index < 10);
+
+            return pow10_uint32_lut[index];
+        }
+
+        static USF_CPP14_CONSTEXPR uint64_t pow10_uint64(const int index) noexcept
+        {
+            assert(index >= 0 && index < 20);
+
+            return pow10_uint64_lut[index];
+        }
+
+        // -------- COUNT DIGITS ----------------------------------------------
+        // Based on the code from:
+        // http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10
+        // --------------------- ----------------------------------------------
+
+        static USF_CPP14_CONSTEXPR int count_digits_dec(const uint32_t n) noexcept
+        {
+            if (n < 10)
+                return 1;
+
+            // The algorithm below doesn't work when `n` is 0 because:
+            // 1. the result of __builtin_clz() is undefined if `n` is 0.
+            // 2. the `pow10_uint32_lut` lookup table has the value 1 in
+            //    the first element and not a 0 as the algorithm expects.
+            // (both cases are covered by the previous if statement or
+            //  by the slower commented OR operation below).
+
+            // n = n | 1;
+
+            const int t = (32 - __builtin_clz(n)) * 1233 >> 12;
+            return t - (n < pow10_uint32_lut[t]) + 1;
+        }
+
+        static USF_CPP14_CONSTEXPR int count_digits_dec(const uint64_t n) noexcept
+        {
+            if (n <= std::numeric_limits<uint32_t>::max())
+            {
+                return count_digits_dec(static_cast<uint32_t>(n));
+            }
+
+            // The algorithm below doesn't work when `n` is 0 because:
+            // 1. the result of __builtin_clzll() is undefined if `n` is 0.
+            // 2. the `pow10_uint64_lut` lookup table has the value 1 in
+            //    the first element and not a 0 as the algorithm expects.
+            // (both cases are covered by the previous if statement or
+            //  by the slower commented OR operation below).
+
+            // n = n | 1;
+
+            const int t = (64 - __builtin_clzll(n)) * 1233 >> 12;
+            return t - (n < pow10_uint64_lut[t]) + 1;
+        }
+
+        static USF_CPP14_CONSTEXPR int count_digits_bin(const uint32_t n) noexcept
+        {
+            // The result of __builtin_clz() is undefined if `n` is 0.
+            return (n < 2) ? 1 : (32 - __builtin_clz(n));
+        }
+
+        static USF_CPP14_CONSTEXPR int count_digits_bin(const uint64_t n) noexcept
+        {
+            // The result of __builtin_clzll() is undefined if `n` is 0.
+            return (n < 2) ? 1 : (64 - __builtin_clzll(n));
+        }
+
+        template <typename T, typename std::enable_if<std::numeric_limits<T>::is_integer && std::is_unsigned<T>::value, bool>::type = true> static USF_CPP14_CONSTEXPR int count_digits_oct(T n) noexcept
+        {
+            int digits = 1;
+            while ((n >>= 3U) != 0)
+            {
+                ++digits;
+            }
+            return digits;
+        }
+
+        template <typename T, typename std::enable_if<std::numeric_limits<T>::is_integer && std::is_unsigned<T>::value, bool>::type = true> static USF_CPP14_CONSTEXPR int count_digits_hex(T n) noexcept
+        {
+            int digits = 1;
+            while ((n >>= 4U) != 0)
+            {
+                ++digits;
+            }
+            return digits;
+        }
+
+        // -------- FAST DIVIDE BY 10 -----------------------------------------
+        // Based on the code from Hacker's Delight:
+        // http://www.hackersdelight.org/divcMore.pdf
+        // --------------------- ----------------------------------------------
+        static USF_CPP14_CONSTEXPR uint32_t div10(const uint32_t n) noexcept
+        {
+#if defined(__arm__)
+            uint32_t q = (n >> 1) + (n >> 2);
+            q += (q >> 4);
+            q += (q >> 8);
+            q += (q >> 16);
+            q >>= 3;
+
+            const uint32_t r = n - (q << 3) - (q << 1);
+
+            return q + ((r + 6) >> 4);
+            // return q + (r > 9);
+#else
+            return n / 10;
+#endif
+        }
+
+        static USF_CPP14_CONSTEXPR uint64_t div10(const uint64_t n) noexcept
+        {
+#if defined(__arm__)
+            uint64_t q = (n >> 1) + (n >> 2);
+            q += (q >> 4);
+            q += (q >> 8);
+            q += (q >> 16);
+            q += (q >> 32);
+            q >>= 3;
+
+            const uint64_t r = n - (q << 3) - (q << 1);
+
+            return q + ((r + 6) >> 4);
+            // return q + (r > 9);
+#else
+            return n / 10;
+#endif
+        }
+
+        // -------- CONVERTERS ------------------------------------------------
+        // The following converters write the value from back to front.
+        // It is assumed that the pointer `dst` is already placed at the
+        // position after the last character. The pointer position is
+        // calculated using the corresponding count_digits_xxx() functions.
+
+        // Example:
+        // value ->  1234
+        // array -> [........]
+        // dst   ->      ^
+
+        // -------- DECIMAL CONVERSION ----------------------------------------
+        template <typename CharT> static USF_CPP14_CONSTEXPR void convert_dec(CharT* dst, uint32_t value) noexcept
+        {
+            do
+            {
+                const uint32_t v = value;
+                value            = div10(value);
+                *(--dst)         = static_cast<CharT>('0' + (v - (value * 10)));
+            } while (value);
+        }
+
+        template <typename CharT> static USF_CPP14_CONSTEXPR void convert_dec(CharT* dst, uint64_t value) noexcept
+        {
+            while (value > std::numeric_limits<uint32_t>::max())
+            {
+                const uint64_t v = value;
+                value            = div10(value);
+                *(--dst)         = static_cast<CharT>('0' + (v - (value * 10)));
+            }
+
+            convert_dec(dst, static_cast<uint32_t>(value));
+        }
+
+        // -------- BINARY CONVERSION -----------------------------------------
+        template <typename CharT> static USF_CPP14_CONSTEXPR void convert_bin(CharT* dst, uint32_t value) noexcept
+        {
+            do
+            {
+                const uint32_t v = value;
+                value >>= 1U;
+                *(--dst) = static_cast<CharT>('0' + (v - (value << 1U)));
+            } while (value);
+        }
+
+        template <typename CharT> static USF_CPP14_CONSTEXPR void convert_bin(CharT* dst, uint64_t value) noexcept
+        {
+            while (value > std::numeric_limits<uint32_t>::max())
+            {
+                const uint64_t v = value;
+                value >>= 1U;
+                *(--dst) = static_cast<CharT>('0' + (v - (value << 1U)));
+            }
+
+            convert_bin(dst, static_cast<uint32_t>(value));
+        }
+
+        // -------- OCTAL CONVERSION ------------------------------------------
+        template <typename CharT> static USF_CPP14_CONSTEXPR void convert_oct(CharT* dst, uint32_t value) noexcept
+        {
+            do
+            {
+                const uint32_t v = value;
+                value >>= 3U;
+                *(--dst) = static_cast<CharT>('0' + (v - (value << 3U)));
+            } while (value);
+        }
+
+        template <typename CharT> static USF_CPP14_CONSTEXPR void convert_oct(CharT* dst, uint64_t value) noexcept
+        {
+            while (value > std::numeric_limits<uint32_t>::max())
+            {
+                const uint64_t v = value;
+                value >>= 3U;
+                *(--dst) = static_cast<CharT>('0' + (v - (value << 3U)));
+            }
+
+            convert_oct(dst, static_cast<uint32_t>(value));
+        }
+
+        // -------- HEXADECIMAL CONVERSION ------------------------------------
+        template <typename CharT> static USF_CPP14_CONSTEXPR void convert_hex(CharT* dst, uint32_t value, const bool uppercase) noexcept
+        {
+            const char* digits = uppercase ? digits_hex_uppercase : digits_hex_lowercase;
+            do
+            {
+                const uint32_t v = value;
+                value >>= 4U;
+                *(--dst) = static_cast<CharT>(digits[v - (value << 4U)]);
+            } while (value);
+        }
+
+        template <typename CharT> static USF_CPP14_CONSTEXPR void convert_hex(CharT* dst, uint64_t value, const bool uppercase) noexcept
+        {
+            const char* digits = uppercase ? digits_hex_uppercase : digits_hex_lowercase;
+            while (value > std::numeric_limits<uint32_t>::max())
+            {
+                const uint64_t v = value;
+                value >>= 4U;
+                *(--dst) = static_cast<CharT>(digits[v - (value << 4U)]);
+            }
+
+            convert_hex(dst, static_cast<uint32_t>(value), uppercase);
+        }
+    };
+
+    class Float
+    {
+    public:
+        // --------------------------------------------------------------------
+        // PUBLIC STATIC FUNCTIONS
+        // --------------------------------------------------------------------
+
+        template <typename CharT> static USF_CPP14_CONSTEXPR int convert(CharT* const significand, int& exponent, double value, const bool format_fixed, const int precision) noexcept
+        {
+            uint64_t ipart = 0;
+            uint64_t fpart = 0;
+
+            int ipart_digits = 0;
+            int fpart_digits = 0;
+
+            int fpart_padding = 0;
+
+            if (value < 1)
+            {
+                // Negative exponent
+
+                value *= 1e19;
+
+                fpart        = static_cast<uint64_t>(value);
+                fpart_digits = Integer::count_digits_dec(fpart);
+
+                exponent = fpart_digits - 20;
+
+                fpart_padding = -exponent - 1;
+
+                // if(!format_fixed && precision > 19 - fpart_padding)
+                if (fpart_padding > 14 - precision)
+                {
+                    fpart        = static_cast<uint64_t>(value * static_cast<double>(Integer::pow10_uint64(fpart_padding)));
+                    fpart_digits = Integer::count_digits_dec(fpart);
+                }
+            }
+            else
+            {
+                // Positive exponent
+
+                ipart        = static_cast<uint64_t>(value);
+                ipart_digits = Integer::count_digits_dec(ipart);
+
+                fpart        = static_cast<uint64_t>((value - static_cast<double>(ipart)) * 1e14);
+                fpart_digits = Integer::count_digits_dec(fpart);
+
+                exponent = ipart_digits - 1;
+
+                fpart_padding = 14 - fpart_digits;
+            }
+
+            const auto round_index = 1 + precision + (format_fixed ? exponent : 0);
+
+            if (round_index < 0)
+            {
+                // Specified precision higher than converted value.
+                // Should print all zeros. Bail!
+                significand[0] = '0';
+                exponent       = 0;
+                return 1;
+            }
+
+            CharT* it = significand;
+
+            if (ipart != 0)
+            {
+                it += ipart_digits;
+                Integer::convert_dec(it, ipart);
+            }
+
+            if (fpart != 0)
+            {
+                if (ipart != 0)
+                {
+                    CharTraits::assign(it, '0', fpart_padding);
+                }
+
+                it += fpart_digits;
+                Integer::convert_dec(it, fpart);
+            }
+
+            const auto significand_size = remove_trailing_zeros(significand, it);
+
+            if (significand_size <= round_index)
+            {
+                // Rounding not needed. Bail!
+                return significand_size;
+            }
+
+            // Round to the specified precision.
+            return round(significand, significand_size, exponent, format_fixed, round_index);
+        }
+
+    private:
+        // --------------------------------------------------------------------
+        // PRIVATE STATIC FUNCTIONS
+        // --------------------------------------------------------------------
+
+        template <typename CharT> static USF_CPP14_CONSTEXPR int round(CharT* const significand, const int significand_size, int& exponent, const bool format_fixed, const int round_index) noexcept
+        {
+            CharT* it = significand + round_index;
+
+            bool round_up = false;
+
+            if (round_index == significand_size - 1)
+            {
+                // Round the last digit of the significand buffer.
+                // It can simultaneously be the first one if the
+                // significant buffer has only one digit.
+
+                const bool prev_digit_odd = (round_index > 0) ? (('0' - *(it - 1)) & 1) != 0 : false;
+
+                if (*it > '5' || (*it == '5' && prev_digit_odd))
+                {
+                    // Round up if digit is:
+                    // 1) greater than 5
+                    //    e.g. 2.6 -> 3
+                    // 2) exactly 5 and previous digit is odd
+                    //    e.g. 2.5 -> 2
+                    //    e.g. 3.5 -> 3
+                    round_up = true;
+                }
+            }
+            else if (*it >= '5')
+            {
+                // Round any digit except the last one. Since the trailing zeros were
+                // removed, we only need to test if the digit is at least '5' because it
+                // is granted that other non-zero digits are present after this position.
+                round_up = true;
+            }
+
+            if (round_up)
+            {
+                bool carry = false;
+
+                if (round_index > 0)
+                {
+                    --it;
+
+                    do
+                    {
+                        if (*it < '9')
+                        {
+                            carry = false;
+                            ++(*it);
+                        }
+                        else
+                        {
+                            carry = true;
+                            *it   = '0';
+                        }
+                    } while (--it >= significand && carry);
+                }
+                else
+                {
+                    carry = true;
+                }
+
+                // Buffer termination is not necessary since the caller functions
+                // rely on the returned size and not on null terminator.
+
+                if (carry)
+                {
+                    significand[0] = '1';
+                    ++exponent;
+                    return 1;
+                }
+            }
+            else if (round_index == 0)
+            {
+                significand[0] = '0';
+                exponent       = 0;
+                return 1;
+            }
+
+            // Do not remove the trailing zeros if format is fixed.
+            if (format_fixed)
+            {
+                return round_index;
+            }
+
+            return remove_trailing_zeros(significand, significand + round_index);
+        }
+
+        // Evaluates the range [first, last), truncates all the trailing zeros and return the
+        // new range size. Keeps always at least 1 element of the range (even if it is zero).
+        template <typename CharT> static USF_CPP14_CONSTEXPR int remove_trailing_zeros(const CharT* const first, const CharT* last) noexcept
+        {
+            while ((last - 1) > first && *(last - 1) == '0')
+            {
+                --last;
+            }
+
+            // Buffer termination is not really necessary since the caller
+            // functions rely on the returned size and not on null terminator.
+
+            return static_cast<int>(last - first);
+        }
+    };
+
+    template <typename CharT> class CharTraits
     {
     public:
         // --------------------------------------------------------------------
@@ -45,15 +539,188 @@ namespace ncore
         template <typename CharT> USF_ALWAYS_INLINE static USF_CPP14_CONSTEXPR std::ptrdiff_t length(const CharT* str) noexcept
         {
             const CharT* str_begin = str;
-
             while (*str != CharT{})
             {
                 ++str;
             }
-
             return str - str_begin;
         }
     };
+
+    template <typename CharT> class BasicStringSpan
+    {
+    public:
+        // --------------------------------------------------------------------
+        // PUBLIC TYPE ALIASES
+        // --------------------------------------------------------------------
+
+        using char_type       = CharT;
+        using size_type       = std::ptrdiff_t;
+        using reference       = char_type&;
+        using const_reference = const char_type&;
+        using pointer         = char_type*;
+        using const_pointer   = const char_type*;
+        using iterator        = pointer;
+        using const_iterator  = const_pointer;
+
+        // --------------------------------------------------------------------
+        // TEMPLATE PARAMETERS VALIDATION
+        // --------------------------------------------------------------------
+
+        static_assert(std::is_trivial<CharT>::value && std::is_standard_layout<CharT>::value, "usf::BasicStringSpan: CharT must be a POD type (both trivial and standard-layout).");
+
+        // --------------------------------------------------------------------
+        // PUBLIC MEMBER FUNCTIONS
+        // --------------------------------------------------------------------
+
+        // -------- CONSTRUCTORS ----------------------------------------------
+
+        USF_CPP14_CONSTEXPR BasicStringSpan() noexcept = delete;
+
+        USF_CPP14_CONSTEXPR BasicStringSpan(const BasicStringSpan&) noexcept = default;
+        USF_CPP14_CONSTEXPR BasicStringSpan(BasicStringSpan&&) noexcept      = default;
+#if 0
+        template <std::size_t N> // N includes the null terminator!
+        USF_CPP14_CONSTEXPR BasicStringSpan(char_type (&str)[N]) noexcept
+            : m_begin{str}, m_end{str + N - 1}
+        {}
+#endif
+        USF_CPP14_CONSTEXPR BasicStringSpan(pointer str) noexcept
+            : m_begin{str}
+            , m_end{str + internal::CharTraits::length(str)}
+        {
+        }
+
+        USF_CPP14_CONSTEXPR BasicStringSpan(pointer str, const size_type str_count)
+            : m_begin{str}
+            , m_end{str + str_count}
+        {
+            USF_ENFORCE(str_count >= 0, std::runtime_error);
+        }
+
+        USF_CPP14_CONSTEXPR BasicStringSpan(iterator first, iterator last)
+            : m_begin{first}
+            , m_end{last}
+        {
+            USF_ENFORCE(first <= last, std::runtime_error);
+        }
+
+        template <std::size_t N>
+        USF_CPP14_CONSTEXPR BasicStringSpan(std::array<CharT, N>& array) noexcept
+            : m_begin{array.begin()}
+            , m_end{array.end()}
+        {
+        }
+
+        // -------- ASSIGNMENT ------------------------------------------------
+
+        USF_CPP14_CONSTEXPR BasicStringSpan& operator=(const BasicStringSpan&) noexcept = default;
+        USF_CPP14_CONSTEXPR BasicStringSpan& operator=(BasicStringSpan&&) noexcept      = default;
+
+        // -------- ELEMENT ACCESS --------------------------------------------
+
+        // Returns a reference to the character at specified location `pos`.
+        // Bounds checking is performed.
+        inline USF_CPP14_CONSTEXPR const_reference at(const size_type pos) const
+        {
+            USF_ENFORCE(pos >= 0 && pos < size(), std::out_of_range);
+            return m_begin[pos];
+        }
+
+        inline USF_CPP14_CONSTEXPR reference at(const size_type pos)
+        {
+            USF_ENFORCE(pos >= 0 && pos < size(), std::out_of_range);
+            return m_begin[pos];
+        }
+
+        // Returns a reference to the character at specified location `pos`.
+        // No bounds checking is performed.
+        inline USF_CPP14_CONSTEXPR const_reference operator[](const size_type pos) const noexcept { return m_begin[pos]; }
+        inline USF_CPP14_CONSTEXPR reference       operator[](const size_type pos) noexcept { return m_begin[pos]; }
+
+        // Returns reference to the first character of the sequence.
+        inline USF_CPP14_CONSTEXPR const_reference front() const noexcept
+        {
+            assert(!empty());
+            return m_begin[0];
+        }
+        inline USF_CPP14_CONSTEXPR reference front() noexcept
+        {
+            assert(!empty());
+            return m_begin[0];
+        }
+
+        // Returns reference to the last character of the sequence.
+        inline USF_CPP14_CONSTEXPR const_reference back() const noexcept
+        {
+            assert(!empty());
+            return *(m_end - 1);
+        }
+        inline USF_CPP14_CONSTEXPR reference back() noexcept
+        {
+            assert(!empty());
+            return *(m_end - 1);
+        }
+
+        // Returns a pointer to the beginning of the sequence.
+        inline USF_CPP14_CONSTEXPR const_pointer data() const noexcept { return m_begin; }
+        inline USF_CPP14_CONSTEXPR pointer       data() noexcept { return m_begin; }
+
+#if defined(USF_STD_BASIC_STRING_VIEW)
+        // Conversion to std::basic_string view.
+        template <typename Traits = std::char_traits<CharT>> inline USF_CPP14_CONSTEXPR operator USF_STD_BASIC_STRING_VIEW<CharT, Traits>() const noexcept { return USF_STD_BASIC_STRING_VIEW<CharT, Traits>{data(), static_cast<std::size_t>(size())}; }
+#endif
+        // -------- ITERATORS -------------------------------------------------
+
+        // Returns an iterator to the first character of the sequence.
+        inline USF_CPP14_CONSTEXPR const_iterator cbegin() const noexcept { return m_begin; }
+        inline USF_CPP14_CONSTEXPR const_iterator begin() const noexcept { return m_begin; }
+        inline USF_CPP14_CONSTEXPR iterator       begin() noexcept { return m_begin; }
+
+        // Returns an iterator to the character following the last character of the sequence.
+        // This character acts as a placeholder, attempting to access it results in undefined behavior.
+        inline USF_CPP14_CONSTEXPR const_iterator cend() const noexcept { return m_end; }
+        inline USF_CPP14_CONSTEXPR const_iterator end() const noexcept { return m_end; }
+        inline USF_CPP14_CONSTEXPR iterator       end() noexcept { return m_end; }
+
+        // -------- CAPACITY --------------------------------------------------
+
+        // Checks if the sequence has no characters, i.e. whether begin() == end().
+        inline USF_CPP14_CONSTEXPR bool empty() const noexcept { return (size() == 0); }
+
+        // Returns the number of characters in the sequence, i.e. the distance between begin() and end().
+        inline USF_CPP14_CONSTEXPR size_type size() const noexcept { return static_cast<size_type>(m_end - m_begin); }
+        inline USF_CPP14_CONSTEXPR size_type length() const noexcept { return static_cast<size_type>(m_end - m_begin); }
+
+        // -------- MODIFIERS -------------------------------------------------
+
+        // Moves the start of the sequence forward by `n` characters.
+        // The behavior is undefined if n > size().
+        inline USF_CPP14_CONSTEXPR void remove_prefix(const size_type n) noexcept { m_begin += n; }
+
+        // Moves the end of the sequence back by `n` characters.
+        // The behavior is undefined if n > size().
+        inline USF_CPP14_CONSTEXPR void remove_suffix(const size_type n) noexcept { m_end -= n; }
+
+    private:
+        // --------------------------------------------------------------------
+        // PRIVATE MEMBER VARIABLES
+        // --------------------------------------------------------------------
+
+        iterator m_begin{nullptr};
+        iterator m_end{nullptr};
+    };
+
+    using StringSpan  = BasicStringSpan<char>;
+    using WStringSpan = BasicStringSpan<wchar_t>;
+
+#if defined(USF_CPP20_CHAR8_T_SUPPORT)
+    using U8StringSpan = BasicStringSpan<char8_t>;
+#endif
+    using U16StringSpan = BasicStringSpan<char16_t>;
+    using U32StringSpan = BasicStringSpan<char32_t>;
+
+    using ByteStringSpan = BasicStringSpan<uint8_t>;
 
     template <typename CharT> class BasicStringView
     {
@@ -83,8 +750,7 @@ namespace ncore
 
         // -------- CONSTRUCTORS ----------------------------------------------
 
-        USF_CPP14_CONSTEXPR BasicStringView() noexcept = delete;
-
+        USF_CPP14_CONSTEXPR BasicStringView() noexcept                       = delete;
         USF_CPP14_CONSTEXPR BasicStringView(const BasicStringView&) noexcept = default;
         USF_CPP14_CONSTEXPR BasicStringView(BasicStringView&&) noexcept      = default;
 #if 0
@@ -95,7 +761,7 @@ namespace ncore
 #endif
         USF_CPP14_CONSTEXPR BasicStringView(const_pointer str) noexcept
             : m_begin{str}
-            , m_end{str + internal::CharTraits::length(str)}
+            , m_end{str + CharTraits<CharT>::length(str)}
         {
         }
 
@@ -654,9 +1320,543 @@ namespace ncore
         int8_t m_index     = -1;
     };
 
+    template <typename CharT> class Argument
+    {
+    public:
+        // --------------------------------------------------------------------
+        // PUBLIC TYPE ALIASES
+        // --------------------------------------------------------------------
+
+        using iterator       = CharT*;
+        using const_iterator = const CharT*;
+
+        using Format = ArgFormat<CharT>;
+
+        // --------------------------------------------------------------------
+        // PUBLIC MEMBER FUNCTIONS
+        // --------------------------------------------------------------------
+
+        constexpr Argument() = delete;
+
+        constexpr Argument(const bool value) noexcept
+            : m_bool(value)
+            , m_type_id(TypeId::kBool)
+        {
+        }
+
+        constexpr Argument(const CharT value) noexcept
+            : m_char(value)
+            , m_type_id(TypeId::kChar)
+        {
+        }
+
+        constexpr Argument(const int32_t value) noexcept
+            : m_int32(value)
+            , m_type_id(TypeId::kInt32)
+        {
+        }
+
+        constexpr Argument(const uint32_t value) noexcept
+            : m_uint32(value)
+            , m_type_id(TypeId::kUint32)
+        {
+        }
+
+        constexpr Argument(const int64_t value) noexcept
+            : m_int64(value)
+            , m_type_id(TypeId::kInt64)
+        {
+        }
+
+        constexpr Argument(const uint64_t value) noexcept
+            : m_uint64(value)
+            , m_type_id(TypeId::kUint64)
+        {
+        }
+
+        constexpr Argument(const void* value) noexcept
+            : m_pointer(reinterpret_cast<std::uintptr_t>(value))
+            , m_type_id(TypeId::kPointer)
+        {
+        }
+
+#if !defined(USF_DISABLE_FLOAT_SUPPORT)
+        constexpr Argument(const double value) noexcept
+            : m_float(value)
+            , m_type_id(TypeId::kFloat)
+        {
+        }
+#endif
+        constexpr Argument(const BasicStringView<CharT> value) noexcept
+            : m_string(value)
+            , m_type_id(TypeId::kString)
+        {
+        }
+
+        USF_CPP14_CONSTEXPR void format(BasicStringSpan<CharT>& dst, Format& format) const
+        {
+            iterator it = dst.begin();
+
+            switch (m_type_id)
+            {
+                case TypeId::kBool: format_bool(it, dst.end(), format, m_bool); break;
+                case TypeId::kChar: format_char(it, dst.end(), format, m_char); break;
+                case TypeId::kInt32: format_integer(it, dst.end(), format, m_int32); break;
+                case TypeId::kUint32: format_integer(it, dst.end(), format, m_uint32); break;
+                case TypeId::kInt64: format_integer(it, dst.end(), format, m_int64); break;
+                case TypeId::kUint64: format_integer(it, dst.end(), format, m_uint64); break;
+                case TypeId::kPointer: format_pointer(it, dst.end(), format, m_pointer); break;
+#if !defined(USF_DISABLE_FLOAT_SUPPORT)
+                case TypeId::kFloat: format_float(it, dst.end(), format, m_float); break;
+#endif
+                case TypeId::kString: format_string(it, dst.end(), format, m_string); break;
+                case TypeId::kCustom:
+                    USF_ENFORCE(format.is_empty(), std::runtime_error);
+                    it = m_custom(dst).end();
+                    break;
+            }
+
+            dst.remove_prefix(it - dst.begin());
+        }
+
+    private:
+        // --------------------------------------------------------------------
+        // PRIVATE STATIC FUNCTIONS
+        // --------------------------------------------------------------------
+
+        static USF_CPP14_CONSTEXPR void format_bool(iterator& it, const_iterator end, const Format& format, const bool value)
+        {
+            if (format.type_is_none())
+            {
+                format_string(it, end, format, value ? "true" : "false", value ? 4 : 5);
+            }
+            else if (format.type_is_integer())
+            {
+                format_integer(it, end, format, static_cast<uint32_t>(value));
+            }
+            else
+            {
+                // Argument type / format mismatch
+                USF_CONTRACT_VIOLATION(std::runtime_error);
+            }
+        }
+
+        static USF_CPP14_CONSTEXPR void format_char(iterator& it, const_iterator end, Format& format, const CharT value)
+        {
+            if (format.type_is_none() || format.type_is_char())
+            {
+                // Characters and strings align to left by default.
+                format.default_align_left();
+
+                const int fill_after = format.write_alignment(it, end, 1, false);
+                *it++                = value;
+                CharTraits::assign(it, format.fill_char(), fill_after);
+            }
+            else if (format.type_is_integer())
+            {
+                format_integer(it, end, format, static_cast<int32_t>(value));
+            }
+            else
+            {
+                // Argument type / format mismatch
+                USF_CONTRACT_VIOLATION(std::runtime_error);
+            }
+        }
+
+        template <typename T, typename std::enable_if<std::is_signed<T>::value, bool>::type = true> static USF_CPP14_CONSTEXPR void format_integer(iterator& it, const_iterator end, const Format& format, const T value)
+        {
+            using unsigned_type = typename std::make_unsigned<T>::type;
+
+            const bool negative = (value < 0);
+            const auto uvalue   = static_cast<unsigned_type>(negative ? -value : value);
+
+            format_integer(it, end, format, uvalue, negative);
+        }
+
+        template <typename T, typename std::enable_if<std::is_unsigned<T>::value, bool>::type = true> static USF_CPP14_CONSTEXPR void format_integer(iterator& it, const_iterator end, const Format& format, const T value, const bool negative = false)
+        {
+            int fill_after = 0;
+
+            if (format.type_is_none() || format.type_is_integer_dec())
+            {
+                const auto digits = Integer::count_digits_dec(value);
+                fill_after        = format.write_alignment(it, end, digits, negative);
+                it += digits;
+                Integer::convert_dec(it, value);
+            }
+            else if (format.type_is_integer_hex())
+            {
+                const auto digits = Integer::count_digits_hex(value);
+                fill_after        = format.write_alignment(it, end, digits, negative);
+                it += digits;
+                Integer::convert_hex(it, value, format.uppercase());
+            }
+            else if (format.type_is_integer_oct())
+            {
+                const auto digits = Integer::count_digits_oct(value);
+                fill_after        = format.write_alignment(it, end, digits, negative);
+                it += digits;
+                Integer::convert_oct(it, value);
+            }
+            else if (format.type_is_integer_bin())
+            {
+                const auto digits = Integer::count_digits_bin(value);
+                fill_after        = format.write_alignment(it, end, digits, negative);
+                it += digits;
+                Integer::convert_bin(it, value);
+            }
+            else
+            {
+                // Argument type / format mismatch
+                USF_CONTRACT_VIOLATION(std::runtime_error);
+            }
+
+            CharTraits::assign(it, format.fill_char(), fill_after);
+        }
+
+        static USF_CPP14_CONSTEXPR void format_pointer(iterator& it, const_iterator end, const Format& format, const std::uintptr_t value)
+        {
+            if (format.type_is_none() || format.type_is_pointer())
+            {
+#if defined(USF_TARGET_64_BITS)
+                const auto ivalue = static_cast<uint64_t>(value);
+#else
+                const auto ivalue = static_cast<uint32_t>(value);
+#endif
+                const auto digits     = Integer::count_digits_hex(ivalue);
+                const auto fill_after = format.write_alignment(it, end, digits, false);
+                it += digits;
+                Integer::convert_hex(it, ivalue, format.uppercase());
+                CharTraits::assign(it, format.fill_char(), fill_after);
+            }
+            else
+            {
+                // Argument type / format mismatch
+                USF_CONTRACT_VIOLATION(std::runtime_error);
+            }
+        }
+
+#if !defined(USF_DISABLE_FLOAT_SUPPORT)
+        static USF_CPP14_CONSTEXPR void format_float(iterator& it, const_iterator end, const Format& format, double value)
+        {
+            // Test for argument type / format match
+            USF_ENFORCE(format.type_is_none() || format.type_is_float(), std::runtime_error);
+
+            if (std::isnan(value))
+            {
+                format_string(it, end, format, format.uppercase() ? "NAN" : "nan", 3);
+            }
+            else
+            {
+                const bool negative = std::signbit(value);
+
+                if (std::isinf(value))
+                {
+                    format_string(it, end, format, format.uppercase() ? "INF" : "inf", 3, negative);
+                }
+                else
+                {
+                    if (negative)
+                    {
+                        value = -value;
+                    }
+
+                    struct fp_t
+                    {
+                        union
+                        {
+                            double   d;
+                            uint64_t i;
+                        };
+                    };
+
+                    const fp_t fp_value{{value}};
+
+                    if (fp_value.i == 0)
+                    {
+                        format_float_zero(it, end, format, negative);
+                    }
+                    else if (value >= 1E-19 && value <= 1.8446744E19)
+                    {
+                        int precision = format.precision();
+
+                        if (precision < 0)
+                        {
+                            precision = 6;
+                        }
+
+                        bool format_fixed        = format.type_is_float_fixed();
+                        bool significant_figures = false;
+
+                        if (format.type_is_none() || format.type_is_float_general())
+                        {
+                            // General format
+                            significant_figures = true;
+
+                            if (precision > 0)
+                            {
+                                --precision;
+                            }
+                        }
+
+                        CharT significand[36]{}; // 34 characters should be the maximum size needed
+                        int   exponent = 0;
+
+                        const auto significand_size = Float::convert(significand, exponent, value, format_fixed, precision);
+
+                        if (significant_figures)
+                        {
+                            if (exponent >= -4 && exponent <= precision)
+                            {
+                                format_fixed = true;
+                            }
+
+                            if (!format.hash())
+                            {
+                                precision = significand_size - 1;
+                            }
+
+                            if (format_fixed)
+                            {
+                                precision -= exponent;
+                            }
+                        }
+
+                        int fill_after = 0;
+
+                        if (format_fixed)
+                        {
+                            // Fixed point format
+                            if (exponent < 0)
+                            {
+                                // 0.<0>SIGNIFICAND[0:N]<0>
+
+                                const int full_digits = precision + 2;
+                                fill_after            = format.write_alignment(it, end, full_digits, negative);
+
+                                *it++ = '0';
+                                *it++ = '.';
+
+                                int zero_digits = -exponent - 1;
+                                CharTraits::assign(it, '0', zero_digits);
+                                CharTraits::copy(it, significand, significand_size);
+
+                                // Padding is needed if conversion function removes trailing zeros.
+                                zero_digits = precision - zero_digits - significand_size;
+                                CharTraits::assign(it, '0', zero_digits);
+                            }
+                            else
+                            {
+                                const int full_digits = exponent + 1 + precision + static_cast<int>(precision > 0 || format.hash());
+                                fill_after            = format.write_alignment(it, end, full_digits, negative);
+
+                                const int ipart_digits = exponent + 1;
+
+                                if (ipart_digits >= significand_size)
+                                {
+                                    // [SIGNIFICAND]<0><.><0>
+
+                                    CharTraits::copy(it, significand, significand_size);
+                                    CharTraits::assign(it, '0', ipart_digits - significand_size);
+
+                                    if (precision > 0 || format.hash())
+                                    {
+                                        *it++ = '.';
+                                    }
+
+                                    if (precision > 0)
+                                    {
+                                        CharTraits::assign(it, '0', precision);
+                                    }
+                                }
+                                else
+                                {
+                                    // SIGNIFICAND[0:x].SIGNIFICAND[x:N]<0>
+
+                                    CharTraits::copy(it, significand, ipart_digits);
+                                    *it++ = '.';
+
+                                    const int copy_size = significand_size - ipart_digits;
+                                    CharTraits::copy(it, significand + ipart_digits, copy_size);
+
+                                    // Padding is needed if conversion function removes trailing zeros.
+                                    CharTraits::assign(it, '0', precision - copy_size);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Exponent format
+                            // SIGNIFICAND[0:N]<.>eEXP
+                            // OR
+                            // SIGNIFICAND[0].SIGNIFICAND[1:N]<0>eEXP
+
+                            const int full_digits = 5 + precision + static_cast<int>(precision > 0 || format.hash());
+                            fill_after            = format.write_alignment(it, end, full_digits, negative);
+
+                            *it++ = *significand;
+
+                            if (precision > 0 || format.hash())
+                            {
+                                *it++ = '.';
+
+                                const int copy_size = significand_size - 1;
+                                CharTraits::copy(it, significand + 1, copy_size);
+                                CharTraits::assign(it, '0', precision - copy_size);
+                            }
+
+                            write_float_exponent(it, exponent, format.uppercase());
+                        }
+
+                        CharTraits::assign(it, format.fill_char(), fill_after);
+
+                        // it += sprintf(it, "[%s] Size:%d Exponent:%d Precision:%d Fixed:%d->", significand, significand_size, exponent, precision, int(format_fixed));
+                    }
+                    else
+                    {
+                        format_string(it, end, format, format.uppercase() ? "OVF" : "ovf", 3, negative);
+                    }
+                }
+            }
+        }
+
+        static USF_CPP14_CONSTEXPR void write_float_exponent(iterator& it, int exponent, const bool uppercase) noexcept
+        {
+            *it++ = uppercase ? 'E' : 'e';
+
+            if (exponent < 0)
+            {
+                exponent = -exponent;
+                *it++    = '-';
+            }
+            else
+            {
+                *it++ = '+';
+            }
+
+            // No point in making a proper integer to string
+            // conversion for exponent since we only support [e-19; e19].
+            assert(exponent <= 19);
+
+            if (exponent < 10)
+            {
+                *it++ = '0';
+                *it++ = static_cast<CharT>('0' + exponent);
+            }
+            else
+            {
+                *it++ = '1';
+                *it++ = static_cast<CharT>('0' + (exponent - 10));
+            }
+        }
+
+        static USF_CPP14_CONSTEXPR void format_float_zero(iterator& it, const_iterator end, const Format& format, const bool negative)
+        {
+            int precision = 0;
+
+            if (format.type_is_float_fixed() || format.type_is_float_scientific())
+            {
+                precision = format.precision();
+            }
+
+            int digits = 1;
+
+            if (precision > 0)
+            {
+                digits += precision + 1;
+            }
+
+            if (format.type_is_float_scientific())
+            {
+                digits += 4;
+            }
+
+            const int fill_after = format.write_alignment(it, end, digits, negative);
+
+            *it++ = '0';
+
+            if (precision > 0)
+            {
+                *it++ = '.';
+                CharTraits::assign(it, '0', precision);
+            }
+
+            if (format.type_is_float_scientific())
+            {
+                *it++ = format.uppercase() ? 'E' : 'e';
+                *it++ = '+';
+                *it++ = '0';
+                *it++ = '0';
+            }
+
+            CharTraits::assign(it, format.fill_char(), fill_after);
+        }
+#endif // !defined(USF_DISABLE_FLOAT_SUPPORT)
+
+        static USF_CPP14_CONSTEXPR void format_string(iterator& it, const_iterator end, Format& format, const BasicStringView<CharT>& str)
+        {
+            // Test for argument type / format match
+            USF_ENFORCE(format.type_is_none() || format.type_is_string(), std::runtime_error);
+
+            // Characters and strings align to left by default.
+            format.default_align_left();
+
+            // If precision is specified use it up to string size.
+            const int str_length = (format.precision() == -1) ? static_cast<int>(str.size()) : std::min(static_cast<int>(format.precision()), static_cast<int>(str.size()));
+
+            format_string(it, end, format, str.data(), str_length);
+        }
+
+        template <typename CharSrc, typename std::enable_if<std::is_convertible<CharSrc, CharT>::value, bool>::type = true>
+        static USF_CPP14_CONSTEXPR void format_string(iterator& it, const_iterator end, const Format& format, const CharSrc* str, const int str_length, const bool negative = false)
+        {
+            const int fill_after = format.write_alignment(it, end, str_length, negative);
+
+            CharTraits::copy(it, str, str_length);
+            CharTraits::assign(it, format.fill_char(), fill_after);
+        }
+
+        // --------------------------------------------------------------------
+        // PRIVATE MEMBER VARIABLES
+        // --------------------------------------------------------------------
+
+        enum class TypeId
+        {
+            kBool = 0,
+            kChar,
+            kInt32,
+            kUint32,
+            kInt64,
+            kUint64,
+            kPointer,
+#if !defined(USF_DISABLE_FLOAT_SUPPORT)
+            kFloat,
+#endif
+            kString,
+            kCustom
+        };
+
+        union
+        {
+            bool           m_bool;
+            CharT          m_char;
+            int32_t        m_int32;
+            uint32_t       m_uint32;
+            int64_t        m_int64;
+            uint64_t       m_uint64;
+            std::uintptr_t m_pointer;
+#if !defined(USF_DISABLE_FLOAT_SUPPORT)
+            double m_float;
+#endif
+            BasicStringView<CharT> m_string;
+        };
+
+        TypeId m_type_id;
+    };
+
     static void Test()
     {
-        BasicStringView s("=+ 10.5d");
+        BasicStringView<char> s("=+ 10.5d");
         ArgFormat<char> f(s, 2);
     }
 
