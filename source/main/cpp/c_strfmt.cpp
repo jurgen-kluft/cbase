@@ -385,7 +385,7 @@ namespace ncore
             {
                 if (ipart != 0)
                 {
-                    CharTraits::assign(it, '0', fpart_padding);
+                    CharTraits<CharT>::assign(it, '0', fpart_padding);
                 }
 
                 it += fpart_digits;
@@ -567,7 +567,7 @@ namespace ncore
         // TEMPLATE PARAMETERS VALIDATION
         // --------------------------------------------------------------------
 
-        static_assert(std::is_trivial<CharT>::value && std::is_standard_layout<CharT>::value, "usf::BasicStringSpan: CharT must be a POD type (both trivial and standard-layout).");
+        static_assert(std::is_trivial<CharT>::value && std::is_standard_layout<CharT>::value, "BasicStringSpan: CharT must be a POD type (both trivial and standard-layout).");
 
         // --------------------------------------------------------------------
         // PUBLIC MEMBER FUNCTIONS
@@ -587,7 +587,7 @@ namespace ncore
 #endif
         USF_CPP14_CONSTEXPR BasicStringSpan(pointer str) noexcept
             : m_begin{str}
-            , m_end{str + internal::CharTraits::length(str)}
+            , m_end{str + internal::CharTraits<CharT>::length(str)}
         {
         }
 
@@ -866,6 +866,17 @@ namespace ncore
         const_iterator m_end{nullptr};
     };
 
+    using StringView  = BasicStringView<char>;
+    using WStringView = BasicStringView<wchar_t>;
+
+#if defined(USF_CPP20_CHAR8_T_SUPPORT)
+    using U8StringView = BasicStringView<char8_t>;
+#endif
+    using U16StringView = BasicStringView<char16_t>;
+    using U32StringView = BasicStringView<char32_t>;
+
+    using ByteStringView = BasicStringView<uint8_t>;
+
     template <typename CharT> class ArgFormat
     {
     public:
@@ -1126,7 +1137,7 @@ namespace ncore
                 if (al != Align::kLeft && al != Align::kNumeric)
                 {
                     // None (default right), Right or Center alignment
-                    CharTraits::assign(it, fill_char(), fill_count);
+                    CharTraits<CharT>::assign(it, fill_char(), fill_count);
                 }
 
                 write_sign(it, negative);
@@ -1134,7 +1145,7 @@ namespace ncore
 
                 if (al == Align::kNumeric)
                 {
-                    CharTraits::assign(it, fill_char(), fill_count);
+                    CharTraits<CharT>::assign(it, fill_char(), fill_count);
                 }
             }
 
@@ -1410,10 +1421,7 @@ namespace ncore
                 case TypeId::kFloat: format_float(it, dst.end(), format, m_float); break;
 #endif
                 case TypeId::kString: format_string(it, dst.end(), format, m_string); break;
-                case TypeId::kCustom:
-                    USF_ENFORCE(format.is_empty(), std::runtime_error);
-                    it = m_custom(dst).end();
-                    break;
+
             }
 
             dst.remove_prefix(it - dst.begin());
@@ -1450,7 +1458,7 @@ namespace ncore
 
                 const int fill_after = format.write_alignment(it, end, 1, false);
                 *it++                = value;
-                CharTraits::assign(it, format.fill_char(), fill_after);
+                CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
             }
             else if (format.type_is_integer())
             {
@@ -1511,7 +1519,7 @@ namespace ncore
                 USF_CONTRACT_VIOLATION(std::runtime_error);
             }
 
-            CharTraits::assign(it, format.fill_char(), fill_after);
+            CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
         }
 
         static USF_CPP14_CONSTEXPR void format_pointer(iterator& it, const_iterator end, const Format& format, const std::uintptr_t value)
@@ -1527,7 +1535,7 @@ namespace ncore
                 const auto fill_after = format.write_alignment(it, end, digits, false);
                 it += digits;
                 Integer::convert_hex(it, ivalue, format.uppercase());
-                CharTraits::assign(it, format.fill_char(), fill_after);
+                CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
             }
             else
             {
@@ -1638,12 +1646,12 @@ namespace ncore
                                 *it++ = '.';
 
                                 int zero_digits = -exponent - 1;
-                                CharTraits::assign(it, '0', zero_digits);
-                                CharTraits::copy(it, significand, significand_size);
+                                CharTraits<CharT>::assign(it, '0', zero_digits);
+                                CharTraits<CharT>::copy(it, significand, significand_size);
 
                                 // Padding is needed if conversion function removes trailing zeros.
                                 zero_digits = precision - zero_digits - significand_size;
-                                CharTraits::assign(it, '0', zero_digits);
+                                CharTraits<CharT>::assign(it, '0', zero_digits);
                             }
                             else
                             {
@@ -1656,8 +1664,8 @@ namespace ncore
                                 {
                                     // [SIGNIFICAND]<0><.><0>
 
-                                    CharTraits::copy(it, significand, significand_size);
-                                    CharTraits::assign(it, '0', ipart_digits - significand_size);
+                                    CharTraits<CharT>::copy(it, significand, significand_size);
+                                    CharTraits<CharT>::assign(it, '0', ipart_digits - significand_size);
 
                                     if (precision > 0 || format.hash())
                                     {
@@ -1666,21 +1674,21 @@ namespace ncore
 
                                     if (precision > 0)
                                     {
-                                        CharTraits::assign(it, '0', precision);
+                                        CharTraits<CharT>::assign(it, '0', precision);
                                     }
                                 }
                                 else
                                 {
                                     // SIGNIFICAND[0:x].SIGNIFICAND[x:N]<0>
 
-                                    CharTraits::copy(it, significand, ipart_digits);
+                                    CharTraits<CharT>::copy(it, significand, ipart_digits);
                                     *it++ = '.';
 
                                     const int copy_size = significand_size - ipart_digits;
-                                    CharTraits::copy(it, significand + ipart_digits, copy_size);
+                                    CharTraits<CharT>::copy(it, significand + ipart_digits, copy_size);
 
                                     // Padding is needed if conversion function removes trailing zeros.
-                                    CharTraits::assign(it, '0', precision - copy_size);
+                                    CharTraits<CharT>::assign(it, '0', precision - copy_size);
                                 }
                             }
                         }
@@ -1701,14 +1709,14 @@ namespace ncore
                                 *it++ = '.';
 
                                 const int copy_size = significand_size - 1;
-                                CharTraits::copy(it, significand + 1, copy_size);
-                                CharTraits::assign(it, '0', precision - copy_size);
+                                CharTraits<CharT>::copy(it, significand + 1, copy_size);
+                                CharTraits<CharT>::assign(it, '0', precision - copy_size);
                             }
 
                             write_float_exponent(it, exponent, format.uppercase());
                         }
 
-                        CharTraits::assign(it, format.fill_char(), fill_after);
+                        CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
 
                         // it += sprintf(it, "[%s] Size:%d Exponent:%d Precision:%d Fixed:%d->", significand, significand_size, exponent, precision, int(format_fixed));
                     }
@@ -1778,7 +1786,7 @@ namespace ncore
             if (precision > 0)
             {
                 *it++ = '.';
-                CharTraits::assign(it, '0', precision);
+                CharTraits<CharT>::assign(it, '0', precision);
             }
 
             if (format.type_is_float_scientific())
@@ -1789,7 +1797,7 @@ namespace ncore
                 *it++ = '0';
             }
 
-            CharTraits::assign(it, format.fill_char(), fill_after);
+            CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
         }
 #endif // !defined(USF_DISABLE_FLOAT_SUPPORT)
 
@@ -1812,8 +1820,8 @@ namespace ncore
         {
             const int fill_after = format.write_alignment(it, end, str_length, negative);
 
-            CharTraits::copy(it, str, str_length);
-            CharTraits::assign(it, format.fill_char(), fill_after);
+            CharTraits<CharT>::copy(it, str, str_length);
+            CharTraits<CharT>::assign(it, format.fill_char(), fill_after);
         }
 
         // --------------------------------------------------------------------
@@ -1854,10 +1862,202 @@ namespace ncore
         TypeId m_type_id;
     };
 
+    // Boolean
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const bool arg) { return arg; }
+
+    // Character (char)
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const char arg) { return static_cast<CharT>(arg); }
+
+    // Character (CharT != char)
+    template <typename CharT, typename std::enable_if<!std::is_same<CharT, char>::value, bool>::type = true> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const CharT arg) { return arg; }
+
+    // 8 bit signed integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int8_t arg) { return static_cast<int32_t>(arg); }
+
+    // 8 bit unsigned integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint8_t arg) { return static_cast<uint32_t>(arg); }
+
+    // 16 bit signed integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int16_t arg) { return static_cast<int32_t>(arg); }
+
+    // 16 bit unsigned integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint16_t arg) { return static_cast<uint32_t>(arg); }
+
+    // 32 bit signed integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int arg) { return static_cast<int32_t>(arg); }
+
+    // 32 bit unsigned integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const unsigned int arg) { return static_cast<uint32_t>(arg); }
+
+#if (__LONG_MAX__ != __LONG_LONG_MAX__)
+
+    // 32 bit signed integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const long int arg) { return static_cast<int32_t>(arg); }
+
+    // 32 bit unsigned integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const unsigned long int arg) { return static_cast<uint32_t>(arg); }
+
+#endif // (__LONG_MAX__ != __LONG_LONG_MAX__)
+
+    // 64 bit signed integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const int64_t arg)
+    {
+        if (arg >= std::numeric_limits<int32_t>::min() && arg <= std::numeric_limits<int32_t>::max())
+        {
+            return static_cast<int32_t>(arg);
+        }
+
+        return arg;
+    }
+
+    // 64 bit unsigned integer
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const uint64_t arg)
+    {
+        if (arg <= std::numeric_limits<uint32_t>::max())
+        {
+            return static_cast<uint32_t>(arg);
+        }
+
+        return arg;
+    }
+
+    // Pointer (void*)
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(void* arg) { return arg; }
+
+    // Pointer (const void*)
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const void* arg) { return arg; }
+
+#if !defined(USF_DISABLE_FLOAT_SUPPORT)
+    // Floating point (float)
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(float arg) { return static_cast<double>(arg); }
+
+    // Floating point (double)
+    template <typename CharT> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(double arg) { return arg; }
+#endif // !defined(USF_DISABLE_FLOAT_SUPPORT)
+
+    // String (convertible to string view)
+    template <typename CharT, typename T, typename std::enable_if<std::is_convertible<T, BasicStringView<CharT>>::value, bool>::type = true> inline USF_CPP14_CONSTEXPR Argument<CharT> make_argument(const T& arg) { return BasicStringView<CharT>(arg); }
+
+    template <typename CharT> USF_CPP14_CONSTEXPR void parse_format_string(BasicStringSpan<CharT>& str, BasicStringView<CharT>& fmt)
+    {
+        CharT*       str_it = str.begin();
+        const CharT* fmt_it = fmt.cbegin();
+
+        while (fmt_it < fmt.cend() && str_it < str.end())
+        {
+            if (*fmt_it == '{')
+            {
+                if (*(fmt_it + 1) == '{')
+                {
+                    // Found '{{' escape character, skip the first and copy the second '{'.
+                    ++fmt_it;
+                    *str_it++ = *fmt_it++;
+                }
+                else
+                {
+                    // A type format should follow...
+                    break;
+                }
+            }
+            else if (*fmt_it == '}')
+            {
+                USF_ENFORCE(*(fmt_it + 1) == '}', std::runtime_error);
+
+                // Found '}}' escape character, skip the first and copy the second '}'.
+                ++fmt_it;
+                *str_it++ = *fmt_it++;
+            }
+            else
+            {
+                // Copy literal text
+                *str_it++ = *fmt_it++;
+            }
+        }
+
+        // USF_ENFORCE(str_it < str.end(), std::runtime_error);
+
+        str.remove_prefix(str_it - str.begin());
+        fmt.remove_prefix(fmt_it - fmt.cbegin());
+    }
+
+    template <typename CharT> USF_CPP14_CONSTEXPR void process(BasicStringSpan<CharT>& str, BasicStringView<CharT>& fmt, const Argument<CharT>* const args, const int arg_count)
+    {
+        // Argument's sequential index
+        int arg_seq_index = 0;
+
+        parse_format_string(str, fmt);
+
+        while (!fmt.empty())
+        {
+            ArgFormat<CharT> format(fmt, arg_count);
+
+            // Determine which argument index to use, sequential or positional.
+            int arg_index = format.index();
+
+            if (arg_index < 0)
+            {
+                USF_ENFORCE(arg_seq_index < arg_count, std::runtime_error);
+                arg_index = arg_seq_index++;
+            }
+
+            args[arg_index].format(str, format);
+
+            parse_format_string(str, fmt);
+        }
+    }
+
+    template <typename CharT, typename... Args> USF_CPP14_CONSTEXPR BasicStringSpan<CharT> basic_format_to(BasicStringSpan<CharT> str, BasicStringView<CharT> fmt)
+    {
+        auto str_begin = str.begin();
+
+        internal::parse_format_string(str, fmt);
+
+        USF_ENFORCE(fmt.empty(), std::runtime_error);
+
+#if !defined(USF_DISABLE_STRING_TERMINATION)
+        // If not disabled in configuration, null terminate the resulting string.
+        str[0] = CharT{};
+#endif
+
+        // Return a string span to the resulting string
+        return BasicStringSpan<CharT>(str_begin, str.begin());
+    }
+
+    template <typename CharT, typename... Args> USF_CPP14_CONSTEXPR BasicStringSpan<CharT> basic_format_to(BasicStringSpan<CharT> str, BasicStringView<CharT> fmt, Args&&... args)
+    {
+        auto str_begin = str.begin();
+
+        const Argument<CharT> arguments[sizeof...(Args)]{make_argument<CharT>(args)...};
+
+        process(str, fmt, arguments, static_cast<int>(sizeof...(Args)));
+
+#if !defined(USF_DISABLE_STRING_TERMINATION)
+        // If not disabled in configuration, null terminate the resulting string.
+        str[0] = CharT{};
+#endif
+
+        // Return a string span to the resulting string
+        return BasicStringSpan<CharT>(str_begin, str.begin());
+    }
+
+    template <typename CharT, typename... Args> USF_CPP14_CONSTEXPR CharT* basic_format_to(CharT* str, const std::ptrdiff_t str_count, BasicStringView<CharT> fmt, Args&&... args)
+    {
+        return basic_format_to(BasicStringSpan<CharT>(str, str_count), fmt, args...).end();
+    }
+
+    // ----------------------------------------------------------------------------
+    // Formats a char string
+    // ---------------------------------------------------------------------------
+    template <typename... Args> USF_CPP14_CONSTEXPR StringSpan format_to(StringSpan str, StringView fmt, Args&&... args) { return basic_format_to(str, fmt, args...); }
+    template <typename... Args> USF_CPP14_CONSTEXPR char*      format_to(char* str, const std::ptrdiff_t str_count, StringView fmt, Args&&... args) { return basic_format_to(str, str_count, fmt, args...); }
+
     static void Test()
     {
         BasicStringView<char> s("=+ 10.5d");
-        ArgFormat<char> f(s, 2);
+        ArgFormat<char>       f(s, 2);
+
+        char str[128];
+        format_to(str, 128, "{:14}", false);
     }
 
 } // namespace ncore
