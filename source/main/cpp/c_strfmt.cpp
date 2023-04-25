@@ -1921,69 +1921,24 @@ namespace ncore
             }
         }
 
-        template <typename CharT, typename... Args> USF_CPP14_CONSTEXPR BasicStringSpan<CharT> basic_format_to(BasicStringSpan<CharT> str, BasicStringView<CharT> fmt)
+        bool toStr(ascii::prune str, ascii::prune end, ascii::prune fmt, args_t& args)
         {
-            auto str_begin = str.begin();
-
-            parse_format_string(str, fmt);
-
-            USF_ENFORCE(fmt.empty(), std::runtime_error);
-
-#if !defined(USF_DISABLE_STRING_TERMINATION)
-            // If not disabled in configuration, null terminate the resulting string.
-            str[0] = CharT{};
-#endif
-
-            // Return a string span to the resulting string
-            return BasicStringSpan<CharT>(str_begin, str.begin());
+            BasicStringSpan str_span(str, end);
+            BasicStringView fmt_view(fmt);
+            BasicStringSpan result_span = process(str_span, fmt_view, args);
+            return result_span.end() > result_span.begin();
         }
-
-        template <typename CharT, typename... Args> USF_CPP14_CONSTEXPR BasicStringSpan<CharT> basic_format_to(BasicStringSpan<CharT> str, BasicStringView<CharT> fmt, Args&&... args)
-        {
-            auto str_begin = str.begin();
-
-            const Argument<CharT> arguments[sizeof...(Args)]{make_argument<CharT>(args)...};
-
-            process(str, fmt, arguments, static_cast<int>(sizeof...(Args)));
-
-#if !defined(USF_DISABLE_STRING_TERMINATION)
-            // If not disabled in configuration, null terminate the resulting string.
-            str[0] = CharT{};
-#endif
-
-            // Return a string span to the resulting string
-            return BasicStringSpan<CharT>(str_begin, str.begin());
-        }
-
-        template <typename CharT, typename... Args> USF_CPP14_CONSTEXPR CharT* basic_format_to(CharT* str, const std::ptrdiff_t str_count, BasicStringView<CharT> fmt, Args&&... args)
-        {
-            return basic_format_to(BasicStringSpan<CharT>(str, str_count), fmt, args...).end();
-        }
-
-        // There is really NO need to make all of the above using templates, the only 2 'smart' objects you need are:
-        //   - string reader
-        //   - string writer
-        //
-        // And we basically already have this with crunes_t and runes_t.
-        // 
-
-
-        // ----------------------------------------------------------------------------
-        // Formats a char string
-        // ---------------------------------------------------------------------------
-        template <typename... Args> USF_CPP14_CONSTEXPR StringSpan format_to(StringSpan str, StringView fmt, Args&&... args) { return basic_format_to(str, fmt, args...); }
-        template <typename... Args> USF_CPP14_CONSTEXPR char*      format_to(char* str, const std::ptrdiff_t str_count, StringView fmt, Args&&... args) { return basic_format_to(str, str_count, fmt, args...); }
 
         static void Test()
         {
-            BasicStringView<char> s("=+ 10.5d");
-            ArgFormat<char>       f(s, 2);
+            char s[128];
+            toStr(s, 128, "Hello {:s}!", "world");
 
             char str[128];
-            format_to(str, 128, "{:14}", false);
+            toStr(str, 128, "{:14}", false);
+            toStr(str, 128, "{0}{1}", false, 100.0f);
+            toStr(str, 128, "{0}{1}{2}", false, 100.0f, 10);
         }
-
-        bool to(ascii::prune str, ascii::prune end, ascii::prune fmt, arg_t a, arg_t b, arg_t c, arg_t d, arg_t e, arg_t f, arg_t g, arg_t h, arg_t i, arg_t j, arg_t k, arg_t l) {}
 
     } // namespace fmt
 } // namespace ncore
