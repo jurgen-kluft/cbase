@@ -1528,15 +1528,15 @@ namespace ncore
 
         static s32 divmod10(u32 value, s8& remainder)
         {
-            const u32 q = (value / 10) * 10;
-            remainder   = (s8)(value - q);
+            const u32 q = (value / 10);
+            remainder   = (s8)(value - (q*10));
             return (s32)(q);
         }
 
         static s32 divmod10(s32 value, s8& remainder)
         {
-            const s32 q = (value / 10) * 10;
-            remainder   = (s8)(value - q);
+            const s32 q = (value / 10);
+            remainder   = (s8)(value - (q*10));
             return q;
         }
 
@@ -1575,7 +1575,7 @@ namespace ncore
 
                     do
                     {
-                        sval = divmod10(val, mod);
+                        sval = divmod10(sval, mod);
                         c    = toChar(mod);
                         w -= 1;
                         *w = c;
@@ -1637,15 +1637,15 @@ namespace ncore
 
         static s64 divmod10(u64 value, s8& remainder)
         {
-            const u64 q = (value / 10) * 10;
-            remainder   = (s8)(value - q);
+            const u64 q = (value / 10);
+            remainder   = (s8)(value - (q * 10));
             return (s64)(q);
         }
 
         static s64 divmod10(s64 value, s8& remainder)
         {
-            const s64 q = (value / 10) * 10;
-            remainder   = (s8)(value - q);
+            const s64 q = (value / 10);
+            remainder   = (s8)(value - (q * 10));
             return q;
         }
 
@@ -1671,7 +1671,7 @@ namespace ncore
                     if (val > ((~(u64)0) >> 1))
                     {
                         sval = divmod10(val, mod);
-                        c    = toChar((s32)mod);
+                        c    = toChar(mod);
                         *--w = c;
                     }
                     else
@@ -1682,7 +1682,7 @@ namespace ncore
                     do
                     {
                         sval = divmod10(sval, mod);
-                        c    = toChar(sval % 10);
+                        c    = toChar(mod);
                         *--w = c;
                     } while (sval != 0);
 
@@ -1721,7 +1721,7 @@ namespace ncore
 
             // The conversion might not use all 10 characters, so we need to
             // move the characters down to the bottom of the buffer.
-            const char* we = cursor + 10;
+            const char* we = cursor + 20;
             while (w < we)
                 *cursor++ = *w++;
 
