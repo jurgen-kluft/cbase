@@ -29,9 +29,8 @@ namespace ncore
 
 			char buf[128];
 			char* end = fmt::toStr(buf, 128, "{}/{:02d}/{:02d}", 1900 + time->tm_year, time->tm_mon + 1, time->tm_mday);
-			s32 len = (s32)(end - buf);
 			
-            state.write_alignment(dst, len, false);
+            ArgFormatState::format_string(dst, state, buf, end);
 
             // write out the date time string
             // using 'state' information to format the string

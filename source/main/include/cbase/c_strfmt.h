@@ -125,9 +125,8 @@ namespace ncore
                 kInvalid
             };
 
-            // Writes the alignment (sign, prefix and fill before) for any
-            // argument type. Returns the fill counter to write after argument.
-            int write_alignment(BasicStringSpan& it, int digits, const bool negative) const;
+            static void format_string(BasicStringSpan& it, ArgFormatState& state, const char* str, const char* end);
+            static void format_string(BasicStringSpan& it, ArgFormatState& state, const BasicStringView& str);
 
             inline constexpr char fill_char() const noexcept { return m_fill_char; }
             inline constexpr Type type() const noexcept { return m_type; }
@@ -168,6 +167,14 @@ namespace ncore
             }
 
         protected:
+            friend class Arg;
+            
+            // Writes the alignment (sign, prefix and fill before) for any
+            // argument type. Returns the fill counter to write after argument.
+            int write_alignment(BasicStringSpan& it, int digits, const bool negative) const;
+
+            static void format_string(BasicStringSpan& it, const ArgFormatState& state, BasicStringView& str, const int str_length, const bool negative = false);
+
             inline constexpr int sign_width(const bool negative) const noexcept { return (!negative && sign() <= Sign::kMinus) ? 0 : 1; }
 
             // Alternative format is valid for hexadecimal (including pointers), octal, binary and all floating point types.

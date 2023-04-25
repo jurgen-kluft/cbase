@@ -969,6 +969,36 @@ namespace ncore
             ArgFormatState state;
         };
 
+        void ArgFormatState::format_string(BasicStringSpan& it, ArgFormatState& state, const char* str, const char* end) 
+        { 
+            BasicStringView strview(str, end);
+            format_string(it, state, strview);
+        }
+
+        void ArgFormatState::format_string(BasicStringSpan& it, ArgFormatState& state, const BasicStringView& str)
+        {
+            // Test for argument type / format match
+            FMT_CHECK(state.type_is_none() || state.type_is_string(), std::runtime_error);
+
+            // TODO Characters and strings align to left by default.
+            // default_align_left();
+
+            // If precision is specified use it up to string size.
+            BasicStringView src(str);
+            const int       src_length = (state.precision() == -1) ? static_cast<int>(src.length()) : std::min(static_cast<int>(state.precision()), static_cast<int>(src.length()));
+
+            format_string(it, state, src, src_length);
+        }
+
+        void ArgFormatState::format_string(BasicStringSpan& it, const ArgFormatState& state, BasicStringView& str, const int str_length, const bool negative)
+        {
+            const int fill_after = state.write_alignment(it, str_length, negative);
+
+            CharTraits::copy(it, str, str_length);
+            CharTraits::assign(it, state.fill_char(), fill_after);
+        }
+
+
         class Arg
         {
         public:
@@ -994,7 +1024,7 @@ namespace ncore
                     case kPointer: format_pointer(it, format, argValue); break;
                     case kFloat: format_float(it, format, arg_t<float>::decode(argValue)); break;
                     case kDouble: format_float(it, format, arg_t<double>::decode(argValue)); break;
-                    case kString: format_string(it, format, arg_t<const char*>::decode(argValue)); break;
+                    case kString: ArgFormatState::format_string(it, format, arg_t<const char*>::decode(argValue)); break;
                 }
 
                 dst = it;
@@ -1011,7 +1041,7 @@ namespace ncore
                 {
                     s32 const       len = value ? 4 : 5;
                     BasicStringView src(value ? "true" : "false", len);
-                    format_string(it, state, src, len);
+                    ArgFormatState::format_string(it, state, src, len);
                 }
                 else if (state.type_is_integer())
                 {
@@ -1136,7 +1166,7 @@ namespace ncore
                 if (std::isnan(value))
                 {
                     BasicStringView src(state.uppercase() ? "NAN" : "nan", 3);
-                    format_string(it, state, src, 3);
+                    ArgFormatState::format_string(it, state, src, 3);
                 }
                 else
                 {
@@ -1145,7 +1175,7 @@ namespace ncore
                     if (std::isinf(value))
                     {
                         BasicStringView src(state.uppercase() ? "INF" : "inf", 3);
-                        format_string(it, state, src, 3, negative);
+                        ArgFormatState::format_string(it, state, src, 3, negative);
                     }
                     else
                     {
@@ -1307,7 +1337,7 @@ namespace ncore
                         else
                         {
                             BasicStringView src(state.uppercase() ? "NAN" : "nan", 3);
-                            format_string(it, state, src, 3, negative);
+                            ArgFormatState::format_string(it, state, src, 3, negative);
                         }
                     }
                 }
@@ -1388,29 +1418,6 @@ namespace ncore
                 }
 
                 CharTraits::assign(out, state.fill_char(), fill_after);
-            }
-
-            static void format_string(BasicStringSpan& it, ArgFormatState& state, const BasicStringView& str)
-            {
-                // Test for argument type / format match
-                FMT_CHECK(state.type_is_none() || state.type_is_string(), std::runtime_error);
-
-                // TODO Characters and strings align to left by default.
-                // default_align_left();
-
-                // If precision is specified use it up to string size.
-                BasicStringView src(str);
-                const int       src_length = (state.precision() == -1) ? static_cast<int>(src.length()) : std::min(static_cast<int>(state.precision()), static_cast<int>(src.length()));
-
-                format_string(it, state, src, src_length);
-            }
-
-            static void format_string(BasicStringSpan& it, const ArgFormatState& state, BasicStringView& str, const int str_length, const bool negative = false)
-            {
-                const int fill_after = state.write_alignment(it, str_length, negative);
-
-                CharTraits::copy(it, str, str_length);
-                CharTraits::assign(it, state.fill_char(), fill_after);
             }
         };
 
