@@ -4030,13 +4030,9 @@ namespace ncore
         m_cursor = str;
     }
     runes_reader_t::runes_reader_t(crunes_t const& runes)
+        : m_runes(runes)
     {
-        m_runes.m_type        = runes.m_type;
-        m_runes.m_ascii.m_bos = runes.m_ascii.m_str;
-        m_runes.m_ascii.m_eos = runes.m_ascii.m_eos;
-        m_runes.m_ascii.m_str = runes.m_ascii.m_str;
-        m_runes.m_ascii.m_end = runes.m_ascii.m_end;
-        m_cursor              = m_runes.m_ascii.m_str;
+        m_cursor = m_runes.m_ascii.m_str;
     }
 
     crunes_t runes_reader_t::get_source() const
@@ -4047,12 +4043,8 @@ namespace ncore
 
     crunes_t runes_reader_t::get_current() const
     {
-        crunes_t str;
-        str.m_type        = m_runes.m_type;
-        str.m_ascii.m_bos = m_runes.m_ascii.m_bos;
+        crunes_t str(m_runes);
         str.m_ascii.m_str = m_cursor.m_ascii;
-        str.m_ascii.m_eos = m_runes.m_ascii.m_eos;
-        str.m_ascii.m_end = m_runes.m_ascii.m_end;
         return str;
     }
 
@@ -4191,12 +4183,15 @@ namespace ncore
     runes_reader_t runes_reader_t::select(crunes_t::ptr_t const& from, crunes_t::ptr_t to) const
     {
         runes_reader_t reader;
-        reader.m_runes.m_type        = m_runes.m_type;
-        reader.m_runes.m_ascii.m_bos = m_runes.m_ascii.m_str;
-        reader.m_runes.m_ascii.m_eos = m_runes.m_ascii.m_eos;
-        reader.m_runes.m_ascii.m_str = from.m_ascii;
-        reader.m_runes.m_ascii.m_end = to.m_ascii;
-        reader.m_cursor              = from;
+        if (from.m_ascii >= reader.m_runes.m_ascii.m_bos && to.m_ascii <= reader.m_runes.m_ascii.m_eos)
+        {
+            reader.m_runes.m_type        = m_runes.m_type;
+            reader.m_runes.m_ascii.m_bos = m_runes.m_ascii.m_str;
+            reader.m_runes.m_ascii.m_eos = m_runes.m_ascii.m_eos;
+            reader.m_runes.m_ascii.m_str = from.m_ascii;
+            reader.m_runes.m_ascii.m_end = to.m_ascii;
+            reader.m_cursor              = from;
+        }
         return reader;
     }
 

@@ -5,6 +5,16 @@
 #    pragma once
 #endif
 
+// TODO
+
+// Mirror all functions from main runes_t and crunes_t in:
+// - ascii runes_t and crunes_t
+// - utf-8
+// - utf-16
+// - utf-32
+
+// The result is that we can also use them separately
+
 namespace ncore
 {
 #undef printf
@@ -215,10 +225,7 @@ namespace ncore
     {
         struct ptr_t
         {
-            ptr_t()
-                : m_ascii(nullptr)
-            {
-            }
+            ptr_t();
             ptr_t(ascii::prune ptr)
                 : m_ascii(ptr)
             {
