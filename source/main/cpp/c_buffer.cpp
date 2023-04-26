@@ -501,14 +501,14 @@ namespace ncore
     {
         if (size() == 0)
             return -1;
-        u32 const offset          = m_cursor;
-        out_str.m_type                = read_s32();
-        u32 const strlen              = read_u32();
-        out_str.m_ascii.m_bos = (char const*)(m_buffer + m_cursor);
-        out_str.m_ascii.m_str = (out_str.m_ascii.m_bos);
-        out_str.m_ascii.m_end = (out_str.m_ascii.m_bos + strlen);
-        out_str.m_ascii.m_eos = (out_str.m_ascii.m_bos + strlen);
-        m_cursor += strlen;
+        u32 const offset               = m_cursor;
+        out_str.m_ascii.m_flags        = read_s32();
+        u32 const datalen              = read_u32();
+        out_str.m_ascii.m_bos          = (char const*)(m_buffer + m_cursor);
+        out_str.m_ascii.m_str          = 0;
+        out_str.m_ascii.m_end          = datalen;
+        out_str.m_ascii.m_eos          = datalen;
+        m_cursor += datalen;
         return offset;
     }
 
@@ -781,20 +781,20 @@ namespace ncore
     u32 binary_writer_t::write_string(crunes_t const& str)
     {
         u32 const   offset = m_cursor;
-        char const* srcstr = str.m_ascii.m_str;
-        char const* srcend = str.m_ascii.m_end;
-        u32 const   size   = (u32)(srcend - srcstr);
-        if (can_write(4 + 4 + size))
+        char const* srcstr   = &str.m_ascii.m_bos[str.m_ascii.m_str];
+        char const* srcend   = &str.m_ascii.m_bos[str.m_ascii.m_end];
+        u32 const   datasize = (u32)(srcend - srcstr);
+        if (can_write(4 + 4 + datasize))
         {
-            write(str.m_type);
-            write((u32)size);
+            write(str.m_ascii.m_flags);
+            write((u32)datasize);
 
             char* dststr = (char*)m_buffer + m_cursor;
             while (srcstr < srcend)
             {
                 *dststr++ = *srcstr++;
             }
-            m_cursor += size;
+            m_cursor += datasize;
             return offset;
         }
         return -1;

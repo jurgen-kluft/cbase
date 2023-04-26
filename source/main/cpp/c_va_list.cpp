@@ -16,7 +16,7 @@ namespace ncore
 
     va_t::va_t(crunes_t const& str) : mType(TYPE_PCRUNES)
     {
-        mArg[0] = str.m_type;
+        mArg[0] = str.m_ascii.m_flags;
         mArg[1] = (u64)str.m_ascii.m_str;
         mArg[2] = (u64)str.m_ascii.m_end;
     }
@@ -81,7 +81,7 @@ namespace ncore
             case TYPE_PCRUNES:
             {
                 crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
-                ch.m_type = (s32)mArg[0];
+                ch.m_ascii.m_flags = (s32)mArg[0];
                 copy(ch, str);
             }
             break;
@@ -163,7 +163,7 @@ namespace ncore
             case TYPE_PCRUNES:
             {
                 crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
-                ch.m_type = (s32)mArg[0];
+                ch.m_ascii.m_flags = (s32)mArg[0];
                 parse(ch, i);
             }
             break;
@@ -223,7 +223,7 @@ namespace ncore
             case TYPE_PCRUNES:
             {
                 crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
-                ch.m_type = (s32)mArg[0];
+                ch.m_ascii.m_flags= (s32)mArg[0];
                 parse(ch, i);
             }
             break;
@@ -278,7 +278,7 @@ namespace ncore
             case TYPE_PCRUNES:
             {
                 crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
-                ch.m_type = (s32)mArg[0];
+                ch.m_ascii.m_flags = (s32)mArg[0];
                 parse(ch, i);
             }
             break;
@@ -333,7 +333,7 @@ namespace ncore
             case TYPE_PCRUNES:
             {
                 crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
-                ch.m_type = (s32)mArg[0];
+                ch.m_ascii.m_flags = (s32)mArg[0];
                 parse(ch, i);
             }
             break;
@@ -387,7 +387,7 @@ namespace ncore
             case TYPE_PCRUNES:
             {
                 crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
-                ch.m_type = (s32)mArg[0];
+                ch.m_ascii.m_flags = (s32)mArg[0];
                 bool b    = false;
                 parse(ch, b);
                 i = b ? 1 : 0;
@@ -407,7 +407,7 @@ namespace ncore
             case TYPE_PCRUNES:
             {
                 crunes_t ch((ascii::pcrune)mArg[1], (ascii::pcrune)mArg[2]);
-                ch.m_type = (s32)mArg[0];
+                ch.m_ascii.m_flags = (s32)mArg[0];
                 return ch;
             }
             default: break; // Fall through

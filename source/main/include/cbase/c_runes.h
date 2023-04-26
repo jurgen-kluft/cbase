@@ -600,17 +600,17 @@ namespace ncore
         };
         T m_run[SIZE];
         inline runez_t()
-            : runes_t(m_run, m_run, &m_run[SIZE - 1])
+            : runes_t(m_run, 0, 0, SIZE - 1)
         {
         }
         inline runez_t(uchar32 c)
-            : runes_t(m_run, &m_run[1])
+            : runes_t(m_run, 0, 1, SIZE - 1)
         {
             m_run[0] = c;
             m_run[1] = 0;
         }
         inline runez_t(const char* _str)
-            : runes_t(m_run, m_run, m_run, &m_run[SIZE - 1])
+            : runes_t(m_run, 0, 0, SIZE - 1)
         {
             crunes_t str((ascii::pcrune)_str);
             concatenate(*this, str);
@@ -628,7 +628,7 @@ namespace ncore
         T m_run[SIZE];
 
         inline crunez_t(uchar32 c)
-            : crunes_t(m_run, &m_run[1])
+            : crunes_t(m_run, 0, 1, SIZE - 1)
         {
             m_run[0] = c;
             m_run[1] = 0;

@@ -7,9 +7,9 @@
 
 namespace ncore
 {
-#define XCONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
+#define D_CONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
     type::rune local_var_name##Buffer[size];               \
-    runes_t    local_var_name(local_var_name##Buffer, local_var_name##Buffer, local_var_name##Buffer, &local_var_name##Buffer[size - 1], type::TYPE);
+    runes_t    local_var_name(local_var_name##Buffer, 0, 0, (u32)size, type::TYPE);
 
     class xconsole_null : public console_t
     {
@@ -99,42 +99,42 @@ namespace ncore
 
     void xconsole_default::write(f64 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
+        D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
         to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(s32 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
+        D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
         to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(s64 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
+        D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
         to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(f32 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
+        D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
         to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(u32 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
+        D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
         to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void xconsole_default::write(u64 _value)
     {
-        XCONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
+        D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
         to_string(tmp, _value, 2);
         write(tmp);
     }

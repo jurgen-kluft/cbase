@@ -44,7 +44,7 @@ namespace ncore
         {
             vflush();
             
-            switch (str.m_type)
+            switch (str.get_type())
             {
                 case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii)!=0;
                 case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16)!=0;
@@ -107,8 +107,8 @@ namespace ncore
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            ascii::pcrune src = str.m_str;
-            ascii::pcrune end = str.m_end;
+            ascii::pcrune src = &str.m_bos[ str.m_str ];
+            ascii::pcrune end = &str.m_bos[ str.m_end ];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -134,8 +134,8 @@ namespace ncore
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf16::pcrune src = str.m_str;
-            utf16::pcrune end = str.m_end;
+            utf16::pcrune src = &str.m_bos[ str.m_str];
+            utf16::pcrune end = &str.m_bos[ str.m_end];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -161,8 +161,8 @@ namespace ncore
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf32::pcrune src = str.m_str;
-            utf32::pcrune end = str.m_end;
+            utf32::pcrune src = &str.m_bos[str.m_str];
+            utf32::pcrune end = &str.m_bos[str.m_end];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -197,7 +197,7 @@ namespace ncore
 
         virtual s32 write(const crunes_t& str)
         {
-            switch (str.m_type)
+            switch (str.get_type())
             {
                 case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii);
                 case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16);

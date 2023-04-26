@@ -20,7 +20,7 @@ namespace ncore
         {
         }
 
-        virtual runes_t allocate(s32 len, s32 cap, s32 type)
+        virtual runes_t allocate(s32 len, s32 cap, s32 flags)
         {
             len = (len + (8 - 1)) & ~(8 - 1);
             if (len > cap)
@@ -29,29 +29,29 @@ namespace ncore
             cap = cap + 7;
 
             s32 sizeofrune = 1;
-            if (type == utf32::TYPE)
+            if (flags == utf32::TYPE)
                 sizeofrune = 4;
-            else if (type == utf16::TYPE)
+            else if (flags == utf16::TYPE)
                 sizeofrune = 2;
 
             alloc_t* sysalloc = context_t::system_alloc();
 
             runes_t r;
-            r.m_type        = type;
+            r.m_ascii.m_flags = flags;
             r.m_ascii.m_bos = (ascii::prune)sysalloc->allocate((cap + 1) * sizeofrune, sizeof(void*));
-            r.m_ascii.m_str = r.m_ascii.m_bos;
-            r.m_ascii.m_end = r.m_ascii.m_bos + len * sizeofrune;
-            r.m_ascii.m_eos = r.m_ascii.m_bos + cap * sizeofrune;
+            r.m_ascii.m_str = 0;
+            r.m_ascii.m_end = len * sizeofrune;
+            r.m_ascii.m_eos = cap * sizeofrune;
 
-            switch (type)
+            switch (flags)
             {
             case ascii::TYPE:
-                r.m_ascii.m_end[0] = '\0';
-                r.m_ascii.m_eos[0] = '\0';
-                break;
+                    r.m_ascii.m_bos[r.m_ascii.m_end] = '\0';
+                    r.m_ascii.m_bos[r.m_ascii.m_eos] = '\0';
+                    break;
             case utf32::TYPE:
-                r.m_utf32.m_end[0] = '\0';
-                r.m_utf32.m_eos[0] = '\0';
+                    r.m_utf32.m_bos[r.m_utf32.m_end] = '\0';
+                    r.m_utf32.m_bos[r.m_utf32.m_eos] = '\0';
                 break;
 
             }

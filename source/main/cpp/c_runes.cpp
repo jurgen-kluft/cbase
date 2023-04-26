@@ -2783,6 +2783,7 @@ namespace ncore
                 case utf8::TYPE: c = utf::peek(m_utf8, m_utf8.m_str); break;
                 case utf16::TYPE: c = utf::peek(m_utf16, m_utf16.m_str); break;
                 case utf32::TYPE: c = m_utf32.m_bos[m_utf32.m_str]; break;
+                default: c = '\0'; break;
             }
             return c;
         }
@@ -2800,6 +2801,7 @@ namespace ncore
                 case utf8::TYPE: c = utf::read(m_utf8, m_utf8.m_end); break;
                 case utf16::TYPE: c = utf::read(m_utf16, m_utf16.m_end); break;
                 case utf32::TYPE: c = m_utf32.m_bos[m_utf32.m_str++]; break;
+                default: c = '\0'; break;
             }
             return c;
         }
@@ -2816,6 +2818,7 @@ namespace ncore
                 case utf8::TYPE: utf::write(c, m_utf8.m_bos, m_utf8.m_end, m_utf8.m_eos); return true;
                 case utf16::TYPE: utf::write(c, m_utf16.m_bos, m_utf16.m_end, m_utf16.m_eos); return true;
                 case utf32::TYPE: m_utf32.m_bos[m_utf32.m_end++] = c; return true;
+                default: c = '\0'; break;
             }
         }
         return false;
