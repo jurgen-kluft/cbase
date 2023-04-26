@@ -28,7 +28,7 @@ namespace math
     }
 
     // float power function
-    f32 powf(f32 x, s32 p)
+    inline f32 powf(f32 x, s32 p)
     {
         if (p == 0)
             return 1.0f;
@@ -52,6 +52,7 @@ namespace math
 
             x *= x;
         }
+        return r;
     }
 
     inline f32 positiveZero()

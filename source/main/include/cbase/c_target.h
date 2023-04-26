@@ -14,109 +14,109 @@ namespace ncore
     };
 
 #if defined(TARGET_PC)
-    #if defined(TARGET_DEBUG)
-        #if defined(TARGET_DEV)
-            #define TARGET_PC_DEV_DEBUG
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_PC_RETAIL_DEBUG
-        #elif defined(TARGET_TEST)
-            #define TARGET_PC_TEST_DEBUG
-        #else
-            #error "TARGET_DEBUG must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #elif defined(TARGET_RELEASE)
-        #if defined(TARGET_DEV)
-            #define TARGET_PC_DEV_RELEASE
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_PC_RETAIL_RELEASE
-        #elif defined(TARGET_TEST)
-            #define TARGET_PC_TEST_RELEASE
-        #else
-            #error "TARGET_RELEASE must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #elif defined(TARGET_FINAL)
-        #if defined(TARGET_DEV)
-            #define TARGET_PC_DEV_FINAL
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_PC_RETAIL_FINAL
-        #elif defined(TARGET_TEST)
-            #define TARGET_PC_TEST_FINAL
-        #else
-            #error "TARGET_FINAL must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #else
-        #error "TARGET_DEBUG, TARGET_RELEASE or TARGET_FINAL must be defined"
-    #endif
+#    if defined(TARGET_DEBUG)
+#        if defined(TARGET_DEV)
+#            define TARGET_PC_DEV_DEBUG
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_PC_RETAIL_DEBUG
+#        elif defined(TARGET_TEST)
+#            define TARGET_PC_TEST_DEBUG
+#        else
+#            error "TARGET_DEBUG must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    elif defined(TARGET_RELEASE)
+#        if defined(TARGET_DEV)
+#            define TARGET_PC_DEV_RELEASE
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_PC_RETAIL_RELEASE
+#        elif defined(TARGET_TEST)
+#            define TARGET_PC_TEST_RELEASE
+#        else
+#            error "TARGET_RELEASE must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    elif defined(TARGET_FINAL)
+#        if defined(TARGET_DEV)
+#            define TARGET_PC_DEV_FINAL
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_PC_RETAIL_FINAL
+#        elif defined(TARGET_TEST)
+#            define TARGET_PC_TEST_FINAL
+#        else
+#            error "TARGET_FINAL must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    else
+#        error "TARGET_DEBUG, TARGET_RELEASE or TARGET_FINAL must be defined"
+#    endif
 #elif defined(TARGET_MAC)
-    #if defined(TARGET_DEBUG)
-        #if defined(TARGET_DEV)
-            #define TARGET_MAC_DEV_DEBUG
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_MAC_RETAIL_DEBUG
-        #elif defined(TARGET_TEST)
-            #define TARGET_MAC_TEST_DEBUG
-        #else
-            #error "TARGET_DEBUG must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #elif defined(TARGET_RELEASE)
-        #if defined(TARGET_DEV)
-            #define TARGET_MAC_DEV_RELEASE
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_MAC_RETAIL_RELEASE
-        #elif defined(TARGET_TEST)
-            #define TARGET_MAC_TEST_RELEASE
-        #else
-            #error "TARGET_RELEASE must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #elif defined(TARGET_FINAL)
-        #if defined(TARGET_DEV)
-            #define TARGET_MAC_DEV_FINAL
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_MAC_RETAIL_FINAL
-        #elif defined(TARGET_TEST)
-            #define TARGET_MAC_TEST_FINAL
-        #else
-            #error "TARGET_FINAL must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #else
-        #error "TARGET_DEBUG, TARGET_RELEASE or TARGET_FINAL must be defined"
-    #endif
+#    if defined(TARGET_DEBUG)
+#        if defined(TARGET_DEV)
+#            define TARGET_MAC_DEV_DEBUG
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_MAC_RETAIL_DEBUG
+#        elif defined(TARGET_TEST)
+#            define TARGET_MAC_TEST_DEBUG
+#        else
+#            error "TARGET_DEBUG must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    elif defined(TARGET_RELEASE)
+#        if defined(TARGET_DEV)
+#            define TARGET_MAC_DEV_RELEASE
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_MAC_RETAIL_RELEASE
+#        elif defined(TARGET_TEST)
+#            define TARGET_MAC_TEST_RELEASE
+#        else
+#            error "TARGET_RELEASE must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    elif defined(TARGET_FINAL)
+#        if defined(TARGET_DEV)
+#            define TARGET_MAC_DEV_FINAL
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_MAC_RETAIL_FINAL
+#        elif defined(TARGET_TEST)
+#            define TARGET_MAC_TEST_FINAL
+#        else
+#            error "TARGET_FINAL must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    else
+#        error "TARGET_DEBUG, TARGET_RELEASE or TARGET_FINAL must be defined"
+#    endif
 #elif defined(TARGET_LINUX)
-    #if defined(TARGET_DEBUG)
-        #if defined(TARGET_DEV)
-            #define TARGET_LINUD_DEV_DEBUG
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_LINUD_RETAIL_DEBUG
-        #elif defined(TARGET_TEST)
-            #define TARGET_LINUD_TEST_DEBUG
-        #else
-            #error "TARGET_DEBUG must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #elif defined(TARGET_RELEASE)
-        #if defined(TARGET_DEV)
-            #define TARGET_LINUD_DEV_RELEASE
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_LINUD_RETAIL_RELEASE
-        #elif defined(TARGET_TEST)
-            #define TARGET_LINUD_TEST_RELEASE
-        #else
-            #error "TARGET_RELEASE must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #elif defined(TARGET_FINAL)
-        #if defined(TARGET_DEV)
-            #define TARGET_LINUD_DEV_FINAL
-        #elif defined(TARGET_RETAIL)
-            #define TARGET_LINUD_RETAIL_FINAL
-        #elif defined(TARGET_TEST)
-            #define TARGET_LINUD_TEST_FINAL
-        #else
-            #error "TARGET_FINAL must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
-        #endif
-    #else
-        #error "TARGET_DEBUG, TARGET_RELEASE or TARGET_FINAL must be defined"
-    #endif
+#    if defined(TARGET_DEBUG)
+#        if defined(TARGET_DEV)
+#            define TARGET_LINUD_DEV_DEBUG
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_LINUD_RETAIL_DEBUG
+#        elif defined(TARGET_TEST)
+#            define TARGET_LINUD_TEST_DEBUG
+#        else
+#            error "TARGET_DEBUG must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    elif defined(TARGET_RELEASE)
+#        if defined(TARGET_DEV)
+#            define TARGET_LINUD_DEV_RELEASE
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_LINUD_RETAIL_RELEASE
+#        elif defined(TARGET_TEST)
+#            define TARGET_LINUD_TEST_RELEASE
+#        else
+#            error "TARGET_RELEASE must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    elif defined(TARGET_FINAL)
+#        if defined(TARGET_DEV)
+#            define TARGET_LINUD_DEV_FINAL
+#        elif defined(TARGET_RETAIL)
+#            define TARGET_LINUD_RETAIL_FINAL
+#        elif defined(TARGET_TEST)
+#            define TARGET_LINUD_TEST_FINAL
+#        else
+#            error "TARGET_FINAL must be defined with TARGET_DEV, TARGET_RETAIL or TARGET_TEST"
+#        endif
+#    else
+#        error "TARGET_DEBUG, TARGET_RELEASE or TARGET_FINAL must be defined"
+#    endif
 #else
-    #error "TARGET_PC, TARGET_MAC or TARGET_LINUX must be defined"
+#    error "TARGET_PC, TARGET_MAC or TARGET_LINUX must be defined"
 #endif
 
 #undef TARGET_PC
@@ -601,8 +601,8 @@ namespace ncore
 #        define TARGET_PLATFORM PLATFORM_PC
 #        define TARGET_EDITOR
 #        define VALID_TARGET
-//#define D_USE_NATIVE_NEW_AND_DELETE
-//#define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
+// #define D_USE_NATIVE_NEW_AND_DELETE
+// #define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
 #        define D_EXCEPTIONS
 #    endif
 #endif
@@ -621,8 +621,8 @@ namespace ncore
 #        define TARGET_PLATFORM PLATFORM_PC
 #        define TARGET_EDITOR
 #        define VALID_TARGET
-//#define D_USE_NATIVE_NEW_AND_DELETE
-//#define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
+// #define D_USE_NATIVE_NEW_AND_DELETE
+// #define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
 #        define D_EXCEPTIONS
 #    endif
 #endif
@@ -641,8 +641,8 @@ namespace ncore
 #        define TARGET_PLATFORM PLATFORM_PC
 #        define TARGET_EDITOR
 #        define VALID_TARGET
-//#define D_USE_NATIVE_NEW_AND_DELETE
-//#define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
+// #define D_USE_NATIVE_NEW_AND_DELETE
+// #define __PLACEMENT_NEW_INLINE      // Tells MFC that we are dealing with the placement new/delete
 #        define D_EXCEPTIONS
 #    endif
 #endif
@@ -813,7 +813,6 @@ namespace ncore
     //  Operating System Designation
     //
 
-
     //
     //  Compiler Designation
     //
@@ -930,43 +929,43 @@ namespace ncore
         };
     };
 
-//#define D_NO_PARTIAL_TEMPLATE
+// #define D_NO_PARTIAL_TEMPLATE
 #    define D_CACHE_LINE_SIZE 32
-#    define D_CHAR_BIT        8
-#    define D_IEEE_FLOATS
+#    define D_CHAR_BIT 8
+#    define D_IEEE_FLOATS 1
 #    define D_USE_PRAGMA_ONCE
-#    define D_STD_CALL     __stdcall
-#    define D_C_DECL       __cdecl
-#    define f_inline       __forceinline
-#    define f_noinline     __declspec(noinline)
+#    define D_STD_CALL __stdcall
+#    define D_C_DECL __cdecl
+#    define f_inline __forceinline
+#    define f_noinline __declspec(noinline)
 #    define D_FORCE_INLINE __forceinline
-#    define D_BOOL         signed long
-#    define D_BYTE         unsigned char
-#    define D_WCHAR        unsigned short
-#    define D_INT8         char
-#    define D_INT16        short
-#    define D_INT32        int
-#    define D_INT64        signed __int64
-#    define D_UINT64       unsigned __int64
-#    define D_INT128       s128
-#    define D_UINT128      u128
-#    define D_INT256       s256
-#    define D_UINT256      u256
+#    define D_BOOL signed long
+#    define D_BYTE unsigned char
+#    define D_WCHAR unsigned short
+#    define D_INT8 char
+#    define D_INT16 short
+#    define D_INT32 int
+#    define D_INT64 signed __int64
+#    define D_UINT64 unsigned __int64
+#    define D_INT128 s128
+#    define D_UINT128 u128
+#    define D_INT256 s256
+#    define D_UINT256 u256
 #    ifdef TARGET_64BIT
-#        define D_SIZE              unsigned __int64
-#        define D_INT               __int64
-#        define D_PTR_SIZED_INT     __int64
+#        define D_SIZE unsigned __int64
+#        define D_INT __int64
+#        define D_PTR_SIZED_INT __int64
 #        define D_ALIGNMENT_DEFAULT 8
 #    else
-#        define D_SIZE              unsigned int
-#        define D_INT               int
-#        define D_PTR_SIZED_INT     int
+#        define D_SIZE unsigned int
+#        define D_INT int
+#        define D_PTR_SIZED_INT int
 #        define D_ALIGNMENT_DEFAULT 4
 #    endif
 #    define D_LITTLE_ENDIAN 4321
-#    define D_FLOAT         float
-#    define D_DOUBLE        double
-#    define D_ALIGNMENT(a)  __declspec(align(a))
+#    define D_FLOAT float
+#    define D_DOUBLE double
+#    define D_ALIGNMENT(a) __declspec(align(a))
 
 #    define D_ALIGN_BEGIN(a) __declspec(align(a))
 #    define D_ALIGN_END(a)
@@ -978,14 +977,14 @@ namespace ncore
 #    pragma inline_depth(255)
 
 #    define D_THREAD_LOCAL __declspec(thread)
-#    define D_FINAL        final
+#    define D_FINAL final
 
 /// disable useless warnings
 #    pragma warning(disable : 4800)
 
 #elif defined(COMPILER_CLANG)
 
-// #pragma message "clang compiler"
+    // #pragma message "clang compiler"
 
 #    define D_NO_CUSTOM_INT64
 #    define D_NO_CUSTOM_UINT64
@@ -996,42 +995,42 @@ namespace ncore
 
 #    define __NO_PARTIAL_TEMPLATE__
 #    define D_CACHE_LINE_SIZE 32
-#    define D_CHAR_BIT        8
+#    define D_CHAR_BIT 8
 #    define D_USE_PRAGMA_ONCE
-#    define D_STD_CALL         __stdcall
-#    define D_C_DECL           __cdecl
-#    define f_inline           __attribute__((always_inline))
-#    define f_noinline         __attribute__((noinline))
-#    define D_FORCE_INLINE     __attribute__((always_inline))
+#    define D_STD_CALL __stdcall
+#    define D_C_DECL __cdecl
+#    define f_inline __attribute__((always_inline))
+#    define f_noinline __attribute__((noinline))
+#    define D_FORCE_INLINE __attribute__((always_inline))
 #    define D_FORCE_INLINE_SPU __attribute__((always_inline))
 
-#ifdef TARGET_OS_MAC
-#    define D_BOOL    unsigned int
-#    define D_BYTE    unsigned char
-#    define D_WCHAR   unsigned short
-#    define D_INT8    char
-#    define D_INT16   short
-#    define D_INT32   int
-#    define D_INT64   signed long
-#    define D_UINT64  unsigned long
-#    define D_INT128  s128
-#    define D_UINT128 u128
-#    define D_INT256  s256
-#    define D_UINT256 u256
-#else
-#    define D_BOOL    unsigned int
-#    define D_BYTE    unsigned char
-#    define D_WCHAR   unsigned short
-#    define D_INT8    char
-#    define D_INT16   short
-#    define D_INT32   int
-#    define D_INT64   signed long long
-#    define D_UINT64  unsigned long long
-#    define D_INT128  s128
-#    define D_UINT128 u128
-#    define D_INT256  s256
-#    define D_UINT256 u256
-#endif
+#    ifdef TARGET_OS_MAC
+#        define D_BOOL unsigned int
+#        define D_BYTE unsigned char
+#        define D_WCHAR unsigned short
+#        define D_INT8 char
+#        define D_INT16 short
+#        define D_INT32 int
+#        define D_INT64 signed long
+#        define D_UINT64 unsigned long
+#        define D_INT128 s128
+#        define D_UINT128 u128
+#        define D_INT256 s256
+#        define D_UINT256 u256
+#    else
+#        define D_BOOL unsigned int
+#        define D_BYTE unsigned char
+#        define D_WCHAR unsigned short
+#        define D_INT8 char
+#        define D_INT16 short
+#        define D_INT32 int
+#        define D_INT64 signed long long
+#        define D_UINT64 unsigned long long
+#        define D_INT128 s128
+#        define D_UINT128 u128
+#        define D_INT256 s256
+#        define D_UINT256 u256
+#    endif
 
     template <bool> struct CompileTimeAssert;
     template <> struct CompileTimeAssert<true>
@@ -1043,21 +1042,21 @@ namespace ncore
     };
 
 #    ifdef TARGET_64BIT
-#        define D_SIZE              D_UINT64
-#        define D_INT               D_INT64
-#        define D_PTR_SIZED_INT     D_INT64
+#        define D_SIZE D_UINT64
+#        define D_INT D_INT64
+#        define D_PTR_SIZED_INT D_INT64
 #        define D_ALIGNMENT_DEFAULT 8
 #    else
-#        define D_SIZE              D_UINT32
-#        define D_INT               D_INT32
-#        define D_PTR_SIZED_INT     D_INT32
+#        define D_SIZE D_UINT32
+#        define D_INT D_INT32
+#        define D_PTR_SIZED_INT D_INT32
 #        define D_ALIGNMENT_DEFAULT 4
 #    endif
 
 #    define D_LITTLE_ENDIAN 4321
-#    define D_FLOAT         float
-#    define D_DOUBLE        double
-#    define D_ALIGNMENT(a)  __attribute__((aligned(a)))
+#    define D_FLOAT float
+#    define D_DOUBLE double
+#    define D_ALIGNMENT(a) __attribute__((aligned(a)))
 
 #    define D_ALIGN_BEGIN(a)
 #    define D_ALIGN_END(a) __attribute__((aligned(a)))
@@ -1067,7 +1066,7 @@ namespace ncore
 #    define D_ALIGNOF(t) __alignof(t)
 
 #    define D_THREAD_LOCAL __declspec(thread)
-#    define D_FINAL        final
+#    define D_FINAL final
 
 #else
 #    error x_target, error; no compiler selected
@@ -1160,7 +1159,7 @@ namespace ncore
     typedef D_INT            int_t;
     typedef D_PTR_SIZED_INT  ptr_t;
     typedef D_WCHAR          wchar;
-    
+
     //==============================================================================
     // ASCII + UTF 8, 16, 32
     typedef char uchar;
@@ -1188,10 +1187,10 @@ namespace ncore
     //==============================================================================
     // KB, MB, GB, TB values
     //==============================================================================
-    const u64 cKB  = (u64)1024;
-    const u64 cMB  = (u64)1024 * 1024;
-    const u64 cGB  = (u64)1024 * 1024 * 1024;
-    const u64 cTB  = (u64)1024 * 1024 * 1024 * 1024;
+    const u64 cKB = (u64)1024;
+    const u64 cMB = (u64)1024 * 1024;
+    const u64 cGB = (u64)1024 * 1024 * 1024;
+    const u64 cTB = (u64)1024 * 1024 * 1024 * 1024;
 
     //==============================================================================
     // Memory Alignment
@@ -1250,8 +1249,8 @@ namespace ncore
     const bool TRUE  = true;  ///< the value of True to true
     const bool FALSE = false; ///< the value of False to false
 
-    #define D_FOR_I(__from, __to) for (s32 i=__from; i<__to; ++i)
-    #define D_FOR(__type, __var, __from, __to) for (__type __var=__from; __var<__to; ++__var)
+#define D_FOR_I(__from, __to) for (s32 i = __from; i < __to; ++i)
+#define D_FOR(__type, __var, __from, __to) for (__type __var = __from; __var < __to; ++__var)
 
 }; // namespace ncore
 

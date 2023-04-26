@@ -77,23 +77,51 @@ namespace math
     /**
      * Limits and const values
      */
-    inline f64			positiveZero()									{ u64 f = (u64)0; return *(f64*)&f; }
-    inline f64			negativeZero()									{ u64 f = (u64)sDoubleIEEE.DD_SIGN_MASK; return *(f64*)&f; }
+    inline f64 positiveZero64()
+    {
+        u64 f = (u64)0;
+        return *(f64*)&f;
+    }
+    inline f64 negativeZero64()
+    {
+        u64 f = (u64)sDoubleIEEE.DD_SIGN_MASK;
+        return *(f64*)&f;
+    }
 #ifdef IEEE_FLOATS
-    inline f64			nan()											{ u64 f = (u64)(sDoubleIEEE.DD_EXPONENT_MASK | 1); return *(f64*)&f; }
-    inline f64			positiveInfinity()								{ u64 f = (u64)(sDoubleIEEE.DD_EXPONENT_MASK); return *(f64*)&f; }
-    inline f64			negativeInfinity()								{ u64 f = (u64)(sDoubleIEEE.DD_SIGN_MASK | sDoubleIEEE.DD_EXPONENT_MASK); return *(f64*)&f; }
+    inline f64 nan64()
+    {
+        u64 f = (u64)(sDoubleIEEE.DD_EXPONENT_MASK | 1);
+        return *(f64*)&f;
+    }
+    inline f64 positiveInfinity64()
+    {
+        u64 f = (u64)(sDoubleIEEE.DD_EXPONENT_MASK);
+        return *(f64*)&f;
+    }
+    inline f64 negativeInfinity64()
+    {
+        u64 f = (u64)(sDoubleIEEE.DD_SIGN_MASK | sDoubleIEEE.DD_EXPONENT_MASK);
+        return *(f64*)&f;
+    }
 #endif
-    inline f64			positiveMaximum()								{ u64 f = (u64)(((sDoubleIEEE.DD_MAX_EXPONENT_BIAS-1) << sDoubleIEEE.DD_GET_EXPONENT_SHIFT) | sDoubleIEEE.DD_FRACTION_MASK); return toF64(f); }
-    inline f64			negativeMaximum()								{ u64 f = (u64)((sDoubleIEEE.DD_SIGN_MASK | ((sDoubleIEEE.DD_MAX_EXPONENT_BIAS-1) << sDoubleIEEE.DD_GET_EXPONENT_SHIFT)) | sDoubleIEEE.DD_FRACTION_MASK);  return toF64(f); }
-    inline f64			positiveMinimum()								{ u64 f = (u64)((u64)(1) << sDoubleIEEE.DD_GET_EXPONENT_SHIFT); return toF64(f); }
-    inline f64			negativeMinimum()								{ u64 f = (u64)(sDoubleIEEE.DD_SIGN_MASK | ((u64)1 << sDoubleIEEE.DD_GET_EXPONENT_SHIFT)); return toF64(f); }
+    inline f64			positiveMaximum64()								{ u64 f = (u64)(((sDoubleIEEE.DD_MAX_EXPONENT_BIAS-1) << sDoubleIEEE.DD_GET_EXPONENT_SHIFT) | sDoubleIEEE.DD_FRACTION_MASK); return toF64(f); }
+    inline f64			negativeMaximum64()								{ u64 f = (u64)((sDoubleIEEE.DD_SIGN_MASK | ((sDoubleIEEE.DD_MAX_EXPONENT_BIAS-1) << sDoubleIEEE.DD_GET_EXPONENT_SHIFT)) | sDoubleIEEE.DD_FRACTION_MASK);  return toF64(f); }
+    inline f64			positiveMinimum64()								{ u64 f = (u64)((u64)(1) << sDoubleIEEE.DD_GET_EXPONENT_SHIFT); return toF64(f); }
+    inline f64			negativeMinimum64()								{ u64 f = (u64)(sDoubleIEEE.DD_SIGN_MASK | ((u64)1 << sDoubleIEEE.DD_GET_EXPONENT_SHIFT)); return toF64(f); }
 
     /**
      * De-normalized (DEN) positive and negative minimums
      */
-    inline f64			positiveMinimumDEN()							{ u64 f = (u64)((u64)1 << (sDoubleIEEE.DD_FRACTION_BITS-1)); return toF64(f); }
-    inline f64			negativeMinimumDEN()							{ u64 f = (u64)(sDoubleIEEE.DD_SIGN_MASK | ((u64)1 << (sDoubleIEEE.DD_FRACTION_BITS-1))); return toF64(f); }
+    inline f64 positiveMinimumDEN64()
+    {
+        u64 f = (u64)((u64)1 << (sDoubleIEEE.DD_FRACTION_BITS - 1));
+        return toF64(f);
+    }
+    inline f64 negativeMinimumDEN64()
+    {
+        u64 f = (u64)(sDoubleIEEE.DD_SIGN_MASK | ((u64)1 << (sDoubleIEEE.DD_FRACTION_BITS - 1)));
+        return toF64(f);
+    }
 
     /**
      * Rational Determination.

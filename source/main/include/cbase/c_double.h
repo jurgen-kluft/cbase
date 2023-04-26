@@ -21,21 +21,21 @@ namespace ncore
         //---------------------------------------------------------------------------------------------------------------------
         // Limits and const values
         //---------------------------------------------------------------------------------------------------------------------
-        inline f64 positiveZero();
-        inline f64 negativeZero();
+        inline f64 positiveZero64();
+        inline f64 negativeZero64();
 #ifdef IEEE_FLOATS
-        inline f64 nan();
-        inline f64 positiveInfinity();
-        inline f64 negativeInfinity();
+        inline f64 nan64();
+        inline f64 positiveInfinity64();
+        inline f64 negativeInfinity64();
 #endif
-        inline f64 positiveMaximum();
-        inline f64 negativeMaximum();
-        inline f64 positiveMinimum();
-        inline f64 negativeMinimum();
+        inline f64 positiveMaximum64();
+        inline f64 negativeMaximum64();
+        inline f64 positiveMinimum64();
+        inline f64 negativeMinimum64();
 
         // De-normalized (DEN) positive and negative minimums
-        inline f64 positiveMinimumDEN();
-        inline f64 negativeMinimumDEN();
+        inline f64 positiveMinimumDEN64();
+        inline f64 negativeMinimumDEN64();
 
         //---------------------------------------------------------------------------------------------------------------------
         //    Rational Determination.
