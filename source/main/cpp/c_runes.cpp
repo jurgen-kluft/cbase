@@ -581,9 +581,9 @@ namespace ncore
 
     namespace ascii
     {
-        s32 strlen(pcrune str, pcrune eos)
+        s32 strlen(pcrune str, pcrune& end, pcrune eos)
         {
-            pcrune end = str;
+            end = str;
             if (eos == nullptr)
             {
                 while (*end != TERMINATOR)
@@ -883,22 +883,63 @@ namespace ncore
 
     namespace utf8
     {
-        s32 strlen(pcrune str, pcrune eos)
+        s32 strlen(pcrune str, pcrune& end, pcrune eos)
         {
-            pcrune end = str;
+            s32 chars = 0;
+            end       = str;
             if (eos == nullptr)
             {
                 while (*end != TERMINATOR)
-                    end++;
+                    end++, chars++;
             }
             else
             {
                 while (*end != TERMINATOR && end < eos)
-                    end++;
+                    end++, chars++;
             }
-            return (s32)(end - str);
+            return chars;
         }
     } // namespace utf8
+
+    namespace utf16
+    {
+        s32 strlen(pcrune str, pcrune& end, pcrune eos)
+        {
+            s32 chars = 0;
+            end       = str;
+            if (eos == nullptr)
+            {
+                while (*end != TERMINATOR)
+                    end++, chars++;
+            }
+            else
+            {
+                while (*end != TERMINATOR && end < eos)
+                    end++, chars++;
+            }
+            return chars;
+        }
+    } // namespace utf16
+
+    namespace utf32
+    {
+        s32 strlen(pcrune str, pcrune& end, pcrune eos)
+        {
+            s32 chars = 0;
+            end       = str;
+            if (eos == nullptr)
+            {
+                while (*end != TERMINATOR)
+                    end++, chars++;
+            }
+            else
+            {
+                while (*end != TERMINATOR && end < eos)
+                    end++, chars++;
+            }
+            return chars;
+        }
+    } // namespace utf32
 
     // u32 functions
     static u32     get_begin(runes_t const& str);
@@ -2309,14 +2350,14 @@ namespace ncore
 
     void trimLeft(crunes_t& str, uchar32 _c)
     {
-        uchar32 charseta[] = {_c, utf32::TERMINATOR};
+        uchar32  charseta[] = {_c, utf32::TERMINATOR};
         crunes_t charset(charseta, 0, 1, 1);
         trimLeft(str, charseta);
     }
 
     void trimRight(crunes_t& str, uchar32 _c)
     {
-        uchar32 charseta[2] = {_c, utf32::TERMINATOR};
+        uchar32  charseta[2] = {_c, utf32::TERMINATOR};
         crunes_t charset(charseta, 0, 1, 1);
         trimLeft(str, charset);
     }
@@ -3128,9 +3169,19 @@ namespace ncore
             case ascii::TYPE: size = (s32)((m_ascii.m_end - m_ascii.m_str)); break;
             case utf32::TYPE: size = (s32)((m_utf32.m_end - m_utf32.m_str)); break;
             case utf16::TYPE:
+            {
+                utf16::pcrune end;
+                utf16::pcrune eos = m_utf16.m_bos + m_utf16.m_eos;
+                size              = utf16::strlen(m_utf16.m_bos, end, eos);
+            }
+            break;
             case utf8::TYPE:
-                break; // This is problematic, since we need to count the actual runes since a rune can span more than one utf
-                       // value.
+            {
+                utf8::pcrune end;
+                utf8::pcrune eos = m_utf8.m_bos + m_utf8.m_eos;
+                size             = utf8::strlen(m_utf8.m_bos, end, eos);
+            }
+            break;
         }
         return size;
     }

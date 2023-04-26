@@ -86,8 +86,7 @@ namespace ncore
             u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
         };
 
-        // return length of string in bytes (for ascii this also means number of characters)
-        s32 strlen(pcrune str, pcrune eos = nullptr);
+        s32 strlen(pcrune str, pcrune& end, pcrune eos);
 
         s32 compare(pcrune left, pcrune right);
         s32 compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2);
@@ -156,8 +155,9 @@ namespace ncore
             u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
         };
 
-        // return length of string in bytes (for utf8 this means number of bytes and NOT characters)
-        s32 strlen(pcrune str, pcrune eos = nullptr);
+        // return length of string in runes
+        s32 strlen(pcrune str, pcrune& end, pcrune eos);
+
     } // namespace utf8
 
     namespace utf16
@@ -212,6 +212,8 @@ namespace ncore
             u32    m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
             u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
         };
+
+        s32 strlen(pcrune str, pcrune& end, pcrune eos);
 
     } // namespace utf16
 
@@ -268,7 +270,7 @@ namespace ncore
             u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
         };
 
-        u32 strlen(pcrune str, pcrune eos = nullptr);
+        s32 strlen(pcrune str, pcrune& end, pcrune eos);
     } // namespace utf32
 
     struct crunes_t;
