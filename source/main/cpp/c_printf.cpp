@@ -19,6 +19,12 @@ namespace ncore
 
         inline s64 count() const { return m_runes_count; }
 
+        virtual bool vwriteln()
+        {
+            m_runes_count += 2;
+            return true;
+        }
+
         virtual bool vwrite(uchar32 c)
         {
             m_runes_count += 1;
@@ -51,6 +57,15 @@ namespace ncore
 
     public:
         inline console_writer_t() {}
+
+        virtual bool vwriteln()
+        {
+            if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
+                vflush();
+            m_write_to_console_cache += '\r';
+            m_write_to_console_cache += '\n';
+            return true;
+        }
 
         virtual bool vwrite(uchar32 c)
         {
