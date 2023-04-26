@@ -319,9 +319,9 @@ namespace ncore
             utf32::runes_t m_utf32;
         };
 
-        inline u32  get_type() const { return m_ascii.m_flags & 3; }
+        inline u32  get_type() const { return m_ascii.m_flags & 0xF; }
         inline bool is_ascii() const { return get_type() == ascii::TYPE; }
-        inline bool is_utf8() const {  return get_type() == utf8::TYPE; }
+        inline bool is_utf8() const { return get_type() == utf8::TYPE; }
         inline bool is_utf16() const { return get_type() == utf16::TYPE; }
         inline bool is_utf32() const { return get_type() == utf32::TYPE; }
     };
@@ -377,7 +377,7 @@ namespace ncore
             utf32::crunes_t m_utf32;
         };
 
-        inline u32  get_type() const { return m_ascii.m_flags & 3; }
+        inline u32  get_type() const { return m_ascii.m_flags & 0xF; }
         inline bool is_ascii() const { return get_type() == ascii::TYPE; }
         inline bool is_utf8() const { return get_type() == utf8::TYPE; }
         inline bool is_utf16() const { return get_type() == utf16::TYPE; }
@@ -394,10 +394,6 @@ namespace ncore
 
     // -------------------------------------------------------------------------------
     // search functions
-    crunes_t find(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    runes_t  find(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    crunes_t findLast(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    runes_t  findLast(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
     crunes_t find(crunes_t const& str, crunes_t const& find, bool case_sensitive = true);
     runes_t  find(runes_t const& str, crunes_t const& find, bool case_sensitive = true);
     crunes_t findLast(crunes_t const& str, crunes_t const& find, bool case_sensitive = true);
@@ -405,18 +401,26 @@ namespace ncore
     crunes_t findOneOf(crunes_t const& str, crunes_t const& set, bool case_sensitive = true);
     runes_t  findOneOf(runes_t const& str, crunes_t const& set, bool case_sensitive = true);
 
-    crunes_t findSelectUntil(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    crunes_t find(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
+    crunes_t findLast(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
+    crunes_t findOneOf(crunes_t const& str, crunes_t const& set, bool case_sensitive = true);
+    runes_t  find(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
+    runes_t  findLast(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
+    runes_t  findOneOf(runes_t const& str, crunes_t const& set, bool case_sensitive = true);
+
     crunes_t findSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findLastSelectUntil(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     crunes_t findLastSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     crunes_t findSelectUntilIncluded(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     crunes_t findSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findLastSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     crunes_t findLastSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+
+    crunes_t findSelectUntil(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    crunes_t findLastSelectUntil(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    crunes_t findSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    crunes_t findSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    crunes_t findLastSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
 
     // -------------------------------------------------------------------------------
     // search and select text between delimiters
@@ -436,24 +440,25 @@ namespace ncore
 
     // -------------------------------------------------------------------------------
 
-    runes_t findSelectUntil(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     runes_t findSelectUntil(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findLastSelectUntil(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     runes_t findLastSelectUntil(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findSelectUntilIncluded(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     runes_t findSelectUntilIncluded(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findLastSelectUntilIncluded(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     runes_t findLastSelectUntilIncluded(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findSelectAfter(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     runes_t findSelectAfter(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findLastSelectAfter(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
     runes_t findLastSelectAfter(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+
+    runes_t findSelectUntil(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    runes_t findLastSelectUntil(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    runes_t findSelectUntilIncluded(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    runes_t findLastSelectUntilIncluded(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    runes_t findSelectAfter(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+    runes_t findLastSelectAfter(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
 
     // -------------------------------------------------------------------------------
     // search and select
     runes_t selectBetween(const runes_t& inStr, uchar32 inLeft, uchar32 inRight);
-    runes_t selectNextBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
     runes_t selectBetweenLast(const runes_t& inStr, uchar32 inLeft, uchar32 inRight);
+    runes_t selectNextBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
     runes_t selectPreviousBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
     runes_t selectBeforeExclude(const runes_t& inStr, const runes_t& inSelection);
     runes_t selectBeforeInclude(const runes_t& inStr, const runes_t& inSelection);

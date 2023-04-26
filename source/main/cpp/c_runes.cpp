@@ -1112,7 +1112,7 @@ namespace ncore
     // ------------------------------------------------------------------------------------
     crunes_t findSelectUntil(const crunes_t& _str, uchar32 _c, bool _casesensitive)
     {
-        crunez_t<utf32::rune, 4> _find(_c);
+        crunez_t<utf32::rune, 2> _find(_c);
         return findSelectUntil(_str, _find, _casesensitive);
     }
 
@@ -1126,7 +1126,7 @@ namespace ncore
 
     crunes_t findLastSelectUntil(const crunes_t& _str, uchar32 _c, bool _casesensitive)
     {
-        crunez_t<utf32::rune, 4> _find(_c);
+        crunez_t<utf32::rune, 2> _find(_c);
         return findLastSelectUntil(_str, _find, _casesensitive);
     }
 
@@ -1140,7 +1140,7 @@ namespace ncore
 
     crunes_t findSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
     {
-        crunez_t<utf32::rune, 4> _find(_c);
+        crunez_t<utf32::rune, 2> _find(_c);
         return findSelectUntilIncluded(_str, _find, _casesensitive);
     }
 
@@ -1154,7 +1154,7 @@ namespace ncore
 
     crunes_t findLastSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
     {
-        crunez_t<utf32::rune, 4> _find(_c);
+        crunez_t<utf32::rune, 2> _find(_c);
         return findLastSelectUntilIncluded(_str, _find, _casesensitive);
     }
 
@@ -1537,7 +1537,7 @@ namespace ncore
     {
         crunes_t    str          = _str;
         ascii::rune format_str[] = {'%', 'b', ascii::TERMINATOR};
-        crunes_t    format(format_str, format_str + 2);
+        crunes_t    format(format_str, 0, 2, 2);
         sscanf(str, format, va_r_t(&value));
         return str;
     }
@@ -1600,7 +1600,7 @@ namespace ncore
             case 10: format_str[1] = 'd'; break;
             case 8: format_str[1] = 'o'; break;
         };
-        crunes_t format(format_str, format_str + 2);
+        crunes_t format(format_str, 0, 2, 2);
         sscanf(str, format, va_r_t(&value));
         return str;
     }
@@ -1615,7 +1615,7 @@ namespace ncore
             case 10: format_str[1] = 'd'; break;
             case 8: format_str[1] = 'o'; break;
         };
-        crunes_t format(format_str, format_str + 2);
+        crunes_t format(format_str, 0, 2, 2);
         sscanf(str, format, va_r_t(&value));
         return str;
     }
@@ -1624,7 +1624,7 @@ namespace ncore
     {
         crunes_t    str          = _str;
         ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
-        crunes_t    format(format_str, format_str + 2);
+        crunes_t    format(format_str, 0, 2, 2);
         sscanf(str, format, va_r_t(&value));
         return str;
     }
@@ -1633,7 +1633,7 @@ namespace ncore
     {
         crunes_t    str          = _str;
         ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
-        crunes_t    format(format_str, format_str + 2);
+        crunes_t    format(format_str, 0, 2, 2);
         sscanf(str, format, va_r_t(&value));
         return str;
     }
@@ -1699,7 +1699,7 @@ namespace ncore
     bool is_float(crunes_t const& _str)
     {
         ascii::rune f32chars_str[] = {'E', 'e', '.', '#', 'Q', 'N', 'A', 'B', 'I', 'F', 0};
-        crunes_t    f32chars(f32chars_str, &f32chars_str[10]);
+        crunes_t    f32chars(f32chars_str, 0, 10, 10);
 
         u32 iter = get_begin(_str);
         u32 end  = get_end(_str);
@@ -1765,7 +1765,7 @@ namespace ncore
             case 10: format_str[1] = 'd'; break;
             case 8: format_str[1] = 'o'; break;
         };
-        crunes_t format(format_str, format_str + 2);
+        crunes_t format(format_str, 0, 2, 2);
         sprintf(str, format, va_t(val));
     }
 
@@ -1778,7 +1778,7 @@ namespace ncore
             case 10: format_str[1] = 'u'; break;
             case 8: format_str[1] = 'o'; break;
         };
-        crunes_t format(format_str, format_str + 2);
+        crunes_t format(format_str, 0, 2, 2);
         sprintf(str, format, va_t(val));
     }
 
@@ -1793,7 +1793,7 @@ namespace ncore
             case 10: format_str[1] = 'd'; break;
             case 8: format_str[1] = 'o'; break;
         };
-        crunes_t format(format_str, format_str + 2);
+        crunes_t format(format_str, 0, 2, 2);
         sprintf(str, format, va_t(val));
     }
 
@@ -1806,7 +1806,7 @@ namespace ncore
             case 10: format_str[1] = 'd'; break;
             case 8: format_str[1] = 'o'; break;
         };
-        crunes_t format(format_str, format_str + 2);
+        crunes_t format(format_str, 0, 2, 2);
         sprintf(str, format, va_t(val));
     }
 
@@ -1818,7 +1818,7 @@ namespace ncore
             format_str[2] = '0' + numFractionalDigits / 10;
             format_str[3] = '0' + numFractionalDigits % 10;
         }
-        crunes_t format(format_str, format_str + 5);
+        crunes_t format(format_str, 0, 5, 5);
         sprintf(str, format, va_t(val));
     }
 
@@ -1830,7 +1830,7 @@ namespace ncore
             format_str[2] = '0' + numFractionalDigits / 10;
             format_str[3] = '0' + numFractionalDigits % 10;
         }
-        crunes_t format(format_str, format_str + 5);
+        crunes_t format(format_str, 0, 5, 5);
         sprintf(str, format, va_t(val));
     }
 
@@ -2260,14 +2260,14 @@ namespace ncore
     void trimQuotes(runes_t& str)
     {
         uchar32  charseta[] = {'\'', '"', utf32::TERMINATOR};
-        crunes_t charset(charseta, &charseta[2]);
+        crunes_t charset(charseta, 0, 2, 2);
         trim(str, charseta);
     }
 
     void trimQuotes(runes_t& str, uchar32 quote)
     {
         uchar32  charseta[] = {quote, utf32::TERMINATOR};
-        crunes_t charset(charseta, &charseta[1]);
+        crunes_t charset(charseta, 0, 1, 1);
         trim(str, charseta);
     }
 
@@ -2280,7 +2280,7 @@ namespace ncore
     void trim(crunes_t& str)
     {
         uchar32  charseta[] = {' ', '\t', utf32::TERMINATOR};
-        crunes_t charset(charseta, &charseta[2]);
+        crunes_t charset(charseta, 0, 2, 2);
         trimLeft(str, charseta);
         trimRight(str, charseta);
     }
@@ -2288,34 +2288,36 @@ namespace ncore
     void trimLeft(crunes_t& str)
     {
         uchar32  charseta[] = {' ', '\t', utf32::TERMINATOR};
-        crunes_t charset(charseta, &charseta[2]);
+        crunes_t charset(charseta, 0, 2, 2);
         trimLeft(str, charseta);
     }
 
     void trimRight(crunes_t& str)
     {
         uchar32  charseta[] = {' ', '\t', utf32::TERMINATOR};
-        crunes_t charset(charseta, &charseta[2]);
+        crunes_t charset(charseta, 0, 2, 2);
         trimRight(str, charseta);
     }
 
     void trim(crunes_t& str, uchar32 _c)
     {
         uchar32  charseta[] = {_c, utf32::TERMINATOR};
-        crunes_t charset(charseta, &charseta[1]);
+        crunes_t charset(charseta, 0, 1, 1);
         trimLeft(str, charseta);
         trimRight(str, charseta);
     }
 
     void trimLeft(crunes_t& str, uchar32 _c)
     {
-        uchar32 charset[] = {_c, utf32::TERMINATOR};
-        trimLeft(str, charset);
+        uchar32 charseta[] = {_c, utf32::TERMINATOR};
+        crunes_t charset(charseta, 0, 1, 1);
+        trimLeft(str, charseta);
     }
 
     void trimRight(crunes_t& str, uchar32 _c)
     {
-        uchar32 charset[2] = {_c, utf32::TERMINATOR};
+        uchar32 charseta[2] = {_c, utf32::TERMINATOR};
+        crunes_t charset(charseta, 0, 1, 1);
         trimLeft(str, charset);
     }
 
@@ -2381,14 +2383,14 @@ namespace ncore
     void trimQuotes(crunes_t& str)
     {
         uchar32  charseta[] = {'\'', '"', utf32::TERMINATOR};
-        crunes_t charset(charseta, &charseta[2]);
+        crunes_t charset(charseta, 0, 2, 2);
         trim(str, charseta);
     }
 
     void trimQuotes(crunes_t& str, uchar32 quote)
     {
         uchar32  charseta[] = {quote, utf32::TERMINATOR};
-        crunes_t charset(charseta, &charseta[1]);
+        crunes_t charset(charseta, 0, 1, 1);
         trim(str, charseta);
     }
 
