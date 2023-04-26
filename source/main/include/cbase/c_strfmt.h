@@ -89,9 +89,6 @@ namespace ncore
             };
 
         public:
-            using iterator       = char*;
-            using const_iterator = const char*;
-
             enum class Align : u8
             {
                 kNone    = kAlignNone,
@@ -171,7 +168,9 @@ namespace ncore
             
             // Writes the alignment (sign, prefix and fill before) for any
             // argument type. Returns the fill counter to write after argument.
-            int write_alignment(str_t& it, int digits, const bool negative) const;
+            int write_alignment(str_t& it, int characters, const bool negative) const;
+            void write_sign(str_t& it, const bool negative) const noexcept;
+            void write_prefix(str_t& it) const noexcept;
 
             static void format_string(str_t& it, const state_t& state, const cstr_t& str, const int str_length, const bool negative = false);
 
@@ -179,9 +178,6 @@ namespace ncore
 
             // Alternative format is valid for hexadecimal (including pointers), octal, binary and all floating point types.
             inline constexpr int prefix_width() const noexcept { return (!hash() || type_is_float()) ? 0 : type_is_integer_oct() ? 1 : 2; }
-
-            void write_sign(str_t& it, const bool negative) const noexcept;
-            void write_prefix(str_t& it) const noexcept;
 
             char m_fill_char = ' ';
             Type m_type      = Type::kNone;

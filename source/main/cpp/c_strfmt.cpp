@@ -6,7 +6,6 @@
 #include "cbase/c_strfmt.h"
 #include "cbase/c_runes.h"
 
-
 namespace ncore
 {
     namespace fmt
@@ -14,48 +13,6 @@ namespace ncore
 #define USF_CONTRACT_VIOLATION(except) static_cast<void>(0)
 #define USF_FALLTHROUGH /*fall through*/
 #define FMT_CHECK(cond, except) ((!!(cond)) ? static_cast<void>(0) : USF_CONTRACT_VIOLATION(except))
-
-// ----------------------------------------------------------------------------
-// Compiler version detection
-// ----------------------------------------------------------------------------
-
-// MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
-// MSVC++ 14.1 _MSC_VER >= 1910 (Visual Studio 2017)
-#if defined(_MSC_VER) && !defined(__clang__)
-#    define USF_COMPILER_MSVC
-#    define USF_MSVC_VERSION (_MSC_VER / 10 - 10 * (5 + (_MSC_VER < 1900)))
-#    if (USF_MSVC_VERSION < 140)
-#        error usflib requires MSVC++ 14.0 or greater
-#    endif
-// Note: VC14.0/1900 (VS2015) lacks too much from C++14.
-#    define USF_CPLUSPLUS (_MSC_VER <= 1900 ? 201103L : _MSVC_LANG)
-#endif
-
-        // ----------------------------------------------------------------------------
-// Missing intrinsic functions definition for MSVC
-// ----------------------------------------------------------------------------
-#if defined(USF_COMPILER_MSVC)
-#    include <intrin.h>
-
-#    pragma intrinsic(_BitScanReverse, _BitScanReverse64)
-
-        int __builtin_clz(u32 value)
-        {
-            unsigned long leading_zero = 0;
-            return _BitScanReverse(&leading_zero, value) ? static_cast<int>(31 - leading_zero) : 32;
-        }
-
-        int __builtin_clzll(u64 value)
-        {
-            unsigned long leading_zero = 0;
-            return _BitScanReverse64(&leading_zero, value) ? static_cast<int>(63 - leading_zero) : 64;
-        }
-#endif // defined(USF_COMPILER_MSVC)
-
-        constexpr u32 pow10_uint32_lut[]{1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
-
-        constexpr u64 pow10_uint64_lut[]{1,           10,           100,           1000,           10000,           100000,           1000000,           10000000,           100000000,           1000000000,
-                                         10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000, 10000000000000000000U};
 
         constexpr char digits_hex_uppercase[]{"0123456789ABCDEF"};
         constexpr char digits_hex_lowercase[]{"0123456789abcdef"};
@@ -73,7 +30,7 @@ namespace ncore
             } m_type;
 
         public:
-            cstr_t() noexcept                       = delete;
+            cstr_t() noexcept              = delete;
             cstr_t(const cstr_t&) noexcept = default;
             cstr_t(cstr_t&&) noexcept      = default;
 
@@ -138,7 +95,7 @@ namespace ncore
         {
             if (m_type == Type_Ascii)
             {
-                if ((m_begin+n) < m_end)
+                if ((m_begin + n) < m_end)
                 {
                     return static_cast<uchar32>(*(m_begin + n));
                 }
@@ -158,7 +115,7 @@ namespace ncore
             return '\0';
         }
 
-        void cstr_t::skip(int n) noexcept 
+        void cstr_t::skip(int n) noexcept
         {
             if (m_type == Type_Ascii)
             {
@@ -168,22 +125,7 @@ namespace ncore
                 }
                 else
                 {
-                    m_begin  = m_end;
-                }
-            }
-        }
-
-        void str_t::write(uchar32 c)
-        {
-            if (m_type == Type_Ascii)
-            {
-                if (c < 0x80)
-                {
-                    *m_begin++ = static_cast<char>(c);
-                }
-                else
-                {
-                    *m_begin++ = '?';
+                    m_begin = m_end;
                 }
             }
         }
@@ -200,6 +142,21 @@ namespace ncore
             if (m_type == Type_Ascii)
             {
                 m_begin += n;
+            }
+        }
+
+        void str_t::write(uchar32 c)
+        {
+            if (m_type == Type_Ascii)
+            {
+                if (c < 0x80)
+                {
+                    *m_begin++ = static_cast<char>(c);
+                }
+                else
+                {
+                    *m_begin++ = '?';
+                }
             }
         }
 
@@ -269,6 +226,11 @@ namespace ncore
             }
         };
 
+        constexpr u32 pow10_uint32_lut[] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+
+        constexpr u64 pow10_uint64_lut[] = {1,           10,           100,           1000,           10000,           100000,           1000000,           10000000,           100000000,           1000000000,
+                                            10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000, 10000000000000000000U};
+
         class Integer
         {
         public:
@@ -298,78 +260,92 @@ namespace ncore
             }
 
             // -------- COUNT DIGITS ----------------------------------------------
-            // Based on the code from:
-            // http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10
-            // --------------------- ----------------------------------------------
-
-            static int count_digits_dec(const u32 n) noexcept
-            {
-                if (n < 10)
-                    return 1;
-
-                // The algorithm below doesn't work when `n` is 0 because:
-                // 1. the result of __builtin_clz() is undefined if `n` is 0.
-                // 2. the `pow10_uint32_lut` lookup table has the value 1 in
-                //    the first element and not a 0 as the algorithm expects.
-                // (both cases are covered by the previous if statement or
-                //  by the slower commented OR operation below).
-
-                // n = n | 1;
-
-                const int t = (32 - __builtin_clz(n)) * 1233 >> 12;
-                return t - (n < pow10_uint32_lut[t]) + 1;
-            }
 
             static int count_digits_dec(const u64 n) noexcept
             {
-                if (n <= 4294967295)
+                const int length = sizeof(pow10_uint64_lut) / sizeof(pow10_uint64_lut[0]);
+                int       index  = 0;
+                int       left   = 0;
+                int       right  = length - 1;
+                while (left <= right)
                 {
-                    return count_digits_dec(static_cast<u32>(n));
+                    index = (left + right) / 2;
+                    if (n <= pow10_uint64_lut[index])
+                    {
+                        if (n > pow10_uint64_lut[index - 1])
+                        {
+                            break;
+                        }
+                        right = index - 1;
+                    }
+                    else
+                    {
+                        left = index + 1;
+                    }
                 }
-
-                // The algorithm below doesn't work when `n` is 0 because:
-                // 1. the result of __builtin_clzll() is undefined if `n` is 0.
-                // 2. the `pow10_uint64_lut` lookup table has the value 1 in
-                //    the first element and not a 0 as the algorithm expects.
-                // (both cases are covered by the previous if statement or
-                //  by the slower commented OR operation below).
-
-                // n = n | 1;
-
-                const int t = (64 - __builtin_clzll(n)) * 1233 >> 12;
-                return t - (n < pow10_uint64_lut[t]) + 1;
+                return index + 1;
             }
 
-            static int count_digits_bin(const u32 n) noexcept
+            static int count_digits_dec(const u32 n) noexcept { return count_digits_dec((u64)n); }
+
+            static int count_digits_bin(u64 n) noexcept
             {
-                // The result of __builtin_clz() is undefined if `n` is 0.
-                return (n < 2) ? 1 : (32 - __builtin_clz(n));
+                s8 c = 0;
+                if (n > 0xFFFFFFFF)
+                {
+                    n >>= 32;
+                    c += 32;
+                }
+                while (n > 0xFF)
+                {
+                    n >>= 8;
+                    c += 8;
+                }
+                if (n > 0xF)
+                {
+                    n >>= 4;
+                    c += 4;
+                }
+                while (n > 0)
+                {
+                    n >>= 1;
+                    ++c;
+                }
+                return c;
             }
 
-            static int count_digits_bin(const u64 n) noexcept
-            {
-                // The result of __builtin_clzll() is undefined if `n` is 0.
-                return (n < 2) ? 1 : (64 - __builtin_clzll(n));
-            }
+            static int count_digits_bin(const u32 n) noexcept { return count_digits_bin((u64)n); }
 
             static int count_digits_oct(u64 n) noexcept
             {
-                int digits = 1;
-                while ((n >>= 3U) != 0)
+                s8 c = 0;
+                while (n > 0xFFF)
                 {
-                    ++digits;
+                    c += 4;
+                    n >>= 12;
                 }
-                return digits;
+                while ((n >>= 3U) != 0)
+                    ++c;
+                return c;
             }
 
-            static int count_digits_hex(u64 n) noexcept
+            static int count_digits_oct(u32 n) noexcept { return count_digits_oct((u64)n); }
+
+            static inline int count_digits_hex(u8 n) noexcept { return n > 0xF ? 2 : 1; }
+            static inline int count_digits_hex(u16 n) noexcept
             {
-                int digits = 1;
-                while ((n >>= 4U) != 0)
-                {
-                    ++digits;
-                }
-                return digits;
+                const int c = (n > 0xFF) ? 2 : count_digits_hex((u8)(n));
+                return c + count_digits_hex((u8)(n >> 8));
+            }
+            static inline int count_digits_hex(u32 n) noexcept
+            {
+                const int c = (n > 0xFFFF) ? 4 : count_digits_hex((u16)(n));
+                return c + count_digits_hex((u16)(n >> 16));
+            }
+            static inline int count_digits_hex(u64 n) noexcept
+            {
+                const int c = (n > 0xFFFFFFFFUL) ? 8 : count_digits_hex((u32)(n));
+                return c + count_digits_hex((u32)(n >> 32));
             }
 
             // -------- DIVIDE BY 10 WITH REMAINDER-------------------------------
@@ -941,8 +917,8 @@ namespace ncore
                 uchar32 c     = 0;
                 do
                 {
-                    c = it.read();
-                    value     = (value * 10) + static_cast<int>(c - '0');
+                    c     = it.read();
+                    value = (value * 10) + static_cast<int>(c - '0');
                     FMT_CHECK(value <= max_value, std::runtime_error); // Check for overflow
                     c = it.peek();
                 } while (c >= '0' && c <= '9');
@@ -965,8 +941,8 @@ namespace ncore
             state_t state;
         };
 
-        void state_t::format_string(str_t& it, state_t& state, const char* str, const char* end) 
-        { 
+        void state_t::format_string(str_t& it, state_t& state, const char* str, const char* end)
+        {
             cstr_t strview(str, end);
             format_string(it, state, strview);
         }
@@ -992,7 +968,6 @@ namespace ncore
             CharTraits::copy(it, str, str_length);
             CharTraits::assign(it, state.fill_char(), fill_after);
         }
-
 
         class argument_t
         {
@@ -1034,8 +1009,8 @@ namespace ncore
             {
                 if (state.type_is_none())
                 {
-                    s32 const       len = value ? 4 : 5;
-                    cstr_t src(value ? "true" : "false", len);
+                    s32 const len = value ? 4 : 5;
+                    cstr_t    src(value ? "true" : "false", len);
                     state_t::format_string(it, state, src, len);
                 }
                 else if (state.type_is_integer())
@@ -1166,7 +1141,7 @@ namespace ncore
                 else
                 {
                     const bool negative = math::signBit(value) != 0;
-                    
+
                     if (math::isInfinite(value))
                     {
                         cstr_t src(state.uppercase() ? "INF" : "inf", 3);
@@ -1487,7 +1462,7 @@ namespace ncore
 
         ascii::prune toStr(ascii::prune str, ascii::prune end, ascii::pcrune fmt, args_t const& args)
         {
-            str_t str_span(str, end);
+            str_t  str_span(str, end);
             cstr_t fmt_view(fmt);
             process(str_span, fmt_view, args);
             str_span.write();
