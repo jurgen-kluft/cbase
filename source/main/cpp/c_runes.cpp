@@ -3026,6 +3026,14 @@ namespace ncore
         m_ascii.m_eos   = (u32)(_end - _str);
         m_ascii.m_flags = ascii::TYPE;
     }
+    crunes_t::crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u32 _flags)
+    {
+        m_ascii.m_bos   = _bos;
+        m_ascii.m_str   = _str;
+        m_ascii.m_end   = _end;
+        m_ascii.m_eos   = _eos;
+        m_ascii.m_flags = _flags;
+    }
 
     crunes_t::crunes_t(utf8::crunes_t const& _str) { m_utf8 = _str; }
     crunes_t::crunes_t(utf8::pcrune _str)
@@ -3042,6 +3050,14 @@ namespace ncore
         m_utf8.m_str = 0;
         m_utf8.m_end = (u32)(_end - _str);
         m_utf8.m_eos = (u32)(_end - _str);
+    }
+    crunes_t::crunes_t(utf8::pcrune _bos, u32 _str, u32 _end, u32 _eos)
+    {
+        m_utf8.m_bos   = _bos;
+        m_utf8.m_str   = _str;
+        m_utf8.m_end   = _end;
+        m_utf8.m_eos   = _eos;
+        m_utf8.m_flags = utf8::TYPE;
     }
 
     crunes_t::crunes_t(utf16::crunes_t const& _str) { m_utf16 = _str; }
@@ -3062,6 +3078,14 @@ namespace ncore
         m_utf16.m_eos   = (u32)(_end - _str);
         m_utf16.m_flags = utf16::TYPE;
     }
+    crunes_t::crunes_t(utf16::pcrune _bos, u32 _str, u32 _end, u32 _eos)
+    {
+        m_utf16.m_bos   = _bos;
+        m_utf16.m_str   = _str;
+        m_utf16.m_end   = _end;
+        m_utf16.m_eos   = _eos;
+        m_utf16.m_flags = utf16::TYPE;
+    }
 
     crunes_t::crunes_t(utf32::crunes_t const& _str) { m_utf32 = _str; }
     crunes_t::crunes_t(utf32::pcrune _str)
@@ -3078,6 +3102,14 @@ namespace ncore
         m_utf32.m_str = 0;
         m_utf32.m_eos = (u32)(_end - _str);
         m_utf32.m_end = (u32)(_end - _str);
+    }
+    crunes_t::crunes_t(utf32::pcrune _bos, u32 _str, u32 _end, u32 _eos)
+    {
+        m_utf32.m_bos   = _bos;
+        m_utf32.m_str   = _str;
+        m_utf32.m_end   = _end;
+        m_utf32.m_eos   = _eos;
+        m_utf32.m_flags = utf32::TYPE;
     }
 
     crunes_t& crunes_t::operator=(crunes_t const& other)

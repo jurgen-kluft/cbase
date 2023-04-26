@@ -332,7 +332,7 @@ namespace ncore
         crunes_t(ascii::crunes_t const& _str);
         crunes_t(ascii::pcrune _bos);
         crunes_t(ascii::pcrune _bos, ascii::pcrune _end);
-        crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ascii::TYPE);
+        crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u32 _flags = ascii::TYPE);
 
         crunes_t(utf8::crunes_t const& _str);
         crunes_t(utf8::pcrune _str);
