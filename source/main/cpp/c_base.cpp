@@ -33,6 +33,8 @@ namespace ncore
                 sizeofrune = 4;
             else if (flags == utf16::TYPE)
                 sizeofrune = 2;
+            else if (flags == utf8::TYPE)
+                sizeofrune = 3;
 
             alloc_t* sysalloc = context_t::system_alloc();
 
@@ -49,11 +51,18 @@ namespace ncore
                     r.m_ascii.m_bos[r.m_ascii.m_end] = '\0';
                     r.m_ascii.m_bos[r.m_ascii.m_eos] = '\0';
                     break;
+            case utf8::TYPE:
+                    r.m_utf8.m_bos[r.m_utf8.m_end] = '\0';
+                    r.m_utf8.m_bos[r.m_utf8.m_eos] = '\0';
+                break;
+            case utf16::TYPE:
+                    r.m_utf16.m_bos[r.m_utf16.m_end] = '\0';
+                    r.m_utf16.m_bos[r.m_utf16.m_eos] = '\0';
+                break;
             case utf32::TYPE:
                     r.m_utf32.m_bos[r.m_utf32.m_end] = '\0';
                     r.m_utf32.m_bos[r.m_utf32.m_eos] = '\0';
                 break;
-
             }
 
             m_alloc_count++;
