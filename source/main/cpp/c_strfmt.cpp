@@ -234,9 +234,6 @@ namespace ncore
         class Integer
         {
         public:
-            // --------------------------------------------------------------------
-            // PUBLIC
-            // --------------------------------------------------------------------
             enum // 64 bit
             {
                 kMaxDigitsDec     = 20 + 1,
@@ -260,7 +257,6 @@ namespace ncore
             }
 
             // -------- COUNT DIGITS ----------------------------------------------
-
             static int count_digits_dec(const u64 n) noexcept
             {
                 const int length = sizeof(pow10_uint64_lut) / sizeof(pow10_uint64_lut[0]);
@@ -291,7 +287,7 @@ namespace ncore
             static int count_digits_bin(u64 n) noexcept
             {
                 s8 c = 0;
-                if (n > 0xFFFFFFFF)
+                if (n > 0xFFFFFFFFUL)
                 {
                     n >>= 32;
                     c += 32;
@@ -306,12 +302,12 @@ namespace ncore
                     n >>= 4;
                     c += 4;
                 }
-                while (n > 0)
+                if (n > 0x3)
                 {
-                    n >>= 1;
-                    ++c;
+                    n >>= 2;
+                    c += 2;
                 }
-                return c;
+                return c + n;
             }
 
             static int count_digits_bin(const u32 n) noexcept { return count_digits_bin((u64)n); }
@@ -331,22 +327,28 @@ namespace ncore
 
             static int count_digits_oct(u32 n) noexcept { return count_digits_oct((u64)n); }
 
-            static inline int count_digits_hex(u8 n) noexcept { return n > 0xF ? 2 : 1; }
-            static inline int count_digits_hex(u16 n) noexcept
-            {
-                const int c = (n > 0xFF) ? 2 : count_digits_hex((u8)(n));
-                return c + count_digits_hex((u8)(n >> 8));
-            }
-            static inline int count_digits_hex(u32 n) noexcept
-            {
-                const int c = (n > 0xFFFF) ? 4 : count_digits_hex((u16)(n));
-                return c + count_digits_hex((u16)(n >> 16));
-            }
             static inline int count_digits_hex(u64 n) noexcept
             {
-                const int c = (n > 0xFFFFFFFFUL) ? 8 : count_digits_hex((u32)(n));
-                return c + count_digits_hex((u32)(n >> 32));
+                s8 c = 0;
+                while (n > 0xFFFF)
+                {
+                    n >>= 16;
+                    c += 4;
+                }
+                if (n > 0xFF)
+                {
+                    n >>= 8;
+                    c += 2;
+                }
+                if (n > 0xF)
+                {
+                    n >>= 4;
+                    c += 1;
+                }
+                return c + (n > 0 ? 1 : 0);
             }
+
+            static inline int count_digits_hex(u32 n) noexcept { return count_digits_hex((u64)n); }
 
             // -------- DIVIDE BY 10 WITH REMAINDER-------------------------------
             static u32 moddiv10(const u32 n, s8& mod) noexcept
@@ -535,10 +537,6 @@ namespace ncore
             }
 
         private:
-            // --------------------------------------------------------------------
-            // PRIVATE STATIC FUNCTIONS
-            // --------------------------------------------------------------------
-
             static int round(char* const significand, const int significand_size, int& exponent, const bool format_fixed, const int round_index) noexcept
             {
                 char* it = significand + round_index;
