@@ -2956,21 +2956,15 @@ namespace ncore
     // cptr_t functions
     cptr_t get_begin(crunes_t const& str)
     {
-        cptr_t c;
-        c.m_ascii = str.m_ascii.m_str;
-        return c;
+        return cptr_t(str.m_ascii.m_str);
     }
     cptr_t get_end(crunes_t const& str)
     {
-        cptr_t c;
-        c.m_ascii = str.m_ascii.m_end;
-        return c;
+        return cptr_t(str.m_ascii.m_end);
     }
     cptr_t get_eos(crunes_t const& str)
     {
-        cptr_t c;
-        c.m_ascii = str.m_ascii.m_eos;
-        return c;
+        return cptr_t(str.m_ascii.m_eos);
     }
     crunes_t select(crunes_t const& str, cptr_t const& from, cptr_t const& to)
     {
@@ -4367,6 +4361,12 @@ namespace ncore
             }
         }
         return false;
+    }
+
+    bool runes_writer_t::vwriteln()
+    { 
+        const char* eol = "\r\n";
+        return vwrite(eol, eol + 2);
     }
 
     void runes_writer_t::vflush() {}

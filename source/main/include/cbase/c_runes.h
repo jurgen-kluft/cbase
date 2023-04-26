@@ -225,7 +225,10 @@ namespace ncore
     {
         struct ptr_t
         {
-            ptr_t();
+            ptr_t()
+                : m_ascii(nullptr)
+            {
+            }
             ptr_t(ascii::prune ptr)
                 : m_ascii(ptr)
             {
@@ -333,10 +336,7 @@ namespace ncore
     {
         struct ptr_t
         {
-            ptr_t()
-                : m_ascii("")
-            {
-            }
+            ptr_t();
             ptr_t(ascii::pcrune ptr)
                 : m_ascii(ptr)
             {
