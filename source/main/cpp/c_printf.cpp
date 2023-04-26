@@ -19,12 +19,6 @@ namespace ncore
 
         inline s64 count() const { return m_runes_count; }
 
-        virtual bool vwriteln()
-        {
-            m_runes_count += 2;
-            return true;
-        }
-
         virtual bool vwrite(uchar32 c)
         {
             m_runes_count += 1;

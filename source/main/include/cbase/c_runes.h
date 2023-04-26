@@ -771,7 +771,7 @@ namespace ncore
             write(str);
             writeln();
         }
-        bool writeln();
+        bool writeln() { const char* eos = "\n"; return vwrite(eos, eos + 1); }
         void flush() { vflush(); }
 
     protected:
@@ -779,7 +779,6 @@ namespace ncore
         virtual bool vwrite(uchar32 c)                        = 0;
         virtual bool vwrite(const char* str, const char* end) = 0;
         virtual bool vwrite(crunes_t const& str)              = 0;
-        virtual bool vwriteln()                               = 0;
         virtual void vflush()                                 = 0;
     };
 
@@ -802,7 +801,6 @@ namespace ncore
         virtual bool vwrite(uchar32 c);
         virtual bool vwrite(const char* str, const char* end);
         virtual bool vwrite(crunes_t const& str);
-        virtual bool vwriteln();
         virtual void vflush();
 
         runes_t        m_runes;

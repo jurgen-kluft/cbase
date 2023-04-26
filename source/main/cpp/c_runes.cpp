@@ -4363,12 +4363,6 @@ namespace ncore
         return false;
     }
 
-    bool runes_writer_t::vwriteln()
-    { 
-        const char* eol = "\r\n";
-        return vwrite(eol, eol + 2);
-    }
-
     void runes_writer_t::vflush() {}
 
 } // namespace ncore
