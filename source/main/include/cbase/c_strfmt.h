@@ -12,8 +12,8 @@ namespace ncore
 {
     namespace fmt
     {
-        class BasicStringSpan;
-        class ArgFormat;
+        class str_t;
+        class format_t;
 
         enum TypeId
         {
@@ -34,9 +34,9 @@ namespace ncore
             kCustom
         };
 
-        class BasicStringView;
+        class cstr_t;
 
-        class BasicStringSpan
+        class str_t
         {
             enum
             {
@@ -47,27 +47,27 @@ namespace ncore
             } m_type;
 
         public:
-            BasicStringSpan() noexcept = delete;
-            BasicStringSpan(char* first, char* last);
-            BasicStringSpan(const BasicStringSpan&) noexcept = default;
-            BasicStringSpan(BasicStringSpan&&) noexcept      = default;
+            str_t() noexcept = delete;
+            str_t(char* first, char* last);
+            str_t(const str_t&) noexcept = default;
+            str_t(str_t&&) noexcept      = default;
 
-            BasicStringSpan& operator=(const BasicStringSpan&) noexcept = default;
+            str_t& operator=(const str_t&) noexcept = default;
 
             bool at_end() const noexcept { return m_begin == m_end; }
             void write(uchar32 c = '\0');
             void skip(const uint_t n);
-            void write(BasicStringView const& str);
+            void write(cstr_t const& str);
 
         protected:
             char* m_begin;
             char* m_end;
         };
 
-        class ArgFormatState
+        class state_t
         {
         protected:
-            friend class ArgFormat;
+            friend class format_t;
 
             enum Flags : u8
             {
@@ -125,8 +125,8 @@ namespace ncore
                 kInvalid
             };
 
-            static void format_string(BasicStringSpan& it, ArgFormatState& state, const char* str, const char* end);
-            static void format_string(BasicStringSpan& it, ArgFormatState& state, const BasicStringView& str);
+            static void format_string(str_t& it, state_t& state, const char* str, const char* end);
+            static void format_string(str_t& it, state_t& state, const cstr_t& str);
 
             inline constexpr char fill_char() const noexcept { return m_fill_char; }
             inline constexpr Type type() const noexcept { return m_type; }
@@ -167,21 +167,21 @@ namespace ncore
             }
 
         protected:
-            friend class Arg;
+            friend class argument_t;
             
             // Writes the alignment (sign, prefix and fill before) for any
             // argument type. Returns the fill counter to write after argument.
-            int write_alignment(BasicStringSpan& it, int digits, const bool negative) const;
+            int write_alignment(str_t& it, int digits, const bool negative) const;
 
-            static void format_string(BasicStringSpan& it, const ArgFormatState& state, BasicStringView& str, const int str_length, const bool negative = false);
+            static void format_string(str_t& it, const state_t& state, const cstr_t& str, const int str_length, const bool negative = false);
 
             inline constexpr int sign_width(const bool negative) const noexcept { return (!negative && sign() <= Sign::kMinus) ? 0 : 1; }
 
             // Alternative format is valid for hexadecimal (including pointers), octal, binary and all floating point types.
             inline constexpr int prefix_width() const noexcept { return (!hash() || type_is_float()) ? 0 : type_is_integer_oct() ? 1 : 2; }
 
-            void write_sign(BasicStringSpan& it, const bool negative) const noexcept;
-            void write_prefix(BasicStringSpan& it) const noexcept;
+            void write_sign(str_t& it, const bool negative) const noexcept;
+            void write_prefix(str_t& it) const noexcept;
 
             char m_fill_char = ' ';
             Type m_type      = Type::kNone;
@@ -191,100 +191,98 @@ namespace ncore
             s8   m_index     = -1;
         };
 
-        typedef void (*ArgFormatFunc)(u8 argType, u64 argValue, BasicStringSpan& dst, ArgFormatState& format);
-
-        void FormatArg(u8 argType, u64 argValue, BasicStringSpan& dst, ArgFormatState& format);
+        typedef void (*format_func_t)(u8 argType, u64 argValue, str_t& dst, state_t& format);
 
         // Arg defs
         template <typename T> struct arg_t
         {
             static inline u64           encode(T v) { return *((u64*)(&v)); }
             static inline T             decode(u64 v) { return *((T*)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<bool>
         {
             static inline u64           encode(bool v) { return *((u64*)(&v)); }
             static inline bool          decode(u64 v) { return *((bool*)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<char>
         {
             static inline u64           encode(char v) { return *((u64*)(&v)); }
             static inline char          decode(u64 v) { return *((char*)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<s32>
         {
             static inline u64           encode(s32 v) { return *((u64*)(&v)); }
             static inline s32           decode(u64 v) { return *((s32*)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<u32>
         {
             static inline u64           encode(u32 v) { return *((u64*)(&v)); }
             static inline u32           decode(u64 v) { return *((u32*)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<s64>
         {
             static inline u64           encode(s64 v) { return *((u64*)(&v)); }
             static inline s64           decode(u64 v) { return *((s64*)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<u64>
         {
             static inline u64           encode(u64 v) { return v; }
             static inline u64           decode(u64 v) { return v; }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<void*>
         {
             static inline u64           encode(void* v) { return reinterpret_cast<u64>(v); }
             static inline const void*   decode(u64 v) { return *((const void**)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<const void*>
         {
             static inline u64           encode(const void* v) { return reinterpret_cast<u64>(v); }
             static inline const void*   decode(u64 v) { return *((const void**)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<float>
         {
             static inline u64           encode(float v) { return *((u64*)(&v)); }
             static inline float         decode(u64 v) { return *((float*)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<double>
         {
             static inline u64           encode(double v) { return *((u64*)(&v)); }
             static inline double        decode(u64 v) { return *((double*)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<char*>
         {
             static inline u64           encode(char* v) { return reinterpret_cast<u64>(v); }
             static inline const char*   decode(u64 v) { return *((const char**)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         template <> struct arg_t<const char*>
         {
             static inline u64           encode(const char* v) { return reinterpret_cast<u64>(v); }
             static inline const char*   decode(u64 v) { return *((const char**)(&v)); }
-            static inline ArgFormatFunc formatter() { return FormatArg; }
+            static inline format_func_t formatter() { return nullptr; }
         };
 
         // Type defs
@@ -358,7 +356,7 @@ namespace ncore
         {
             u64 const*           args;
             u8 const*            types;
-            ArgFormatFunc const* funcs;
+            format_func_t const* funcs;
             s32                  size;
         };
 
@@ -368,7 +366,7 @@ namespace ncore
         {
             const u8            types[]  = {typed<Args>::value...};
             const u64           values[] = {arg_t<Args>::encode(args)...};
-            const ArgFormatFunc funcs[]  = {arg_t<Args>::formatter()...};
+            const format_func_t funcs[]  = {arg_t<Args>::formatter()...};
 
             args_t _args = {values, types, funcs, (s32)(sizeof(types) / sizeof(types[0]))};
             return toStr(str, &str[strMaxLen], fmt, _args);

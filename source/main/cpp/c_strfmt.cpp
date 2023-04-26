@@ -65,9 +65,9 @@ namespace ncore
         constexpr char digits_hex_uppercase[]{"0123456789ABCDEF"};
         constexpr char digits_hex_lowercase[]{"0123456789abcdef"};
 
-        class BasicStringView
+        class cstr_t
         {
-            friend class BasicStringSpan;
+            friend class str_t;
 
             enum
             {
@@ -78,45 +78,43 @@ namespace ncore
             } m_type;
 
         public:
-            BasicStringView() noexcept                       = delete;
-            BasicStringView(const BasicStringView&) noexcept = default;
-            BasicStringView(BasicStringView&&) noexcept      = default;
+            cstr_t() noexcept                       = delete;
+            cstr_t(const cstr_t&) noexcept = default;
+            cstr_t(cstr_t&&) noexcept      = default;
 
-            BasicStringView(const char* str) noexcept
+            cstr_t(const char* str) noexcept
                 : m_type(Type_Ascii)
                 , m_begin{str}
+                , m_end{str}
             {
-                m_length = length();
-                m_end    = str;
+                m_end += compute_length();
             }
 
-            BasicStringView(const char* str, const uint_t length)
+            cstr_t(const char* str, const uint_t length)
                 : m_type(Type_Ascii)
                 , m_begin{str}
                 , m_end{str + length}
-                , m_length(length)
             {
                 FMT_CHECK(length >= 0, std::runtime_error);
             }
 
-            BasicStringView(const char* first, const char* last)
+            cstr_t(const char* first, const char* last)
                 : m_type(Type_Ascii)
                 , m_begin{first}
                 , m_end{last}
-                , m_length(last - first)
             {
                 FMT_CHECK(first <= last, std::runtime_error);
             }
 
             // -------- ASSIGNMENT ------------------------------------------------
 
-            BasicStringView& operator=(const BasicStringView&) noexcept = default;
-            BasicStringView& operator=(BasicStringView&&) noexcept      = default;
+            cstr_t& operator=(const cstr_t&) noexcept = default;
+            cstr_t& operator=(cstr_t&&) noexcept      = default;
 
             inline uchar32 operator*() const noexcept { return peek(); }
 
-            uint_t length() const noexcept { return m_length; }
-            bool   at_end() const noexcept { return m_length == 0; }
+            uint_t length() const noexcept { return m_end - m_begin; }
+            bool   at_end() const noexcept { return m_begin >= m_end; }
 
             uchar32 peek(int n = 0) const noexcept;
             uchar32 read() noexcept;
@@ -126,58 +124,61 @@ namespace ncore
             uint_t compute_length() const noexcept
             {
                 // this is different for each character encoding
+                const char* iter = m_begin;
+                while (*iter)
+                {
+                    ++iter;
+                }
+                return iter - m_begin;
             }
 
             // --------------------------------------------------------------------
             // PRIVATE MEMBER VARIABLES
             // --------------------------------------------------------------------
-            uint_t      m_length;
             const char* m_begin;
             const char* m_end;
         };
 
-        uchar32 BasicStringView::peek(int n) const noexcept
+        uchar32 cstr_t::peek(int n) const noexcept
         {
             if (m_type == Type_Ascii)
             {
-                if (n < m_length)
+                if ((m_begin+n) < m_end)
                 {
-                    return static_cast<uchar32>(*static_cast<const char*>(m_begin) + n);
+                    return static_cast<uchar32>(*(m_begin + n));
                 }
             }
             return '\0';
         }
 
-        uchar32 BasicStringView::read() noexcept
+        uchar32 cstr_t::read() noexcept
         {
             if (m_type == Type_Ascii)
             {
-                if (m_length > 0)
+                if (m_begin < m_end)
                 {
-                    --m_length;
-                    return *static_cast<const char*>(m_begin)++;
+                    return *m_begin++;
                 }
             }
             return '\0';
         }
 
-        void BasicStringView::skip(int n) noexcept 
+        void cstr_t::skip(int n) noexcept 
         {
             if (m_type == Type_Ascii)
             {
-                if (n < m_length)
+                if ((m_begin + n) < m_end)
                 {
-                    m_length -= n;
-                    m_begin = static_cast<const char*>(m_begin) + n;
+                    m_begin += n;
                 }
                 else
                 {
-                    m_length = 0;
+                    m_begin  = m_end;
                 }
             }
         }
 
-        void BasicStringSpan::write(uchar32 c)
+        void str_t::write(uchar32 c)
         {
             if (m_type == Type_Ascii)
             {
@@ -192,14 +193,14 @@ namespace ncore
             }
         }
 
-        BasicStringSpan::BasicStringSpan(char* first, char* last)
+        str_t::str_t(char* first, char* last)
             : m_type(Type_Ascii)
             , m_begin{first}
             , m_end{last}
         {
         }
 
-        void BasicStringSpan::skip(const uint_t n)
+        void str_t::skip(const uint_t n)
         {
             if (m_type == Type_Ascii)
             {
@@ -207,11 +208,11 @@ namespace ncore
             }
         }
 
-        void BasicStringSpan::write(BasicStringView const& str)
+        void str_t::write(cstr_t const& str)
         {
             if (m_type == Type_Ascii)
             {
-                if (str.m_type == BasicStringView::Type_Ascii)
+                if (str.m_type == cstr_t::Type_Ascii)
                 {
                     const char* src = static_cast<const char*>(str.m_begin);
                     while (src != static_cast<const char*>(str.m_end))
@@ -236,7 +237,7 @@ namespace ncore
                 }
             }
 
-            inline static void assign(BasicStringSpan& dst, char ch, std::ptrdiff_t count) noexcept
+            inline static void assign(str_t& dst, char ch, std::ptrdiff_t count) noexcept
             {
                 while ((count--) > 0)
                 {
@@ -244,7 +245,7 @@ namespace ncore
                 }
             }
 
-            inline static void copy(BasicStringSpan& dst, const char* src, std::ptrdiff_t count) noexcept
+            inline static void copy(str_t& dst, const char* src, std::ptrdiff_t count) noexcept
             {
                 while ((count--) > 0)
                 {
@@ -252,8 +253,9 @@ namespace ncore
                 }
             }
 
-            inline static void copy(BasicStringSpan& dst, BasicStringView& src, std::ptrdiff_t count) noexcept
+            inline static void copy(str_t& dst, const cstr_t& str, std::ptrdiff_t count) noexcept
             {
+                cstr_t src(str);
                 while ((count--) > 0)
                 {
                     uchar32 c = src.read();
@@ -671,7 +673,7 @@ namespace ncore
 
         // Writes the alignment (sign, prefix and fill before) for any
         // argument type. Returns the fill counter to write after argument.
-        int ArgFormatState::write_alignment(BasicStringSpan& it, int characters, const bool negative) const
+        int state_t::write_alignment(str_t& it, int characters, const bool negative) const
         {
             characters += sign_width(negative) + prefix_width();
 
@@ -715,7 +717,7 @@ namespace ncore
             return fill_after;
         }
 
-        void ArgFormatState::write_sign(BasicStringSpan& it, const bool negative) const noexcept
+        void state_t::write_sign(str_t& it, const bool negative) const noexcept
         {
             if (negative)
             {
@@ -730,7 +732,7 @@ namespace ncore
             }
         }
 
-        void ArgFormatState::write_prefix(BasicStringSpan& it) const noexcept
+        void state_t::write_prefix(str_t& it) const noexcept
         {
             // Alternative format is valid for hexadecimal (including
             // pointers), octal, binary and all floating point types.
@@ -749,7 +751,7 @@ namespace ncore
             }
         }
 
-        class ArgFormat
+        class format_t
         {
         public:
             using iterator       = char*;
@@ -759,9 +761,9 @@ namespace ncore
             // PUBLIC MEMBER FUNCTIONS
             // --------------------------------------------------------------------
 
-            ArgFormat(BasicStringView& fmt, const int arg_count)
+            format_t(cstr_t& fmt, const int arg_count)
             {
-                BasicStringView it = fmt;
+                cstr_t it = fmt;
 
                 // Parse argument index
                 if (*it >= '0' && *it <= '9')
@@ -775,7 +777,7 @@ namespace ncore
                     // A format spec is expected next...
 
                     // Remove the empty format flag
-                    state.m_flags = ArgFormatState::Flags::kNone;
+                    state.m_flags = state_t::Flags::kNone;
 
                     // Advance ':' character
                     it.skip(1);
@@ -783,7 +785,7 @@ namespace ncore
                     // Try to parse alignment flag at second character of format spec.
                     state.m_flags = parse_align_flag(it.peek(1));
 
-                    if (state.m_flags != ArgFormatState::Flags::kNone)
+                    if (state.m_flags != state_t::Flags::kNone)
                     {
                         // Alignment flag present at second character of format spec.
                         // Should also have a fill character at the first character.
@@ -800,7 +802,7 @@ namespace ncore
                         // Try to parse the alignment flag at the first character instead...
                         state.m_flags = parse_align_flag(*it);
 
-                        if (state.m_flags != ArgFormatState::Flags::kNone)
+                        if (state.m_flags != state_t::Flags::kNone)
                         {
                             it.skip(1);
                         }
@@ -810,15 +812,15 @@ namespace ncore
                     switch (*it)
                     {
                         case '-':
-                            state.m_flags |= ArgFormatState::Flags::kSignMinus;
+                            state.m_flags |= state_t::Flags::kSignMinus;
                             it.skip(1);
                             break;
                         case '+':
-                            state.m_flags |= ArgFormatState::Flags::kSignPlus;
+                            state.m_flags |= state_t::Flags::kSignPlus;
                             it.skip(1);
                             break;
                         case ' ':
-                            state.m_flags |= ArgFormatState::Flags::kSignSpace;
+                            state.m_flags |= state_t::Flags::kSignSpace;
                             it.skip(1);
                             break;
                         default: break;
@@ -827,7 +829,7 @@ namespace ncore
                     // Parse hash flag
                     if (*it == '#')
                     {
-                        state.m_flags |= ArgFormatState::Flags::kHash;
+                        state.m_flags |= state_t::Flags::kHash;
                         it.skip(1);
                     }
 
@@ -862,26 +864,26 @@ namespace ncore
                         uchar c = it.read();
                         switch (c)
                         {
-                            case 'c': state.m_type = ArgFormatState::Type::kChar; break;
-                            case 'd': state.m_type = ArgFormatState::Type::kIntegerDec; break;
-                            case 'X': state.m_flags |= ArgFormatState::Flags::kUppercase; USF_FALLTHROUGH;
-                            case 'x': state.m_type = ArgFormatState::Type::kIntegerHex; break;
-                            case 'o': state.m_type = ArgFormatState::Type::kIntegerOct; break;
-                            case 'B': state.m_flags |= ArgFormatState::Flags::kUppercase; USF_FALLTHROUGH;
-                            case 'b': state.m_type = ArgFormatState::Type::kIntegerBin; break;
-                            case 'P': state.m_flags |= ArgFormatState::Flags::kUppercase; USF_FALLTHROUGH;
-                            case 'p': state.m_type = ArgFormatState::Type::kPointer; break;
-                            case 'F': state.m_flags |= ArgFormatState::Flags::kUppercase; USF_FALLTHROUGH;
-                            case 'f': state.m_type = ArgFormatState::Type::kFloatFixed; break;
-                            case 'E': state.m_flags |= ArgFormatState::Flags::kUppercase; USF_FALLTHROUGH;
-                            case 'e': state.m_type = ArgFormatState::Type::kFloatScientific; break;
-                            case 'G': state.m_flags |= ArgFormatState::Flags::kUppercase; USF_FALLTHROUGH;
-                            case 'g': state.m_type = ArgFormatState::Type::kFloatGeneral; break;
-                            case 's': state.m_type = ArgFormatState::Type::kString; break;
-                            default: state.m_type = ArgFormatState::Type::kInvalid; break;
+                            case 'c': state.m_type = state_t::Type::kChar; break;
+                            case 'd': state.m_type = state_t::Type::kIntegerDec; break;
+                            case 'X': state.m_flags |= state_t::Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'x': state.m_type = state_t::Type::kIntegerHex; break;
+                            case 'o': state.m_type = state_t::Type::kIntegerOct; break;
+                            case 'B': state.m_flags |= state_t::Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'b': state.m_type = state_t::Type::kIntegerBin; break;
+                            case 'P': state.m_flags |= state_t::Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'p': state.m_type = state_t::Type::kPointer; break;
+                            case 'F': state.m_flags |= state_t::Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'f': state.m_type = state_t::Type::kFloatFixed; break;
+                            case 'E': state.m_flags |= state_t::Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'e': state.m_type = state_t::Type::kFloatScientific; break;
+                            case 'G': state.m_flags |= state_t::Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'g': state.m_type = state_t::Type::kFloatGeneral; break;
+                            case 's': state.m_type = state_t::Type::kString; break;
+                            default: state.m_type = state_t::Type::kInvalid; break;
                         }
 
-                        FMT_CHECK(state.m_type != ArgFormatState::Type::kInvalid, std::runtime_error);
+                        FMT_CHECK(state.m_type != state_t::Type::kInvalid, std::runtime_error);
                     }
 
                     // Validate the read format spec!
@@ -889,17 +891,17 @@ namespace ncore
                     if (fill_zero)
                     {
                         // Fill zero flag has precedence over any other alignment and fill character.
-                        state.m_flags     = static_cast<u8>((state.m_flags & (~ArgFormatState::Flags::kAlignBitmask)) | ArgFormatState::Flags::kAlignNumeric);
+                        state.m_flags     = static_cast<u8>((state.m_flags & (~state_t::Flags::kAlignBitmask)) | state_t::Flags::kAlignNumeric);
                         state.m_fill_char = '0';
                     }
 
-                    if (state.align() == ArgFormatState::Align::kNumeric)
+                    if (state.align() == state_t::Align::kNumeric)
                     {
                         // Numeric alignment are only valid for numeric and pointer types.
                         FMT_CHECK(state.type_is_numeric() || state.type_is_pointer(), std::runtime_error);
                     }
 
-                    if (state.sign() != ArgFormatState::Sign::kNone)
+                    if (state.sign() != state_t::Sign::kNone)
                     {
                         // Sign is only valid for numeric types.
                         FMT_CHECK(state.type_is_numeric(), std::runtime_error);
@@ -928,16 +930,16 @@ namespace ncore
 
             inline void default_align_left() noexcept
             {
-                if ((state.m_flags & ArgFormatState::Flags::kAlignBitmask) == ArgFormatState::Flags::kAlignNone)
+                if ((state.m_flags & state_t::Flags::kAlignBitmask) == state_t::Flags::kAlignNone)
                 {
-                    state.m_flags |= ArgFormatState::Flags::kAlignLeft;
+                    state.m_flags |= state_t::Flags::kAlignLeft;
                 }
             }
 
             // Parses the input as a positive integer that fits into a `u8` type. This
             // function assumes that the first character is a digit and terminates parsing
             // at the presence of the first non-digit character or when value overflows.
-            static u8 parse_positive_small_int(BasicStringView& it, const int max_value)
+            static u8 parse_positive_small_int(cstr_t& it, const int max_value)
             {
                 assert(max_value < 256);
 
@@ -945,7 +947,7 @@ namespace ncore
                 uchar32 c     = 0;
                 do
                 {
-                    uchar32 c = it.read();
+                    c = it.read();
                     value     = (value * 10) + static_cast<int>(c - '0');
                     FMT_CHECK(value <= max_value, std::runtime_error); // Check for overflow
                     c = it.peek();
@@ -958,24 +960,24 @@ namespace ncore
             {
                 switch (ch)
                 {
-                    case '<': return ArgFormatState::Flags::kAlignLeft; break;
-                    case '>': return ArgFormatState::Flags::kAlignRight; break;
-                    case '^': return ArgFormatState::Flags::kAlignCenter; break;
-                    case '=': return ArgFormatState::Flags::kAlignNumeric; break;
-                    default: return ArgFormatState::Flags::kNone; break;
+                    case '<': return state_t::Flags::kAlignLeft; break;
+                    case '>': return state_t::Flags::kAlignRight; break;
+                    case '^': return state_t::Flags::kAlignCenter; break;
+                    case '=': return state_t::Flags::kAlignNumeric; break;
+                    default: return state_t::Flags::kNone; break;
                 }
             }
 
-            ArgFormatState state;
+            state_t state;
         };
 
-        void ArgFormatState::format_string(BasicStringSpan& it, ArgFormatState& state, const char* str, const char* end) 
+        void state_t::format_string(str_t& it, state_t& state, const char* str, const char* end) 
         { 
-            BasicStringView strview(str, end);
+            cstr_t strview(str, end);
             format_string(it, state, strview);
         }
 
-        void ArgFormatState::format_string(BasicStringSpan& it, ArgFormatState& state, const BasicStringView& str)
+        void state_t::format_string(str_t& it, state_t& state, const cstr_t& str)
         {
             // Test for argument type / format match
             FMT_CHECK(state.type_is_none() || state.type_is_string(), std::runtime_error);
@@ -984,13 +986,12 @@ namespace ncore
             // default_align_left();
 
             // If precision is specified use it up to string size.
-            BasicStringView src(str);
-            const int       src_length = (state.precision() == -1) ? static_cast<int>(src.length()) : std::min(static_cast<int>(state.precision()), static_cast<int>(src.length()));
+            const int str_length = (state.precision() == -1) ? static_cast<int>(str.length()) : std::min(static_cast<int>(state.precision()), static_cast<int>(str.length()));
 
-            format_string(it, state, src, src_length);
+            format_string(it, state, str, str_length);
         }
 
-        void ArgFormatState::format_string(BasicStringSpan& it, const ArgFormatState& state, BasicStringView& str, const int str_length, const bool negative)
+        void state_t::format_string(str_t& it, const state_t& state, const cstr_t& str, const int str_length, const bool negative)
         {
             const int fill_after = state.write_alignment(it, str_length, negative);
 
@@ -999,7 +1000,7 @@ namespace ncore
         }
 
 
-        class Arg
+        class argument_t
         {
         public:
             // --------------------------------------------------------------------
@@ -1009,9 +1010,9 @@ namespace ncore
             using iterator       = char*;
             using const_iterator = const char*;
 
-            static void format(u8 argType, u64 argValue, BasicStringSpan& dst, ArgFormatState& format)
+            static void format(u8 argType, u64 argValue, str_t& dst, state_t& format)
             {
-                BasicStringSpan it = dst;
+                str_t it = dst;
 
                 switch (argType)
                 {
@@ -1024,7 +1025,7 @@ namespace ncore
                     case kPointer: format_pointer(it, format, argValue); break;
                     case kFloat: format_float(it, format, arg_t<float>::decode(argValue)); break;
                     case kDouble: format_float(it, format, arg_t<double>::decode(argValue)); break;
-                    case kString: ArgFormatState::format_string(it, format, arg_t<const char*>::decode(argValue)); break;
+                    case kString: state_t::format_string(it, format, arg_t<const char*>::decode(argValue)); break;
                 }
 
                 dst = it;
@@ -1035,13 +1036,13 @@ namespace ncore
             // PRIVATE STATIC FUNCTIONS
             // --------------------------------------------------------------------
 
-            static void format_bool(BasicStringSpan& it, const ArgFormatState& state, const bool value)
+            static void format_bool(str_t& it, const state_t& state, const bool value)
             {
                 if (state.type_is_none())
                 {
                     s32 const       len = value ? 4 : 5;
-                    BasicStringView src(value ? "true" : "false", len);
-                    ArgFormatState::format_string(it, state, src, len);
+                    cstr_t src(value ? "true" : "false", len);
+                    state_t::format_string(it, state, src, len);
                 }
                 else if (state.type_is_integer())
                 {
@@ -1054,7 +1055,7 @@ namespace ncore
                 }
             }
 
-            static void format_char(BasicStringSpan& it, ArgFormatState& state, const char value)
+            static void format_char(str_t& it, state_t& state, const char value)
             {
                 if (state.type_is_none() || state.type_is_char())
                 {
@@ -1076,7 +1077,7 @@ namespace ncore
                 }
             }
 
-            static void format_integer(BasicStringSpan& it, const ArgFormatState& state, const s64 value)
+            static void format_integer(str_t& it, const state_t& state, const s64 value)
             {
                 const bool negative = (value < 0);
                 const auto uvalue   = (negative ? -value : value);
@@ -1084,7 +1085,7 @@ namespace ncore
                 format_unsigned_integer(it, state, uvalue, negative);
             }
 
-            static void format_unsigned_integer(BasicStringSpan& it, const ArgFormatState& state, const u64 value, const bool negative = false)
+            static void format_unsigned_integer(str_t& it, const state_t& state, const u64 value, const bool negative = false)
             {
                 int fill_after = 0;
 
@@ -1095,7 +1096,7 @@ namespace ncore
                     fill_after        = state.write_alignment(it, digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_dec(dst, value);
-                    BasicStringView src(dst, digits);
+                    cstr_t src(buffer, digits);
                     it.write(src);
                 }
                 else if (state.type_is_integer_hex())
@@ -1105,7 +1106,7 @@ namespace ncore
                     fill_after        = state.write_alignment(it, digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_hex(dst, value, state.uppercase());
-                    BasicStringView src(dst, digits);
+                    cstr_t src(buffer, digits);
                     it.write(src);
                 }
                 else if (state.type_is_integer_oct())
@@ -1115,7 +1116,7 @@ namespace ncore
                     fill_after        = state.write_alignment(it, digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_oct(dst, value);
-                    BasicStringView src(dst, digits);
+                    cstr_t src(buffer, digits);
                     it.write(src);
                 }
                 else if (state.type_is_integer_bin())
@@ -1125,7 +1126,7 @@ namespace ncore
                     fill_after        = state.write_alignment(it, digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_bin(dst, value);
-                    BasicStringView src(dst, digits);
+                    cstr_t src(buffer, digits);
                     it.write(src);
                 }
                 else
@@ -1137,7 +1138,7 @@ namespace ncore
                 CharTraits::assign(it, state.fill_char(), fill_after);
             }
 
-            static void format_pointer(BasicStringSpan& it, const ArgFormatState& state, const std::uintptr_t value)
+            static void format_pointer(str_t& it, const state_t& state, const std::uintptr_t value)
             {
                 if (state.type_is_none() || state.type_is_pointer())
                 {
@@ -1147,7 +1148,7 @@ namespace ncore
                     char       buffer[Integer::kMaxDigitsPointer];
                     char*      dst = buffer + digits;
                     Integer::convert_hex(dst, ivalue, state.uppercase());
-                    BasicStringView src(dst, digits);
+                    cstr_t src(buffer, digits);
                     it.write(src);
                     CharTraits::assign(it, state.fill_char(), fill_after);
                 }
@@ -1158,15 +1159,15 @@ namespace ncore
                 }
             }
 
-            static void format_float(BasicStringSpan& it, const ArgFormatState& state, double value)
+            static void format_float(str_t& it, const state_t& state, double value)
             {
                 // Test for argument type / format match
                 FMT_CHECK(state.type_is_none() || state.type_is_float(), std::runtime_error);
 
                 if (std::isnan(value))
                 {
-                    BasicStringView src(state.uppercase() ? "NAN" : "nan", 3);
-                    ArgFormatState::format_string(it, state, src, 3);
+                    cstr_t src(state.uppercase() ? "NAN" : "nan", 3);
+                    state_t::format_string(it, state, src, 3);
                 }
                 else
                 {
@@ -1174,8 +1175,8 @@ namespace ncore
 
                     if (std::isinf(value))
                     {
-                        BasicStringView src(state.uppercase() ? "INF" : "inf", 3);
-                        ArgFormatState::format_string(it, state, src, 3, negative);
+                        cstr_t src(state.uppercase() ? "INF" : "inf", 3);
+                        state_t::format_string(it, state, src, 3, negative);
                     }
                     else
                     {
@@ -1336,14 +1337,14 @@ namespace ncore
                         }
                         else
                         {
-                            BasicStringView src(state.uppercase() ? "NAN" : "nan", 3);
-                            ArgFormatState::format_string(it, state, src, 3, negative);
+                            cstr_t src(state.uppercase() ? "NAN" : "nan", 3);
+                            state_t::format_string(it, state, src, 3, negative);
                         }
                     }
                 }
             }
 
-            static void write_float_exponent(BasicStringSpan& out, int exponent, const bool uppercase) noexcept
+            static void write_float_exponent(str_t& out, int exponent, const bool uppercase) noexcept
             {
                 char  buffer[10];
                 char* it = buffer;
@@ -1374,11 +1375,11 @@ namespace ncore
                     *it++ = static_cast<char>('0' + (exponent - 10));
                 }
 
-                BasicStringView src(buffer, it);
+                cstr_t src(buffer, it);
                 out.write(src);
             }
 
-            static void format_float_zero(BasicStringSpan& out, const ArgFormatState& state, const bool negative)
+            static void format_float_zero(str_t& out, const state_t& state, const bool negative)
             {
                 int precision = 0;
 
@@ -1421,9 +1422,9 @@ namespace ncore
             }
         };
 
-        void parse_format_string(BasicStringSpan& str, BasicStringView& fmt)
+        void parse_format_string(str_t& str, cstr_t& fmt)
         {
-            while (fmt.at_end() && !str.at_end())
+            while (!fmt.at_end() && !str.at_end())
             {
                 uchar32 c = fmt.read();
                 if (c == '{')
@@ -1456,9 +1457,7 @@ namespace ncore
             }
         }
 
-        void FormatArg(u8 argType, u64 argValue, BasicStringSpan& dst, ArgFormatState& format) { Arg::format(argType, argValue, dst, format); }
-
-        void process(BasicStringSpan& str, BasicStringView& fmt, const args_t& args)
+        void process(str_t& str, cstr_t& fmt, const args_t& args)
         {
             // Argument's sequential index
             int arg_seq_index = 0;
@@ -1468,7 +1467,7 @@ namespace ncore
             while (!fmt.at_end())
             {
                 // Should be one character after '{
-                ArgFormat format(fmt, args.size);
+                format_t format(fmt, args.size);
 
                 // Determine which argument index to use, sequential or positional.
                 int arg_index = format.state.index();
@@ -1479,7 +1478,14 @@ namespace ncore
                     arg_index = arg_seq_index++;
                 }
 
-                args.funcs[arg_index](args.types[arg_index], args.args[arg_index], str, format.state);
+                if (args.funcs != nullptr && args.funcs[arg_index] != nullptr)
+                {
+                    args.funcs[arg_index](args.types[arg_index], args.args[arg_index], str, format.state);
+                }
+                else
+                {
+                    argument_t::format(args.types[arg_index], args.args[arg_index], str, format.state);
+                }
 
                 parse_format_string(str, fmt);
             }
@@ -1487,8 +1493,8 @@ namespace ncore
 
         ascii::prune toStr(ascii::prune str, ascii::prune end, ascii::pcrune fmt, args_t const& args)
         {
-            BasicStringSpan str_span(str, end);
-            BasicStringView fmt_view(fmt);
+            str_t str_span(str, end);
+            cstr_t fmt_view(fmt);
             process(str_span, fmt_view, args);
             str_span.write();
             return str;
