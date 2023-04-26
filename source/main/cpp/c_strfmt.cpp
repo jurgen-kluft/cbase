@@ -1,16 +1,11 @@
 // https://github.com/hparracho/usflib/tree/master
 
+#include "cbase/c_float.h"
+#include "cbase/c_double.h"
+#include "cbase/c_integer.h"
 #include "cbase/c_strfmt.h"
+#include "cbase/c_runes.h"
 
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <climits>
-#include <cmath>
-#include <limits>
-#include <stdexcept>
-#include <string>
-#include <type_traits>
 
 namespace ncore
 {
@@ -229,7 +224,7 @@ namespace ncore
             // --------------------------------------------------------------------
             // PUBLIC STATIC FUNCTIONS
             // --------------------------------------------------------------------
-            inline static void assign(char* dst, char ch, std::ptrdiff_t count) noexcept
+            inline static void assign(char* dst, char ch, ptr_t count) noexcept
             {
                 while ((count--) > 0)
                 {
@@ -237,7 +232,7 @@ namespace ncore
                 }
             }
 
-            inline static void assign(str_t& dst, char ch, std::ptrdiff_t count) noexcept
+            inline static void assign(str_t& dst, char ch, ptr_t count) noexcept
             {
                 while ((count--) > 0)
                 {
@@ -245,7 +240,7 @@ namespace ncore
                 }
             }
 
-            inline static void copy(str_t& dst, const char* src, std::ptrdiff_t count) noexcept
+            inline static void copy(str_t& dst, const char* src, ptr_t count) noexcept
             {
                 while ((count--) > 0)
                 {
@@ -253,7 +248,7 @@ namespace ncore
                 }
             }
 
-            inline static void copy(str_t& dst, const cstr_t& str, std::ptrdiff_t count) noexcept
+            inline static void copy(str_t& dst, const cstr_t& str, ptr_t count) noexcept
             {
                 cstr_t src(str);
                 while ((count--) > 0)
@@ -263,7 +258,7 @@ namespace ncore
                 }
             }
 
-            inline static std::ptrdiff_t length(const char* str) noexcept
+            inline static ptr_t length(const char* str) noexcept
             {
                 const char* str_begin = str;
                 while (*str != char{})
@@ -292,13 +287,13 @@ namespace ncore
             // -------- POWERS OF 10 ----------------------------------------------
             static u32 pow10_uint32(const int index) noexcept
             {
-                assert(index >= 0 && index < 10);
+                ASSERT(index >= 0 && index < 10);
                 return pow10_uint32_lut[index];
             }
 
             static u64 pow10_uint64(const int index) noexcept
             {
-                assert(index >= 0 && index < 20);
+                ASSERT(index >= 0 && index < 20);
                 return pow10_uint64_lut[index];
             }
 
@@ -327,7 +322,7 @@ namespace ncore
 
             static int count_digits_dec(const u64 n) noexcept
             {
-                if (n <= std::numeric_limits<u32>::max())
+                if (n <= 4294967295)
                 {
                     return count_digits_dec(static_cast<u32>(n));
                 }
@@ -416,7 +411,7 @@ namespace ncore
                 do
                 {
                     value    = moddiv10(value, mod);
-                    *(--dst) = static_cast<char>("0123456789??????"[mod & 0xF]);
+                    *(--dst) = to_dec_char(mod);
                 } while (value);
             }
 
@@ -461,10 +456,9 @@ namespace ncore
 
             static void convert_hex(char* dst, u64 value, const bool uppercase) noexcept
             {
-                const char* digits = uppercase ? digits_hex_uppercase : digits_hex_lowercase;
                 do
                 {
-                    *(--dst) = static_cast<char>(digits[value & 0xF]);
+                    *(--dst) = to_hex_char((u8)value, !uppercase);
                     value >>= 4U;
                 } while (value);
             }
@@ -941,7 +935,7 @@ namespace ncore
             // at the presence of the first non-digit character or when value overflows.
             static u8 parse_positive_small_int(cstr_t& it, const int max_value)
             {
-                assert(max_value < 256);
+                ASSERT(max_value < 256);
 
                 int     value = 0;
                 uchar32 c     = 0;
@@ -986,7 +980,7 @@ namespace ncore
             // default_align_left();
 
             // If precision is specified use it up to string size.
-            const int str_length = (state.precision() == -1) ? static_cast<int>(str.length()) : std::min(static_cast<int>(state.precision()), static_cast<int>(str.length()));
+            const int str_length = (state.precision() == -1) ? static_cast<int>(str.length()) : math::min(static_cast<int>(state.precision()), static_cast<int>(str.length()));
 
             format_string(it, state, str, str_length);
         }
@@ -1068,7 +1062,7 @@ namespace ncore
                 }
                 else if (state.type_is_integer())
                 {
-                    format_integer(it, state, static_cast<int32_t>(value));
+                    format_integer(it, state, static_cast<s32>(value));
                 }
                 else
                 {
@@ -1138,7 +1132,7 @@ namespace ncore
                 CharTraits::assign(it, state.fill_char(), fill_after);
             }
 
-            static void format_pointer(str_t& it, const state_t& state, const std::uintptr_t value)
+            static void format_pointer(str_t& it, const state_t& state, const uint_t value)
             {
                 if (state.type_is_none() || state.type_is_pointer())
                 {
@@ -1164,16 +1158,16 @@ namespace ncore
                 // Test for argument type / format match
                 FMT_CHECK(state.type_is_none() || state.type_is_float(), std::runtime_error);
 
-                if (std::isnan(value))
+                if (math::isNAN(value))
                 {
                     cstr_t src(state.uppercase() ? "NAN" : "nan", 3);
                     state_t::format_string(it, state, src, 3);
                 }
                 else
                 {
-                    const bool negative = std::signbit(value);
-
-                    if (std::isinf(value))
+                    const bool negative = math::signBit(value) != 0;
+                    
+                    if (math::isInfinite(value))
                     {
                         cstr_t src(state.uppercase() ? "INF" : "inf", 3);
                         state_t::format_string(it, state, src, 3, negative);
@@ -1362,7 +1356,7 @@ namespace ncore
 
                 // No point in making a proper integer to string
                 // conversion for exponent since we only support [e-19; e19].
-                assert(exponent <= 19);
+                ASSERT(exponent <= 19);
 
                 if (exponent < 10)
                 {
