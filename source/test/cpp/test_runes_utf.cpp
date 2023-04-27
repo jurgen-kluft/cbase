@@ -137,12 +137,12 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             crunes_t src("test");
             CHECK_EQUAL('t', src.m_ascii.m_bos[src.m_ascii.m_str]);
-            CHECK_EQUAL('e', src.m_ascii.m_bos[src.m_ascii.m_str]);
+            CHECK_EQUAL('e', src.m_ascii.m_bos[src.m_ascii.m_str + 1]);
 
             runez_t<utf32::rune, 16> dst;
             copy(src, dst);
 
-            CHECK_EQUAL('t', src.m_utf32.m_bos[dst.m_utf32.m_str]);
+            CHECK_EQUAL('t', dst.m_utf32.m_bos[dst.m_utf32.m_str]);
         }
 
         UNITTEST_TEST(read1_utf8)

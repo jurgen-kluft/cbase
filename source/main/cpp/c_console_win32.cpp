@@ -19,7 +19,7 @@ namespace ncore
 {
     class out_writer_t : public irunes_writer_t
     {
-        runez_t<utf32::rune, 64> m_write_to_console_cache;
+        runez_t<utf32::rune, 256> m_write_to_console_cache;
 
     public:
         inline out_writer_t() {}
@@ -183,7 +183,7 @@ namespace ncore
         }
     };
 
-    class xconsole_out_win32 : public console_t::out_t
+    class console_out_win32 : public console_t::out_t
     {
     public:
         virtual s32 color(console_t::EColor color) { return 0; }
@@ -218,7 +218,7 @@ namespace ncore
 
     console_t::out_t* gGetDefaultConsoleOut()
     {
-        static xconsole_out_win32 sConsoleOut;
+        static console_out_win32 sConsoleOut;
         return &sConsoleOut;
     }
 

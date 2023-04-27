@@ -78,6 +78,14 @@ namespace ncore
                 , m_flags(TYPE)
             {
             }
+            crunes_t(const runes_t& other)
+                : m_bos(other.m_bos)
+                , m_str(other.m_str)
+                , m_end(other.m_end)
+                , m_eos(other.m_eos)
+                , m_flags(other.m_flags)
+            {
+            }
 
             pcrune m_bos;   // begin of string
             u32    m_str;   // &m_bos[m_end] -> string
@@ -145,6 +153,14 @@ namespace ncore
                 , m_flags(TYPE)
             {
             }
+            crunes_t(const runes_t& other)
+                : m_bos(other.m_bos)
+                , m_str(other.m_str)
+                , m_end(other.m_end)
+                , m_eos(other.m_eos)
+                , m_flags(other.m_flags)
+            {
+            }
 
             pcrune m_bos;   // begin of string
             u32    m_str;   // &m_bos[m_end] -> string
@@ -203,6 +219,14 @@ namespace ncore
                 , m_flags(TYPE)
             {
             }
+            crunes_t(const runes_t& other)
+                : m_bos(other.m_bos)
+                , m_str(other.m_str)
+                , m_end(other.m_end)
+                , m_eos(other.m_eos)
+                , m_flags(other.m_flags)
+            {
+            }
 
             pcrune m_bos;   // begin of string
             u32    m_str;   // &m_bos[m_end] -> string
@@ -258,6 +282,14 @@ namespace ncore
                 , m_end((u32)(end - str))
                 , m_eos((u32)(end - str))
                 , m_flags(TYPE)
+            {
+            }
+            crunes_t(const runes_t& other)
+                : m_bos(other.m_bos)
+                , m_str(other.m_str)
+                , m_end(other.m_end)
+                , m_eos(other.m_eos)
+                , m_flags(other.m_flags)
             {
             }
 

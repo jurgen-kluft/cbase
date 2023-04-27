@@ -127,9 +127,9 @@ namespace ncore
 
             inline constexpr char fill_char() const noexcept { return m_fill_char; }
             inline constexpr Type type() const noexcept { return m_type; }
-            inline constexpr int  width() const noexcept { return static_cast<int>(m_width); }
-            inline constexpr int  precision() const noexcept { return static_cast<int>(m_precision); }
-            inline constexpr int  index() const noexcept { return static_cast<int>(m_index); }
+            inline constexpr s32  width() const noexcept { return static_cast<s32>(m_width); }
+            inline constexpr s32  precision() const noexcept { return static_cast<s32>(m_precision); }
+            inline constexpr s32  index() const noexcept { return static_cast<s32>(m_index); }
 
             inline constexpr Align align() const noexcept { return Align(m_flags & Flags::kAlignBitmask); }
             inline constexpr Sign  sign() const noexcept { return Sign(m_flags & Flags::kSignBitmask); }
@@ -168,16 +168,16 @@ namespace ncore
             
             // Writes the alignment (sign, prefix and fill before) for any
             // argument type. Returns the fill counter to write after argument.
-            int write_alignment(str_t& it, int characters, const bool negative) const;
+            s32 write_alignment(str_t& it, s32 characters, const bool negative) const;
             void write_sign(str_t& it, const bool negative) const noexcept;
             void write_prefix(str_t& it) const noexcept;
 
-            static void format_string(str_t& it, const state_t& state, const cstr_t& str, const int str_length, const bool negative = false);
+            static void format_string(str_t& it, const state_t& state, const cstr_t& str, const s32 str_length, const bool negative = false);
 
-            inline constexpr int sign_width(const bool negative) const noexcept { return (!negative && sign() <= Sign::kMinus) ? 0 : 1; }
+            inline constexpr s32 sign_width(const bool negative) const noexcept { return (!negative && sign() <= Sign::kMinus) ? 0 : 1; }
 
             // Alternative format is valid for hexadecimal (including pointers), octal, binary and all floating point types.
-            inline constexpr int prefix_width() const noexcept { return (!hash() || type_is_float()) ? 0 : type_is_integer_oct() ? 1 : 2; }
+            inline constexpr s32 prefix_width() const noexcept { return (!hash() || type_is_float()) ? 0 : type_is_integer_oct() ? 1 : 2; }
 
             char m_fill_char = ' ';
             Type m_type      = Type::kNone;

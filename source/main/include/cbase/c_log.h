@@ -2,7 +2,7 @@
 #define __CBASE_LOG_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "cbase/c_runes.h"
@@ -14,7 +14,6 @@ namespace ncore
     class logger_t;
 
 #define D_LOG
-
 #ifdef D_LOG
 
     struct log_info_t
@@ -40,15 +39,15 @@ namespace ncore
     void __LogPush(const char* fileName, s32 lineNum);
     void __LogFlush(void);
 
-#define D_LogMessage                      \
-    ncore::__LogPush(__FILE__, __LINE__); \
-    ncore::__LogMessage
-#define D_LogWarning                      \
-    ncore::__LogPush(__FILE__, __LINE__); \
-    ncore::__LogWarning
-#define D_LogError                        \
-    ncore::__LogPush(__FILE__, __LINE__); \
-    ncore::__LogError
+#    define D_LogMessage                      \
+        ncore::__LogPush(__FILE__, __LINE__); \
+        ncore::__LogMessage
+#    define D_LogWarning                      \
+        ncore::__LogPush(__FILE__, __LINE__); \
+        ncore::__LogWarning
+#    define D_LogError                        \
+        ncore::__LogPush(__FILE__, __LINE__); \
+        ncore::__LogError
 #else
     inline void __LogPush(const char* fileName, s32 lineNum) {}
     inline void __LogFlush(void) {}
@@ -56,9 +55,9 @@ namespace ncore
     inline void __LogFake(const char* channel, const char* message) {}
     inline void __LogFake(const char* channel, const char* messageFormat, const va_list_t& formatVars) {}
 
-#define D_LogMessage ncore::__LogFake
-#define D_LogWarning ncore::__LogFake
-#define D_LogError ncore::__LogFake
+#    define D_LogMessage ncore::__LogFake
+#    define D_LogWarning ncore::__LogFake
+#    define D_LogError ncore::__LogFake
 #endif
 
     class log_t

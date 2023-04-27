@@ -38,88 +38,114 @@ namespace ncore
      */
     class va_t
     {
-        enum EProperty
-        {
-            PROP_INTEGER  = 0x0800,
-            PROP_SIGNED   = 0x0400,
-            PROP_UNSIGNED = 0x0200,
-            PROP_FLOAT    = 0x0100,
-            PROP_MASK     = 0x0F00,
-            PROP_SHIFT    = 8,
-        };
-        enum ESize
-        {
-            SIZE_MASK  = 0xF000,
-            SIZE_SHIFT = 12,
-            SIZE_8     = 0x1000,
-            SIZE_16    = 0x2000,
-            SIZE_32    = 0x4000,
-            SIZE_64    = 0x8000,
-#ifdef TARGET_32BIT
-            SIZE_PTR = SIZE_32,
-#else
-            SIZE_PTR = SIZE_64,
-#endif
-        };
     public:
         enum EType
         {
-            TYPE_EMPTY   = 0,
-            TYPE_MASK    = 0x00FF,
-            TYPE_INT8    = 0x0001 | PROP_INTEGER | PROP_SIGNED | SIZE_8,
-            TYPE_INT16   = 0x0002 | PROP_INTEGER | PROP_SIGNED | SIZE_16,
-            TYPE_INT     = 0x0004 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
-            TYPE_INT32   = 0x0004 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
-            TYPE_INT64   = 0x0008 | PROP_INTEGER | PROP_SIGNED | SIZE_64,
-            TYPE_UINT8   = 0x0001 | PROP_INTEGER | PROP_UNSIGNED | SIZE_8,
-            TYPE_UINT16  = 0x0002 | PROP_INTEGER | PROP_UNSIGNED | SIZE_16,
-            TYPE_UINT    = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
-            TYPE_UINT32  = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
-            TYPE_UINT64  = 0x0008 | PROP_INTEGER | PROP_UNSIGNED | SIZE_64,
-            TYPE_BOOL    = 0x0020 | PROP_INTEGER | PROP_SIGNED | SIZE_32,
-            TYPE_FLOAT32 = 0x0040 | PROP_FLOAT | SIZE_32,
-            TYPE_FLOAT64 = 0x0050 | PROP_FLOAT | SIZE_64,
-            TYPE_PCRUNES = 0x0080 | SIZE_PTR
+            TYPE_EMPTY   = 0 << 28,
+            TYPE_INT8    = 1 << 28,
+            TYPE_INT16   = 2 << 28,
+            TYPE_INT     = 3 << 28,
+            TYPE_INT32   = 4 << 28,
+            TYPE_INT64   = 5 << 28,
+            TYPE_UINT8   = 6 << 28,
+            TYPE_UINT16  = 7 << 28,
+            TYPE_UINT    = 8 << 28,
+            TYPE_UINT32  = 9 << 28,
+            TYPE_UINT64  = 10 << 28,
+            TYPE_BOOL    = 11 << 28,
+            TYPE_FLOAT32 = 12 << 28,
+            TYPE_FLOAT64 = 13 << 28,
+            TYPE_PCRUNES = 14 << 28,
+            TYPE_MASK    = 0xF0000000,
         };
 
     public:
-        va_t() : mType(TYPE_EMPTY), mCap(0) { mArg[0] = mArg[1] = mArg[2] = 0; }
-        va_t(const va_t& c) : mType(c.mType), mCap(0) { *(u64*)mArg = *(u64*)c.mArg; }
-        explicit va_t(s8 inVar) : mType(TYPE_INT8), mCap(0) { *(s8*)mArg = inVar; }
-        explicit va_t(u8 inVar) : mType(TYPE_UINT8), mCap(0) { *(u8*)mArg = inVar; }
-        explicit va_t(s16 inVar) : mType(TYPE_INT16), mCap(0) { *(s16*)mArg = inVar; }
-        explicit va_t(u16 inVar) : mType(TYPE_UINT16), mCap(0) { *(u16*)mArg = inVar; }
-        explicit va_t(s32 inVar) : mType(TYPE_INT32), mCap(0) { *(s32*)mArg = inVar; }
-        explicit va_t(u32 inVar) : mType(TYPE_UINT32), mCap(0) { *(u32*)mArg = inVar; }
-        explicit va_t(s64 inVar) : mType(TYPE_INT64), mCap(0) { *(s64*)mArg = inVar; }
-        explicit va_t(u64 inVar) : mType(TYPE_UINT64), mCap(0) { *(u64*)mArg = inVar; }
-        explicit va_t(bool inVar) : mType(TYPE_BOOL), mCap(0) { *(u32*)mArg = inVar ? 1 : 0; }
-        explicit va_t(f32 inVar) : mType(TYPE_FLOAT32), mCap(0) { *(f32*)mArg = inVar; }
-        explicit va_t(f64 inVar) : mType(TYPE_FLOAT64), mCap(0) { *(f64*)mArg = inVar; }
+        va_t()
+            : mArg3(TYPE_EMPTY)
+        {
+            mArg = mArg2 = 0;
+        }
+        va_t(const va_t& c)
+            : mArg3(c.mArg3)
+        {
+            *(u64*)&mArg = *(u64*)c.mArg;
+        }
+        explicit va_t(s8 inVar)
+            : mArg3(TYPE_INT8)
+        {
+            *(s8*)&mArg = inVar;
+        }
+        explicit va_t(u8 inVar)
+            : mArg3(TYPE_UINT8)
+        {
+            *(u8*)&mArg = inVar;
+        }
+        explicit va_t(s16 inVar)
+            : mArg3(TYPE_INT16)
+        {
+            *(s16*)&mArg = inVar;
+        }
+        explicit va_t(u16 inVar)
+            : mArg3(TYPE_UINT16)
+        {
+            *(u16*)&mArg = inVar;
+        }
+        explicit va_t(s32 inVar)
+            : mArg3(TYPE_INT32)
+        {
+            *(s32*)&mArg = inVar;
+        }
+        explicit va_t(u32 inVar)
+            : mArg3(TYPE_UINT32)
+        {
+            *(u32*)&mArg = inVar;
+        }
+        explicit va_t(s64 inVar)
+            : mArg3(TYPE_INT64)
+        {
+            *(s64*)&mArg = inVar;
+        }
+        explicit va_t(u64 inVar)
+            : mArg3(TYPE_UINT64)
+        {
+            *(u64*)&mArg = inVar;
+        }
+        explicit va_t(bool inVar)
+            : mArg3(TYPE_BOOL)
+        {
+            *(u32*)&mArg = inVar ? 1 : 0;
+        }
+        explicit va_t(f32 inVar)
+            : mArg3(TYPE_FLOAT32)
+        {
+            *(f32*)&mArg = inVar;
+        }
+        explicit va_t(f64 inVar)
+            : mArg3(TYPE_FLOAT64)
+        {
+            *(f64*)&mArg = inVar;
+        }
         explicit va_t(const char* inVar);
         explicit va_t(crunes_t const& str);
 
-        EType type() const { return (EType)mType; }
+        EType type() const { return (EType)(mArg3 & TYPE_MASK); }
 
-        s32 sizeInBits() const { return (mType & SIZE_MASK) >> SIZE_SHIFT; }
-        s32 sizeInBytes() const { return ((mType & SIZE_MASK) >> SIZE_SHIFT) >> 3; }
+        bool isInteger() const { return ((mArg3 & TYPE_MASK) >= TYPE_INT8 && (mArg3 & TYPE_MASK) <= TYPE_UINT64); }
+        bool isSignedInteger() const { return ((mArg3 & TYPE_MASK) >= TYPE_INT8 && (mArg3 & TYPE_MASK) <= TYPE_INT64); }
+        bool isUnsignedInteger() const { return ((mArg3 & TYPE_MASK) >= TYPE_UINT8 && (mArg3 & TYPE_MASK) <= TYPE_UINT64); }
 
-        bool isInteger() const { return bool((mType & PROP_MASK) == PROP_INTEGER && sizeInBits() == 8); }
-        bool isSignedInteger() const { return bool(isInteger() && ((mType & PROP_MASK) == PROP_SIGNED)); }
-        bool isUnsignedInteger() const { return bool(isInteger() && ((mType & PROP_MASK) == PROP_UNSIGNED)); }
-
-        bool isBool() const { return bool(mType == TYPE_BOOL); }
-        bool isInt8() const { return bool(mType == TYPE_INT8); }
-        bool isInt16() const { return bool(mType == TYPE_INT16); }
-        bool isInt32() const { return bool(mType == TYPE_INT32); }
-        bool isInt64() const { return bool(mType == TYPE_INT64); }
-        bool isUInt8() const { return bool(mType == TYPE_UINT8); }
-        bool isUInt16() const { return bool(mType == TYPE_UINT16); }
-        bool isUInt32() const { return bool(mType == TYPE_UINT32); }
-        bool isUInt64() const { return bool(mType == TYPE_UINT64); }
-        bool isF32() const { return bool(mType == TYPE_FLOAT32); }
-        bool isF64() const { return bool(mType == TYPE_FLOAT64); }
-        bool isPCRunes() const { return bool(mType == TYPE_PCRUNES); }
+        bool isBool() const { return bool((mArg3 & TYPE_MASK) == TYPE_BOOL); }
+        bool isInt8() const { return bool((mArg3 & TYPE_MASK) == TYPE_INT8); }
+        bool isInt16() const { return bool((mArg3 & TYPE_MASK) == TYPE_INT16); }
+        bool isInt32() const { return bool((mArg3 & TYPE_MASK) == TYPE_INT32); }
+        bool isInt64() const { return bool((mArg3 & TYPE_MASK) == TYPE_INT64); }
+        bool isUInt8() const { return bool((mArg3 & TYPE_MASK) == TYPE_UINT8); }
+        bool isUInt16() const { return bool((mArg3 & TYPE_MASK) == TYPE_UINT16); }
+        bool isUInt32() const { return bool((mArg3 & TYPE_MASK) == TYPE_UINT32); }
+        bool isUInt64() const { return bool((mArg3 & TYPE_MASK) == TYPE_UINT64); }
+        bool isF32() const { return bool((mArg3 & TYPE_MASK) == TYPE_FLOAT32); }
+        bool isF64() const { return bool((mArg3 & TYPE_MASK) == TYPE_FLOAT64); }
+        bool isPCRunes() const { return bool((mArg3 & TYPE_MASK) == TYPE_PCRUNES); }
 
         operator char() const { return (char)convertToInt8(); }
         operator s8() const { return convertToInt8(); }
@@ -153,9 +179,9 @@ namespace ncore
         bool     convertToBool() const;
         crunes_t convertToCRunes() const;
 
-        u16  mType;
-        u16  mCap;
-        ptr_t mArg[4];
+        ptr_t mArg;
+        u32   mArg2;
+        u32   mArg3;
     };
 
     class va_list_t
@@ -163,27 +189,38 @@ namespace ncore
     public:
         typedef const va_t& rcva;
 
-        va_list_t() : mLength(0) {}
-        va_list_t(rcva a1) : mLength(1) { mArg[0] = a1; }
-        va_list_t(rcva a1, rcva a2) : mLength(2)
+        va_list_t()
+            : mLength(0)
+        {
+        }
+        va_list_t(rcva a1)
+            : mLength(1)
+        {
+            mArg[0] = a1;
+        }
+        va_list_t(rcva a1, rcva a2)
+            : mLength(2)
         {
             mArg[0] = a1;
             mArg[1] = a2;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3) : mLength(3)
+        va_list_t(rcva a1, rcva a2, rcva a3)
+            : mLength(3)
         {
             mArg[0] = a1;
             mArg[1] = a2;
             mArg[2] = a3;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4) : mLength(4)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4)
+            : mLength(4)
         {
             mArg[0] = a1;
             mArg[1] = a2;
             mArg[2] = a3;
             mArg[3] = a4;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5) : mLength(5)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5)
+            : mLength(5)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -191,7 +228,8 @@ namespace ncore
             mArg[3] = a4;
             mArg[4] = a5;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6) : mLength(6)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6)
+            : mLength(6)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -200,7 +238,8 @@ namespace ncore
             mArg[4] = a5;
             mArg[5] = a6;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7) : mLength(7)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7)
+            : mLength(7)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -210,7 +249,8 @@ namespace ncore
             mArg[5] = a6;
             mArg[6] = a7;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8) : mLength(8)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8)
+            : mLength(8)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -221,7 +261,8 @@ namespace ncore
             mArg[6] = a7;
             mArg[7] = a8;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9) : mLength(9)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9)
+            : mLength(9)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -233,7 +274,8 @@ namespace ncore
             mArg[7] = a8;
             mArg[8] = a9;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10) : mLength(10)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10)
+            : mLength(10)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -246,7 +288,8 @@ namespace ncore
             mArg[8] = a9;
             mArg[9] = a10;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11) : mLength(11)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11)
+            : mLength(11)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -260,7 +303,8 @@ namespace ncore
             mArg[9]  = a10;
             mArg[10] = a11;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12) : mLength(12)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12)
+            : mLength(12)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -275,7 +319,8 @@ namespace ncore
             mArg[10] = a11;
             mArg[11] = a12;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13) : mLength(13)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13)
+            : mLength(13)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -291,7 +336,8 @@ namespace ncore
             mArg[11] = a12;
             mArg[12] = a13;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14) : mLength(14)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14)
+            : mLength(14)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -308,7 +354,8 @@ namespace ncore
             mArg[12] = a13;
             mArg[13] = a14;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14, rcva a15) : mLength(15)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14, rcva a15)
+            : mLength(15)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -326,7 +373,8 @@ namespace ncore
             mArg[13] = a14;
             mArg[14] = a15;
         }
-        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14, rcva a15, rcva a16) : mLength(16)
+        va_list_t(rcva a1, rcva a2, rcva a3, rcva a4, rcva a5, rcva a6, rcva a7, rcva a8, rcva a9, rcva a10, rcva a11, rcva a12, rcva a13, rcva a14, rcva a15, rcva a16)
+            : mLength(16)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -346,12 +394,14 @@ namespace ncore
             mArg[15] = a16;
         }
 
-        va_list_t(rcva a1, const va_list_t& inList) : mLength(1)
+        va_list_t(rcva a1, const va_list_t& inList)
+            : mLength(1)
         {
             mArg[0] = a1;
             add(inList);
         }
-        va_list_t(rcva a1, rcva a2, const va_list_t& inList) : mLength(2)
+        va_list_t(rcva a1, rcva a2, const va_list_t& inList)
+            : mLength(2)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -422,70 +472,158 @@ namespace ncore
      */
     class va_r_t
     {
-        enum EProperty
-        {
-            PROP_INTEGER  = 0x0800,
-            PROP_UNSIGNED = 0x0400,
-            PROP_ARRAY    = 0x0200,
-            PROP_FLOAT    = 0x0100,
-            PROP_MASK     = 0x0F00,
-            PROP_SHIFT    = 8,
-        };
-        enum ESize
-        {
-            SIZE_MASK  = 0xF000,
-            SIZE_SHIFT = 12,
-            SIZE_8     = 0x1000,
-            SIZE_16    = 0x2000,
-            SIZE_32    = 0x4000,
-            SIZE_64    = 0x8000,
-#ifdef TARGET_32BIT
-            SIZE_PTR = SIZE_32,
-#else
-            SIZE_PTR = SIZE_64,
-#endif
-        };
     public:
         enum EType
         {
             TYPE_EMPTY = 0,
-            TYPE_MASK  = 0x00FF,
+            TYPE_MASK  = 0xFF,
 
-            TYPE_INT8    = 0x0001 | PROP_INTEGER | SIZE_8,
-            TYPE_INT16   = 0x0002 | PROP_INTEGER | SIZE_16,
-            TYPE_INT     = 0x0004 | PROP_INTEGER | SIZE_32,
-            TYPE_INT32   = 0x0004 | PROP_INTEGER | SIZE_32,
-            TYPE_INT64   = 0x0008 | PROP_INTEGER | SIZE_64,
-            TYPE_UINT8   = 0x0001 | PROP_INTEGER | PROP_UNSIGNED | SIZE_8,
-            TYPE_UINT16  = 0x0002 | PROP_INTEGER | PROP_UNSIGNED | SIZE_16,
-            TYPE_UINT    = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
-            TYPE_UINT32  = 0x0004 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
-            TYPE_UINT64  = 0x0008 | PROP_INTEGER | PROP_UNSIGNED | SIZE_64,
-            TYPE_BOOL    = 0x0020 | PROP_INTEGER | SIZE_32,
-            TYPE_UCHAR   = 0x0030 | PROP_INTEGER | PROP_UNSIGNED | SIZE_32,
-            TYPE_FLOAT32 = 0x0040 | PROP_FLOAT | SIZE_32,
-            TYPE_FLOAT64 = 0x0050 | PROP_FLOAT | SIZE_64,
-            TYPE_AINT32  = 0x0004 | PROP_INTEGER | SIZE_32 | PROP_ARRAY,
-            TYPE_PRUNES  = 0x0080 | SIZE_PTR
+            TYPE_INT8    = 1,
+            TYPE_INT16   = 2,
+            TYPE_INT32   = 3,
+            TYPE_INT64   = 4,
+            TYPE_UINT8   = 5,
+            TYPE_UINT16  = 6,
+            TYPE_UINT32  = 7,
+            TYPE_UINT64  = 8,
+            TYPE_BOOL    = 9,
+            TYPE_UCHAR   = 10,
+            TYPE_FLOAT32 = 11,
+            TYPE_FLOAT64 = 12,
+            TYPE_AINT32  = 13,
+            TYPE_AUINT32 = 14,
+            TYPE_PRUNES  = 15,
         };
 
     public:
-        va_r_t() : mType(TYPE_EMPTY), mCap(0), mSize(0), mDummy(0) { mRef[0] = 0; }
-        va_r_t(const va_r_t& c) : mType(c.mType), mCap(0), mSize(0), mDummy(0) { mRef[0] = c.mRef[0]; }
-        va_r_t(s8* inRef) : mType(TYPE_INT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(u8* inRef) : mType(TYPE_UINT8), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(s16* inRef) : mType(TYPE_INT16), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(u16* inRef) : mType(TYPE_UINT16), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(s32* inRef) : mType(TYPE_INT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(u32* inRef) : mType(TYPE_UINT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(s32* inRef, s32 inCap) : mType(TYPE_INT32), mCap(inCap), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(u32* inRef, s32 inCap) : mType(TYPE_UINT32), mCap(inCap), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(s64* inRef) : mType(TYPE_INT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(u64* inRef) : mType(TYPE_UINT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(bool* inRef) : mType(TYPE_BOOL), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(f32* inRef) : mType(TYPE_FLOAT32), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(f64* inRef) : mType(TYPE_FLOAT64), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
-        va_r_t(runes_t* inRef) : mType(TYPE_PRUNES), mCap(0), mSize(0), mDummy(0) { mRef[0] = (ptr_t)inRef; }
+        va_r_t()
+            : mType(TYPE_EMPTY)
+            , mSize(0)
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = 0;
+        }
+        va_r_t(const va_r_t& c)
+            : mType(c.mType)
+            , mSize(c.mSize)
+            , mCap(c.mCap)
+            , mDummy(c.mDummy)
+        {
+            mRef = c.mRef;
+        }
+        va_r_t(s8* inRef)
+            : mType(TYPE_INT8)
+            , mSize(sizeof(s8))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(u8* inRef)
+            : mType(TYPE_UINT8)
+            , mSize(sizeof(u8))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(s16* inRef)
+            : mType(TYPE_INT16)
+            , mSize(sizeof(s16))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(u16* inRef)
+            : mType(TYPE_UINT16)
+            , mSize(sizeof(u16))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(s32* inRef)
+            : mType(TYPE_INT32)
+            , mSize(sizeof(s32))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(u32* inRef)
+            : mType(TYPE_UINT32)
+            , mSize(sizeof(u32))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(s32* inRef, s32 inCap)
+            : mType(TYPE_AINT32)
+            , mSize(0)
+            , mCap(inCap)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(u32* inRef, s32 inCap)
+            : mType(TYPE_AUINT32)
+            , mSize(0)
+            , mCap(inCap)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(s64* inRef)
+            : mType(TYPE_INT64)
+            , mSize(sizeof(s64))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(u64* inRef)
+            : mType(TYPE_UINT64)
+            , mSize(sizeof(u64))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(bool* inRef)
+            : mType(TYPE_BOOL)
+            , mSize(sizeof(bool))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(f32* inRef)
+            : mType(TYPE_FLOAT32)
+            , mSize(sizeof(f32))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(f64* inRef)
+            : mType(TYPE_FLOAT64)
+            , mSize(sizeof(f64))
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
+        va_r_t(runes_t* inRef)
+            : mType(TYPE_PRUNES)
+            , mSize(0)
+            , mCap(0)
+            , mDummy(0)
+        {
+            mRef = (ptr_t)inRef;
+        }
 
         va_r_t& operator=(s8 rhs);
         va_r_t& operator=(u8 rhs);
@@ -504,17 +642,16 @@ namespace ncore
         va_r_t& operator+=(s32 rhs);
 
         EType type() const { return (EType)mType; }
-        u16   var() const { return mCap; }
+        u16   var() const { return mType; }
         u16   size() const { return mSize; }
 
-        s32 sizeInBits() const { return ((mType & SIZE_MASK) >> SIZE_SHIFT) << 3; }
-        s32 sizeInBytes() const { return ((mType & SIZE_MASK) >> SIZE_SHIFT); }
+        bool isArray() const { return (mType & TYPE_AINT32) == TYPE_AINT32 || (mType & TYPE_AUINT32) == TYPE_AUINT32; }
+        bool isFloat() const { return (mType & TYPE_FLOAT32) == TYPE_FLOAT32 || (mType & TYPE_FLOAT64) == TYPE_FLOAT64; }
+        bool isInteger() const { return (mType >= TYPE_INT8 && mType <= TYPE_UINT64); }
+        bool isSignedInteger() const { return (mType >= TYPE_INT8 && mType <= TYPE_INT64); }
+        bool isUnsignedInteger() const { return (mType >= TYPE_UINT8 && mType <= TYPE_UINT64); }
 
-        bool isArray() const { return bool((mType & PROP_ARRAY) == PROP_ARRAY); }
-        bool isFloat() const { return bool((mType & PROP_FLOAT) == PROP_FLOAT); }
-        bool isInteger() const { return bool((mType & PROP_INTEGER) == PROP_INTEGER); }
-        bool isSignedInteger() const { return bool(isInteger() && ((mType & PROP_UNSIGNED) == 0)); }
-        bool isUnsignedInteger() const { return bool(isInteger() && ((mType & PROP_UNSIGNED) == PROP_UNSIGNED)); }
+        s32 sizeInBytes() const { return mSize; }
 
         bool isBool() const { return bool(mType == TYPE_BOOL); }
         bool isInt8() const { return bool(mType == TYPE_INT8); }
@@ -533,43 +670,54 @@ namespace ncore
         runes_t* getRunes() const
         {
             if (isPRunes())
-                return (runes_t*)mRef[0];
+                return (runes_t*)mRef;
             else
                 return nullptr;
         }
 
         static va_r_t sEmpty;
 
-        u16  mType;
-        u16  mCap;      // When PROP_ARRAY, this is the maximum capacity
-        u16  mSize;     // When PROP_ARRAY, this is the final size
-        u16  mDummy;
-        ptr_t mRef[1];
+        u16   mType;
+        u16   mSize; // When PROP_ARRAY, this is the final size
+        u16   mCap;  // When PROP_ARRAY, this is the maximum capacity
+        u16   mDummy;
+        ptr_t mRef;
     };
 
     struct va_r_list_t
     {
-        va_r_list_t() : mLength(0) {}
-        va_r_list_t(va_r_t a1) : mLength(1) { mArg[0] = a1; }
-        va_r_list_t(va_r_t a1, va_r_t a2) : mLength(2)
+        va_r_list_t()
+            : mLength(0)
+        {
+        }
+        va_r_list_t(va_r_t a1)
+            : mLength(1)
+        {
+            mArg[0] = a1;
+        }
+        va_r_list_t(va_r_t a1, va_r_t a2)
+            : mLength(2)
         {
             mArg[0] = a1;
             mArg[1] = a2;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3) : mLength(3)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3)
+            : mLength(3)
         {
             mArg[0] = a1;
             mArg[1] = a2;
             mArg[2] = a3;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4) : mLength(4)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4)
+            : mLength(4)
         {
             mArg[0] = a1;
             mArg[1] = a2;
             mArg[2] = a3;
             mArg[3] = a4;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5) : mLength(5)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5)
+            : mLength(5)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -577,7 +725,8 @@ namespace ncore
             mArg[3] = a4;
             mArg[4] = a5;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6) : mLength(6)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6)
+            : mLength(6)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -586,7 +735,8 @@ namespace ncore
             mArg[4] = a5;
             mArg[5] = a6;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7) : mLength(7)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7)
+            : mLength(7)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -596,7 +746,8 @@ namespace ncore
             mArg[5] = a6;
             mArg[6] = a7;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8) : mLength(8)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8)
+            : mLength(8)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -607,7 +758,8 @@ namespace ncore
             mArg[6] = a7;
             mArg[7] = a8;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9) : mLength(9)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9)
+            : mLength(9)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -619,7 +771,8 @@ namespace ncore
             mArg[7] = a8;
             mArg[8] = a9;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10) : mLength(10)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10)
+            : mLength(10)
         {
             mArg[0] = a1;
             mArg[1] = a2;
@@ -632,7 +785,8 @@ namespace ncore
             mArg[8] = a9;
             mArg[9] = a10;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11) : mLength(11)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11)
+            : mLength(11)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -646,7 +800,8 @@ namespace ncore
             mArg[9]  = a10;
             mArg[10] = a11;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12) : mLength(12)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12)
+            : mLength(12)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -661,7 +816,8 @@ namespace ncore
             mArg[10] = a11;
             mArg[11] = a12;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13) : mLength(13)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13)
+            : mLength(13)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -677,7 +833,8 @@ namespace ncore
             mArg[11] = a12;
             mArg[12] = a13;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14) : mLength(14)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14)
+            : mLength(14)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -694,7 +851,8 @@ namespace ncore
             mArg[12] = a13;
             mArg[13] = a14;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15) : mLength(15)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15)
+            : mLength(15)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;
@@ -712,7 +870,8 @@ namespace ncore
             mArg[13] = a14;
             mArg[14] = a15;
         }
-        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15, va_r_t a16) : mLength(16)
+        va_r_list_t(va_r_t a1, va_r_t a2, va_r_t a3, va_r_t a4, va_r_t a5, va_r_t a6, va_r_t a7, va_r_t a8, va_r_t a9, va_r_t a10, va_r_t a11, va_r_t a12, va_r_t a13, va_r_t a14, va_r_t a15, va_r_t a16)
+            : mLength(16)
         {
             mArg[0]  = a1;
             mArg[1]  = a2;

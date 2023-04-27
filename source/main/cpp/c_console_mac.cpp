@@ -12,7 +12,7 @@ namespace ncore
 {
     class out_writer_t : public irunes_writer_t
     {
-        runez_t<utf32::rune, 64> m_write_to_console_cache;
+        runez_t<utf32::rune, 256> m_write_to_console_cache;
 
     public:
         inline out_writer_t() {}
@@ -172,7 +172,7 @@ namespace ncore
         }
     };
 
-    class xconsole_out_macos : public console_t::out_t
+    class console_out_macos : public console_t::out_t
     {
     public:
         // +---------+------------+------------+
@@ -265,7 +265,7 @@ namespace ncore
 
     console_t::out_t* gGetDefaultConsoleOut()
     {
-        static xconsole_out_macos sConsoleOut;
+        static console_out_macos sConsoleOut;
         return &sConsoleOut;
     }
 

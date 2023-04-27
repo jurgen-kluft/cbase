@@ -68,9 +68,9 @@ namespace ncore
             uint_t length() const noexcept { return m_end - m_begin; }
             bool   at_end() const noexcept { return m_begin >= m_end; }
 
-            uchar32 peek(int n = 0) const noexcept;
+            uchar32 peek(s32 n = 0) const noexcept;
             uchar32 read() noexcept;
-            void    skip(int n = 1) noexcept;
+            void    skip(s32 n = 1) noexcept;
 
         protected:
             uint_t compute_length() const noexcept
@@ -91,7 +91,7 @@ namespace ncore
             const char* m_end;
         };
 
-        uchar32 cstr_t::peek(int n) const noexcept
+        uchar32 cstr_t::peek(s32 n) const noexcept
         {
             if (m_type == Type_Ascii)
             {
@@ -115,7 +115,7 @@ namespace ncore
             return '\0';
         }
 
-        void cstr_t::skip(int n) noexcept
+        void cstr_t::skip(s32 n) noexcept
         {
             if (m_type == Type_Ascii)
             {
@@ -244,31 +244,32 @@ namespace ncore
             };
 
             // -------- POWERS OF 10 ----------------------------------------------
-            static u32 pow10_uint32(const int index) noexcept
+            static u32 pow10_uint32(const s32 index) noexcept
             {
                 ASSERT(index >= 0 && index < 10);
                 return pow10_uint32_lut[index];
             }
 
-            static u64 pow10_uint64(const int index) noexcept
+            static u64 pow10_uint64(const s32 index) noexcept
             {
                 ASSERT(index >= 0 && index < 20);
                 return pow10_uint64_lut[index];
             }
 
             // -------- COUNT DIGITS ----------------------------------------------
-            static int count_digits_dec(const u64 n) noexcept
+            static s32 count_digits_dec(const u64 n) noexcept
             {
-                const int length = sizeof(pow10_uint64_lut) / sizeof(pow10_uint64_lut[0]);
-                int       index  = 0;
-                int       left   = 0;
-                int       right  = length - 1;
+                const s32 length = sizeof(pow10_uint64_lut) / sizeof(pow10_uint64_lut[0]);
+                s32       index  = 0;
+                s32       left   = 0;
+                s32       right  = length - 1;
                 while (left <= right)
                 {
                     index = (left + right) / 2;
-                    if (n <= pow10_uint64_lut[index])
+                    if (n < pow10_uint64_lut[index])
                     {
-                        if (n > pow10_uint64_lut[index - 1])
+                        ASSERT(index > 0);
+                        if (n >= pow10_uint64_lut[index - 1])
                         {
                             break;
                         }
@@ -279,12 +280,12 @@ namespace ncore
                         left = index + 1;
                     }
                 }
-                return index + 1;
+                return index;
             }
 
-            static int count_digits_dec(const u32 n) noexcept { return count_digits_dec((u64)n); }
+            static s32 count_digits_dec(const u32 n) noexcept { return count_digits_dec((u64)n); }
 
-            static int count_digits_bin(u64 n) noexcept
+            static s32 count_digits_bin(u64 n) noexcept
             {
                 s8 c = 0;
                 if (n > 0xFFFFFFFFUL)
@@ -307,12 +308,12 @@ namespace ncore
                     n >>= 2;
                     c += 2;
                 }
-                return c + n;
+                return c + (s8)n;
             }
 
-            static int count_digits_bin(const u32 n) noexcept { return count_digits_bin((u64)n); }
+            static s32 count_digits_bin(const u32 n) noexcept { return count_digits_bin((u64)n); }
 
-            static int count_digits_oct(u64 n) noexcept
+            static s32 count_digits_oct(u64 n) noexcept
             {
                 s8 c = 0;
                 while (n > 0xFFF)
@@ -320,14 +321,17 @@ namespace ncore
                     c += 4;
                     n >>= 12;
                 }
-                while ((n >>= 3U) != 0)
+                while (n != 0)
+                {
                     ++c;
+                    n >>= 3;
+                }
                 return c;
             }
 
-            static int count_digits_oct(u32 n) noexcept { return count_digits_oct((u64)n); }
+            static s32 count_digits_oct(u32 n) noexcept { return count_digits_oct((u64)n); }
 
-            static inline int count_digits_hex(u64 n) noexcept
+            static inline s32 count_digits_hex(u64 n) noexcept
             {
                 s8 c = 0;
                 while (n > 0xFFFF)
@@ -348,7 +352,7 @@ namespace ncore
                 return c + (n > 0 ? 1 : 0);
             }
 
-            static inline int count_digits_hex(u32 n) noexcept { return count_digits_hex((u64)n); }
+            static inline s32 count_digits_hex(u32 n) noexcept { return count_digits_hex((u64)n); }
 
             // -------- DIVIDE BY 10 WITH REMAINDER-------------------------------
             static u32 moddiv10(const u32 n, s8& mod) noexcept
@@ -394,12 +398,6 @@ namespace ncore
             }
 
             // -------- BINARY CONVERSION -----------------------------------------
-            static void convert_bin(char* dst, u32 value) noexcept
-            {
-                u64 tmp = value;
-                convert_bin(dst, tmp);
-            }
-
             static void convert_bin(char* dst, u64 value) noexcept
             {
                 do
@@ -408,14 +406,13 @@ namespace ncore
                     value >>= 1U;
                 } while (value);
             }
-
-            // -------- OCTAL CONVERSION ------------------------------------------
-            static void convert_oct(char* dst, u32 value) noexcept
+            static void convert_bin(char* dst, u32 value) noexcept
             {
                 u64 tmp = value;
-                convert_oct(dst, tmp);
+                convert_bin(dst, tmp);
             }
 
+            // -------- OCTAL CONVERSION ------------------------------------------
             static void convert_oct(char* dst, u64 value) noexcept
             {
                 do
@@ -424,14 +421,13 @@ namespace ncore
                     value >>= 3U;
                 } while (value);
             }
-
-            // -------- HEXADECIMAL CONVERSION ------------------------------------
-            static void convert_hex(char* dst, u32 value, const bool uppercase) noexcept
+            static void convert_oct(char* dst, u32 value) noexcept
             {
                 u64 tmp = value;
-                convert_hex(dst, tmp, uppercase);
+                convert_oct(dst, tmp);
             }
 
+            // -------- HEXADECIMAL CONVERSION ------------------------------------
             static void convert_hex(char* dst, u64 value, const bool uppercase) noexcept
             {
                 do
@@ -439,6 +435,11 @@ namespace ncore
                     *(--dst) = to_hex_char((u8)value, !uppercase);
                     value >>= 4U;
                 } while (value);
+            }
+            static void convert_hex(char* dst, u32 value, const bool uppercase) noexcept
+            {
+                u64 tmp = value;
+                convert_hex(dst, tmp, uppercase);
             }
         };
 
@@ -449,15 +450,15 @@ namespace ncore
             // PUBLIC STATIC FUNCTIONS
             // --------------------------------------------------------------------
 
-            static int convert(char* const significand, char* const significandEnd, int& exponent, double value, const bool format_fixed, const int precision) noexcept
+            static s32 convert(char* const significand, char* const significandEnd, s32& exponent, double value, const bool format_fixed, const s32 precision) noexcept
             {
                 u64 ipart = 0;
                 u64 fpart = 0;
 
-                int ipart_digits = 0;
-                int fpart_digits = 0;
+                s32 ipart_digits = 0;
+                s32 fpart_digits = 0;
 
-                int fpart_padding = 0;
+                s32 fpart_padding = 0;
 
                 if (value < 1)
                 {
@@ -537,7 +538,7 @@ namespace ncore
             }
 
         private:
-            static int round(char* const significand, const int significand_size, int& exponent, const bool format_fixed, const int round_index) noexcept
+            static s32 round(char* const significand, const s32 significand_size, s32& exponent, const bool format_fixed, const s32 round_index) noexcept
             {
                 char* it = significand + round_index;
 
@@ -625,7 +626,7 @@ namespace ncore
 
             // Evaluates the range [first, last), truncates all the trailing zeros and return the
             // new range size. Keeps always at least 1 element of the range (even if it is zero).
-            static int remove_trailing_zeros(const char* const first, const char* last) noexcept
+            static s32 remove_trailing_zeros(const char* const first, const char* last) noexcept
             {
                 while ((last - 1) > first && *(last - 1) == '0')
                 {
@@ -635,17 +636,17 @@ namespace ncore
                 // Buffer termination is not really necessary since the caller
                 // functions rely on the returned size and not on null terminator.
 
-                return static_cast<int>(last - first);
+                return static_cast<s32>(last - first);
             }
         };
 
         // Writes the alignment (sign, prefix and fill before) for any
         // argument type. Returns the fill counter to write after argument.
-        int state_t::write_alignment(str_t& it, int characters, const bool negative) const
+        s32 state_t::write_alignment(str_t& it, s32 characters, const bool negative) const
         {
             characters += sign_width(negative) + prefix_width();
 
-            int fill_after = 0;
+            s32 fill_after = 0;
 
             if (width() <= characters)
             {
@@ -655,7 +656,7 @@ namespace ncore
             }
             else
             {
-                int         fill_count = width() - characters;
+                s32         fill_count = width() - characters;
                 const Align al         = align();
                 if (al == Align::kLeft)
                 {
@@ -729,7 +730,7 @@ namespace ncore
             // PUBLIC MEMBER FUNCTIONS
             // --------------------------------------------------------------------
 
-            format_t(cstr_t& fmt, const int arg_count)
+            format_t(cstr_t& fmt, const s32 arg_count)
             {
                 cstr_t it = fmt;
 
@@ -907,16 +908,16 @@ namespace ncore
             // Parses the input as a positive integer that fits into a `u8` type. This
             // function assumes that the first character is a digit and terminates parsing
             // at the presence of the first non-digit character or when value overflows.
-            static u8 parse_positive_small_int(cstr_t& it, const int max_value)
+            static u8 parse_positive_small_int(cstr_t& it, const s32 max_value)
             {
                 ASSERT(max_value < 256);
 
-                int     value = 0;
+                s32     value = 0;
                 uchar32 c     = 0;
                 do
                 {
                     c     = it.read();
-                    value = (value * 10) + static_cast<int>(c - '0');
+                    value = (value * 10) + static_cast<s32>(c - '0');
                     FMT_CHECK(value <= max_value, std::runtime_error); // Check for overflow
                     c = it.peek();
                 } while (c >= '0' && c <= '9');
@@ -954,14 +955,14 @@ namespace ncore
             // default_align_left();
 
             // If precision is specified use it up to string size.
-            const int str_length = (state.precision() == -1) ? static_cast<int>(str.length()) : math::min(static_cast<int>(state.precision()), static_cast<int>(str.length()));
+            const s32 str_length = (state.precision() == -1) ? static_cast<s32>(str.length()) : math::min(static_cast<s32>(state.precision()), static_cast<s32>(str.length()));
 
             format_string(it, state, str, str_length);
         }
 
-        void state_t::format_string(str_t& it, const state_t& state, const cstr_t& str, const int str_length, const bool negative)
+        void state_t::format_string(str_t& it, const state_t& state, const cstr_t& str, const s32 str_length, const bool negative)
         {
-            const int fill_after = state.write_alignment(it, str_length, negative);
+            const s32 fill_after = state.write_alignment(it, str_length, negative);
 
             CharTraits::copy(it, str, str_length);
             CharTraits::assign(it, state.fill_char(), fill_after);
@@ -1029,7 +1030,7 @@ namespace ncore
                     // TODO Characters and strings align to left by default.
                     // state.default_align_left();
 
-                    const int fill_after = state.write_alignment(it, 1, false);
+                    const s32 fill_after = state.write_alignment(it, 1, false);
                     it.write(value);
                     CharTraits::assign(it, state.fill_char(), fill_after);
                 }
@@ -1054,7 +1055,7 @@ namespace ncore
 
             static void format_unsigned_integer(str_t& it, const state_t& state, const u64 value, const bool negative = false)
             {
-                int fill_after = 0;
+                s32 fill_after = 0;
 
                 if (state.type_is_none() || state.type_is_integer_dec())
                 {
@@ -1169,7 +1170,7 @@ namespace ncore
                         }
                         else if (value >= 1E-19 && value <= 1.8446744E19)
                         {
-                            int precision = state.precision();
+                            s32 precision = state.precision();
 
                             if (precision < 0)
                             {
@@ -1191,7 +1192,7 @@ namespace ncore
                             }
 
                             char significand[36]{}; // 34 characters should be the maximum size needed
-                            int  exponent = 0;
+                            s32  exponent = 0;
 
                             const auto significand_size = Float::convert(significand, &significand[35], exponent, value, format_fixed, precision);
 
@@ -1213,7 +1214,7 @@ namespace ncore
                                 }
                             }
 
-                            int fill_after = 0;
+                            s32 fill_after = 0;
 
                             if (format_fixed)
                             {
@@ -1222,12 +1223,12 @@ namespace ncore
                                 {
                                     // 0.<0>SIGNIFICAND[0:N]<0>
 
-                                    const int full_digits = precision + 2;
+                                    const s32 full_digits = precision + 2;
                                     fill_after            = state.write_alignment(it, full_digits, negative);
 
                                     it.write("0.");
 
-                                    int zero_digits = -exponent - 1;
+                                    s32 zero_digits = -exponent - 1;
                                     CharTraits::assign(it, '0', zero_digits);
                                     CharTraits::copy(it, significand, significand_size);
 
@@ -1237,10 +1238,10 @@ namespace ncore
                                 }
                                 else
                                 {
-                                    const int full_digits = exponent + 1 + precision + static_cast<int>(precision > 0 || state.hash());
+                                    const s32 full_digits = exponent + 1 + precision + static_cast<s32>(precision > 0 || state.hash());
                                     fill_after            = state.write_alignment(it, full_digits, negative);
 
-                                    const int ipart_digits = exponent + 1;
+                                    const s32 ipart_digits = exponent + 1;
 
                                     if (ipart_digits >= significand_size)
                                     {
@@ -1266,7 +1267,7 @@ namespace ncore
                                         CharTraits::copy(it, significand, ipart_digits);
                                         it.write('.');
 
-                                        const int copy_size = significand_size - ipart_digits;
+                                        const s32 copy_size = significand_size - ipart_digits;
                                         CharTraits::copy(it, significand + ipart_digits, copy_size);
 
                                         // Padding is needed if conversion function removes trailing zeros.
@@ -1281,7 +1282,7 @@ namespace ncore
                                 // OR
                                 // SIGNIFICAND[0].SIGNIFICAND[1:N]<0>eEXP
 
-                                const int full_digits = 5 + precision + static_cast<int>(precision > 0 || state.hash());
+                                const s32 full_digits = 5 + precision + static_cast<s32>(precision > 0 || state.hash());
                                 fill_after            = state.write_alignment(it, full_digits, negative);
 
                                 it.write(*significand);
@@ -1290,7 +1291,7 @@ namespace ncore
                                 {
                                     it.write('.');
 
-                                    const int copy_size = significand_size - 1;
+                                    const s32 copy_size = significand_size - 1;
                                     CharTraits::copy(it, significand + 1, copy_size);
                                     CharTraits::assign(it, '0', precision - copy_size);
                                 }
@@ -1300,7 +1301,7 @@ namespace ncore
 
                             CharTraits::assign(it, state.fill_char(), fill_after);
 
-                            // it += sprintf(it, "[%s] Size:%d Exponent:%d Precision:%d Fixed:%d->", significand, significand_size, exponent, precision, int(format_fixed));
+                            // it += sprintf(it, "[%s] Size:%d Exponent:%d Precision:%d Fixed:%d->", significand, significand_size, exponent, precision, s32(format_fixed));
                         }
                         else
                         {
@@ -1311,7 +1312,7 @@ namespace ncore
                 }
             }
 
-            static void write_float_exponent(str_t& out, int exponent, const bool uppercase) noexcept
+            static void write_float_exponent(str_t& out, s32 exponent, const bool uppercase) noexcept
             {
                 char  buffer[10];
                 char* it = buffer;
@@ -1348,14 +1349,14 @@ namespace ncore
 
             static void format_float_zero(str_t& out, const state_t& state, const bool negative)
             {
-                int precision = 0;
+                s32 precision = 0;
 
                 if (state.type_is_float_fixed() || state.type_is_float_scientific())
                 {
                     precision = state.precision();
                 }
 
-                int digits = 1;
+                s32 digits = 1;
 
                 if (precision > 0)
                 {
@@ -1367,7 +1368,7 @@ namespace ncore
                     digits += 4;
                 }
 
-                const int fill_after = state.write_alignment(out, digits, negative);
+                const s32 fill_after = state.write_alignment(out, digits, negative);
 
                 out.write('0');
 
@@ -1427,7 +1428,7 @@ namespace ncore
         void process(str_t& str, cstr_t& fmt, const args_t& args)
         {
             // Argument's sequential index
-            int arg_seq_index = 0;
+            s32 arg_seq_index = 0;
 
             parse_format_string(str, fmt);
 
@@ -1437,7 +1438,7 @@ namespace ncore
                 format_t format(fmt, args.size);
 
                 // Determine which argument index to use, sequential or positional.
-                int arg_index = format.state.index();
+                s32 arg_index = format.state.index();
 
                 if (arg_index < 0)
                 {

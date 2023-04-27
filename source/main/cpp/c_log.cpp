@@ -18,7 +18,7 @@ namespace ncore
 		sGetLogInfoFunc = Function;
 	}
 
-	xlog_to_console_imp	sLogDefaultToConsole;
+	log_to_console_imp	sLogDefaultToConsole;
 	logger_t*			log_t::sLogger[log_t::COUNT] = 
 	{
 		&sLogDefaultToConsole,

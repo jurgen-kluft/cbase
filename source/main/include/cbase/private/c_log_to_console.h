@@ -10,7 +10,7 @@
 
 namespace ncore
 {
-	class xlog_to_console_imp : public logger_t
+	class log_to_console_imp : public logger_t
 	{
 		virtual void			initialize();
 		virtual void			flush();
