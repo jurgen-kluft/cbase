@@ -6,7 +6,6 @@
 #endif
 #include "cbase/c_debug.h"
 #include "cbase/c_runes.h"
-#include "cbase/c_va_list.h"
 
 namespace ncore
 {
@@ -32,6 +31,58 @@ namespace ncore
             kDouble,
             kString,
             kCustom
+        };
+
+        enum Flags : u8
+        {
+            kNone         = (0U << 0U),
+            kEmpty        = (1U << 0U),
+            kAlignNone    = (0U << 1U),
+            kAlignLeft    = (1U << 1U),
+            kAlignRight   = (2U << 1U),
+            kAlignCenter  = (3U << 1U),
+            kAlignNumeric = (4U << 1U),
+            kAlignBitmask = kAlignLeft | kAlignRight | kAlignCenter | kAlignNumeric,
+            kSignNone     = (0U << 4U),
+            kSignMinus    = (1U << 4U),
+            kSignPlus     = (2U << 4U),
+            kSignSpace    = (3U << 4U),
+            kSignBitmask  = kSignMinus | kSignPlus | kSignSpace,
+            kHash         = (1U << 6U),
+            kUppercase    = (1U << 7U)
+        };
+
+        enum class Align : u8
+        {
+            kNone    = kAlignNone,
+            kLeft    = kAlignLeft,
+            kRight   = kAlignRight,
+            kCenter  = kAlignCenter,
+            kNumeric = kAlignNumeric
+        };
+
+        enum class Sign : u8
+        {
+            kNone  = kSignNone,
+            kMinus = kSignMinus,
+            kPlus  = kSignPlus,
+            kSpace = kSignSpace
+        };
+
+        enum class Type : u8
+        {
+            kNone,
+            kIntegerDec,
+            kIntegerHex,
+            kIntegerOct,
+            kIntegerBin,
+            kFloatFixed,
+            kFloatScientific,
+            kFloatGeneral,
+            kPointer,
+            kString,
+            kChar,
+            kInvalid
         };
 
         class cstr_t;
@@ -75,58 +126,10 @@ namespace ncore
         protected:
             friend class format_t;
 
-            enum Flags : u8
-            {
-                kNone         = (0U << 0U),
-                kEmpty        = (1U << 0U),
-                kAlignNone    = (0U << 1U),
-                kAlignLeft    = (1U << 1U),
-                kAlignRight   = (2U << 1U),
-                kAlignCenter  = (3U << 1U),
-                kAlignNumeric = (4U << 1U),
-                kAlignBitmask = kAlignLeft | kAlignRight | kAlignCenter | kAlignNumeric,
-                kSignNone     = (0U << 4U),
-                kSignMinus    = (1U << 4U),
-                kSignPlus     = (2U << 4U),
-                kSignSpace    = (3U << 4U),
-                kSignBitmask  = kSignMinus | kSignPlus | kSignSpace,
-                kHash         = (1U << 6U),
-                kUppercase    = (1U << 7U)
-            };
-
         public:
-            enum class Align : u8
-            {
-                kNone    = kAlignNone,
-                kLeft    = kAlignLeft,
-                kRight   = kAlignRight,
-                kCenter  = kAlignCenter,
-                kNumeric = kAlignNumeric
-            };
-
-            enum class Sign : u8
-            {
-                kNone  = kSignNone,
-                kMinus = kSignMinus,
-                kPlus  = kSignPlus,
-                kSpace = kSignSpace
-            };
-
-            enum class Type : u8
-            {
-                kNone,
-                kIntegerDec,
-                kIntegerHex,
-                kIntegerOct,
-                kIntegerBin,
-                kFloatFixed,
-                kFloatScientific,
-                kFloatGeneral,
-                kPointer,
-                kString,
-                kChar,
-                kInvalid
-            };
+            state_t() noexcept;
+            state_t(const state_t&) noexcept = default;
+            state_t(s8 width, Type type = Type::kString, Flags flags = Flags::kAlignCenter, s8 precision = 0, char fill_char = ' ') noexcept;
 
             static bool format_string(str_t& it, state_t& state, const char* str, const char* end);
             static bool format_string(str_t& it, state_t& state, const cstr_t& str);
@@ -220,7 +223,7 @@ namespace ncore
         template <> struct arg_t<s8>
         {
             static inline u64           encode(s8 v) { return *((u64*)(&v)); }
-            static inline s8           decode(u64 v) { return *((s8*)(&v)); }
+            static inline s8            decode(u64 v) { return *((s8*)(&v)); }
             static inline format_func_t formatter() { return nullptr; }
         };
 
@@ -241,7 +244,7 @@ namespace ncore
         template <> struct arg_t<u8>
         {
             static inline u64           encode(u8 v) { return *((u64*)(&v)); }
-            static inline u8           decode(u64 v) { return *((u8*)(&v)); }
+            static inline u8            decode(u64 v) { return *((u8*)(&v)); }
             static inline format_func_t formatter() { return nullptr; }
         };
 
