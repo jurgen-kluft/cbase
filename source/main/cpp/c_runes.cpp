@@ -581,20 +581,22 @@ namespace ncore
 
     namespace ascii
     {
-        s32 strlen(pcrune str, pcrune& end, pcrune eos)
+        s32 strlen(pcrune str, pcrune* end, pcrune eos)
         {
-            end = str;
+            pcrune iter = str;
             if (eos == nullptr)
             {
-                while (*end != TERMINATOR)
-                    end++;
+                while (*iter != TERMINATOR)
+                    iter++;
             }
             else
             {
-                while (*end != TERMINATOR && end < eos)
-                    end++;
+                while (*iter != TERMINATOR && iter < eos)
+                    iter++;
             }
-            return (s32)(end - str);
+            if (end != nullptr)
+                *end = iter;
+            return (s32)(iter - str);
         }
 
         s32 compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2)

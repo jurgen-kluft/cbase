@@ -11,7 +11,7 @@ namespace ncore
     {
         mArg[0] = ascii::TYPE;
         mArg[1] = (u64)inVar;
-        mArg[2] = (u64)inVar + ascii::strlen(inVar);
+        mArg[2] = (u64)ascii::strlen(inVar);
     }
 
     va_t::va_t(crunes_t const& str) : mType(TYPE_PCRUNES)

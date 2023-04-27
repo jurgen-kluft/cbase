@@ -86,11 +86,9 @@ namespace ncore
             u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
         };
 
-        s32 strlen(pcrune str, pcrune& end, pcrune eos);
-
-        s32 compare(pcrune left, pcrune right);
-        s32 compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2);
-
+        s32  strlen(pcrune str, pcrune* end = nullptr, pcrune eos = nullptr);
+        s32  compare(pcrune left, pcrune right);
+        s32  compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2);
         void reverse(char* str, char* end);
 
         // return false when there is not enough space in the output
@@ -405,10 +403,10 @@ namespace ncore
 
     crunes_t find(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
     crunes_t findLast(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    crunes_t findOneOf(crunes_t const& str, crunes_t const& set, bool case_sensitive = true);
+    crunes_t findOneOf(crunes_t const& str, uchar32 _c, bool case_sensitive = true);
     runes_t  find(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
     runes_t  findLast(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    runes_t  findOneOf(runes_t const& str, crunes_t const& set, bool case_sensitive = true);
+    runes_t  findOneOf(runes_t const& str, uchar32 _c, bool case_sensitive = true);
 
     crunes_t findSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
     crunes_t findLastSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
@@ -714,7 +712,7 @@ namespace ncore
         bool writeln(crunes_t const& str)
         {
             write(str);
-            writeln();
+            return writeln();
         }
         bool writeln()
         {
