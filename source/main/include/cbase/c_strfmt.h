@@ -217,10 +217,38 @@ namespace ncore
             static inline format_func_t formatter() { return nullptr; }
         };
 
+        template <> struct arg_t<s8>
+        {
+            static inline u64           encode(s8 v) { return *((u64*)(&v)); }
+            static inline s8           decode(u64 v) { return *((s8*)(&v)); }
+            static inline format_func_t formatter() { return nullptr; }
+        };
+
+        template <> struct arg_t<s16>
+        {
+            static inline u64           encode(s16 v) { return *((u64*)(&v)); }
+            static inline s16           decode(u64 v) { return *((s16*)(&v)); }
+            static inline format_func_t formatter() { return nullptr; }
+        };
+
         template <> struct arg_t<s32>
         {
             static inline u64           encode(s32 v) { return *((u64*)(&v)); }
             static inline s32           decode(u64 v) { return *((s32*)(&v)); }
+            static inline format_func_t formatter() { return nullptr; }
+        };
+
+        template <> struct arg_t<u8>
+        {
+            static inline u64           encode(u8 v) { return *((u64*)(&v)); }
+            static inline u8           decode(u64 v) { return *((u8*)(&v)); }
+            static inline format_func_t formatter() { return nullptr; }
+        };
+
+        template <> struct arg_t<u16>
+        {
+            static inline u64           encode(u16 v) { return *((u64*)(&v)); }
+            static inline u16           decode(u64 v) { return *((u16*)(&v)); }
             static inline format_func_t formatter() { return nullptr; }
         };
 
@@ -304,9 +332,29 @@ namespace ncore
             static const u8 value = kChar;
         };
 
+        template <> struct typed<s8>
+        {
+            static const u8 value = kInt8;
+        };
+
+        template <> struct typed<s16>
+        {
+            static const u8 value = kInt16;
+        };
+
         template <> struct typed<s32>
         {
             static const u8 value = kInt32;
+        };
+
+        template <> struct typed<u8>
+        {
+            static const u8 value = kUint8;
+        };
+
+        template <> struct typed<u16>
+        {
+            static const u8 value = kUint16;
         };
 
         template <> struct typed<u32>

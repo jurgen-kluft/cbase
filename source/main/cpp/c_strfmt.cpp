@@ -311,7 +311,12 @@ namespace ncore
                     n >>= 2;
                     c += 2;
                 }
-                c += (s8)n;
+                if (n > 0x1)
+                {
+                    n >>= 1;
+                    c += 1;
+                }
+                c += (s8)(n);
                 return c == 0 ? 1 : c;
             }
 
@@ -990,7 +995,11 @@ namespace ncore
                 {
                     case kBool: return format_bool(it, format, arg_t<bool>::decode(argValue)); break;
                     case kChar: return format_char(it, format, arg_t<char>::decode(argValue)); break;
+                    case kInt8: return format_integer(it, format, arg_t<s8>::decode(argValue)); break;
+                    case kInt16: return format_integer(it, format, arg_t<s16>::decode(argValue)); break;
                     case kInt32: return format_integer(it, format, arg_t<s32>::decode(argValue)); break;
+                    case kUint8: return format_integer(it, format, arg_t<u8>::decode(argValue)); break;
+                    case kUint16: return format_integer(it, format, arg_t<u16>::decode(argValue)); break;
                     case kUint32: return format_integer(it, format, arg_t<u32>::decode(argValue)); break;
                     case kInt64: return format_integer(it, format, arg_t<s64>::decode(argValue)); break;
                     case kUint64: return format_integer(it, format, arg_t<u64>::decode(argValue)); break;
