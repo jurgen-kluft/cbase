@@ -881,6 +881,33 @@ namespace ncore
             return asStr((u64)val, str, cursor, end, base, octzero, lowercase);
         }
 
+        // enum EBoolTypes
+        // {
+        //     TrueFalse = 0,
+        //     YesNo = 1,
+        //     LowerCase = 0,
+        //     UpperCase = 2,
+        //     CamelCase = 4,
+        // };
+
+        bool asStr(bool val, char const* str, char*& cursor, char const* end, s8 caseType)
+        {
+            const char* boolstr;
+            switch (caseType)
+            {
+                case TrueFalse | LowerCase: boolstr = (val ? "true" : "false"); break;
+                case TrueFalse | CamelCase: boolstr = (val ? "True" : "False"); break;
+                case TrueFalse | UpperCase: boolstr = (val ? "TRUE" : "FALSE"); break;
+                case YesNo | LowerCase: boolstr = (val ? "yes" : "no"); break;
+                case YesNo | CamelCase: boolstr = (val ? "Yes" : "No"); break;
+                case YesNo | UpperCase: boolstr = (val ? "YES" : "NO"); break;
+                default: ASSERT(false); return false;
+            }
+            while (*boolstr != '\0' && cursor < end)
+                *cursor++ = *boolstr++;
+            return *boolstr == '\0';
+        }
+
     } // namespace ascii
 
     namespace utf8
@@ -3203,7 +3230,7 @@ namespace ncore
                 case utf8::TYPE: c = utf::peek(m_utf8, m_utf8.m_str); break;
                 case utf16::TYPE: c = utf::peek(m_utf16, m_utf16.m_str); break;
                 case utf32::TYPE: c = m_utf32.m_bos[m_utf32.m_str]; break;
-            default: ASSERT(false); break;
+                default: ASSERT(false); break;
             }
             return c;
         }
@@ -3221,7 +3248,7 @@ namespace ncore
                 case utf8::TYPE: c = utf::read(m_utf8, m_utf8.m_str); break;
                 case utf16::TYPE: c = utf::read(m_utf16, m_utf16.m_str); break;
                 case utf32::TYPE: c = m_utf32.m_bos[m_utf32.m_str++]; break;
-            default: ASSERT(false); break;
+                default: ASSERT(false); break;
             }
             return c;
         }
@@ -3394,8 +3421,10 @@ namespace ncore
                     utf::skip(m_utf32.m_bos, cursor, m_utf32.m_str, m_utf32.m_end, 1);
                 }
             }
-            default: ASSERT(false); break;
-            break;
+            default:
+                ASSERT(false);
+                break;
+                break;
         }
         return false;
     }

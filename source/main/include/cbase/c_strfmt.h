@@ -51,6 +51,12 @@ namespace ncore
             str_t(char* first, char* last);
             str_t(const str_t&) noexcept = default;
             str_t(str_t&&) noexcept      = default;
+            template <uint_t N>
+            str_t(char (&array)[N])
+                : m_begin(array)
+                , m_end(array + N - 1)
+            {
+            }
 
             str_t& operator=(const str_t&) noexcept = default;
 
@@ -122,8 +128,8 @@ namespace ncore
                 kInvalid
             };
 
-            static void format_string(str_t& it, state_t& state, const char* str, const char* end);
-            static void format_string(str_t& it, state_t& state, const cstr_t& str);
+            static bool format_string(str_t& it, state_t& state, const char* str, const char* end);
+            static bool format_string(str_t& it, state_t& state, const cstr_t& str);
 
             inline constexpr char fill_char() const noexcept { return m_fill_char; }
             inline constexpr Type type() const noexcept { return m_type; }
@@ -165,14 +171,14 @@ namespace ncore
 
         protected:
             friend class argument_t;
-            
+
             // Writes the alignment (sign, prefix and fill before) for any
             // argument type. Returns the fill counter to write after argument.
-            s32 write_alignment(str_t& it, s32 characters, const bool negative) const;
+            s32  write_alignment(str_t& it, s32 characters, const bool negative) const;
             void write_sign(str_t& it, const bool negative) const noexcept;
             void write_prefix(str_t& it) const noexcept;
 
-            static void format_string(str_t& it, const state_t& state, const cstr_t& str, const s32 str_length, const bool negative = false);
+            static bool format_string(str_t& it, const state_t& state, const cstr_t& str, const s32 str_length, const bool negative = false);
 
             inline constexpr s32 sign_width(const bool negative) const noexcept { return (!negative && sign() <= Sign::kMinus) ? 0 : 1; }
 
@@ -356,9 +362,9 @@ namespace ncore
             s32                  size;
         };
 
-        ascii::prune toStr(ascii::prune str, ascii::prune end, ascii::pcrune fmt, args_t const& args);
+        bool toStr(ascii::prune str, ascii::prune end, ascii::pcrune fmt, args_t const& args);
 
-        template <typename... Args> ascii::prune toStr(ascii::prune str, s32 strMaxLen, ascii::pcrune fmt, Args... args)
+        template <typename... Args> bool toStr(ascii::prune str, s32 strMaxLen, ascii::pcrune fmt, Args... args)
         {
             const u8            types[]  = {typed<Args>::value...};
             const u64           values[] = {arg_t<Args>::encode(args)...};

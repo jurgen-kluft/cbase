@@ -5,7 +5,6 @@
 
 namespace ncore
 {
-
     namespace nuadrw
     {
         /// ---------------------------------------------------------------------------------------
@@ -128,9 +127,9 @@ namespace ncore
     /// Binary Reader
     /// ---------------------------------------------------------------------------------------
 
-    u32   binary_reader_t::size() const { return m_cursor; }
-    u32   binary_reader_t::length() const { return m_len; }
-    u32   binary_reader_t::remain() const { return m_len - m_cursor; }
+    u32       binary_reader_t::size() const { return m_cursor; }
+    u32       binary_reader_t::length() const { return m_len; }
+    u32       binary_reader_t::remain() const { return m_len - m_cursor; }
     cbuffer_t binary_reader_t::get_current_buffer() const { return cbuffer_t(size(), m_buffer + m_cursor); }
     bool      binary_reader_t::can_read(u32 number_of_bytes) const { return (m_cursor + number_of_bytes) <= m_len; }
     bool      binary_reader_t::at_end() const { return m_cursor == m_len; }
@@ -144,8 +143,8 @@ namespace ncore
         return false;
     }
 
-    u32 binary_reader_t::pos() const { return m_cursor; }
-    void    binary_reader_t::reset() { m_cursor = 0; }
+    u32  binary_reader_t::pos() const { return m_cursor; }
+    void binary_reader_t::reset() { m_cursor = 0; }
 
     u32 binary_reader_t::skip(u32 c)
     {
@@ -309,7 +308,7 @@ namespace ncore
         if (can_read(sizeof(b)))
         {
             u8 const* ptr = m_buffer + m_cursor;
-            b                = nuadrw::read_u16(ptr);
+            b             = nuadrw::read_u16(ptr);
         }
         return b;
     }
@@ -501,13 +500,13 @@ namespace ncore
     {
         if (size() == 0)
             return -1;
-        u32 const offset               = m_cursor;
-        out_str.m_ascii.m_flags        = read_s32();
-        u32 const datalen              = read_u32();
-        out_str.m_ascii.m_bos          = (char const*)(m_buffer + m_cursor);
-        out_str.m_ascii.m_str          = 0;
-        out_str.m_ascii.m_end          = datalen;
-        out_str.m_ascii.m_eos          = datalen;
+        u32 const offset        = m_cursor;
+        out_str.m_ascii.m_flags = read_s32();
+        u32 const datalen       = read_u32();
+        out_str.m_ascii.m_bos   = (char const*)(m_buffer + m_cursor);
+        out_str.m_ascii.m_str   = 0;
+        out_str.m_ascii.m_end   = datalen;
+        out_str.m_ascii.m_eos   = datalen;
         m_cursor += datalen;
         return offset;
     }
@@ -717,7 +716,7 @@ namespace ncore
         u32 const offset = m_cursor;
         if (can_write(buf.size()))
         {
-            u32 const    n   = buf.size();
+            u32 const n   = buf.size();
             u8*       dst = m_buffer + m_cursor;
             u8 const* src = buf.m_mutable;
             for (u32 i = 0; i < n; i++)
@@ -733,7 +732,7 @@ namespace ncore
         u32 const offset = m_cursor;
         if (can_write(buf.size()))
         {
-            u32 const    n   = buf.size();
+            u32 const n   = buf.size();
             u8*       dst = (u8*)m_buffer + m_cursor;
             u8 const* src = buf.m_const;
             for (u32 i = 0; i < n; i++)
@@ -780,7 +779,7 @@ namespace ncore
 
     u32 binary_writer_t::write_string(crunes_t const& str)
     {
-        u32 const   offset = m_cursor;
+        u32 const   offset   = m_cursor;
         char const* srcstr   = &str.m_ascii.m_bos[str.m_ascii.m_str];
         char const* srcend   = &str.m_ascii.m_bos[str.m_ascii.m_end];
         u32 const   datasize = (u32)(srcend - srcstr);

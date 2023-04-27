@@ -2,7 +2,7 @@
 #define __CCORE_BUFFER_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "cbase/c_allocator.h"
@@ -44,12 +44,19 @@ namespace ncore
         bool operator>(const cbuffer_t& other) const;
         bool operator>=(const cbuffer_t& other) const;
 
+        bool operator==(const buffer_t& other) const;
+        bool operator!=(const buffer_t& other) const;
+        bool operator<(const buffer_t& other) const;
+        bool operator<=(const buffer_t& other) const;
+        bool operator>(const buffer_t& other) const;
+        bool operator>=(const buffer_t& other) const;
+
         cbuffer_t operator()(u32 from, u32 to) const;
 
         binary_reader_t reader() const;
 
-        s32       m_len;
         u8 const* m_const;
+        s32       m_len;
     };
 
     class buffer_t
@@ -73,87 +80,29 @@ namespace ncore
         void reset(u8 fill);
         void clear();
 
-        s32 compare(const cbuffer_t& other) const
-        {
-            cbuffer_t cthis(*this);
-            return cthis.compare(other);
-        }
+        s32 compare(const cbuffer_t& other) const;
 
-        bool operator==(const cbuffer_t& other) const
-        {
-            cbuffer_t cthis(*this);
-            return cthis == other;
-        }
-        bool operator!=(const cbuffer_t& other) const
-        {
-            cbuffer_t cthis(*this);
-            return cthis != other;
-        }
-        bool operator<(const cbuffer_t& other) const
-        {
-            cbuffer_t cthis(*this);
-            return cthis < other;
-        }
-        bool operator<=(const cbuffer_t& other) const
-        {
-            cbuffer_t cthis(*this);
-            return cthis <= other;
-        }
-        bool operator>(const cbuffer_t& other) const
-        {
-            cbuffer_t cthis(*this);
-            return cthis > other;
-        }
-        bool operator>=(const cbuffer_t& other) const
-        {
-            cbuffer_t cthis(*this);
-            return cthis >= other;
-        }
+        bool operator==(const cbuffer_t& other) const;
+        bool operator!=(const cbuffer_t& other) const;
+        bool operator<(const cbuffer_t& other) const;
+        bool operator<=(const cbuffer_t& other) const;
+        bool operator>(const cbuffer_t& other) const;
+        bool operator>=(const cbuffer_t& other) const;
 
-        bool operator==(const buffer_t& other) const
-        {
-            cbuffer_t cother(other);
-            cbuffer_t cthis(*this);
-            return cthis == cother;
-        }
-        bool operator!=(const buffer_t& other) const
-        {
-            cbuffer_t cother(other);
-            cbuffer_t cthis(*this);
-            return cthis != cother;
-        }
-        bool operator<(const buffer_t& other) const
-        {
-            cbuffer_t cother(other);
-            cbuffer_t cthis(*this);
-            return cthis < cother;
-        }
-        bool operator<=(const buffer_t& other) const
-        {
-            cbuffer_t cother(other);
-            cbuffer_t cthis(*this);
-            return cthis <= cother;
-        }
-        bool operator>(const buffer_t& other) const
-        {
-            cbuffer_t cother(other);
-            cbuffer_t cthis(*this);
-            return cthis > cother;
-        }
-        bool operator>=(const buffer_t& other) const
-        {
-            cbuffer_t cother(other);
-            cbuffer_t cthis(*this);
-            return cthis >= cother;
-        }
+        bool operator==(const buffer_t& other) const;
+        bool operator!=(const buffer_t& other) const;
+        bool operator<(const buffer_t& other) const;
+        bool operator<=(const buffer_t& other) const;
+        bool operator>(const buffer_t& other) const;
+        bool operator>=(const buffer_t& other) const;
 
         buffer_t operator()(u32 from, u32 to) const;
 
         binary_reader_t reader() const;
         binary_writer_t writer() const;
 
-        u32 m_len;
         u8* m_mutable;
+        u32 m_len;
     };
 
     template <u32 L> class u8s : public buffer_t
@@ -334,28 +283,57 @@ namespace ncore
     {
     }
 
-    inline s32 cbuffer_t::compare(const cbuffer_t& other) const
+    inline s32 compare_buffers(u8 const* buf1, u32 len1, u8 const* buf2, u32 len2)
     {
-        if (size() < other.size())
-            return -1;
-        if (size() > other.size())
-            return 1;
-        for (u32 i = 0; i < size(); ++i)
+        if (len1 == len2)
         {
-            if (m_const[i] < other.m_const[i])
+            len1 = 0;
+            while (len1 < len2 && buf1[len1] == buf2[len1])
+                ++len1;
+            if (len1 == len2)
+                return 0;
+            if (buf1[len1] < buf2[len1])
                 return -1;
-            else if (m_const[i] > other.m_const[i])
-                return 1;
         }
-        return 0;
+        else
+        {
+            if (len1 < len2)
+                return -1;
+        }
+        return 1;
     }
 
-    inline bool cbuffer_t::operator==(const cbuffer_t& other) const { return compare(other) == 0; }
-    inline bool cbuffer_t::operator!=(const cbuffer_t& other) const { return compare(other) != 0; }
-    inline bool cbuffer_t::operator<(const cbuffer_t& other) const { return compare(other) < 0; }
-    inline bool cbuffer_t::operator<=(const cbuffer_t& other) const { return compare(other) <= 0; }
-    inline bool cbuffer_t::operator>(const cbuffer_t& other) const { return compare(other) > 0; }
-    inline bool cbuffer_t::operator>=(const cbuffer_t& other) const { return compare(other) >= 0; }
+    inline s32  buffer_t::compare(const cbuffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_const, other.m_len); }
+
+    inline bool buffer_t::operator==(const buffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_mutable, other.m_len) == 0; }
+    inline bool buffer_t::operator!=(const buffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_mutable, other.m_len) != 0; }
+    inline bool buffer_t::operator<(const buffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_mutable, other.m_len) < 0; }
+    inline bool buffer_t::operator<=(const buffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_mutable, other.m_len) <= 0; }
+    inline bool buffer_t::operator>(const buffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_mutable, other.m_len) > 0; }
+    inline bool buffer_t::operator>=(const buffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_mutable, other.m_len) >= 0; }
+
+    inline bool buffer_t::operator==(const cbuffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_const, other.m_len) == 0; }
+    inline bool buffer_t::operator!=(const cbuffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_const, other.m_len) != 0; }
+    inline bool buffer_t::operator<(const cbuffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_const, other.m_len) < 0; }
+    inline bool buffer_t::operator<=(const cbuffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_const, other.m_len) <= 0; }
+    inline bool buffer_t::operator>(const cbuffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_const, other.m_len) > 0; }
+    inline bool buffer_t::operator>=(const cbuffer_t& other) const { return compare_buffers(m_mutable, m_len, other.m_const, other.m_len) >= 0; }
+
+    inline s32  cbuffer_t::compare(const cbuffer_t& other) const { return compare_buffers(m_const, m_len, other.m_const, other.m_len); }
+
+    inline bool cbuffer_t::operator==(const cbuffer_t& other) const { return compare_buffers(m_const, m_len, other.m_const, other.m_len) == 0; }
+    inline bool cbuffer_t::operator!=(const cbuffer_t& other) const { return compare_buffers(m_const, m_len, other.m_const, other.m_len) != 0; }
+    inline bool cbuffer_t::operator<(const cbuffer_t& other) const { return compare_buffers(m_const, m_len, other.m_const, other.m_len) < 0; }
+    inline bool cbuffer_t::operator<=(const cbuffer_t& other) const { return compare_buffers(m_const, m_len, other.m_const, other.m_len) <= 0; }
+    inline bool cbuffer_t::operator>(const cbuffer_t& other) const { return compare_buffers(m_const, m_len, other.m_const, other.m_len) > 0; }
+    inline bool cbuffer_t::operator>=(const cbuffer_t& other) const { return compare_buffers(m_const, m_len, other.m_const, other.m_len) >= 0; }
+
+    inline bool cbuffer_t::operator==(const buffer_t& other) const { return compare_buffers(m_const, m_len, other.m_mutable, other.m_len) == 0; }
+    inline bool cbuffer_t::operator!=(const buffer_t& other) const { return compare_buffers(m_const, m_len, other.m_mutable, other.m_len) != 0; }
+    inline bool cbuffer_t::operator<(const buffer_t& other) const { return compare_buffers(m_const, m_len, other.m_mutable, other.m_len) < 0; }
+    inline bool cbuffer_t::operator<=(const buffer_t& other) const { return compare_buffers(m_const, m_len, other.m_mutable, other.m_len) <= 0; }
+    inline bool cbuffer_t::operator>(const buffer_t& other) const { return compare_buffers(m_const, m_len, other.m_mutable, other.m_len) > 0; }
+    inline bool cbuffer_t::operator>=(const buffer_t& other) const { return compare_buffers(m_const, m_len, other.m_mutable, other.m_len) >= 0; }
 
     inline cbuffer_t cbuffer_t::operator()(u32 from, u32 to) const
     {

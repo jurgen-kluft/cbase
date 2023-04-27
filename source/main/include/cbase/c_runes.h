@@ -105,6 +105,15 @@ namespace ncore
         bool asStr(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
         bool asStr(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
         bool asStr(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
+        enum EBoolTypes
+        {
+            TrueFalse = 0,
+            YesNo = 1,
+            LowerCase = 0,
+            UpperCase = 2,
+            CamelCase = 4,
+        };
+        bool asStr(bool val, char const* str, char*& cursor, char const* end, s8 caseType = TrueFalse | LowerCase);
 
     } // namespace ascii
 

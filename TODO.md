@@ -12,7 +12,7 @@ Naming convention:
 - DONE -> namespaces start with n (e.g. ncore)
 - DONE -> struct/class ends with _t (e.g. alloc_t)
 - DONE -> global functions start with g_ (e.g. g_min, g_max, g_po2)
-- restyle __xint64, __xint128, ...
+- restyle __xint64, __xint128 to s64, s128
 
 ## cstring (Alpha)
 
@@ -34,7 +34,7 @@ This is just hashing, no encryption.
 
 ## cmerkle
 
-Utilities to construct, update use merkle trees.
+Utilities to construct, update and use merkle trees.
 
 ## ccrypto (AES)
 

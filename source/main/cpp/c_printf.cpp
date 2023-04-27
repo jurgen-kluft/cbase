@@ -377,11 +377,8 @@ namespace ncore
             // convert integer part
             if (ipart == 0.0)
             {
-                // Removed this because I want to always see the zero I don't like things
-                // that look like ".324234" I like "0.324234" to make sure we don't give
-                // up precision I incremented the space for the number.
                 prec++;
-                // if (cvt != 'g' || fwidth < prec || fwidth < width)
+                if (cvt != 'g' || fwidth < prec || fwidth < width)
                 {
                     *--iw = '0';
                     ++iwidth;
@@ -628,18 +625,6 @@ namespace ncore
      */
 #define to_digit(c) ((c) - '0')
 #define is_digit(c) ((u32)to_digit(c) >= 0 && ((u32)to_digit(c) <= 9))
-
-    static const char* sBooleanStrs[] = {"false", "true", "FALSE", "TRUE", "False", "True", "no", "yes", "NO", "YES", "No", "Yes"};
-    static const char* sBoolAsAsciiStr(u32 _boolean, bool yesNo, ncore::s32 flags)
-    {
-        s32 i = yesNo ? 6 : 0;
-        if (flags & CAMELCASE)
-            i += 4;
-        else if (flags & UPPERCASE)
-            i += 2;
-        i += (_boolean == 0) ? 0 : 1;
-        return (ascii::pcrune)sBooleanStrs[i];
-    }
 
     static void PadBuffer(irunes_writer_t* writer, s32 howMany, char with)
     {
@@ -996,8 +981,8 @@ namespace ncore
                     // defined manner."
                     // -- ANSI X3J11
 
-                    uqval         = (u64)args[argindex++];
-                    base          = 16;
+                    uqval                = (u64)args[argindex++];
+                    base                 = 16;
                     hexDigitsAsLowerCase = true;
                     flags |= QUADINT; // | HEXPREFIX; Not prefixes
                     ch = 'x';
@@ -1021,33 +1006,41 @@ namespace ncore
 
                 case 'B':
                 {
-                    ulval                = ((bool)args[argindex++]) ? 1 : 0;
-                    const char* bool_str = sBoolAsAsciiStr(ulval, false, ((flags & ALT) != 0) ? CAMELCASE : UPPERCASE);
-                    size                 = buffer->write(bool_str);
+                    ulval = ((bool)args[argindex++]) ? 1 : 0;
+                    char  bool_str[8];
+                    char* cursor = bool_str;
+                    ascii::asStr((bool)ulval, bool_str, cursor, &bool_str[7], ((flags & ALT) != 0) ? ascii::CamelCase : ascii::UpperCase);
+                    size = buffer->write(bool_str, cursor);
                 }
                 break;
 
                 case 'b':
                 {
-                    ulval                = ((bool)args[argindex++]) ? 1 : 0;
-                    const char* bool_str = sBoolAsAsciiStr(ulval, false, ((flags & ALT) != 0) ? CAMELCASE : 0);
-                    size                 = buffer->write(bool_str);
+                    ulval = ((bool)args[argindex++]) ? 1 : 0;
+                    char  bool_str[8];
+                    char* cursor = bool_str;
+                    ascii::asStr((bool)ulval, bool_str, cursor, &bool_str[7], ((flags & ALT) != 0) ? ascii::CamelCase : 0);
+                    size = buffer->write(bool_str, cursor);
                 }
                 break;
 
                 case 'Y':
                 {
-                    ulval                = ((bool)args[argindex++]) ? 1 : 0;
-                    const char* bool_str = sBoolAsAsciiStr(ulval, true, ((flags & ALT) != 0) ? CAMELCASE : UPPERCASE);
-                    size                 = buffer->write(bool_str);
+                    ulval = ((bool)args[argindex++]) ? 1 : 0;
+                    char  bool_str[8];
+                    char* cursor = bool_str;
+                    ascii::asStr((bool)ulval, bool_str, cursor, &bool_str[7], ((flags & ALT) != 0) ? ascii::CamelCase | ascii::YesNo : ascii::UpperCase | ascii::YesNo);
+                    size = buffer->write(bool_str, cursor);
                 }
                 break;
 
                 case 'y':
                 {
-                    ulval                = ((bool)args[argindex++]) ? 1 : 0;
-                    const char* bool_str = sBoolAsAsciiStr(ulval, true, ((flags & ALT) != 0) ? CAMELCASE : 0);
-                    size                 = buffer->write(bool_str);
+                    ulval = ((bool)args[argindex++]) ? 1 : 0;
+                    char  bool_str[8];
+                    char* cursor = bool_str;
+                    ascii::asStr((bool)ulval, bool_str, cursor, &bool_str[7], ((flags & ALT) != 0) ? ascii::CamelCase | ascii::YesNo : ascii::YesNo);
+                    size = buffer->write(bool_str, cursor);
                 }
                 break;
 
