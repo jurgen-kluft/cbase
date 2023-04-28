@@ -24,43 +24,54 @@ namespace ncore
         char specifier;
     } flags;
 
-    void s21_strcpy(char* dest, const char* src)
+    namespace internal
     {
-        while (*src)
-            *dest++ = *src++;
-        *dest = '\0';
-    }
-
-    void s21_strcat(char* dest, const char* src)
-    {
-        while (*dest)
-            dest++;
-        while (*src)
-            *dest++ = *src++;
-        *dest = '\0';
-    }
-
-    char* s21_strchr(char* str, char character)
-    {
-        while (*str != character)
+        s32 strlen(const char* str)
         {
-            if (!*str++)
-                return 0;
+            s32 len = 0;
+            while (*str++)
+                len++;
+            return len;
         }
-        return (char*)str;
-    }
 
-    s32 wcstombs(char* dest, const wchar_t* src, s32 n)
-    {
-        s32 count = 0;
-        while (n--)
+        void strcpy(char* dest, const char* src)
         {
-            if ((*dest++ = (char)*src++) == '\0')
-                break;
-            count++;
+            while (*src)
+                *dest++ = *src++;
+            *dest = '\0';
         }
-        return count;
-    }
+
+        void strcat(char* dest, const char* src)
+        {
+            while (*dest)
+                dest++;
+            while (*src)
+                *dest++ = *src++;
+            *dest = '\0';
+        }
+
+        char* strchr(char* str, char character)
+        {
+            while (*str != character)
+            {
+                if (!*str++)
+                    return 0;
+            }
+            return (char*)str;
+        }
+
+        s32 wcstombs(char* dest, const wchar_t* src, s32 n)
+        {
+            s32 count = 0;
+            while (n--)
+            {
+                if ((*dest++ = (char)*src++) == '\0')
+                    break;
+                count++;
+            }
+            return count;
+        }
+    } // namespace internal
 
     // TODO:
     // - pass down destination as a [begin, cursor, end] string range
@@ -74,6 +85,18 @@ namespace ncore
         char const* end;
 
         inline s32 length() const { return (s32)(cursor - begin); }
+
+        bool move_right(s32 n)
+        {
+            if (cursor + n > end)
+                return false;
+            char* dst = cursor + n;
+            char* src = cursor;
+            while (src > begin)
+                *dst-- = *src--;
+            cursor += n;
+            return true;
+        }
     };
 
     s32 s21_sprintf(char* str, char const* str_end, const char* format, const char* format_end, ...);
@@ -312,28 +335,25 @@ namespace ncore
 
     void format_precision(char* buff, flags f)
     {
-        char tmp[BUFF_SIZE] = {'\0'};
+        const char sign_char = '-';
+        const s32  sign      = buff[0] == '-' ? 1 : 0;
+        const s32  len       = internal::strlen(buff) - sign;
 
-        s32 sign = 0;
-        s32 len  = ascii::strlen(buff);
+        const s32 fill_cnt = (f.precision > len) ? f.precision - len : 0;
 
-        if (buff[0] == '-')
+        // shift string to the right
+        for (s32 i = len + sign; i >= sign; i--)
         {
-            tmp[0] = '-';
-            len--;
-            sign = 1;
+            buff[i + fill_cnt] = buff[i];
         }
 
-        if (f.precision > len)
+        // add sign
+        buff[0] = sign_char; // if sign is not set, this will be overwritten
+
+        // fill with zeros
+        for (s32 i = sign; i < sign + fill_cnt; i++)
         {
-            s32 idx;
-            for (idx = sign; idx < f.precision - len + sign; idx++)
-                tmp[idx] = '0';
-
-            for (s32 i = sign; buff[i]; i++, idx++)
-                tmp[idx] = buff[i];
-
-            s21_strcpy(buff, tmp);
+            buff[i] = '0';
         }
 
         if (f.is_precision_set && f.precision == 0 && check_integer_specifier(f.specifier) && buff[0] == '0')
@@ -342,17 +362,16 @@ namespace ncore
 
     bool check_integer_specifier(char c)
     {
-        char specs[] = {'d', 'i', 'o', 'u', 'x', 'X'};
-        bool res     = false;
-        for (s32 i = 0; i < sizeof(specs); i++)
+        switch (c)
         {
-            if (specs[i] == c)
-            {
-                res = true;
-                break;
-            }
+            case 'd':
+            case 'i':
+            case 'o':
+            case 'u':
+            case 'x':
+            case 'X': return true;
         }
-        return res;
+        return false;
     }
 
     void format_flags(char* buff, flags f)
@@ -373,7 +392,7 @@ namespace ncore
             sign_len  = 1;
         }
 
-        s32 const len = ascii::strlen(buff);
+        s32 const len = internal::strlen(buff);
         if (f.width > len)
         {
             const s32  fill_cnt  = (f.width - len);
@@ -395,20 +414,50 @@ namespace ncore
 
     void unsigned_num_to_string(u64 val, char* ret, s32 base)
     {
-        char buf[32 + 1] = {'\0'};
-        s32  idx         = BUFF_SIZE - 1;
         if (val == 0)
         {
-            buf[idx] = '0';
-            idx--;
+            *ret = '0';
+            return;
         }
 
-        // TODO we could do this in-place instead of using a temporary buffer
+        char* iter = ret;
+        if (base == 10)
+        {
+            while (val != 0)
+            {
+                const u64 q = val / 10;
+                *iter++ = "0123456789"[val - q * 10];
+                val = q;
+            }
+        }
+        else if (base == 16)
+        {
+            while (val != 0)
+            {
+                *iter++ = "0123456789abcdef"[val & 15];
+                val >>= 4;
+            }
+        }
+        else if (base == 8)
+        {
+            while (val != 0)
+            {
+                *iter++ = "01234567"[val & 7];
+                val >>= 3;
+            }
+        }
 
-        for (; val && idx; --idx, val /= base)
-            buf[idx] = "0123456789abcdef"[val % base];
-        for (s32 j = 0; buf[idx + 1]; idx++, j++)
-            ret[j] = buf[idx + 1];
+        // reverse string
+        char* beg = ret;
+        char* end = iter - 1;
+        while (beg < end)
+        {
+            char tmp = *beg;
+            *beg     = *end;
+            *end     = tmp;
+            beg++;
+            end--;
+        }
     }
 
     void parse_unsigned(flags f, char* buff, va_list_t& va, s32& va_idx)
@@ -473,7 +522,7 @@ namespace ncore
     {
         if (!is_all_zeroes(buff) || f.specifier == 'p')
         {
-            nmem::memmove(buff + 2, buff, ascii::strlen(buff));
+            // nmem::memmove(buff + 2, buff, internal::strlen(buff));
             buff[0] = '0';
             buff[1] = 'x';
         }
@@ -498,20 +547,20 @@ namespace ncore
         if (!f.minus && f.width)
         {
             char tmp[BUFF_SIZE] = {'\0'};
-            wcstombs(tmp, &w_c, BUFF_SIZE);
-            for (s32 i = 0; i < f.width - ascii::strlen(tmp); i++)
+            internal::wcstombs(tmp, &w_c, BUFF_SIZE);
+            for (s32 i = 0; i < f.width - internal::strlen(tmp); i++)
                 buff[i] = ' ';
-            s21_strcat(buff, tmp);
+            internal::strcat(buff, tmp);
         }
         else if (f.width)
         {
-            wcstombs(buff, &w_c, BUFF_SIZE);
-            for (s32 i = ascii::strlen(buff); i < f.width; i++)
+            internal::wcstombs(buff, &w_c, BUFF_SIZE);
+            for (s32 i = internal::strlen(buff); i < f.width; i++)
                 buff[i] = ' ';
         }
         else
         {
-            wcstombs(buff, &w_c, BUFF_SIZE);
+            internal::wcstombs(buff, &w_c, BUFF_SIZE);
         }
     }
     void format_char(flags f, char* buff, char c)
@@ -553,26 +602,26 @@ namespace ncore
     void format_string(flags f, char* buff, const char* str)
     {
         char tmp[BUFF_SIZE] = {'\0'};
-        s21_strcpy(tmp, str);
+        internal::strcpy(tmp, str);
         if (f.is_precision_set)
             tmp[f.precision] = '\0';
 
-        s32 shift = f.width - ascii::strlen(tmp);
-        s32 len   = ascii::strlen(tmp);
+        s32 shift = f.width - internal::strlen(tmp);
+        s32 len   = internal::strlen(tmp);
 
         if (f.minus && shift > 0)
         {
-            s21_strcpy(buff, tmp);
+            internal::strcpy(buff, tmp);
             nmem::memset(buff + len, ' ', shift);
         }
         else if (shift > 0)
         {
             nmem::memset(buff, ' ', shift);
-            s21_strcpy(buff + shift, tmp);
+            internal::strcpy(buff + shift, tmp);
         }
         else
         {
-            s21_strcpy(buff, tmp);
+            internal::strcpy(buff, tmp);
         }
     }
     void format_wide_string(flags f, char* buff, const wchar_t* wstr)
@@ -580,27 +629,27 @@ namespace ncore
         char tmp[BUFF_SIZE] = {'\0'};
         char str[BUFF_SIZE] = {'\0'};
 
-        wcstombs(str, wstr, BUFF_SIZE);
-        s21_strcpy(tmp, str);
+        internal::wcstombs(str, wstr, BUFF_SIZE);
+        internal::strcpy(tmp, str);
         if (f.is_precision_set)
             tmp[f.precision] = '\0';
 
-        s32 shift = f.width - ascii::strlen(tmp);
-        s32 len   = ascii::strlen(tmp);
+        s32 shift = f.width - internal::strlen(tmp);
+        s32 len   = internal::strlen(tmp);
 
         if (f.minus && shift > 0)
         {
-            s21_strcpy(buff, tmp);
+            internal::strcpy(buff, tmp);
             nmem::memset(buff + len, ' ', shift);
         }
         else if (shift > 0)
         {
             nmem::memset(buff, ' ', shift);
-            s21_strcpy(buff + shift, tmp);
+            internal::strcpy(buff + shift, tmp);
         }
         else
         {
-            s21_strcpy(buff, tmp);
+            internal::strcpy(buff, tmp);
         }
     }
 
@@ -637,8 +686,8 @@ namespace ncore
 
     void remove_trailing_zeroes(char* buff)
     {
-        s32   len = ascii::strlen(buff);
-        char* dot = s21_strchr(buff, '.');
+        s32   len = internal::strlen(buff);
+        char* dot = internal::strchr(buff, '.');
         if (dot)
         {
             for (s32 i = len - 1; buff[i] != '.'; i--)
@@ -696,7 +745,7 @@ namespace ncore
 
     void prepend_mantiss(char* str, int pow, char sign)
     {
-        int len      = ascii::strlen(str);
+        int len      = internal::strlen(str);
         str[len]     = 'e';
         str[len + 1] = sign;
         str[len + 3] = pow % 10 + '0';
@@ -759,9 +808,9 @@ namespace ncore
     void format_gG_precision(char* buff, s32 precision)
     {
         s32 sig_digs       = 0;
-        s32 len            = ascii::strlen(buff);
+        s32 len            = internal::strlen(buff);
         int not_zero_found = 0;
-        for (s32 i = 0; i < ascii::strlen(buff); i++)
+        for (s32 i = 0; i < internal::strlen(buff); i++)
         {
             if ((buff[i] == '0' && !not_zero_found) || buff[i] == '.')
                 continue;
