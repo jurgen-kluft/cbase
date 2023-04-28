@@ -1,4 +1,5 @@
 #include "cbase/c_target.h"
+#include "cbase/c_allocator.h"
 #include "cbase/c_debug.h"
 #include "cbase/c_hash.h"
 #include "cbase/c_memory.h"
@@ -26,26 +27,26 @@ namespace ncore
     {
 #if (WYHASH_32BIT_MUM)
         uint64_t hh = (*A >> 32) * (*B >> 32), hl = (*A >> 32) * (uint32_t)*B, lh = (uint32_t)*A * (*B >> 32), ll = (uint64_t)(uint32_t)*A * (uint32_t)*B;
-#if (WYHASH_PROTECTION > 1)
+#    if (WYHASH_PROTECTION > 1)
         *A ^= _wyrot(hl) ^ hh;
         *B ^= _wyrot(lh) ^ ll;
-#else
+#    else
         *A = _wyrot(hl) ^ hh;
         *B = _wyrot(lh) ^ ll;
-#endif
+#    endif
 #else
         uint64_t ha = *A >> 32, hb = *B >> 32, la = (uint32_t)*A, lb = (uint32_t)*B, hi, lo;
         uint64_t rh = ha * hb, rm0 = ha * lb, rm1 = hb * la, rl = la * lb, t = rl + (rm0 << 32), c = t < rl;
         lo = t + (rm1 << 32);
         c += lo < t;
         hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
-#if (WYHASH_PROTECTION > 1)
+#    if (WYHASH_PROTECTION > 1)
         *A ^= lo;
         *B ^= hi;
-#else
+#    else
         *A = lo;
         *B = hi;
-#endif
+#    endif
 #endif
     }
 
@@ -192,13 +193,16 @@ namespace ncore
             {
                 ok        = 1;
                 secret[i] = 0;
+
                 for (uint_t j = 0; j < 64; j += 8)
                     secret[i] |= ((uint64_t)c[wyrand(&seed) % sizeof(c)]) << j;
+
                 if (secret[i] % 2 == 0)
                 {
                     ok = 0;
                     continue;
                 }
+
                 for (uint_t j = 0; j < i; j++)
                 {
                     // manual popcount
@@ -266,5 +270,36 @@ namespace ncore
         return	i;
     }
     */
+
+    class wyset
+    {
+    public:
+        void init(alloc_t* allocator, s32 size);
+        s64  size() const;
+        void insert(u64 key, s64& pos);
+        bool find(u64 key, s64& pos) const;
+        bool remove(u64 key);
+
+    protected:
+        friend class wymap;
+        alloc_t* m_allocator;
+        s64      m_size;
+        u64*     m_keys;
+        u64      m_secret[4];
+    };
+
+    template <typename T> class wymap
+    {
+    public:
+        void init(alloc_t* allocator, s32 size);
+        s64  size() const;
+        void insert(T const& item);
+        bool contains(T const& item) const;
+        bool remove(T const& item);
+
+    protected:
+        wyset m_set;
+        T*    m_values;
+    };
 
 } // namespace ncore
