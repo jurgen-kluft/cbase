@@ -522,7 +522,8 @@ namespace ncore
     {
         if (!is_all_zeroes(buff) || f.specifier == 'p')
         {
-            // nmem::memmove(buff + 2, buff, internal::strlen(buff));
+            for (s32 i = internal::strlen(buff); i >= 0; i--)
+                buff[i + 2] = buff[i];
             buff[0] = '0';
             buff[1] = 'x';
         }
