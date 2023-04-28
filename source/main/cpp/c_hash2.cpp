@@ -270,6 +270,7 @@ namespace ncore
         return	i;
     }
     */
+    template <typename T> class wymap;
 
     class wyset
     {
@@ -280,8 +281,6 @@ namespace ncore
         bool find(u64 key, s64& pos) const;
         bool remove(u64 key);
 
-    protected:
-        friend class wymap;
         alloc_t* m_allocator;
         s64      m_size;
         u64*     m_keys;
@@ -297,7 +296,6 @@ namespace ncore
         bool contains(T const& item) const;
         bool remove(T const& item);
 
-    protected:
         wyset m_set;
         T*    m_values;
     };

@@ -76,16 +76,16 @@ namespace ncore
             {
             }
 
-            inline bool operator==(EFlag rhs) const noexcept { return value == rhs; }
-            inline bool operator!=(EFlag rhs) const noexcept { return value != rhs; }
+            inline constexpr bool operator==(EFlag rhs) const noexcept { return value == rhs; }
+            inline constexpr bool operator!=(EFlag rhs) const noexcept { return value != rhs; }
 
-            inline Flags& operator =(EFlag rhs) noexcept
+            inline constexpr Flags& operator=(EFlag rhs) noexcept
             {
                 value = rhs;
                 return *this;
             }
 
-            inline Flags& operator|=(EFlag rhs) noexcept
+            inline constexpr Flags& operator|=(EFlag rhs) noexcept
             {
                 value |= rhs;
                 return *this;
@@ -114,8 +114,8 @@ namespace ncore
             {
             }
 
-            bool operator==(const EAlign& rhs) const noexcept { return value == rhs; }
-            bool operator!=(const EAlign& rhs) const noexcept { return value != rhs; }
+            inline constexpr bool operator==(const EAlign& rhs) const noexcept { return value == rhs; }
+            inline constexpr bool operator!=(const EAlign& rhs) const noexcept { return value != rhs; }
 
             u8 value;
         };
@@ -138,8 +138,8 @@ namespace ncore
             {
             }
 
-            inline bool operator==(ESign rhs) const noexcept { return value == rhs; }
-            inline bool operator!=(ESign rhs) const noexcept { return value != rhs; }
+            inline constexpr bool operator==(ESign rhs) const noexcept { return value == rhs; }
+            inline constexpr bool operator!=(ESign rhs) const noexcept { return value != rhs; }
             
             u8 value;
         };
@@ -163,8 +163,8 @@ namespace ncore
                 kInvalid
             };
 
-            inline bool operator==(EType rhs) const noexcept { return value == rhs; }
-            inline bool operator!=(EType rhs) const noexcept { return value != rhs; }
+            inline constexpr bool operator==(EType rhs) const noexcept { return value == rhs; }
+            inline constexpr bool operator!=(EType rhs) const noexcept { return value != rhs; }
 
             inline Type& operator=(const EType& rhs) noexcept
             {
@@ -197,8 +197,9 @@ namespace ncore
             str_t(char* first, char* last);
             str_t(const str_t&) noexcept = default;
             str_t(str_t&&) noexcept      = default;
+
             template <uint_t N>
-            str_t(char (&array)[N])
+            inline str_t(char (&array)[N])
                 : m_begin(array)
                 , m_end(array + N - 1)
             {
@@ -206,7 +207,7 @@ namespace ncore
 
             str_t& operator=(const str_t&) noexcept = default;
 
-            bool at_end() const noexcept { return m_begin == m_end; }
+            inline constexpr bool at_end() const noexcept { return m_begin == m_end; }
             void write(uchar32 c = '\0');
             void skip(const uint_t n);
             void write(cstr_t const& str);
@@ -222,7 +223,7 @@ namespace ncore
             friend class format_t;
 
         public:
-            state_t() noexcept;
+            state_t() noexcept = default;
             state_t(const state_t&) noexcept = default;
             state_t(s8 width, TypeId type = TypeId::kString, Flags flags = Flags::kAlignCenter, s8 precision = 0, char fill_char = ' ') noexcept;
 
@@ -417,7 +418,7 @@ namespace ncore
 
         template <typename T> struct typed
         {
-            static const u8 value = kCustom;
+            static const u8 value = TypeId::kCustom;
         };
 
         template <> struct typed<bool>

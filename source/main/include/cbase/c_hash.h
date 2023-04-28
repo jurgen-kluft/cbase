@@ -11,21 +11,21 @@ namespace ncore
 
     namespace nhash
     {
-        u64 datahash(u8 const* data, u32 size);
+        u64 datahash(u8 const* data, u32 size, u64 seed = 0);
 
-        u64 strhash(const char* str);
-        u64 strhash(const char* str, const char* end);
-        u64 strhash(crunes_t const& str);
-        u64 strhash_lowercase(const char* str);
-        u64 strhash_lowercase(const char* str, const char* end);
-        u64 strhash_lowercase(crunes_t const& str);
+        u64 strhash(const char* str, u64 seed = 0);
+        u64 strhash(const char* str, const char* end, u64 seed = 0);
+        u64 strhash(crunes_t const& str, u64 seed = 0);
+        u64 strhash_lowercase(const char* str, u64 seed = 0);
+        u64 strhash_lowercase(const char* str, const char* end, u64 seed = 0);
+        u64 strhash_lowercase(crunes_t const& str, u64 seed = 0);
 
-        u32 strhash32(const char* str);
-        u32 strhash32(const char* str, const char* end);
-        u32 strhash32(crunes_t const& str);
-        u32 strhash32_lowercase(const char* str);
-        u32 strhash32_lowercase(const char* str, const char* end);
-        u32 strhash32_lowercase(crunes_t const& str);
+        u32 strhash32(const char* str, u64 seed = 0);
+        u32 strhash32(const char* str, const char* end, u64 seed = 0);
+        u32 strhash32(crunes_t const& str, u64 seed = 0);
+        u32 strhash32_lowercase(const char* str, u64 seed = 0);
+        u32 strhash32_lowercase(const char* str, const char* end, u64 seed = 0);
+        u32 strhash32_lowercase(crunes_t const& str, u64 seed = 0);
 
         template <typename K> class hasher_t
         {

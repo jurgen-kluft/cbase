@@ -16,7 +16,7 @@
 namespace ncore
 {
 
-    template <typename K, typename V, typename H = hasher_t<K>> class map_t
+    template <typename K, typename V, typename H = nhash::hasher_t<K>> class map_t
     {
     public:
         inline map_t(alloc_t* a = nullptr, u32 max_items = 65535)
@@ -65,7 +65,7 @@ namespace ncore
         tree_t          m_tree;
     };
 
-    template <typename K, typename H = hasher_t<K>> class set_t
+    template <typename K, typename H = nhash::hasher_t<K>> class set_t
     {
     public:
         inline set_t(alloc_t* a = nullptr, u32 max_items = 65535)

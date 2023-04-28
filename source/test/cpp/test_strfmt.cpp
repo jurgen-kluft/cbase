@@ -33,11 +33,6 @@ namespace ncore
             static inline format_func_t formatter() { return FormatDateTime; }
         };
 
-        template <> struct typed<DateTime>
-        {
-            static const u8 value = kCustom;
-        };
-
     } // namespace fmt
 
 } // namespace ncore
