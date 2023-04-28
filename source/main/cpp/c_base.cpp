@@ -40,29 +40,29 @@ namespace ncore
 
             runes_t r;
             r.m_ascii.m_flags = flags;
-            r.m_ascii.m_bos = (ascii::prune)sysalloc->allocate((cap + 1) * sizeofrune, sizeof(void*));
-            r.m_ascii.m_str = 0;
-            r.m_ascii.m_end = len * sizeofrune;
-            r.m_ascii.m_eos = cap * sizeofrune;
+            r.m_ascii.m_bos   = (ascii::prune)sysalloc->allocate((cap + 1) * sizeofrune, sizeof(void*));
+            r.m_ascii.m_str   = 0;
+            r.m_ascii.m_end   = len * sizeofrune;
+            r.m_ascii.m_eos   = cap * sizeofrune;
 
             switch (flags)
             {
-            case ascii::TYPE:
+                case ascii::TYPE:
                     r.m_ascii.m_bos[r.m_ascii.m_end] = '\0';
                     r.m_ascii.m_bos[r.m_ascii.m_eos] = '\0';
                     break;
-            case utf8::TYPE:
+                case utf8::TYPE:
                     r.m_utf8.m_bos[r.m_utf8.m_end] = '\0';
                     r.m_utf8.m_bos[r.m_utf8.m_eos] = '\0';
-                break;
-            case utf16::TYPE:
+                    break;
+                case utf16::TYPE:
                     r.m_utf16.m_bos[r.m_utf16.m_end] = '\0';
                     r.m_utf16.m_bos[r.m_utf16.m_eos] = '\0';
-                break;
-            case utf32::TYPE:
+                    break;
+                case utf32::TYPE:
                     r.m_utf32.m_bos[r.m_utf32.m_end] = '\0';
                     r.m_utf32.m_bos[r.m_utf32.m_eos] = '\0';
-                break;
+                    break;
             }
 
             m_alloc_count++;
@@ -92,23 +92,29 @@ namespace ncore
         return s_main_runes_alloc_ptr;
     }
 
-    extern u64 wyrand(u64* seed);
+    namespace nhash
+    {
+        extern u64 wyrand(u64* seed);
+    }
 
-	class wyrand_t : public random_t
-	{
-	public:
-        wyrand_t() : m_seed(0) {}
-		virtual				~wyrand_t() {}
-		virtual void		reset(s64 inSeed = 0);
-		virtual u32			generate();
+    class wyrand_t : public random_t
+    {
+    public:
+        wyrand_t()
+            : m_seed(0)
+        {
+        }
+        virtual ~wyrand_t() {}
+        virtual void reset(s64 inSeed = 0);
+        virtual u32  generate();
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
-	private:
-		u64			m_seed;
-	};
+    private:
+        u64 m_seed;
+    };
 
     void wyrand_t::reset(s64 inSeed) { m_seed = inSeed; }
-    u32 wyrand_t::generate() { return (u32)wyrand(&m_seed); }
+    u32  wyrand_t::generate() { return (u32)nhash::wyrand(&m_seed); }
 
 } // namespace ncore
 
@@ -118,7 +124,7 @@ namespace cbase
     {
         ncore::alloc_t::init_system();
         ncore::console_t::init_default_console();
-		ncore::context_t::init(number_of_threads, 16, ncore::alloc_t::get_system());
+        ncore::context_t::init(number_of_threads, 16, ncore::alloc_t::get_system());
         ncore::context_t::register_thread(); // Should be called once from a created thread
 
 #ifdef D_ASSERT
@@ -135,7 +141,7 @@ namespace cbase
         {
             const ncore::s32 slot = i;
 
-            ncore::u8* buffer_data = (ncore::u8*)system_allocator->allocate(temporary_allocator_size);
+            ncore::u8*       buffer_data      = (ncore::u8*)system_allocator->allocate(temporary_allocator_size);
             ncore::alloc_t*  stack_allocator  = ncore::alloc_t::get_system()->construct<ncore::alloc_buffer_t>(buffer_data, temporary_allocator_size);
             ncore::random_t* random_generator = ncore::alloc_t::get_system()->construct<ncore::wyrand_t>();
             random_generator->reset((ncore::s64)random_generator); // randomize the seed
