@@ -1,6 +1,6 @@
 namespace ncore
 {
-    template <typename T, typename K, typename V, typename H = hasher_t<K>> class map_tree_ctxt_t : public tree_t::ctxt_t
+    template <typename T, typename K, typename V, typename H = nhash::hasher_t<K>> class map_tree_ctxt_t : public tree_t::ctxt_t
     {
     public:
         struct nodeT_t

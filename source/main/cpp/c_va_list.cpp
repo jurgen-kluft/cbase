@@ -15,6 +15,20 @@ namespace ncore
         mArg2 = ascii::strlen(inVar);
     }
 
+    va_t::va_t(const wchar_t* inVar)
+        : mArg3(TYPE_PCRUNES)
+    {
+        mArg = (u64)inVar;
+        mArg3 |= ascii::TYPE;
+        mArg2 = 0;
+        const wchar_t* it = inVar;
+        while (*it != L'\0')
+        {
+            ++it;
+            ++mArg2;
+        }
+    }
+
     va_t::va_t(crunes_t const& str)
         : mArg3(TYPE_PCRUNES)
     {

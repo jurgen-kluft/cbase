@@ -41,22 +41,25 @@ namespace ncore
     public:
         enum EType
         {
-            TYPE_EMPTY   = 0 << 28,
-            TYPE_INT8    = 1 << 28,
-            TYPE_INT16   = 2 << 28,
-            TYPE_INT     = 3 << 28,
-            TYPE_INT32   = 4 << 28,
-            TYPE_INT64   = 5 << 28,
-            TYPE_UINT8   = 6 << 28,
-            TYPE_UINT16  = 7 << 28,
-            TYPE_UINT    = 8 << 28,
-            TYPE_UINT32  = 9 << 28,
-            TYPE_UINT64  = 10 << 28,
-            TYPE_BOOL    = 11 << 28,
-            TYPE_FLOAT32 = 12 << 28,
-            TYPE_FLOAT64 = 13 << 28,
-            TYPE_PCRUNES = 14 << 28,
-            TYPE_MASK    = 0xF0000000,
+            TYPE_EMPTY   = 0 << 24,
+            TYPE_INT8    = 1 << 24,
+            TYPE_INT16   = 2 << 24,
+            TYPE_INT     = 3 << 24,
+            TYPE_INT32   = 4 << 24,
+            TYPE_INT64   = 5 << 24,
+            TYPE_UINT8   = 6 << 24,
+            TYPE_UINT16  = 7 << 24,
+            TYPE_UINT    = 8 << 24,
+            TYPE_UINT32  = 9 << 24,
+            TYPE_UINT64  = 10 << 24,
+            TYPE_BOOL    = 11 << 24,
+            TYPE_FLOAT32 = 12 << 24,
+            TYPE_FLOAT64 = 13 << 24,
+            TYPE_PCRUNES = 14 << 24,
+            TYPE_PINT32  = 15 << 24,
+            TYPE_PCCHAR  = 16 << 24,
+            TYPE_PCWHAR  = 17 << 24,
+            TYPE_MASK    = 0xFF000000,
         };
 
     public:
@@ -95,6 +98,11 @@ namespace ncore
         {
             *(s32*)&mArg = inVar;
         }
+        explicit va_t(s32* inVar)
+            : mArg3(TYPE_PINT32)
+        {
+            *(s32**)&mArg = inVar;
+        }
         explicit va_t(u32 inVar)
             : mArg3(TYPE_UINT32)
         {
@@ -126,6 +134,7 @@ namespace ncore
             *(f64*)&mArg = inVar;
         }
         explicit va_t(const char* inVar);
+        explicit va_t(const wchar_t* inVar);
         explicit va_t(crunes_t const& str);
 
         EType type() const { return (EType)(mArg3 & TYPE_MASK); }
@@ -146,6 +155,7 @@ namespace ncore
         bool isF32() const { return bool((mArg3 & TYPE_MASK) == TYPE_FLOAT32); }
         bool isF64() const { return bool((mArg3 & TYPE_MASK) == TYPE_FLOAT64); }
         bool isPCRunes() const { return bool((mArg3 & TYPE_MASK) == TYPE_PCRUNES); }
+        bool isPInt32() const { return bool((mArg3 & TYPE_MASK) == TYPE_PINT32); }
 
         operator char() const { return (char)convertToInt8(); }
         operator s8() const { return convertToInt8(); }
@@ -160,6 +170,9 @@ namespace ncore
         operator f64() const { return convertToDouble(); }
         operator bool() const { return convertToBool(); }
         operator crunes_t() const { return convertToCRunes(); }
+        operator const char*() const { return *(const char**)&mArg;}
+        operator const wchar_t*() const { return *(const wchar_t**)&mArg;}
+        operator s32*() const { return *(s32**)&mArg;}
 
         void convertToRunes(runes_t& chars) const;
 
