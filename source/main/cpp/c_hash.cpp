@@ -7,7 +7,7 @@ namespace ncore
 {
     namespace nhash
     {
-        static xxhash
+        namespace xxhash
         {
             static constexpr u64 PRIME64_1 = 11400714785074694791ULL;
             static constexpr u64 PRIME64_2 = 14029467366897019727ULL;
@@ -39,7 +39,7 @@ namespace ncore
                 return val;
             }
 
-            static u64 round(u64 acc, u64 input)
+            static inline u64 round(u64 acc, u64 input)
             {
                 acc += input * PRIME64_2;
                 acc = (acc << 31) | (acc >> (64 - 31));
@@ -47,7 +47,7 @@ namespace ncore
                 return acc;
             }
 
-            static u64 mergeRound(u64 acc, u64 val)
+            static inline u64 mergeRound(u64 acc, u64 val)
             {
                 val = round(0, val);
                 acc ^= val;
@@ -55,7 +55,7 @@ namespace ncore
                 return acc;
             }
 
-            static inline u64 rotl64(u64 x, int8_t r) { return (x << r) | (x >> (64 - r)); }
+            static inline u64 rotl64(u64 x, s8 r) { return (x << r) | (x >> (64 - r)); }
 
             u64 Hash(const void* input, u32 len, u64 seed = PRIME64_4)
             {
@@ -84,10 +84,10 @@ namespace ncore
                     } while (p <= limit);
 
                     h64 = rotl64(v1, 1) + rotl64(v2, 7) + rotl64(v3, 12) + rotl64(v4, 18);
-                    h64 = XXH64_mergeRound(h64, v1);
-                    h64 = XXH64_mergeRound(h64, v2);
-                    h64 = XXH64_mergeRound(h64, v3);
-                    h64 = XXH64_mergeRound(h64, v4);
+                    h64 = mergeRound(h64, v1);
+                    h64 = mergeRound(h64, v2);
+                    h64 = mergeRound(h64, v3);
+                    h64 = mergeRound(h64, v4);
                 }
                 else
                 {
@@ -126,7 +126,13 @@ namespace ncore
 
                 return h64;
             }
-        }
+        } // namespace xxhash
+
+        // TODO: Implement a xxhash version that can 'lowercase' the 'string' as it hashes.
+        namespace xxhash_lowercase
+        {
+            u64 Hash(const void* input, u32 len, u64 seed = PRIME64_4) { return 0; }
+        } // namespace xxhash_lowercase
 
         // ----------------------------------------------------------------------------
         u64 datahash(u8 const* data, u32 size) { return xxhash::Hash(data, size); }
@@ -135,12 +141,17 @@ namespace ncore
         {
             const char* end = str;
             while (*end++ != '\0') {}
-            return XXH64(str, end - str);
+            return xxhash::Hash(str, end - str);
         }
 
         u64 strhash(const char* str, const char* end) { return xxhash::Hash(str, end - str); }
-        u64 strhash64_lowercase(const char* str) { return 0; }
-        u64 strhash64_lowercase(const char* str, const char* end) { return 0; }
+        u64 strhash64_lowercase(const char* str)
+        {
+            const char* end = str;
+            while (*end++ != '\0') {}
+            return xxhash_lowercase::Hash(str, end - str);
+        }
+        u64 strhash64_lowercase(const char* str, const char* end) { return xxhash_lowercase::Hash(str, end - str); }
 
         static u32 hash64_to_hash32(u64 key)
         {
@@ -196,7 +207,7 @@ namespace ncore
             {
                 const char* begin = &strdata.m_ascii.m_bos[strdata.m_ascii.m_str];
                 const char* end   = &strdata.m_ascii.m_bos[strdata.m_ascii.m_str];
-                return strhash(begin, end);
+                return strhash_lowercase(begin, end);
             }
         }
 
