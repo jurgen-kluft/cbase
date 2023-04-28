@@ -2,6 +2,7 @@
 
 #include "cbase/c_float.h"
 #include "cbase/c_double.h"
+#include "cbase/c_dconv.h"
 #include "cbase/c_integer.h"
 #include "cbase/c_strfmt.h"
 #include "cbase/c_runes.h"
@@ -274,7 +275,7 @@ namespace ncore
                         ASSERT(index > 0);
                         if (n >= pow10_uint64_lut[index - 1])
                         {
-                            break;
+                            return index;
                         }
                         right = index - 1;
                     }
@@ -283,7 +284,7 @@ namespace ncore
                         left = index + 1;
                     }
                 }
-                return index;
+                return index + 1;
             }
 
             static s32 count_digits_dec(const u32 n) noexcept { return count_digits_dec((u64)n); }
@@ -871,7 +872,7 @@ namespace ncore
                     {
                         // Fill zero flag has precedence over any other alignment and fill character.
                         state.m_flags.value = ((state.m_flags.value & (~Flags::kAlignBitmask)) | Flags::kAlignNumeric);
-                        state.m_fill_char = '0';
+                        state.m_fill_char   = '0';
                     }
 
                     if (state.align() == Align::kNumeric)
@@ -998,11 +999,11 @@ namespace ncore
                     case TypeId::kInt8: return format_integer(it, format, arg_t<s8>::decode(argValue)); break;
                     case TypeId::kInt16: return format_integer(it, format, arg_t<s16>::decode(argValue)); break;
                     case TypeId::kInt32: return format_integer(it, format, arg_t<s32>::decode(argValue)); break;
-                    case TypeId::kUint8: return format_integer(it, format, arg_t<u8>::decode(argValue)); break;
-                    case TypeId::kUint16: return format_integer(it, format, arg_t<u16>::decode(argValue)); break;
-                    case TypeId::kUint32: return format_integer(it, format, arg_t<u32>::decode(argValue)); break;
+                    case TypeId::kUint8: return format_unsigned_integer(it, format, arg_t<u8>::decode(argValue)); break;
+                    case TypeId::kUint16: return format_unsigned_integer(it, format, arg_t<u16>::decode(argValue)); break;
+                    case TypeId::kUint32: return format_unsigned_integer(it, format, arg_t<u32>::decode(argValue)); break;
                     case TypeId::kInt64: return format_integer(it, format, arg_t<s64>::decode(argValue)); break;
-                    case TypeId::kUint64: return format_integer(it, format, arg_t<u64>::decode(argValue)); break;
+                    case TypeId::kUint64: return format_unsigned_integer(it, format, arg_t<u64>::decode(argValue)); break;
                     case TypeId::kPointer: return format_pointer(it, format, argValue); break;
                     case TypeId::kFloat: return format_float(it, format, arg_t<float>::decode(argValue)); break;
                     case TypeId::kDouble: return format_float(it, format, arg_t<double>::decode(argValue)); break;
@@ -1147,21 +1148,36 @@ namespace ncore
 
             static bool format_float(str_t& it, const state_t& state, double value)
             {
-                // Test for argument type / format match
-                if (math::isNAN(value))
+                char format_char;
+                s8   precision;
+                if (state.type_is_none())
                 {
-                    cstr_t src(state.uppercase() ? "NAN" : "nan", 3);
-                    state_t::format_string(it, state, src, 3);
+                    format_char = 'g';
+                    precision   = DoubleConvert::DEFAULT_PRECISION;
                 }
                 else
                 {
-                    const bool negative = math::signBit(value) != 0;
+                    precision   = state.m_precision < 0 ? DoubleConvert::DEFAULT_PRECISION : state.m_precision;
+                    format_char = state.type_is_float_scientific() ? 'e' : state.type_is_float_general() ? 'g' : 'f';
+                }
+                u32 flags = 0;
+                if (state.uppercase())
+                {
+                    flags |= DoubleConvert::FLAG_UPPERCASE;
+                }
 
-                    if (math::isInfinite(value))
-                    {
-                        cstr_t src(state.uppercase() ? "INF" : "inf", 3);
-                        state_t::format_string(it, state, src, 3, negative);
-                    }
+                // s32 dconvstr_print(char** outbuf, s32* outbuf_size,
+                //                    double value, s32 format_char, u32 format_flags,
+                //                    s32 format_width, s32 format_precision);
+                char      outbuffer[64];
+                char*     outbuf      = outbuffer;
+                const s32 output_cap  = 64;
+                s32       outbuf_size = output_cap;
+                s32       result      = dconvstr_print(&outbuf, &outbuf_size, value, format_char, flags, state.m_width, precision);
+                if (result)
+                {
+                    CharTraits::copy(it, outbuffer, output_cap - outbuf_size);
+                    return true;
                 }
                 return false;
             }
@@ -1243,7 +1259,7 @@ namespace ncore
         {
             str_t  str_span(str, end);
             cstr_t fmt_view(fmt);
-            bool result = process(str_span, fmt_view, args);
+            bool   result = process(str_span, fmt_view, args);
             str_span.write();
             return result;
         }

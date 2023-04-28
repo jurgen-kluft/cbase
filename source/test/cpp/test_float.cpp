@@ -75,7 +75,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 			CHECK_TRUE(1.0f / (math::negativeZero()*math::negativeZero()) >= 1.0f);
 #endif
 		}
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
 		UNITTEST_TEST(Nan)
 		{
 			CHECK_NOT_EQUAL(math::nan(), math::nan());
@@ -96,7 +96,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 			CHECK_TRUE(math::negativeInfinity() <= 0xffffffff);
 			CHECK_TRUE(math::bin(math::negativeInfinity()) == (u32)0xff800000);
 		}
-#endif // IEEE_FLOATS
+#endif // D_IEEE_FLOATS
 		UNITTEST_TEST(PositiveMaximum)
 		{
 			CHECK_EQUAL(math::positiveMaximum(), math::positiveMaximum());
@@ -145,7 +145,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 			CHECK_TRUE(math::isNegativeZero(math::negativeZero()));
 			CHECK_TRUE(!math::isNegativeZero(math::positiveZero()));
 		}
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
 		UNITTEST_TEST(IsPositiveInfinite)
 		{
 			f32 a = 0.0f, b= 999.0f;
@@ -204,7 +204,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 		UNITTEST_TEST(Bin)
 		{
 			CHECK_TRUE(math::bin(0.0f) == 0);
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
 			CHECK_TRUE(math::bin(math::nan()) == math::bin(math::nan()+1));
 #endif
 			CHECK_TRUE(math::bin(1.0f) == (u32)0x3f800000);
@@ -215,7 +215,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 		{
 			CHECK_EQUAL(math::sbin(0.0f), 0);
 			CHECK_EQUAL(math::sbin(-2.0f), (s32)0xc0000000);
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
 			CHECK_EQUAL(math::sbin(math::nan()), math::sbin(math::nan()+1));
 #endif
 		}
@@ -246,7 +246,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 		{
 			CHECK_TRUE(!math::isEqual(0.0001f,0.0f));
 			CHECK_TRUE(math::isEqual(20.0f,20.000f));
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
 			CHECK_TRUE(math::isEqual(math::negativeZero(),-0.0f));
 			CHECK_TRUE(math::isEqual(math::nan(),math::nan()));
 #endif
@@ -256,7 +256,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 		{
 			CHECK_TRUE(math::isNotEqual(0.0001f,0.0f));
 			CHECK_TRUE(!math::isNotEqual(20.0f,20.000f));
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
 			CHECK_TRUE(!math::isNotEqual(math::negativeZero(),-0.0f));
 			CHECK_TRUE(!math::isNotEqual(math::nan(),math::nan()));
 #endif

@@ -21,7 +21,7 @@ namespace ncore
         //---------------------------------------------------------------------------------------------------------------------
         // Limits and const values
         //---------------------------------------------------------------------------------------------------------------------
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
         inline f32 nan();
         inline f32 positiveInfinity();
         inline f32 negativeInfinity();

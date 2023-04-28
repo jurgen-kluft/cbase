@@ -47,10 +47,9 @@ UNITTEST_SUITE_BEGIN(test_double)
             CHECK_TRUE(math::negativeZero64() * math::negativeZero64() == math::positiveZero64());
             CHECK_TRUE(1.0 / (math::negativeZero64() * math::negativeZero64()) >= 1.0);
         }
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
         UNITTEST_TEST(Nan)
-        {
-            CHECK_TRUE(math::nan() != math::nan());
+        { CHECK_TRUE(math::nan64() != math::nan64());
         }
 
         UNITTEST_TEST(PositiveInfinity)
@@ -111,7 +110,7 @@ UNITTEST_SUITE_BEGIN(test_double)
             CHECK_TRUE(math::negativeMinimumDEN64() < 0.0);
             CHECK_TRUE(math::negativeMinimumDEN64() > math::negativeMinimum64());
         }
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
         UNITTEST_TEST(IsInfinite)
         {
             CHECK_FALSE(math::isInfinite(0.0));
@@ -148,8 +147,8 @@ UNITTEST_SUITE_BEGIN(test_double)
         UNITTEST_TEST(Bin)
         {
             CHECK_TRUE(math::bin(0.0) == 0);
-#ifdef IEEE_FLOATS
-            CHECK_TRUE(math::bin(math::nan()) == math::bin(math::nan()+1.0));
+#ifdef D_IEEE_FLOATS
+            CHECK_TRUE(math::bin(math::nan64()) == math::bin(math::nan64() + 1.0));
 #endif
             CHECK_TRUE(math::bin(1.0) == D_CONSTANT_64(0x3ff0000000000000));
             CHECK_TRUE(math::bin(-2.0) == D_CONSTANT_64(0xc000000000000000));
@@ -159,8 +158,8 @@ UNITTEST_SUITE_BEGIN(test_double)
         {
             CHECK_TRUE(math::sbin(0.0) == 0);
             CHECK_TRUE(math::sbin(-2.0) == D_CONSTANT_64(0xc000000000000000));
-#ifdef IEEE_FLOATS
-            CHECK_TRUE(math::sbin(math::nan()) == math::sbin(math::nan()+1.0));
+#ifdef D_IEEE_FLOATS
+            CHECK_TRUE(math::sbin(math::nan64()) == math::sbin(math::nan64() + 1.0));
 #endif
         }
 
@@ -190,8 +189,8 @@ UNITTEST_SUITE_BEGIN(test_double)
             CHECK_TRUE(math::isEqual(20.0,20.000));
             CHECK_TRUE(math::isEqual(math::negativeZero64(), -0.0));
 
-#ifdef IEEE_FLOATS
-            CHECK_TRUE(math::isEqual(math::nan(),math::nan()));
+#ifdef D_IEEE_FLOATS
+            CHECK_TRUE(math::isEqual(math::nan64(), math::nan64()));
 #endif
         }
 
@@ -200,8 +199,8 @@ UNITTEST_SUITE_BEGIN(test_double)
             CHECK_TRUE(math::isNotEqual(0.0001,0.0));
             CHECK_FALSE(math::isNotEqual(20.0,20.000));
             CHECK_FALSE(math::isNotEqual(math::negativeZero64(), -0.0));
-#ifdef IEEE_FLOATS
-            CHECK_FALSE(math::isNotEqual(math::nan(),math::nan()));
+#ifdef D_IEEE_FLOATS
+            CHECK_FALSE(math::isNotEqual(math::nan64(), math::nan64()));
 #endif
         }
 

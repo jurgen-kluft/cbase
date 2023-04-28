@@ -1,11 +1,9 @@
 #include "cbase/c_dconv.h"
-#include "cunittest/cunittest.h"
+#include "cbase/c_double.h"
+#include "cbase/c_memory.h"
+#include "cbase/c_runes.h"
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <math.h>
+#include "cunittest/cunittest.h"
 
 #ifndef _MSC_VER
 #    include <stdint.h>
@@ -139,7 +137,7 @@ UNITTEST_SUITE_BEGIN(test_dconv)
 
             // 2. Check conversion val -> str
             char alt_str[128];
-            memset(alt_str, 0, sizeof(alt_str));
+            nmem::memset(alt_str, 0, sizeof(alt_str));
             int   alt_str_size          = sizeof(alt_str) - 1;
             char* alt_str_end           = alt_str;
             int   dconvstr_print_status = dconvstr_print(&alt_str_end, &alt_str_size, val, format_char, format_flags, format_width, format_precision);
@@ -150,7 +148,7 @@ UNITTEST_SUITE_BEGIN(test_dconv)
             }
 
             *alt_str_end = 0;
-            if (0 != strcmp(str, alt_str))
+            if (0 != ascii::compare(str, alt_str))
             {
                 // Formatting result not as expected
                 return false;
@@ -159,8 +157,8 @@ UNITTEST_SUITE_BEGIN(test_dconv)
             // 3. Check conversion str -> val
             if (flag_reverse_test)
             {
-                const char* str_expected_end     = str + strlen(str);
-                const char* str_actual_end       = NULL;
+                const char* str_expected_end     = str + ascii::strlen(str);
+                const char* str_actual_end       = nullptr;
                 double      alt_val              = 0.0;
                 int         erange_condition     = 1;
                 int         dconvstr_scan_status = dconvstr_scan(str, &str_actual_end, &alt_val, &erange_condition);
@@ -179,7 +177,7 @@ UNITTEST_SUITE_BEGIN(test_dconv)
                     // Unexpected syntax error in reverse test
                     return false;
                 }
-                if (0 != memcmp(&alt_val, &val, sizeof(double)))
+                if (0 != nmem::memcmp(&alt_val, &val, sizeof(double)))
                 {
                     // Scanning result not as expected
                     return false;
@@ -190,8 +188,8 @@ UNITTEST_SUITE_BEGIN(test_dconv)
 
         static bool ensure_not_parseable(const char* str)
         {
-            const char* str_end              = str + strlen(str);
-            const char* str_returned_end     = NULL;
+            const char* str_end              = str + ascii::strlen(str);
+            const char* str_returned_end     = nullptr;
             double      val                  = 0.0;
             int         erange_condition     = 1;
             int         dconvstr_scan_status = dconvstr_scan(str, &str_returned_end, &val, &erange_condition);
@@ -223,7 +221,7 @@ UNITTEST_SUITE_BEGIN(test_dconv)
             CHECK_TRUE(single_static_test("%.0f", "1", 0.6, 0));
             CHECK_TRUE(single_static_test("%2.4e", "8.6000e+00", 8.6, 1));
             CHECK_TRUE(single_static_test("%2.4g", "8.6", 8.6, 1));
-            CHECK_TRUE(single_static_test("%e", "-inf", -HUGE_VAL, 1));
+            CHECK_TRUE(single_static_test("%e", "-inf", math::negativeInfinity64(), 1));
 
             CHECK_TRUE(single_static_test("%e", "1.234000e+01", 12.34, 1));
             CHECK_TRUE(single_static_test("%e", "1.234000e-01", 0.1234, 1));

@@ -65,7 +65,7 @@ namespace math
         u32 f = (u32)FF_SIGN_MASK;
         return toF32(f);
     }
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
     inline f32 nan()
     {
         u32 f = (u32)(FF_EXPONENT_MASK | 1);
@@ -112,7 +112,7 @@ namespace math
      */
     inline bool isPositiveZero(f32 inNumber) { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == 0); }
     inline bool isNegativeZero(f32 inNumber) { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == FF_SIGN_MASK); }
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
     inline bool isPositiveInfinite(f32 inNumber) { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == FF_EXPONENT_MASK); }
     inline bool isNegativeInfinite(f32 inNumber) { return bool((bin(inNumber) & (FF_EXPONENT_MASK | FF_FRACTION_MASK | FF_SIGN_MASK)) == (FF_EXPONENT_MASK | FF_SIGN_MASK)); }
 

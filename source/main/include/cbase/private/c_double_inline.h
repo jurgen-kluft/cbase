@@ -87,7 +87,7 @@ namespace math
         u64 f = (u64)sDoubleIEEE.DD_SIGN_MASK;
         return *(f64*)&f;
     }
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
     inline f64 nan64()
     {
         u64 f = (u64)(sDoubleIEEE.DD_EXPONENT_MASK | 1);
@@ -126,7 +126,7 @@ namespace math
     /**
      * Rational Determination.
      */
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
     inline bool		isInfinite(f64 inNumber)						{ return bool((bin(inNumber) & (sDoubleIEEE.DD_EXPONENT_MASK | sDoubleIEEE.DD_FRACTION_MASK)) == sDoubleIEEE.DD_EXPONENT_MASK); } 
     inline bool		isNAN(f64 inNumber)     						{ return bool(((bin(inNumber) & sDoubleIEEE.DD_EXPONENT_MASK) == sDoubleIEEE.DD_EXPONENT_MASK) && (bin(inNumber) & sDoubleIEEE.DD_FRACTION_MASK)); }
     inline bool		isFinite(f64 inNumber)  						{ return bool(!isInfinite(inNumber) && !isNAN(inNumber)); }

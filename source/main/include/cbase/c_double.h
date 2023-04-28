@@ -23,7 +23,7 @@ namespace ncore
         //---------------------------------------------------------------------------------------------------------------------
         inline f64 positiveZero64();
         inline f64 negativeZero64();
-#ifdef IEEE_FLOATS
+#ifdef D_IEEE_FLOATS
         inline f64 nan64();
         inline f64 positiveInfinity64();
         inline f64 negativeInfinity64();
