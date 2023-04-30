@@ -17,7 +17,7 @@ namespace ncore
     int printf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
     int snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc);
     int vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
-    int fctprintf(void (*out)(char character, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
+    int fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
     int vzprintf(irunes_writer_t& writer, const crunes_t& str, const va_t* argv, s32 argc);
 
     inline void printf(crunes_t const& str)
@@ -40,7 +40,8 @@ namespace ncore
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-        snprintf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_end], &format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        int ret = snprintf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_eos], &format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        str.m_ascii.m_end = str.m_ascii.m_str + ret;
     }
 
     template <typename... Args>

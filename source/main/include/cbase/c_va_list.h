@@ -64,7 +64,7 @@ namespace ncore
 
     public:
         va_t() : mArg3(TYPE_EMPTY) { mArg = mArg2 = 0; }
-        va_t(const va_t &c) : mArg3(c.mArg3) { *(u64 *)&mArg = *(u64 *)c.mArg; }
+        va_t(const va_t &c) : mArg(c.mArg), mArg2(c.mArg2), mArg3(c.mArg3) { }
         explicit va_t(s8 inVar) : mArg3(TYPE_INT8) { *(s8 *)&mArg = inVar; }
         explicit va_t(u8 inVar) : mArg3(TYPE_UINT8) { *(u8 *)&mArg = inVar; }
         explicit va_t(s16 inVar) : mArg3(TYPE_INT16) { *(s16 *)&mArg = inVar; }

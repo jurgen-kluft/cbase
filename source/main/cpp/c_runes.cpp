@@ -3693,40 +3693,42 @@ namespace ncore
 
     static bool at_end(u32 p, runes_t const& str) { return p >= str.m_ascii.m_eos; }
 
-    bool runes_writer_t::vwrite(uchar32 c)
+    s32 runes_writer_t::vwrite(uchar32 c)
     {
         if (!at_end(m_cursor, m_runes))
         {
+            s32 count = m_count;
             switch (m_runes.get_type())
             {
                 case ascii::TYPE:
                     m_runes.m_ascii.m_bos[m_cursor] = c;
                     m_cursor += 1;
                     m_count += 1;
-                    return true;
+                    return m_count - count;
                 case utf8::TYPE:
                     utf::write(c, m_runes.m_utf8, m_cursor);
                     m_count += 1;
-                    return true;
+                    return m_count - count;
                 case utf16::TYPE:
                     utf::write(c, m_runes.m_utf16, m_cursor);
                     m_count += 1;
-                    return true;
+                    return m_count - count;
                 case utf32::TYPE:
                     m_runes.m_utf32.m_bos[m_cursor] = c;
                     m_cursor += 1;
                     m_count += 1;
-                    return true;
+                    return m_count - count;
                 default: ASSERT(false); break;
             }
         }
-        return false;
+        return 0;
     }
 
-    bool runes_writer_t::vwrite(const char* str, const char* end)
+    s32 runes_writer_t::vwrite(const char* str, const char* end)
     {
         if (!at_end(m_cursor, m_runes))
         {
+            s32 count = m_count;
             uchar32 c;
             switch (m_runes.get_type())
             {
@@ -3737,8 +3739,15 @@ namespace ncore
                         m_cursor += 1;
                         m_count += 1;
                     }
-                    return true;
+                    return m_count - count;
                 case utf8::TYPE:
+                    while (str < end && !at_end(m_cursor, m_runes))
+                    {
+                        c = *str++;
+                        utf::write(c, m_runes.m_utf8, m_cursor);
+                        m_count += 1;
+                    }
+                    return m_count - count;
                 case utf16::TYPE:
                     while (str < end && !at_end(m_cursor, m_runes))
                     {
@@ -3746,7 +3755,7 @@ namespace ncore
                         utf::write(c, m_runes.m_utf16, m_cursor);
                         m_count += 1;
                     }
-                    return true;
+                    return m_count - count;
                 case utf32::TYPE:
                     while (str < end && !at_end(m_cursor, m_runes))
                     {
@@ -3754,19 +3763,20 @@ namespace ncore
                         m_cursor += 1;
                         m_count += 1;
                     }
-                    return true;
+                    return m_count - count;
                 default: ASSERT(false); break;
             }
         }
-        return false;
+        return 0;
     }
 
-    bool runes_writer_t::vwrite(crunes_t const& str)
+    s32 runes_writer_t::vwrite(crunes_t const& str)
     {
         if (!at_end(m_cursor, m_runes))
         {
             uchar32        c;
             runes_reader_t reader(str);
+            s32            count = m_count;
             switch (m_runes.get_type())
             {
                 case ascii::TYPE:
@@ -3776,15 +3786,21 @@ namespace ncore
                         m_cursor += 1;
                         m_count += 1;
                     }
-                    return true;
+                    return m_count - count;
                 case utf8::TYPE:
-                case utf16::TYPE:
                     while (reader.read(c) && !at_end(m_cursor, m_runes))
                     {
                         utf::write(c, m_runes.m_utf8, m_cursor);
                         m_count += 1;
                     }
-                    return true;
+                    return m_count - count;
+                case utf16::TYPE:
+                    while (reader.read(c) && !at_end(m_cursor, m_runes))
+                    {
+                        utf::write(c, m_runes.m_utf16, m_cursor);
+                        m_count += 1;
+                    }
+                    return m_count - count;
                 case utf32::TYPE:
                     while (reader.read(c) && !at_end(m_cursor, m_runes))
                     {
@@ -3792,11 +3808,11 @@ namespace ncore
                         m_cursor += 1;
                         m_count += 1;
                     }
-                    return true;
+                    return m_count - count;
                 default: ASSERT(false); break;
             }
         }
-        return false;
+        return 0;
     }
 
     void runes_writer_t::vflush() {}

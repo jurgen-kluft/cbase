@@ -33,6 +33,10 @@ namespace ncore
                 Bottom = 0x80,
             };
 
+            inline Border() : value((u8)LSR | (u8)Single) {}
+            inline Border(EBorder value) : value((u8)value) {}
+            inline Border(s32 value) : value((u8)value) {}
+
             u8 value;
         };
         struct CellColor
@@ -53,27 +57,30 @@ namespace ncore
 
         struct tbl_state_t
         {
-            s8*    widths_;
-            Flags* flags_;
-            s8*    colors_;
-            u8*    borders_;
-            char*  row_;
-            s16    columns_size_;
-            s16    row_size_;
+            s8*      widths_;
+            Flags*   flags_;
+            s8*      colors_;
+            Border*  borders_;
+            uchar32* row_;
+            s32      row_len_;
+            s16      columns_size_;
+            s16      row_size_;
         };
 
         void tbl_init(tbl_state_t& state);
         void tbl_format(tbl_state_t& state, args_t const& args);
         void tbl_cell(s8 column, tbl_state_t& state, args_t const& args);
-        void tbl_line(tbl_state_t& state, Border::EBorder const* borders, s32 borders_count, Border style);
+        void tbl_line(tbl_state_t& state, Border const* borders, s32 borders_count, Border style);
         void tbl_flags(tbl_state_t& state, Flags const* flags, s32 count);
+        void tbl_row_to_utf8(tbl_state_t& state, utf8::prune str, utf8::pcrune end);
+        void tbl_row_to_utf16(tbl_state_t& state, utf16::prune str, utf16::pcrune end);
 
         // A table formatter (helper) that uses a (given) fixed size array to store a table row.
         template <uint_t N>
         struct table_t
         {
             template <uint_t C>
-            table_t(char (&row)[C])
+            table_t(uchar32 (&row)[C])
             {
                 state_.widths_       = widths_;
                 state_.flags_        = flags_;
@@ -90,6 +97,9 @@ namespace ncore
                 if (column < state_.columns_size_)
                     colors_[column] = (s8)color;
             }
+
+            void row_to_utf8(utf8::prune str, utf8::pcrune end) { tbl_row_to_utf8(state_, str, end); }
+            void row_to_utf16(utf16::prune str, utf16::pcrune end) { tbl_row_to_utf16(state_, str, end); }
 
             template <typename... Args>
             void row(Args&&... _args)
@@ -121,9 +131,9 @@ namespace ncore
                 tbl_cell(column, state_, args);
             }
 
-            void top() { tbl_line(state_, nullptr, 0, {Border::Single | Border::Top}); }
-            void line() { tbl_line(state_, nullptr, 0, {Border::Single | Border::Middle}); }
-            void bottom() { tbl_line(state_, nullptr, 0, {Border::Single | Border::Bottom}); }
+            void top() { tbl_line(state_, nullptr, 0, Border{Border::Single | Border::Top | Border::LSR}); }
+            void line() { tbl_line(state_, nullptr, 0, Border{Border::Single | Border::Middle | Border::LSR}); }
+            void bottom() { tbl_line(state_, nullptr, 0, Border{Border::Single | Border::Bottom | Border::LSR}); }
 
             template <typename... Args>
             void flags(Args&&... args)
@@ -133,33 +143,41 @@ namespace ncore
             }
 
             template <typename... Args>
+            void widths(Args&&... args)
+            {
+                const s8 widths[] = {(s8)(args)...};
+                for (s32 i = 0; i < sizeof(widths) / sizeof(widths[0]); ++i)
+                    widths_[i] = widths[i];
+            }
+
+            template <typename... Args>
             void top(Args&&... args)
             {
-                const Border::EBorder bd[] = {args...};
-                const s32             bc   = sizeof(bd) / sizeof(bd[0]);
+                const Border bd[] = {Border(args)...};
+                const s32    bc   = sizeof(bd) / sizeof(bd[0]);
                 tbl_line(state_, bd, bc, {Border::Single | Border::Top});
             }
 
             template <typename... Args>
             void line(Args&&... args)
             {
-                const Border::EBorder bd[] = {args...};
-                const s32             bc   = sizeof(bd) / sizeof(bd[0]);
+                const Border bd[] = {Border(args)...};
+                const s32    bc   = sizeof(bd) / sizeof(bd[0]);
                 tbl_line(state_, bd, bc, {Border::Single | Border::Middle});
             }
 
             template <typename... Args>
             void bottom(Args&&... args)
             {
-                const Border::EBorder bd[] = {args...};
-                const s32             bc   = sizeof(bd) / sizeof(bd[0]);
+                const Border bd[] = {Border(args)...};
+                const s32    bc   = sizeof(bd) / sizeof(bd[0]);
                 tbl_line(state_, bd, bc, {Border::Single | Border::Bottom});
             }
 
             s8          widths_[N];
             s8          colors_[N];
             Flags       flags_[N];
-            u8          borders_[N];
+            Border      borders_[N];
             tbl_state_t state_;
         };
 

@@ -17,15 +17,15 @@ namespace ncore
     public:
         inline out_writer_t() {}
 
-        virtual bool        vwrite(uchar32 c)
+        virtual s32 vwrite(uchar32 c)
         {
             if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
                 vflush();
             m_write_to_console_cache += c;
-            return true;
+            return 1;
         }
 
-		virtual bool        vwrite(const char* str, const char* end)
+		virtual s32        vwrite(const char* str, const char* end)
 		{
 			vflush();
 
@@ -33,7 +33,7 @@ namespace ncore
 			return write_ascii(src)!=0;
 		}
 
-        virtual bool        vwrite(crunes_t const& str)
+        virtual s32        vwrite(crunes_t const& str)
         {
             vflush();
             
@@ -45,7 +45,7 @@ namespace ncore
                 default: //@todo: UTF-8
                     break;
             }
-            return true;
+            return 0;
         }
 
         virtual void vflush()
@@ -58,7 +58,7 @@ namespace ncore
             }
         }
 
-        static void write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
+        static s32 write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
         {
             s32 len = 0;
             if (rune < 0xd800)
@@ -83,6 +83,7 @@ namespace ncore
                 if (len == 1 && dest < end)
                 {
                     *dest++ = (uchar16)rune;
+                    return 1;
                 }
                 else if ((dest + 1) < end)
                 {
@@ -90,8 +91,10 @@ namespace ncore
                     u32 const iv = rune - 0x10000;
                     *dest++      = static_cast<uchar16>((iv >> 10) + 0xd800);
                     *dest++      = static_cast<uchar16>((iv & 0x03ff) + 0xdc00);
+                    return 1;
                 }
             }
+            return 0;
         }
 
         static s32 write_ascii(const ascii::crunes_t& str)

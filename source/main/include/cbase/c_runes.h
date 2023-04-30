@@ -87,7 +87,7 @@ namespace ncore
         typedef u8          rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const u32    TYPE         = 2;
+        static const u32    TYPE         = 3;
         static const rune   TERMINATOR   = '\0';
         static const u64    EMPTY_STRING = 0;
 
@@ -125,7 +125,7 @@ namespace ncore
         typedef u16         rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const u32    TYPE         = 4;
+        static const u32    TYPE         = 2;
         static const rune   TERMINATOR   = '\0';
         static const u64    EMPTY_STRING = 0;
 
@@ -162,7 +162,7 @@ namespace ncore
         typedef u32         rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const u32    TYPE         = 8;
+        static const u32    TYPE         = 4;
         static const rune   TERMINATOR   = '\0';
         static const u64    EMPTY_STRING = 0;
 
@@ -624,14 +624,10 @@ namespace ncore
     class irunes_writer_t
     {
     public:
-        bool write(uchar32 c) { return vwrite(c); }
-        bool write(const char* str, const char* end) { return vwrite(str, end); }
-        bool write(crunes_t const& str) { return vwrite(str); }
-        bool writeln(crunes_t const& str)
-        {
-            write(str);
-            return writeln();
-        }
+        s32  write(uchar32 c) { return vwrite(c); }
+        s32  write(const char* str, const char* end) { return vwrite(str, end); }
+        s32  write(crunes_t const& str) { return vwrite(str); }
+        s32  writeln(crunes_t const& str) { return write(str) + writeln(); }
         bool writeln()
         {
             const char* eos = "\n";
@@ -641,9 +637,9 @@ namespace ncore
 
     protected:
         virtual ~irunes_writer_t() {}
-        virtual bool vwrite(uchar32 c)                        = 0;
-        virtual bool vwrite(const char* str, const char* end) = 0;
-        virtual bool vwrite(crunes_t const& str)              = 0;
+        virtual s32  vwrite(uchar32 c)                        = 0;
+        virtual s32  vwrite(const char* str, const char* end) = 0;
+        virtual s32  vwrite(crunes_t const& str)              = 0;
         virtual void vflush()                                 = 0;
     };
 
@@ -663,9 +659,9 @@ namespace ncore
         s32  count() const;
 
     protected:
-        virtual bool vwrite(uchar32 c);
-        virtual bool vwrite(const char* str, const char* end);
-        virtual bool vwrite(crunes_t const& str);
+        virtual s32 vwrite(uchar32 c);
+        virtual s32 vwrite(const char* str, const char* end);
+        virtual s32 vwrite(crunes_t const& str);
         virtual void vflush();
 
         runes_t m_runes;
