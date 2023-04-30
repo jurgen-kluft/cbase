@@ -5,10 +5,10 @@
 #    pragma once
 #endif
 
+#include "cbase/c_allocator.h"
+
 namespace ncore
 {
-    class alloc_t;
-
     namespace nhash
     {
         class wyreg

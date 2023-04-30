@@ -15,12 +15,12 @@ namespace ncore
     void _putflush(); // Indicate that we are done 
 
     int printf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
-    int sprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc);
     int snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc);
     int vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
     int fctprintf(void (*out)(char character, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
+    int vzprintf(irunes_writer_t& writer, const crunes_t& str, const va_t* argv, s32 argc);
 
-    void printf(crunes_t const& str)
+    inline void printf(crunes_t const& str)
     {
         const va_t* argv = nullptr;
         const s32   argc = 0;
@@ -28,11 +28,27 @@ namespace ncore
     }
 
     template <typename... Args>
-    void printf(crunes_t const& format, Args&&... args)
+    inline void printf(crunes_t const& format, Args&&... args)
     {
-        const va_t argv[] = {&args...};
+        const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
         printf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+    }
+
+    template <typename... Args>
+    inline void sprintf(runes_t& str, crunes_t const& format, Args&&... args)
+    {
+        const va_t argv[] = {args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        snprintf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_end], &format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+    }
+
+    template <typename... Args>
+    inline s32 cprintf(crunes_t const& format, Args&&... args)
+    {
+        const va_t argv[] = {args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        return vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
     }
 
     s32 sscanf(crunes_t& str, crunes_t const& format, X_VA_R_ARGS_16_DEF);

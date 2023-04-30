@@ -996,6 +996,7 @@ namespace ncore
 #    define __NO_PARTIAL_TEMPLATE__
 #    define D_CACHE_LINE_SIZE 32
 #    define D_CHAR_BIT 8
+#    define D_IEEE_FLOATS 1
 #    define D_USE_PRAGMA_ONCE
 #    define D_STD_CALL __stdcall
 #    define D_C_DECL __cdecl

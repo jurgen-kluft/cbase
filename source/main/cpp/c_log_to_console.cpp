@@ -17,7 +17,7 @@ namespace ncore
     void log_to_console_imp::write(u32 value) { console->write(value); }
     void log_to_console_imp::write(u64 value) { console->write(value); }
     void log_to_console_imp::write(const crunes_t& str) { console->write(str); }
-    void log_to_console_imp::write(const crunes_t& format, const va_list_t& arguments) { console->write(format, arguments); }
+    void log_to_console_imp::write(const crunes_t& format, const va_t* argv, s32 argc) { console->write(format, argv, argc); }
     void log_to_console_imp::writeLine() { console->writeLine(); }
     void log_to_console_imp::writeLine(bool value) { console->writeLine(value); }
     void log_to_console_imp::writeLine(f64 value) { console->writeLine(value); }
@@ -27,6 +27,6 @@ namespace ncore
     void log_to_console_imp::writeLine(u32 value) { console->writeLine(value); }
     void log_to_console_imp::writeLine(u64 value) { console->writeLine(value); }
     void log_to_console_imp::writeLine(const crunes_t& str) { console->writeLine(str); }
-    void log_to_console_imp::writeLine(const crunes_t& format, const va_list_t& arguments) { console->writeLine(format, arguments); }
+    void log_to_console_imp::writeLine(const crunes_t& format, const va_t* argv, s32 argc) { console->writeLine(format, argv, argc); }
 
 }; // namespace ncore

@@ -476,7 +476,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             s32           i      = 100;
             crunes_t str    = "hello";
             crunes_t fmt    = "%d %s";
-            s32           length = vcprintf(fmt, va_list_t(va_t(i), va_t(str)));
+            s32           length = cprintf(fmt, va_t(i), va_t(str));
             CHECK_EQUAL(9, length);
         }
 
@@ -551,7 +551,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             s32           i   = 100;
             crunes_t str = "hello";
             crunes_t fmt = "%d %s";
-            vsprintf(buffer, fmt, va_list_t(va_t(i), va_t(str)));
+            sprintf(buffer, fmt, va_t(i), va_t(str));
             CHECK_EQUAL(9, buffer.size());
             CHECK_TRUE(compare(buffer, "100 hello") == 0);
         }

@@ -32,7 +32,7 @@ namespace ncore
         virtual void write(u64 _value);
 
         virtual void write(const crunes_t& str);
-        virtual void write(const crunes_t& fmt, const va_list_t& args);
+        virtual void write(const crunes_t& fmt, const va_t* args, s32 argc);
 
         virtual void writeLine();
     };
@@ -48,7 +48,7 @@ namespace ncore
     void console_null::write(u32 _value) {}
     void console_null::write(u64 _value) {}
     void console_null::write(const crunes_t& str) {}
-    void console_null::write(const crunes_t& fmt, const va_list_t& args) {}
+    void console_null::write(const crunes_t& fmt, const va_t* args, s32 argc) {}
     void console_null::writeLine() {}
 
     static console_null sNullConsole;
@@ -77,7 +77,7 @@ namespace ncore
         virtual void write(u64 _value);
 
         virtual void write(const crunes_t& str);
-        virtual void write(const crunes_t& fmt, const va_list_t& args);
+        virtual void write(const crunes_t& fmt, const va_t* args, s32 argc);
 
         virtual void writeLine();
     };
@@ -144,9 +144,9 @@ namespace ncore
         mOut->write(str);
     }
 
-    void console_default::write(const crunes_t& fmt, const va_list_t& args)
+    void console_default::write(const crunes_t& fmt, const va_t* args, s32 argc)
     {
-        mOut->write(fmt, args);
+        mOut->write(fmt, args, argc);
     }
 
     void console_default::writeLine() { mOut->writeln(); }

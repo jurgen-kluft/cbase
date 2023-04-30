@@ -254,10 +254,10 @@ namespace ncore
             return 0;
         }
 
-        virtual s32 write(const crunes_t& str, const va_list_t& args)
+        virtual s32 write(const crunes_t& str, const va_t* argv, s32 argc)
         {
             out_writer_t dstwriter;
-            vzprintf(dstwriter, str, args);
+            vzprintf(dstwriter, str, argv, argc);
             dstwriter.flush();
             return 0;
         }

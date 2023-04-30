@@ -23,7 +23,7 @@ UNITTEST_SUITE_BEGIN(test_wyhash)
 
             s32 test_values[] = {0, 1, 2, 3, 4, 5, 6, 7};
 
-            for (size_t i = 0; i < sizeof(test_values) / sizeof(s32); ++i)
+            for (uint_t i = 0; i < sizeof(test_values) / sizeof(s32); ++i)
             {
                 s32 pos;
                 CHECK_TRUE(reg.insert(&test_values[i], sizeof(s32), pos));
@@ -39,14 +39,14 @@ UNITTEST_SUITE_BEGIN(test_wyhash)
             s32 test_values[] = {0, 1, 2, 3, 4, 5, 6, 7};
             s32 test_pos[] = {0, 1, 2, 3, 4, 5, 6, 7};
 
-            for (size_t i = 0; i < sizeof(test_values) / sizeof(s32); ++i)
+            for (uint_t i = 0; i < sizeof(test_values) / sizeof(s32); ++i)
             {
                 s32 pos;
                 CHECK_TRUE(reg.insert(&test_values[i], sizeof(s32), pos));
                 test_pos[i] = pos;
             }
 
-            for (size_t i = 0; i < sizeof(test_values) / sizeof(s32); ++i)
+            for (uint_t i = 0; i < sizeof(test_values) / sizeof(s32); ++i)
             {
                 s32 pos;
                 CHECK_TRUE(reg.find(&test_values[i], sizeof(s32), pos));

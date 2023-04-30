@@ -108,7 +108,7 @@ namespace ncore
         //
         // Dump the scope info
         //
-        D_LogError("Assert", "%s(%d): %s; %s ", va_list_t(va_t(fileName), va_t(lineNumber), va_t(exprString), va_t(messageString)));
+        D_LogError("Assert", "%s(%d): %s; %s ", va_t(fileName), va_t(lineNumber), va_t(exprString), va_t(messageString));
 
         //
         // Default: Skip this assert

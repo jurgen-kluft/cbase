@@ -109,9 +109,9 @@ namespace ncore
 		sLogger[inLevel]->write(str);
 	}
 
-	void 				log_t::write(elevel inLevel, const crunes_t& format, const va_list_t& arguments)
+	void 				log_t::write(elevel inLevel, const crunes_t& format, const va_t* argv, s32 argc)
 	{
-		sLogger[inLevel]->write(format, arguments);
+		sLogger[inLevel]->write(format, argv, argc);
 	}
 
 	void 				log_t::writeLine(elevel inLevel)
@@ -161,9 +161,9 @@ namespace ncore
 		sLogger[inLevel]->writeLine(str);
 	}
 
-	void 				log_t::writeLine(elevel inLevel, const crunes_t& format, const va_list_t& arguments)
+	void 				log_t::writeLine(elevel inLevel, const crunes_t& format, const va_t* argv, s32 argc)
 	{
-		sLogger[inLevel]->writeLine(format, arguments);
+		sLogger[inLevel]->writeLine(format, argv, argc);
 	}
 
 	
@@ -197,7 +197,7 @@ namespace ncore
 	 *     __x_LogWarning, __x_LogError
 	 *------------------------------------------------------------------------------
 	 */
-	void __LogMessage(const char* channel, const char* msgFormat, const va_list_t& args)
+	void __LogMessage2(const char* channel, const char* msgFormat, const va_t* argv, s32 argc)
 	{
 		log_info_t& info = sGetLogInfoFunc();
 
@@ -205,16 +205,17 @@ namespace ncore
 		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
 		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
 
-		log_t::writeLine(log_t::INFO, logformatrunes, va_list_t(va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel)));
-		if (args.length() > 0)
-			log_t::writeLine(log_t::INFO, msgformatrunes, args);
+		log_t::writeLine(log_t::INFO, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
+		if (argc > 0)
+			log_t::writeLine(log_t::INFO, msgformatrunes, argv, argc);
 		else
 			log_t::writeLine(log_t::INFO, msgformatrunes);
 	}
 
 	void __LogMessage(const char* channel, const char* message)
 	{
-		__LogMessage(channel, message, va_list_t());
+		const va_t argv[] = { va_t(0) };
+		__LogMessage2(channel, message, argv, 0);
 	}
 
 	/**
@@ -237,7 +238,7 @@ namespace ncore
 	 *     __x_LogError, __x_LogMessage
 	 *------------------------------------------------------------------------------
 	 */
-	void __LogWarning(const char* channel, const char* msgFormat, const va_list_t& args)
+	void __LogWarning2(const char* channel, const char* msgFormat, const va_t* argv, s32 argc)
 	{
 		log_info_t& info = sGetLogInfoFunc();
 
@@ -245,16 +246,17 @@ namespace ncore
 		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
 		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
 
-		log_t::writeLine(log_t::WARNING, logformatrunes, va_list_t(va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel)));
-		if (args.length() > 0)
-			log_t::writeLine(log_t::WARNING, msgformatrunes, args);
+		log_t::writeLine(log_t::WARNING, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
+		if (argc > 0)
+			log_t::writeLine(log_t::WARNING, msgformatrunes, argv, argc);
 		else
 			log_t::writeLine(log_t::WARNING, msgformatrunes);
 	}
 
 	void __LogWarning(const char* channel, const char* message)
 	{
-		__LogWarning(channel, message, va_list_t());
+		const va_t argv[] = { va_t(0) };
+		__LogWarning2(channel, message, argv, 0);
 	}
 
     /**
@@ -277,7 +279,7 @@ namespace ncore
 	 *     __x_LogWarning, __x_LogMessage
 	 *------------------------------------------------------------------------------
 	 */
-	void __LogError(const char* channel, const char* msgFormat, const va_list_t& args)
+	void __LogError2(const char* channel, const char* msgFormat, const va_t* argv, s32 argc)
 	{
 		log_info_t& info = sGetLogInfoFunc();
 
@@ -285,16 +287,17 @@ namespace ncore
 		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
 		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
 
-		log_t::writeLine(log_t::ERROR, logformatrunes, va_list_t(va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel)));
-		if (args.length() > 0)
-			log_t::writeLine(log_t::ERROR, msgformatrunes, args);
+		log_t::writeLine(log_t::ERROR, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
+		if (argc > 0)
+			log_t::writeLine(log_t::ERROR, msgformatrunes, argv, argc);
 		else
 			log_t::writeLine(log_t::ERROR, msgformatrunes);
 	}
 
 	void __LogError(const char* channel, const char* message)
 	{
-		__LogError(channel, message, va_list_t());
+		const va_t argv[] = { va_t(0) };
+		__LogError2(channel, message, argv, 0);
 	}
 
 	//------------------------------------------------------------------------------

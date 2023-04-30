@@ -6,11 +6,11 @@
 #endif
 
 #include "cbase/c_runes.h"
+#include "cbase/c_va_list.h"
 
 namespace ncore
 {
     // Forward declares
-    class va_list_t;
     class logger_t;
 
 #define D_LOG
@@ -32,9 +32,35 @@ namespace ncore
     void __LogMessage(const char* channel, const char* message);
     void __LogWarning(const char* channel, const char* message);
     void __LogError(const char* channel, const char* message);
-    void __LogMessage(const char* channel, const char* messageFormat, const va_list_t& formatVars);
-    void __LogWarning(const char* channel, const char* messageFormat, const va_list_t& formatVars);
-    void __LogError(const char* channel, const char* messageFormat, const va_list_t& formatVars);
+
+    void __LogMessage2(const char* channel, const char* messageFormat, const va_t* argv, s32 argc);
+    void __LogWarning2(const char* channel, const char* messageFormat, const va_t* argv, s32 argc);
+    void __LogError2(const char* channel, const char* messageFormat, const va_t* argv, s32 argc);
+
+    template <typename... Args>
+    inline void __LogMessage(const char* channel, const char* messageFormat, Args&&... _args)
+    {
+        const va_t argv[] = {_args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        __LogMessage2(channel, messageFormat, argv, argc);
+    }
+
+    template <typename... Args>
+    inline void __LogWarning(const char* channel, const char* messageFormat, Args&&... _args)
+    {
+        const va_t argv[] = {_args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        __LogWarning2(channel, messageFormat, argv, argc);
+    }
+
+    template <typename... Args>
+    inline void __LogError(const char* channel, const char* messageFormat, Args&&... _args)
+    {
+        const va_t argv[] = {_args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        __LogError2(channel, messageFormat, argv, argc);
+    }
+
 
     void __LogPush(const char* fileName, s32 lineNum);
     void __LogFlush(void);
@@ -57,7 +83,7 @@ namespace ncore
 
 #    define D_LogMessage ncore::__LogFake
 #    define D_LogWarning ncore::__LogFake
-#    define D_LogError ncore::__LogFake
+#    define D_LogError   ncore::__LogFake
 #endif
 
     class log_t
@@ -81,7 +107,7 @@ namespace ncore
         static void flush();
         static void clear();
 
-        static logger_t* redirect(elevel inLevel, logger_t* inLogger);
+        static logger_t* redirect(elevel inLevel, logger_t * inLogger);
 
         static void write(elevel inLevel, bool _value);
         static void write(elevel inLevel, s32 _value);
@@ -91,7 +117,15 @@ namespace ncore
         static void write(elevel inLevel, f32 _value);
         static void write(elevel inLevel, f64 _value);
         static void write(elevel inLevel, const crunes_t& str);
-        static void write(elevel inLevel, const crunes_t& format, const va_list_t& arguments);
+        static void write(elevel inLevel, const crunes_t& format, const va_t* argv, s32 argc);
+
+        template <typename... Args>
+        inline static void write(elevel inLevel, crunes_t const& format, Args&&... _args)
+        {
+            const va_t argv[] = {_args...};
+            const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+            write(inLevel, format, argv, argc);
+        }
 
         static void writeLine(elevel inLevel);
         static void writeLine(elevel inLevel, bool _value);
@@ -102,7 +136,15 @@ namespace ncore
         static void writeLine(elevel inLevel, f32 _value);
         static void writeLine(elevel inLevel, f64 _value);
         static void writeLine(elevel inLevel, const crunes_t& str);
-        static void writeLine(elevel inLevel, const crunes_t& format, const va_list_t& arguments);
+        static void writeLine(elevel inLevel, const crunes_t& format, const va_t* argv, s32 argc);
+
+        template <typename... Args>
+        inline static void writeLine(elevel inLevel, crunes_t const& format, Args&&... _args)
+        {
+            const va_t argv[] = {_args...};
+            const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+            write(inLevel, format, argv, argc);
+        }
     };
 
     /**
@@ -128,7 +170,15 @@ namespace ncore
         virtual void write(f32 _value)                                         = 0;
         virtual void write(f64 _value)                                         = 0;
         virtual void write(const crunes_t& str)                                = 0;
-        virtual void write(const crunes_t& format, const va_list_t& arguments) = 0;
+        virtual void write(const crunes_t& format, const va_t* argv, s32 argc) = 0;
+
+        template <typename... Args>
+        inline void write(crunes_t const& format, Args&&... _args)
+        {
+            const va_t argv[] = {_args...};
+            const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+            write(format, argv, argc);
+        }
 
         virtual void writeLine()                                                   = 0;
         virtual void writeLine(bool _value)                                        = 0;
@@ -139,11 +189,19 @@ namespace ncore
         virtual void writeLine(f32 _value)                                         = 0;
         virtual void writeLine(f64 _value)                                         = 0;
         virtual void writeLine(const crunes_t& str)                                = 0;
-        virtual void writeLine(const crunes_t& format, const va_list_t& arguments) = 0;
+        virtual void writeLine(const crunes_t& format, const va_t* argv, s32 argc) = 0;
+
+        template <typename... Args>
+        inline void writeLine(crunes_t const& format, Args&&... _args)
+        {
+            const va_t argv[] = {_args...};
+            const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+            write(format, argv, argc);
+        }
     };
 
-}; // namespace ncore
+};  // namespace ncore
 
 #include "private/c_log_to_console.h"
 
-#endif ///< END __CBASE_LOG_H__
+#endif  ///< END __CBASE_LOG_H__
