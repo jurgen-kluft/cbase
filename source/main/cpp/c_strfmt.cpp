@@ -12,8 +12,8 @@ namespace ncore
     namespace fmt
     {
 #define USF_CONTRACT_VIOLATION(except) static_cast<void>(0)
-#define USF_FALLTHROUGH /*fall through*/
-#define FMT_CHECK(cond, except) ((!!(cond)) ? static_cast<void>(0) : USF_CONTRACT_VIOLATION(except))
+#define USF_FALLTHROUGH                /*fall through*/
+#define FMT_CHECK(cond, except)        ((!!(cond)) ? static_cast<void>(0) : USF_CONTRACT_VIOLATION(except))
 
         constexpr char digits_hex_uppercase[]{"0123456789ABCDEF"};
         constexpr char digits_hex_lowercase[]{"0123456789abcdef"};
@@ -35,29 +35,11 @@ namespace ncore
             cstr_t(const cstr_t&) noexcept = default;
             cstr_t(cstr_t&&) noexcept      = default;
 
-            cstr_t(const char* str) noexcept
-                : m_type(Type_Ascii)
-                , m_begin{str}
-                , m_end{str}
-            {
-                m_end += compute_length();
-            }
+            cstr_t(const char* str) noexcept : m_type(Type_Ascii), m_begin{str}, m_end{str} { m_end += compute_length(); }
 
-            cstr_t(const char* str, const uint_t length)
-                : m_type(Type_Ascii)
-                , m_begin{str}
-                , m_end{str + length}
-            {
-                FMT_CHECK(length >= 0, std::runtime_error);
-            }
+            cstr_t(const char* str, const uint_t length) : m_type(Type_Ascii), m_begin{str}, m_end{str + length} { FMT_CHECK(length >= 0, std::runtime_error); }
 
-            cstr_t(const char* first, const char* last)
-                : m_type(Type_Ascii)
-                , m_begin{first}
-                , m_end{last}
-            {
-                FMT_CHECK(first <= last, std::runtime_error);
-            }
+            cstr_t(const char* first, const char* last) : m_type(Type_Ascii), m_begin{first}, m_end{last} { FMT_CHECK(first <= last, std::runtime_error); }
 
             // -------- ASSIGNMENT ------------------------------------------------
 
@@ -131,12 +113,7 @@ namespace ncore
             }
         }
 
-        str_t::str_t(char* first, char* last)
-            : m_type(Type_Ascii)
-            , m_begin{first}
-            , m_end{last}
-        {
-        }
+        str_t::str_t(char* first, char* last) : m_type(Type_Ascii), m_begin{first}, m_end{last} {}
 
         void str_t::skip(const uint_t n)
         {
@@ -235,7 +212,7 @@ namespace ncore
         class Integer
         {
         public:
-            enum // 64 bit
+            enum  // 64 bit
             {
                 kMaxDigitsDec     = 20 + 1,
                 kMaxDigitsHex     = 16 + 1,
@@ -757,7 +734,7 @@ namespace ncore
                     // A format spec is expected next...
 
                     // Remove the empty format flag
-                    state.m_flags = Flags::kNone;
+                    state.m_flags = Flags::None;
 
                     // Advance ':' character
                     it.skip(1);
@@ -765,7 +742,7 @@ namespace ncore
                     // Try to parse alignment flag at second character of format spec.
                     state.m_flags = parse_align_flag(it.peek(1));
 
-                    if (state.m_flags != Flags::kNone)
+                    if (state.m_flags != Flags::None)
                     {
                         // Alignment flag present at second character of format spec.
                         // Should also have a fill character at the first character.
@@ -782,7 +759,7 @@ namespace ncore
                         // Try to parse the alignment flag at the first character instead...
                         state.m_flags = parse_align_flag(*it);
 
-                        if (state.m_flags != Flags::kNone)
+                        if (state.m_flags != Flags::None)
                         {
                             it.skip(1);
                         }
@@ -792,15 +769,15 @@ namespace ncore
                     switch (*it)
                     {
                         case '-':
-                            state.m_flags.value |= Flags::kSignMinus;
+                            state.m_flags.value |= Flags::SignMinus;
                             it.skip(1);
                             break;
                         case '+':
-                            state.m_flags.value |= Flags::kSignPlus;
+                            state.m_flags.value |= Flags::SignPlus;
                             it.skip(1);
                             break;
                         case ' ':
-                            state.m_flags.value |= Flags::kSignSpace;
+                            state.m_flags.value |= Flags::SignSpace;
                             it.skip(1);
                             break;
                         default: break;
@@ -809,7 +786,7 @@ namespace ncore
                     // Parse hash flag
                     if (*it == '#')
                     {
-                        state.m_flags.value |= Flags::kHash;
+                        state.m_flags.value |= Flags::Hash;
                         it.skip(1);
                     }
 
@@ -846,18 +823,18 @@ namespace ncore
                         {
                             case 'c': state.m_type = Type::kChar; break;
                             case 'd': state.m_type = Type::kIntegerDec; break;
-                            case 'X': state.m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'X': state.m_flags |= Flags::Uppercase; USF_FALLTHROUGH;
                             case 'x': state.m_type = Type::kIntegerHex; break;
                             case 'o': state.m_type = Type::kIntegerOct; break;
-                            case 'B': state.m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'B': state.m_flags |= Flags::Uppercase; USF_FALLTHROUGH;
                             case 'b': state.m_type = Type::kIntegerBin; break;
-                            case 'P': state.m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'P': state.m_flags |= Flags::Uppercase; USF_FALLTHROUGH;
                             case 'p': state.m_type = Type::kPointer; break;
-                            case 'F': state.m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'F': state.m_flags |= Flags::Uppercase; USF_FALLTHROUGH;
                             case 'f': state.m_type = Type::kFloatFixed; break;
-                            case 'E': state.m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'E': state.m_flags |= Flags::Uppercase; USF_FALLTHROUGH;
                             case 'e': state.m_type = Type::kFloatScientific; break;
-                            case 'G': state.m_flags |= Flags::kUppercase; USF_FALLTHROUGH;
+                            case 'G': state.m_flags |= Flags::Uppercase; USF_FALLTHROUGH;
                             case 'g': state.m_type = Type::kFloatGeneral; break;
                             case 's': state.m_type = Type::kString; break;
                             default: state.m_type = Type::kInvalid; break;
@@ -866,38 +843,40 @@ namespace ncore
                         FMT_CHECK(state.m_type != Type::kInvalid, std::runtime_error);
                     }
 
-                    // Validate the read format spec!
-
+                    // Validate and adjust the read format spec!
                     if (fill_zero)
                     {
                         // Fill zero flag has precedence over any other alignment and fill character.
-                        state.m_flags.value = ((state.m_flags.value & (~Flags::kAlignBitmask)) | Flags::kAlignNumeric);
+                        state.m_flags.value = ((state.m_flags.value & (~Flags::AlignBitmask)) | Flags::AlignNumeric);
                         state.m_fill_char   = '0';
                     }
 
                     if (state.align() == Align::kNumeric)
                     {
                         // Numeric alignment are only valid for numeric and pointer types.
-                        FMT_CHECK(state.type_is_numeric() || state.type_is_pointer(), std::runtime_error);
+                        if (!state.type_is_numeric())
+                            state.m_flags.value = (state.m_flags.value & Flags::AlignBitmask) | Flags::AlignDefault;
                     }
 
                     if (state.sign() != Sign::kNone)
                     {
                         // Sign is only valid for numeric types.
-                        FMT_CHECK(state.type_is_numeric(), std::runtime_error);
+                        if (!state.type_is_numeric())
+                            state.m_flags.value &= ~Flags::SignBitmask;
                     }
 
                     if (state.hash())
                     {
-                        // Alternative format is valid for hexadecimal (including
-                        // pointers), octal, binary and all floating point types.
-                        FMT_CHECK(state.type_allow_hash(), std::runtime_error);
+                        // Alternative format is valid for hexadecimal (including pointers), octal, binary and all floating point types.
+                        if (!state.type_allow_hash())
+                            state.m_flags.value &= ~Flags::Hash;
                     }
 
                     if (state.m_precision != -1)
                     {
                         // Precision is only valid for floating point and string types.
-                        FMT_CHECK(state.type_is_float() || state.type_is_string(), std::runtime_error);
+                        if (!state.type_is_float() && !state.type_is_string())
+                            state.m_precision = -1;
                     }
                 }
 
@@ -910,9 +889,9 @@ namespace ncore
 
             inline void default_align_left() noexcept
             {
-                if ((state.m_flags.value & Flags::kAlignBitmask) == Flags::kAlignNone)
+                if ((state.m_flags.value & Flags::AlignBitmask) == Flags::AlignNone)
                 {
-                    state.m_flags.value |= Flags::kAlignLeft;
+                    state.m_flags.value |= Flags::AlignLeft;
                 }
             }
 
@@ -929,7 +908,7 @@ namespace ncore
                 {
                     c     = it.read();
                     value = (value * 10) + static_cast<s32>(c - '0');
-                    FMT_CHECK(value <= max_value, std::runtime_error); // Check for overflow
+                    FMT_CHECK(value <= max_value, std::runtime_error);  // Check for overflow
                     c = it.peek();
                 } while (c >= '0' && c <= '9');
 
@@ -940,11 +919,11 @@ namespace ncore
             {
                 switch (ch)
                 {
-                    case '<': return Flags::kAlignLeft; break;
-                    case '>': return Flags::kAlignRight; break;
-                    case '^': return Flags::kAlignCenter; break;
-                    case '=': return Flags::kAlignNumeric; break;
-                    default: return Flags::kNone; break;
+                    case '<': return Flags::AlignLeft; break;
+                    case '>': return Flags::AlignRight; break;
+                    case '^': return Flags::AlignCenter; break;
+                    case '=': return Flags::AlignNumeric; break;
+                    default: return Flags::None; break;
                 }
             }
 
@@ -1277,5 +1256,5 @@ namespace ncore
             toStr(str, 128, "{0}{1}{2}{3}{4}", false, 100.0f, 10, "test", 'a');
         }
 
-    } // namespace fmt
-} // namespace ncore
+    }  // namespace fmt
+}  // namespace ncore

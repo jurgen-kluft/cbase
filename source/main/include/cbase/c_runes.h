@@ -19,11 +19,11 @@ namespace ncore
 {
 #undef printf
 
-    const uchar32 cEOS = 0x00; // \0, end of string
-    const uchar32 cEOF = 0x05; // end of file
-    const uchar32 cEOL = 0x0A; // \n, end of line
-    const uchar32 cCR  = 0x0D; // \r, carriage return
-    const uchar32 cTAB = 0x09; // \t, tab
+    const uchar32 cEOS = 0x00;  // \0, end of string
+    const uchar32 cEOF = 0x05;  // end of file
+    const uchar32 cEOL = 0x0A;  // \n, end of line
+    const uchar32 cCR  = 0x0D;  // \r, carriage return
+    const uchar32 cTAB = 0x09;  // \t, tab
 
     namespace ascii
     {
@@ -36,62 +36,27 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t()
-                : m_bos(nullptr)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
+            runes_t() : m_bos(nullptr), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
 
-            prune m_bos;   // begin of string
-            u32   m_str;   // &m_bos[m_end] -> string
-            u32   m_end;   // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32   m_flags; // type (ascii, utf-8, utf-16, utf-32)
+            prune m_bos;    // begin of string
+            u32   m_str;    // &m_bos[m_end] -> string
+            u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
+            u32   m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
         struct crunes_t
         {
-            crunes_t()
-                : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, u32 len)
-                : m_bos(str)
-                , m_str(0)
-                , m_end(len)
-                , m_eos(len)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, pcrune end)
-                : m_bos(str)
-                , m_str(0)
-                , m_end((u32)(end - str))
-                , m_eos((u32)(end - str))
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(const runes_t& other)
-                : m_bos(other.m_bos)
-                , m_str(other.m_str)
-                , m_end(other.m_end)
-                , m_eos(other.m_eos)
-                , m_flags(other.m_flags)
-            {
-            }
+            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
+            crunes_t(pcrune str, u32 len) : m_bos(str), m_str(0), m_end(len), m_eos(len), m_flags(TYPE) {}
+            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(0), m_end((u32)(end - str)), m_eos((u32)(end - str)), m_flags(TYPE) {}
+            crunes_t(const runes_t& other) : m_bos(other.m_bos), m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos), m_flags(other.m_flags) {}
 
-            pcrune m_bos;   // begin of string
-            u32    m_str;   // &m_bos[m_end] -> string
-            u32    m_end;   // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
+            pcrune m_bos;    // begin of string
+            u32    m_str;    // &m_bos[m_end] -> string
+            u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
+            u32    m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
         s32  strlen(pcrune str, pcrune* end = nullptr, pcrune eos = nullptr);
@@ -101,21 +66,21 @@ namespace ncore
 
         // return false when there is not enough space in the output
         // would need at least 10 characters for u32 and 20 for u64
-        bool asStr(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
-        bool asStr(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
-        bool asStr(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
-        bool asStr(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
+        bool utoa(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
+        bool itoa(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
+        bool utoa(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
+        bool itoa(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
         enum EBoolTypes
         {
             TrueFalse = 0,
-            YesNo = 1,
+            YesNo     = 1,
             LowerCase = 0,
             UpperCase = 2,
             CamelCase = 4,
         };
-        bool asStr(bool val, char const* str, char*& cursor, char const* end, s8 caseType = TrueFalse | LowerCase);
+        bool btoa(bool val, char const* str, char*& cursor, char const* end, s8 caseType = TrueFalse | LowerCase);
 
-    } // namespace ascii
+    }  // namespace ascii
 
     namespace utf8
     {
@@ -128,60 +93,32 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t()
-                : m_bos(nullptr)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
+            runes_t() : m_bos(nullptr), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
 
-            prune m_bos;   // begin of string
-            u32   m_str;   // &m_bos[m_end] -> string
-            u32   m_end;   // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32   m_flags; // type (ascii, utf-8, utf-16, utf-32)
+            prune m_bos;    // begin of string
+            u32   m_str;    // &m_bos[m_end] -> string
+            u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
+            u32   m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
         struct crunes_t
         {
-            crunes_t()
-                : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, pcrune end)
-                : m_bos(str)
-                , m_str(0)
-                , m_end((u32)(end - str))
-                , m_eos((u32)(end - str))
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(const runes_t& other)
-                : m_bos(other.m_bos)
-                , m_str(other.m_str)
-                , m_end(other.m_end)
-                , m_eos(other.m_eos)
-                , m_flags(other.m_flags)
-            {
-            }
+            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
+            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(0), m_end((u32)(end - str)), m_eos((u32)(end - str)), m_flags(TYPE) {}
+            crunes_t(const runes_t& other) : m_bos(other.m_bos), m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos), m_flags(other.m_flags) {}
 
-            pcrune m_bos;   // begin of string
-            u32    m_str;   // &m_bos[m_end] -> string
-            u32    m_end;   // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
+            pcrune m_bos;    // begin of string
+            u32    m_str;    // &m_bos[m_end] -> string
+            u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
+            u32    m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
         // return length of string in runes
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
 
-    } // namespace utf8
+    }  // namespace utf8
 
     namespace utf16
     {
@@ -194,59 +131,31 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t()
-                : m_bos(nullptr)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
+            runes_t() : m_bos(nullptr), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
 
-            prune m_bos;   // begin of string
-            u32   m_str;   // &m_bos[m_end] -> string
-            u32   m_end;   // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32   m_flags; // type (ascii, utf-8, utf-16, utf-32)
+            prune m_bos;    // begin of string
+            u32   m_str;    // &m_bos[m_end] -> string
+            u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
+            u32   m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
         struct crunes_t
         {
-            crunes_t()
-                : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, pcrune end)
-                : m_bos(str)
-                , m_str(0)
-                , m_end((u32)(end - str))
-                , m_eos((u32)(end - str))
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(const runes_t& other)
-                : m_bos(other.m_bos)
-                , m_str(other.m_str)
-                , m_end(other.m_end)
-                , m_eos(other.m_eos)
-                , m_flags(other.m_flags)
-            {
-            }
+            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
+            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(0), m_end((u32)(end - str)), m_eos((u32)(end - str)), m_flags(TYPE) {}
+            crunes_t(const runes_t& other) : m_bos(other.m_bos), m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos), m_flags(other.m_flags) {}
 
-            pcrune m_bos;   // begin of string
-            u32    m_str;   // &m_bos[m_end] -> string
-            u32    m_end;   // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
+            pcrune m_bos;    // begin of string
+            u32    m_str;    // &m_bos[m_end] -> string
+            u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
+            u32    m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
 
-    } // namespace utf16
+    }  // namespace utf16
 
     namespace utf32
     {
@@ -259,58 +168,30 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t()
-                : m_bos(nullptr)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
+            runes_t() : m_bos(nullptr), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
 
-            prune m_bos;   // begin of string
-            u32   m_str;   // &m_bos[m_end] -> string
-            u32   m_end;   // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32   m_flags; // type (ascii, utf-8, utf-16, utf-32)
+            prune m_bos;    // begin of string
+            u32   m_str;    // &m_bos[m_end] -> string
+            u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
+            u32   m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
         struct crunes_t
         {
-            crunes_t()
-                : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, pcrune end)
-                : m_bos(str)
-                , m_str(0)
-                , m_end((u32)(end - str))
-                , m_eos((u32)(end - str))
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(const runes_t& other)
-                : m_bos(other.m_bos)
-                , m_str(other.m_str)
-                , m_end(other.m_end)
-                , m_eos(other.m_eos)
-                , m_flags(other.m_flags)
-            {
-            }
+            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
+            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(0), m_end((u32)(end - str)), m_eos((u32)(end - str)), m_flags(TYPE) {}
+            crunes_t(const runes_t& other) : m_bos(other.m_bos), m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos), m_flags(other.m_flags) {}
 
-            pcrune m_bos;   // begin of string
-            u32    m_str;   // &m_bos[m_end] -> string
-            u32    m_end;   // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;   // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32    m_flags; // type (ascii, utf-8, utf-16, utf-32)
+            pcrune m_bos;    // begin of string
+            u32    m_str;    // &m_bos[m_end] -> string
+            u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
+            u32    m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
-    } // namespace utf32
+    }  // namespace utf32
 
     struct crunes_t;
     struct runes_t
@@ -343,8 +224,8 @@ namespace ncore
         uchar32 read();
         bool    write(uchar32 c);
 
-        bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const; // scan until we reach one of the 'chars'
-        void skip(u32& cursor, const crunes_t& skip_chars) const;                        // skip until we reach a character not part of 'chars'
+        bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const;  // scan until we reach one of the 'chars'
+        void skip(u32& cursor, const crunes_t& skip_chars) const;                         // skip until we reach a character not part of 'chars'
 
         runes_t& operator+=(const ascii::crunes_t& str);
         runes_t& operator+=(const utf32::crunes_t& str);
@@ -404,8 +285,8 @@ namespace ncore
         uchar32 peek() const;
         uchar32 read();
 
-        bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const; // scan until we reach one of the 'chars'
-        void skip(u32& cursor, const crunes_t& skip_chars) const;                        // skip until we reach a character not part of 'chars'
+        bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const;  // scan until we reach one of the 'chars'
+        void skip(u32& cursor, const crunes_t& skip_chars) const;                         // skip until we reach a character not part of 'chars'
         bool contains(uchar32 c) const;
 
         crunes_t& operator=(crunes_t const& other);
@@ -595,31 +476,31 @@ namespace ncore
     runes_t expand(runes_t& str, runes_t const& sel);
     runes_t expand(runes_t& str, crunes_t const& sel);
 
-    void trim(runes_t&);                                            // Trim whitespace from left and right side
-    void trimLeft(runes_t&);                                        // Trim whitespace from left side
-    void trimRight(runes_t&);                                       // Trim whitespace from right side
-    void trim(runes_t&, uchar32 inChar);                            // Trim characters in <inCharSet> from left and right side
-    void trimLeft(runes_t&, uchar32 inChar);                        // Trim character <inChar> from left side
-    void trimRight(runes_t&, uchar32 inChar);                       // Trim character <inChar> from right side
-    void trim(runes_t&, crunes_t const& inCharSet);                 // Trim characters in <inCharSet> from left and right side
-    void trimLeft(runes_t&, crunes_t const& inCharSet);             // Trim characters in <inCharSet> from left side
-    void trimRight(runes_t&, crunes_t const& inCharSet);            // Trim characters in <inCharSet> from right side
-    void trimQuotes(runes_t&);                                      // Trim double quotes from left and right side
-    void trimQuotes(runes_t&, uchar32 quote);                       // Trim double quotes from left and right side
-    void trimDelimiters(runes_t&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side
+    void trim(runes_t&);                                             // Trim whitespace from left and right side
+    void trimLeft(runes_t&);                                         // Trim whitespace from left side
+    void trimRight(runes_t&);                                        // Trim whitespace from right side
+    void trim(runes_t&, uchar32 inChar);                             // Trim characters in <inCharSet> from left and right side
+    void trimLeft(runes_t&, uchar32 inChar);                         // Trim character <inChar> from left side
+    void trimRight(runes_t&, uchar32 inChar);                        // Trim character <inChar> from right side
+    void trim(runes_t&, crunes_t const& inCharSet);                  // Trim characters in <inCharSet> from left and right side
+    void trimLeft(runes_t&, crunes_t const& inCharSet);              // Trim characters in <inCharSet> from left side
+    void trimRight(runes_t&, crunes_t const& inCharSet);             // Trim characters in <inCharSet> from right side
+    void trimQuotes(runes_t&);                                       // Trim double quotes from left and right side
+    void trimQuotes(runes_t&, uchar32 quote);                        // Trim double quotes from left and right side
+    void trimDelimiters(runes_t&, uchar32 inLeft, uchar32 inRight);  // Trim delimiters from left and right side
 
-    void trim(crunes_t&);                                            // Trim whitespace from left and right side
-    void trimLeft(crunes_t&);                                        // Trim whitespace from left side
-    void trimRight(crunes_t&);                                       // Trim whitespace from right side
-    void trim(crunes_t&, uchar32 inChar);                            // Trim characters in <inCharSet> from left and right side
-    void trimLeft(crunes_t&, uchar32 inChar);                        // Trim character <inChar> from left side
-    void trimRight(crunes_t&, uchar32 inChar);                       // Trim character <inChar> from right side
-    void trim(crunes_t&, crunes_t const& inCharSet);                 // Trim characters in <inCharSet> from left and right side
-    void trimLeft(crunes_t&, crunes_t const& inCharSet);             // Trim characters in <inCharSet> from left side
-    void trimRight(crunes_t&, crunes_t const& inCharSet);            // Trim characters in <inCharSet> from right side
-    void trimQuotes(crunes_t&);                                      // Trim double quotes from left and right side
-    void trimQuotes(crunes_t&, uchar32 quote);                       // Trim double quotes from left and right side
-    void trimDelimiters(crunes_t&, uchar32 inLeft, uchar32 inRight); // Trim delimiters from left and right side
+    void trim(crunes_t&);                                             // Trim whitespace from left and right side
+    void trimLeft(crunes_t&);                                         // Trim whitespace from left side
+    void trimRight(crunes_t&);                                        // Trim whitespace from right side
+    void trim(crunes_t&, uchar32 inChar);                             // Trim characters in <inCharSet> from left and right side
+    void trimLeft(crunes_t&, uchar32 inChar);                         // Trim character <inChar> from left side
+    void trimRight(crunes_t&, uchar32 inChar);                        // Trim character <inChar> from right side
+    void trim(crunes_t&, crunes_t const& inCharSet);                  // Trim characters in <inCharSet> from left and right side
+    void trimLeft(crunes_t&, crunes_t const& inCharSet);              // Trim characters in <inCharSet> from left side
+    void trimRight(crunes_t&, crunes_t const& inCharSet);             // Trim characters in <inCharSet> from right side
+    void trimQuotes(crunes_t&);                                       // Trim double quotes from left and right side
+    void trimQuotes(crunes_t&, uchar32 quote);                        // Trim double quotes from left and right side
+    void trimDelimiters(crunes_t&, uchar32 inLeft, uchar32 inRight);  // Trim delimiters from left and right side
 
     void copy(const crunes_t& src, runes_t& dst);
     void copy(const crunes_t& src, runes_t& dst, runes_alloc_t* allocator, s32 size_alignment = 8);
@@ -637,7 +518,8 @@ namespace ncore
 
     // -------------------------------------------------------------------------------
     // helpers for inline sized runes_t
-    template <typename T, s32 L> class runez_t : public runes_t
+    template <typename T, s32 L>
+    class runez_t : public runes_t
     {
     public:
         enum
@@ -645,18 +527,13 @@ namespace ncore
             SIZE = L
         };
         T m_run[SIZE];
-        inline runez_t()
-            : runes_t(m_run, 0, 0, SIZE - 1)
-        {
-        }
-        inline runez_t(uchar32 c)
-            : runes_t(m_run, 0, 1, SIZE - 1)
+        inline runez_t() : runes_t(m_run, 0, 0, SIZE - 1) {}
+        inline runez_t(uchar32 c) : runes_t(m_run, 0, 1, SIZE - 1)
         {
             m_run[0] = c;
             m_run[1] = 0;
         }
-        inline runez_t(const char* _str)
-            : runes_t(m_run, 0, 0, SIZE - 1)
+        inline runez_t(const char* _str) : runes_t(m_run, 0, 0, SIZE - 1)
         {
             crunes_t str((ascii::pcrune)_str);
             concatenate(*this, str);
@@ -664,7 +541,8 @@ namespace ncore
         }
     };
 
-    template <typename T, s32 L> class crunez_t : public crunes_t
+    template <typename T, s32 L>
+    class crunez_t : public crunes_t
     {
     public:
         enum
@@ -673,8 +551,7 @@ namespace ncore
         };
         T m_run[SIZE];
 
-        inline crunez_t(uchar32 c)
-            : crunes_t(m_run, 0, 1, SIZE - 1)
+        inline crunez_t(uchar32 c) : crunes_t(m_run, 0, 1, SIZE - 1)
         {
             m_run[0] = c;
             m_run[1] = 0;
@@ -796,6 +673,6 @@ namespace ncore
         s32     m_count;
     };
 
-}; // namespace ncore
+};  // namespace ncore
 
-#endif ///< __CBASE_RUNES2_H__
+#endif  ///< __CBASE_RUNES2_H__

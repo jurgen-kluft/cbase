@@ -119,9 +119,9 @@ namespace ncore
             reader->read();
         }
 
-        uchar32 c;                     // Current character.
-        c            = reader->peek(); // Save sign indication.
-        uchar32 sign = c;              // If '-', then negative, otherwise positive.
+        uchar32 c;                      // Current character.
+        c            = reader->peek();  // Save sign indication.
+        uchar32 sign = c;               // If '-', then negative, otherwise positive.
 
         // skip sign.
         if ((c == '-') || (c == '+'))
@@ -129,7 +129,7 @@ namespace ncore
             c = reader->read();
         }
 
-        s64 total = 0; // Current total.
+        s64 total = 0;  // Current total.
 
         // Decode the rest of the string
         while (true)
@@ -365,9 +365,9 @@ namespace ncore
 
     enum ESScanf
     {
-        RESPECT_WIDTH = 1, ///< use fixed width
-        ADD_PLUS      = 2, ///< use + for positive
-        SPACE_PAD     = 4, ///< use padding
+        RESPECT_WIDTH = 1,  ///< use fixed width
+        ADD_PLUS      = 2,  ///< use + for positive
+        SPACE_PAD     = 4,  ///< use padding
         ZERO_PAD      = 8,
         LEFT_PAD      = 16,
 
@@ -445,26 +445,26 @@ namespace ncore
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
-						runes_t* runes = r.getRunes();
-						if (runes != nullptr)
-						{
-							runes_writer_t str_writer(*runes);
+                        runes_t* runes = r.getRunes();
+                        if (runes != nullptr)
+                        {
+                            runes_writer_t str_writer(*runes);
 
-							l = 0;
-							while (reader->peek() != 0 && reader->peek() != ' ')
-							{
-								if (!(flag & SPACE_PAD))
-								{
-									str_writer.write(reader->read());
-								}
-								else if (l < w)
-								{
-									str_writer.write(reader->read());
-									l++;
-								}
-								reader->read();
-							}
-						}
+                            l = 0;
+                            while (reader->peek() != 0 && reader->peek() != ' ')
+                            {
+                                if (!(flag & SPACE_PAD))
+                                {
+                                    str_writer.write(reader->read());
+                                }
+                                else if (l < w)
+                                {
+                                    str_writer.write(reader->read());
+                                    l++;
+                                }
+                                reader->read();
+                            }
+                        }
 
                         scanned++;
                         parsing = 0;
@@ -491,7 +491,7 @@ namespace ncore
                         fmt->skip();
 
                         utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-						runes_reader_t decimalChars(allDecimalChars, allDecimalChars + 12);
+                        runes_reader_t decimalChars(allDecimalChars, allDecimalChars + 12);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
@@ -521,7 +521,7 @@ namespace ncore
                         fmt->skip();
 
                         utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-						runes_reader_t decimalChars(allDecimalChars, allDecimalChars + 10);
+                        runes_reader_t decimalChars(allDecimalChars, allDecimalChars + 10);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
@@ -550,8 +550,8 @@ namespace ncore
                     {
                         fmt->skip();
 
-						utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-						runes_reader_t octalChars(allDecimalChars, allDecimalChars + 8);
+                        utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+                        runes_reader_t octalChars(allDecimalChars, allDecimalChars + 8);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
@@ -582,7 +582,7 @@ namespace ncore
                         fmt->skip();
 
                         utf32::rune    allHexChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
-						runes_reader_t hexChars(allHexChars, allHexChars + 23);
+                        runes_reader_t hexChars(allHexChars, allHexChars + 23);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
@@ -603,7 +603,7 @@ namespace ncore
                                 str[strl] = '\0';
                                 for (s32 j = 0; j < strl; ++j)
                                     str[j] = reader->read();
-								runes_reader_t str_reader(str, str + strl);
+                                runes_reader_t str_reader(str, str + strl);
                                 n2 = StrToS64(&str_reader, 16);
                             }
                             else if (w == 4)
@@ -618,8 +618,8 @@ namespace ncore
                                     if (c == '\0')
                                         break;
                                 }
-								runes_reader_t str_reader(str, str + strl);
-								n2 = StrToS64(&str_reader, 16);
+                                runes_reader_t str_reader(str, str + strl);
+                                n2 = StrToS64(&str_reader, 16);
                             }
                             else if (w == 8)
                             {
@@ -633,10 +633,10 @@ namespace ncore
                                     if (c == '\0')
                                         break;
                                 }
-								runes_reader_t str_reader(str, str + strl);
-								n2 = StrToS64(&str_reader, 16);
+                                runes_reader_t str_reader(str, str + strl);
+                                n2 = StrToS64(&str_reader, 16);
                             }
-                            else // if (w == 16)
+                            else  // if (w == 16)
                             {
                                 u32 const strl = 16;
                                 uchar32   str[strl + 1];
@@ -648,8 +648,8 @@ namespace ncore
                                     if (c == '\0')
                                         break;
                                 }
-								runes_reader_t str_reader(str, str + strl);
-								n2 = (u64)StrToS64(&str_reader, 16);
+                                runes_reader_t str_reader(str, str + strl);
+                                n2 = (u64)StrToS64(&str_reader, 16);
                             }
                         }
 
@@ -676,7 +676,7 @@ namespace ncore
                         fmt->skip();
 
                         utf32::rune    allFloatChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
-						runes_reader_t floatChars(allFloatChars, allFloatChars + 14);
+                        runes_reader_t floatChars(allFloatChars, allFloatChars + 14);
 
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
@@ -726,25 +726,25 @@ namespace ncore
         return scanned;
     }
 
-    s32 sscanf(crunes_t & str, crunes_t const& fmt, X_VA_R_ARGS_16)
+    s32 sscanf(crunes_t& str, crunes_t const& fmt, X_VA_R_ARGS_16)
     {
         va_r_list_t    vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
         runes_reader_t buf_reader(str);
         runes_reader_t fmt_reader(fmt);
         s32            scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-		str = buf_reader.get_current();
-		return scanned;
+        str                    = buf_reader.get_current();
+        return scanned;
     }
 
-    s32 vsscanf(crunes_t & str, crunes_t const& fmt, const va_r_list_t& vr_args)
+    s32 vsscanf(crunes_t& str, crunes_t const& fmt, const va_r_list_t& vr_args)
     {
         runes_reader_t buf_reader(str);
         runes_reader_t fmt_reader(fmt);
         s32            scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-		str = buf_reader.get_current();
+        str                    = buf_reader.get_current();
         return scanned;
     }
 
-}; // namespace ncore
+};  // namespace ncore
 
-#endif // ifndef SPU
+#endif  // ifndef SPU

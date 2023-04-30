@@ -12,111 +12,150 @@ namespace ncore
 {
     namespace fmt
     {
+        struct Border
+        {
+            enum EBorder
+            {
+                None   = 0x00,
+                ___    = 0x00,
+                __R    = 0x01,
+                _S_    = 0x02,
+                _SR    = 0x03,
+                L__    = 0x04,
+                L_R    = 0x05,
+                LS_    = 0x06,
+                LSR    = 0x07,
+                Middle = 0x08,
+                Single = 0x10,
+                Double = 0x20,
+                Top    = 0x40,
+                Bottom = 0x80,
+            };
+
+            u8 value;
+        };
+        struct CellColor
+        {
+            enum EColor
+            {
+                Black   = 0,
+                Red     = 1,
+                Green   = 2,
+                Yellow  = 3,
+                Blue    = 4,
+                Magenta = 5,
+                Cyan    = 6,
+                White   = 7,
+            };
+            u8 value;
+        };
+
+        struct tbl_state_t
+        {
+            s8*    widths_;
+            Flags* flags_;
+            s8*    colors_;
+            char*  row_;
+            s16    columns_size_;
+            s16    row_size_;
+        };
+
+        void tbl_format(tbl_state_t& state, u8* arg_types, u64* arg_values, format_func_t* arg_formatters, s32 argc);
+        void tbl_cell(s8 column, tbl_state_t& state, u8* arg_types, u64* arg_values, format_func_t* arg_formatters, s32 argc);
+        void tbl_line(tbl_state_t& state, u8 const* separators, s32 separator_count, Border style);
+        void tbl_flags(tbl_state_t& state, Flags const* flags, s32 count);
+
+        // A table formatter (helper) that uses a (given) fixed size array to store a table row.
+        template <uint_t N>
         struct table_t
         {
-            static const u8 ___ = 0x0;
-            static const u8 __R = 0x1;
-            static const u8 _S_ = 0x2;
-            static const u8 _SR = 0x3;
-            static const u8 L__ = 0x4;
-            static const u8 L_R = 0x5;
-            static const u8 LS_ = 0x6;
-            static const u8 LSR = 0x7;
-
-            typedef s8         Color;
-            static const Color Black   = 0;
-            static const Color Red     = 1;
-            static const Color Green   = 2;
-            static const Color Yellow  = 3;
-            static const Color Blue    = 4;
-            static const Color Magenta = 5;
-            static const Color Cyan    = 6;
-            static const Color White   = 7;
-
-            template <uint_t N>
-            table_t(state_t (&columns)[N], char* row, uint_t row_size)
-                : columns_(columns)
-                , row_(row)
-                , row_size_(row_size)
+            template <uint_t C>
+            table_t(char (&row)[C])
             {
+                state_.widths_       = widths_;
+                state_.flags_        = flags_;
+                state_.colors_       = colors_;
+                state_.row_          = row_;
+                state_.columns_size_ = N;
+                state_.row_size_     = C;
             }
 
-            void cell_color(s8 column, Color color)
+            void cell_color(s8 column, CellColor::EColor color)
             {
-                // Take the argument and format it into the row buffer using
-                // the column state information.
+                if (column < column_count_)
+                    colors_[column] = color.value;
             }
 
-            template <typename... Args> void header_values(Args&&... args)
+            template <typename... Args>
+            void row(Args&&... args)
             {
                 const u8            types[]  = {typed<Args>::value...};
                 const u64           values[] = {arg_t<Args>::encode(args)...};
                 const format_func_t funcs[]  = {arg_t<Args>::formatter()...};
-
-                // First we need to format the top border of the table and
-                // print it to the row buffer.
-
-                // Take each argument and format it into the row buffer using
-                // the column state information.
-                // Also take the left / right border style into account.
-
-                // Then we need to format the bottom border of the header and
-                // print it to the row buffer.
+                args_t              args{types, values, funcs, sizeof(types) / sizeof(types[0])};
+                tbl_format(state_, types, values, funcs, argc);
             }
 
-            template <typename... Args> void row_values(Args&&... args)
-            {
-                const u8            types[]  = {typed<Args>::value...};
-                const u64           values[] = {arg_t<Args>::encode(args)...};
-                const format_func_t funcs[]  = {arg_t<Args>::formatter()...};
-
-                // Take each argument and format it into the row buffer using
-                // the column state information.
-                // Also take the left / right border style into account.
-            }
-
-            template <typename T> void cell_value(s8 column, T const& arg)
+            template <typename T>
+            void cell_replace(s8 column, T const& arg, Flags flags = Flags::None)
             {
                 const u8            types[]  = {typed<T>::value};
                 const u64           values[] = {arg_t<T>::encode(arg)};
                 const format_func_t funcs[]  = {arg_t<T>::formatter()};
-
-                // Take the argument and format it into the row buffer using
-                // the column state information.
+                args_t              args{types, values, funcs, sizeof(types) / sizeof(types[0])};
+                tbl_cell(state_, types, values, funcs, argc);
             }
 
-            void print()
+            template <typename T>
+            void cell_overlay(s8 column, T const& arg, Flags flags = Flags::None)
             {
-                // print where ?
+                const u8            types[]  = {typed<T>::value};
+                const u64           values[] = {arg_t<T>::encode(arg)};
+                const format_func_t funcs[]  = {arg_t<T>::formatter()};
+                args_t              args{types, values, funcs, sizeof(types) / sizeof(types[0])};
+                tbl_cell(state_, types, values, funcs, argc);
             }
 
-            template <typename... Args> void separator_line(Args&&... args)
+            void top() { tbl_line(state_, nullptr, 0, {BorderStyle::Single | Border::Top}); }
+            void line() { tbl_line(state_, nullptr, 0, {BorderStyle::Single | Border::Middle}); }
+            void bottom() { tbl_line(state_, nullptr, 0, {BorderStyle::Single | Border::Bottom}); }
+
+            template <typename... Args>
+            void flags(Args&&... args)
             {
-                const u8 borders[] = { arg... };
-
-                // print a separator line
-
+                const Flags flags[] = {Flags(args)...};
+                tbl_flags(state_, flags, sizeof(flags) / sizeof(flags[0]));
             }
 
-            void final()
+            template <typename... Args>
+            void top(Args&&... args)
             {
-                // Print the bottom border of the table.
+                const u8  bd[] = {arg...};
+                const s32 bc   = sizeof(bd) / sizeof(bd[0]);
+                tbl_line(state_, bd, bc, {BorderStyle::Single}, 0);
             }
 
-            static const char* const BorderStyleNone[];
-            static const char* const BorderStyleSingle[];
-            static const char* const BorderStyleDouble[];
+            template <typename... Args>
+            void line(Args&&... args)
+            {
+                const u8  bd[] = {arg...};
+                const s32 bc   = sizeof(bd) / sizeof(bd[0]);
+                tbl_line(state_, bd, bc, {BorderStyle::Single}, 3);
+            }
 
-            state_t* columns_;
-            uint_t   column_count_;
-            char*    row_;
-            uint_t   row_size_;
+            template <typename... Args>
+            void bottom(Args&&... args)
+            {
+                const u8  bd[] = {arg...};
+                const s32 bc   = sizeof(bd) / sizeof(bd[0]);
+                tbl_line(state_, bd, bc, {BorderStyle::Single}, 6);
+            }
+
+            s8          width_[N];
+            s8          colors_[N];
+            Flags       flags_[N];
+            tbl_state_t state_;
         };
-
-        const char* const table_t::BorderStyleNone[] = {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "};
-        const char* const table_t::BorderStyleSingle[] = {"┌", "┬", "┐", "├", "┼", "┤", "└", "┴", "┘", "─", "│", " "};
-        const char* const table_t::BorderStyleDouble[] = {"╔", "╦", "╗", "╠", "╬", "╣", "╚", "╩", "╝", "═", "║", " "};
-
 
         // some thoughs on how to provide a simple API for the user to 'generate'
         // nicely formatted tables:
@@ -130,41 +169,51 @@ namespace ncore
         //
         // Note: Left/Right borders have a space character in front of them.
         //       Middle borders have a space character on both sides of them.
-        // 
+        //
         // So the table with the 4 columns defined below as an example has
         // actually a total width of 93 characters:
         // 1 + 1 + 20 + 1 + 1 + 1 + 20 + 1 + 1 + 1 + 20 + 1 + 1 + 1 + 20 + 1 + 1 = 93
-        inline void UserCase()
+        inline void UseCase()
         {
-            state_t columns[] = {
-                state_t(20, TypeId::kString, Flags::kAlignCenter),
-                state_t(20, TypeId::kString, Flags::kAlignCenter),
-                state_t(20, TypeId::kFloat, Flags::kAlignCenter),
-                state_t(20, TypeId::kFloat, Flags::kAlignCenter),
-            };
+            char            row[256];    // 256 characters should be enough for most tables
+            fmt::table_t<4> table(row);  // 4 columns
 
-            char row[256];
+            table.top();
+            // printf(row);                                        // console print ?
 
-            fmt::table_t table(columns, row, sizeof(row));
+            table.flags(Flags::AlignLeft, Flags::AlignRight, Flags::AlignRight, Flags::AlignRight);
+            table.row("hello", "hello", "constant", "constant");
+            // printf(row);
 
-            table.header_values("hello", "hello", "constant", "constant");
-            table.print(); // console print ?
+            table.line();
+            // printf(row);                                        // console print ?
 
-            table.row_values("world", "world", 3.1415f, 3.1415f);
-            table.cell_value(1, "hello");      // still update/overwrite a cell
-            table.cell_color(1, table_t::Red); // change the color of a cell
-            table.print();                     // console print ?
+            table.row("world", "world", 3.1415f, 3.1415f);
+            table.cell_replace(1, "hello", Flags::AlignLeft);    // overwrite a cell
+            table.cell_overlay(1, "world!", Flags::AlignRight);  // overlay a cell
+            table.cell_color(1, CellColor::Red);                  // change the color of a cell
 
-            // row
-
-            table.separator_line(table_t::LSR, table_t::LSR, table_t::L_R, table_t::L_R); // console print ?
+            // printf(row);                                        // console print ?
 
             // row
 
-            table.final(); // console print ?
+            table.line();
+            // printf(row);                                        // console print ?
+
+            // or if you want to override the separators for the line:
+            table.line(Border::LSR, Border::LSR, Border::L_R, Border::L_R);
+            // printf(row);                                        // console print ?
+
+            // row
+
+            table.bottom();
+            // printf(row);                                        // console print ?
+
+            // or if you want to override the separators for the bottom line:
+            table.bottom(Border::LSR, Border::LS_, Border::_S_, Border::_SR);
         }
 
-    } // namespace fmt
-} // namespace ncore
+    }  // namespace fmt
+}  // namespace ncore
 
-#endif // __CBASE_TABLE_FMT_H__
+#endif  // __CBASE_TABLE_FMT_H__

@@ -9,24 +9,35 @@
 
 namespace ncore
 {
-    s32  cprintf(crunes_t const& format, X_VA_ARGS_16_DEF);
-    s32  vcprintf(crunes_t const& format, const va_list_t& args);
-    void sprintf(runes_t& dst, crunes_t const& format, X_VA_ARGS_16_DEF);
-    void vsprintf(runes_t& dst, crunes_t const& format, const va_list_t& args);
-    void zprintf(irunes_writer_t& dst, crunes_t const& format, X_VA_ARGS_16_DEF);
-    void vzprintf(irunes_writer_t& dst, crunes_t const& format, const va_list_t& args);
-    void printf(crunes_t const& str);
-    void printf(crunes_t const& format, X_VA_ARGS_16_DEF);
-    void printf(crunes_t const& format, const va_list_t& args);
-    s32  sscanf(crunes_t& str, crunes_t const& format, X_VA_R_ARGS_16_DEF);
-    s32  vsscanf(crunes_t& str, crunes_t const& format, const va_r_list_t& vr_args);
+    // Output a character to a custom device like UART, used by the printf() function.
+    // This function is declared here, you have to write your custom implementation.
+    void _putchar(char character);
+    void _putflush(); // Indicate that we are done 
 
-    char* itoa(s64 value, char* dst, char const* end, s32 radix);
-    char* utoa(u64 value, char* dst, char const* end, s32 radix);
-    char* ftoa(f32 value, char* dst, char const* end);
-    char* dtoa(f64 value, char* dst, char const* end);
-    char* btoa(bool value, char* dst, char const* end);
-    
-} // namespace ncore
+    int printf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
+    int sprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc);
+    int snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc);
+    int vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
+    int fctprintf(void (*out)(char character, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
 
-#endif ///< __CCORE_CHARS_H__
+    void printf(crunes_t const& str)
+    {
+        const va_t* argv = nullptr;
+        const s32   argc = 0;
+        printf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_end], argv, argc);
+    }
+
+    template <typename... Args>
+    void printf(crunes_t const& format, Args&&... args)
+    {
+        const va_t argv[] = {&args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        printf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+    }
+
+    s32 sscanf(crunes_t& str, crunes_t const& format, X_VA_R_ARGS_16_DEF);
+    s32 vsscanf(crunes_t& str, crunes_t const& format, const va_r_list_t& vr_args);
+
+}  // namespace ncore
+
+#endif  ///< __CCORE_CHARS_H__

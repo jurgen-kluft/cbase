@@ -170,7 +170,7 @@ namespace ncore
                 switch (l)
                 {
                     case 0:
-                        c = '?'; // Illegal character in utf8, replace with '?'
+                        c = '?';  // Illegal character in utf8, replace with '?'
                         break;
                     case 1: break;
                     case 2:
@@ -366,7 +366,7 @@ namespace ncore
                     switch (l)
                     {
                         case 0:
-                            c = '?'; // Illegal character in utf8, replace with '?'
+                            c = '?';  // Illegal character in utf8, replace with '?'
                             cursor++;
                             break;
                         case 1: c = str[cursor++]; break;
@@ -478,7 +478,7 @@ namespace ncore
         static bool write(uchar32 cp, utf8::prune bos, u32& cursor, u32 end)
         {
             if (cp < 0x80)
-            { // one octet
+            {  // one octet
                 if (cursor < end)
                 {
                     bos[cursor++] = static_cast<uchar8>(cp);
@@ -486,7 +486,7 @@ namespace ncore
                 }
             }
             else if (cp < 0x800)
-            { // two octets
+            {  // two octets
                 if ((cursor + 1) < end)
                 {
                     bos[cursor++] = static_cast<uchar8>((cp >> 6) | 0xc0);
@@ -495,7 +495,7 @@ namespace ncore
                 }
             }
             else if (cp < 0x10000)
-            { // three octets
+            {  // three octets
                 if ((cursor + 2) < end)
                 {
                     bos[cursor++] = static_cast<uchar8>((cp >> 12) | 0xe0);
@@ -505,7 +505,7 @@ namespace ncore
                 }
             }
             else
-            { // four octets
+            {  // four octets
                 if ((cursor + 3) < end)
                 {
                     bos[cursor++] = static_cast<uchar8>((cp >> 18) | 0xf0);
@@ -577,7 +577,7 @@ namespace ncore
         static inline bool terminate_str(utf16::runes_t& dst) { return write(utf16::TERMINATOR, dst.m_bos, dst.m_end, dst.m_eos); }
         static inline bool terminate_str(utf32::runes_t& dst) { return write(utf32::TERMINATOR, dst.m_bos, dst.m_end, dst.m_eos); }
 
-    } // namespace utf
+    }  // namespace utf
 
     namespace ascii
     {
@@ -678,7 +678,7 @@ namespace ncore
             return q;
         }
 
-        bool asStr(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        bool utoa(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
         {
             ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
 
@@ -758,7 +758,7 @@ namespace ncore
             return true;
         }
 
-        bool asStr(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        bool itoa(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
         {
             ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
 
@@ -770,7 +770,7 @@ namespace ncore
                 *cursor++ = '-';
                 val       = -val;
             }
-            return asStr((u32)val, str, cursor, end, base, octzero, lowercase);
+            return utoa((u32)val, str, cursor, end, base, octzero, lowercase);
         }
 
         static s64 divmod10(u64 value, s8& remainder)
@@ -787,7 +787,7 @@ namespace ncore
             return q;
         }
 
-        bool asStr(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        bool utoa(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
         {
             uchar32 c;
             s64     sval;
@@ -866,7 +866,7 @@ namespace ncore
             return true;
         }
 
-        bool asStr(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        bool itoa(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
         {
             ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
 
@@ -878,7 +878,7 @@ namespace ncore
                 *cursor++ = '-';
                 val       = -val;
             }
-            return asStr((u64)val, str, cursor, end, base, octzero, lowercase);
+            return utoa((u64)val, str, cursor, end, base, octzero, lowercase);
         }
 
         // enum EBoolTypes
@@ -908,7 +908,7 @@ namespace ncore
             return *boolstr == '\0';
         }
 
-    } // namespace ascii
+    }  // namespace ascii
 
     namespace utf8
     {
@@ -928,7 +928,7 @@ namespace ncore
             }
             return chars;
         }
-    } // namespace utf8
+    }  // namespace utf8
 
     namespace utf16
     {
@@ -948,7 +948,7 @@ namespace ncore
             }
             return chars;
         }
-    } // namespace utf16
+    }  // namespace utf16
 
     namespace utf32
     {
@@ -968,7 +968,7 @@ namespace ncore
             }
             return chars;
         }
-    } // namespace utf32
+    }  // namespace utf32
 
     // u32 functions
     static u32     get_begin(runes_t const& str);
@@ -2137,7 +2137,7 @@ namespace ncore
                 str.m_ascii.m_bos[dst--] = str.m_ascii.m_bos[src--];
             }
 
-            end = _str.m_ascii.m_end + move_len; // Update str_end
+            end = _str.m_ascii.m_end + move_len;  // Update str_end
         }
         else if (selected_len > replace_len)
         {
@@ -2151,7 +2151,7 @@ namespace ncore
                 str.m_ascii.m_bos[dst++] = str.m_ascii.m_bos[src++];
             }
 
-            end = _str.m_ascii.m_end - move_len; // Update str_end
+            end = _str.m_ascii.m_end - move_len;  // Update str_end
         }
         else
         {
@@ -3471,11 +3471,7 @@ namespace ncore
         m_runes       = crunes_t(str, 0, len, len);
         m_cursor      = 0;
     }
-    runes_reader_t::runes_reader_t(crunes_t const& runes)
-        : m_runes(runes)
-    {
-        m_cursor = m_runes.m_ascii.m_str;
-    }
+    runes_reader_t::runes_reader_t(crunes_t const& runes) : m_runes(runes) { m_cursor = m_runes.m_ascii.m_str; }
 
     crunes_t runes_reader_t::get_source() const
     {
@@ -3668,8 +3664,7 @@ namespace ncore
         m_cursor      = 0;
         m_count       = 0;
     }
-    runes_writer_t::runes_writer_t(runes_t const& runes)
-        : m_runes(runes)
+    runes_writer_t::runes_writer_t(runes_t const& runes) : m_runes(runes)
     {
         m_cursor = m_runes.m_ascii.m_str;
         m_count  = 0;
@@ -3744,13 +3739,6 @@ namespace ncore
                     }
                     return true;
                 case utf8::TYPE:
-                    while (str < end && !at_end(m_cursor, m_runes))
-                    {
-                        c = *str++;
-                        utf::write(c, m_runes.m_utf8, m_cursor);
-                        m_count += 1;
-                    }
-                    return true;
                 case utf16::TYPE:
                     while (str < end && !at_end(m_cursor, m_runes))
                     {
@@ -3790,16 +3778,10 @@ namespace ncore
                     }
                     return true;
                 case utf8::TYPE:
-                    while (reader.read(c) && !at_end(m_cursor, m_runes))
-                    {
-                        utf::write(c, m_runes.m_utf8, m_cursor);
-                        m_count += 1;
-                    }
-                    return true;
                 case utf16::TYPE:
                     while (reader.read(c) && !at_end(m_cursor, m_runes))
                     {
-                        utf::write(c, m_runes.m_utf16, m_cursor);
+                        utf::write(c, m_runes.m_utf8, m_cursor);
                         m_count += 1;
                     }
                     return true;
@@ -3819,4 +3801,4 @@ namespace ncore
 
     void runes_writer_t::vflush() {}
 
-} // namespace ncore
+}  // namespace ncore
