@@ -80,13 +80,13 @@ namespace ncore
             else if (style.value & Border::Bottom)
                 offset = 8;
 
-            if (style.value & ((Border::_SR & column_border) == Border::_SR))
+            if (style.value & ((Border::LSR & column_border) == Border::_SR))
                 return borderChars[offset];
             if (style.value & ((Border::LSR & column_border) == Border::LSR))
                 return borderChars[offset + 1];
-            if (style.value & ((Border::LS_ & column_border) == Border::LS_))
+            if (style.value & ((Border::LSR & column_border) == Border::LS_))
                 return borderChars[offset + 2];
-            if (style.value & ((Border::_S_ & column_border) == Border::_S_))
+            if (style.value & ((Border::LSR & column_border) == Border::_S_))
                 return borderChars[offset + 3];
             return ' ';
         }
