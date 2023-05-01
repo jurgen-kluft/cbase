@@ -8,6 +8,7 @@
 #include "cbase/c_debug.h"
 #include "cbase/c_runes.h"
 #include "cbase/c_strfmt.h"
+#include "cbase/c_va_list.h"
 
 namespace ncore
 {
@@ -68,29 +69,31 @@ namespace ncore
         };
 
         void tbl_init(tbl_state_t& state);
-        void tbl_format(tbl_state_t& state, args_t const& args);
-        void tbl_cell(s8 column, tbl_state_t& state, args_t const& args);
+        void tbl_format(tbl_state_t& state, va_t const* argv, s32 argc);
+        void tbl_cell(s8 column, tbl_state_t& state, va_t const* argv, s32 argc);
         void tbl_line(tbl_state_t& state, Border const* borders, s32 borders_count, Border style);
         void tbl_flags(tbl_state_t& state, Flags const* flags, s32 count);
         void tbl_row_to_utf8(tbl_state_t& state, utf8::prune str, utf8::pcrune end);
         void tbl_row_to_utf16(tbl_state_t& state, utf16::prune str, utf16::pcrune end);
 
         // A table formatter (helper) that uses a (given) fixed size array to store a table row.
-        template <uint_t N>
+        // 
+        template <uint_t C, uint_t W>
         struct table_t
         {
-            template <uint_t C>
-            table_t(uchar32 (&row)[C])
+            table_t()
             {
                 state_.widths_       = widths_;
                 state_.flags_        = flags_;
                 state_.colors_       = colors_;
                 state_.borders_      = borders_;
-                state_.row_          = row;
-                state_.columns_size_ = N;
-                state_.row_size_     = C;
+                state_.row_          = row_;
+                state_.columns_size_ = C;
+                state_.row_size_     = W;
                 tbl_init(state_);
             }
+
+            inline s32 columns() const { return state_.columns_size_; }
 
             void cell_color(s8 column, CellColor::EColor color)
             {
@@ -104,31 +107,25 @@ namespace ncore
             template <typename... Args>
             void row(Args&&... _args)
             {
-                const u8            types[]  = {typed<Args>::value...};
-                const u64           values[] = {arg_t<Args>::encode(_args)...};
-                const format_func_t funcs[]  = {arg_t<Args>::formatter()...};
-                args_t              args{values, types, funcs, sizeof(types) / sizeof(types[0])};
-                tbl_format(state_, args);
+                const va_t argv[] = {va_t(_args)...};
+                const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+                tbl_format(state_, argv, argc);
             }
 
             template <typename T>
             void cell_replace(s8 column, T arg, Flags flags = Flags::None)
             {
-                const u8            types[]  = {typed<T>::value};
-                const u64           values[] = {arg_t<T>::encode(arg)};
-                const format_func_t funcs[]  = {arg_t<T>::formatter()};
-                args_t              args{values, types, funcs, sizeof(types) / sizeof(types[0])};
-                tbl_cell(column, state_, args);
+                const va_t argv[] = {va_t(arg)};
+                const s32  argc   = 1;
+                tbl_cell(column, state_, argv, argc);
             }
 
             template <typename T>
             void cell_overlay(s8 column, T arg, Flags flags = Flags::None)
             {
-                const u8            types[]  = {typed<T>::value};
-                const u64           values[] = {arg_t<T>::encode(arg)};
-                const format_func_t funcs[]  = {arg_t<T>::formatter()};
-                args_t              args{values, types, funcs, sizeof(types) / sizeof(types[0])};
-                tbl_cell(column, state_, args);
+                const va_t argv[] = {va_t(arg)};
+                const s32  argc   = 1;
+                tbl_cell(column, state_, argv, argc);
             }
 
             void top() { tbl_line(state_, nullptr, 0, Border{Border::Single | Border::Top | Border::LSR}); }
@@ -174,10 +171,18 @@ namespace ncore
                 tbl_line(state_, bd, bc, {Border::Single | Border::Bottom});
             }
 
-            s8          widths_[N];
-            s8          colors_[N];
-            Flags       flags_[N];
-            Border      borders_[N];
+            const char* str_utf8()
+            {
+                row_to_utf8(row_utf8_, &row_utf8_[W * 3 - 3]);
+                return ((const char*)row_utf8_);
+            }
+
+            s8      widths_[C];
+            s8      colors_[C];
+            Flags   flags_[C];
+            Border  borders_[C];
+            uchar32 row_[W];
+            uchar8  row_utf8_[W * 3];
             tbl_state_t state_;
         };
 

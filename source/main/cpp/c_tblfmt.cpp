@@ -1,16 +1,17 @@
 #include "cbase/c_tblfmt.h"
+#include "cbase/c_printf.h"
 #include "cbase/c_runes.h"
 
 namespace ncore
 {
     namespace fmt
     {
-        // static const uchar32 BorderStyleNone[]   = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
-        // static const uchar32 BorderStyleSingle[] = {'┌', '┬', '┐', '├', '┼', '┤', '└', '┴', '┘', '─', '│', ' '};
-        // static const uchar32 BorderStyleDouble[] = {'╔', '╦', '╗', '╠', '╬', '╣', '╚', '╩', '╝', '═', '║', ' '};
-        static const uchar32 BorderStyleNone[]   = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
-        static const uchar32 BorderStyleSingle[] = {0x250C, 0x252C, 0x2510, 0x251C, 0x253C, 0x2524, 0x2514, 0x2534, 0x2518, 0x2500, 0x2502, ' '};
-        static const uchar32 BorderStyleDouble[] = {0x2554, 0x2566, 0x2557, 0x2560, 0x256C, 0x2563, 0x255A, 0x2569, 0x255D, 0x2550, 0x2551, ' '};
+        // static const uchar32 BorderStyleNone[]   = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+        // static const uchar32 BorderStyleSingle[] = {'┌', '┬', '┐', '─', '├', '┼', '┤', '─', '└', '┴', '┘', '─', '│', '│', '│', ' '};
+        // static const uchar32 BorderStyleDouble[] = {'╔', '╦', '╗', '═', '╠', '╬', '╣', '═', '╚', '╩', '╝', '═', '║', '║', '║', ' '};
+        static const uchar32 BorderStyleNone[]   = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+        static const uchar32 BorderStyleSingle[] = {0x250C, 0x252C, 0x2510, 0x2500, 0x251C, 0x253C, 0x2524, 0x2500, 0x2514, 0x2534, 0x2518, 0x2500, 0x2502, 0x2502, 0x2502, ' '};
+        static const uchar32 BorderStyleDouble[] = {0x2554, 0x2566, 0x2557, 0x2550, 0x2560, 0x256C, 0x2563, 0x2550, 0x255A, 0x2569, 0x255D, 0x2550, 0x2551, 0x2551, 0x2551, ' '};
 
         void tbl_init(tbl_state_t& state)
         {
@@ -20,9 +21,31 @@ namespace ncore
             }
         }
 
-        void tbl_format(tbl_state_t& state, args_t const& args) {}
+        void tbl_format(tbl_state_t& state, va_t const* argv, s32 argc)
+        {
+            tbl_line(state, nullptr, 0, Border{Border::Single | Border::LSR});
+            if (argc <= 0)
+                return;
 
-        void tbl_cell(s8 column, tbl_state_t& state, args_t const& args) {}
+            const char* format_begin = "%20v";
+            const char* format_end   = format_begin + 4;
+            crunes_t    format(format_begin, format_end);
+
+            // print each arg in their cell
+            s32 offset = 0;
+            for (s32 i = 0; i < argc; ++i)
+            {
+                offset += 2;
+
+                runes_writer_t writer(state.row_ + offset, state.row_ + offset + state.widths_[i]);
+                s32            n       = vzprintf(writer, format, argv + i, 1);
+                state.row_[offset + n] = ' ';
+
+                offset += state.widths_[i] + 1;  // skip the width (content) plus one spacing character
+            }
+        }
+
+        void tbl_cell(s8 column, tbl_state_t& state, va_t const* argv, s32 argc) {}
 
         static inline uchar32 GetBorder(Border style, s32 column_border)
         {
@@ -35,21 +58,23 @@ namespace ncore
             else if (style.value & Border::Double)
                 borderChars = BorderStyleDouble;
 
-            s32 offset = 0;
-            if (style.value & Border::Middle)
-                offset += 3;
+            s32 offset = 12;
+            if (style.value & Border::Top)
+                offset = 0;
+            else if (style.value & Border::Middle)
+                offset = 4;
             else if (style.value & Border::Bottom)
-                offset += 6;
+                offset = 8;
 
+            if (style.value & ((Border::_SR & column_border) == Border::_SR))
+                return borderChars[offset];
             if (style.value & ((Border::LSR & column_border) == Border::LSR))
                 return borderChars[offset + 1];
             if (style.value & ((Border::LS_ & column_border) == Border::LS_))
                 return borderChars[offset + 2];
-            if (style.value & ((Border::_SR & column_border) == Border::_SR))
-                return borderChars[offset];
             if (style.value & ((Border::_S_ & column_border) == Border::_S_))
-                return borderChars[9];
-            return borderChars[10];
+                return borderChars[offset + 3];
+            return ' ';
         }
 
         static inline s32 BorderFlip(s32 border) { return (border & 2) | ((border & 1) << 2) | ((border & 4) >> 2); }
@@ -126,7 +151,7 @@ namespace ncore
 
         void tbl_row_to_utf8(tbl_state_t& state, utf8::prune str, utf8::pcrune end)
         {
-            utf8::prune   iter = str;
+            utf8::prune iter = str;
             while (iter < end)
                 *iter++ = 0;
 
@@ -139,7 +164,7 @@ namespace ncore
 
         void tbl_row_to_utf16(tbl_state_t& state, utf16::prune str, utf16::pcrune end)
         {
-            utf16::prune   iter = str;
+            utf16::prune iter = str;
             while (iter < end)
                 *iter++ = 0;
 
