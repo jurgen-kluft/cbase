@@ -82,6 +82,7 @@ namespace ncore
         explicit va_t(crunes_t const &str);
 
         EType type() const { return (EType)(mArg3 & TYPE_MASK); }
+        char specifier() const;
 
         bool isInteger() const { return ((mArg3 & TYPE_MASK) >= TYPE_INT8 && (mArg3 & TYPE_MASK) <= TYPE_UINT64); }
         bool isSignedInteger() const { return ((mArg3 & TYPE_MASK) >= TYPE_INT8 && (mArg3 & TYPE_MASK) <= TYPE_INT64); }

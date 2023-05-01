@@ -171,7 +171,7 @@ namespace ncore
         (void)maxlen;
         if (str)
         {
-            ((runes_writer_t*)buffer)->write(str, str + n);
+            idx += ((runes_writer_t*)buffer)->write(str, str + n);
         }
     }
 
@@ -657,51 +657,52 @@ namespace ncore
             out = _out_null;
         }
 
-        while (*format && format < format_end)
+        uchar32 f = *format;
+        while (f != '\0' && format < format_end)
         {
             // format specifier?  %[flags][width][.precision][length]
-            if (*format != '%')
+            if (f != '%')
             {
                 // no
                 out(format, 1, buffer, idx, maxlen);
-                format++;
+                f = *++format;
                 continue;
             }
             else
             {
                 // yes, evaluate it
-                format++;
+                f = *++format;
             }
 
             // evaluate flags
             flags = 0U;
             do
             {
-                switch (*format)
+                switch (f)
                 {
                     case '0':
                         flags |= FLAGS_ZEROPAD;
-                        format++;
+                        f = *++format;
                         n = 1U;
                         break;
                     case '-':
                         flags |= FLAGS_LEFT;
-                        format++;
+                        f = *++format;
                         n = 1U;
                         break;
                     case '+':
                         flags |= FLAGS_PLUS;
-                        format++;
+                        f = *++format;
                         n = 1U;
                         break;
                     case ' ':
                         flags |= FLAGS_SPACE;
-                        format++;
+                        f = *++format;
                         n = 1U;
                         break;
                     case '#':
                         flags |= FLAGS_HASH;
-                        format++;
+                        f = *++format;
                         n = 1U;
                         break;
                     default: n = 0U; break;
@@ -710,11 +711,12 @@ namespace ncore
 
             // evaluate width field
             width = 0U;
-            if (_is_digit(*format))
+            if (_is_digit(f))
             {
                 width = _atoi(&format);
+                f     = *format;
             }
-            else if (*format == '*')
+            else if (f == '*')
             {
                 const int w = va_arg(va, int);
                 if (w < 0)
@@ -726,67 +728,77 @@ namespace ncore
                 {
                     width = (u32)w;
                 }
-                format++;
+                f = *++format;
             }
 
             // evaluate precision field
             precision = 0U;
-            if (*format == '.')
+            if (f == '.')
             {
                 flags |= FLAGS_PRECISION;
-                format++;
-                if (_is_digit(*format))
+                f = *++format;
+                if (_is_digit(f))
                 {
                     precision = _atoi(&format);
+                    f = *format;
                 }
-                else if (*format == '*')
+                else if (f == '*')
                 {
                     const int prec = (int)va_arg(va, int);
                     precision      = prec > 0 ? (u32)prec : 0U;
-                    format++;
+                    f              = *++format;
                 }
             }
 
             // evaluate length field
-            switch (*format)
+            switch (f)
             {
                 case 'l':
                     flags |= FLAGS_LONG;
-                    format++;
-                    if (*format == 'l')
+                    f = *++format;
+                    if (f == 'l')
                     {
                         flags |= FLAGS_LONG_LONG;
-                        format++;
+                        f = *++format;
                     }
                     break;
                 case 'h':
                     flags |= FLAGS_SHORT;
-                    format++;
-                    if (*format == 'h')
+                    f = *++format;
+                    if (f == 'h')
                     {
                         flags |= FLAGS_CHAR;
-                        format++;
+                        f = *++format;
                     }
                     break;
 #if defined(PRINTF_SUPPORT_PTRDIFF_T)
                 case 't':
                     flags |= (sizeof(ptr_t) == sizeof(s32) ? FLAGS_LONG : FLAGS_LONG_LONG);
-                    format++;
+                    f = *++format;
                     break;
 #endif
                 case 'j':
                     flags |= (sizeof(uint_t) == sizeof(s32) ? FLAGS_LONG : FLAGS_LONG_LONG);
-                    format++;
+                    f = *++format;
                     break;
                 case 'z':
                     flags |= (sizeof(u64) == sizeof(s32) ? FLAGS_LONG : FLAGS_LONG_LONG);
-                    format++;
+                    f = *++format;
                     break;
                 default: break;
             }
 
+            if (f == 'v' || f == 'V')
+            {
+                if (f == 'V')
+                {
+                    flags |= FLAGS_UPPERCASE;
+                }
+                f = va.args[va.size].specifier();  // determine the specifier from the va_t type
+            }
+
             // evaluate specifier
-            switch (*format)
+            switch (f)
             {
                 case 'd':
                 case 'i':
@@ -801,32 +813,32 @@ namespace ncore
                 {
                     // set the base
                     u32 base;
-                    if (*format == 'x' || *format == 'X')
+                    if (f == 'x' || f == 'X')
                     {
                         base = 16U;
 
                         // uppercase
-                        if (*format == 'X')
+                        if (f == 'X')
                         {
                             flags |= FLAGS_UPPERCASE;
                         }
                     }
-                    else if (*format == 'o')
+                    else if (f == 'o')
                     {
                         base = 8U;
                     }
-                    else if (*format == 'b' || *format == 'B')
+                    else if (f == 'b' || f == 'B')
                     {
                         base = 2U;
-                        if (*format == 'B')
+                        if (f == 'B')
                         {
                             flags |= FLAGS_UPPERCASE;
                         }
                     }
-                    else if (*format == 'y' || *format == 'Y')
+                    else if (f == 'y' || f == 'Y')
                     {
                         base = 2U;
-                        if (*format == 'Y')
+                        if (f == 'Y')
                         {
                             flags |= FLAGS_UPPERCASE;
                         }
@@ -838,7 +850,7 @@ namespace ncore
                     }
 
                     // no plus or space flag for u, x, X, o, b, y
-                    if ((*format != 'i') && (*format != 'd'))
+                    if ((f != 'i') && (f != 'd'))
                     {
                         flags &= ~(FLAGS_PLUS | FLAGS_SPACE);
                     }
@@ -849,12 +861,12 @@ namespace ncore
                         flags &= ~FLAGS_ZEROPAD;
                     }
 
-                    if ((*format == 'b' || *format == 'B' || *format == 'y' || *format == 'Y') && va.args[va.size].isBool())
+                    if ((f == 'b' || f == 'B' || f == 'y' || f == 'Y') && va.args[va.size].isBool())
                     {
                         const bool value = va_arg(va, bool);
 
                         const char* boolStr;
-                        if (*format == 'y' || *format == 'Y')
+                        if (f == 'y' || f == 'Y')
                         {
                             boolStr = (flags & FLAGS_UPPERCASE) ? (value ? "YES" : "NO") : (value ? "yes" : "no");
                             if (flags & FLAGS_HASH)
@@ -883,31 +895,27 @@ namespace ncore
                             idx             = _ntoa_long_long(out, buffer, idx, maxlen, (u64)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
                         }
                     }
-                    format++;
+                    f = *++format;
                     break;
                 }
-#if defined(PRINTF_SUPPORT_FLOAT)
                 case 'f':
                 case 'F':
-                    if (*format == 'F')
+                    if (f == 'F')
                         flags |= FLAGS_UPPERCASE;
                     idx = _ftoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
-                    format++;
+                    f   = *++format;
                     break;
-#    if defined(PRINTF_SUPPORT_EXPONENTIAL)
                 case 'e':
                 case 'E':
                 case 'g':
                 case 'G':
-                    if ((*format == 'g') || (*format == 'G'))
+                    if ((f == 'g') || (f == 'G'))
                         flags |= FLAGS_ADAPT_EXP;
-                    if ((*format == 'E') || (*format == 'G'))
+                    if ((f == 'E') || (f == 'G'))
                         flags |= FLAGS_UPPERCASE;
                     idx = _etoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
-                    format++;
+                    f   = *++format;
                     break;
-#    endif  // PRINTF_SUPPORT_EXPONENTIAL
-#endif      // PRINTF_SUPPORT_FLOAT
                 case 'c':
                 {
                     u32 l = 1U;
@@ -936,7 +944,7 @@ namespace ncore
                             out(" ", 1, buffer, idx, maxlen);
                         }
                     }
-                    format++;
+                    f = *++format;
                     break;
                 }
 
@@ -970,7 +978,7 @@ namespace ncore
                             out(" ", 1, buffer, idx, maxlen);
                         }
                     }
-                    format++;
+                    f = *++format;
                     break;
                 }
 
@@ -991,18 +999,18 @@ namespace ncore
 #if defined(PRINTF_SUPPORT_LONG_LONG)
                     }
 #endif
-                    format++;
+                    f = *++format;
                     break;
                 }
 
                 case '%':
                     out("%", 1, buffer, idx, maxlen);
-                    format++;
+                    f = *++format;
                     break;
 
                 default:
                     out(format, 1, buffer, idx, maxlen);
-                    format++;
+                    f = *++format;
                     break;
             }
         }

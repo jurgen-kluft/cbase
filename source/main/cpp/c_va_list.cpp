@@ -7,20 +7,18 @@ namespace ncore
 {
     const va_t va_t::sEmpty;
 
-    va_t::va_t(const char* inVar)
-        : mArg3(TYPE_PCRUNES)
+    va_t::va_t(const char* inVar) : mArg3(TYPE_PCRUNES)
     {
         mArg = (u64)inVar;
         mArg3 |= ascii::TYPE;
         mArg2 = ascii::strlen(inVar);
     }
 
-    va_t::va_t(const wchar_t* inVar)
-        : mArg3(TYPE_PCRUNES)
+    va_t::va_t(const wchar_t* inVar) : mArg3(TYPE_PCRUNES)
     {
         mArg = (u64)inVar;
         mArg3 |= ascii::TYPE;
-        mArg2 = 0;
+        mArg2             = 0;
         const wchar_t* it = inVar;
         while (*it != L'\0')
         {
@@ -29,8 +27,7 @@ namespace ncore
         }
     }
 
-    va_t::va_t(crunes_t const& str)
-        : mArg3(TYPE_PCRUNES)
+    va_t::va_t(crunes_t const& str) : mArg3(TYPE_PCRUNES)
     {
         switch (str.m_ascii.m_flags & 0x0F)
         {
@@ -61,6 +58,26 @@ namespace ncore
             default: break;
         }
         mArg2 = str.m_ascii.m_end - str.m_ascii.m_str;
+    }
+
+    char va_t::specifier() const 
+    {
+        switch (mArg3 & TYPE_MASK)
+        {
+            case TYPE_BOOL:    return 'b';
+            case TYPE_UINT32:  return 'u';
+            case TYPE_INT32:   return 'd';
+            case TYPE_UINT8:   return 'u';
+            case TYPE_INT8:    return 'd';
+            case TYPE_UINT16:  return 'u';
+            case TYPE_INT16:   return 'd';
+            case TYPE_UINT64:  return 'u';
+            case TYPE_INT64:   return 'd';
+            case TYPE_FLOAT32: return 'f';
+            case TYPE_FLOAT64: return 'f';
+            case TYPE_PCRUNES: return 's';
+            default:           return 's';
+        }
     }
 
     void va_t::convertToRunes(runes_t& str) const
@@ -126,7 +143,7 @@ namespace ncore
                 copy(ch, str);
             }
             break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
     }
 
@@ -207,7 +224,7 @@ namespace ncore
                 parse(ch, i);
             }
             break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return i;
@@ -266,7 +283,7 @@ namespace ncore
                 parse(ch, i);
             }
             break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return i;
@@ -320,7 +337,7 @@ namespace ncore
                 parse(ch, i);
             }
             break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return i;
@@ -374,7 +391,7 @@ namespace ncore
                 parse(ch, i);
             }
             break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return i;
@@ -430,7 +447,7 @@ namespace ncore
             }
             break;
 
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return i != 0;
@@ -445,7 +462,7 @@ namespace ncore
                 crunes_t ch((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 return ch;
             }
-            default: break; // Fall through
+            default: break;  // Fall through
         };
         return crunes_t();
     }
@@ -468,7 +485,7 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -496,7 +513,7 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -524,7 +541,7 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -552,7 +569,7 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -580,7 +597,7 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = (s64)rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -602,7 +619,7 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = (s64)rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -624,7 +641,7 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = rhs ? 1 : 0; break;
             case TYPE_FLOAT32: *((f32*)mRef) = rhs ? 1.0f : 0.0f; break;
             case TYPE_FLOAT64: *((f64*)mRef) = rhs ? 1.0 : 0.0; break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -647,7 +664,7 @@ namespace ncore
             case TYPE_FLOAT32: parse(rhs, *((f32*)mRef)); break;
             case TYPE_FLOAT64: parse(rhs, *((f64*)mRef)); break;
             case TYPE_PRUNES: break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -670,7 +687,7 @@ namespace ncore
             case TYPE_FLOAT32: *((f32*)mRef) = rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = rhs; break;
             case TYPE_PRUNES: rhs.convertToRunes(*(runes_t*)mRef); break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
@@ -695,10 +712,10 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
-            default: break; // Fall through
+            default: break;  // Fall through
         };
 
         return *this;
     }
 
-}; // namespace ncore
+};  // namespace ncore
