@@ -171,6 +171,12 @@ namespace ncore
                 tbl_line(state_, bd, bc, {Border::Single | Border::Bottom});
             }
 
+            const wchar_t* str_utf16()
+            {
+                row_to_utf16((utf16::prune)row_utf8_, (utf16::pcrune)&row_utf8_[W * 3 - 3]);
+                return ((const wchar_t*)row_utf8_);
+            }
+
             const char* str_utf8()
             {
                 row_to_utf8(row_utf8_, &row_utf8_[W * 3 - 3]);

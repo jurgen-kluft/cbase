@@ -21,21 +21,35 @@ namespace ncore
             }
         }
 
+        static const char* UpdateStringFormat(char* format, s8 width)
+        {
+            const s8 tens = width / 10;
+            const s8 ones = width - tens * 10;
+            s8 i = 0;
+            format[i++] = '%';
+            if (tens > 0)
+                format[i++] = '0' + tens;
+            format[i++] = '0' + ones;
+            format[i++] = 'v';
+            format[i++] = '\0';
+            return format + i;
+        }
+
         void tbl_format(tbl_state_t& state, va_t const* argv, s32 argc)
         {
             tbl_line(state, nullptr, 0, Border{Border::Single | Border::LSR});
             if (argc <= 0)
                 return;
 
-            const char* format_begin = "%20v";
-            const char* format_end   = format_begin + 4;
-            crunes_t    format(format_begin, format_end);
-
             // print each arg in their cell
-            s32 offset = 0;
+            s32  offset = 0;
+            char format_begin[8];
             for (s32 i = 0; i < argc; ++i)
             {
                 offset += 2;
+
+                const char* format_end = UpdateStringFormat(format_begin, state.widths_[i]);
+                crunes_t    format(format_begin, format_end);
 
                 runes_writer_t writer(state.row_ + offset, state.row_ + offset + state.widths_[i]);
                 s32            n       = vzprintf(writer, format, argv + i, 1);
