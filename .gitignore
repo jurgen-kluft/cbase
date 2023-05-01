@@ -6,7 +6,9 @@ vendor/
 t2-output/
 target/
 zig-cache/
-tags
+tags/
+.idea/
+cmake-build-debug/
 
 #except the following files
 !.gitignore
@@ -36,4 +38,5 @@ tags
 !*.ini
 !*.bat
 
-#except the following folders
+#except do ignore the following files
+CMakeLists.txt
