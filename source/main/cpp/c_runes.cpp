@@ -3646,21 +3646,21 @@ namespace ncore
     runes_writer_t::runes_writer_t(utf8::prune str, utf8::prune str_end)
     {
         u32 const len = (u32)(str_end - str);
-        m_runes       = runes_t(str, 0, len, len, ascii::TYPE);
+        m_runes       = runes_t(str, 0, len, len, utf8::TYPE);
         m_cursor      = 0;
         m_count       = 0;
     }
     runes_writer_t::runes_writer_t(utf16::prune str, utf16::prune str_end)
     {
         u32 const len = (u32)(str_end - str);
-        m_runes       = runes_t(str, 0, len, len, ascii::TYPE);
+        m_runes       = runes_t(str, 0, len, len, utf16::TYPE);
         m_cursor      = 0;
         m_count       = 0;
     }
     runes_writer_t::runes_writer_t(utf32::prune str, utf32::prune str_end)
     {
         u32 const len = (u32)(str_end - str);
-        m_runes       = runes_t(str, 0, len, len, ascii::TYPE);
+        m_runes       = runes_t(str, 0, len, len, utf32::TYPE);
         m_cursor      = 0;
         m_count       = 0;
     }
