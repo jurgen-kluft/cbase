@@ -89,7 +89,7 @@ namespace ncore
 
         // find the bit position/index of the first bit from high to low
         // If 'integer == 0' this function will return -1
-        inline s8 findLastBit(u8 integer) { return 7 - countLeadingZeros(integer); }
+        inline s8 findLastBit(u8 integer) { return countLeadingZeros(integer); }
 
         // find the bit position/index of the first bit from low to high
         // If 'integer == 0' this function will return
@@ -102,7 +102,7 @@ namespace ncore
 
         // find the bit position/index of the first bit from high to low
         // If 'integer == 0' this function will return -1
-        inline s8 findLastBit(u16 integer) { return 15 - countLeadingZeros(integer); }
+        inline s8 findLastBit(u16 integer) { return countLeadingZeros(integer); }
 
         // find the bit position/index of the first bit from low to high
         // If 'integer == 0' this function will return -1
@@ -115,7 +115,7 @@ namespace ncore
 
         // find the bit position/index of the first bit from high to low
         // If 'integer == 0' this function will return -1
-        inline s8 findLastBit(u32 integer) { return 31 - countLeadingZeros(integer); }
+        inline s8 findLastBit(u32 integer) { return countLeadingZeros(integer); }
 
         // find the bit position/index of the first bit from low to high
         // If 'integer == 0' this function will return 0
@@ -128,7 +128,7 @@ namespace ncore
 
         // find the bit position/index of the first bit from high to low
         // If 'integer == 0' this function will return -1
-        inline s8 findLastBit(u64 integer) { return 63 - countLeadingZeros(integer); }
+        inline s8 findLastBit(u64 integer) { return countLeadingZeros(integer); }
 
         /**
          * count one bits in 32 bit word

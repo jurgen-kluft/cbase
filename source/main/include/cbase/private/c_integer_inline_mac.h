@@ -48,7 +48,7 @@ namespace ncore
             if (integer == 0)
                 return 8;
             s8 count = __builtin_clz(integer);
-            return count - 8;
+            return count-24;
         }
         // find the number of leading zeros in 16-bit v
         // if 'v==0' this function returns 16
@@ -57,7 +57,7 @@ namespace ncore
             if (integer == 0)
                 return 16;
             s8 count = __builtin_clz(integer);
-            return count - 16;
+            return count-16;
         }
         // find the number of leading zeros in 32-bit v
         // if 'v==0' this function returns 32
@@ -115,8 +115,10 @@ namespace ncore
         }
 
         // find the bit position/index of the first bit from high to low
-        // If 'integer == 0' this function will return -1
-        inline s8 findLastBit(u8 integer) { return 7 - countLeadingZeros(integer); }
+        // If 'integer == 0' this function will return 8
+        // If 'integer == 0x01' this function will return 0
+        // If 'integer == 0x80' this function will return 7
+        inline s8 findLastBit(u8 integer) { return countLeadingZeros(integer); }
 
         // find the bit position/index of the first bit from low to high
         // If 'integer == 0' this function will return -1
@@ -128,8 +130,10 @@ namespace ncore
         }
 
         // find the bit position/index of the first bit from high to low
-        // If 'integer == 0' this function will return -1
-        inline s8 findLastBit(u16 integer) { return 15 - countLeadingZeros(integer); }
+        // If 'integer == 0' this function will return 16
+        // If 'integer == 0x01' this function will return 15
+        // If 'integer == 0x8000' this function will return 0
+        inline s8 findLastBit(u16 integer) { return countLeadingZeros(integer); }
 
         // find the bit position/index of the first bit from low to high
         // If 'integer == 0' this function will return -1
@@ -141,8 +145,10 @@ namespace ncore
         }
 
         // find the bit position/index of the first bit from high to low
-        // If 'integer == 0' this function will return -1
-        inline s8 findLastBit(u32 integer) { return 31 - countLeadingZeros(integer); }
+        // If 'integer == 0' this function will return 32
+        // If 'integer == 0x00000001' this function will return 31
+        // If 'integer == 0x80000000' this function will return 0
+        inline s8 findLastBit(u32 integer) { return countLeadingZeros(integer); }
 
         // find the bit position/index of the first bit from low to high
         // If 'integer == 0' this function will return 0
@@ -154,69 +160,31 @@ namespace ncore
         }
 
         // find the bit position/index of the first bit from high to low
-        // If 'integer == 0' this function will return -1
-        inline s8 findLastBit(u64 integer) { return 63 - countLeadingZeros(integer); }
+        // If 'integer == 0' this function will return 64
+        // If 'integer == 0x0000000000000001' this function will return 63
+        // If 'integer == 0x8000000000000000' this function will return 0
+        inline s8 findLastBit(u64 integer) { return countLeadingZeros(integer); }
 
-        /**
-         * count one bits in 32 bit word
-         */
         inline s8 countBits(u8 inInteger)
         {
-            // inInteger -= ((inInteger >> 1) & 0x55555555);
-            // inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
-            // inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
-            // return (s8)(inInteger & 0x0000003f);
             u32 i = inInteger;
             return __builtin_popcount(i);
         }
 
-        /**
-         * count one bits in 32 bit word
-         */
         inline s8 countBits(u16 inInteger)
         {
-            // inInteger -= ((inInteger >> 1) & 0x55555555);
-            // inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
-            // inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
-            // inInteger += (inInteger >> 8);
-            // return (s8)(inInteger & 0x0000003f);
             u32 i = inInteger;
             return __builtin_popcount(i);
         }
 
-        /**
-         * count one bits in 32 bit word
-         */
         inline s8 countBits(u32 inInteger)
         {
-            // inInteger -= ((inInteger >> 1) & 0x55555555);
-            // inInteger = (((inInteger >> 2) & 0x33333333) + (inInteger & 0x33333333));
-            // inInteger = (((inInteger >> 4) + inInteger) & 0x0f0f0f0f);
-            // inInteger += (inInteger >> 8);
-            // inInteger += (inInteger >> 16);
-            // return (s8)(inInteger & 0x0000003f);
             u32 i = inInteger;
             return __builtin_popcount(i);
         }
 
-        /**
-         * count one bits in 64 bit word
-         */
         inline s8 countBits(u64 inInteger)
         {
-            // u32 high = (u64(inInteger) >> 32) & 0xffffffff;
-            // high -= ((high >> 1) & 0x55555555);
-            // high = (((high >> 2) & 0x33333333) + (high & 0x33333333));
-            // high = (((high >> 4) + high) & 0x0f0f0f0f);
-            // high += (high >> 8);
-            // high += (high >> 16);
-            // u32 low = inInteger & 0xffffffff;
-            // low -= ((low >> 1) & 0x55555555);
-            // low = (((low >> 2) & 0x33333333) + (low & 0x33333333));
-            // low = (((low >> 4) + low) & 0x0f0f0f0f);
-            // low += (low >> 8);
-            // low += (low >> 16);
-            // return (s8)(low & 0x0000003f) + (s8)(high & 0x0000003f);
             u64 i = inInteger;
             return __builtin_popcountll(i);
         }

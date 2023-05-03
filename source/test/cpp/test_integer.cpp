@@ -294,12 +294,28 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			CHECK_EQUAL(-1, math::findFirstBit(c));
 		}
 
-		UNITTEST_TEST(FindLastBit)
+		UNITTEST_TEST(FindLastBit_u16)
+		{
+			u16 a = 12, b = 64, c = 0;
+			CHECK_EQUAL(15-3 , math::findLastBit(a));
+			CHECK_EQUAL(15-6 , math::findLastBit(b));
+			CHECK_EQUAL(16, math::findLastBit(c));
+		}
+
+		UNITTEST_TEST(FindLastBit_u32)
 		{
 			u32 a = 12, b = 64, c = 0;
-			CHECK_EQUAL(3 , math::findLastBit(a));
-			CHECK_EQUAL(6 , math::findLastBit(b));
-			CHECK_EQUAL(-1, math::findLastBit(c));
+			CHECK_EQUAL(31-3 , math::findLastBit(a));
+			CHECK_EQUAL(31-6 , math::findLastBit(b));
+			CHECK_EQUAL(32, math::findLastBit(c));
+		}
+
+		UNITTEST_TEST(FindLastBit_u64)
+		{
+			u64 a = 12, b = 64, c = 0;
+			CHECK_EQUAL(63-3 , math::findLastBit(a));
+			CHECK_EQUAL(63-6 , math::findLastBit(b));
+			CHECK_EQUAL(64, math::findLastBit(c));
 		}
 
 		UNITTEST_TEST(Rol32)
