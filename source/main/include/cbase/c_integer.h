@@ -73,6 +73,7 @@ namespace ncore
         inline u32  alignUp(u32 integer, u32 alignment);   ///< Return the aligned value of integer
         inline u64  alignUp(u64 integer, u64 alignment);   ///< Return the aligned value of integer
         inline bool isAligned(u32 integer, u32 alignment); ///< Return True if integer is aligned
+        inline bool isAligned(u64 integer, u32 alignment); ///< Return True if integer is aligned
 
         inline s32  abs(s32 integer);                     ///< Return the absolute value of integer
         inline s32  neg(s32 integer, bool inDoNotNegate); ///< Return the conditionally negated value of integer

@@ -104,6 +104,12 @@ namespace ncore
             return integer == ((integer) & (~(alignment - 1)));
         }
 
+        inline bool isAligned(u64 integer, u32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            return integer == ((integer) & (~((u64)alignment - 1)));
+        }
+
         /**
          * Return the absolute value of integer
          */

@@ -1,7 +1,7 @@
 /**
 * @file Head file x_uint64.h
 *
-* xCore custom 64 bit unsigned integer.
+* ccore custom 64 bit unsigned integer.
 */
 
 #ifndef __CBASE_64_BIT_UNSIGNED_INTEGER_H__
@@ -15,7 +15,7 @@
 
 
 /**
- * xCore namespace
+ * ccore namespace
  */
 namespace ncore
 {
@@ -276,11 +276,11 @@ namespace ncore
 
 
 	//==============================================================================
-	// END xCore namespace
+	// END ccore namespace
 	//==============================================================================
 };
 /**
- *  END xCore namespace
+ *  END ccore namespace
  */
 
 #endif

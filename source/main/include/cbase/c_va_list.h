@@ -721,18 +721,18 @@ namespace ncore
         va_r_t mArg[16];
     };
 
-#define X_VA_ARGS_16                                                                                                                                                                                                                                      \
+#define D_VA_ARGS_16                                                                                                                                                                                                                                      \
     const va_t &v1, const va_t &v2, const va_t &v3, const va_t &v4, const va_t &v5, const va_t &v6, const va_t &v7, const va_t &v8, const va_t &v9, const va_t &v10, const va_t &v11, const va_t &v12, const va_t &v13, const va_t &v14, const va_t &v15, \
       const va_t &v16
-#define X_VA_ARGS_16_DEF                                                                                                                                                                                                                                      \
+#define D_VA_ARGS_16_DEF                                                                                                                                                                                                                                      \
     const va_t &v1, const va_t &v2 = va_t::sEmpty, const va_t &v3 = va_t::sEmpty, const va_t &v4 = va_t::sEmpty, const va_t &v5 = va_t::sEmpty, const va_t &v6 = va_t::sEmpty, const va_t &v7 = va_t::sEmpty, const va_t &v8 = va_t::sEmpty,                  \
                                const va_t &v9 = va_t::sEmpty, const va_t &v10 = va_t::sEmpty, const va_t &v11 = va_t::sEmpty, const va_t &v12 = va_t::sEmpty, const va_t &v13 = va_t::sEmpty, const va_t &v14 = va_t::sEmpty, const va_t &v15 = va_t::sEmpty, \
                                const va_t &v16 = va_t::sEmpty
 
-#define X_VA_R_ARGS_16                                                                                                                                                                                                                            \
+#define D_VA_R_ARGS_16                                                                                                                                                                                                                            \
     const va_r_t &v1, const va_r_t &v2, const va_r_t &v3, const va_r_t &v4, const va_r_t &v5, const va_r_t &v6, const va_r_t &v7, const va_r_t &v8, const va_r_t &v9, const va_r_t &v10, const va_r_t &v11, const va_r_t &v12, const va_r_t &v13, \
       const va_r_t &v14, const va_r_t &v15, const va_r_t &v16
-#define X_VA_R_ARGS_16_DEF                                                                                                                                                                                                                               \
+#define D_VA_R_ARGS_16_DEF                                                                                                                                                                                                                               \
     const va_r_t &v1, const va_r_t &v2 = va_r_t::sEmpty, const va_r_t &v3 = va_r_t::sEmpty, const va_r_t &v4 = va_r_t::sEmpty, const va_r_t &v5 = va_r_t::sEmpty, const va_r_t &v6 = va_r_t::sEmpty, const va_r_t &v7 = va_r_t::sEmpty,                  \
                                    const va_r_t &v8 = va_r_t::sEmpty, const va_r_t &v9 = va_r_t::sEmpty, const va_r_t &v10 = va_r_t::sEmpty, const va_r_t &v11 = va_r_t::sEmpty, const va_r_t &v12 = va_r_t::sEmpty, const va_r_t &v13 = va_r_t::sEmpty, \
                                    const va_r_t &v14 = va_r_t::sEmpty, const va_r_t &v15 = va_r_t::sEmpty, const va_r_t &v16 = va_r_t::sEmpty

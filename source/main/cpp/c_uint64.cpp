@@ -1,6 +1,6 @@
 /**
 * @file x_uint64.cpp
-* xCore custom 64 bit unsigned integer
+* ccore custom 64 bit unsigned integer
 */
 
 #include "cbase/c_target.h"

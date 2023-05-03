@@ -52,7 +52,7 @@ namespace ncore
         return vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
     }
 
-    s32 sscanf(crunes_t& str, crunes_t const& format, X_VA_R_ARGS_16_DEF);
+    s32 sscanf(crunes_t& str, crunes_t const& format, D_VA_R_ARGS_16_DEF);
     s32 vsscanf(crunes_t& str, crunes_t const& format, const va_r_list_t& vr_args);
 
 }  // namespace ncore

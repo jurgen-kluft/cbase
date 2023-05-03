@@ -21,7 +21,7 @@ namespace ncore
 	 *     these macros toggle when the system native Endian does NOT match the macro 
 	 *     name, and do nothing when the system native does match the macro name.
 	 * See Also:
-	 *     D_LITTLE_ENDIAN D_BIG_ENDIAN X_INTEL_ENDIAN
+	 *     D_LITTLE_ENDIAN D_BIG_ENDIAN D_INTEL_ENDIAN
 	 */
 	namespace x_endian_swap
 	{

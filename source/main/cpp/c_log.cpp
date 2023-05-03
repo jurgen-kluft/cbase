@@ -191,7 +191,7 @@ namespace ncore
 	 * Description:
 	 *     The function outputs log message. It works like x_printf except:
 	 *     (a)The output goes to the debugger if possible.
-	 *     (b)It only works when X_DEBUG is defined.
+	 *     (b)It only works when D_DEBUG is defined.
 	 *     (c)Add necessary information like file name before message.
 	 * See Also:
 	 *     __x_LogWarning, __x_LogError
@@ -232,7 +232,7 @@ namespace ncore
 	 * Description:
 	 *     The function outputs log warning. It works like x_printf except:
 	 *     (a)The output goes to the debugger if possible.
-	 *     (b)It only works when X_DEBUG is defined.
+	 *     (b)It only works when D_DEBUG is defined.
 	 *     (c)Add necessary information like file name before warning.
 	 * See Also:
 	 *     __x_LogError, __x_LogMessage
@@ -273,7 +273,7 @@ namespace ncore
 	 * Description:
 	 *     The function outputs log error. It works like x_printf except:
 	 *     (a)The output goes to the debugger if possible.
-	 *     (b)It only works when X_DEBUG is defined.
+	 *     (b)It only works when D_DEBUG is defined.
 	 *     (c)Add necessary information like file name before error.
 	 * See Also:
 	 *     __x_LogWarning, __x_LogMessage

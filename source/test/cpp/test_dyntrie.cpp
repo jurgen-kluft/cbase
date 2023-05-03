@@ -330,6 +330,8 @@ namespace ncore
         }
 
         // start and end are not in the same byte
+
+        // head
         {
             const u8 byte1 = key1[byte_start];
             const u8 byte2 = key2[byte_start];
@@ -352,6 +354,7 @@ namespace ncore
             }
         }
 
+        // tail
         {
             const u8 byte1 = key1[byte_end];
             const u8 byte2 = key2[byte_end];

@@ -7,7 +7,7 @@
 
 #include "cbase/c_debug.h"
 
-#ifndef X_NO_CUSTOM_UINT128
+#ifndef D_NO_CUSTOM_UINT128
 #include "cbase/private/c_uint128.h"
 #endif
 

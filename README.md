@@ -12,15 +12,15 @@ Cross platform base library
   - debug (assert)
   - endian
   - hierarchical bitset (hbb_t)
-  - integer
-  - limits
-  - log
+  - integer (min/max, clamp, align, ilog2, findLastBit, findFirstBit, countBits, countTrailingZeros/countLeadingZeros)
+  - limits (minimum/maximum value of system types)
+  - log (logging to console)
   - printf / sprintf
   - random (interface)
   - runes (ascii, utf-8, utf-16, utf-32) and many string manipulation functions
+  - low-level string functions
   - singleton
   - slice
   - sort
   - tls
-  - low-level string functions
-  - va-list
+  - va-list (va_t)
