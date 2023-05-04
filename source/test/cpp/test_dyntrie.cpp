@@ -20,66 +20,123 @@ namespace ncore
 
     struct dynnode_t  // 12 bytes
     {
-        inline bool is_value(s32 i) const { return (m_branch[i] & 0x80000000) == 0; }
-        inline bool is_node(s32 i) const { return !is_value(i); }
-        inline void mark_value(s32 i) { m_branch[i] &= 0x7fffffff; }
-        inline void mark_node(s32 i) { m_branch[i] |= 0x80000000; }
-
-        inline u32 branch(s32 i) const { return (m_branch[i] & 0x00ffffff); }
-        inline u32 key() const { return (m_bit_key & 0x00ffffff); }
-        inline u32 key_len() const { return (m_bit_key & 0xff000000) >> 24; }
-        inline s32 bit() const { return (m_branch[0] & 0x7f000000) >> (1 + 16) | (m_branch[1] & 0x7f000000) >> 24; }
-
-        inline void set_branch(s32 i, s32 branch) { m_branch[i] = (m_branch[i] & 0xff000000) | (branch & 0x00ffffff); }
-        inline void set_bit(s16 bit)
+        inline void reset()
         {
-            m_branch[0] = (m_branch[0] & 0x80ffffff) | ((bit & 0x00003f80) << (1 + 16));
-            m_branch[1] = (m_branch[1] & 0x80ffffff) | ((bit & 0x0000007f) << 24);
+            m_branch[0] = 0;
+            m_branch[1] = 0;
+            m_key_index = 0;
         }
-        inline void set_key(s32 key, s8 keylen)
+        inline bool is_value(s8 i) const { return (m_branch[i] & 0x80000000) == 0; }
+        inline bool is_node(s8 i) const { return (m_branch[i] & 0x80000000) == 0x80000000; }
+        inline void mark_value(s8 i) { m_branch[i] &= 0x7fffffff; }
+        inline void mark_node(s8 i) { m_branch[i] |= 0x80000000; }
+
+        inline u32 branch(s8 i) const { return (m_branch[i] & 0x00ffffff); }
+        inline u32 key() const { return (m_key_index & 0x00ffffff); }
+        inline u16 bit() const { return ((m_branch[0] & 0x0f000000) >> (24 - 8)) | ((m_branch[1] & 0x0f000000) >> (24 - 4)) | ((m_key_index & 0x0f000000) >> 24); }
+
+        inline void set_branch(s8 i, u32 index) { m_branch[i] = (m_branch[i] & 0xff000000) | (index & 0x00ffffff); }
+        inline void set_bit(u16 bit)
         {
-            m_bit_key = (m_bit_key & 0xff000000) | (key & 0x00ffffff);
-            m_bit_key = (m_bit_key & 0x00ffffff) | ((keylen & 0x000000ff) << 24);
+            m_branch[0] = (m_branch[0] & 0x80ffffff) | ((bit & 0x00000f00) << (24 - 8));
+            m_branch[1] = (m_branch[1] & 0x80ffffff) | ((bit & 0x000000f0) << (24 - 4));
+            m_key_index = (m_key_index & 0x00ffffff) | ((bit & 0x0000000f) << 24);
         }
+        inline void set_key(u32 key_index) { m_key_index = (m_key_index & 0xff000000) | (key_index & 0x00ffffff); }
 
         u32 m_branch[2];  // left/right (node or value (1 bit) : bit-index (7 bits) : 'node or value'-index (24 bits))
-        u32 m_bit_key;    // key-len (8 bits) : key-index (24 bits)
+        u32 m_key_index;  // key-index (24 bits)
     };
 
-    static s32  get_bit(s8 keylen, dynkey_t key, s32 bit) { ASSERT((bit>>3)<keylen); return (key[(bit >> 3)] & (0x80 >> (bit & 0x07))) ? 1 : 0; }
-    static s32  ffs_bit(u8 byte);
-    static bool compare_keys(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start);
-    static s32  findfirst_bit_range(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start, s32 bit_end, dynkey_t nullkey);
-    static s32  findfirst_bit_range_fixedkey(s8 keylen, dynkey_t key1, dynkey_t key2, s32 bit_start, s32 bit_end);
+    static s8 get_bit(u8 keylen, dynkey_t key, u16 bit)
+    {
+        ASSERT((bit >> 3) < keylen);
+        return (key[(bit >> 3)] & (0x80 >> (bit & 0x07))) ? (s8)1 : (s8)0;
+    }
+    static u16  ffs_bit(u8 byte);
+    static bool compare_keys(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start);
+    static u16  findfirst_bit_range(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start, u16 bit_end, dynkey_t nullkey);
+    static u16  findfirst_bit_range_fixedkey(u8 keylen, dynkey_t key1, dynkey_t key2, u16 bit_start, u16 bit_end);
 
     // Trie data structure where the key is a variable length byte array (strings, etc..)
     // No hashing
     // Lookup/Insert is O(Log2(N)) where N is the number of items in the trie, the key length is not so much
     // a factor in that the key range is visited in a range by range forward fashion.
     // NOTE: We could also have a version where the keys are fixed length (byte sized) which would be faster.
-    // NOTE: This node could even be 8 bytes if the total amount of items is less than 2^16.
     class dyntrie_t
     {
     public:
-        inline dyntrie_t() : m_root(nullptr), m_key(nullptr), m_value(nullptr), m_count(0), m_capacity(1024) {}
+        inline dyntrie_t()
+            : m_root(nullptr)
+            , m_count(0)
+            , m_capacity(1024)
+            , m_node_head_index(0xffffffff)
+            , m_node_free_index(0)
+            , m_node_count(0)
+        {
+        }
 
-        bool insert(s8 keylen, dynkey_t key, dynval_t value);
-        bool find(s8 keylen, dynkey_t key, dynval_t& value) const;
-        bool remove(s8 keylen, dynkey_t key, dynval_t& value);
+        // initialize
+
+        // Key length unit is bytes
+        bool insert(u8 keylen, dynkey_t key, dynval_t value);
+        bool find(u8 keylen, dynkey_t key, dynval_t& value) const;
+        bool remove(u8 keylen, dynkey_t key, dynval_t& value);
 
     protected:
-        static const char s_nullkey[256];
-        dynnode_t*        m_root;
-        dynkey_t          m_key;
-        dynval_t          m_value;
-        s32               m_count;
-        s32               m_capacity;
-        dynnode_t         m_nodes[1024];   // the nodes
-        dynkey_t          m_keys[1024];    // pointers to keys, key/value are stored in pairs at the same index
-        dynval_t          m_values[1024];  // pointers to values
+        static const u8 s_nullkey[256];
+        dynnode_t*      m_root;
+        s32             m_count;
+        s32             m_capacity;
+
+        inline u32        node_to_index(const dynnode_t* node) const { return (u32)(node - m_nodes); }
+        inline dynnode_t* index_to_node(u32 index) { return &m_nodes[index]; }
+
+        dynnode_t* alloc_node()
+        {
+            if (m_node_head_index != 0xffffffff)
+            {
+                dynnode_t* node   = index_to_node(m_node_head_index);
+                m_node_head_index = node->key();
+                m_node_count++;
+                node->reset();
+                return node;
+            }
+            if (m_node_free_index < m_capacity)
+            {
+                m_node_count++;
+                dynnode_t* node = index_to_node(m_node_free_index++);
+                node->reset();
+                return node;
+            }
+            return nullptr;
+        }
+
+        void free_node(dynnode_t* node)
+        {
+            node->reset();
+            m_node_count--;
+            if (m_node_count == 0)
+            {
+                m_node_head_index = 0xffffffff;
+                m_node_free_index = 0;
+                return;
+            }
+            node->set_key(m_node_head_index);
+            m_node_head_index = node_to_index(node);
+        }
+
+        u32       m_node_head_index;  // head of the free node list
+        u32       m_node_free_index;  // initially we use this index to obtain a free node
+        u32       m_node_count;       // number of nodes allocated
+        dynnode_t m_nodes[1024];      // the nodes
+
+        dynkey_t m_keys[1024];     // pointers to keys, key/value are stored in pairs at the same index
+        u8       m_keylens[1024];  // lengths of keys, key/value are stored in pairs at the same index
+        dynval_t m_values[1024];   // pointers to values
     };
 
-    const char dyntrie_t::s_nullkey[256] = {0};
+    const u8 dyntrie_t::s_nullkey[256] = {0};
 
 };  // namespace ncore
 
@@ -95,7 +152,9 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
         struct XorRandom
         {
             u64 s0, s1;
-            inline XorRandom(u64 seed) : s0(seed), s1(0)
+            inline XorRandom(u64 seed)
+                : s0(seed)
+                , s1(0)
             {
                 next();
                 next();
@@ -150,7 +209,7 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
         {
             u8 key1[20];
             u8 key2[20];
-            
+
             MakeKey(key1, 20, 5);
             MakeKey(key2, 20, 5);
             CHECK_TRUE(compare_keys(20, key1, 20, key2, 0));
@@ -164,11 +223,11 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
             CHECK_TRUE(compare_keys(20, key1, 20, key2, 30));
         }
 
-        UNITTEST_TEST(findfirst_bit_range) 
+        UNITTEST_TEST(findfirst_bit_range)
         {
             u8 key1[20];
             u8 key2[20];
-            
+
             MakeKey(key1, 20, 10);
             MakeKey(key2, 20, 32);
 
@@ -178,7 +237,6 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
 
             CHECK_EQUAL(32, findfirst_bit_range(20, key1, 20, key2, 11, 60, s_nullkey));
         }
-
 
         UNITTEST_TEST(insert_find) {}
         UNITTEST_TEST(insert_find_1) {}
@@ -214,13 +272,13 @@ UNITTEST_SUITE_END
 
 namespace ncore
 {
-    s32 ffs_bit(u8 byte) { return math::findLastBit(byte); }
+    u16 ffs_bit(u8 byte) { return (u16)math::findLastBit(byte); }
 
     // nullkey is used to compare the key outside the range of a key
     // return:
     // - bit_end + 1 if the two keys are equal in the range
     // - bit_start + n if the two keys are different in the range and the n-th bit is different
-    s32 findfirst_bit_range(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start, s32 bit_end, dynkey_t nullkey)
+    u16 findfirst_bit_range(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start, u16 bit_end, dynkey_t nullkey)
     {
         // first we make sure that the key with the smaller length is key1
         if (keylen1 > keylen2)
@@ -229,7 +287,7 @@ namespace ncore
             g_swap(key1, key2);
         }
 
-        s32 byte_start = bit_start >> 3;
+        u16 byte_start = bit_start >> 3;
         if (byte_start > keylen1)
         {
             key1 = nullkey;
@@ -242,7 +300,7 @@ namespace ncore
             return bit_end + 1;
 
         // start and end are in the same byte
-        const s32 byte_end = bit_end >> 3;
+        const u16 byte_end = bit_end >> 3;
         if (byte_start == byte_end)
         {
             const u8 byte1 = key1[byte_start];
@@ -312,12 +370,12 @@ namespace ncore
         return bit_end + 1;
     }
 
-    s32 findfirst_bit_range_fixedkey(s8 keylen, dynkey_t key1, dynkey_t key2, s32 bit_start, s32 bit_end)
+    u16 findfirst_bit_range_fixedkey(u8 keylen, dynkey_t key1, dynkey_t key2, u16 bit_start, u16 bit_end)
     {
-        s32 byte_start = bit_start >> 3;
+        u16 byte_start = bit_start >> 3;
 
         // start and end are in the same byte
-        const s32 byte_end = bit_end >> 3;
+        const u16 byte_end = bit_end >> 3;
         if (byte_start == byte_end)
         {
             const u8 byte1 = key1[byte_start];
@@ -368,12 +426,12 @@ namespace ncore
         return bit_end + 1;
     }
 
-    bool compare_keys(s8 keylen1, dynkey_t key1, s8 keylen2, dynkey_t key2, s32 bit_start)
+    bool compare_keys(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start)
     {
         if (keylen1 != keylen2)
             return false;
 
-        s32 byte_start = bit_start >> 3;
+        u16 byte_start = bit_start >> 3;
 
         if ((bit_start & 7) != 0)
         {
@@ -401,119 +459,196 @@ namespace ncore
         return true;
     }
 
-    bool dyntrie_t::insert(s8 keylen, dynkey_t key, dynval_t value)
+    bool dyntrie_t::insert(u8 keylen, dynkey_t key, dynval_t value)
     {
         if (m_root == nullptr)
-            return false;
+        {
+            const u16  bit_diff2 = findfirst_bit_range(keylen, key, keylen, s_nullkey, 0, (keylen * 8) - 1, s_nullkey);
+            const s8   branch2   = get_bit(keylen, key, bit_diff2);
+            dynnode_t* new_node  = alloc_node();
 
-        dynnode_t* node      = m_root;
-        s32        bit_start = 0;
+            new_node->set_bit(bit_diff2);
+            if (bit_diff2 == keylen * 8)
+                new_node->set_bit(keylen * 8 - 1);
+
+            u32 const ki2  = m_count++;
+            m_keys[ki2]    = key;
+            m_keylens[ki2] = keylen;
+            m_values[ki2]  = value;
+
+            new_node->set_key(ki2);
+            new_node->set_branch(branch2, ki2);
+            new_node->set_branch(!branch2, 0xFFFFFF);  // max = 0xFFFFFF, so this is an invalid value/node index
+            new_node->mark_value(branch2);
+            new_node->mark_value(!branch2);
+
+            m_root = new_node;
+            return true;
+        }
+
+        dynnode_t* prevnode        = nullptr;
+        s8         prevnode_branch = -1;
+        dynnode_t* curnode         = m_root;
+        s8         curnode_branch  = -1;
+        u16        bit_start       = 0;
         while (true)
         {
-            const s32 bit_end     = node->bit();
-            const s32 bit_key     = node->key();
-            const s32 bit_key_len = node->key_len();
-            const s32 bit_key_end = bit_key + bit_key_len;
+            const u16 bit_end   = curnode->bit();
+            const u32 key_index = curnode->key();
 
-            const s32 bit_diff = findfirst_bit_range(keylen, key, bit_key_len, m_keys[bit_key], bit_start, bit_key_end, (dynkey_t)s_nullkey);
+            const u16 bit_diff = findfirst_bit_range(keylen, key, m_keylens[key_index], m_keys[key_index], bit_start, bit_end, s_nullkey);
             if (bit_diff == bit_end + 1)
             {
-                const s32 branch = get_bit(keylen, key, bit_diff);
-                if (node->is_value(branch))
+                const s8 branch = get_bit(keylen, key, bit_diff);
+                if (curnode->is_value(branch))
                 {
-                    dynkey_t k = m_keys[node->branch(branch)];
+                    const u32 ki = curnode->branch(branch);
+                    if (ki == 0xFFFFFF)
+                    {
+                        u32 const ki2  = m_count++;
+                        m_keys[ki2]    = key;
+                        m_keylens[ki2] = keylen;
+                        m_values[ki2]  = value;
+                        curnode->set_branch(branch, ki2);
+                        return true;
+                    }
+                    const dynkey_t k  = m_keys[ki];
+                    const u8       kl = m_keylens[ki];
 
                     // check if the incoming and the stored key are the same
-                    if (compare_keys(keylen, key, bit_key_len, k, bit_end))
+                    const u16 bit_diff2 = findfirst_bit_range(keylen, key, kl, k, bit_diff, 4096, s_nullkey);
+                    if (bit_diff2 == 4096)
                     {
+                        // the keys are the same
                         return false;
                     }
                     else
-                    {  // keys are not the same so we need to insert a new node
+                    {
+                        // keys are not the same so we need to insert a new node
+                        u32 const ki2  = m_count++;
+                        m_keys[ki2]    = key;
+                        m_keylens[ki2] = keylen;
+                        m_values[ki2]  = value;
 
-                        // TODO: insert a new node
-                        // create a new node
-                        // set the new node's key to the key of the current node
+                        const s8 branch2 = get_bit(keylen, key, bit_diff2);
+                        ASSERT(get_bit(kl, k, bit_diff2) == (1 - branch2));
 
-                        return false;
+                        dynnode_t* new_node = alloc_node();
+                        new_node->set_bit(bit_diff2);
+                        new_node->set_key(key_index);
+                        new_node->set_branch(branch2, ki2);
+                        new_node->set_branch(!branch2, ki);
+
+                        if (prevnode == nullptr)
+                        {
+                            m_root = new_node;
+                        }
+                        else
+                        {
+                            curnode->set_branch(branch, node_to_index(new_node));
+                            curnode->mark_node(branch);
+                        }
+
+                        return true;
                     }
                 }
                 else  // branch is a node, so we need to continue the search
                 {
-                    node      = &m_nodes[node->branch(branch)];
-                    bit_start = bit_diff;
+                    prevnode        = curnode;
+                    prevnode_branch = curnode_branch;
+                    curnode_branch  = curnode->branch(branch);
+                    curnode         = &m_nodes[curnode_branch];
+                    bit_start       = bit_diff;
                 }
             }
             else
             {
                 // we have found a bit that is within the [bit_start, bit_end] range and so
-                // we need to insert a node before this node
-                const u32 newkey_index = m_count++;
-                m_keys[newkey_index]   = key;
-                m_values[newkey_index] = value;
+                // we need to insert a new node at 'bit_diff'
+                const u32 newkey_index  = m_count++;
+                m_keys[newkey_index]    = key;
+                m_keylens[newkey_index] = keylen;
+                m_values[newkey_index]  = value;
 
-                dynnode_t* new_node = &m_nodes[newkey_index];
-                new_node->set_key(keylen, newkey_index);
+                //   From                  To
+                //
+                // prevnode              prevnode
+                //    |                     |
+                //    |                     v
+                //    |                  newnode (bit diff)
+                //    |                 /       \         
+                //    v                v         v
+                // curnode         curnode      value
+
+                const s8   branch   = get_bit(keylen, key, bit_diff);
+                dynnode_t* new_node = alloc_node();
+                new_node->set_key(newkey_index);
                 new_node->set_bit(bit_diff);
+                new_node->set_branch(1 - branch, node_to_index(curnode));
+                new_node->set_branch(branch, newkey_index);
+                new_node->mark_node(1 - branch);
+                new_node->mark_value(branch);
 
-                // figure out left/right of 'node' and set the new node's branches
+                // the prevnode should now point to the new node
+                prevnode->set_branch(curnode_branch, node_to_index(new_node));
 
                 return true;
             }
         }
     }
 
-    bool dyntrie_t::find(s8 keylen, dynkey_t key, dynval_t& value) const
+    bool dyntrie_t::find(u8 keylen, dynkey_t key, dynval_t& value) const
     {
         if (m_root == nullptr)
             return false;
 
         const dynnode_t* node      = m_root;
-        s32              bit_start = 0;
+        u16              bit_start = 0;
         while (true)
         {
-            const s32 bit_end     = node->bit();
-            const s32 bit_key     = node->key();
-            const s32 bit_key_len = node->key_len();
-            const s32 bit_key_end = bit_key + bit_key_len;
+            const u16 bit_end   = node->bit();
+            const u32 key_index = node->key();
 
-            const s32 bit_diff = findfirst_bit_range(keylen, key, bit_key_len, m_keys[bit_key], bit_start, bit_key_end, (dynkey_t)s_nullkey);
-            if (bit_diff == bit_key_end + 1)
+            const s32 bit_diff = findfirst_bit_range(keylen, key, m_keylens[key_index], m_keys[key_index], bit_start, bit_end, s_nullkey);
+            if (bit_diff == bit_end + 1)
             {
-                const s32 branch = get_bit(keylen, key, bit_diff);
+                const s8 branch = get_bit(keylen, key, bit_diff);
                 if (node->is_value(branch))
                 {
-                    dynkey_t k = m_keys[node->branch(branch)];
+                    const dynkey_t k  = m_keys[node->branch(branch)];
+                    const u8       kl = m_keylens[node->branch(branch)];
 
                     // check if the incoming and the stored key are the same
-                    if (compare_keys(keylen, key, bit_key_len, k, bit_start))
+                    if (compare_keys(keylen, key, kl, k, bit_start))
                     {
                         value = m_values[node->branch(branch)];
                         return true;
                     }
                     else
-                    {  // keys are not the same so we need to insert a new node
-                        // TODO: insert a new node
+                    {
+                        // keys are not the same, it doesn't exist
                         return false;
                     }
                 }
                 else  // branch is a node, so we need to continue the search
                 {
-                    const s32 branch = node->branch(branch);
-                    if (branch == 0)
+                    const u32 nodeIdx = node->branch(branch);
+                    if (nodeIdx == 0)
                         break;
-                    node      = &m_nodes[branch];
-                    bit_start = bit_diff + 1;
+                    node      = &m_nodes[nodeIdx];
+                    bit_start = bit_diff;
                 }
             }
             else
             {
+                // we have found a bit that is within the [bit_start, bit_end] range and so
+                // this means that the key doesn't exist
                 break;
             }
         }
         return false;
     }
 
-    bool dyntrie_t::remove(s8 keylen, dynkey_t key, dynval_t& value) { return false; }
+    bool dyntrie_t::remove(u8 keylen, dynkey_t key, dynval_t& value) { return false; }
 
 }  // namespace ncore
