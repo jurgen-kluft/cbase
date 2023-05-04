@@ -24,15 +24,15 @@ namespace ncore
     public:
         inline out_writer_t() {}
 
-        virtual bool        vwrite(uchar32 c)
+        virtual s32        vwrite(uchar32 c)
         {
             if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
                 vflush();
             m_write_to_console_cache += c;
-            return true;
+            return 1;
         }
 
-        virtual bool        vwrite(const char* str, const char* end)
+        virtual s32 vwrite(const char* str, const char* end)
         {
             vflush();
 
@@ -40,7 +40,7 @@ namespace ncore
             return write_ascii(src)!=0;
         }
 
-        virtual bool        vwrite(crunes_t const& str)
+        virtual s32 vwrite(crunes_t const& str)
         {
             vflush();
             
@@ -52,7 +52,7 @@ namespace ncore
                 default: //@todo: UTF-8
                     break;
             }
-            return true;
+            return 0;
         }
 
         virtual void vflush()
@@ -208,10 +208,10 @@ namespace ncore
             return 0;
         }
 
-        virtual s32 write(const crunes_t& str, const va_list_t& args)
+        virtual s32 write(const crunes_t& str, const va_t* argv, s32 argc)
         {
             out_writer_t dstwriter;
-            vzprintf(dstwriter, str, args);
+            vzprintf(dstwriter, str, argv, argc);
             return 0;
         }
     };

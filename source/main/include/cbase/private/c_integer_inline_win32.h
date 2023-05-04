@@ -1,5 +1,5 @@
 #include <intrin.h>
-#pragma intrinsic(_BitScanForward,_BitScanForward64,_BitScanReverse,_BitScanReverse64)
+#pragma intrinsic(_BitScanForward, _BitScanForward64, _BitScanReverse, _BitScanReverse64)
 
 namespace ncore
 {
@@ -40,16 +40,36 @@ namespace ncore
 
         // find the number of leading zeros in 8-bit v
         // if 'v==0' this function returns 8
-        inline s8 countLeadingZeros(u8 v) { return (s8)::__lzcnt(v); }
+        inline s8 countLeadingZeros(u8 v)
+        {
+            if (v == 0)
+                return 8;
+            return (s8)::__lzcnt16(v) - 8;
+        }
         // find the number of leading zeros in 16-bit v
         // if 'v==0' this function returns 16
-        inline s8 countLeadingZeros(u16 v) { return (s8)::__lzcnt16(v); }
+        inline s8 countLeadingZeros(u16 v)
+        {
+            if (v == 0)
+                return 16;
+            return (s8)::__lzcnt16(v);
+        }
         // find the number of leading zeros in 32-bit v
         // if 'v==0' this function returns 32
-        inline s8 countLeadingZeros(u32 v) { return (s8)::__lzcnt(v); }
+        inline s8 countLeadingZeros(u32 v)
+        {
+            if (v == 0)
+                return 32;
+            return (s8)::__lzcnt(v);
+        }
         // find the number of leading zeros in 64-bit v
         // if 'v==0' this function returns 64
-        inline s8 countLeadingZeros(u64 v) { return (s8)::__lzcnt64(v); }
+        inline s8 countLeadingZeros(u64 v)
+        {
+            if (v == 0)
+                return 64;
+            return (s8)::__lzcnt64(v);
+        }
 
         // Return v but with only the Least Significant Bit "1"
         inline u32 leastSignificantOneBit(u32 integer) { return (integer ^ (integer & (integer - 1))); }
@@ -153,5 +173,5 @@ namespace ncore
          * count one bits in 64 bit word
          */
         inline s8 countBits(u64 inInteger) { return (s8)__popcnt64(inInteger); }
-    } // namespace math
-}
+    }  // namespace math
+}  // namespace ncore

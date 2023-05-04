@@ -98,10 +98,22 @@ namespace ncore
         /**
          * Check if integer is aligned
          */
+        inline bool isAligned(s32 integer, u32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            return integer == ((integer) & (~(alignment - 1)));
+        }
+
         inline bool isAligned(u32 integer, u32 alignment)
         {
             ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
             return integer == ((integer) & (~(alignment - 1)));
+        }
+
+        inline bool isAligned(s64 integer, u32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            return integer == ((integer) & (~((u64)alignment - 1)));
         }
 
         inline bool isAligned(u64 integer, u32 alignment)
