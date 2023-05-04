@@ -22,41 +22,42 @@ namespace ncore
     {
         inline void reset()
         {
-            m_branch[0] = 0;
-            m_branch[1] = 0;
-            m_key_index = 0;
+            m_branch[0]  = 0;
+            m_branch[1]  = 0;
+            m_item_index = 0;
         }
         inline bool is_value(s8 i) const { return (m_branch[i] & 0x80000000) == 0; }
         inline bool is_node(s8 i) const { return (m_branch[i] & 0x80000000) == 0x80000000; }
         inline void mark_value(s8 i) { m_branch[i] &= 0x7fffffff; }
         inline void mark_node(s8 i) { m_branch[i] |= 0x80000000; }
 
-        inline u32 branch(s8 i) const { return (m_branch[i] & 0x00ffffff); }
-        inline u32 key() const { return (m_key_index & 0x00ffffff); }
-        inline u16 bit() const { return ((m_branch[0] & 0x0f000000) >> (24 - 8)) | ((m_branch[1] & 0x0f000000) >> (24 - 4)) | ((m_key_index & 0x0f000000) >> 24); }
+        inline u32  get_item_index() const { return (m_item_index & 0x00ffffff); }
+        inline void set_item_index(u32 node_item_index) { m_item_index = (m_item_index & 0xff000000) | (node_item_index & 0x00ffffff); }
 
+        inline u32  get_branch(s8 i) const { return (m_branch[i] & 0x00ffffff); }
         inline void set_branch(s8 i, u32 index) { m_branch[i] = (m_branch[i] & 0xff000000) | (index & 0x00ffffff); }
-        inline void set_bit(u16 bit)
-        {
-            m_branch[0] = (m_branch[0] & 0x80ffffff) | ((bit & 0x00000f00) << (24 - 8));
-            m_branch[1] = (m_branch[1] & 0x80ffffff) | ((bit & 0x000000f0) << (24 - 4));
-            m_key_index = (m_key_index & 0x00ffffff) | ((bit & 0x0000000f) << 24);
-        }
-        inline void set_key(u32 key_index) { m_key_index = (m_key_index & 0xff000000) | (key_index & 0x00ffffff); }
 
-        u32 m_branch[2];  // left/right (node or value (1 bit) : bit-index (7 bits) : 'node or value'-index (24 bits))
-        u32 m_key_index;  // key-index (24 bits)
+        inline u16  get_bit() const { return ((m_branch[0] & 0x0f000000) >> (24 - 8)) | ((m_branch[1] & 0x0f000000) >> (24 - 4)) | ((m_item_index & 0x0f000000) >> 24); }
+        inline void set_bit(u16 get_bit)
+        {
+            m_branch[0]  = (m_branch[0] & 0x80ffffff) | ((get_bit & 0x00000f00) << (24 - 8));
+            m_branch[1]  = (m_branch[1] & 0x80ffffff) | ((get_bit & 0x000000f0) << (24 - 4));
+            m_item_index = (m_item_index & 0x00ffffff) | ((get_bit & 0x0000000f) << 24);
+        }
+
+        u32 m_branch[2];   // left/right (node or value (1 get_bit) : get_bit-index (7 bits) : 'node or value'-index (24 bits))
+        u32 m_item_index;  // key-index (24 bits)
     };
 
-    static s8 get_bit(u8 keylen, dynkey_t key, u16 bit)
+    static s8 get_bit(u8 keylen, dynkey_t key, u16 get_bit)
     {
-        ASSERT((bit >> 3) < keylen);
-        return (key[(bit >> 3)] & (0x80 >> (bit & 0x07))) ? (s8)1 : (s8)0;
+        ASSERT((get_bit >> 3) < keylen);
+        return (key[(get_bit >> 3)] & (0x80 >> (get_bit & 0x07))) ? (s8)1 : (s8)0;
     }
     static u16  ffs_bit(u8 byte);
     static bool compare_keys(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start);
-    static u16  findfirst_bit_range(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start, u16 bit_end, dynkey_t nullkey);
-    static u16  findfirst_bit_range_fixedkey(u8 keylen, dynkey_t key1, dynkey_t key2, u16 bit_start, u16 bit_end);
+    static u16  findfirst_bit_range(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start, u16 node_bit_end, dynkey_t nullkey);
+    static u16  findfirst_bit_range_fixedkey(u8 keylen, dynkey_t key1, dynkey_t key2, u16 bit_start, u16 node_bit_end);
 
     // Trie data structure where the key is a variable length byte array (strings, etc..)
     // No hashing
@@ -97,7 +98,7 @@ namespace ncore
             if (m_node_head_index != 0xffffffff)
             {
                 dynnode_t* node   = index_to_node(m_node_head_index);
-                m_node_head_index = node->key();
+                m_node_head_index = node->get_item_index();
                 m_node_count++;
                 node->reset();
                 return node;
@@ -122,7 +123,7 @@ namespace ncore
                 m_node_free_index = 0;
                 return;
             }
-            node->set_key(m_node_head_index);
+            node->set_item_index(m_node_head_index);
             m_node_head_index = node_to_index(node);
         }
 
@@ -173,13 +174,13 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
         };
         static XorRandom s_rand(0x1234567890abcdef);
 
-        static void MakeKey(u8 * dst, u32 size, s32 bit)
+        static void MakeKey(u8 * dst, u32 size, s32 get_bit)
         {
             for (u32 i = 0; i < size; ++i)
             {
                 dst[i] = 0;
             }
-            dst[bit >> 3] |= 0x80 >> (bit & 0x07);
+            dst[get_bit >> 3] |= 0x80 >> (get_bit & 0x07);
         }
 
         UNITTEST_FIXTURE_SETUP() {}
@@ -276,9 +277,9 @@ namespace ncore
 
     // nullkey is used to compare the key outside the range of a key
     // return:
-    // - bit_end + 1 if the two keys are equal in the range
-    // - bit_start + n if the two keys are different in the range and the n-th bit is different
-    u16 findfirst_bit_range(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start, u16 bit_end, dynkey_t nullkey)
+    // - node_bit_end + 1 if the two keys are equal in the range
+    // - bit_start + n if the two keys are different in the range and the n-th get_bit is different
+    u16 findfirst_bit_range(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start, u16 node_bit_end, dynkey_t nullkey)
     {
         // first we make sure that the key with the smaller length is key1
         if (keylen1 > keylen2)
@@ -297,17 +298,17 @@ namespace ncore
             key2 = nullkey;
         }
         if (key1 == nullkey && key2 == nullkey)
-            return bit_end + 1;
+            return node_bit_end + 1;
 
         // start and end are in the same byte
-        const u16 byte_end = bit_end >> 3;
+        const u16 byte_end = node_bit_end >> 3;
         if (byte_start == byte_end)
         {
             const u8 byte1 = key1[byte_start];
             const u8 byte2 = key2[byte_start];
-            const u8 mask  = (0xFF >> (bit_start & 7)) & (0xFF << (7 - (bit_end & 7)));
+            const u8 mask  = (0xFF >> (bit_start & 7)) & (0xFF << (7 - (node_bit_end & 7)));
             if ((byte1 & mask) == (byte2 & mask))
-                return bit_end + 1;
+                return node_bit_end + 1;
 
             return (byte_start << 3) + ffs_bit((byte1 ^ byte2) & mask);
         }
@@ -347,7 +348,7 @@ namespace ncore
                 if (key2 != nullkey && (byte_start >= keylen2))
                     key2 = nullkey;
                 if (key1 == nullkey && key2 == nullkey)
-                    return bit_end + 1;
+                    return node_bit_end + 1;
                 const u8 byte1 = key1[byte_start];
                 const u8 byte2 = key2[byte_start];
                 if (byte1 != byte2)
@@ -360,29 +361,29 @@ namespace ncore
         {
             const u8 byte1 = key1[byte_end];
             const u8 byte2 = key2[byte_end];
-            const u8 mask  = 0xFF << (7 - (bit_end & 7));
+            const u8 mask  = 0xFF << (7 - (node_bit_end & 7));
             if ((byte1 & mask) != (byte2 & mask))
             {
                 return (byte_end << 3) + ffs_bit((byte1 ^ byte2) & mask);
             }
         }
 
-        return bit_end + 1;
+        return node_bit_end + 1;
     }
 
-    u16 findfirst_bit_range_fixedkey(u8 keylen, dynkey_t key1, dynkey_t key2, u16 bit_start, u16 bit_end)
+    u16 findfirst_bit_range_fixedkey(u8 keylen, dynkey_t key1, dynkey_t key2, u16 bit_start, u16 node_bit_end)
     {
         u16 byte_start = bit_start >> 3;
 
         // start and end are in the same byte
-        const u16 byte_end = bit_end >> 3;
+        const u16 byte_end = node_bit_end >> 3;
         if (byte_start == byte_end)
         {
             const u8 byte1 = key1[byte_start];
             const u8 byte2 = key2[byte_start];
-            const u8 mask  = (0xFF >> (bit_start & 7)) & (0xFF << (7 - (bit_end & 7)));
+            const u8 mask  = (0xFF >> (bit_start & 7)) & (0xFF << (7 - (node_bit_end & 7)));
             if ((byte1 & mask) == (byte2 & mask))
-                return bit_end + 1;
+                return node_bit_end + 1;
 
             return (byte_start << 3) + ffs_bit((byte1 ^ byte2) & mask);
         }
@@ -416,14 +417,14 @@ namespace ncore
         {
             const u8 byte1 = key1[byte_end];
             const u8 byte2 = key2[byte_end];
-            const u8 mask  = 0xFF << (7 - (bit_end & 7));
+            const u8 mask  = 0xFF << (7 - (node_bit_end & 7));
             if ((byte1 & mask) != (byte2 & mask))
             {
                 return (byte_end << 3) + ffs_bit((byte1 ^ byte2) & mask);
             }
         }
 
-        return bit_end + 1;
+        return node_bit_end + 1;
     }
 
     bool compare_keys(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start)
@@ -467,17 +468,16 @@ namespace ncore
             const s8   branch2   = get_bit(keylen, key, bit_diff2);
             dynnode_t* new_node  = alloc_node();
 
+            u32 const new_item_index  = m_count++;
+            m_keys[new_item_index]    = key;
+            m_keylens[new_item_index] = keylen;
+            m_values[new_item_index]  = value;
+
             new_node->set_bit(bit_diff2);
             if (bit_diff2 == keylen * 8)
                 new_node->set_bit(keylen * 8 - 1);
-
-            u32 const ki2  = m_count++;
-            m_keys[ki2]    = key;
-            m_keylens[ki2] = keylen;
-            m_values[ki2]  = value;
-
-            new_node->set_key(ki2);
-            new_node->set_branch(branch2, ki2);
+            new_node->set_item_index(new_item_index);
+            new_node->set_branch(branch2, new_item_index);
             new_node->set_branch(!branch2, 0xFFFFFF);  // max = 0xFFFFFF, so this is an invalid value/node index
             new_node->mark_value(branch2);
             new_node->mark_value(!branch2);
@@ -493,30 +493,30 @@ namespace ncore
         u16        bit_start       = 0;
         while (true)
         {
-            const u16 bit_end   = curnode->bit();
-            const u32 key_index = curnode->key();
+            const u16 node_bit_end    = curnode->get_bit();
+            const u32 node_item_index = curnode->get_item_index();
 
-            const u16 bit_diff = findfirst_bit_range(keylen, key, m_keylens[key_index], m_keys[key_index], bit_start, bit_end, s_nullkey);
-            if (bit_diff == bit_end + 1)
+            const u16 bit_diff = findfirst_bit_range(keylen, key, m_keylens[node_item_index], m_keys[node_item_index], bit_start, node_bit_end, s_nullkey);
+            if (bit_diff == node_bit_end + 1)
             {
-                const s8 branch = get_bit(keylen, key, bit_diff);
-                if (curnode->is_value(branch))
+                const s8 get_branch = get_bit(keylen, key, bit_diff);
+                if (curnode->is_value(get_branch))
                 {
-                    const u32 ki = curnode->branch(branch);
+                    const u32 ki = curnode->get_branch(get_branch);
                     if (ki == 0xFFFFFF)
                     {
-                        u32 const ki2  = m_count++;
-                        m_keys[ki2]    = key;
-                        m_keylens[ki2] = keylen;
-                        m_values[ki2]  = value;
-                        curnode->set_branch(branch, ki2);
+                        u32 const new_item_index  = m_count++;
+                        m_keys[new_item_index]    = key;
+                        m_keylens[new_item_index] = keylen;
+                        m_values[new_item_index]  = value;
+                        curnode->set_branch(get_branch, new_item_index);
                         return true;
                     }
-                    const dynkey_t k  = m_keys[ki];
-                    const u8       kl = m_keylens[ki];
+                    const dynkey_t branch_key    = m_keys[ki];
+                    const u8       branch_keylen = m_keylens[ki];
 
                     // check if the incoming and the stored key are the same
-                    const u16 bit_diff2 = findfirst_bit_range(keylen, key, kl, k, bit_diff, 4096, s_nullkey);
+                    const u16 bit_diff2 = findfirst_bit_range(keylen, key, branch_keylen, branch_key, bit_diff, 4096, s_nullkey);
                     if (bit_diff2 == 4096)
                     {
                         // the keys are the same
@@ -525,19 +525,21 @@ namespace ncore
                     else
                     {
                         // keys are not the same so we need to insert a new node
-                        u32 const ki2  = m_count++;
-                        m_keys[ki2]    = key;
-                        m_keylens[ki2] = keylen;
-                        m_values[ki2]  = value;
+                        u32 const new_item_index  = m_count++;
+                        m_keys[new_item_index]    = key;
+                        m_keylens[new_item_index] = keylen;
+                        m_values[new_item_index]  = value;
 
                         const s8 branch2 = get_bit(keylen, key, bit_diff2);
-                        ASSERT(get_bit(kl, k, bit_diff2) == (1 - branch2));
+                        ASSERT(get_bit(branch_keylen, branch_key, bit_diff2) == (1 - branch2));
 
                         dynnode_t* new_node = alloc_node();
                         new_node->set_bit(bit_diff2);
-                        new_node->set_key(key_index);
-                        new_node->set_branch(branch2, ki2);
+                        new_node->set_item_index(node_item_index);
+                        new_node->set_branch(branch2, new_item_index);
                         new_node->set_branch(!branch2, ki);
+                        new_node->mark_value(branch2);
+                        new_node->mark_value(!branch2);
 
                         if (prevnode == nullptr)
                         {
@@ -545,49 +547,39 @@ namespace ncore
                         }
                         else
                         {
-                            curnode->set_branch(branch, node_to_index(new_node));
-                            curnode->mark_node(branch);
+                            curnode->set_branch(get_branch, node_to_index(new_node));
+                            curnode->mark_node(get_branch);
                         }
 
                         return true;
                     }
                 }
-                else  // branch is a node, so we need to continue the search
+                else  // get_branch is a node, so we need to continue the search
                 {
                     prevnode        = curnode;
                     prevnode_branch = curnode_branch;
-                    curnode_branch  = curnode->branch(branch);
+                    curnode_branch  = curnode->get_branch(get_branch);
                     curnode         = &m_nodes[curnode_branch];
                     bit_start       = bit_diff;
                 }
             }
             else
             {
-                // we have found a bit that is within the [bit_start, bit_end] range and so
+                // we have found a get_bit that is within the [bit_start, node_bit_end] range and so
                 // we need to insert a new node at 'bit_diff'
-                const u32 newkey_index  = m_count++;
-                m_keys[newkey_index]    = key;
-                m_keylens[newkey_index] = keylen;
-                m_values[newkey_index]  = value;
+                const u32 new_item_index  = m_count++;
+                m_keys[new_item_index]    = key;
+                m_keylens[new_item_index] = keylen;
+                m_values[new_item_index]  = value;
 
-                //   From                  To
-                //
-                // prevnode              prevnode
-                //    |                     |
-                //    |                     v
-                //    |                  newnode (bit diff)
-                //    |                 /       \         
-                //    v                v         v
-                // curnode         curnode      value
-
-                const s8   branch   = get_bit(keylen, key, bit_diff);
-                dynnode_t* new_node = alloc_node();
-                new_node->set_key(newkey_index);
+                const s8   get_branch = get_bit(keylen, key, bit_diff);
+                dynnode_t* new_node   = alloc_node();
+                new_node->set_item_index(new_item_index);
                 new_node->set_bit(bit_diff);
-                new_node->set_branch(1 - branch, node_to_index(curnode));
-                new_node->set_branch(branch, newkey_index);
-                new_node->mark_node(1 - branch);
-                new_node->mark_value(branch);
+                new_node->set_branch(1 - get_branch, node_to_index(curnode));
+                new_node->set_branch(get_branch, new_item_index);
+                new_node->mark_node(1 - get_branch);
+                new_node->mark_value(get_branch);
 
                 // the prevnode should now point to the new node
                 prevnode->set_branch(curnode_branch, node_to_index(new_node));
@@ -606,42 +598,36 @@ namespace ncore
         u16              bit_start = 0;
         while (true)
         {
-            const u16 bit_end   = node->bit();
-            const u32 key_index = node->key();
+            const u16 node_bit_end    = node->get_bit();
+            const u32 node_item_index = node->get_item_index();
 
-            const s32 bit_diff = findfirst_bit_range(keylen, key, m_keylens[key_index], m_keys[key_index], bit_start, bit_end, s_nullkey);
-            if (bit_diff == bit_end + 1)
+            const u16 bit_diff = findfirst_bit_range(keylen, key, m_keylens[node_item_index], m_keys[node_item_index], bit_start, node_bit_end, s_nullkey);
+            if (bit_diff == node_bit_end + 1)
             {
-                const s8 branch = get_bit(keylen, key, bit_diff);
-                if (node->is_value(branch))
-                {
-                    const dynkey_t k  = m_keys[node->branch(branch)];
-                    const u8       kl = m_keylens[node->branch(branch)];
-
-                    // check if the incoming and the stored key are the same
-                    if (compare_keys(keylen, key, kl, k, bit_start))
+                // the bit range is identical, let's traverse further down the tree
+                const s8 node_branch = get_bit(keylen, key, bit_diff);
+                if (node->is_value(node_branch))
+                {  // branch index is a value, ok see if they have the same key
+                    const u32 branch_item_index = node->get_branch(node_branch);
+                    if (compare_keys(keylen, key, m_keylens[branch_item_index], m_keys[branch_item_index], bit_start))
                     {
-                        value = m_values[node->branch(branch)];
+                        value = m_values[node->get_branch(node_branch)];
                         return true;
                     }
-                    else
-                    {
-                        // keys are not the same, it doesn't exist
-                        return false;
-                    }
+                    return false;  // keys are not the same, it doesn't exist
                 }
-                else  // branch is a node, so we need to continue the search
-                {
-                    const u32 nodeIdx = node->branch(branch);
-                    if (nodeIdx == 0)
+                else
+                {  // branch index is a node, so we can iterate further
+                    const u32 node_index = node->get_branch(node_branch);
+                    if (node_index == 0)
                         break;
-                    node      = &m_nodes[nodeIdx];
+                    node      = &m_nodes[node_index];
                     bit_start = bit_diff;
                 }
             }
             else
             {
-                // we have found a bit that is within the [bit_start, bit_end] range and so
+                // we have found a get_bit that is within the [bit_start, node_bit_end] range and so
                 // this means that the key doesn't exist
                 break;
             }
