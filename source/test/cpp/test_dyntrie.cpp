@@ -78,7 +78,7 @@ namespace ncore
         {
         }
 
-        // initialize
+        inline u32 size() const { return m_count; }
 
         // Key length unit is bytes
         bool insert(u8 keylen, dynkey_t key, dynval_t value);
@@ -165,6 +165,14 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
                 next();
             }
 
+            inline void seed(u64 seed)
+            {
+                s0 = seed;
+                s1 = 0;
+                next();
+                next();
+            }
+
             inline u64 next(void)
             {
                 u64 ss1    = s0;
@@ -185,6 +193,16 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
                 dst[i] = 0;
             }
             dst[get_bit >> 3] |= 0x80 >> (get_bit & 0x07);
+        }
+
+        static bool CompareKeys(u8 const* key1, u8 const* key2, s8 len)
+        {
+            for (s8 i = 0; i < len; ++i)
+            {
+                if (key1[i] != key2[i])
+                    return false;
+            }
+            return true;
         }
 
         UNITTEST_FIXTURE_SETUP() {}
@@ -247,6 +265,8 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
         {
             dyntrie_t trie;
 
+            s_rand.seed(0x1234567890abcdef);
+
             u64 key1 = s_rand.next();
             u64 key2 = s_rand.next();
             u64 value1 = s_rand.next();
@@ -260,6 +280,8 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
         {
             dyntrie_t trie;
 
+            s_rand.seed(0x1234567890abcdef);
+
             u64 key1   = s_rand.next();
             u64 key2   = s_rand.next();
             u64 key3   = s_rand.next();
@@ -268,16 +290,44 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
             u64 value2 = s_rand.next();
             u64 value3 = s_rand.next();
 
+            CHECK_EQUAL(0, trie.size());
             CHECK_TRUE(trie.insert(sizeof(key1), (u8*)&key1, (dynval_t)&value1));
             CHECK_TRUE(trie.insert(sizeof(key2), (u8*)&key2, (dynval_t)&value2));
             CHECK_TRUE(trie.insert(sizeof(key3), (u8*)&key3, (dynval_t)&value3));
+            CHECK_EQUAL(3, trie.size());
 
-            CHECK_TRUE(trie.find(sizeof(key1), (u8*)&key1, (dynval_t&)value1));
-            CHECK_TRUE(trie.find(sizeof(key2), (u8*)&key2, (dynval_t&)value2));
-            CHECK_TRUE(trie.find(sizeof(key3), (u8*)&key3, (dynval_t&)value3));
+            dynval_t v;
+            CHECK_TRUE(trie.find(sizeof(key1), (u8*)&key1, v));
+            CHECK_TRUE(CompareKeys((u8 const*)&value1, v, sizeof(u64)));
+            CHECK_TRUE(trie.find(sizeof(key2), (u8*)&key2, v));
+            CHECK_TRUE(CompareKeys((u8 const*)&value2, v, sizeof(u64)));
+            CHECK_TRUE(trie.find(sizeof(key3), (u8*)&key3, v));
+            CHECK_TRUE(CompareKeys((u8 const*)&value3, v, sizeof(u64)));
         }
 
-        UNITTEST_TEST(insert_find_2) {}
+        UNITTEST_TEST(insert_find_2)
+        {
+            dyntrie_t trie;
+
+            u64 keys[1000];
+            u64 values[1000];
+
+            CHECK_EQUAL(0, trie.size());
+
+            for (s32 i = 0; i < 1000; ++i)
+            {
+                keys[i]   = 0xDEADBEEFDEADBEEF + i;
+                values[i] = i;
+
+                CHECK_TRUE(trie.insert(sizeof(keys[i]), (u8*)&keys[i], (dynval_t)&values[i]));
+                
+                u64 value = 0;
+                CHECK_TRUE(trie.find(sizeof(keys[i]), (u8*)&keys[i], (dynval_t&)value));
+            }
+
+            CHECK_EQUAL(1000, trie.size());
+        }
+
         UNITTEST_TEST(insert_max_run_len) {}
         UNITTEST_TEST(insert_many) {}
         UNITTEST_TEST(insert_remove_3) {}
@@ -343,7 +393,10 @@ namespace ncore
             const u8 byte1 = key1[byte_start];
             const u8 byte2 = key2[byte_start];
             const u8 mask  = (0xFF >> (bit_start & 7)) & (0xFF << (7 - (bit_end & 7)));
-            return (byte_start << 3) + ffs_bit((byte1 ^ byte2) & mask);
+            const u8 bits  = (byte1 ^ byte2) & mask;
+            if (bits == 0)
+                return bit_end;
+            return (byte_end << 3) + ffs_bit(bits);
         }
 
         // start and end are not in the same byte
@@ -538,10 +591,10 @@ namespace ncore
             const u16 bit_diff = findfirst_bit_range(keylen, key, m_keylens[node_item], m_keys[node_item], bit_start, node_bit, s_nullkey);
             if (bit_diff == node_bit)
             {
-                const s8 get_branch = get_bit(keylen, key, bit_diff);
-                if (curnode->is_value(get_branch))
+                const s8 node_branch = get_bit(keylen, key, bit_diff);
+                if (curnode->is_value(node_branch))
                 {
-                    const u32 branch_item = curnode->get_branch(get_branch);
+                    const u32 branch_item = curnode->get_branch(node_branch);
                     ASSERT(branch_item != 0xFFFFFF);
                     const dynkey_t branch_key    = m_keys[branch_item];
                     const u8       branch_keylen = m_keylens[branch_item];
@@ -561,14 +614,14 @@ namespace ncore
                         ASSERT(get_bit(branch_keylen, branch_key, bit_diff2) == (1 - branch2));
                         dynnode_t* new_node = alloc_node();
                         new_node->set_bit(bit_diff2);
-                        new_node->set_item_index(node_item);
+                        new_node->set_item_index(new_item_index);
                         new_node->set_branch(branch2, new_item_index);
-                        new_node->set_branch(!branch2, branch_item);
+                        new_node->set_branch(1 - branch2, branch_item);
                         new_node->mark_value(branch2);
-                        new_node->mark_value(!branch2);
+                        new_node->mark_value(1 - branch2);
 
-                        curnode->set_branch(get_branch, node_to_index(new_node));
-                        curnode->mark_node(get_branch);
+                        curnode->set_branch(node_branch, node_to_index(new_node));
+                        curnode->mark_node(node_branch);
                         return true;
                     }
                 }
@@ -576,10 +629,10 @@ namespace ncore
                 {  // branch is a node, so we need to continue the search
                     prevnode        = curnode;
                     prevnode_branch = curnode_branch;
-                    curnode_branch  = curnode->get_branch(get_branch);
+                    curnode_branch  = curnode->get_branch(node_branch);
                     ASSERT(curnode_branch != 0xFFFFFF);
                     curnode   = &m_nodes[curnode_branch];
-                    bit_start = bit_diff;
+                    bit_start = bit_diff + 1;
                 }
             }
             else
@@ -646,7 +699,7 @@ namespace ncore
                     if (node_index == 0)
                         break;
                     node      = &m_nodes[node_index];
-                    bit_start = bit_diff;
+                    bit_start = bit_diff + 1;
                 }
             }
             else
@@ -664,6 +717,11 @@ namespace ncore
         // removal of a key is a bit tricky, we need to traverse the tree and find the node that
         // contains the key, then we need to remove the key from the node, remove the node by
         // replacing the parent branch with the other branch
+
+        // when removing an item one thing to keep in mind is that the item index can be 
+        // used in any number of nodes. So we might have to iterate again replacing any
+        // item index reference to the one being removed.
+
         return false; 
     }
 
