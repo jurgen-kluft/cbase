@@ -127,6 +127,8 @@ namespace ncore
             m_node_head_index = node_to_index(node);
         }
 
+        dynnode_t*  new_node(u16 bit_diff, dynkey_t key, u32 keylen, dynval_t value);
+
         u32       m_node_head_index;  // head of the free node list
         u32       m_node_free_index;  // initially we use this index to obtain a free node
         u32       m_node_count;       // number of nodes allocated
@@ -466,21 +468,23 @@ namespace ncore
         {
             const u16  bit_diff2 = findfirst_bit_range(keylen, key, keylen, s_nullkey, 0, (keylen * 8) - 1, s_nullkey);
             const s8   branch2   = get_bit(keylen, key, bit_diff2);
-            dynnode_t* new_node  = alloc_node();
+            
+            dynnode_t* new_node  = new_node(bit_diff2, key, keylen, value);
 
-            u32 const new_item_index  = m_count++;
-            m_keys[new_item_index]    = key;
-            m_keylens[new_item_index] = keylen;
-            m_values[new_item_index]  = value;
+            // u32 const new_item_index  = m_count++;
+            // m_keys[new_item_index]    = key;
+            // m_keylens[new_item_index] = keylen;
+            // m_values[new_item_index]  = value;
 
-            new_node->set_bit(bit_diff2);
-            if (bit_diff2 == keylen * 8)
-                new_node->set_bit(keylen * 8 - 1);
-            new_node->set_item_index(new_item_index);
-            new_node->set_branch(branch2, new_item_index);
-            new_node->set_branch(!branch2, 0xFFFFFF);  // max = 0xFFFFFF, so this is an invalid value/node index
-            new_node->mark_value(branch2);
-            new_node->mark_value(!branch2);
+            // new_node->set_bit(bit_diff2);
+            // if (bit_diff2 == keylen * 8)
+            //     new_node->set_bit(keylen * 8 - 1);
+            // new_node->set_item_index(new_item_index);
+            // new_node->set_branch(branch2, new_item_index);
+            // new_node->set_branch(!branch2, 0xFFFFFF);  // max = 0xFFFFFF, so this is an invalid value/node index
+            // new_node->mark_value(branch2);
+            // new_node->mark_value(!branch2);
+
 
             m_root = new_node;
             return true;
@@ -587,6 +591,24 @@ namespace ncore
                 return true;
             }
         }
+    }
+
+    dynnode_t* dyntrie_t::new_node(u16 bit_diff, dynkey_t key, u32 keylen, dynval_t value)
+    {
+        const u32 new_item_index  = m_count++;
+        m_keys[new_item_index]    = key;
+        m_keylens[new_item_index] = keylen;
+        m_values[new_item_index]  = value;
+
+        const s8   get_branch = get_bit(keylen, key, bit_diff);
+        dynnode_t* new_node   = alloc_node();
+        new_node->set_item_index(new_item_index);
+        new_node->set_bit(bit_diff);
+        //new_node->set_branch(1 - get_branch, node_to_index(curnode));
+        new_node->set_branch(get_branch, new_item_index);
+        new_node->mark_node(1 - get_branch);
+        new_node->mark_value(get_branch);
+        return new_node;
     }
 
     bool dyntrie_t::find(u8 keylen, dynkey_t key, dynval_t& value) const
