@@ -18,7 +18,25 @@ namespace ncore
     typedef const u8* dynkey_t;
     typedef const u8* dynval_t;
 
-    struct dynnode_t  // 12 bytes
+    // If the key is a standard u32 or u64, then we can use a fixed key trie
+    // and we can directly embed the key into the node.
+    // The benefit is that we save not only memory but also a level of indirection
+    // which means faster lookups.
+    struct dynnode_fixed_t  // 12 bytes
+    {
+        u32 m_branch[2];   // left/right (node or value (1 get_bit) : get_bit-index (7 bits) : 'node or value'-index (24 bits))
+        u32 m_key;         // key (32 bits key)
+    };
+
+    struct dynnode_fixed2_t  // 16 bytes
+    {
+        u32 m_branch[2];   // left/right (node or value (1 get_bit) : get_bit-index (7 bits) : 'node or value'-index (24 bits))
+        u64 m_key;         // key (64 bits key)
+    };
+
+
+
+    struct dynnode_t  // 12 bytes (dynamic key)
     {
         inline void reset()
         {
@@ -285,16 +303,19 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
             u64 key1   = s_rand.next();
             u64 key2   = s_rand.next();
             u64 key3   = s_rand.next();
+            u64 key4   = s_rand.next();
 
             u64 value1 = s_rand.next();
             u64 value2 = s_rand.next();
             u64 value3 = s_rand.next();
+            u64 value4 = s_rand.next();
 
             CHECK_EQUAL(0, trie.size());
             CHECK_TRUE(trie.insert(sizeof(key1), (u8*)&key1, (dynval_t)&value1));
             CHECK_TRUE(trie.insert(sizeof(key2), (u8*)&key2, (dynval_t)&value2));
             CHECK_TRUE(trie.insert(sizeof(key3), (u8*)&key3, (dynval_t)&value3));
-            CHECK_EQUAL(3, trie.size());
+            CHECK_TRUE(trie.insert(sizeof(key4), (u8*)&key4, (dynval_t)&value4));
+            CHECK_EQUAL(4, trie.size());
 
             dynval_t v;
             CHECK_TRUE(trie.find(sizeof(key1), (u8*)&key1, v));
@@ -303,6 +324,8 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
             CHECK_TRUE(CompareKeys((u8 const*)&value2, v, sizeof(u64)));
             CHECK_TRUE(trie.find(sizeof(key3), (u8*)&key3, v));
             CHECK_TRUE(CompareKeys((u8 const*)&value3, v, sizeof(u64)));
+            CHECK_TRUE(trie.find(sizeof(key4), (u8*)&key4, v));
+            CHECK_TRUE(CompareKeys((u8 const*)&value4, v, sizeof(u64)));
         }
 
         UNITTEST_TEST(insert_find_2)
@@ -595,7 +618,6 @@ namespace ncore
                 if (curnode->is_value(node_branch))
                 {
                     const u32 branch_item = curnode->get_branch(node_branch);
-                    ASSERT(branch_item != 0xFFFFFF);
                     const dynkey_t branch_key    = m_keys[branch_item];
                     const u8       branch_keylen = m_keylens[branch_item];
 
@@ -629,10 +651,9 @@ namespace ncore
                 {  // branch is a node, so we need to continue the search
                     prevnode        = curnode;
                     prevnode_branch = curnode_branch;
-                    curnode_branch  = curnode->get_branch(node_branch);
-                    ASSERT(curnode_branch != 0xFFFFFF);
-                    curnode   = &m_nodes[curnode_branch];
-                    bit_start = bit_diff + 1;
+                    curnode         = &m_nodes[curnode->get_branch(node_branch)];
+                    curnode_branch  = node_branch;
+                    bit_start       = bit_diff + 1;
                 }
             }
             else
@@ -640,18 +661,24 @@ namespace ncore
                 // we have found a bit that is within the [bit_start, node_bit_end] range and so
                 // we need to insert a new node at 'bit_diff'
                 const u32  new_item_index = add_item(key, keylen, value);
-                const s8   get_branch     = get_bit(keylen, key, bit_diff);
+                const s8   branch2     = get_bit(keylen, key, bit_diff);
                 dynnode_t* new_node       = alloc_node();
-                new_node->set_item_index(new_item_index);
                 new_node->set_bit(bit_diff);
-                new_node->set_branch(1 - get_branch, node_to_index(curnode));
-                new_node->set_branch(get_branch, new_item_index);
-                new_node->mark_node(1 - get_branch);
-                new_node->mark_value(get_branch);
+                new_node->set_item_index(new_item_index);
+                new_node->set_branch(1 - branch2, node_to_index(curnode));
+                new_node->set_branch(branch2, new_item_index);
+                new_node->mark_node(1 - branch2);
+                new_node->mark_value(branch2);
 
-                // the prevnode should now point to the new node
-                prevnode->set_branch(curnode_branch, node_to_index(new_node));
-
+                // the prevnode (or root) should now point to the new node
+                if (prevnode != nullptr)
+                {
+                    prevnode->set_branch(curnode_branch, node_to_index(new_node));
+                }
+                else
+                {
+                    m_root = new_node;
+                }
                 return true;
             }
         }
@@ -669,7 +696,18 @@ namespace ncore
     bool dyntrie_t::find(u8 keylen, dynkey_t key, dynval_t& value) const
     {
         if (m_root == nullptr)
+        {
+            if (m_first_item == 0xffffffff)
+                return false;
+            const dynkey_t first_key    = m_keys[m_first_item];
+            const u8       first_keylen = m_keylens[m_first_item];
+            if (compare_keys(keylen, key, first_keylen, first_key, 0))
+            {
+                value = m_values[m_first_item];
+                return true;
+            }
             return false;
+        }
 
         const dynnode_t* node      = m_root;
         u16              bit_start = 0;
@@ -696,8 +734,6 @@ namespace ncore
                 else
                 {  // branch index is a node, so we can iterate further
                     const u32 node_index = node->get_branch(node_branch);
-                    if (node_index == 0)
-                        break;
                     node      = &m_nodes[node_index];
                     bit_start = bit_diff + 1;
                 }
