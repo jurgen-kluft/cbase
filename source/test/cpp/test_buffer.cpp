@@ -14,8 +14,8 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
 
         UNITTEST_TEST(test_buffer32)
         {
-            u8s<32> buf1;
-            u8s<32> buf2;
+            sbuffer_t<32> buf1;
+            sbuffer_t<32> buf2;
             buf1.reset(1);
             buf2.reset(2);
 
@@ -32,7 +32,7 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
 
         UNITTEST_TEST(test_binary_reader)
         {
-            u8s<2048>   buffer;
+            sbuffer_t<2048>   buffer;
             binary_writer_t writer = buffer.writer();
 
             CHECK_EQUAL(0, writer.skip(16));
@@ -52,7 +52,7 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             const char* cctext = "this is the buffer";
             cbuffer_t    text(ascii::strlen(cctext), (const u8*)cctext);
 
-            u8s<32> bytes;
+            sbuffer_t<32> bytes;
             bytes.writer().write_data(text);
             writer.write_data(text);
             writer.write_data(bytes);
@@ -98,7 +98,7 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             CHECK_EQUAL(9.0, the_f64);
 
             s32         len = ascii::strlen(cctext);
-            u8s<32> rdata;
+            sbuffer_t<32> rdata;
             buffer_t    rdatalen = rdata(0, len);
             reader.read_data(rdatalen);
 			CHECK_EQUAL(rdatalen.size(), len);

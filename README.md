@@ -19,7 +19,6 @@ Cross platform base library
   - random (interface)
   - runes (ascii, utf-8, utf-16, utf-32) and many string manipulation functions
   - low-level string functions
-  - singleton
   - slice
   - sort
   - tls

@@ -14,7 +14,6 @@ namespace ncore
     class buffer_t;
     class binary_reader_t;
     class binary_writer_t;
-    struct crunes_t;
 
     // --------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
@@ -105,7 +104,7 @@ namespace ncore
         u32 m_len;
     };
 
-    template <u32 L> class u8s : public buffer_t
+    template <u32 L> class sbuffer_t : public buffer_t
     {
         enum
         {
@@ -114,7 +113,7 @@ namespace ncore
 
     public:
         u64 m_data[SIZE];
-        inline u8s()
+        inline sbuffer_t()
             : buffer_t(SIZE * 4, (u8*)m_data)
         {
         }
@@ -192,7 +191,7 @@ namespace ncore
         u32 view_data(u32 size, cbuffer_t& buf);
         u32 read_buffer(buffer_t& buf);
         u32 view_buffer(cbuffer_t& buf);
-        u32 view_crunes(crunes_t& out_str);
+        u32 view_string(const char*& out_str, const char*& out_str_end, s8& str_type);
 
     protected:
         u32       m_len;
@@ -261,7 +260,7 @@ namespace ncore
         u32 write_data(cbuffer_t const& cbuf);
         u32 write_buffer(buffer_t const& cbuf);  // Will write [s32=Length][u8[]=Data]
         u32 write_buffer(cbuffer_t const& cbuf); // Will write [s32=Length][u8[]=Data]
-        u32 write_string(crunes_t const& str);
+        u32 write_string(const char* str, const char* str_end, s8 str_type);
 
         binary_writer_t& operator=(const binary_writer_t& other)
         {

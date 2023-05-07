@@ -97,7 +97,7 @@ namespace ncore
             {
                 newnode    = m_freelist;
                 u32 const freeindex = newnode->m_branches[0];
-                if (freeindex == limits_t<T>::maximum())
+                if (freeindex == type_t<T>::max())
                 {
                     m_freelist = nullptr;
                 }
@@ -112,9 +112,9 @@ namespace ncore
                 m_freeindex++;
             }
 
-            newnode->m_branches[0] = limits_t<T>::maximum();
-            newnode->m_branches[1] = limits_t<T>::maximum();
-            newnode->m_branches[2] = limits_t<T>::maximum();
+            newnode->m_branches[0] = type_t<T>::max();
+            newnode->m_branches[1] = type_t<T>::max();
+            newnode->m_branches[2] = type_t<T>::max();
             
             T const index          = (T)(newnode - m_nodes);
 
@@ -152,7 +152,7 @@ namespace ncore
             nodeT_t* delnode       = (nodeT_t*)node;
             if (m_freelist == nullptr) 
             {
-                delnode->m_branches[0] = limits_t<T>::maximum();
+                delnode->m_branches[0] = type_t<T>::max();
             }
             else
             {

@@ -2,7 +2,7 @@
 #define __CBASE_LIMITS_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 namespace ncore
@@ -45,7 +45,7 @@ namespace ncore
 
     /**
      * Description:
-     *     class limits_t is a template class, which use the C++ class template specialization.
+     *     class type_t is a template class, which use the C++ class template specialization.
      *     The idea of C++ class template specialization is similar to function template
      *     overloading. This can make the template code for certain data types to be fixed.
      *
@@ -54,7 +54,7 @@ namespace ncore
      *      template<class T>
      *      bool isInRange(T inNum)
      *      {
-     *          if ((inNum >= limits_t<T>::minimum()) && (inNum <= limits_t<T>::maximum()))
+     *          if ((inNum >= type_t<T>::min()) && (inNum <= type_t<T>::max()))
      *          {
      *                return true;
      *            }
@@ -64,113 +64,181 @@ namespace ncore
      *</CODE>
      *
      */
-    template <typename T> class limits_t
+
+    struct type_id
+    {
+        enum ETypeId
+        {
+            Int8   = 0,
+            Int16  = 1,
+            Int32  = 2,
+            Int64  = 3,
+            UInt8  = 4,
+            UInt16 = 5,
+            UInt32 = 6,
+            UInt64 = 7,
+            Float  = 8,
+            Double = 9,
+            Bool   = 10,
+            Char   = 11,
+        };
+
+        inline type_id()
+            : value(Bool)
+        {
+        }
+        inline type_id(ETypeId value)
+            : value(value)
+        {
+        }
+        inline type_id(const type_id& other)
+            : value(other.value)
+        {
+        }
+
+        u8 value;
+    };
+
+    template <typename T>
+    class type_t
     {
     };
 
 #undef min
 #undef max
 
-    template <> class limits_t<u8>
+    template <>
+    class type_t<bool>
     {
     public:
-        typedef u8 type_t;
+        typedef bool __type;
 
-        static type_t minimum() { return D_U8_MIN; }
-        static type_t maximum() { return D_U8_MAX; }
-        static bool has_sign() { return false; }
+        static __type  min() { return D_U8_MIN; }
+        static __type  max() { return D_U8_MAX; }
+        static bool    has_sign() { return false; }
+        static type_id id() { return type_id(type_id::Bool); }
     };
 
-    template <> class limits_t<u16>
+    template <>
+    class type_t<u8>
     {
     public:
-        typedef u16 type_t;
+        typedef u8 __type;
 
-        static type_t minimum() { return D_U16_MIN; }
-        static type_t maximum() { return D_U16_MAX; }
-        static bool has_sign() { return false; }
+        static __type  min() { return D_U8_MIN; }
+        static __type  max() { return D_U8_MAX; }
+        static bool    has_sign() { return false; }
+        static type_id id() { return type_id(type_id::UInt8); }
     };
 
-    template <> class limits_t<u32>
+    template <>
+    class type_t<u16>
     {
     public:
-        typedef u32 type_t;
+        typedef u16 __type;
 
-        static type_t minimum() { return D_U32_MIN; }
-        static type_t maximum() { return D_U32_MAX; }
-        static bool has_sign() { return false; }
+        static __type  min() { return D_U16_MIN; }
+        static __type  max() { return D_U16_MAX; }
+        static bool    has_sign() { return false; }
+        static type_id id() { return type_id(type_id::UInt16); }
     };
 
-    template <> class limits_t<u64>
+    template <>
+    class type_t<u32>
     {
     public:
-        typedef u64 type_t;
+        typedef u32 __type;
 
-        static type_t minimum() { return D_U64_MIN; }
-        static type_t maximum() { return D_U64_MAX; }
-        static bool has_sign() { return false; }
+        static __type  min() { return D_U32_MIN; }
+        static __type  max() { return D_U32_MAX; }
+        static bool    has_sign() { return false; }
+        static type_id id() { return type_id(type_id::UInt32); }
     };
 
-    template <> class limits_t<s8>
+    template <>
+    class type_t<u64>
     {
     public:
-        typedef s8 type_t;
+        typedef u64 __type;
 
-        static type_t minimum() { return D_S8_MIN; }
-        static type_t maximum() { return D_S8_MAX; }
-        static bool has_sign() { return true; }
+        static __type  min() { return D_U64_MIN; }
+        static __type  max() { return D_U64_MAX; }
+        static bool    has_sign() { return false; }
+        static type_id id() { return type_id(type_id::UInt64); }
     };
 
-    template <> class limits_t<s16>
+    template <>
+    class type_t<s8>
     {
     public:
-        typedef s16 type_t;
+        typedef s8 __type;
 
-        static type_t minimum() { return D_S16_MIN; }
-        static type_t maximum() { return D_S16_MAX; }
-        static bool has_sign() { return true; }
+        static __type  min() { return D_S8_MIN; }
+        static __type  max() { return D_S8_MAX; }
+        static bool    has_sign() { return true; }
+        static type_id id() { return type_id(type_id::Int8); }
     };
 
-    template <> class limits_t<s32>
+    template <>
+    class type_t<s16>
     {
     public:
-        typedef s32 type_t;
+        typedef s16 __type;
 
-        static type_t minimum() { return D_S32_MIN; }
-        static type_t maximum() { return D_S32_MAX; }
-        static bool has_sign() { return true; }
+        static __type  min() { return D_S16_MIN; }
+        static __type  max() { return D_S16_MAX; }
+        static bool    has_sign() { return true; }
+        static type_id id() { return type_id(type_id::Int16); }
     };
 
-    template <> class limits_t<s64>
+    template <>
+    class type_t<s32>
     {
     public:
-        typedef s64 type_t;
+        typedef s32 __type;
 
-        static type_t minimum() { return D_S64_MIN; }
-        static type_t maximum() { return D_S64_MAX; }
-        static bool has_sign() { return true; }
+        static __type  min() { return D_S32_MIN; }
+        static __type  max() { return D_S32_MAX; }
+        static bool    has_sign() { return true; }
+        static type_id id() { return type_id(type_id::Int32); }
     };
 
-    template <> class limits_t<f32>
+    template <>
+    class type_t<s64>
     {
     public:
-        typedef f32 type_t;
+        typedef s64 __type;
 
-        static type_t minimum() { return D_F32_MIN; }
-        static type_t maximum() { return D_F32_MAX; }
-        static bool has_sign() { return true; }
+        static __type  min() { return D_S64_MIN; }
+        static __type  max() { return D_S64_MAX; }
+        static bool    has_sign() { return true; }
+        static type_id id() { return type_id(type_id::Int64); }
     };
 
-    template <> class limits_t<f64>
+    template <>
+    class type_t<f32>
     {
     public:
-        typedef f64 type_t;
+        typedef f32 __type;
 
-        static type_t minimum() { return D_F64_MIN; }
-        static type_t maximum() { return D_F64_MAX; }
-        static bool has_sign() { return true; }
+        static __type  min() { return D_F32_MIN; }
+        static __type  max() { return D_F32_MAX; }
+        static bool    has_sign() { return true; }
+        static type_id id() { return type_id(type_id::Float); }
     };
 
-}; // namespace ncore
+    template <>
+    class type_t<f64>
+    {
+    public:
+        typedef f64 __type;
 
-#endif ///< END __CBASE_LIMITS_H__
+        static __type  min() { return D_F64_MIN; }
+        static __type  max() { return D_F64_MAX; }
+        static bool    has_sign() { return true; }
+        static type_id id() { return type_id(type_id::Double); }
+    };
+
+};  // namespace ncore
+
+#endif  ///< END __CBASE_LIMITS_H__

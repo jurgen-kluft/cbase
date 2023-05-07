@@ -2,7 +2,7 @@
 #define __CBASE_DEBUG_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 namespace ncore
@@ -57,7 +57,7 @@ namespace ncore
 // assembly code.
 //==============================================================================
 #ifdef D_BREAK
-#undef D_BREAK
+#    undef D_BREAK
 #endif
 
 //------------------------------------------------------------------------------
@@ -73,26 +73,26 @@ namespace ncore
 //     NOP ASSERT
 //------------------------------------------------------------------------------
 #if defined(TARGET_PC) && defined(COMPILER_DEFAULT)
-#define D_BREAK          \
-    {                   \
-        __debugbreak(); \
-    }
+#    define D_BREAK         \
+        {                   \
+            __debugbreak(); \
+        }
 #endif
 
 #if defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
-#define D_BREAK            \
-    {                     \
-        __builtin_trap(); \
-    }
+#    define D_BREAK           \
+        {                     \
+            __builtin_trap(); \
+        }
 #endif
 
 #if !defined(D_BREAK)
-#error Unknown Platform/Compiler configuration for D_BREAK
+#    error Unknown Platform/Compiler configuration for D_BREAK
 #endif
 
 //------------------------------------------------------------------------------
 #ifdef D_NOP
-#undef D_NOP
+#    undef D_NOP
 #endif
 
     //------------------------------------------------------------------------------
@@ -106,21 +106,21 @@ namespace ncore
     //------------------------------------------------------------------------------
 
 #if defined(TARGET_PC) && defined(COMPILER_DEFAULT)
-#define D_NOP                \
-    {                       \
-        __emit(0x00000000); \
-    }
+#    define D_NOP               \
+        {                       \
+            __emit(0x00000000); \
+        }
 #endif
 
 #if defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
-#define D_NOP      \
-    {             \
-        __asm nop \
-    }
+#    define D_NOP     \
+        {             \
+            __asm nop \
+        }
 #endif
 
 #if !defined(D_NOP)
-#error Unknown Platform/Compiler configuration for D_NOP
+#    error Unknown Platform/Compiler configuration for D_NOP
 #endif
 
 //==============================================================================
@@ -154,12 +154,6 @@ namespace ncore
 //
 //      ASSERTS(Radius >= 0.0f, "Radius must be non-negative.");
 //
-//  To place formatted strings within ASSERTS and DVERIFYS, use the xstring_tmp class
-//  from x_string.h.  For example:
-//
-//      pFile = x_fopen(fileName, "rt");
-//      ASSERTS(pFile, xstring_tmp("Failed to open file '%s'.", fileName));
-//
 //  Available options:
 //
 //    - As previously mentioned, the macro D_ASSERT enables the validation
@@ -167,144 +161,111 @@ namespace ncore
 //
 //==============================================================================
 #ifdef ASSERT
-#undef ASSERT
+#    undef ASSERT
 #endif
 
 #ifdef ASSERTS
-#undef ASSERTS
+#    undef ASSERTS
 #endif
 
 #ifdef DVERIFY
-#undef DVERIFY
+#    undef DVERIFY
 #endif
 
 #ifdef DVERIFYS
-#undef DVERIFYS
+#    undef DVERIFYS
 #endif
 
 #ifdef D_ASSERT
 
-#ifndef SPU
+#    define DVERIFY(expr)                                                                                  \
+        do                                                                                                 \
+        {                                                                                                  \
+            static ncore::u32 sAssertFlags = 0;                                                            \
+            if (!((expr) != 0) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
+                D_BREAK;                                                                                   \
+        } while (0)
 
-#define DVERIFY(expr)                                                                               \
-    do                                                                                              \
-    {                                                                                               \
-        static ncore::u32 sAssertFlags = 0;                                                         \
-        if (!((expr) != 0) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
-            D_BREAK;                                                                                 \
-    } while (0)
-#define DVERIFYS(expr, str)                                                                        \
-    do                                                                                             \
-    {                                                                                              \
-        static ncore::u32 sAssertFlags = 0;                                                        \
-        if (!((expr) != 0) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
-            D_BREAK;                                                                                \
-    } while (0)
-#define DBOUNDS(v, l, h)                                                                                                                \
-    do                                                                                                                                  \
-    {                                                                                                                                   \
-        static ncore::u32 sAssertFlags = 0;                                                                                             \
-        if (!((v) >= (l) && (v) <= (h)) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #v ">=" #l " && " #v "<=" #h, nullptr)) \
-            D_BREAK;                                                                                                                     \
-    } while (0)
+#    define DVERIFYS(expr, str)                                                                        \
+        do                                                                                             \
+        {                                                                                              \
+            static ncore::u32 sAssertFlags = 0;                                                        \
+            if (!((expr) != 0) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
+                D_BREAK;                                                                               \
+        } while (0)
 
-#define DASSERTCT(expr) \
-    do                  \
-    {                   \
-    } while (ncore::CompileTimeAssert<(expr) != 0>::OK);
-#define DASSERTSL(level, expr, str)                                                                                                      \
-    do                                                                                                                                   \
-    {                                                                                                                                    \
-        static ncore::u32 sAssertFlags = 0;                                                                                              \
-        if (ncore::xChooseDebugLevel(level) && ((expr) == false) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
-            D_BREAK;                                                                                                                      \
-    } while (0)
-#define DASSERTL(level, expr)                                                                                                             \
-    do                                                                                                                                    \
-    {                                                                                                                                     \
-        static ncore::u32 sAssertFlags = 0;                                                                                               \
-        if (ncore::xChooseDebugLevel(level) && ((expr) == false) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
-            D_BREAK;                                                                                                                       \
-    } while (0)
-#define DASSERT(expr)                                                                               \
-    do                                                                                              \
-    {                                                                                               \
-        static ncore::u32 sAssertFlags = 0;                                                         \
-        if (!((expr) != 0) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
-            D_BREAK;                                                                                 \
-    } while (0)
-#define DASSERTS(expr, str)                                                                        \
-    do                                                                                             \
-    {                                                                                              \
-        static ncore::u32 sAssertFlags = 0;                                                        \
-        if (!((expr) != 0) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
-            D_BREAK;                                                                                \
-    } while (0)
+#    define DBOUNDS(v, l, h)                                                                                                                   \
+        do                                                                                                                                     \
+        {                                                                                                                                      \
+            static ncore::u32 sAssertFlags = 0;                                                                                                \
+            if (!((v) >= (l) && (v) <= (h)) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #v ">=" #l " && " #v "<=" #h, nullptr)) \
+                D_BREAK;                                                                                                                       \
+        } while (0)
 
-#define ASSERTCT(expr) DASSERTCT(expr)
-#define ASSERTSL(level, expr, str) DASSERTSL(level, expr, str)
-#define ASSERTL(level, expr) DASSERTL(level, expr)
-#define ASSERT(expr) DASSERT(expr)
-#define ASSERT_OPEN_RANGE(_i, _min, _max) DASSERT(_i >= _min && _i<_max)
-#define ASSERTS(expr, str) DASSERTS(expr, str)
+#    define DASSERTCT(expr) \
+        do                  \
+        {                   \
+        } while (ncore::CompileTimeAssert<(expr) != 0>::OK);
 
-#else
+#    define DASSERTSL(level, expr, str)                                                                                                      \
+        do                                                                                                                                   \
+        {                                                                                                                                    \
+            static ncore::u32 sAssertFlags = 0;                                                                                              \
+            if (ncore::xChooseDebugLevel(level) && ((expr) == false) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
+                D_BREAK;                                                                                                                     \
+        } while (0)
 
-#define DVERIFY(expr)
-#define DVERIFYS(expr, str)
-#define DBOUNDS(v, l, h)
+#    define DASSERTL(level, expr)                                                                                                                \
+        do                                                                                                                                       \
+        {                                                                                                                                        \
+            static ncore::u32 sAssertFlags = 0;                                                                                                  \
+            if (ncore::xChooseDebugLevel(level) && ((expr) == false) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
+                D_BREAK;                                                                                                                         \
+        } while (0)
 
-#define DASSERTCT(expr)
-#define DASSERTSL(level, expr, str)
-#define DASSERTL(level, expr)
-#define DASSERT(expr)
-#define DASSERTS(expr, str)
+#    define DASSERT(expr)                                                                                  \
+        do                                                                                                 \
+        {                                                                                                  \
+            static ncore::u32 sAssertFlags = 0;                                                            \
+            if (!((expr) != 0) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, nullptr)) \
+                D_BREAK;                                                                                   \
+        } while (0)
 
-#define ASSERTCT(expr) DASSERTCT(expr)
-#define ASSERTSL(level, expr, str) DASSERTSL(level, expr, str)
-#define ASSERTL(level, expr) DASSERTL(level, expr)
-#define ASSERT(expr) DASSERT(expr)
-#define ASSERT_OPEN_RANGE(_i, _min, _max) DASSERT(_i >= _min && _i<_max)
-#define ASSERTS(expr, str) DASSERTS(expr, str)
+#    define DASSERTS(expr, str)                                                                        \
+        do                                                                                             \
+        {                                                                                              \
+            static ncore::u32 sAssertFlags = 0;                                                        \
+            if (!((expr) != 0) && ncore::gAssertHandler(sAssertFlags, __FILE__, __LINE__, #expr, str)) \
+                D_BREAK;                                                                               \
+        } while (0)
 
-#endif
+#    define ASSERTCT(expr)                    DASSERTCT(expr)
+#    define ASSERTSL(level, expr, str)        DASSERTSL(level, expr, str)
+#    define ASSERTL(level, expr)              DASSERTL(level, expr)
+#    define ASSERT(expr)                      DASSERT(expr)
+#    define ASSERT_OPEN_RANGE(_i, _min, _max) DASSERT(_i >= _min && _i < _max)
+#    define ASSERTS(expr, str)                DASSERTS(expr, str)
 
 #else
 
-#if defined(TARGET_PC) && defined(COMPILER_DEFAULT)
-#define DASSERTCT(expr)
-#define DASSERT(expr) (void(0))
-#define DASSERTS(expr, str) (void(0))
-#define DASSERTSL(level, expr, str) (void(0))
-#define DASSERTL(level, expr) (void(0))
-#define ASSERTCT(expr)
-#define ASSERT(expr) (void(0))
-#define ASSERT_OPEN_RANGE(_i, _min, _max) (void(0))
-#define ASSERTS(expr, str) (void(0))
-#define ASSERTSL(level, expr, str) (void(0))
-#define ASSERTL(level, expr) (void(0))
-#elif defined(TARGET_MAC) && defined(COMPILER_DEFAULT)
-#define DASSERTCT(expr)
-#define DASSERT(expr) (void(0))
-#define DASSERTS(expr, str) (void(0))
-#define DASSERTSL(level, expr, str) (void(0))
-#define DASSERTL(level, expr) (void(0))
-#define ASSERTCT(expr)
-#define ASSERT(expr) (void(0))
-#define ASSERT_OPEN_RANGE(_i, _min, _max) (void(0))
-#define ASSERTS(expr, str) (void(0))
-#define ASSERTSL(level, expr, str) (void(0))
-#define ASSERTL(level, expr) (void(0))
-#else
-#error Unknown target/compiler configuration for defining assert
-#endif
+#    define DASSERTCT(expr)
+#    define DASSERT(expr)               (void(0))
+#    define DASSERTS(expr, str)         (void(0))
+#    define DASSERTSL(level, expr, str) (void(0))
+#    define DASSERTL(level, expr)       (void(0))
+#    define ASSERTCT(expr)
+#    define ASSERT(expr)                      (void(0))
+#    define ASSERT_OPEN_RANGE(_i, _min, _max) (void(0))
+#    define ASSERTS(expr, str)                (void(0))
+#    define ASSERTSL(level, expr, str)        (void(0))
+#    define ASSERTL(level, expr)              (void(0))
 
-#define DVERIFY(expr) (expr)
-#define DVERIFYS(expr, str) (expr)
-#define DBOUNDS(v, l, h)
+#    define DVERIFY(expr)       (expr)
+#    define DVERIFYS(expr, str) (expr)
+#    define DBOUNDS(v, l, h)
 
 #endif
 
-}; // namespace ncore
+};  // namespace ncore
 
-#endif /// __CBASE_DEBUG_H__
+#endif  /// __CBASE_DEBUG_H__

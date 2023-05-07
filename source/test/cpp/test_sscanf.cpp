@@ -57,13 +57,7 @@ UNITTEST_SUITE_BEGIN(test_sscanf)
 
 			u16 d[4];
 			
-			va_r_t vr1(&d[0]); 
-			va_r_t vr2(&d[1]); 
-			va_r_t vr3(&d[2]); 
-			va_r_t vr4(&d[3]);
-
-			va_r_list_t vl( (va_r_t( &d[0] )), (va_r_t( &d[1] )), (va_r_t( &d[2] )), (va_r_t( &d[3] )) );
-			vsscanf(example, fmt, vl);
+			sscanf(example, fmt, &d[0], &d[1], &d[2], &d[3]);
 			u16 t[] = {512,768,256,128};
 
 			for (s32 i=0; i<4; ++i)

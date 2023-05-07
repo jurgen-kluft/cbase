@@ -119,19 +119,12 @@ UNITTEST_SUITE_BEGIN(test_allocator)
 
         UNITTEST_TEST(test_alloc_buffer)
         {
-            inplace_t<256> inplace;
-            alloc_buffer_t sa(inplace.object<u8>(), inplace.size());
+            u8 inplace[256];
+            alloc_buffer_t sa(inplace, sizeof(inplace));
             test_object4* obj = sa.construct<test_object4>();
             sa.destruct<>(obj);
         }
 
-        UNITTEST_TEST(test_alloc_inplace)
-        {
-            inplace_t<256> inplace;
-            allocinplace_t allocator = inplace.allocator();
-            test_object4*  obj       = allocator.construct<test_object4>();
-            allocator.destruct<test_object4>(obj);
-        }
     }
 }
 UNITTEST_SUITE_END

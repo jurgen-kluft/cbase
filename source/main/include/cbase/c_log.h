@@ -61,7 +61,6 @@ namespace ncore
         __LogError2(channel, messageFormat, argv, argc);
     }
 
-
     void __LogPush(const char* fileName, s32 lineNum);
     void __LogFlush(void);
 
@@ -107,7 +106,7 @@ namespace ncore
         static void flush();
         static void clear();
 
-        static logger_t* redirect(elevel inLevel, logger_t * inLogger);
+        static logger_t* redirect(elevel inLevel, logger_t* inLogger);
 
         static void write(elevel inLevel, bool _value);
         static void write(elevel inLevel, s32 _value);
@@ -147,9 +146,7 @@ namespace ncore
         }
     };
 
-    /**
-     * Interface class, has specific implementations for different environments/platforms
-     */
+    // Interface class, has specific implementations for different environments/platforms
     class logger_t
     {
         friend class log_t;

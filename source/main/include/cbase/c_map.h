@@ -29,11 +29,11 @@ namespace ncore
                 m_allocator = alloc_t::get_system();
             }
 
-            if (max_items <= limits_t<u16>::maximum())
+            if (max_items <= type_t<u16>::max())
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u16, K, u32, H>>(a, max_items);
             }
-            else if (max_items <= limits_t<u32>::maximum())
+            else if (max_items <= type_t<u32>::max())
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, u32, H>>(a, max_items);
             }
@@ -78,11 +78,11 @@ namespace ncore
                 m_allocator = alloc_t::get_system();
             }
 
-            if (max_items <= limits_t<u16>::maximum())
+            if (max_items <= type_t<u16>::max())
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u16, K, u8, H>>(a, max_items, false);
             }
-            else if (max_items <= limits_t<u32>::maximum())
+            else if (max_items <= type_t<u32>::max())
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, u8, H>>(a, max_items, false);
             }

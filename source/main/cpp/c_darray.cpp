@@ -11,7 +11,7 @@ namespace ncore
     {
     public:
         virtual bool set_capacity(void*& items, u32 sizeof_item, u32 cur_size, u32& cur_capacity, u32 new_capacity);
-        virtual u32  max_capacity() const { return limits_t<u32>::maximum() >> 1; }
+        virtual u32  max_capacity() const { return type_t<u32>::max() >> 1; }
     };
 
     array_capacity_handler_t* g_get_default_array_capacity_handler()

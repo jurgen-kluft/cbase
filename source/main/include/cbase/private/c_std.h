@@ -94,7 +94,7 @@ namespace ncore
 
         // clang-format off
         template <typename InputIterator, typename OutputIterator> 
-		inline OutputIterator xcopy(InputIterator first, InputIterator last, OutputIterator result)
+		inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result)
         {
             for (; first != last; ++result, ++first)
                 *result = *first;

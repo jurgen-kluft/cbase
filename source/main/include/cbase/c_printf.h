@@ -52,8 +52,15 @@ namespace ncore
         return vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
     }
 
-    s32 sscanf(crunes_t& str, crunes_t const& format, D_VA_R_ARGS_16_DEF);
-    s32 vsscanf(crunes_t& str, crunes_t const& format, const va_r_list_t& vr_args);
+    s32 sscanf_(crunes_t& str, crunes_t const& format, const va_r_t* argv, s32 argc);
+
+    template <typename... Args>
+    inline s32 sscanf(crunes_t& str, crunes_t const& format, Args&&... args)
+    {
+        const va_r_t argv[] = {args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        return sscanf_(str, format, argv, argc);
+    }
 
 }  // namespace ncore
 

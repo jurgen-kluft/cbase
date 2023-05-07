@@ -2,13 +2,15 @@
 #define __CBASE_DARRAY_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "cbase/c_allocator.h"
 
 namespace ncore
 {
+    // NOTE; this is a dynamically resizing array, however you should only use it for POD types since it will not consider constructors/destructors
+
     class array_capacity_handler_t
     {
     public:
@@ -18,7 +20,8 @@ namespace ncore
 
     extern array_capacity_handler_t* g_get_default_array_capacity_handler();
 
-    template <typename T> class array_t
+    template <typename T>
+    class array_t
     {
     public:
         DCORE_CLASS_PLACEMENT_NEW_DELETE
@@ -32,8 +35,8 @@ namespace ncore
             void*       mem           = alloc->allocate(sizeof(array_t<T>), sizeof(void*));
             array_t<T>* array         = new (mem) array_t<T>();
             array->m_capacity_handler = capacity_handler;
-            array->m_cap_cur = 0;
-            array->m_size = 0;
+            array->m_cap_cur          = 0;
+            array->m_size             = 0;
             array->set_capacity(initial_capacity);
             array->set_size(initial_size);
             return array;
@@ -48,10 +51,10 @@ namespace ncore
 
         inline bool set_capacity(u32 capacity) { return m_capacity_handler->set_capacity((void*&)m_items, sizeof(T), m_size, m_cap_cur, capacity); }
 
-        inline u32 size() const { return m_size; }
+        inline u32  size() const { return m_size; }
         inline void set_size(u32 size) { m_size = size; }
-        inline u32 cap_cur() const { return m_cap_cur; }
-        inline u32 cap_max() const { return m_capacity_handler->max_capacity(); }
+        inline u32  cap_cur() const { return m_cap_cur; }
+        inline u32  cap_max() const { return m_capacity_handler->max_capacity(); }
 
         bool add_item(const T& item)
         {
@@ -73,11 +76,10 @@ namespace ncore
             return false;
         }
 
-        T*       get_item(u32 index) { return &m_items[index]; }
-        T const* get_item(u32 index) const { return &m_items[index]; }
-
-        inline T const* items() const { return m_size; }
+        T*              get_item(u32 index) { return &m_items[index]; }
+        T const*        get_item(u32 index) const { return &m_items[index]; }
         inline T*       items() { return m_size; }
+        inline T const* items() const { return m_size; }
 
         inline bool equal_items(u32 lhs_index, u32 rhs_index) const
         {
@@ -86,7 +88,7 @@ namespace ncore
             return *lhs == *rhs;
         }
 
-        s32 compare_items(u32 lhs_index, u32 rhs_index) const
+        inline s32 compare_items(u32 lhs_index, u32 rhs_index) const
         {
             T* lhs = &m_items[lhs_index];
             T* rhs = &m_items[rhs_index];
@@ -105,7 +107,7 @@ namespace ncore
             , m_cap_cur(0)
         {
         }
-        virtual ~array_t() { m_capacity_handler->set_capacity((void*&)m_items, sizeof(T), m_size, m_cap_cur, 0); }
+        ~array_t() { m_capacity_handler->set_capacity((void*&)m_items, sizeof(T), m_size, m_cap_cur, 0); }
 
         T*                        m_items;
         array_capacity_handler_t* m_capacity_handler;
@@ -113,6 +115,6 @@ namespace ncore
         u32                       m_cap_cur;
     };
 
-}; // namespace ncore
+};  // namespace ncore
 
-#endif // __CBASE_CARRAY_H__
+#endif  // __CBASE_CARRAY_H__

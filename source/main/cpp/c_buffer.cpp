@@ -121,7 +121,7 @@ namespace ncore
             write_u32(ptr, (u32)((c >> 0) & 0xFFFFFFFF));
             write_u32(ptr + 4, (u32)((c >> 32) & 0xFFFFFFFF));
         }
-    } // namespace nuadrw
+    }  // namespace nuadrw
 
     /// ---------------------------------------------------------------------------------------
     /// Binary Reader
@@ -496,17 +496,15 @@ namespace ncore
         return offset;
     }
 
-    u32 binary_reader_t::view_crunes(crunes_t& out_str)
+    u32 binary_reader_t::view_string(const char*& out_str, const char*& out_str_end, s8& out_str_type)
     {
         if (size() == 0)
             return -1;
-        u32 const offset        = m_cursor;
-        out_str.m_ascii.m_flags = read_s32();
-        u32 const datalen       = read_u32();
-        out_str.m_ascii.m_bos   = (char const*)(m_buffer + m_cursor);
-        out_str.m_ascii.m_str   = 0;
-        out_str.m_ascii.m_end   = datalen;
-        out_str.m_ascii.m_eos   = datalen;
+        u32 const offset  = m_cursor;
+        u32 const datalen = read_u32();
+        out_str_type      = read_s8();
+        out_str           = (char const*)(m_buffer + m_cursor);
+        out_str_end       = out_str + datalen;
         m_cursor += datalen;
         return offset;
     }
@@ -777,16 +775,16 @@ namespace ncore
         return -1;
     }
 
-    u32 binary_writer_t::write_string(crunes_t const& str)
+    u32 binary_writer_t::write_string(const char* str, const char* str_end, s8 str_type)
     {
         u32 const   offset   = m_cursor;
-        char const* srcstr   = &str.m_ascii.m_bos[str.m_ascii.m_str];
-        char const* srcend   = &str.m_ascii.m_bos[str.m_ascii.m_end];
+        char const* srcstr   = str;
+        char const* srcend   = str_end;
         u32 const   datasize = (u32)(srcend - srcstr);
         if (can_write(4 + 4 + datasize))
         {
-            write(str.m_ascii.m_flags);
             write((u32)datasize);
+            write(str_type);
 
             char* dststr = (char*)m_buffer + m_cursor;
             while (srcstr < srcend)
@@ -799,4 +797,4 @@ namespace ncore
         return -1;
     }
 
-} // namespace ncore
+}  // namespace ncore

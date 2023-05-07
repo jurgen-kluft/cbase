@@ -36,7 +36,14 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t() : m_bos(nullptr), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
+            runes_t()
+                : m_bos(nullptr)
+                , m_str(0)
+                , m_end(0)
+                , m_eos(0)
+                , m_flags(TYPE)
+            {
+            }
 
             prune m_bos;    // begin of string
             u32   m_str;    // &m_bos[m_end] -> string
@@ -47,10 +54,38 @@ namespace ncore
 
         struct crunes_t
         {
-            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
-            crunes_t(pcrune str, u32 len) : m_bos(str), m_str(0), m_end(len), m_eos(len), m_flags(TYPE) {}
-            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(0), m_end((u32)(end - str)), m_eos((u32)(end - str)), m_flags(TYPE) {}
-            crunes_t(const runes_t& other) : m_bos(other.m_bos), m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos), m_flags(other.m_flags) {}
+            crunes_t()
+                : m_bos((pcrune)&EMPTY_STRING)
+                , m_str(0)
+                , m_end(0)
+                , m_eos(0)
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune str, u32 len)
+                : m_bos(str)
+                , m_str(0)
+                , m_end(len)
+                , m_eos(len)
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune str, pcrune end)
+                : m_bos(str)
+                , m_str(0)
+                , m_end((u32)(end - str))
+                , m_eos((u32)(end - str))
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(const runes_t& other)
+                : m_bos(other.m_bos)
+                , m_str(other.m_str)
+                , m_end(other.m_end)
+                , m_eos(other.m_eos)
+                , m_flags(other.m_flags)
+            {
+            }
 
             pcrune m_bos;    // begin of string
             u32    m_str;    // &m_bos[m_end] -> string
@@ -93,7 +128,14 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t() : m_bos(nullptr), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
+            runes_t()
+                : m_bos(nullptr)
+                , m_str(0)
+                , m_end(0)
+                , m_eos(0)
+                , m_flags(TYPE)
+            {
+            }
 
             prune m_bos;    // begin of string
             u32   m_str;    // &m_bos[m_end] -> string
@@ -104,9 +146,30 @@ namespace ncore
 
         struct crunes_t
         {
-            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
-            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(0), m_end((u32)(end - str)), m_eos((u32)(end - str)), m_flags(TYPE) {}
-            crunes_t(const runes_t& other) : m_bos(other.m_bos), m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos), m_flags(other.m_flags) {}
+            crunes_t()
+                : m_bos((pcrune)&EMPTY_STRING)
+                , m_str(0)
+                , m_end(0)
+                , m_eos(0)
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune str, pcrune end)
+                : m_bos(str)
+                , m_str(0)
+                , m_end((u32)(end - str))
+                , m_eos((u32)(end - str))
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(const runes_t& other)
+                : m_bos(other.m_bos)
+                , m_str(other.m_str)
+                , m_end(other.m_end)
+                , m_eos(other.m_eos)
+                , m_flags(other.m_flags)
+            {
+            }
 
             pcrune m_bos;    // begin of string
             u32    m_str;    // &m_bos[m_end] -> string
@@ -131,7 +194,14 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t() : m_bos(nullptr), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
+            runes_t()
+                : m_bos(nullptr)
+                , m_str(0)
+                , m_end(0)
+                , m_eos(0)
+                , m_flags(TYPE)
+            {
+            }
 
             prune m_bos;    // begin of string
             u32   m_str;    // &m_bos[m_end] -> string
@@ -142,9 +212,30 @@ namespace ncore
 
         struct crunes_t
         {
-            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
-            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(0), m_end((u32)(end - str)), m_eos((u32)(end - str)), m_flags(TYPE) {}
-            crunes_t(const runes_t& other) : m_bos(other.m_bos), m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos), m_flags(other.m_flags) {}
+            crunes_t()
+                : m_bos((pcrune)&EMPTY_STRING)
+                , m_str(0)
+                , m_end(0)
+                , m_eos(0)
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune str, pcrune end)
+                : m_bos(str)
+                , m_str(0)
+                , m_end((u32)(end - str))
+                , m_eos((u32)(end - str))
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(const runes_t& other)
+                : m_bos(other.m_bos)
+                , m_str(other.m_str)
+                , m_end(other.m_end)
+                , m_eos(other.m_eos)
+                , m_flags(other.m_flags)
+            {
+            }
 
             pcrune m_bos;    // begin of string
             u32    m_str;    // &m_bos[m_end] -> string
@@ -168,7 +259,14 @@ namespace ncore
 
         struct runes_t
         {
-            runes_t() : m_bos(nullptr), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
+            runes_t()
+                : m_bos(nullptr)
+                , m_str(0)
+                , m_end(0)
+                , m_eos(0)
+                , m_flags(TYPE)
+            {
+            }
 
             prune m_bos;    // begin of string
             u32   m_str;    // &m_bos[m_end] -> string
@@ -179,9 +277,30 @@ namespace ncore
 
         struct crunes_t
         {
-            crunes_t() : m_bos((pcrune)&EMPTY_STRING), m_str(0), m_end(0), m_eos(0), m_flags(TYPE) {}
-            crunes_t(pcrune str, pcrune end) : m_bos(str), m_str(0), m_end((u32)(end - str)), m_eos((u32)(end - str)), m_flags(TYPE) {}
-            crunes_t(const runes_t& other) : m_bos(other.m_bos), m_str(other.m_str), m_end(other.m_end), m_eos(other.m_eos), m_flags(other.m_flags) {}
+            crunes_t()
+                : m_bos((pcrune)&EMPTY_STRING)
+                , m_str(0)
+                , m_end(0)
+                , m_eos(0)
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune str, pcrune end)
+                : m_bos(str)
+                , m_str(0)
+                , m_end((u32)(end - str))
+                , m_eos((u32)(end - str))
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(const runes_t& other)
+                : m_bos(other.m_bos)
+                , m_str(other.m_str)
+                , m_end(other.m_end)
+                , m_eos(other.m_eos)
+                , m_flags(other.m_flags)
+            {
+            }
 
             pcrune m_bos;    // begin of string
             u32    m_str;    // &m_bos[m_end] -> string
@@ -220,8 +339,10 @@ namespace ncore
         void clear();
         void term();
 
-        uchar32 peek() const;
-        uchar32 read();
+        bool    at_end(u32 cursor) const;
+        bool    is_valid(u32 cursor) const;
+        uchar32 peek(u32 cursor) const;
+        uchar32 read(u32& cursor) const;
         bool    write(uchar32 c);
 
         bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const;  // scan until we reach one of the 'chars'
@@ -282,8 +403,10 @@ namespace ncore
         void reset();
         void clear();
 
-        uchar32 peek() const;
-        uchar32 read();
+        bool    at_end(u32 cursor) const;
+        bool    is_valid(u32 cursor) const;
+        uchar32 peek(u32 cursor) const;
+        uchar32 read(u32& cursor) const;
 
         bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const;  // scan until we reach one of the 'chars'
         void skip(u32& cursor, const crunes_t& skip_chars) const;                         // skip until we reach a character not part of 'chars'
@@ -527,13 +650,18 @@ namespace ncore
             SIZE = L
         };
         T m_run[SIZE];
-        inline runez_t() : runes_t(m_run, 0, 0, SIZE - 1) {}
-        inline runez_t(uchar32 c) : runes_t(m_run, 0, 1, SIZE - 1)
+        inline runez_t()
+            : runes_t(m_run, 0, 0, SIZE - 1)
+        {
+        }
+        inline runez_t(uchar32 c)
+            : runes_t(m_run, 0, 1, SIZE - 1)
         {
             m_run[0] = c;
             m_run[1] = 0;
         }
-        inline runez_t(const char* _str) : runes_t(m_run, 0, 0, SIZE - 1)
+        inline runez_t(const char* _str)
+            : runes_t(m_run, 0, 0, SIZE - 1)
         {
             crunes_t str((ascii::pcrune)_str);
             concatenate(*this, str);
@@ -551,7 +679,8 @@ namespace ncore
         };
         T m_run[SIZE];
 
-        inline crunez_t(uchar32 c) : crunes_t(m_run, 0, 1, SIZE - 1)
+        inline crunez_t(uchar32 c)
+            : crunes_t(m_run, 0, 1, SIZE - 1)
         {
             m_run[0] = c;
             m_run[1] = 0;
@@ -659,9 +788,9 @@ namespace ncore
         s32  count() const;
 
     protected:
-        virtual s32 vwrite(uchar32 c);
-        virtual s32 vwrite(const char* str, const char* end);
-        virtual s32 vwrite(crunes_t const& str);
+        virtual s32  vwrite(uchar32 c);
+        virtual s32  vwrite(const char* str, const char* end);
+        virtual s32  vwrite(crunes_t const& str);
         virtual void vflush();
 
         runes_t m_runes;

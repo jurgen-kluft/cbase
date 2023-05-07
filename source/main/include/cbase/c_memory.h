@@ -7,10 +7,6 @@
 
 #include "cbase/c_debug.h"
 
-#ifndef D_NO_CUSTOM_UINT128
-#include "cbase/private/c_uint128.h"
-#endif
-
 namespace ncore
 {
     template <typename T> inline void set(T* p, T v1) { p[0] = v1; }
@@ -189,12 +185,6 @@ namespace ncore
     }
     ///< Copy <inLength> aligned 32-bit integers from <inSource> to <inDest>
     inline void g_memcopy8(u64* inDest, const u64* inSource, u32 inLength)
-    {
-        for (u32 i = 0; i < inLength; i++)
-            *inDest++ = *inSource++;
-    }
-    ///< Copy <inLength> aligned 64-bit integers from <inSource> to <inDest>
-    inline void g_memcopy16(u128* inDest, const u128* inSource, u32 inLength)
     {
         for (u32 i = 0; i < inLength; i++)
             *inDest++ = *inSource++;

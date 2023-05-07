@@ -71,6 +71,6 @@ namespace ncore
 		ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
 		crunes_t fmt(fmtstr);
 		crunes_t str(_str);
-		sscanf(str, fmt, va_r_t(&mGuid.ma32[0]), va_r_t(&mGuid.ma32[1]), va_r_t(&mGuid.ma32[2]), va_r_t(&mGuid.ma32[3]));
+		sscanf(str, fmt, &mGuid.ma32[0], &mGuid.ma32[1], &mGuid.ma32[2], &mGuid.ma32[3]);
 	}
 };

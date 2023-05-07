@@ -12,19 +12,17 @@ namespace ncore
     // runes_reader_t -> rune_reader_t
     // CharWriter -> rune_writer_t
 
-    static bool SearchUntilOneOf(irunes_reader_t* reader, irunes_reader_t* foo)
+    static bool SearchUntilOneOf(irunes_reader_t* reader, utf32::rune const* foo)
     {
         uchar32 c = reader->peek();
         while (c != '\0')
         {
-            uchar32 f = foo->read();
-            while (f != '\0')
+            c = to_lower(c);
+            for (s32 i = 0; foo[i] != '\0'; ++i)
             {
-                if (f == c)
+                if (foo[i] == c)
                     return true;
-                f = foo->read();
             }
-            foo->reset();
             reader->skip();
             c = reader->peek();
         }
@@ -376,7 +374,7 @@ namespace ncore
         INT64_SIZE = 8,
     };
 
-    s32 VSScanf(irunes_reader_t* reader, irunes_reader_t* fmt, const va_r_list_t& vr_args)
+    s32 VSScanf(irunes_reader_t* reader, irunes_reader_t* fmt, const va_r_t* argv, s32 argc)
     {
         s32 i        = 0;
         s32 w        = 0;
@@ -429,23 +427,30 @@ namespace ncore
                         fmt->skip();
 
                         uchar32 c = reader->read();
-                        va_r_t  r = vr_args[i++];
-                        r         = c;
-                        scanned++;
-                        parsing = 0;
+                        if (i < argc)
+                        {
+                            va_r_t r = argv[i++];
+                            r        = c;
+                            scanned++;
+                            parsing = 0;
+                        }
                     }
                     break;
                     case 's':
                     {
                         fmt->skip();
 
-                        va_r_t r = vr_args[i++];
-
                         u32 i = 0;
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
-                        runes_t* runes = r.getRunes();
+                        runes_t* runes = nullptr;
+                        if (i < argc)
+                        {
+                            va_r_t r = argv[i++];
+                            runes    = r.getRunes();
+                        }
+
                         if (runes != nullptr)
                         {
                             runes_writer_t str_writer(*runes);
@@ -465,7 +470,13 @@ namespace ncore
                                 reader->read();
                             }
                         }
-
+                        else
+                        {
+                            while (reader->peek() != 0 && reader->peek() != ' ')
+                            {
+                                reader->read();
+                            }
+                        }
                         scanned++;
                         parsing = 0;
                     }
@@ -477,10 +488,14 @@ namespace ncore
                     case 'y':
                     {
                         fmt->skip();
-                        va_r_t r = vr_args[i++];
-                        bool   boolean;
-                        MatchBoolStr(reader, boolean);
-                        r = boolean;
+
+                        if (i < argc)
+                        {
+                            va_r_t r = argv[i++];
+                            bool   boolean;
+                            MatchBoolStr(reader, boolean);
+                            r = boolean;
+                        }
                         scanned++;
                     }
                     break;
@@ -490,27 +505,29 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-                        runes_reader_t decimalChars(allDecimalChars, allDecimalChars + 12);
-
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
-                        s64 n1 = 0;
-                        if (SearchUntilOneOf(reader, &decimalChars))
+                        s64                      n1                = 0;
+                        static const utf32::rune allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+                        if (SearchUntilOneOf(reader, allDecimalChars))
                         {
                             n1 = StrToS64(reader, 10);
                         }
 
                         if (!suppress)
                         {
-                            va_r_t r = vr_args[i++];
-                            r        = n1;
+                            if (i < argc)
+                            {
+                                va_r_t r = argv[i++];
+                                r        = n1;
+                            }
                             scanned++;
                         }
                         else
                         {
-                            i++;
+                            if (i < argc)
+                                i++;
                         }
 
                         parsing = 0;
@@ -520,27 +537,29 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-                        runes_reader_t decimalChars(allDecimalChars, allDecimalChars + 10);
-
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
-                        s64 n2 = 0;
-                        if (SearchUntilOneOf(reader, &decimalChars))
+                        s64                      n2                = 0;
+                        static const utf32::rune allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+                        if (SearchUntilOneOf(reader, allDecimalChars))
                         {
                             n2 = StrToS64(reader, 10);
                         }
 
                         if (!suppress)
                         {
-                            va_r_t r = vr_args[i++];
-                            r        = n2;
+                            if (i < argc)
+                            {
+                                va_r_t r = argv[i++];
+                                r        = n2;
+                            }
                             scanned++;
                         }
                         else
                         {
-                            i++;
+                            if (i < argc)
+                                i++;
                         }
 
                         parsing = 0;
@@ -550,27 +569,29 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        utf32::rune    allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-                        runes_reader_t octalChars(allDecimalChars, allDecimalChars + 8);
-
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
-                        s64 n2 = 0;
-                        if (SearchUntilOneOf(reader, &octalChars))
+                        s64                      n2              = 0;
+                        static const utf32::rune allOctalChars[] = {'1', '2', '3', '4', '5', '6', '7', '0', '-', '+', 0};
+                        if (SearchUntilOneOf(reader, allOctalChars))
                         {
                             n2 = StrToS64(reader, 8);
                         }
 
                         if (!suppress)
                         {
-                            va_r_t r = vr_args[i++];
-                            r        = n2;
+                            if (i < argc)
+                            {
+                                va_r_t r = argv[i++];
+                                r        = n2;
+                            }
                             scanned++;
                         }
                         else
                         {
-                            i++;
+                            if (i < argc)
+                                i++;
                         }
 
                         parsing = 0;
@@ -581,20 +602,18 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        utf32::rune    allHexChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
-                        runes_reader_t hexChars(allHexChars, allHexChars + 23);
-
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
                         if (w == 0)
                         {
-                            u32 const varsize = vr_args[i].sizeInBytes();
+                            u32 const varsize = argv[i].sizeInBytes();
                             w                 = varsize * 2;
                         }
 
-                        u64 n2 = 0;
-                        if (SearchUntilOneOf(reader, &hexChars))
+                        u64                      n2            = 0;
+                        static const utf32::rune allHexChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
+                        if (SearchUntilOneOf(reader, allHexChars))
                         {
                             if (w == 2)
                             {
@@ -655,13 +674,17 @@ namespace ncore
 
                         if (!suppress)
                         {
-                            va_r_t r = vr_args[i++];
-                            r        = n2;
+                            if (i < argc)
+                            {
+                                va_r_t r = argv[i++];
+                                r        = n2;
+                            }
                             scanned++;
                         }
                         else
                         {
-                            i++;
+                            if (i < argc)
+                                i++;
                         }
 
                         parsing = 0;
@@ -675,27 +698,29 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        utf32::rune    allFloatChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
-                        runes_reader_t floatChars(allFloatChars, allFloatChars + 14);
-
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
-                        f64 n3 = 0;
-                        if (SearchUntilOneOf(reader, &floatChars))
+                        f64                      n3              = 0;
+                        static const utf32::rune allFloatChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
+                        if (SearchUntilOneOf(reader, allFloatChars))
                         {
                             n3 = StrToF64(reader);
                         }
 
                         if (!suppress)
                         {
-                            va_r_t r = vr_args[i++];
-                            r        = n3;
+                            if (i < argc)
+                            {
+                                va_r_t r = argv[i++];
+                                r        = n3;
+                            }
                             scanned++;
                         }
                         else
                         {
-                            i++;
+                            if (i < argc)
+                                i++;
                         }
 
                         parsing = 0;
@@ -726,21 +751,11 @@ namespace ncore
         return scanned;
     }
 
-    s32 sscanf(crunes_t& str, crunes_t const& fmt, D_VA_R_ARGS_16)
-    {
-        va_r_list_t    vr_args(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16);
-        runes_reader_t buf_reader(str);
-        runes_reader_t fmt_reader(fmt);
-        s32            scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
-        str                    = buf_reader.get_current();
-        return scanned;
-    }
-
-    s32 vsscanf(crunes_t& str, crunes_t const& fmt, const va_r_list_t& vr_args)
+    s32 sscanf_(crunes_t& str, crunes_t const& fmt, const va_r_t* argv, s32 argc)
     {
         runes_reader_t buf_reader(str);
         runes_reader_t fmt_reader(fmt);
-        s32            scanned = VSScanf(&buf_reader, &fmt_reader, vr_args);
+        s32            scanned = VSScanf(&buf_reader, &fmt_reader, argv, argc);
         str                    = buf_reader.get_current();
         return scanned;
     }
