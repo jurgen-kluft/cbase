@@ -1,4 +1,4 @@
-#include "ccore/c_target.h"
+#include "cbase/c_target.h"
 #ifdef TARGET_PC
 
 // Windows includes first
@@ -19,36 +19,28 @@ namespace ncore
 {
     class out_writer_t : public irunes_writer_t
     {
-        runez_t<utf32::rune, 256> m_write_to_console_cache;
-
     public:
         inline out_writer_t() {}
 
         virtual s32        vwrite(uchar32 c)
         {
-            if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
-                vflush();
-            m_write_to_console_cache += c;
-            return 1;
+            utf32::crunes_t src(&c, 0, 1, 1);
+            return write_utf32(src);
         }
 
         virtual s32 vwrite(const char* str, const char* end)
         {
-            vflush();
-
             ascii::crunes_t src(str, end);
             return write_ascii(src)!=0;
         }
 
         virtual s32 vwrite(crunes_t const& str)
         {
-            vflush();
-            
             switch (str.get_type())
             {
-                case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii)!=0;
-                case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16)!=0;
-                case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32)!=0;
+                case ascii::TYPE: return write_ascii(str.m_ascii)!=0;
+                case utf16::TYPE: return write_utf16(str.m_utf16)!=0;
+                case utf32::TYPE: return write_utf32(str.m_utf32)!=0;
                 default: //@todo: UTF-8
                     break;
             }
@@ -57,12 +49,6 @@ namespace ncore
 
         virtual void vflush()
         {
-            if (m_write_to_console_cache.size() > 0)
-            {
-                crunes_t cachestr = m_write_to_console_cache;
-                write_utf32(cachestr.m_utf32);
-                m_write_to_console_cache.reset();
-            }
         }
 
         static void write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
@@ -103,7 +89,7 @@ namespace ncore
 
         static s32 write_ascii(const ascii::crunes_t& str)
         {
-            const s32 maxlen = 252;
+            const s32 maxlen = 124;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
@@ -130,7 +116,7 @@ namespace ncore
 
         static s32 write_utf16(const utf16::crunes_t& str)
         {
-            const s32 maxlen = 252;
+            const s32 maxlen = 124;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
@@ -157,7 +143,7 @@ namespace ncore
 
         static s32 write_utf32(const utf32::crunes_t& str)
         {
-            const s32 maxlen = 252;
+            const s32 maxlen = 124;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;

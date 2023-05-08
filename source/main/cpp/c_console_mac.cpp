@@ -1,62 +1,46 @@
 #include "ccore/c_target.h"
 #ifdef TARGET_MAC
 
-#include <stdio.h>
-#include <iostream>
+#    include <stdio.h>
+#    include <iostream>
 
-#include "cbase/c_console.h"
-#include "cbase/c_printf.h"
-#include "cbase/c_runes.h"
+#    include "cbase/c_console.h"
+#    include "cbase/c_printf.h"
+#    include "cbase/c_runes.h"
 
 namespace ncore
 {
     class out_writer_t : public irunes_writer_t
     {
-        runez_t<utf32::rune, 256> m_write_to_console_cache;
-
     public:
         inline out_writer_t() {}
 
         virtual s32 vwrite(uchar32 c)
         {
-            if (m_write_to_console_cache.size() >= m_write_to_console_cache.cap())
-                vflush();
-            m_write_to_console_cache += c;
-            return 1;
+            utf32::crunes_t src(&c, 0, 1, 1);
+            return write_utf32(src);
         }
 
-		virtual s32        vwrite(const char* str, const char* end)
-		{
-			vflush();
-
-			ascii::crunes_t src(str, end);
-			return write_ascii(src)!=0;
-		}
-
-        virtual s32        vwrite(crunes_t const& str)
+        virtual s32 vwrite(const char* str, const char* end)
         {
-            vflush();
-            
+            ascii::crunes_t src(str, end);
+            return write_ascii(src) != 0;
+        }
+
+        virtual s32 vwrite(crunes_t const& str)
+        {
             switch (str.get_type())
             {
-                case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii);
-                case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16);
-                case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32);
-                default: //@todo: UTF-8
+                case ascii::TYPE: return write_ascii(str.m_ascii);
+                case utf16::TYPE: return write_utf16(str.m_utf16);
+                case utf32::TYPE: return write_utf32(str.m_utf32);
+                default:  //@todo: UTF-8
                     break;
             }
             return 0;
         }
 
-        virtual void vflush()
-        {
-            if (m_write_to_console_cache.size() > 0)
-            {
-                crunes_t cachestr = m_write_to_console_cache;
-                write_utf32(cachestr.m_utf32);
-                m_write_to_console_cache.reset();
-            }
-        }
+        virtual void vflush() {}
 
         static s32 write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
         {
@@ -100,16 +84,16 @@ namespace ncore
         static s32 write_ascii(const ascii::crunes_t& str)
         {
             const s32 maxlen = 252;
-            char   str8[maxlen + 4];
+            char      str8[maxlen + 4];
 
             s32           l   = 0;
-            ascii::pcrune src = &str.m_bos[ str.m_str ];
-            ascii::pcrune end = &str.m_bos[ str.m_end ];
+            ascii::pcrune src = &str.m_bos[str.m_str];
+            ascii::pcrune end = &str.m_bos[str.m_end];
             while (src < end)
             {
                 char* dst8 = (char*)str8;
                 char* end8 = dst8 + maxlen;
-                s32      ll    = 0;
+                s32   ll   = 0;
                 while (src < end && dst8 < end8)
                 {
                     *dst8++ = (char)(*src++);
@@ -128,8 +112,8 @@ namespace ncore
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf16::pcrune src = &str.m_bos[ str.m_str ];
-            utf16::pcrune end = &str.m_bos[ str.m_end ];
+            utf16::pcrune src = &str.m_bos[str.m_str];
+            utf16::pcrune end = &str.m_bos[str.m_end];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -154,8 +138,8 @@ namespace ncore
             uchar32   str32[maxlen + 1];
 
             s32           l   = 0;
-            utf32::pcrune src = &str.m_bos[ str.m_str ];
-            utf32::pcrune end = &str.m_bos[ str.m_end ];
+            utf32::pcrune src = &str.m_bos[str.m_str];
+            utf32::pcrune end = &str.m_bos[str.m_end];
             while (src < end)
             {
                 uchar32* dst32 = (uchar32*)str32;
@@ -164,7 +148,7 @@ namespace ncore
                 while (src < end && dst32 < end32)
                 {
                     uchar32 c = *src++;
-                    *dst32++ = c;
+                    *dst32++  = c;
                     ll += 1;
                 }
                 str32[ll] = 0;
@@ -227,11 +211,11 @@ namespace ncore
             }
             if (fg != nullptr && bg == nullptr)
             {
-				::printf("\x1b[%sm", fg);
+                ::printf("\x1b[%sm", fg);
             }
             if (fg == nullptr && bg != nullptr)
             {
-				::printf("\x1b[%sm", bg);
+                ::printf("\x1b[%sm", bg);
             }
 
             return 0;
@@ -239,7 +223,7 @@ namespace ncore
 
         virtual void writeln()
         {
-            ascii::rune line32[] = {'\n', 0};
+            ascii::rune     line32[] = {'\n', 0};
             ascii::crunes_t line(line32, 1);
             out_writer_t::write_ascii(line);
         }
@@ -251,8 +235,8 @@ namespace ncore
                 case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii);
                 case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16);
                 case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32);
-                default: //@todo: UTF-8
-					break;
+                default:  //@todo: UTF-8
+                    break;
             }
             return 0;
         }
@@ -272,6 +256,6 @@ namespace ncore
         return &sConsoleOut;
     }
 
-}; // namespace ncore
+};  // namespace ncore
 
 #endif
