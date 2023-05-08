@@ -1,7 +1,7 @@
 #define TEST_DYNTRIE
 #ifdef TEST_DYNTRIE
 
-#    include "cbase/c_target.h"
+#    include "ccore/c_target.h"
 #    include "cbase/c_allocator.h"
 #    include "cbase/c_debug.h"
 #    include "cbase/c_integer.h"

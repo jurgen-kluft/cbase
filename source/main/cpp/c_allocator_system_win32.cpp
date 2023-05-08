@@ -1,4 +1,4 @@
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #ifdef TARGET_PC
 
 #ifdef TARGET_DEBUG
@@ -87,14 +87,14 @@ namespace ncore
     };
 
     allocator_win32_system sSystemAllocator;
-    void                     alloc_t::init_system()
+    void                     init_system_alloc()
     {
         if (!sSystemAllocator.isInitialized())
         {
             sSystemAllocator.init();
         }
     }
-    void alloc_t::exit_system()
+    void exit_system_alloc()
     {
         if (sSystemAllocator.isInitialized())
         {
@@ -102,7 +102,7 @@ namespace ncore
         }
     }
 
-    alloc_t* alloc_t::get_system() { return &sSystemAllocator; }
+    alloc_t* get_system_alloc() { return &sSystemAllocator; }
 
 }; // namespace ncore
 

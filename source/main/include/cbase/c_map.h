@@ -1,6 +1,6 @@
 #ifndef __CBASE_MAP_H__
 #define __CBASE_MAP_H__
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
@@ -26,7 +26,7 @@ namespace ncore
         {
             if (m_allocator == nullptr)
             {
-                m_allocator = alloc_t::get_system();
+                m_allocator = get_system_alloc();
             }
 
             if (max_items <= type_t<u16>::max())
@@ -75,7 +75,7 @@ namespace ncore
         {
             if (m_allocator == nullptr)
             {
-                m_allocator = alloc_t::get_system();
+                m_allocator = get_system_alloc();
             }
 
             if (max_items <= type_t<u16>::max())

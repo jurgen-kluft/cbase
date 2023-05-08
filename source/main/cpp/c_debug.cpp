@@ -1,42 +1,25 @@
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #include "cbase/c_context.h"
-#include "cbase/c_debug.h"
-
-#define D_ASSERT
+#include "ccore/c_debug.h"
 
 #ifdef D_ASSERT
 #include "cbase/c_log.h"
+#endif
 
 namespace ncore
 {
+#ifdef D_ASSERT
+
     //==============================================================================
     // Default input func
     //==============================================================================
-    class asserthandler_default_t : public asserthandler_t
+    class asserthandler_cbase_t : public asserthandler_t
     {
     public:
         bool handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString);
     };
 
-    asserthandler_t* asserthandler_t::sGetDefaultAssertHandler()
-    {
-        static asserthandler_default_t sAssertHandler;
-        asserthandler_t*               handler = &sAssertHandler;
-        return handler;
-    }
-
-    class asserthandler_release_t : public asserthandler_t
-    {
-    public:
-        bool handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) { return false; }
-    };
-
-    asserthandler_t* asserthandler_t::sGetReleaseAssertHandler()
-    {
-        static asserthandler_release_t sAssertHandler;
-        asserthandler_t*               handler = &sAssertHandler;
-        return handler;
-    }
+    static asserthandler_cbase_t sBaseAssertHandler;
 
     //------------------------------------------------------------------------------
     // Summary:
@@ -56,19 +39,7 @@ namespace ncore
     //     gAssertHandler
     //------------------------------------------------------------------------------
 
-    bool gAssertHandler(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
-    {
-        // From the thread context, get the assert handler
-        // Call handle_assert() on that object and return
-        asserthandler_t* handler = context_t::assert_handler();
-
-        if (handler == nullptr)
-            handler = asserthandler_t::sGetDefaultAssertHandler();
-
-        return handler->handle_assert(flags, fileName, lineNumber, exprString, messageString);
-    }
-
-    bool asserthandler_default_t::handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
+    bool asserthandler_cbase_t::handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString)
     {
         //
         // handle flags
@@ -101,27 +72,29 @@ namespace ncore
         //
         // Default: Skip this assert
         //
-        return False;
+        return false;
     }
-
-};  // namespace ncore
 
 #else
 
-namespace ncore
-{
     class asserthandler_release_t : public asserthandler_t
     {
     public:
         bool handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) { return false; }
     };
 
-    asserthandler_t* asserthandler_t::sGetReleaseAssertHandler()
-    {
-        static asserthandler_release_t sAssertHandler;
-        asserthandler_t*               handler = &sAssertHandler;
-        return handler;
-    }
-}  // namespace ncore
+    static asserthandler_release_t sBaseAssertHandler;
 
 #endif
+
+}  // namespace ncore
+
+namespace cbase
+{
+    ncore::asserthandler_t* gSetAssertHandler()
+    {
+        ncore::asserthandler_t* assertHandler = &ncore::sBaseAssertHandler;
+        ncore::gSetAssertHandler(assertHandler);
+        return assertHandler;
+    }
+}  // namespace nbase

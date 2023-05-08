@@ -1,4 +1,4 @@
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
 #include "cbase/c_base.h"
 #include "cbase/c_buffer.h"
@@ -122,18 +122,15 @@ namespace cbase
 {
     void init(ncore::s32 number_of_threads, ncore::s32 temporary_allocator_size)
     {
-        ncore::alloc_t::init_system();
+        ncore::asserthandler_t* assert_handler = gSetAssertHandler();
+
+        ncore::init_system_alloc();
+
         ncore::console_t::init_default_console();
-        ncore::context_t::init(number_of_threads, 16, ncore::alloc_t::get_system());
+        ncore::context_t::init(number_of_threads, 16, ncore::get_system_alloc());
         ncore::context_t::register_thread(); // Should be called once from a created thread
 
-#ifdef D_ASSERT
-        ncore::asserthandler_t* assert_handler = ncore::asserthandler_t::sGetDefaultAssertHandler();
-#else
-        ncore::asserthandler_t* assert_handler = ncore::asserthandler_t::sGetReleaseAssertHandler();
-#endif // D_ASSERT
-
-        ncore::alloc_t*       system_allocator = ncore::alloc_t::get_system();
+        ncore::alloc_t*       system_allocator = ncore::get_system_alloc();
         ncore::runes_alloc_t* string_allocator = ncore::get_runes_alloc();
 
         // The assert handler, system and string allocator are thread safe
@@ -142,8 +139,8 @@ namespace cbase
             const ncore::s32 slot = i;
 
             ncore::u8*       buffer_data      = (ncore::u8*)system_allocator->allocate(temporary_allocator_size);
-            ncore::alloc_t*  stack_allocator  = ncore::alloc_t::get_system()->construct<ncore::alloc_buffer_t>(buffer_data, temporary_allocator_size);
-            ncore::random_t* random_generator = ncore::alloc_t::get_system()->construct<ncore::wyrand_t>();
+            ncore::alloc_t*  stack_allocator  = ncore::get_system_alloc()->construct<ncore::alloc_buffer_t>(buffer_data, temporary_allocator_size);
+            ncore::random_t* random_generator = ncore::get_system_alloc()->construct<ncore::wyrand_t>();
             random_generator->reset((ncore::s64)random_generator); // randomize the seed
 
             ncore::context_t::set_assert_handler(assert_handler);
@@ -175,7 +172,7 @@ namespace cbase
         system_allocator->deallocate(stack_allocator);
 
         ncore::context_t::exit(system_allocator);
-        ncore::alloc_t::exit_system();
+        ncore::exit_system_alloc();
 
         ncore::context_t::set_assert_handler(nullptr);
     }

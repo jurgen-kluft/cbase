@@ -1,6 +1,6 @@
 #ifndef __CBASE_LIMITS_H__
 #define __CBASE_LIMITS_H__
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
@@ -113,8 +113,8 @@ namespace ncore
     public:
         typedef bool __type;
 
-        static __type  min() { return D_U8_MIN; }
-        static __type  max() { return D_U8_MAX; }
+        static __type  min() { return false; }
+        static __type  max() { return true; }
         static bool    has_sign() { return false; }
         static type_id id() { return type_id(type_id::Bool); }
     };

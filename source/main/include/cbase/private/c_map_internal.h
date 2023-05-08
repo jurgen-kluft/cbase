@@ -17,19 +17,19 @@ namespace ncore
             m_allocator = allocator;
             m_size      = 0;
             m_freeindex = 0;
-            m_nodes     = m_allocator->obtain_array<nodeT_t>(maxsize);
-            m_colors    = m_allocator->obtain_array<u32>((maxsize + 31) >> 5);
-            m_keys      = m_allocator->obtain_array<K>(maxsize);
+            m_nodes     = g_allocate_array<nodeT_t>(m_allocator, maxsize);
+            m_colors    = g_allocate_array<u32>(m_allocator, (maxsize + 31) >> 5);
+            m_keys      = g_allocate_array<K>(m_allocator, maxsize);
 
             m_values = nullptr;
             if (has_values)
-                m_values = m_allocator->obtain_array<V>(maxsize);
+                m_values = g_allocate_array<V>(m_allocator, maxsize);
 
             m_hashes = nullptr;
             H hasher;
             if (hasher.is_hashable())
             {
-                m_hashes = m_allocator->obtain_array<u64>(maxsize);
+                m_hashes = g_allocate_array<u64>(m_allocator, maxsize);
             }
 
             m_freelist = nullptr;
@@ -37,13 +37,13 @@ namespace ncore
 
         virtual ~map_tree_ctxt_t()
         {
-            m_allocator->deallocate(m_nodes);
-            m_allocator->deallocate(m_colors);
-            m_allocator->deallocate(m_keys);
+            g_deallocate_array(m_allocator, m_nodes);
+            g_deallocate_array(m_allocator, m_colors);
+            g_deallocate_array(m_allocator, m_keys);
             if (m_hashes != nullptr)
-                m_allocator->deallocate(m_hashes);
+                g_deallocate_array(m_allocator, m_hashes);
             if (m_values != nullptr)
-                m_allocator->deallocate(m_values);
+                g_deallocate_array(m_allocator, m_values);
         }
 
         virtual s32   v_size() const final { return m_size; }

@@ -1,4 +1,4 @@
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
 #include "cbase/c_tree.h"
 #include "cbase/test_allocator.h"
@@ -493,7 +493,6 @@ UNITTEST_SUITE_BEGIN(test_tree)
             s32 e(5);
             CHECK_FALSE(tree.find(&e, node));
 
-            void const* data;
             while (!tree.clear()) {}
 
             CHECK_EQUAL(0, tree.size());

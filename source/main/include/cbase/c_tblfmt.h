@@ -1,11 +1,11 @@
 #ifndef __CBASE_TABLE_FMT_H__
 #define __CBASE_TABLE_FMT_H__
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
 
-#include "cbase/c_debug.h"
+#include "ccore/c_debug.h"
 #include "cbase/c_runes.h"
 #include "cbase/c_strfmt.h"
 #include "cbase/c_va_list.h"
@@ -107,8 +107,8 @@ namespace ncore
             template <typename... Args>
             void row(Args&&... _args)
             {
-                const va_t argv[] = {va_t(_args)...};
-                const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+                const va_t argv[] = {va_t(_args)..., va_t(0)};
+                const s32  argc   = (sizeof(argv) / sizeof(argv[0])) - 1;
                 tbl_format(state_, argv, argc);
             }
 

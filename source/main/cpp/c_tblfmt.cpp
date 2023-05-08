@@ -163,6 +163,12 @@ namespace ncore
             }
         }
 
+        template<typename T>
+        inline static u32 distance_to_size32(T const* str, T const* end)
+        {
+            return (u32)((uint_t)end - (uint_t)str);
+        }
+
         void tbl_row_to_utf8(tbl_state_t& state, utf8::prune str, utf8::pcrune end)
         {
             utf8::prune iter = str;
@@ -170,7 +176,7 @@ namespace ncore
                 *iter++ = 0;
 
             // convert the utf32 row string to utf8
-            runes_t        utf_8(str, 0, end - str, end - str, utf8::TYPE);
+            runes_t        utf_8(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf8::TYPE);
             crunes_t       utf_32((utf32::pcrune)state.row_, 0, state.row_len_, state.row_len_);
             runes_writer_t writer(utf_8);
             writer.write(utf_32);
@@ -183,7 +189,7 @@ namespace ncore
                 *iter++ = 0;
 
             // convert the utf32 row string to utf16
-            runes_t        utf_16(str, 0, end - str, end - str, utf16::TYPE);
+            runes_t        utf_16(str, 0, distance_to_size32(str, end), distance_to_size32(str,end), utf16::TYPE);
             crunes_t       utf_32((utf32::pcrune)state.row_, 0, state.row_len_, state.row_len_);
             runes_writer_t writer(utf_16);
             writer.write(utf_32);

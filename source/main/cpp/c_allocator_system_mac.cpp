@@ -1,4 +1,4 @@
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #ifdef TARGET_MAC
 
 #include <stdlib.h>
@@ -45,10 +45,10 @@ namespace ncore
         return new_ptr;
     }
 
-    class x_allocator_macos_system : public alloc_t
+    class allocator_macos_system : public alloc_t
     {
     public:
-        x_allocator_macos_system()
+        allocator_macos_system()
             : mInitialized(0)
             , mDefaultAlignment(4)
             , mAllocationCount(0)
@@ -93,9 +93,9 @@ namespace ncore
         u64 mAllocationCount;
     };
 
-    x_allocator_macos_system sSystemAllocator;
+    allocator_macos_system sSystemAllocator;
 
-    void alloc_t::init_system()
+    void init_system_alloc()
     {
         if (!sSystemAllocator.isInitialized())
         {
@@ -103,7 +103,7 @@ namespace ncore
         }
     }
     
-    void alloc_t::exit_system()
+    void exit_system_alloc()
     {
         if (sSystemAllocator.isInitialized())
         {
@@ -111,7 +111,7 @@ namespace ncore
         }
     }
 
-    alloc_t* alloc_t::get_system() { return &sSystemAllocator; }
+    alloc_t* get_system_alloc() { return &sSystemAllocator; }
 
 }; // namespace ncore
 

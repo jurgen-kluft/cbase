@@ -1,6 +1,6 @@
 #ifndef __CCORE_CHARS_H__
 #define __CCORE_CHARS_H__
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif

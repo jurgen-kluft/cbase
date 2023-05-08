@@ -5,7 +5,7 @@
 
 #ifndef __CBASE_CONSOLE_H__
 #define __CBASE_CONSOLE_H__
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
