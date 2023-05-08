@@ -44,6 +44,14 @@ namespace ncore
                 , m_flags(TYPE)
             {
             }
+            runes_t(prune bos, u32 str, u32 end, u32 eos)
+                : m_bos(bos)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(eos)
+                , m_flags(TYPE)
+            {
+            }
 
             prune m_bos;    // begin of string
             u32   m_str;    // &m_bos[m_end] -> string
@@ -75,6 +83,14 @@ namespace ncore
                 , m_str(0)
                 , m_end((u32)(end - str))
                 , m_eos((u32)(end - str))
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune bos, u32 str, u32 end, u32 eos)
+                : m_bos(bos)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(eos)
                 , m_flags(TYPE)
             {
             }
@@ -136,6 +152,14 @@ namespace ncore
                 , m_flags(TYPE)
             {
             }
+            runes_t(prune bos, u32 str, u32 end, u32 eos)
+                : m_bos(bos)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(eos)
+                , m_flags(TYPE)
+            {
+            }
 
             prune m_bos;    // begin of string
             u32   m_str;    // &m_bos[m_end] -> string
@@ -159,6 +183,14 @@ namespace ncore
                 , m_str(0)
                 , m_end((u32)(end - str))
                 , m_eos((u32)(end - str))
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune bos, u32 str, u32 end, u32 eos)
+                : m_bos(bos)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(eos)
                 , m_flags(TYPE)
             {
             }
@@ -202,6 +234,14 @@ namespace ncore
                 , m_flags(TYPE)
             {
             }
+            runes_t(prune bos, u32 str, u32 end, u32 eos)
+                : m_bos(bos)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(eos)
+                , m_flags(TYPE)
+            {
+            }
 
             prune m_bos;    // begin of string
             u32   m_str;    // &m_bos[m_end] -> string
@@ -225,6 +265,14 @@ namespace ncore
                 , m_str(0)
                 , m_end((u32)(end - str))
                 , m_eos((u32)(end - str))
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune bos, u32 str, u32 end, u32 eos)
+                : m_bos(bos)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(eos)
                 , m_flags(TYPE)
             {
             }
@@ -267,6 +315,14 @@ namespace ncore
                 , m_flags(TYPE)
             {
             }
+            runes_t(prune bos, u32 str, u32 end, u32 eos)
+                : m_bos(bos)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(eos)
+                , m_flags(TYPE)
+            {
+            }
 
             prune m_bos;    // begin of string
             u32   m_str;    // &m_bos[m_end] -> string
@@ -290,6 +346,14 @@ namespace ncore
                 , m_str(0)
                 , m_end((u32)(end - str))
                 , m_eos((u32)(end - str))
+                , m_flags(TYPE)
+            {
+            }
+            crunes_t(pcrune bos, u32 str, u32 end, u32 eos)
+                : m_bos(bos)
+                , m_str(str)
+                , m_end(end)
+                , m_eos(eos)
                 , m_flags(TYPE)
             {
             }
