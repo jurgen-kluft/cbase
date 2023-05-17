@@ -349,9 +349,9 @@ namespace ncore
             if (mLength < 11)
             {
                 mArg[mLength++] = inArg1;
-                return True;
+                return true;
             }
-            return False;
+            return false;
         }
         void add(const va_list_t &inList)
         {
@@ -696,9 +696,9 @@ namespace ncore
             if (mLength < 16)
             {
                 mArg[mLength++] = inArg1;
-                return True;
+                return true;
             }
-            return False;
+            return false;
         }
 
         va_r_t operator[](s32 inIndex) const

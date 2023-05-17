@@ -46,7 +46,7 @@ namespace ncore
         //
         if ((flags & asserthandler_t::DB_FLAG_IGNORE) != 0)
         {
-            return False;
+            return false;
         }
 
         //

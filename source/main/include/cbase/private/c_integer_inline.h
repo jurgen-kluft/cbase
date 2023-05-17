@@ -55,7 +55,7 @@ namespace ncore
          */
         inline u32 align(u32 integer, u32 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return (integer) & (~(alignment - 1));
         }
 
@@ -64,7 +64,7 @@ namespace ncore
          */
         inline u32 alignDown(u32 integer, u32 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return (integer) & (~(alignment - 1));
         }
 
@@ -73,7 +73,7 @@ namespace ncore
          */
         inline s32 alignUp(s32 integer, s32 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return ((integer + (alignment - 1)) & (~(alignment - 1)));
         }
 
@@ -82,7 +82,7 @@ namespace ncore
          */
         inline u32 alignUp(u32 integer, u32 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return ((integer + (alignment - 1)) & (~(alignment - 1)));
         }
 
@@ -91,7 +91,7 @@ namespace ncore
          */
         inline u64 alignUp(u64 integer, u64 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return ((integer + (alignment - 1)) & (~(alignment - 1)));
         }
 
@@ -100,25 +100,25 @@ namespace ncore
          */
         inline bool isAligned(s32 integer, u32 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return integer == ((integer) & (~(alignment - 1)));
         }
 
         inline bool isAligned(u32 integer, u32 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return integer == ((integer) & (~(alignment - 1)));
         }
 
         inline bool isAligned(s64 integer, u32 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return integer == ((integer) & (~((u64)alignment - 1)));
         }
 
         inline bool isAligned(u64 integer, u32 alignment)
         {
-            ASSERTS(ispo2(alignment) == True, "Error: alignment value should be a power of 2");
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return integer == ((integer) & (~((u64)alignment - 1)));
         }
 

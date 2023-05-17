@@ -473,7 +473,7 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? True : False; break;
+            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
             case TYPE_UINT32: *((u32*)mRef) = rhs; break;
             case TYPE_INT32: *((s32*)mRef) = rhs; break;
             case TYPE_AINT32: *((s32*)mRef) = rhs; break;
@@ -501,7 +501,7 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? True : False; break;
+            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
             case TYPE_UINT32: *((u32*)mRef) = rhs; break;
             case TYPE_INT32: *((s32*)mRef) = rhs; break;
             case TYPE_AINT32: *((s32*)mRef) = rhs; break;
@@ -529,7 +529,7 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? True : False; break;
+            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
             case TYPE_UINT32: *((u32*)mRef) = rhs; break;
             case TYPE_INT32: *((s32*)mRef) = rhs; break;
             case TYPE_AINT32: *((s32*)mRef) = rhs; break;
@@ -557,7 +557,7 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? True : False; break;
+            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
             case TYPE_UINT32: *((u32*)mRef) = (u32)rhs; break;
             case TYPE_INT32: *((s32*)mRef) = (s32)rhs; break;
             case TYPE_AINT32: *((s32*)mRef) = (s32)rhs; break;
@@ -585,7 +585,7 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? True : False; break;
+            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
             case TYPE_UINT32: *((u32*)mRef) = (u32)rhs; break;
             case TYPE_INT32: *((s32*)mRef) = (s32)rhs; break;
             case TYPE_AINT32: *((s32*)mRef) = (s32)rhs; break;
@@ -607,7 +607,7 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? True : False; break;
+            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
             case TYPE_UINT32: *((u32*)mRef) = (u32)rhs; break;
             case TYPE_INT32: *((s32*)mRef) = (s32)rhs; break;
             case TYPE_AINT32: *((s32*)mRef) = (s32)rhs; break;
@@ -697,7 +697,7 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? True : False; break;
+            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
             case TYPE_UINT32: *((u32*)mRef) = rhs; break;
             case TYPE_INT32: *((s32*)mRef) = rhs; break;
             case TYPE_AINT32:
