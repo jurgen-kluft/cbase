@@ -65,18 +65,18 @@ namespace ncore
     public:
         va_t() : mArg3(TYPE_EMPTY) { mArg = mArg2 = 0; }
         va_t(const va_t &c) : mArg(c.mArg), mArg2(c.mArg2), mArg3(c.mArg3) { }
-        explicit va_t(s8 inVar) : mArg3(TYPE_INT8) { *(s8 *)&mArg = inVar; }
-        explicit va_t(u8 inVar) : mArg3(TYPE_UINT8) { *(u8 *)&mArg = inVar; }
-        explicit va_t(s16 inVar) : mArg3(TYPE_INT16) { *(s16 *)&mArg = inVar; }
-        explicit va_t(u16 inVar) : mArg3(TYPE_UINT16) { *(u16 *)&mArg = inVar; }
-        explicit va_t(s32 inVar) : mArg3(TYPE_INT32) { *(s32 *)&mArg = inVar; }
+        explicit va_t(const s8 inVar) : mArg3(TYPE_INT8) { *(s8 *)&mArg = inVar; }
+        explicit va_t(const u8 inVar) : mArg3(TYPE_UINT8) { *(u8 *)&mArg = inVar; }
+        explicit va_t(const s16 inVar) : mArg3(TYPE_INT16) { *(s16 *)&mArg = inVar; }
+        explicit va_t(const u16 inVar) : mArg3(TYPE_UINT16) { *(u16 *)&mArg = inVar; }
+        explicit va_t(const s32 inVar) : mArg3(TYPE_INT32) { *(s32 *)&mArg = inVar; }
         explicit va_t(s32 *inVar) : mArg3(TYPE_PINT32) { *(s32 **)&mArg = inVar; }
-        explicit va_t(u32 inVar) : mArg3(TYPE_UINT32) { *(u32 *)&mArg = inVar; }
-        explicit va_t(s64 inVar) : mArg3(TYPE_INT64) { *(s64 *)&mArg = inVar; }
-        explicit va_t(u64 inVar) : mArg3(TYPE_UINT64) { *(u64 *)&mArg = inVar; }
-        explicit va_t(bool inVar) : mArg3(TYPE_BOOL) { *(u32 *)&mArg = inVar ? 1 : 0; }
-        explicit va_t(f32 inVar) : mArg3(TYPE_FLOAT32) { *(f32 *)&mArg = inVar; }
-        explicit va_t(f64 inVar) : mArg3(TYPE_FLOAT64) { *(f64 *)&mArg = inVar; }
+        explicit va_t(const u32 inVar) : mArg3(TYPE_UINT32) { *(u32 *)&mArg = inVar; }
+        explicit va_t(const s64 inVar) : mArg3(TYPE_INT64) { *(s64 *)&mArg = inVar; }
+        explicit va_t(const u64 inVar) : mArg3(TYPE_UINT64) { *(u64 *)&mArg = inVar; }
+        explicit va_t(const bool inVar) : mArg3(TYPE_BOOL) { *(u32 *)&mArg = inVar ? 1 : 0; }
+        explicit va_t(const f32 inVar) : mArg3(TYPE_FLOAT32) { *(f32 *)&mArg = inVar; }
+        explicit va_t(const f64 inVar) : mArg3(TYPE_FLOAT64) { *(f64 *)&mArg = inVar; }
         explicit va_t(const char *inVar);
         explicit va_t(const wchar_t *inVar);
         explicit va_t(crunes_t const &str);
