@@ -1263,7 +1263,7 @@ namespace ncore
      *            0  if there is not enough room in buffer or internal error happened during conversion.
      *
      */
-    int dconvstr_print(char** outbuf, int* outbuf_size, double value, int format_char, u32 format_flags, int format_width, int format_precision)
+    s32 dconvstr_print(char** outbuf, s32* outbuf_size, double value, s32 format_char, u32 format_flags, s32 format_width, s32 format_precision)
     {
         // 1. Unpack double precision value
         int is_nan      = 0;
@@ -1534,7 +1534,7 @@ namespace ncore
      *  condition as an indication of successful conversion.
      *
      */
-    int dconvstr_scan(const char* input, const char** input_end, double* output, int* output_erange)
+    s32 dconvstr_scan(const char* input, const char** input_end, f64* output, s32* output_erange)
     {
         // 1. Handle special cases
         if (((input[0] == 'n') || (input[0] == 'N')) && ((input[1] == 'a') || (input[1] == 'A')) && ((input[2] == 'n') || (input[2] == 'N')))

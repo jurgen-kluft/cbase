@@ -73,7 +73,7 @@ namespace ncore
     //  error checking, then set input_end != NULL and use ( ret_value != 0 )&&( **input_end == 0 )
     //  condition as an indication of successful conversion.
     //
-    s32 dconvstr_scan(const char* input, const char** input_end, double* output, s32* output_erange);
+    s32 dconvstr_scan(const char* input, const char** input_end, f64* output, s32* output_erange);
 
 } // namespace ncore
 

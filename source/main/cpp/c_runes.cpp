@@ -1,6 +1,7 @@
 #include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
 #include "ccore/c_debug.h"
+#include "cbase/c_dconv.h"
 #include "cbase/c_integer.h"
 #include "cbase/c_console.h"
 #include "cbase/c_memory.h"
@@ -678,12 +679,12 @@ namespace ncore
             return q;
         }
 
-        bool utoa(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        char* utoa(u32 val, char* cursor, char const* end, s32 base, bool octzero, bool lowercase)
         {
-            ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
+            ASSERT(cursor != nullptr && end != nullptr);
 
             if ((end - cursor) < 10)
-                return false;
+                return cursor;
 
             uchar32 c;
             s32     sval;
@@ -755,22 +756,22 @@ namespace ncore
             const char* we = cursor + 10;
             while (w < we)
                 *cursor++ = *w++;
-            return true;
+            return cursor;
         }
 
-        bool itoa(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        char* itoa(s32 val, char* cursor, char const* end, s32 base, bool octzero, bool lowercase)
         {
-            ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
+            ASSERT(cursor != nullptr && end != nullptr);
 
             if ((end - cursor) < 11)
-                return false;
+                return cursor;
 
             if (val < 0)
             {
                 *cursor++ = '-';
                 val       = -val;
             }
-            return utoa((u32)val, str, cursor, end, base, octzero, lowercase);
+            return utoa((u32)val, cursor, end, base, octzero, lowercase);
         }
 
         static s64 divmod10(u64 value, s8& remainder)
@@ -787,14 +788,14 @@ namespace ncore
             return q;
         }
 
-        bool utoa(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        char* utoa(u64 val, char* cursor, char const* end, s32 base, bool octzero, bool lowercase)
         {
             uchar32 c;
             s64     sval;
             s8      mod;
 
             if ((end - cursor) < 20)
-                return false;
+                return cursor;
 
             char* w = cursor + 20;
 
@@ -863,34 +864,41 @@ namespace ncore
             while (w < we)
                 *cursor++ = *w++;
 
-            return true;
+            return cursor;
         }
 
-        bool itoa(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase)
+        char* itoa(s64 val, char* cursor, char const* end, s32 base, bool octzero, bool lowercase)
         {
-            ASSERT(str != nullptr && cursor != nullptr && end != nullptr);
+            ASSERT(cursor != nullptr && end != nullptr);
 
             if ((end - cursor) < 11)
-                return false;
+                return cursor;
 
             if (val < 0)
             {
                 *cursor++ = '-';
                 val       = -val;
             }
-            return utoa((u64)val, str, cursor, end, base, octzero, lowercase);
+            return utoa((u64)val, cursor, end, base, octzero, lowercase);
         }
 
-        // enum EBoolTypes
-        // {
-        //     TrueFalse = 0,
-        //     YesNo = 1,
-        //     LowerCase = 0,
-        //     UpperCase = 2,
-        //     CamelCase = 4,
-        // };
+        char* ftoa(f32 val, char* cursor, char const* end, bool lowercase)
+        {
+            s32 bufsize = end - cursor;
+            u32 const flags = lowercase ? 0 : DoubleConvert::FLAG_UPPERCASE;
+            const s32 len = dconvstr_print(&cursor, &bufsize, val, 'g', flags, 0, DoubleConvert::DEFAULT_PRECISION);
+            return cursor + len;
+        }
 
-        bool asStr(bool val, char const* str, char*& cursor, char const* end, s8 caseType)
+        char* dtoa(f64 val, char* cursor, char const* end, bool lowercase)
+        {
+            s32 bufsize = end - cursor;
+            u32 const flags = lowercase ? 0 : DoubleConvert::FLAG_UPPERCASE;
+            const s32 len = dconvstr_print(&cursor, &bufsize, val, 'g', flags, 0, DoubleConvert::DEFAULT_PRECISION);
+            return cursor + len;
+        }
+
+        char* btoa(bool val, char* cursor, char const* end, s8 caseType)
         {
             const char* boolstr;
             switch (caseType)
@@ -901,11 +909,11 @@ namespace ncore
                 case YesNo | LowerCase: boolstr = (val ? "yes" : "no"); break;
                 case YesNo | CamelCase: boolstr = (val ? "Yes" : "No"); break;
                 case YesNo | UpperCase: boolstr = (val ? "YES" : "NO"); break;
-                default: ASSERT(false); return false;
+                default: ASSERT(false); return cursor;
             }
             while (*boolstr != '\0' && cursor < end)
                 *cursor++ = *boolstr++;
-            return *boolstr == '\0';
+            return cursor;
         }
 
     }  // namespace ascii

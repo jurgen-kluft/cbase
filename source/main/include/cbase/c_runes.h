@@ -117,10 +117,12 @@ namespace ncore
 
         // return false when there is not enough space in the output
         // would need at least 10 characters for u32 and 20 for u64
-        bool utoa(u32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
-        bool itoa(s32 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
-        bool utoa(u64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
-        bool itoa(s64 val, char const* str, char*& cursor, char const* end, s32 base, bool octzero, bool lowercase);
+        char* utoa(u32 val, char* cursor, char const* end, s32 base, bool octzero=false, bool lowercase=true);
+        char* itoa(s32 val, char* cursor, char const* end, s32 base, bool octzero=false, bool lowercase=true);
+        char* utoa(u64 val, char* cursor, char const* end, s32 base, bool octzero=false, bool lowercase=true);
+        char* itoa(s64 val, char* cursor, char const* end, s32 base, bool octzero=false, bool lowercase=true);
+        char* ftoa(f32 val, char* cursor, char const* end, bool lowercase=true);
+        char* dtoa(f64 val, char* cursor, char const* end, bool lowercase=true);
         enum EBoolTypes
         {
             TrueFalse = 0,
@@ -129,7 +131,7 @@ namespace ncore
             UpperCase = 2,
             CamelCase = 4,
         };
-        bool btoa(bool val, char const* str, char*& cursor, char const* end, s8 caseType = TrueFalse | LowerCase);
+        char* btoa(bool val, char* cursor, char const* end, s8 caseType = TrueFalse | LowerCase);
 
     }  // namespace ascii
 
