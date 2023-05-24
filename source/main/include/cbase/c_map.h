@@ -22,7 +22,6 @@ namespace ncore
         inline map_t(alloc_t* a = nullptr, u32 max_items = 65535)
             : m_allocator(a)
             , m_ctxt(nullptr)
-            , m_tree()
         {
             if (m_allocator == nullptr)
             {
@@ -37,23 +36,20 @@ namespace ncore
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, u32, H>>(a, max_items);
             }
-
-            m_tree.init(m_ctxt);
         }
 
         inline ~map_t()
         {
-            while (!m_tree.clear()) {}
-            m_tree.exit();
+            while (!ntree::clear(m_ctxt)) {}
             m_allocator->destruct(m_ctxt);
         }
 
-        bool insert(K const& key, V const& value) { return m_tree.insert(&key, &value); }
-        bool remove(K const& key) { return m_tree.remove(&key); }
+        bool insert(K const& key, V const& value) { return ntree::insert(m_ctxt, &key, &value); }
+        bool remove(K const& key) { return ntree::remove(m_ctxt, &key); }
         bool find(K const& key, V const*& value) const
         {
-            tree_t::node_t* found;
-            bool    result = m_tree.find(&key, found);
+            ntree::node_t* found;
+            bool            result = ntree::find(m_ctxt, &key, found);
             if (found != nullptr)
                 value= (V const*)m_ctxt->v_get_value(found);
             return result;
@@ -61,8 +57,7 @@ namespace ncore
 
     private:
         alloc_t*        m_allocator;
-        tree_t::ctxt_t* m_ctxt;
-        tree_t          m_tree;
+        ntree::tree_t* m_ctxt;
     };
 
     template <typename K, typename H = nhash::hasher_t<K>> class set_t
@@ -71,7 +66,6 @@ namespace ncore
         inline set_t(alloc_t* a = nullptr, u32 max_items = 65535)
             : m_allocator(a)
             , m_ctxt(nullptr)
-            , m_tree()
         {
             if (m_allocator == nullptr)
             {
@@ -86,33 +80,30 @@ namespace ncore
             {
                 m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, u8, H>>(a, max_items, false);
             }
-
-            m_tree.init(m_ctxt);
         }
 
         ~set_t() 
         {
-            m_tree.exit();
+            while (!ntree::clear(m_ctxt)) {}
             m_allocator->destruct(m_ctxt); 
         }
 
-        bool insert(K const& key) { return m_tree.insert(&key, nullptr); }
+        bool insert(K const& key) { return ntree::insert(m_ctxt, &key, nullptr); }
         bool contains(K const& key) const
         {
-            tree_t::node_t* found  = nullptr;
-            bool            result = m_tree.find(&key, found);
+            ntree::node_t* found  = nullptr;
+            bool            result = ntree::find(m_ctxt, &key, found);
             return result;
         }
         bool remove(K const& key)
         {
-            bool result = m_tree.remove(&key);
+            bool result = ntree::remove(m_ctxt, &key);
             return result;
         }
 
     private:
         alloc_t*        m_allocator;
-        tree_t::ctxt_t* m_ctxt;
-        tree_t          m_tree;
+        ntree::tree_t* m_ctxt;
     };
 
 }; // namespace ncore
