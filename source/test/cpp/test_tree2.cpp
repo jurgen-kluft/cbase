@@ -197,6 +197,7 @@ namespace ncore
         count++;
 
     duplicate:
+        return;
     }
 
     rbnode_t *rb_remove(rbnode_t *&root, rbnode_t *nill, s32 &count, void *item, s32 (*compare)(void *a, void *b))
