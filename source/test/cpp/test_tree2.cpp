@@ -492,8 +492,8 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
         static s32 compare(void *aa, void *bb)
         {
-            u64 a = (u64)aa;
-            u64 b = (u64)bb;
+            s64 a = (s64)aa;
+            s64 b = (s64)bb;
             if (a < b)
                 return -1;
             if (a > b)
@@ -505,7 +505,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         {
             const s32 num_nodes = 2048;
             rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
-            u64      *values    = (u64 *)Allocator->allocate(num_nodes * sizeof(u64));
+            s64      *values    = (s64 *)Allocator->allocate(num_nodes * sizeof(s64));
 
             s_rand.seed(0x1234567890abcdef);
             for (s32 i = 0; i < num_nodes; ++i)
@@ -532,17 +532,31 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             Allocator->deallocate(values);
         }
 
+        
+        static void RandomShuffle(s64* v, s32 size, u64 seed)
+        {
+            XorRandom rng(seed);
+            for (s32 i = 0; i < size; ++i)
+            {
+                const s32 j = i + ((s32)(rng.next() & 0x7fffffff) % (size - i));
+                const s64 t = v[i];
+                v[i] = v[j];
+                v[j] = t;
+            }
+        }
+
+
         UNITTEST_TEST(insert_remove_find)
         {
-            const s32 num_nodes = 2048;
+            const s32 num_nodes = 8192;
             rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
-            u64      *values    = (u64 *)Allocator->allocate(num_nodes * sizeof(u64));
+            s64      *values    = (s64 *)Allocator->allocate(num_nodes * sizeof(s64));
 
             s_rand.seed(0x1234567890abcdef);
             for (s32 i = 0; i < num_nodes; ++i)
             {
                 // make sure we have no duplicates
-                u64 r = s_rand.next();
+                s64 r = s_rand.next();
                 for (s32 j = 0; j < i; ++j)
                 {
                     if (values[j] == r)
@@ -564,29 +578,25 @@ UNITTEST_SUITE_BEGIN(test_tree2)
                 CHECK_NULL(node);
             }
 
-            // remove all 'odd' indexed values
-            for (s32 i = 0; i < num_nodes; ++i)
+            RandomShuffle(values, num_nodes, 0x1234567890abcdef);
+
+            // remove all half of the values
+            for (s32 i = 0; i < (num_nodes/2); ++i)
             {
-                if ((i & 1) == 1)
-                {
-                    rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
-                    CHECK_NOT_NULL(found);
-                    CHECK_EQUAL((ptr_t)found->m_item, values[i]);
-                    rbnode_t *removed = rb_remove(root, count, (void *)(ptr_t)(values[i]), compare);
-                    CHECK_NOT_NULL(removed);
-                    CHECK_EQUAL((ptr_t)removed->m_item, values[i]);
-                    CHECK_EQUAL(found, removed);
-                }
+                rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(found);
+                CHECK_EQUAL((ptr_t)found->m_item, values[i]);
+                rbnode_t *removed = rb_remove(root, count, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(removed);
+                CHECK_EQUAL((ptr_t)removed->m_item, values[i]);
+                CHECK_EQUAL(found, removed);
             }
 
-            for (s32 i = 0; i < num_nodes; ++i)
+            for (s32 i = (num_nodes/2); i < num_nodes; ++i)
             {
-                if ((i & 1) == 0)
-                {
-                    rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
-                    CHECK_NOT_NULL(found);
-                    CHECK_EQUAL((ptr_t)found->m_item, values[i]);
-                }
+                rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(found);
+                CHECK_EQUAL((ptr_t)found->m_item, values[i]);
             }
 
             Allocator->deallocate(nodes);
