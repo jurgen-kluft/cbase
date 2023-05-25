@@ -431,9 +431,6 @@ namespace ncore
 
     rbnode_t *rb_find(rbnode_t *root, void *item, s32 (*compare)(void *a, void *b))
     {
-        if (item == nullptr)
-            return nullptr;
-
         rbnode_t *iter = root;
         while (iter != nullptr)
         {
@@ -543,6 +540,108 @@ UNITTEST_SUITE_BEGIN(test_tree2)
                 v[i] = v[j];
                 v[j] = t;
             }
+        }
+
+        UNITTEST_TEST(insert_remove_find_sorted_ascending)
+        {
+            const s32 num_nodes = 32768;
+            rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
+            s64      *values    = (s64 *)Allocator->allocate(num_nodes * sizeof(s64));
+
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                values[i] = 1000 + i*9;
+            }
+
+            rbnode_t *root  = nullptr;
+            s32       count = 0;
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                rbnode_t *node = &nodes[i];
+                rb_insert(root, count, (void *)(ptr_t)values[i], compare, node);
+                CHECK_NOT_NULL(root);
+                CHECK_NULL(node);
+            }
+
+            const char *error = nullptr;
+            rb_validate(root, compare, error);
+            CHECK_NULL(error);
+
+            // remove all half of the values
+            for (s32 i = 0; i < (num_nodes/2); ++i)
+            {
+                rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(found);
+                CHECK_EQUAL((ptr_t)found->m_item, values[i]);
+                rbnode_t *removed = rb_remove(root, count, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(removed);
+                CHECK_EQUAL((ptr_t)removed->m_item, values[i]);
+                CHECK_EQUAL(found, removed);
+            }
+
+            rb_validate(root, compare, error);
+            CHECK_NULL(error);
+
+            for (s32 i = (num_nodes/2); i < num_nodes; ++i)
+            {
+                rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(found);
+                CHECK_EQUAL((ptr_t)found->m_item, values[i]);
+            }
+
+            Allocator->deallocate(nodes);
+            Allocator->deallocate(values);
+        }
+
+        UNITTEST_TEST(insert_remove_find_sorted_descending)
+        {
+            const s32 num_nodes = 32768;
+            rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
+            s64      *values    = (s64 *)Allocator->allocate(num_nodes * sizeof(s64));
+
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                values[i] = (num_nodes * 32) - (i*9);
+            }
+
+            rbnode_t *root  = nullptr;
+            s32       count = 0;
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                rbnode_t *node = &nodes[i];
+                rb_insert(root, count, (void *)(ptr_t)values[i], compare, node);
+                CHECK_NOT_NULL(root);
+                CHECK_NULL(node);
+            }
+
+            const char *error = nullptr;
+            rb_validate(root, compare, error);
+            CHECK_NULL(error);
+
+            // remove all half of the values
+            for (s32 i = 0; i < (num_nodes/2); ++i)
+            {
+                rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(found);
+                CHECK_EQUAL((ptr_t)found->m_item, values[i]);
+                rbnode_t *removed = rb_remove(root, count, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(removed);
+                CHECK_EQUAL((ptr_t)removed->m_item, values[i]);
+                CHECK_EQUAL(found, removed);
+            }
+
+            rb_validate(root, compare, error);
+            CHECK_NULL(error);
+
+            for (s32 i = (num_nodes/2); i < num_nodes; ++i)
+            {
+                rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                CHECK_NOT_NULL(found);
+                CHECK_EQUAL((ptr_t)found->m_item, values[i]);
+            }
+
+            Allocator->deallocate(nodes);
+            Allocator->deallocate(values);
         }
 
 
