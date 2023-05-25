@@ -393,15 +393,13 @@ namespace ncore
             node_t* node = rbfirst(tree);
             while (node != rbnil(tree))
             {
-                //            s32 c = tree->m_compare(key, node->get_data());
-                s32 c = tree->v_compare_insert(key, node);
+                const s32 c = tree->v_compare_insert(key, node);
                 if (c == 0)
                 {
                     found = node;
                     return true;
                 }
-                c    = (c + 1) >> 1;
-                node = node->get_child(tree, c);
+                node = node->get_child(tree, (c + 1) >> 1);
             }
             found = (nullptr);
             return false;

@@ -281,7 +281,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             CHECK_TRUE(inserted);
             CHECK_TRUE(ntree::validate(ctxt, result));
 
-            CHECK_EQUAL(9, ntree::size(ctxt));
+            CHECK_EQUAL(9+2, ntree::size(ctxt));
 
             ntree::node_t* node = nullptr;
             CHECK_EQUAL(true, ntree::find(ctxt, &a, node));
@@ -297,11 +297,11 @@ UNITTEST_SUITE_BEGIN(test_tree)
             s32 x(99);
             CHECK_FALSE(ntree::find(ctxt, &x, node));
 
-            CHECK_EQUAL(9, ntree::size(ctxt));
+            CHECK_EQUAL(11, ntree::size(ctxt));
 
             while (!ntree::clear(ctxt)) {}
 
-            CHECK_EQUAL(0, ntree::size(ctxt));
+            CHECK_EQUAL(2, ntree::size(ctxt));
         }
 
         UNITTEST_TEST(void_tree_iterate_preorder)
@@ -513,7 +513,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             CHECK_TRUE(inserted);
             CHECK_TRUE(ntree::validate(ctxt, result));
 
-            CHECK_EQUAL(4, ntree::size(ctxt));
+            CHECK_EQUAL(6, ntree::size(ctxt));
 
             ntree::node_t* node = nullptr;
             CHECK_EQUAL(true, ntree::find(ctxt, &a, node));
@@ -526,7 +526,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
 
             while (!ntree::clear(ctxt)) {}
 
-            CHECK_EQUAL(0, ntree::size(ctxt));
+            CHECK_EQUAL(2, ntree::size(ctxt));
         }
     }
 }

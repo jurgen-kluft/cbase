@@ -17,18 +17,28 @@ namespace ncore
             : m_item(nullptr)
             , m_color(RB_RED)
         {
+            m_chld[RB_LEFT]  = nullptr;
+            m_chld[RB_RIGHT] = nullptr;
         }
 
         void set_right(rbnode_t *node) { m_chld[RB_RIGHT] = node; }
         void set_left(rbnode_t *node) { m_chld[RB_LEFT] = node; }
-        void set_child(s32 side, rbnode_t *node) { m_chld[side] = node; }
+        void set_child(s32 side, rbnode_t *node)
+        {
+            ASSERT(side == RB_LEFT || side == RB_RIGHT);
+            m_chld[side] = node;
+        }
 
         void set_red() { m_color = RB_RED; }
         void set_black() { m_color = RB_BLCK; }
 
         rbnode_t *get_right() { return m_chld[RB_RIGHT]; }
         rbnode_t *get_left() { return m_chld[RB_LEFT]; }
-        rbnode_t *get_child(s32 side) { return m_chld[side]; }
+        rbnode_t *get_child(s32 side)
+        {
+            ASSERT(side == RB_LEFT || side == RB_RIGHT);
+            return m_chld[side];
+        }
 
         rbnode_t *m_chld[2];
         void     *m_item;
@@ -58,45 +68,72 @@ namespace ncore
     //
     // cX: color of X
 
-    void rb_init(rbnode_t *root, rbnode_t *nill)
-    {
-        nill->m_item           = (void *)nullptr;
-        nill->m_chld[RB_LEFT]  = nill;
-        nill->m_chld[RB_RIGHT] = nill;
-
-        root->m_item           = (void *)nullptr;
-        root->m_chld[RB_LEFT]  = nill;
-        root->m_chld[RB_RIGHT] = nill;
-    }
-
-    void rb_init_node(rbnode_t *n, rbnode_t * const nill)
+    void rb_init_node(rbnode_t *n)
     {
         n->m_item           = (void *)nullptr;
-        n->m_chld[RB_LEFT]  = nill;
-        n->m_chld[RB_RIGHT] = nill;
+        n->m_chld[RB_LEFT]  = nullptr;
+        n->m_chld[RB_RIGHT] = nullptr;
         n->m_color          = RB_RED;
     }
 
-    static inline rbnode_t *rotate_single(rbnode_t *root, s32 dir)
+    // show what a single red-black tree rotation does in ASCII art
+    //
+    // Left
+    //     |            |
+    //     x            y
+    //    / \          / \
+    //   a   y   ->   x   c
+    //      / \      / \
+    //     b   c    a   b
+    //
+    // Right
+    //     |            |
+    //     x            y
+    //    / \          / \
+    //   y   c   ->   a   x
+    //  / \              / \
+    // a   b            b   c
+    //
+
+    static inline rbnode_t *rotate_single(rbnode_t *node, s32 dir)
     {
-        rbnode_t *save = root->get_child(!dir);
-
-        root->set_child(!dir, save->get_child(dir));
-        save->set_child(dir, root);
-
-        root->set_red();
-        save->set_black();
-
+        rbnode_t *save        = node->m_chld[1 - dir];
+        node->m_chld[1 - dir] = save->m_chld[dir];
+        save->m_chld[dir]     = node;
+        node->m_color         = RB_RED;
+        save->m_color         = RB_BLCK;
         return save;
     }
 
-    static inline rbnode_t *rotate_double(rbnode_t *root, s32 dir)
+    // show what a double red-black tree rotation does in ASCII art
+    //
+    // Left
+    //     |            |
+    //     x            z
+    //    / \          / \
+    //   a   y   ->   x   y
+    //      / \      / \ / \
+    //     b   z    a  b c  d
+    //        / \
+    //       c   d
+    //
+    // Right
+    //     |            |
+    //     x            z
+    //    / \          / \
+    //   y   c   ->   y   x
+    //  / \          / \ / \
+    // a   z        a  b c  d
+    //    / \
+    //   b   d
+    //
+    static inline rbnode_t *rotate_double(rbnode_t *node, s32 dir)
     {
-        root->m_chld[!dir] = rotate_single(root->get_child(!dir), !dir);
-        return rotate_single(root, dir);
+        node->m_chld[1 - dir] = rotate_single(node->m_chld[1 - dir], 1 - dir);
+        return rotate_single(node, dir);
     }
 
-    static inline s32 is_red(rbnode_t *root) { return root != nullptr && root->m_color == RB_RED; }
+    static inline s32 is_red(rbnode_t *node) { return node != nullptr && node->m_color == RB_RED; }
 
     // validate the tree (return violation description in 'result'), also returns black height
     static s32 rb_validate(rbnode_t *root, s32 (*compare)(void *a, void *b), const char *&result)
@@ -144,82 +181,82 @@ namespace ncore
         return 0;
     }
 
-    s32 rb_insert(rbnode_t *&root, rbnode_t *const nill, s32 &count, void *item, s32 (*compare)(void *a, void *b), rbnode_t *&new_node)
+    s32 rb_insert(rbnode_t *&root, s32 &count, void *item, s32 (*compare)(void *a, void *b), rbnode_t *&new_node)
     {
         s32 result = 0;
         if (root == nullptr)
         {
             // We have an empty tree; attach the
             // new node directly to the root
+            rb_init_node(new_node);
             root         = new_node;
+            new_node     = nullptr;
             root->m_item = item;
             result       = 1;
-            if (root == nullptr)
-                return result;
         }
         else
         {
             rbnode_t  head;   // False tree root
             rbnode_t *g, *t;  // Grandparent & parent
-            rbnode_t *p, *q;  // Iterator & parent
+            rbnode_t *p, *n;  // Iterator & parent
             s32       dir = 0, last = 0;
 
             // Set up our helpers
             t = &head;
-            g = p = nullptr;
-            q     = root;
+            t->m_item = nullptr;
+            t->set_black();  // Color it black
             t->set_right(root);
+            t->set_left(nullptr);
+
+            g = p = nullptr;
+            n     = root;
 
             // Search down the tree for a place to insert
             for (;;)
             {
-                if (q == nullptr)
+                if (n == nullptr)
                 {
                     // Insert a new node at the first null link
-                    result    = 1;
-                    q         = new_node;
-                    q->m_item = item;
-                    p->set_child(dir, q);
-
-                    if (q == nullptr)
-                        return result;
+                    rb_init_node(new_node);
+                    n         = new_node;
+                    new_node  = nullptr;
+                    n->m_item = item;
+                    p->set_child(dir, n);
+                    result = 1;
                 }
-                else if (is_red(q->get_left()) && is_red(q->get_right()))
+                else if (is_red(n->get_left()) && is_red(n->get_right()))
                 {
                     // Simple red violation: color flip
-                    q->set_red();
-                    q->get_left()->set_black();
-                    q->get_right()->set_black();
+                    n->set_red();
+                    n->get_left()->set_black();
+                    n->get_right()->set_black();
                 }
 
-                if (is_red(q) && is_red(p))
+                if (is_red(n) && is_red(p))
                 {
                     // Hard red violation: rotations necessary
-                    s32 dir2 = t->get_right() == g;
+                    const s32 dir2 = (t->get_right() == g) ? 1 : 0;
 
-                    rbnode_t *rotated;
-                    if (q == p->get_child(last))
-                        rotated = rotate_single(g, !last);
+                    if (n == p->get_child(last))
+                        t->m_chld[dir2] = rotate_single(g, 1 - last);
                     else
-                        rotated = rotate_double(g, !last);
-
-                    t->set_child(dir2, rotated);
+                        t->m_chld[dir2] = rotate_double(g, 1 - last);
                 }
 
                 // Stop working if we inserted a node. This
                 // check also disallows duplicates in the tree
-                dir = compare(item, q->m_item);
+                last = dir;
+                dir = compare(item, n->m_item);
                 if (dir == 0)
                     break;
                 dir  = ((dir + 1) >> 1);
-                last = dir;
 
                 // Move the helpers down
                 if (g != nullptr)
                     t = g;
 
-                g = p, p = q;
-                q = q->get_child(dir);
+                g = p, p = n;
+                n = n->get_child(dir);
             }
 
             // Update the root (it may be different)
@@ -232,208 +269,134 @@ namespace ncore
         return result;
     }
 
-    rbnode_t *rb_remove(rbnode_t * const root, rbnode_t * const nill, s32 &count, void *item, s32 (*compare)(void *a, void *b))
+    rbnode_t *rb_remove(rbnode_t *&root, rbnode_t *const nill, s32 &count, void *item, s32 (*compare)(void *a, void *b))
     {
-        if (item == nullptr)
+        if (root == nullptr)
             return nullptr;
 
-        int       sP;
-        int       sX     = RB_RIGHT;
-        rbnode_t *G      = root;
-        rbnode_t *P      = G;
-        rbnode_t *X      = P->m_chld[RB_RIGHT];
-        rbnode_t *T      = nullptr;
-        rbnode_t *toDel  = nill;
-        rbnode_t *toDelP = nill;
-        int       sDel   = 0;
+        rbnode_t  head;           // False tree root
+        rbnode_t *n, *p, *g;      // Helpers, node, parent, grandparent
+        rbnode_t *fn  = nullptr;  // Found node
+        rbnode_t *fp  = nullptr;  // Found node parent
+        s32       dir = 1;
 
-        // step 1: examine the root
-        int c2b;
-        if (RB_ISBLCK(X->m_chld[RB_LEFT]) && RB_ISBLCK(X->m_chld[RB_RIGHT]))
-        {
-            RB_MKRED(X);
-            c2b = 0;
-        }
-        else
-        {
-            // step 2B
-            c2b = 1;
-        }
+        // Set up our helpers
+        n = &head;
+        g = p = nullptr;
+        n->set_right(root);
 
-        goto l0;
-
-        // Top-Down Deletion
-        do
+        // Search and push a red node down
+        // to fix red violations as we go
+        while (n->get_child(dir) != nullptr)
         {
-            // case 2b continue: check new X
-            if (c2b)
+            const s32 last = dir;
+
+            // Move the helpers down
+            g = p, p = n;
+            n   = n->get_child(dir);
+            dir = compare(item, n->m_item);
+
+            // Save the node with matching data and keep
+            // going; we'll do removal tasks at the end
+            if (dir == 0)
             {
-                c2b = 0;
-
-                // if new X is red continue down again
-                if (RB_ISRED(X))
-                    goto l0;
-
-                G->m_chld[sP]  = T;
-                P->m_chld[!sX] = T->m_chld[sX];
-                T->m_chld[sX]  = P;
-
-                RB_MKRED(P);
-                RB_MKBLCK(T);
-
-                if (toDelP == G)
-                {
-                    toDelP = T;
-                    sDel   = sX;
-                }
-
-                G  = T;
-                T  = P->m_chld[!sX];
-                sP = sX;
-                // if new X is black back to case 2
+                fn = n;
+                fp = p;
             }
+            dir = ((dir + 1) >> 1);
 
-            // case 2: X has two black children
-            if (RB_ISBLCK(X->m_chld[RB_LEFT]) && RB_ISBLCK(X->m_chld[RB_RIGHT]))
+            /* Push the red node down with rotations and color flips */
+            if (!is_red(n) && !is_red(n->get_child(dir)))
             {
-                // case 1.a: T has two black children
-                if (T != nill && RB_ISBLCK(T->m_chld[RB_LEFT]) && RB_ISBLCK(T->m_chld[RB_RIGHT]))
+                if (is_red(n->get_child(1 - dir)))
                 {
-                    // color flip
-                    RB_MKRED(X);
-                    RB_MKRED(T);
-                    RB_MKBLCK(P);
+                    rbnode_t *r = rotate_single(n, dir);
+                    if (fn == n)  // update parent of 'fn' if needed
+                        fp = r;
+                    p->set_child(last, r);
+                    p = r;
                 }
-
-                // case 1.b: T's left child is red
-                else if (RB_ISRED(T->m_chld[sX]))
+                else if (!is_red(n->get_child(1 - dir)))
                 {
-                    rbnode_t *R = T->m_chld[sX];
-
-                    // double rotate: rotate R around T, then R around P
-                    T->m_chld[sX]  = R->m_chld[!sX];
-                    P->m_chld[!sX] = R->m_chld[sX];
-                    R->m_chld[sX]  = P;
-                    R->m_chld[!sX] = T;
-                    G->m_chld[sP]  = R;
-
-                    RB_MKRED(X);
-                    RB_MKBLCK(P);
-
-                    if (toDelP == G)
+                    rbnode_t *s = p->get_child(1 - last);
+                    if (s != nullptr)
                     {
-                        toDelP = R;
-                        sDel   = sX;
-                    }
-                }
+                        if (!is_red(s->get_child(1 - last)) && !is_red(s->get_child(last)))
+                        {
+                            // Color flip
+                            p->set_black();
+                            s->set_red();
+                            n->set_red();
+                        }
+                        else
+                        {
+                            const s32 dir2 = g->get_right() == p ? 1 : 0;
+                            if (is_red(s->get_child(last)))
+                            {
+                                rbnode_t *r = rotate_double(p, last);
+                                if (fn == p)  // update parent of 'fn' if needed
+                                    fp = r;
+                                g->set_child(dir2, r);
+                            }
+                            else if (is_red(s->get_child(1 - last)))
+                            {
+                                rbnode_t *r = rotate_single(p, last);
+                                if (fn == p)  // update parent of 'fn' if needed
+                                    fp = r;
+                                g->set_child(dir2, r);
+                            }
 
-                // case 1.c: T's right child is red
-                else if (RB_ISRED(T->m_chld[!sX]))
-                {
-                    rbnode_t *R = T->m_chld[!sX];
+                            // Ensure correct coloring
+                            n->set_red();
+                            g->get_child(dir2)->set_red();
 
-                    // single rotate: rotate T around P
-                    P->m_chld[!sX] = T->m_chld[sX];
-                    T->m_chld[sX]  = P;
-                    G->m_chld[sP]  = T;
-
-                    RB_MKRED(X);
-                    RB_MKRED(T);
-                    RB_MKBLCK(P);
-                    RB_MKBLCK(R);
-
-                    if (toDelP == G)
-                    {
-                        toDelP = T;
-                        sDel   = sX;
+                            g->get_child(dir2)->get_left()->set_black();
+                            g->get_child(dir2)->get_right()->set_black();
+                        }
                     }
                 }
             }
-            else
-            {
-                // case 2b: X's one child is red, advance to next level
-                c2b = 1;
-            }
-
-        l0:
-            sP = sX;
-            if (toDel != nill)
-            {
-                sX = toDel->m_chld[RB_RIGHT] == nill;
-            }
-            else
-            {
-                s32 const cmpRet = compare(item, X->m_item);
-                if (cmpRet == 0)
-                {
-                    toDelP = P;
-                    toDel  = X;
-                    sDel   = sP;
-                    sX     = toDel->m_chld[RB_RIGHT] != nill;
-                }
-                else
-                {
-                    sX = (cmpRet + 1) >> 1;
-                }
-            }
-
-            G = P;
-            P = X;
-            X = P->m_chld[sX];
-            T = P->m_chld[!sX];
-        } while (X != nill);
-
-        // make root black
-        RB_MKBLCK(root->m_chld[RB_RIGHT]);
-
-        if (toDel == nill)
-            return nullptr;
-
-        if (P != toDel)  // toDel has least one child
-        {
-            // P is black, save black height
-            if (c2b)
-                RB_MKBLCK(P->m_chld[!sX]);
-
-            // change color
-            if (RB_ISRED(toDel))
-                RB_MKRED(P);
-            else
-                RB_MKBLCK(P);
-
-            // replace P with its left child
-            G->m_chld[sP] = P->m_chld[!sX];
-
-            // replace X with in-order predecessor
-            P->m_chld[RB_RIGHT]  = toDel->m_chld[RB_RIGHT];
-            P->m_chld[RB_LEFT]   = toDel->m_chld[RB_LEFT];
-            toDelP->m_chld[sDel] = P;
-        }
-        else  // P is toDel; there is no child
-        {
-            G->m_chld[sP] = nill;
         }
 
-        count--;
-        return toDel;
+        // Replace and remove the saved node
+        if (fn != nullptr)
+        {
+            void const *old_data = fn->m_item;
+
+            rbnode_t *child1 = n->get_child(n->get_left() == nullptr);
+            p->set_child(p->get_right() == n, child1);
+
+            // swap 'n' and 'fn', we want to remove the node that was holding 'item'
+            fp->set_child(fp->get_right() == fn, n);
+            n->set_child(RB_LEFT, fn->get_left());
+            n->set_child(RB_RIGHT, fn->get_right());
+            n->m_color = fn->m_color;
+        }
+
+        // Update the root (it may be different)
+        root = head.get_right();
+
+        // Make the root black for simplified logic
+        if (root != nullptr)
+            root->set_black();
+
+        count -= 1;
+        return fn;
     }
 
-    rbnode_t *rb_find(rbnode_t *root, rbnode_t *nill, void *item, s32 (*compare)(void *a, void *b))
+    rbnode_t *rb_find(rbnode_t *root, void *item, s32 (*compare)(void *a, void *b))
     {
         if (item == nullptr)
             return nullptr;
 
-        rbnode_t *iter = root->m_chld[RB_RIGHT];
-        while (iter != nill)
+        rbnode_t *iter = root;
+        while (iter != nullptr)
         {
             const s32 cmpRet = compare(item, iter->m_item);
             if (cmpRet == 0)
                 break;
             iter = iter->m_chld[(cmpRet + 1) >> 1];
         }
-
-        if (iter == nill)
-            return nullptr;
         return iter;
     }
 
@@ -450,11 +413,42 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
+        struct XorRandom
+        {
+            u64 s0, s1;
+            inline XorRandom(u64 seed)
+                : s0(seed)
+                , s1(0)
+            {
+                next();
+                next();
+            }
+
+            inline void seed(u64 seed)
+            {
+                s0 = seed;
+                s1 = 0;
+                next();
+                next();
+            }
+
+            inline u64 next(void)
+            {
+                u64 ss1    = s0;
+                u64 ss0    = s1;
+                u64 result = ss0 + ss1;
+                s0         = ss0;
+                ss1 ^= ss1 << 23;
+                s1 = ss1 ^ ss0 ^ (ss1 >> 18) ^ (ss0 >> 5);
+                return result;
+            }
+        };
+        static XorRandom s_rand(0x1234567890abcdef);
 
         static s32 compare(void *aa, void *bb)
         {
-            s32 a = (s32)(u64)aa;
-            s32 b = (s32)(u64)bb;
+            u64 a = (u64)aa;
+            u64 b = (u64)bb;
             if (a < b)
                 return -1;
             if (a > b)
@@ -462,34 +456,35 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             return 0;
         }
 
-        UNITTEST_TEST(tree_node) 
-        { 
-            const s32 num_nodes = 128;
-            rbnode_t  nodes[num_nodes];
+        UNITTEST_TEST(tree_node)
+        {
+            const s32 num_nodes = 2048;
+            rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
+            u64      *values    = (u64 *)Allocator->allocate(num_nodes * sizeof(u64));
 
-            rbnode_t root;
-            rbnode_t nill;
-            rb_init(&root, &nill);
+            s_rand.seed(0x1234567890abcdef);
+            for (s32 i = 0; i < num_nodes; ++i)
+                values[i] = s_rand.next();
 
-            s32 count = 0;
-
+            rbnode_t *root  = nullptr;
+            s32       count = 0;
             for (s32 i = 0; i < num_nodes; ++i)
             {
-                rbnode_t* node = &nodes[i];
-                rb_init_node(node, &nill);
-                
-                node->m_item = (void *)(ptr_t)i;
-                rb_insert(&root, &nill, count, (void *)(ptr_t)i, compare, node);
-                CHECK_NOT_NULL(root.m_chld[RB_RIGHT]);
+                rbnode_t *node = &nodes[i];
+                rb_insert(root, count, (void *)(ptr_t)values[i], compare, node);
+                CHECK_NOT_NULL(root);
                 CHECK_NULL(node);
             }
 
             for (s32 i = 0; i < num_nodes; ++i)
             {
-                rbnode_t *found = rb_find(&root, &nill, (void *)(ptr_t)i, compare);
+                rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
                 CHECK_NOT_NULL(found);
-                CHECK_EQUAL((s32)(ptr_t)found->m_item, i);
+                CHECK_EQUAL((ptr_t)found->m_item, values[i]);
             }
+
+            Allocator->deallocate(nodes);
+            Allocator->deallocate(values);
         }
     }
 }
