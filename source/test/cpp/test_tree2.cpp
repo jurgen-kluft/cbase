@@ -57,7 +57,15 @@ namespace ncore
         root->m_chld[RB_RIGHT] = nill;
     }
 
-    void rb_insert(rbnode_t *&root, rbnode_t *const nill, s32 &count, void *item, s32 (*compare)(void *a, void *b), rbnode_t *&new_node)
+    void rb_init_node(rbnode_t *n, rbnode_t * const nill)
+    {
+        n->m_item           = (void *)nullptr;
+        n->m_chld[RB_LEFT]  = nill;
+        n->m_chld[RB_RIGHT] = nill;
+        n->m_color          = RB_RED;
+    }
+
+    void rb_insert(rbnode_t * const root, rbnode_t * const nill, s32 &count, void *item, s32 (*compare)(void *a, void *b), rbnode_t *&new_node)
     {
         new_node->m_chld[RB_LEFT]  = nill;
         new_node->m_chld[RB_RIGHT] = nill;
@@ -67,6 +75,7 @@ namespace ncore
         {
             RB_MKBLCK(new_node);
             root->m_chld[RB_RIGHT] = new_node;
+            new_node               = nullptr;
             count++;
             return;
         }
@@ -194,13 +203,14 @@ namespace ncore
 
         // make root black
         RB_MKBLCK(root->m_chld[RB_RIGHT]);
+        new_node = nullptr;
         count++;
 
     duplicate:
         return;
     }
 
-    rbnode_t *rb_remove(rbnode_t *&root, rbnode_t *nill, s32 &count, void *item, s32 (*compare)(void *a, void *b))
+    rbnode_t *rb_remove(rbnode_t * const root, rbnode_t * const nill, s32 &count, void *item, s32 (*compare)(void *a, void *b))
     {
         if (item == nullptr)
             return nullptr;
@@ -418,7 +428,47 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        UNITTEST_TEST(tree_node) {}
+
+        static s32 compare(void *aa, void *bb)
+        {
+            s32 a = (s32)(u64)aa;
+            s32 b = (s32)(u64)bb;
+            if (a < b)
+                return -1;
+            if (a > b)
+                return 1;
+            return 0;
+        }
+
+        UNITTEST_TEST(tree_node) 
+        { 
+            const s32 num_nodes = 128;
+            rbnode_t  nodes[num_nodes];
+
+            rbnode_t root;
+            rbnode_t nill;
+            rb_init(&root, &nill);
+
+            s32 count = 0;
+
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                rbnode_t* node = &nodes[i];
+                rb_init_node(node, &nill);
+                
+                node->m_item = (void *)(ptr_t)i;
+                rb_insert(&root, &nill, count, (void *)(ptr_t)i, compare, node);
+                CHECK_NOT_NULL(root.m_chld[RB_RIGHT]);
+                CHECK_NULL(node);
+            }
+
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                rbnode_t *found = rb_find(&root, &nill, (void *)(ptr_t)i, compare);
+                CHECK_NOT_NULL(found);
+                CHECK_EQUAL((s32)(ptr_t)found->m_item, i);
+            }
+        }
     }
 }
 UNITTEST_SUITE_END
