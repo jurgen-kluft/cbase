@@ -105,6 +105,22 @@ namespace ncore
         return save;
     }
 
+    static inline rbnode_t *rotate_single_track_parent(rbnode_t *node, s32 dir, rbnode_t* fn, rbnode_t*& fp)
+    {
+        rbnode_t *save        = node->m_chld[1 - dir];
+        node->m_chld[1 - dir] = save->m_chld[dir];
+        save->m_chld[dir]     = node;
+        node->m_color         = RB_RED;
+        save->m_color         = RB_BLCK;
+
+        if (fn == node)
+            fp = save;
+        else if (fn == node->m_chld[1 - dir])
+            fp = node;
+
+        return save;
+    }
+
     // show what a double red-black tree rotation does in ASCII art
     //
     // Left
@@ -131,6 +147,17 @@ namespace ncore
     {
         node->m_chld[1 - dir] = rotate_single(node->m_chld[1 - dir], 1 - dir);
         return rotate_single(node, dir);
+    }
+
+    static inline rbnode_t *rotate_double_track_parent(rbnode_t *node, s32 dir, rbnode_t* fn, rbnode_t*& fp)
+    {
+        node->m_chld[1 - dir] = rotate_single_track_parent(node->m_chld[1 - dir], 1 - dir, fn, fp);
+        if (fn == node->m_chld[1 - dir])
+            fp = node;
+        rbnode_t* save = rotate_single_track_parent(node, dir, fn, fp);
+        if (fn == node)
+            fp = save;
+        return save;
     }
 
     static inline s32 is_red(rbnode_t *node) { return node != nullptr && node->m_color == RB_RED; }
@@ -202,7 +229,7 @@ namespace ncore
             s32       dir = 0, last = 0;
 
             // Set up our helpers
-            t = &head;
+            t         = &head;
             t->m_item = nullptr;
             t->set_black();  // Color it black
             t->set_right(root);
@@ -246,10 +273,10 @@ namespace ncore
                 // Stop working if we inserted a node. This
                 // check also disallows duplicates in the tree
                 last = dir;
-                dir = compare(item, n->m_item);
+                dir  = compare(item, n->m_item);
                 if (dir == 0)
                     break;
-                dir  = ((dir + 1) >> 1);
+                dir = ((dir + 1) >> 1);
 
                 // Move the helpers down
                 if (g != nullptr)
@@ -269,7 +296,7 @@ namespace ncore
         return result;
     }
 
-    rbnode_t *rb_remove(rbnode_t *&root, rbnode_t *const nill, s32 &count, void *item, s32 (*compare)(void *a, void *b))
+    rbnode_t *rb_remove(rbnode_t *&root, s32 &count, void *item, s32 (*compare)(void *a, void *b))
     {
         if (root == nullptr)
             return nullptr;
@@ -281,9 +308,13 @@ namespace ncore
         s32       dir = 1;
 
         // Set up our helpers
-        n = &head;
         g = p = nullptr;
+
+        n         = &head;
+        n->m_item = nullptr;
+        n->set_black();  // Color it black
         n->set_right(root);
+        n->set_left(nullptr);
 
         // Search and push a red node down
         // to fix red violations as we go
@@ -310,10 +341,10 @@ namespace ncore
             {
                 if (is_red(n->get_child(1 - dir)))
                 {
-                    rbnode_t *r = rotate_single(n, dir);
-                    if (fn == n)  // update parent of 'fn' if needed
-                        fp = r;
+                    rbnode_t *r = rotate_single_track_parent(n, dir, fn, fp);
                     p->set_child(last, r);
+                    if (fn == r)
+                        fp = p;
                     p = r;
                 }
                 else if (!is_red(n->get_child(1 - dir)))
@@ -333,17 +364,17 @@ namespace ncore
                             const s32 dir2 = g->get_right() == p ? 1 : 0;
                             if (is_red(s->get_child(last)))
                             {
-                                rbnode_t *r = rotate_double(p, last);
-                                if (fn == p)  // update parent of 'fn' if needed
-                                    fp = r;
+                                rbnode_t *r = rotate_double_track_parent(p, last, fn, fp);
                                 g->set_child(dir2, r);
+                                if (fn == r)
+                                    fp = g;
                             }
                             else if (is_red(s->get_child(1 - last)))
                             {
-                                rbnode_t *r = rotate_single(p, last);
-                                if (fn == p)  // update parent of 'fn' if needed
-                                    fp = r;
+                                rbnode_t *r = rotate_single_track_parent(p, last, fn, fp);
                                 g->set_child(dir2, r);
+                                if (fn == r)
+                                    fp = g;
                             }
 
                             // Ensure correct coloring
@@ -358,23 +389,37 @@ namespace ncore
             }
         }
 
+        // Update the root (it may be different)
+        root = head.get_right();
+
         // Replace and remove the saved node
         if (fn != nullptr)
         {
-            void const *old_data = fn->m_item;
+            ASSERT(fp->get_right() == fn || fp->get_left() == fn);
 
+            if (fp == p)
+            {
+                fn->m_item = n->m_item;
+            }
+
+            void *item = fn->m_item;
+            ASSERT(p->get_right() == n || p->get_left() == n);
             rbnode_t *child1 = n->get_child(n->get_left() == nullptr);
             p->set_child(p->get_right() == n, child1);
+            fn->m_item = n->m_item;
 
             // swap 'n' and 'fn', we want to remove the node that was holding 'item'
-            fp->set_child(fp->get_right() == fn, n);
-            n->set_child(RB_LEFT, fn->get_left());
-            n->set_child(RB_RIGHT, fn->get_right());
-            n->m_color = fn->m_color;
-        }
+            // fp->set_child(fp->get_right() == fn, n);
+            // n->set_child(RB_LEFT, fn->get_left());
+            // n->set_child(RB_RIGHT, fn->get_right());
+            // n->m_color = fn->m_color;
 
-        // Update the root (it may be different)
-        root = head.get_right();
+            // if (root == fn)
+            //     root = n;
+            fn = n;
+            rb_init_node(fn);
+            fn->m_item = item;
+        }
 
         // Make the root black for simplified logic
         if (root != nullptr)
@@ -456,7 +501,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             return 0;
         }
 
-        UNITTEST_TEST(tree_node)
+        UNITTEST_TEST(insert_find)
         {
             const s32 num_nodes = 2048;
             rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
@@ -481,6 +526,66 @@ UNITTEST_SUITE_BEGIN(test_tree2)
                 rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
                 CHECK_NOT_NULL(found);
                 CHECK_EQUAL((ptr_t)found->m_item, values[i]);
+            }
+
+            Allocator->deallocate(nodes);
+            Allocator->deallocate(values);
+        }
+
+        UNITTEST_TEST(insert_remove_find)
+        {
+            const s32 num_nodes = 2048;
+            rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
+            u64      *values    = (u64 *)Allocator->allocate(num_nodes * sizeof(u64));
+
+            s_rand.seed(0x1234567890abcdef);
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                // make sure we have no duplicates
+                u64 r = s_rand.next();
+                for (s32 j = 0; j < i; ++j)
+                {
+                    if (values[j] == r)
+                    {
+                        r = s_rand.next();
+                        j = -1;
+                    }
+                }
+                values[i] = r;
+            }
+
+            rbnode_t *root  = nullptr;
+            s32       count = 0;
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                rbnode_t *node = &nodes[i];
+                rb_insert(root, count, (void *)(ptr_t)values[i], compare, node);
+                CHECK_NOT_NULL(root);
+                CHECK_NULL(node);
+            }
+
+            // remove all 'odd' indexed values
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                if ((i & 1) == 1)
+                {
+                    rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                    CHECK_NOT_NULL(found);
+                    CHECK_EQUAL((ptr_t)found->m_item, values[i]);
+                    rbnode_t *removed = rb_remove(root, count, (void *)(ptr_t)(values[i]), compare);
+                    CHECK_NOT_NULL(removed);
+                    CHECK_EQUAL((ptr_t)removed->m_item, values[i]);
+                }
+            }
+
+            for (s32 i = 0; i < num_nodes; ++i)
+            {
+                if ((i & 1) == 0)
+                {
+                    rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                    CHECK_NOT_NULL(found);
+                    CHECK_EQUAL((ptr_t)found->m_item, values[i]);
+                }
             }
 
             Allocator->deallocate(nodes);
