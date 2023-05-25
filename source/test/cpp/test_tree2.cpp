@@ -105,7 +105,7 @@ namespace ncore
         return save;
     }
 
-    static inline rbnode_t *rotate_single_track_parent(rbnode_t *node, s32 dir, rbnode_t* fn, rbnode_t*& fp)
+    static inline rbnode_t *rotate_single_track_parent(rbnode_t *node, s32 dir, rbnode_t *fn, rbnode_t *&fp)
     {
         rbnode_t *save        = node->m_chld[1 - dir];
         node->m_chld[1 - dir] = save->m_chld[dir];
@@ -149,12 +149,12 @@ namespace ncore
         return rotate_single(node, dir);
     }
 
-    static inline rbnode_t *rotate_double_track_parent(rbnode_t *node, s32 dir, rbnode_t* fn, rbnode_t*& fp)
+    static inline rbnode_t *rotate_double_track_parent(rbnode_t *node, s32 dir, rbnode_t *fn, rbnode_t *&fp)
     {
         node->m_chld[1 - dir] = rotate_single_track_parent(node->m_chld[1 - dir], 1 - dir, fn, fp);
         if (fn == node->m_chld[1 - dir])
             fp = node;
-        rbnode_t* save = rotate_single_track_parent(node, dir, fn, fp);
+        rbnode_t *save = rotate_single_track_parent(node, dir, fn, fp);
         if (fn == node)
             fp = save;
         return save;
@@ -397,26 +397,26 @@ namespace ncore
         {
             ASSERT(fp->get_right() == fn || fp->get_left() == fn);
 
-            if (fp == p)
-            {
-                fn->m_item = n->m_item;
-            }
-
             void *item = fn->m_item;
+
             ASSERT(p->get_right() == n || p->get_left() == n);
             rbnode_t *child1 = n->get_child(n->get_left() == nullptr);
             p->set_child(p->get_right() == n, child1);
-            fn->m_item = n->m_item;
 
-            // swap 'n' and 'fn', we want to remove the node that was holding 'item'
-            // fp->set_child(fp->get_right() == fn, n);
-            // n->set_child(RB_LEFT, fn->get_left());
-            // n->set_child(RB_RIGHT, fn->get_right());
-            // n->m_color = fn->m_color;
+            if (fn != n)
+            {  
+                ASSERT(fp != p);
 
-            // if (root == fn)
-            //     root = n;
-            fn = n;
+                // swap 'n' and 'fn', we want to remove the node that was holding 'item'
+                fp->set_child(fp->get_right() == fn, n);
+                n->set_child(RB_LEFT, fn->get_left());
+                n->set_child(RB_RIGHT, fn->get_right());
+                n->m_color = fn->m_color;
+            }
+
+            if (root == fn)
+                root = n;
+
             rb_init_node(fn);
             fn->m_item = item;
         }
@@ -575,6 +575,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
                     rbnode_t *removed = rb_remove(root, count, (void *)(ptr_t)(values[i]), compare);
                     CHECK_NOT_NULL(removed);
                     CHECK_EQUAL((ptr_t)removed->m_item, values[i]);
+                    CHECK_EQUAL(found, removed);
                 }
             }
 
