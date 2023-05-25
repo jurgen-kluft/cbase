@@ -431,9 +431,9 @@ namespace ncore
                         {
                             va_r_t r = argv[i++];
                             r        = c;
-                            scanned++;
-                            parsing = 0;
                         }
+                        scanned++;
+                        parsing = 0;
                     }
                     break;
                     case 's':
@@ -541,7 +541,7 @@ namespace ncore
                             reader->read();
 
                         s64                      n2                = 0;
-                        static const utf32::rune allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+                        static const utf32::rune allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
                         if (SearchUntilOneOf(reader, allDecimalChars))
                         {
                             n2 = StrToS64(reader, 10);
