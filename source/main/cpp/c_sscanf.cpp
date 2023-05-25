@@ -440,7 +440,7 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        u32 i = 0;
+                        s32 i = 0;
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
