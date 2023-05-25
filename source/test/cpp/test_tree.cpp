@@ -39,7 +39,18 @@ class ctxt_tree_t : public ncore::ntree::tree_t
     node16_t* m_root;
 
 public:
-    ctxt_tree_t() {}
+    ctxt_tree_t()
+        : m_allocator(nullptr)
+        , m_size(0)
+        , m_cap(0)
+        , m_nodes(nullptr)
+        , m_freeindex(0)
+        , m_freelist(nullptr)
+        , m_keys(nullptr)
+        , m_nill(nullptr)
+        , m_root(nullptr)
+    {
+    }
 
     void init(alloc_t* allocator)
     {
@@ -121,9 +132,23 @@ public:
         if (node == nullptr)
             return;
         node16_t* n      = (node16_t*)node;
-        n->m_branches[2] = (u16)(m_freelist - m_nodes);
-        m_freelist       = n;
+        n->m_branches[0] = 0;
+        n->m_branches[1] = 0;
+        if (m_freelist == nullptr)
+        {
+            n->m_branches[2] = 0xffff;
+        }
+        else 
+        {
+            n->m_branches[2] = (u16)(m_freelist - m_nodes);
+        }
+        m_freelist = n;
         m_size--;
+        if (m_size == 0)
+        {
+            m_freelist = nullptr;
+            m_freeindex = 0;
+        }
     }
     virtual s32 v_compare_nodes(ntree::node_t const* node, ntree::node_t const* other) const { return compare_s32(v_get_key(node), v_get_key(other)); }
     virtual s32 v_compare_insert(void const* key, ntree::node_t const* node) const { return compare_s32(key, v_get_key(node)); }
