@@ -884,7 +884,7 @@ namespace ncore
 
         char* ftoa(f32 val, char* cursor, char const* end, bool lowercase)
         {
-            s32 bufsize = end - cursor;
+            s32       bufsize = (s32)(end - cursor);
             u32 const flags = lowercase ? 0 : DoubleConvert::FLAG_UPPERCASE;
             const s32 len = dconvstr_print(&cursor, &bufsize, val, 'g', flags, 0, DoubleConvert::DEFAULT_PRECISION);
             return cursor + len;
@@ -892,7 +892,7 @@ namespace ncore
 
         char* dtoa(f64 val, char* cursor, char const* end, bool lowercase)
         {
-            s32 bufsize = end - cursor;
+            s32 bufsize = (s32)(end - cursor);
             u32 const flags = lowercase ? 0 : DoubleConvert::FLAG_UPPERCASE;
             const s32 len = dconvstr_print(&cursor, &bufsize, val, 'g', flags, 0, DoubleConvert::DEFAULT_PRECISION);
             return cursor + len;
