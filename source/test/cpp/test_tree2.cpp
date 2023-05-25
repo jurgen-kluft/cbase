@@ -115,7 +115,7 @@ namespace ncore
 
         if (fn == node)
             fp = save;
-        else if (fn == node->m_chld[1 - dir])
+        else if (fn == node->m_chld[1 - dir]) // never triggered
             fp = node;
 
         return save;
@@ -152,7 +152,7 @@ namespace ncore
     static inline rbnode_t *rotate_double_track_parent(rbnode_t *node, s32 dir, rbnode_t *fn, rbnode_t *&fp)
     {
         node->m_chld[1 - dir] = rotate_single_track_parent(node->m_chld[1 - dir], 1 - dir, fn, fp);
-        if (fn == node->m_chld[1 - dir])
+        if (fn == node->m_chld[1 - dir]) // never triggered
             fp = node;
         rbnode_t *save = rotate_single_track_parent(node, dir, fn, fp);
         if (fn == node)
@@ -343,7 +343,7 @@ namespace ncore
                 {
                     rbnode_t *r = rotate_single_track_parent(n, dir, fn, fp);
                     p->set_child(last, r);
-                    if (fn == r)
+                    if (fn == r) // never triggered
                         fp = p;
                     p = r;
                 }
@@ -366,14 +366,14 @@ namespace ncore
                             {
                                 rbnode_t *r = rotate_double_track_parent(p, last, fn, fp);
                                 g->set_child(dir2, r);
-                                if (fn == r)
+                                if (fn == r) // never triggered
                                     fp = g;
                             }
                             else if (is_red(s->get_child(1 - last)))
                             {
                                 rbnode_t *r = rotate_single_track_parent(p, last, fn, fp);
                                 g->set_child(dir2, r);
-                                if (fn == r)
+                                if (fn == r) // never triggered
                                     fp = g;
                             }
 
@@ -548,7 +548,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
         UNITTEST_TEST(insert_remove_find)
         {
-            const s32 num_nodes = 8192;
+            const s32 num_nodes = 32768;
             rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
             s64      *values    = (s64 *)Allocator->allocate(num_nodes * sizeof(s64));
 
@@ -580,6 +580,10 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             RandomShuffle(values, num_nodes, 0x1234567890abcdef);
 
+            const char *error = nullptr;
+            rb_validate(root, compare, error);
+            CHECK_NULL(error);
+
             // remove all half of the values
             for (s32 i = 0; i < (num_nodes/2); ++i)
             {
@@ -591,6 +595,9 @@ UNITTEST_SUITE_BEGIN(test_tree2)
                 CHECK_EQUAL((ptr_t)removed->m_item, values[i]);
                 CHECK_EQUAL(found, removed);
             }
+
+            rb_validate(root, compare, error);
+            CHECK_NULL(error);
 
             for (s32 i = (num_nodes/2); i < num_nodes; ++i)
             {
