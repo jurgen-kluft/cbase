@@ -50,27 +50,72 @@ namespace ncore
 
         static inline s32 is_red(tree_t* tree, node_t* n) { return n != nullptr && n->is_red(tree); }
 
-        s32 rb_insert(tree_t* tree, void const* key, void const* value)
+        static inline node_t* rotate_single(tree_t* tree, node_t* node, s32 dir)
         {
-            s32     result = 0;
-            node_t* root   = tree->v_get_root();
+            node_t* save = node->get_child(tree, 1 - dir);
+            node->set_child(tree, 1 - dir, save->get_child(tree, dir));
+            save->set_child(tree, dir, node);
+            node->set_red(tree);
+            save->set_black(tree);
+            return save;
+        }
+
+        static inline node_t* rotate_single_track_parent(tree_t* tree, node_t* node, s32 dir, node_t* fn, node_t*& fp)
+        {
+            node_t* save = node->get_child(tree, 1 - dir);
+            node->set_child(tree, 1 - dir, save->get_child(tree, dir));
+            save->set_child(tree, dir, node);
+            node->set_red(tree);
+            save->set_black(tree);
+
+            if (fn == node)
+                fp = save;
+            else if (fn == node->get_child(tree, 1 - dir))  // never triggered
+                fp = node;
+
+            return save;
+        }
+
+        static inline node_t* rotate_double(tree_t* tree, node_t* node, s32 dir)
+        {
+            node->set_child(tree, 1 - dir, rotate_single(tree, node->get_child(tree, 1 - dir), 1 - dir));
+            return rotate_single(tree, node, dir);
+        }
+
+        static inline node_t* rotate_double_track_parent(tree_t* tree, node_t* node, s32 dir, node_t* fn, node_t*& fp)
+        {
+            node_t* child = rotate_single_track_parent(tree, node->get_child(tree, 1 - dir), 1 - dir, fn, fp);
+            node->set_child(tree, 1 - dir, child);
+
+            if (fn == child)  // never triggered
+                fp = node;
+            node_t* save = rotate_single_track_parent(tree, node, dir, fn, fp);
+            if (fn == node)
+                fp = save;
+            return save;
+        }
+
+        bool insert(tree_t* tree, void const* key, void const* value)
+        {
+            bool    inserted = false;
+            node_t* root     = tree->v_get_root();
             if (root == nullptr)
             {
                 // We have an empty tree; attach the
                 // new node directly to the root
                 node_t* new_node = tree->v_new_node(key, value);
                 tree->v_set_root(new_node);
-                result = 1;
+                inserted = true;
             }
             else
             {
-                node_t* head = tree->v_get_temp_root();  // False tree root
-                node_t *g, *t;                           // Grandparent & parent
-                node_t *p, *n;                           // Iterator & parent
+                node_t* head = tree->v_get_temp();  // False tree root
+                node_t *g, *t;                      // Grandparent & parent
+                node_t *p, *n;                      // Iterator & parent
                 s32     dir = 0, last = 0;
 
                 // Set up our helpers
-                t         = head;
+                t = head;
                 t->set_black(tree);  // Color it black
                 t->set_right(tree, root);
                 t->set_left(tree, nullptr);
@@ -86,7 +131,7 @@ namespace ncore
                         // Insert a new node at the first null link
                         n = tree->v_new_node(key, value);
                         p->set_child(tree, dir, n);
-                        result = 1;
+                        inserted = true;
                     }
                     else if (is_red(tree, n->get_left(tree)) && is_red(tree, n->get_right(tree)))
                     {
@@ -131,7 +176,7 @@ namespace ncore
             // Make the root black for simplified logic
             root->set_black(tree);
 
-            return result;
+            return inserted;
         }
 
         bool rb_clear(tree_t* tree, node_t*& removed_node)
@@ -200,11 +245,188 @@ namespace ncore
             return false;
         }
 
-        bool insert(tree_t* ctxt, void const* key, void const* value) { return false; }
+        // validate the tree (return violation description in 'result'), also returns black height
+        static s32 rb_validate(tree_t* tree, node_t* root, const char*& result)
+        {
+            if (root == nullptr)
+            {
+                return 1;
+            }
+            else
+            {
+                node_t* ln = root->get_left(tree);
+                node_t* rn = root->get_right(tree);
 
-        bool remove(tree_t* ctxt, void const* key) { return false; }
+                // Consecutive red links
+                if (is_red(tree, root))
+                {
+                    if (is_red(tree, ln) || is_red(tree, rn))
+                    {
+                        result = "Red violation";
+                        return 0;
+                    }
+                }
 
-        bool validate(tree_t* ctxt, const char*& error_str) { return false; }
+                s32 lh = rb_validate(tree, ln, result);
+                s32 rh = rb_validate(tree, rn, result);
+
+                // Invalid binary search tree
+                if ((ln != nullptr && tree->v_compare_nodes(ln, root) >= 0) || (rn != nullptr && tree->v_compare_nodes(rn, root) <= 0))
+                {
+                    result = "Binary tree violation";
+                    return 0;
+                }
+
+                if (lh != 0 && rh != 0 && lh != rh)  // Black height mismatch
+                {
+                    result = "Black violation";
+                    return 0;
+                }
+
+                if (lh != 0 && rh != 0)  // Only count black links
+                {
+                    return is_red(tree, root) ? lh : lh + 1;
+                }
+            }
+            return 0;
+        }
+
+        bool remove(tree_t* tree, void const* key)
+        {
+            node_t* root = tree->v_get_root();
+            if (root == nullptr)
+                return false;
+
+            node_t* head = tree->v_get_temp();  // False tree root
+            node_t* fn  = nullptr;              // Found node
+            node_t* fp  = nullptr;              // Found node parent
+            s32     dir = 1;
+
+            // Set up our helpers
+            node_t *g = nullptr;
+            node_t *p = nullptr;
+
+            node_t* n = head;
+            n->set_black(tree);  // Color it black
+            n->set_right(tree, root);
+            n->set_left(tree, nullptr);
+
+            // Search and push a red node down
+            // to fix red violations as we go
+            while (n->get_child(tree, dir) != nullptr)
+            {
+                const s32 last = dir;
+
+                // Move the helpers down
+                g = p, p = n;
+                n   = n->get_child(tree, dir);
+                dir = tree->v_compare_insert(key, n);
+
+                // Save the node with matching data and keep
+                // going; we'll do removal tasks at the end
+                if (dir == 0)
+                {
+                    fn = n;
+                    fp = p;
+                }
+                dir = ((dir + 1) >> 1);
+
+                /* Push the red node down with rotations and color flips */
+                if (!is_red(tree, n) && !is_red(tree, n->get_child(tree, dir)))
+                {
+                    if (is_red(tree, n->get_child(tree, 1 - dir)))
+                    {
+                        node_t* r = rotate_single_track_parent(tree, n, dir, fn, fp);
+                        p->set_child(tree, last, r);
+                        if (fn == r)  // never triggered
+                            fp = p;
+                        p = r;
+                    }
+                    else if (!is_red(tree, n->get_child(tree, 1 - dir)))
+                    {
+                        node_t* s = p->get_child(tree, 1 - last);
+                        if (s != nullptr)
+                        {
+                            if (!is_red(tree, s->get_child(tree, 1 - last)) && !is_red(tree, s->get_child(tree, last)))
+                            {
+                                // Color flip
+                                p->set_black(tree);
+                                s->set_red(tree);
+                                n->set_red(tree);
+                            }
+                            else
+                            {
+                                const s32 dir2 = g->get_right(tree) == p ? 1 : 0;
+                                if (is_red(tree, s->get_child(tree, last)))
+                                {
+                                    node_t* r = rotate_double_track_parent(tree, p, last, fn, fp);
+                                    g->set_child(tree, dir2, r);
+                                    if (fn == r)  // never triggered
+                                        fp = g;
+                                }
+                                else if (is_red(tree, s->get_child(tree, 1 - last)))
+                                {
+                                    node_t* r = rotate_single_track_parent(tree, p, last, fn, fp);
+                                    g->set_child(tree, dir2, r);
+                                    if (fn == r)  // never triggered
+                                        fp = g;
+                                }
+
+                                // Ensure correct coloring
+                                n->set_red(tree);
+                                g->get_child(tree, dir2)->set_red(tree);
+
+                                g->get_child(tree, dir2)->get_left(tree)->set_black(tree);
+                                g->get_child(tree, dir2)->get_right(tree)->set_black(tree);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Update the root (it may be different)
+            root = head->get_right(tree);
+
+            // Replace and remove the saved node
+            if (fn != nullptr)
+            {
+                ASSERT(fp->get_right(tree) == fn || fp->get_left(tree) == fn);
+
+                ASSERT(p->get_right(tree) == n || p->get_left(tree) == n);
+                node_t* child1 = n->get_child(tree, n->get_left(tree) == nullptr);
+                p->set_child(tree, p->get_right(tree) == n, child1);
+
+                if (fn != n)
+                {
+                    ASSERT(fp != p);
+
+                    // swap 'n' and 'fn', we want to remove the node that was holding 'item'
+                    fp->set_child(tree, fp->get_right(tree) == fn, n);
+                    n->set_child(tree, LEFT, fn->get_left(tree));
+                    n->set_child(tree, RIGHT, fn->get_right(tree));
+                    n->set_color(tree, fn->get_color(tree));
+                }
+
+                if (root == fn)
+                    root = n;
+
+                tree->v_del_node(fn);
+            }
+
+            // Make the root black for simplified logic
+            if (root != nullptr)
+                root->set_black(tree);
+
+            tree->v_set_root(root);
+            return true;
+        }
+
+        bool validate(tree_t* tree, const char*& error_str)
+        {
+            node_t* root = tree->v_get_root();
+            rb_validate(tree, root, error_str);
+            return error_str == nullptr;
+        }
 
         iterator_t iterate(tree_t* ctxt)
         {

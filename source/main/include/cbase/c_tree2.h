@@ -36,6 +36,7 @@ namespace ncore
             virtual s32         v_capacity() const                                             = 0;
             virtual node_t*     v_get_root() const                                             = 0;
             virtual void        v_set_root(node_t* node)                                       = 0;
+            virtual node_t*     v_get_temp() const                                             = 0;
             virtual void        v_set_color(node_t* node, color_e color)                       = 0;
             virtual color_e     v_get_color(node_t const* node) const                          = 0;
             virtual void const* v_get_key(node_t const* node) const                            = 0;
