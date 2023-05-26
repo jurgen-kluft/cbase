@@ -7,20 +7,20 @@
 
 namespace ncore
 {
-    class default_array_capacity_handler : public array_capacity_handler_t
+    class default_array_memory_handler : public array_memory_t
     {
     public:
         virtual bool set_capacity(void*& items, u32 sizeof_item, u32 cur_size, u32& cur_capacity, u32 new_capacity);
         virtual u32  max_capacity() const { return type_t<u32>::max() >> 1; }
     };
 
-    array_capacity_handler_t* g_get_default_array_capacity_handler()
+    array_memory_t* g_get_default_array_memory_handler()
     {
-        static default_array_capacity_handler s_default_array_capacity_handler;
+        static default_array_memory_handler s_default_array_capacity_handler;
         return &s_default_array_capacity_handler;
     }
 
-    bool default_array_capacity_handler::set_capacity(void*& items, u32 sizeof_item, u32 cur_size, u32& cur_capacity, u32 new_capacity)
+    bool default_array_memory_handler::set_capacity(void*& items, u32 sizeof_item, u32 cur_size, u32& cur_capacity, u32 new_capacity)
     {
         if (new_capacity == cur_capacity)
             return true;
