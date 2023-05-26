@@ -7,15 +7,12 @@
 
 #include "cbase/c_allocator.h"
 #include "cbase/c_integer.h"
-#include "cbase/c_hash.h"
 #include "cbase/c_limits.h"
-#include "cbase/c_tree.h"
 #include "cbase/private/c_std.h"
 #include "cbase/private/c_map_internal.h"
 
 namespace ncore
 {
-
     template <typename K, typename V, typename H = nhash::hasher_t<K>> class map_t
     {
     public:
@@ -30,11 +27,11 @@ namespace ncore
 
             if (max_items <= type_t<u16>::max())
             {
-                m_ctxt = m_allocator->construct<map_tree_ctxt_t<u16, K, u32, H>>(a, max_items);
+                m_ctxt = m_allocator->construct<map_tree_ctxt_t<u16, K, V, H>>(a, max_items);
             }
             else if (max_items <= type_t<u32>::max())
             {
-                m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, u32, H>>(a, max_items);
+                m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, V, H>>(a, max_items);
             }
         }
 
