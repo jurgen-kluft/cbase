@@ -7,14 +7,16 @@ namespace ncore
 {
     const va_t va_t::sEmpty;
 
-    va_t::va_t(const char* inVar) : mArg3(TYPE_PCRUNES)
+    va_t::va_t(const char* inVar)
+        : mArg3(TYPE_PCRUNES)
     {
         mArg = (u64)inVar;
         mArg3 |= ascii::TYPE;
         mArg2 = ascii::strlen(inVar);
     }
 
-    va_t::va_t(const wchar_t* inVar) : mArg3(TYPE_PCRUNES)
+    va_t::va_t(const wchar_t* inVar)
+        : mArg3(TYPE_PCRUNES)
     {
         mArg = (u64)inVar;
         mArg3 |= ascii::TYPE;
@@ -27,56 +29,38 @@ namespace ncore
         }
     }
 
-    va_t::va_t(crunes_t const& str) : mArg3(TYPE_PCRUNES)
+    va_t::va_t(crunes_t const& str)
+        : mArg3(TYPE_PCRUNES)
     {
+        mArg3 |= (str.m_ascii.m_flags & 0x0F);
         switch (str.m_ascii.m_flags & 0x0F)
         {
-            case ascii::TYPE:
-            {
-                mArg = (u64)(&str.m_ascii.m_bos[str.m_ascii.m_str]);
-                mArg3 |= ascii::TYPE;
-            }
-            break;
-            case utf8::TYPE:
-            {
-                mArg = (u64)(&str.m_utf8.m_bos[str.m_utf8.m_str]);
-                mArg3 |= utf8::TYPE;
-            }
-            break;
-            case utf16::TYPE:
-            {
-                mArg = (u64)(&str.m_utf16.m_bos[str.m_utf16.m_str]);
-                mArg3 |= utf16::TYPE;
-            }
-            break;
-            case utf32::TYPE:
-            {
-                mArg = (u64)(&str.m_utf32.m_bos[str.m_utf32.m_str]);
-                mArg3 |= utf32::TYPE;
-            }
-            break;
+            case ascii::TYPE: mArg = (u64)(&str.m_ascii.m_bos[str.m_ascii.m_str]); break;
+            case utf8::TYPE: mArg = (u64)(&str.m_utf8.m_bos[str.m_utf8.m_str]); break;
+            case utf16::TYPE: mArg = (u64)(&str.m_utf16.m_bos[str.m_utf16.m_str]); break;
+            case utf32::TYPE: mArg = (u64)(&str.m_utf32.m_bos[str.m_utf32.m_str]); break;
             default: break;
         }
         mArg2 = str.m_ascii.m_end - str.m_ascii.m_str;
     }
 
-    char va_t::specifier() const 
+    char va_t::specifier() const
     {
         switch (mArg3 & TYPE_MASK)
         {
-            case TYPE_BOOL:    return 'b';
-            case TYPE_UINT32:  return 'u';
-            case TYPE_INT32:   return 'd';
-            case TYPE_UINT8:   return 'u';
-            case TYPE_INT8:    return 'd';
-            case TYPE_UINT16:  return 'u';
-            case TYPE_INT16:   return 'd';
-            case TYPE_UINT64:  return 'u';
-            case TYPE_INT64:   return 'd';
+            case TYPE_BOOL: return 'b';
+            case TYPE_UINT32: return 'u';
+            case TYPE_INT32: return 'd';
+            case TYPE_UINT8: return 'u';
+            case TYPE_INT8: return 'd';
+            case TYPE_UINT16: return 'u';
+            case TYPE_INT16: return 'd';
+            case TYPE_UINT64: return 'u';
+            case TYPE_INT64: return 'd';
             case TYPE_FLOAT32: return 'f';
             case TYPE_FLOAT64: return 'f';
             case TYPE_PCRUNES: return 's';
-            default:           return 's';
+            default: return 's';
         }
     }
 
@@ -161,7 +145,7 @@ namespace ncore
 
     s16 va_t::convertToInt16() const
     {
-        u32 i = convertToUInt32();
+        s32 i = convertToInt32();
         return (s16)i;
     }
 
@@ -173,49 +157,67 @@ namespace ncore
 
     s32 va_t::convertToInt32() const
     {
-        u32 i = convertToUInt32();
-        return (s32)i;
+        s32 i = (s32)convertToInt64();
+        return i;
     }
 
-    u32 va_t::convertToUInt32() const
+    u32 va_t::convertToUInt32() const { return (u32)convertToUInt64(); }
+
+    s64 va_t::convertToInt64() const
     {
-        u32 i = 0;
+        s64 i = 0;
         switch (mArg3 & TYPE_MASK)
         {
             case TYPE_BOOL:
             case TYPE_UINT32:
+            {
+                i = (s64)(*(u32*)&mArg);
+            }
+            break;
             case TYPE_INT32:
             {
-                i = (u32)(*(u32*)&mArg);
+                i = (s64)(*(u32*)&mArg);
             }
             break;
 
-            case TYPE_UINT8:
             case TYPE_INT8:
             {
-                i = (u32)(*(u8*)&mArg);
+                i = (s64)(*(s8*)&mArg);
+            }
+            break;
+            case TYPE_UINT8:
+            {
+                i = (s64)(*(u8*)&mArg);
+            }
+            break;
+            case TYPE_INT16:
+            {
+                i = (s64)(*(s16*)&mArg);
             }
             break;
             case TYPE_UINT16:
-            case TYPE_INT16:
             {
-                i = (u32)(*(u16*)&mArg);
+                i = (s64)(*(u16*)&mArg);
             }
             break;
             case TYPE_UINT64:
+            {
+                i = (s64)(*(u64*)&mArg);
+            }
+            break;
             case TYPE_INT64:
             {
-                i = (u32)(*(u64*)&mArg);
+                i = (*(s64*)&mArg);
             }
             break;
             case TYPE_FLOAT32:
             {
-                i = (u32)(*(f32*)&mArg);
+                i = (s64)(*(f32*)&mArg);
             }
             break;
             case TYPE_FLOAT64:
             {
-                i = (u32)(*(f64*)&mArg);
+                i = (s64)(*(f64*)&mArg);
             }
             break;
             case TYPE_PCRUNES:
@@ -228,12 +230,6 @@ namespace ncore
         };
 
         return i;
-    }
-
-    s64 va_t::convertToInt64() const
-    {
-        u64 i = convertToUInt64();
-        return (s64)i;
     }
 
     u64 va_t::convertToUInt64() const
@@ -289,59 +285,7 @@ namespace ncore
         return i;
     }
 
-    f32 va_t::convertToFloat() const
-    {
-        f32 i = 0.0f;
-        switch (mArg3 & TYPE_MASK)
-        {
-            case TYPE_BOOL:
-            case TYPE_UINT32:
-            case TYPE_INT32:
-            {
-                i = (f32)(*(u32*)&mArg);
-            }
-            break;
-
-            case TYPE_UINT8:
-            case TYPE_INT8:
-            {
-                i = (f32)(*(u8*)&mArg);
-            }
-            break;
-            case TYPE_UINT16:
-            case TYPE_INT16:
-            {
-                i = (f32)(*(u16*)&mArg);
-            }
-            break;
-            case TYPE_UINT64:
-            case TYPE_INT64:
-            {
-                i = (f32)(*(u64*)&mArg);
-            }
-            break;
-
-            case TYPE_FLOAT32:
-            {
-                i = (f32)(*(f32*)&mArg);
-            }
-            break;
-            case TYPE_FLOAT64:
-            {
-                i = (f32)(*(f64*)&mArg);
-            }
-            break;
-            case TYPE_PCRUNES:
-            {
-                crunes_t ch((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
-                parse(ch, i);
-            }
-            break;
-            default: break;  // Fall through
-        };
-
-        return i;
-    }
+    f32 va_t::convertToFloat() const { return (f32)convertToDouble(); }
 
     f64 va_t::convertToDouble() const
     {
