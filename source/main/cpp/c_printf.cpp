@@ -740,7 +740,7 @@ namespace ncore
                 if (_is_digit(f))
                 {
                     precision = _atoi(&format);
-                    f = *format;
+                    f         = *format;
                 }
                 else if (f == '*')
                 {
@@ -1024,67 +1024,80 @@ namespace ncore
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    int vsnprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, va_iter_t& va)
+    s32 vsnprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, va_iter_t& va)
     {
         const u64 maxlen = buffer_end - buffer;
-        const int ret    = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va);
+        const s32 ret    = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va);
         _putflush();
         return ret;
     }
 
-    int printf_(const char* format, const char* format_end, const va_t* argv, s32 argc)
+    s32 printf_(const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t va_iter = {argv, 0, argc};
         char      buffer[1];
-        const int ret = _vsnprintf(_out_char, buffer, (u64)-1, format, format_end, va_iter);
+        const s32 ret = _vsnprintf(_out_char, buffer, (u64)-1, format, format_end, va_iter);
         _putflush();
         return ret;
     }
 
-    int sprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc)
+    s32 sprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t va_iter = {argv, 0, argc};
         const u64 maxlen  = buffer_end - buffer;
-        const int ret     = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va_iter);
+        const s32 ret     = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va_iter);
         _putflush();
         return ret;
     }
 
-    int snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc)
+    s32 snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t va_iter = {argv, 0, argc};
         const u64 maxlen  = buffer_end - buffer;
-        const int ret     = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va_iter);
+        const s32 ret     = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va_iter);
         _putflush();
         return ret;
     }
 
-    int vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc)
+    s32 vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t va_iter = {argv, 0, argc};
         char      buffer[1];
-        const int ret = _vsnprintf(_out_char, buffer, (u64)-1, format, format_end, va_iter);
+        const s32 ret = _vsnprintf(_out_char, buffer, (u64)-1, format, format_end, va_iter);
         _putflush();
         return ret;
     }
 
-    int fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc)
+    s32 fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t               va_iter      = {argv, 0, argc};
         const out_fct_wrap_type out_fct_wrap = {out, arg};
-        const int               ret          = _vsnprintf(_out_fct, (char*)(ptr_t)&out_fct_wrap, (u64)-1, format, format_end, va_iter);
+        const s32               ret          = _vsnprintf(_out_fct, (char*)(ptr_t)&out_fct_wrap, (u64)-1, format, format_end, va_iter);
         _putflush();
         return ret;
     }
 
-    int vzprintf(irunes_writer_t& writer, const crunes_t& format, const va_t* argv, s32 argc)
+    s32 vzprintf(irunes_writer_t& writer, const crunes_t& format, const va_t* argv, s32 argc)
     {
         va_iter_t   va_iter      = {argv, 0, argc};
         const char* format_begin = &format.m_ascii.m_bos[format.m_ascii.m_str];
         const char* format_end   = &format.m_ascii.m_bos[format.m_ascii.m_end];
-        const int   ret          = _vsnprintf(_out_runeswriter, (char*)(ptr_t)&writer, (u64)-1, format_begin, format_end, va_iter);
+        const s32   ret          = _vsnprintf(_out_runeswriter, (char*)(ptr_t)&writer, (u64)-1, format_begin, format_end, va_iter);
         writer.flush();
         return ret;
     }
+
+    s32 sprintf_(runes_t& str, crunes_t const& format, const va_t* argv, s32 argc)
+    {
+        const s32 ret     = snprintf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_eos], &format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        str.m_ascii.m_end = str.m_ascii.m_str + ret;
+        return ret;
+    }
+
+    s32 cprintf_(crunes_t const& format, const va_t* argv, s32 argc)
+    {
+        return vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+    }
+
 
 };  // namespace ncore

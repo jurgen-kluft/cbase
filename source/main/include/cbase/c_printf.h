@@ -14,11 +14,14 @@ namespace ncore
     void _putchar(char character);
     void _putflush(); // Indicate that we are done 
 
-    int printf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
-    int snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc);
-    int vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
-    int fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
-    int vzprintf(irunes_writer_t& writer, const crunes_t& str, const va_t* argv, s32 argc);
+    s32 printf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
+    s32 sprintf_(runes_t& str, crunes_t const& format, const va_t* argv, s32 argc);
+    s32 snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc);
+    s32 vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
+    s32 cprintf_(crunes_t const& format, const va_t* argv, s32 argc);
+    s32 fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
+    s32 vzprintf(irunes_writer_t& writer, const crunes_t& str, const va_t* argv, s32 argc);
+    s32 sscanf_(crunes_t& str, crunes_t const& format, const va_r_t* argv, s32 argc);
 
     inline void printf(crunes_t const& str)
     {
@@ -51,8 +54,6 @@ namespace ncore
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
         return vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
     }
-
-    s32 sscanf_(crunes_t& str, crunes_t const& format, const va_r_t* argv, s32 argc);
 
     template <typename... Args>
     inline s32 sscanf(crunes_t& str, crunes_t const& format, Args&&... args)
