@@ -117,12 +117,12 @@ namespace ncore
 
         // return false when there is not enough space in the output
         // would need at least 10 characters for u32 and 20 for u64
-        char* utoa(u32 val, char* cursor, char const* end, s32 base, bool octzero=false, bool lowercase=true);
-        char* itoa(s32 val, char* cursor, char const* end, s32 base, bool octzero=false, bool lowercase=true);
-        char* utoa(u64 val, char* cursor, char const* end, s32 base, bool octzero=false, bool lowercase=true);
-        char* itoa(s64 val, char* cursor, char const* end, s32 base, bool octzero=false, bool lowercase=true);
-        char* ftoa(f32 val, char* cursor, char const* end, bool lowercase=true);
-        char* dtoa(f64 val, char* cursor, char const* end, bool lowercase=true);
+        char* utoa(u32 val, char* cursor, char const* end, s32 base, bool octzero = false, bool lowercase = true);
+        char* itoa(s32 val, char* cursor, char const* end, s32 base, bool octzero = false, bool lowercase = true);
+        char* utoa(u64 val, char* cursor, char const* end, s32 base, bool octzero = false, bool lowercase = true);
+        char* itoa(s64 val, char* cursor, char const* end, s32 base, bool octzero = false, bool lowercase = true);
+        char* ftoa(f32 val, char* cursor, char const* end, bool lowercase = true);
+        char* dtoa(f64 val, char* cursor, char const* end, bool lowercase = true);
         enum EBoolTypes
         {
             TrueFalse = 0,
@@ -442,6 +442,7 @@ namespace ncore
         crunes_t(ascii::pcrune _bos);
         crunes_t(ascii::pcrune _bos, ascii::pcrune _end);
         crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u32 _flags = ascii::TYPE);
+        crunes_t(ascii::pcrune _bos, u32 _len) : crunes_t(_bos, 0, _len, _len, ascii::TYPE) {}
 
         crunes_t(utf8::crunes_t const& _str);
         crunes_t(utf8::pcrune _str);
@@ -488,7 +489,8 @@ namespace ncore
             utf32::crunes_t m_utf32;
         };
 
-        inline u32  get_type() const { return m_ascii.m_flags & 0xF; }
+        inline void set_type(u8 _type) { m_ascii.m_flags = m_ascii.m_flags & 0xFFFFFFF0 | _type; }
+        inline u8   get_type() const { return m_ascii.m_flags & 0xF; }
         inline bool is_ascii() const { return get_type() == ascii::TYPE; }
         inline bool is_utf8() const { return get_type() == utf8::TYPE; }
         inline bool is_utf16() const { return get_type() == utf16::TYPE; }
