@@ -265,7 +265,7 @@ namespace ncore
                 case utf16::TYPE: return read(str.m_utf16.m_bos, cursor, str.m_utf16.m_end);
                 case utf32::TYPE: return read(str.m_utf32.m_bos, cursor, str.m_utf32.m_end);
             }
-            return '\0';
+            return cEOS;
         }
         static uchar32 read(crunes_t const& str, u32& cursor)
         {
@@ -276,7 +276,7 @@ namespace ncore
                 case utf16::TYPE: return read(str.m_utf16.m_bos, cursor, str.m_utf16.m_end);
                 case utf32::TYPE: return read(str.m_utf32.m_bos, cursor, str.m_utf32.m_end);
             }
-            return '\0';
+            return cEOS;
         }
 
         static uchar32 peek(ascii::runes_t const& str, u32 ptr) { return read(str.m_bos, ptr, str.m_end); }
@@ -294,7 +294,7 @@ namespace ncore
                 case utf32::TYPE: return peek(str.m_ascii, ptr);
                 default: ASSERT(false); break;
             }
-            return '\0';
+            return cEOS;
         }
 
         static uchar32 peek(crunes_t const& str, u32 ptr)
@@ -307,7 +307,7 @@ namespace ncore
                 case utf32::TYPE: return peek(str.m_ascii, ptr);
                 default: ASSERT(false); break;
             }
-            return '\0';
+            return cEOS;
         }
 
         static uchar32 peek(ascii::crunes_t const& str, u32 ptr) { return read(str.m_bos, ptr, str.m_end); }
@@ -2610,7 +2610,7 @@ namespace ncore
             case utf16::TYPE: return utf::peek(str.m_utf16, cursor);
             case utf32::TYPE: return utf::peek(str.m_utf32, cursor);
         }
-        return '\0';
+        return cEOS;
     }
     uchar32 read(runes_t const& str, u32& cursor)
     {
@@ -2621,7 +2621,7 @@ namespace ncore
             case utf16::TYPE: return utf::read(str.m_utf16.m_bos, cursor, str.m_utf16.m_end);
             case utf32::TYPE: return utf::read(str.m_utf32.m_bos, cursor, str.m_utf32.m_end);
         }
-        return '\0';
+        return cEOS;
     }
     bool write(runes_t const& str, u32& cursor, uchar32 c)
     {
@@ -2875,7 +2875,7 @@ namespace ncore
             }
             return c;
         }
-        return '\0';
+        return cEOS;
     }
 
     uchar32 runes_t::read(u32& cursor) const
@@ -2899,7 +2899,7 @@ namespace ncore
             }
             return c;
         }
-        return '\0';
+        return cEOS;
     }
 
     bool runes_t::write(uchar32 c)
@@ -3256,7 +3256,7 @@ namespace ncore
             }
             return c;
         }
-        return '\0';
+        return cEOS;
     }
 
     uchar32 crunes_t::read(u32& cursor) const
@@ -3280,7 +3280,7 @@ namespace ncore
             }
             return c;
         }
-        return '\0';
+        return cEOS;
     }
 
     bool crunes_t::scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const
