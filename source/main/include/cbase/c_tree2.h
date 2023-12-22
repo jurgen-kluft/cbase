@@ -51,20 +51,21 @@ namespace ncore
 
         struct iterator_t
         {
-            bool       traverse(s32 d, void const*& data);
-            bool       preorder(s32 d, void const*& data);
-            bool       sortorder(s32 d, void const*& data);
-            bool       postorder(s32 d, void const*& data);
-            inline s32 getdir(s32 compare) const { return (compare + 1) >> 1; }
+            bool              traverse(s32 d, void const*& data);
+            bool              preorder(s32 d, void const*& data);
+            bool              sortorder(s32 d, void const*& data);
+            bool              postorder(s32 d, void const*& data);
+            static inline s32 getdir(s32 compare) { return (compare + 1) >> 1; }
 
             tree_t* m_tree;
             node_t* m_it;
-            node_t* m_stack[40];
+            node_t* m_stack_array[32];
+            s32     m_stack;
         };
 
         inline int_t size(tree_t* c) { return c->v_size(); }
         inline int_t capacity(tree_t* c) { return c->v_capacity(); }
-        bool         clear(tree_t* c);  // Repeatedly call 'clear' until true is returned ()
+        bool         clear(tree_t* c);  // Repeatedly call 'clear' until true is returned
         bool         find(tree_t* c, void const* key, node_t*& found);
         bool         insert(tree_t* c, void const* key, void const* value = nullptr);
         bool         remove(tree_t* c, void const* key);

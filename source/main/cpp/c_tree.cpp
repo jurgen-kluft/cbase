@@ -26,28 +26,9 @@ namespace ncore
     //    You can also provide a normal implementation where a node just holds a pointer to the
     //    value, parent and children.
     //
-    // TODO implement a couple of different backends
 
     namespace ntree
     {
-
-#define rbnil(t)         ((t)->v_get_nill())
-#define rbfirst(t)       ((t)->v_get_root()->get_left(t))
-#define rbroot(t)        ((t)->v_get_root())
-#define rbsetfirst(t, n) ((t)->v_get_root()->set_left(t, n))
-
-#define rbchild(n, child)       ((n)->get_child(tree, child))
-#define rbdata(n)               ((n)->get_data(tree))
-#define rbleft(n)               ((n)->get_left(tree))
-#define rbright(n)              ((n)->get_right(tree))
-#define rbparent(n)             ((n)->get_parent(tree))
-#define rbcolor(n)              ((n)->get_color(tree))
-#define rbsetchild(n, child, v) ((n)->set_child(tree, child, v))
-#define rbsetleft(n, v)         ((n)->set_left(tree, v))
-#define rbsetright(n, v)        ((n)->set_right(tree, v))
-#define rbsetparent(n, v)       ((n)->set_parent(tree, v))
-#define rbsetcolor(n, color)    ((n)->set_color(tree, color))
-
         struct node_t
         {
             inline void const* get_key(tree_t const* c) const { return c->v_get_key(this); }
@@ -79,7 +60,7 @@ namespace ncore
         class tree_internal_t
         {
         public:
-            static inline s32 is_red(tree_t* tree, node_t* n) { return n != rbnil(tree) && n->is_red(tree); }
+            static inline s32 is_red(tree_t* tree, node_t* n) { return n != tree->v_get_nill() && n->is_red(tree); }
 
             static void rotate_left(tree_t* tree, node_t* node);
             static void rotate_right(tree_t* tree, node_t* node);
@@ -102,7 +83,7 @@ namespace ncore
             child = node->get_right(tree);
             node->set_right(tree, child->get_left(tree));
 
-            if (child->get_left(tree) != rbnil(tree))
+            if (child->get_left(tree) != tree->v_get_nill())
                 child->get_left(tree)->set_parent(tree, node);
 
             child->set_parent(tree, node->get_parent(tree));
@@ -118,15 +99,14 @@ namespace ncore
 
         void tree_internal_t::rotate_right(tree_t* tree, node_t* node)
         {
-            node_t* child = rbleft(node);
-            rbsetleft(node, rbright(child));
+            node_t* child = node->get_left(tree);
+            node->set_left(tree, child->get_right(tree));
 
-            // if (child->get_right(tree) != rbnil(tree))
-            //     child->get_right(tree)->set_parent(tree, node);
-            // child->set_parent(tree, node->get_parent(tree));
-            if (rbright(child) != rbnil(tree))
-                rbsetparent(rbright(child), node);
-            rbsetparent(child, rbparent(node));
+            if (child->get_right(tree) != tree->v_get_nill())
+            {
+                child->get_right(tree)->set_parent(tree, node);
+            }
+            child->set_parent(tree, node->get_parent(tree));
 
             if (node == node->get_parent(tree)->get_left(tree))
                 node->get_parent(tree)->set_left(tree, child);
@@ -141,9 +121,9 @@ namespace ncore
         node_t* tree_internal_t::tree_successor(tree_t* tree, node_t* node)
         {
             node_t* succ = succ = node->get_right(tree);
-            if (succ != rbnil(tree))
+            if (succ != tree->v_get_nill())
             {
-                while (succ->get_left(tree) != rbnil(tree))
+                while (succ->get_left(tree) != tree->v_get_nill())
                     succ = succ->get_left(tree);
             }
             else
@@ -152,8 +132,8 @@ namespace ncore
                 for (succ = node->get_parent(tree); node == succ->get_right(tree); succ = succ->get_parent(tree))
                     node = succ;
 
-                if (succ == rbroot(tree))
-                    succ = rbnil(tree);
+                if (succ == tree->v_get_root())
+                    succ = tree->v_get_nill();
             }
             return (succ);
         }
@@ -162,7 +142,7 @@ namespace ncore
         void tree_internal_t::tree_remove(tree_t* tree, node_t* z)
         {
             node_t* y = nullptr;
-            if (z->get_left(tree) == rbnil(tree) || z->get_right(tree) == rbnil(tree))
+            if (z->get_left(tree) == tree->v_get_nill() || z->get_right(tree) == tree->v_get_nill())
             {
                 y = z;
             }
@@ -171,12 +151,13 @@ namespace ncore
                 y = tree_successor(tree, z);
             }
 
-            node_t* x = (y->get_left(tree) == rbnil(tree)) ? y->get_right(tree) : y->get_left(tree);
+            node_t* x = (y->get_left(tree) == tree->v_get_nill()) ? y->get_right(tree) : y->get_left(tree);
 
             x->set_parent(tree, y->get_parent(tree));
-            if (x->get_parent(tree) == rbroot(tree))
+            if (x->get_parent(tree) == tree->v_get_root())
             {
-                rbsetfirst(tree, x);
+                //rbsetfirst(tree, x);
+                tree->v_get_root()->set_left(tree, x);
             }
             else
             {
@@ -286,11 +267,11 @@ namespace ncore
         // already exists, a pointer to the existant node is returned.
         bool tree_internal_t::tree_insert(tree_t* tree, void const* key, void const* value)
         {
-            node_t* node   = rbfirst(tree);
-            node_t* parent = rbroot(tree);
+            node_t* node   = tree->v_get_root()->get_left(tree);
+            node_t* parent = tree->v_get_root();
 
             // Find correct insertion point.
-            while (node != rbnil(tree))
+            while (node != tree->v_get_nill())
             {
                 parent = node;
                 // s32 res = tree->m_compare(key, node->get_data());
@@ -301,11 +282,11 @@ namespace ncore
             }
 
             node = tree->v_new_node(key, value);
-            node->set_right(tree, rbnil(tree));
-            node->set_left(tree, rbnil(tree));
+            node->set_right(tree, tree->v_get_nill());
+            node->set_left(tree, tree->v_get_nill());
             node->set_parent(tree, parent);
-            //        if (parent == rbroot(tree) || tree->m_compare(key, parent->get_data()) < 0)
-            if (parent == rbroot(tree) || tree->v_compare_insert(key, parent) < 0)
+            //        if (parent == tree->v_get_root() || tree->m_compare(key, parent->get_data()) < 0)
+            if (parent == tree->v_get_root() || tree->v_compare_insert(key, parent) < 0)
                 parent->set_left(tree, node);
             else
                 parent->set_right(tree, node);
@@ -382,7 +363,7 @@ namespace ncore
                     }
                 }
             }
-            rbfirst(tree)->set_black(tree);  // first node is always black
+            tree->v_get_root()->get_left(tree)->set_black(tree);  // first node is always black
             return true;
         }
 
@@ -390,8 +371,8 @@ namespace ncore
         // Returns a pointer to the node if found, else nullptr.
         bool tree_internal_t::tree_find(tree_t const* tree, void const* key, node_t*& found)
         {
-            node_t* node = rbfirst(tree);
-            while (node != rbnil(tree))
+            node_t* node = tree->v_get_root()->get_left(tree);
+            while (node != tree->v_get_nill())
             {
                 const s32 c = tree->v_compare_insert(key, node);
                 if (c == 0)
@@ -415,16 +396,16 @@ namespace ncore
         {
             removed_node = nullptr;
 
-            node_t* node = rbfirst(tree);
-            if (node == rbnil(tree))
+            node_t* node = tree->v_get_root()->get_left(tree);
+            if (node == tree->v_get_nill())
                 return true;
 
             node_t* todelete = tree->v_get_root()->get_left(tree);
-            if (node->get_left(tree) == rbnil(tree))
+            if (node->get_left(tree) == tree->v_get_nill())
             {
                 tree->v_get_root()->set_left(tree, node->get_right(tree));
             }
-            else if (node->get_right(tree) == rbnil(tree))
+            else if (node->get_right(tree) == tree->v_get_nill())
             {
                 tree->v_get_root()->set_left(tree, node->get_left(tree));
             }
@@ -434,21 +415,21 @@ namespace ncore
                 // Take right branch and place it
                 // somewhere down the left branch
                 node_t* branch = node->get_right(tree);
-                node->set_right(tree, rbnil(tree));
+                node->set_right(tree, tree->v_get_nill());
 
                 // Find a node in the left branch that does not
                 // have both a left and right branch and place
                 // our branch there.
                 node_t* iter = node->get_left(tree);
-                while (iter->get_left(tree) != rbnil(tree) && iter->get_right(tree) != rbnil(tree))
+                while (iter->get_left(tree) != tree->v_get_nill() && iter->get_right(tree) != tree->v_get_nill())
                 {
                     iter = iter->get_left(tree);
                 }
-                if (iter->get_left(tree) == rbnil(tree))
+                if (iter->get_left(tree) == tree->v_get_nill())
                 {
                     iter->set_left(tree, branch);
                 }
-                else if (iter->get_right(tree) == rbnil(tree))
+                else if (iter->get_right(tree) == tree->v_get_nill())
                 {
                     iter->set_right(tree, branch);
                 }
@@ -465,7 +446,7 @@ namespace ncore
         // @result: If any error it returns a description of the error in 'result', when no error it will be nullptr
         s32 tree_internal_t::tree_validate(tree_t* tree, node_t* root, const char*& result)
         {
-            if (root == rbnil(tree))
+            if (root == tree->v_get_nill())
             {
                 return 1;
             }
@@ -488,8 +469,8 @@ namespace ncore
                 s32 const rh = tree_validate(tree, rn, result);
 
                 // Invalid binary search tree
-                // if ((ln != rbnil(tree) && tree->m_compare(ln->get_data(), root->get_data()) >= 0) || (rn != rbnil(tree) && tree->m_compare(rn->get_data(), root->get_data()) <= 0))
-                if ((ln != rbnil(tree) && tree->v_compare_nodes(ln, root) >= 0) || (rn != rbnil(tree) && tree->v_compare_nodes(rn, root) <= 0))
+                // if ((ln != tree->v_get_nill() && tree->m_compare(ln->get_data(), root->get_data()) >= 0) || (rn != tree->v_get_nill() && tree->m_compare(rn->get_data(), root->get_data()) <= 0))
+                if ((ln != tree->v_get_nill() && tree->v_compare_nodes(ln, root) >= 0) || (rn != tree->v_get_nill() && tree->v_compare_nodes(rn, root) <= 0))
                 {
                     result = "Binary tree violation";
                     return 0;
@@ -541,7 +522,7 @@ namespace ncore
             return result;
         }
 
-        bool find(tree_t* ctxt, void const* key, node_t*& found) 
+        bool find(tree_t* ctxt, void const* key, node_t*& found)
         {
             bool result = tree_internal_t::tree_find(ctxt, key, found);
             return result;
@@ -562,7 +543,7 @@ namespace ncore
 
         bool validate(tree_t* ctxt, const char*& error_str)
         {
-            s32 depth = tree_internal_t::tree_validate(ctxt, rbfirst(ctxt), error_str);
+            s32 depth = tree_internal_t::tree_validate(ctxt, ctxt->v_get_root()->get_left(ctxt), error_str);
             return (error_str == nullptr);
         }
 
@@ -578,7 +559,7 @@ namespace ncore
         {
             if (m_it == nullptr)
             {
-                m_it = rbfirst(m_tree);
+                m_it = m_tree->v_get_root()->get_left(m_tree);
             }
             else
             {
@@ -592,7 +573,7 @@ namespace ncore
                 }
             }
 
-            if (m_it != rbnil(m_tree))
+            if (m_it != m_tree->v_get_nill())
             {
                 key = m_it->get_key(m_tree);
                 return true;
@@ -603,31 +584,31 @@ namespace ncore
         bool iterator_t::preorder(s32 dir, void const*& key)
         {
             key = nullptr;
-            if (m_it == rbnil(m_tree))
+            if (m_it == m_tree->v_get_nill())
                 return false;
 
             if (m_it == nullptr)
             {
-                m_it = rbfirst(m_tree);
+                m_it = m_tree->v_get_root()->get_left(m_tree);
             }
             else
             {
                 node_t* next = m_it->get_child(m_tree, 1 - (s32)dir);
-                if (next == rbnil(m_tree))
+                if (next == m_tree->v_get_nill())
                 {
                     next = m_it->get_child(m_tree, (s32)dir);
-                    if (next == rbnil(m_tree))
+                    if (next == m_tree->v_get_nill())
                     {
                         do
                         {
-                            while (m_it != rbnil(m_tree) && m_it->get_parent_side(m_tree) == dir)
+                            while (m_it != m_tree->v_get_nill() && m_it->get_parent_side(m_tree) == dir)
                             {
                                 m_it = m_it->get_parent(m_tree);
                             }
                             m_it = m_it->get_parent(m_tree);
-                        } while (m_it != rbnil(m_tree) && m_it->get_child(m_tree, (s32)dir) == rbnil(m_tree));
+                        } while (m_it != m_tree->v_get_nill() && m_it->get_child(m_tree, (s32)dir) == m_tree->v_get_nill());
 
-                        if (m_it != rbnil(m_tree))
+                        if (m_it != m_tree->v_get_nill())
                         {
                             m_it = m_it->get_child(m_tree, (s32)dir);
                         }
@@ -643,7 +624,7 @@ namespace ncore
                 }
             }
 
-            if (m_it != rbnil(m_tree))
+            if (m_it != m_tree->v_get_nill())
             {
                 key = m_it->get_key(m_tree);
                 return true;
@@ -655,13 +636,13 @@ namespace ncore
         bool iterator_t::sortorder(s32 dir, void const*& key)
         {
             key = nullptr;
-            if (m_it == rbnil(m_tree))
+            if (m_it == m_tree->v_get_nill())
                 return false;
 
             if (m_it == nullptr)
             {
-                m_it = rbfirst(m_tree);
-                while (m_it->get_child(m_tree, 1 - (s32)dir) != rbnil(m_tree))
+                m_it = m_tree->v_get_root()->get_left(m_tree);
+                while (m_it->get_child(m_tree, 1 - (s32)dir) != m_tree->v_get_nill())
                 {
                     m_it = m_it->get_child(m_tree, 1 - (s32)dir);
                 }
@@ -669,15 +650,15 @@ namespace ncore
             else
             {
                 node_t* next = m_it->get_child(m_tree, (s32)dir);
-                if (next == rbnil(m_tree))
+                if (next == m_tree->v_get_nill())
                 {
                     if (m_it->get_parent_side(m_tree) == dir)
                     {
-                        while (m_it != rbnil(m_tree) && m_it->get_parent_side(m_tree) == dir)
+                        while (m_it != m_tree->v_get_nill() && m_it->get_parent_side(m_tree) == dir)
                         {
                             m_it = m_it->get_parent(m_tree);
                         }
-                        if (m_it != rbnil(m_tree))
+                        if (m_it != m_tree->v_get_nill())
                         {
                             m_it = m_it->get_parent(m_tree);
                         }
@@ -693,11 +674,11 @@ namespace ncore
                     {
                         m_it = next;
                         next = next->get_child(m_tree, 1 - (s32)dir);
-                    } while (next != rbnil(m_tree));
+                    } while (next != m_tree->v_get_nill());
                 }
             }
 
-            if (m_it != rbnil(m_tree) && m_it != rbroot(m_tree))
+            if (m_it != m_tree->v_get_nill() && m_it != m_tree->v_get_root())
             {
                 key = m_it->get_key(m_tree);
                 return true;
@@ -709,18 +690,18 @@ namespace ncore
         bool iterator_t::postorder(s32 dir, void const*& key)
         {
             key = nullptr;
-            if (m_it == rbnil(m_tree))
+            if (m_it == m_tree->v_get_nill())
                 return false;
 
             if (m_it == nullptr)
             {
-                m_it = rbfirst(m_tree);
+                m_it = m_tree->v_get_root()->get_left(m_tree);
 
                 // Travel on the outside (left - right - left - right ....)
                 node_t* branch = m_it->get_child(m_tree, 1 - (s32)dir);
-                while (branch != rbnil(m_tree))
+                while (branch != m_tree->v_get_nill())
                 {
-                    while (branch != rbnil(m_tree))
+                    while (branch != m_tree->v_get_nill())
                     {
                         m_it   = branch;
                         branch = branch->get_child(m_tree, 1 - (s32)dir);
@@ -740,9 +721,9 @@ namespace ncore
 
                     // Travel on the outside (left - right - left - right ....)
                     node_t* branch = m_it->get_child(m_tree, (s32)dir);
-                    while (branch != rbnil(m_tree))
+                    while (branch != m_tree->v_get_nill())
                     {
-                        while (branch != rbnil(m_tree))
+                        while (branch != m_tree->v_get_nill())
                         {
                             m_it   = branch;
                             branch = branch->get_child(m_tree, 1 - (s32)dir);
@@ -752,7 +733,7 @@ namespace ncore
                 }
             }
 
-            if (m_it != rbnil(m_tree) && m_it != rbroot(m_tree))
+            if (m_it != m_tree->v_get_nill() && m_it != m_tree->v_get_root())
             {
                 key = m_it->get_key(m_tree);
                 return true;
@@ -760,11 +741,6 @@ namespace ncore
 
             return false;
         }
-
-#undef rbnil
-#undef rbfirst
-#undef rbroot
-#undef rbsetfirst
 
     }  // namespace ntree
 }  // namespace ncore

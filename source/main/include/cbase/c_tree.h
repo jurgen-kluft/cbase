@@ -62,36 +62,14 @@ namespace ncore
             node_t* m_it;
         };
 
-        struct iterator2_t
-        {
-            bool       traverse(s32 d, void const*& data);
-            bool       preorder(s32 d, void const*& data);
-            bool       sortorder(s32 d, void const*& data);
-            bool       postorder(s32 d, void const*& data);
-            inline s32 getdir(s32 compare) const { return (compare + 1) >> 1; }
-
-            tree_t* m_tree;
-            node_t* m_it;
-            node_t* m_stack[40];
-        };
-
         inline int_t size(tree_t* c) { return c->v_size(); }
         inline int_t capacity(tree_t* c) { return c->v_capacity(); }
-        bool         clear(tree_t* c);  // Repeatedly call 'clear' until true is returned ()
+        bool         clear(tree_t* c);  // Repeatedly call 'clear' until true is returned
         bool         find(tree_t* c, void const* key, node_t*& found);
         bool         insert(tree_t* c, void const* key, void const* value = nullptr);
         bool         remove(tree_t* c, void const* key);
         bool         validate(tree_t* c, const char*& error_str);
         iterator_t   iterate(tree_t* c);
-
-        inline int_t size2(tree_t* c) { return c->v_size(); }
-        inline int_t capacity2(tree_t* c) { return c->v_capacity(); }
-        bool         clear2(tree_t* c);  // Repeatedly call 'clear' until true is returned ()
-        bool         find2(tree_t* c, void const* key, node_t*& found);
-        bool         insert2(tree_t* c, void const* key, void const* value = nullptr);
-        bool         remove2(tree_t* c, void const* key);
-        bool         validate2(tree_t* c, const char*& error_str);
-        iterator2_t   iterate2(tree_t* c);
 
     }  // namespace ntree
 

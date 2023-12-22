@@ -1,42 +1,38 @@
 #include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
 #include "cbase/test_allocator.h"
+#include "cbase/c_tree2.h"
 
 #include "cunittest/cunittest.h"
 
 namespace ncore
 {
-#define RB_RED   1
-#define RB_BLCK  0
-#define RB_RIGHT 1
-#define RB_LEFT  0
-
     struct rbnode_t
     {
         rbnode_t()
             : m_item(nullptr)
-            , m_color(RB_RED)
+            , m_color(ntree2::RED)
         {
-            m_chld[RB_LEFT]  = nullptr;
-            m_chld[RB_RIGHT] = nullptr;
+            m_chld[ntree2::LEFT]  = nullptr;
+            m_chld[ntree2::RIGHT] = nullptr;
         }
 
-        void set_right(rbnode_t *node) { m_chld[RB_RIGHT] = node; }
-        void set_left(rbnode_t *node) { m_chld[RB_LEFT] = node; }
+        void set_right(rbnode_t *node) { m_chld[ntree2::RIGHT] = node; }
+        void set_left(rbnode_t *node) { m_chld[ntree2::LEFT] = node; }
         void set_child(s32 side, rbnode_t *node)
         {
-            ASSERT(side == RB_LEFT || side == RB_RIGHT);
+            ASSERT(side == ntree2::LEFT || side == ntree2::RIGHT);
             m_chld[side] = node;
         }
 
-        void set_red() { m_color = RB_RED; }
-        void set_black() { m_color = RB_BLCK; }
+        void set_red() { m_color = ntree2::RED; }
+        void set_black() { m_color = ntree2::BLACK; }
 
-        rbnode_t *get_right() { return m_chld[RB_RIGHT]; }
-        rbnode_t *get_left() { return m_chld[RB_LEFT]; }
+        rbnode_t *get_right() { return m_chld[ntree2::RIGHT]; }
+        rbnode_t *get_left() { return m_chld[ntree2::LEFT]; }
         rbnode_t *get_child(s32 side)
         {
-            ASSERT(side == RB_LEFT || side == RB_RIGHT);
+            ASSERT(side == ntree2::LEFT || side == ntree2::RIGHT);
             return m_chld[side];
         }
 
@@ -44,11 +40,6 @@ namespace ncore
         void     *m_item;
         s8        m_color;
     };
-
-#define RB_MKBLCK(R) R->m_color = RB_BLCK
-#define RB_MKRED(R)  R->m_color = RB_RED
-#define RB_ISRED(R)  (R->m_color == RB_RED)
-#define RB_ISBLCK(R) (R->m_color == RB_BLCK)
 
     // Insertion and Deletion are Top-Down
     //
@@ -70,10 +61,10 @@ namespace ncore
 
     void rb_init_node(rbnode_t *n)
     {
-        n->m_item           = (void *)nullptr;
-        n->m_chld[RB_LEFT]  = nullptr;
-        n->m_chld[RB_RIGHT] = nullptr;
-        n->m_color          = RB_RED;
+        n->m_item                = (void *)nullptr;
+        n->m_chld[ntree2::LEFT]  = nullptr;
+        n->m_chld[ntree2::RIGHT] = nullptr;
+        n->m_color               = ntree2::RED;
     }
 
     // show what a single red-black tree rotation does in ASCII art
@@ -100,8 +91,8 @@ namespace ncore
         rbnode_t *save        = node->m_chld[1 - dir];
         node->m_chld[1 - dir] = save->m_chld[dir];
         save->m_chld[dir]     = node;
-        node->m_color         = RB_RED;
-        save->m_color         = RB_BLCK;
+        node->m_color         = ntree2::RED;
+        save->m_color         = ntree2::BLACK;
         return save;
     }
 
@@ -110,12 +101,12 @@ namespace ncore
         rbnode_t *save        = node->m_chld[1 - dir];
         node->m_chld[1 - dir] = save->m_chld[dir];
         save->m_chld[dir]     = node;
-        node->m_color         = RB_RED;
-        save->m_color         = RB_BLCK;
+        node->m_color         = ntree2::RED;
+        save->m_color         = ntree2::BLACK;
 
         if (fn == node)
             fp = save;
-        else if (fn == node->m_chld[1 - dir]) // never triggered
+        else if (fn == node->m_chld[1 - dir])  // never triggered
             fp = node;
 
         return save;
@@ -152,7 +143,7 @@ namespace ncore
     static inline rbnode_t *rotate_double_track_parent(rbnode_t *node, s32 dir, rbnode_t *fn, rbnode_t *&fp)
     {
         node->m_chld[1 - dir] = rotate_single_track_parent(node->m_chld[1 - dir], 1 - dir, fn, fp);
-        if (fn == node->m_chld[1 - dir]) // never triggered
+        if (fn == node->m_chld[1 - dir])  // never triggered
             fp = node;
         rbnode_t *save = rotate_single_track_parent(node, dir, fn, fp);
         if (fn == node)
@@ -160,7 +151,7 @@ namespace ncore
         return save;
     }
 
-    static inline s32 is_red(rbnode_t *node) { return node != nullptr && node->m_color == RB_RED; }
+    static inline s32 is_red(rbnode_t *node) { return node != nullptr && node->m_color == ntree2::RED; }
 
     // validate the tree (return violation description in 'result'), also returns black height
     static s32 rb_validate(rbnode_t *root, s32 (*compare)(void *a, void *b), const char *&result)
@@ -184,8 +175,8 @@ namespace ncore
                 }
             }
 
-            s32 lh = rb_validate(ln, compare, result);
-            s32 rh = rb_validate(rn, compare, result);
+            const s32 lh = rb_validate(ln, compare, result);
+            const s32 rh = rb_validate(rn, compare, result);
 
             // Invalid binary search tree
             if ((ln != nullptr && compare(ln->m_item, root->m_item) >= 0) || (rn != nullptr && compare(rn->m_item, root->m_item) <= 0))
@@ -343,7 +334,7 @@ namespace ncore
                 {
                     rbnode_t *r = rotate_single_track_parent(n, dir, fn, fp);
                     p->set_child(last, r);
-                    if (fn == r) // never triggered
+                    if (fn == r)  // never triggered
                         fp = p;
                     p = r;
                 }
@@ -366,14 +357,14 @@ namespace ncore
                             {
                                 rbnode_t *r = rotate_double_track_parent(p, last, fn, fp);
                                 g->set_child(dir2, r);
-                                if (fn == r) // never triggered
+                                if (fn == r)  // never triggered
                                     fp = g;
                             }
                             else if (is_red(s->get_child(1 - last)))
                             {
                                 rbnode_t *r = rotate_single_track_parent(p, last, fn, fp);
                                 g->set_child(dir2, r);
-                                if (fn == r) // never triggered
+                                if (fn == r)  // never triggered
                                     fp = g;
                             }
 
@@ -404,13 +395,13 @@ namespace ncore
             p->set_child(p->get_right() == n, child1);
 
             if (fn != n)
-            {  
+            {
                 ASSERT(fp != p);
 
                 // swap 'n' and 'fn', we want to remove the node that was holding 'item'
                 fp->set_child(fp->get_right() == fn, n);
-                n->set_child(RB_LEFT, fn->get_left());
-                n->set_child(RB_RIGHT, fn->get_right());
+                n->set_child(ntree2::LEFT, fn->get_left());
+                n->set_child(ntree2::RIGHT, fn->get_right());
                 n->m_color = fn->m_color;
             }
 
@@ -529,16 +520,15 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             Allocator->deallocate(values);
         }
 
-        
-        static void RandomShuffle(s64* v, s32 size, u64 seed)
+        static void RandomShuffle(s64 * v, s32 size, u64 seed)
         {
             XorRandom rng(seed);
             for (s32 i = 0; i < size; ++i)
             {
                 const s32 j = i + ((s32)(rng.next() & 0x7fffffff) % (size - i));
                 const s64 t = v[i];
-                v[i] = v[j];
-                v[j] = t;
+                v[i]        = v[j];
+                v[j]        = t;
             }
         }
 
@@ -550,7 +540,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             for (s32 i = 0; i < num_nodes; ++i)
             {
-                values[i] = 1000 + i*9;
+                values[i] = 1000 + i * 9;
             }
 
             rbnode_t *root  = nullptr;
@@ -568,7 +558,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_NULL(error);
 
             // remove all half of the values
-            for (s32 i = 0; i < (num_nodes/2); ++i)
+            for (s32 i = 0; i < (num_nodes / 2); ++i)
             {
                 rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
                 CHECK_NOT_NULL(found);
@@ -582,7 +572,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             rb_validate(root, compare, error);
             CHECK_NULL(error);
 
-            for (s32 i = (num_nodes/2); i < num_nodes; ++i)
+            for (s32 i = (num_nodes / 2); i < num_nodes; ++i)
             {
                 rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
                 CHECK_NOT_NULL(found);
@@ -601,7 +591,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             for (s32 i = 0; i < num_nodes; ++i)
             {
-                values[i] = (num_nodes * 32) - (i*9);
+                values[i] = (num_nodes * 32) - (i * 9);
             }
 
             rbnode_t *root  = nullptr;
@@ -619,7 +609,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_NULL(error);
 
             // remove all half of the values
-            for (s32 i = 0; i < (num_nodes/2); ++i)
+            for (s32 i = 0; i < (num_nodes / 2); ++i)
             {
                 rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
                 CHECK_NOT_NULL(found);
@@ -633,7 +623,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             rb_validate(root, compare, error);
             CHECK_NULL(error);
 
-            for (s32 i = (num_nodes/2); i < num_nodes; ++i)
+            for (s32 i = (num_nodes / 2); i < num_nodes; ++i)
             {
                 rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
                 CHECK_NOT_NULL(found);
@@ -643,7 +633,6 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             Allocator->deallocate(nodes);
             Allocator->deallocate(values);
         }
-
 
         UNITTEST_TEST(insert_remove_find)
         {
@@ -684,7 +673,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_NULL(error);
 
             // remove all half of the values
-            for (s32 i = 0; i < (num_nodes/2); ++i)
+            for (s32 i = 0; i < (num_nodes / 2); ++i)
             {
                 rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
                 CHECK_NOT_NULL(found);
@@ -698,7 +687,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             rb_validate(root, compare, error);
             CHECK_NULL(error);
 
-            for (s32 i = (num_nodes/2); i < num_nodes; ++i)
+            for (s32 i = (num_nodes / 2); i < num_nodes; ++i)
             {
                 rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
                 CHECK_NOT_NULL(found);
@@ -707,6 +696,525 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             Allocator->deallocate(nodes);
             Allocator->deallocate(values);
+        }
+    }
+
+    s32 compare_s32(void const *p1, void const *p2)
+    {
+        s32 const s1 = *(s32 const *)p1;
+        s32 const s2 = *(s32 const *)p2;
+        if (s1 < s2)
+            return -1;
+        else if (s1 > s2)
+            return 1;
+        return 0;
+    }
+
+    class ctxt_tree2_t : public ncore::ntree2::tree_t
+    {
+        alloc_t *m_allocator;
+        s32      m_size;
+        s32      m_cap;
+
+        struct node16_t
+        {
+            s32 m_data;
+            u16 m_color;
+            u16 m_branches[3];
+        };
+
+        node16_t *m_nodes;
+        s32       m_freeindex;
+        node16_t *m_freelist;
+        s32      *m_keys;
+        node16_t *m_temp;
+        node16_t *m_root;
+
+    public:
+        ctxt_tree2_t()
+            : m_allocator(nullptr)
+            , m_size(0)
+            , m_cap(0)
+            , m_nodes(nullptr)
+            , m_freeindex(0)
+            , m_freelist(nullptr)
+            , m_keys(nullptr)
+            , m_temp(nullptr)
+            , m_root(nullptr)
+        {
+        }
+
+        void init(alloc_t *allocator)
+        {
+            m_allocator                      = allocator;
+            m_size                           = 0;
+            m_cap                            = 8192;
+            m_nodes                          = (node16_t *)m_allocator->allocate(sizeof(node16_t) * m_cap);
+            m_freeindex                      = 0;
+            m_freelist                       = nullptr;
+            m_keys                           = (s32 *)m_allocator->allocate(sizeof(s32) * m_cap);
+            m_nodes[m_cap - 1].m_branches[0] = 0xffff;
+            m_nodes[m_cap - 1].m_branches[1] = 0xffff;
+            m_nodes[m_cap - 1].m_branches[2] = 0xffff;
+
+            m_root = nullptr;
+            m_temp = (node16_t *)v_new_node(nullptr, nullptr);
+        }
+
+        void exit()
+        {
+            m_allocator->deallocate(m_nodes);
+            m_nodes = nullptr;
+            m_allocator->deallocate(m_keys);
+            m_keys = nullptr;
+        }
+
+        virtual ntree2::node_t *v_get_root() const final { return (ntree2::node_t *)m_root; }
+        virtual void            v_set_root(ntree2::node_t *node) { m_root = (node16_t *)node; }
+        virtual ntree2::node_t *v_get_temp() const { return (ntree2::node_t *)m_temp; }
+
+        virtual s32 v_size() const final { return m_size; }
+        virtual s32 v_capacity() const final { return m_cap; }
+
+        virtual void            v_set_color(ntree2::node_t *node, ntree2::color_e color) final { ((node16_t *)node)->m_color = color; }
+        virtual ntree2::color_e v_get_color(ntree2::node_t const *node) const final { return (ntree2::color_e)((node16_t const *)node)->m_color; }
+        virtual void const     *v_get_key(ntree2::node_t const *node) const final
+        {
+            u16 const index = (u16)((node16_t const *)node - m_nodes);
+            return (void const *)&m_keys[index];
+        }
+        virtual void const *v_get_value(ntree2::node_t const *node) const final
+        {
+            u16 const index = (u16)((node16_t const *)node - m_nodes);
+            return (void const *)&m_keys[index];
+        }
+        virtual ntree2::node_t *v_get_node(ntree2::node_t const *node, ntree2::node_e ne) const final { return (ntree2::node_t *)(&m_nodes[((node16_t const *)node)->m_branches[ne]]); }
+        virtual void            v_set_node(ntree2::node_t *node, ntree2::node_e ne, ntree2::node_t *set) final { ((node16_t *)node)->m_branches[ne] = (u16)((node16_t *)set - m_nodes); }
+        virtual ntree2::node_t *v_new_node(void const *key, void const *value) final
+        {
+            node16_t *node = nullptr;
+            if (m_freelist != nullptr)
+            {
+                node       = m_freelist;
+                m_freelist = (node->m_branches[2] == 0xffff) ? nullptr : &m_nodes[node->m_branches[2]];
+            }
+            else if (m_freeindex < m_cap)
+            {
+                node = &m_nodes[m_freeindex++];
+            }
+            else
+            {
+                return nullptr;
+            }
+
+            u16 const index     = (u16)(node - m_nodes);
+            m_keys[index]       = key != nullptr ? *((const s32 *)key) : 0;
+            node->m_color       = ntree2::RED;
+            node->m_data        = index;
+            node->m_branches[0] = 0;
+            node->m_branches[1] = 0;
+            node->m_branches[2] = 0;
+            m_size++;
+            return (ntree2::node_t *)node;
+        }
+        virtual void v_del_node(ntree2::node_t *node)
+        {
+            if (node == nullptr)
+                return;
+            node16_t *n      = (node16_t *)node;
+            n->m_branches[0] = 0;
+            n->m_branches[1] = 0;
+            if (m_freelist == nullptr)
+            {
+                n->m_branches[2] = 0xffff;
+            }
+            else
+            {
+                n->m_branches[2] = (u16)(m_freelist - m_nodes);
+            }
+            m_freelist = n;
+            m_size--;
+            if (m_size == 0)
+            {
+                m_freelist  = nullptr;
+                m_freeindex = 0;
+            }
+        }
+        virtual s32 v_compare_nodes(ntree2::node_t const *node, ntree2::node_t const *other) const { return compare_s32(v_get_key(node), v_get_key(other)); }
+        virtual s32 v_compare_insert(void const *key, ntree2::node_t const *node) const { return compare_s32(key, v_get_key(node)); }
+    };
+
+    UNITTEST_FIXTURE(tree2)
+    {
+        static ctxt_tree2_t    ctxt_instance;
+        static ntree2::tree_t *ctxt = &ctxt_instance;
+
+        UNITTEST_ALLOCATOR;
+
+        UNITTEST_FIXTURE_SETUP() { ctxt_instance.init(Allocator); }
+        UNITTEST_FIXTURE_TEARDOWN() { ctxt_instance.exit(); }
+
+        UNITTEST_TEST(tree_node)
+        {
+            s32 const key = 0;
+
+            ntree2::node_t *node  = ctxt->v_new_node(&key, nullptr);
+            ntree2::node_t *left  = ctxt->v_new_node(&key, nullptr);
+            ntree2::node_t *right = ctxt->v_new_node(&key, nullptr);
+
+            ntree2::node_t *left_ptr = left;
+            // node->set_left(ctxt, left_ptr);
+            ctxt->v_set_node(node, ntree2::LEFT, left_ptr);
+
+            // CHECK_EQUAL(left_ptr, node->get_left(ctxt));
+            CHECK_EQUAL(left_ptr, ctxt->v_get_node(node, ntree2::LEFT));
+
+            ntree2::node_t *right_ptr = right;
+            // node->set_right(ctxt, right_ptr);
+            ctxt->v_set_node(node, ntree2::RIGHT, right_ptr);
+            // CHECK_EQUAL(right_ptr, node->get_right(ctxt));
+            CHECK_EQUAL(right_ptr, ctxt->v_get_node(node, ntree2::RIGHT));
+
+            // CHECK_EQUAL(true, node->is_red(ctxt));
+            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree2::RED);
+
+            // node->set_black(ctxt);
+            // CHECK_EQUAL(false, node->is_red(ctxt));
+            // node->set_red(ctxt);
+            // CHECK_EQUAL(true, node->is_red(ctxt));
+            // node->set_black(ctxt);
+            // CHECK_EQUAL(false, node->is_red(ctxt));
+            // CHECK_EQUAL(true, node->is_black(ctxt));
+            ctxt->v_set_color(node, ntree2::BLACK);
+            CHECK_EQUAL(false, ctxt->v_get_color(node) == ntree2::RED);
+            ctxt->v_set_color(node, ntree2::RED);
+            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree2::RED);
+            ctxt->v_set_color(node, ntree2::BLACK);
+            CHECK_EQUAL(false, ctxt->v_get_color(node) == ntree2::RED);
+            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree2::BLACK);
+
+            left_ptr  = left;
+            right_ptr = right;
+            // node->set_left(ctxt, left_ptr);
+            // node->set_right(ctxt, right_ptr);
+            // CHECK_EQUAL(left_ptr, node->get_child(ctxt, 0));
+            // CHECK_EQUAL(right_ptr, node->get_child(ctxt, 1));
+            // CHECK_EQUAL(true, node->is_black(ctxt));
+            ctxt->v_set_node(node, ntree2::LEFT, left_ptr);
+            ctxt->v_set_node(node, ntree2::RIGHT, right_ptr);
+            CHECK_EQUAL(left_ptr, ctxt->v_get_node(node, ntree2::LEFT));
+            CHECK_EQUAL(right_ptr, ctxt->v_get_node(node, ntree2::RIGHT));
+            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree2::BLACK);
+
+            // node->set_child(ctxt, 0, left_ptr);
+            // node->set_child(ctxt, 1, right_ptr);
+            ctxt->v_set_node(node, ntree2::LEFT, left_ptr);
+            ctxt->v_set_node(node, ntree2::RIGHT, right_ptr);
+
+            // CHECK_EQUAL(left_ptr, node->get_child(ctxt, 0));
+            // CHECK_EQUAL(right_ptr, node->get_child(ctxt, 1));
+            CHECK_EQUAL(left_ptr, ctxt->v_get_node(node, ntree2::LEFT));
+            CHECK_EQUAL(right_ptr, ctxt->v_get_node(node, ntree2::RIGHT));
+
+            // CHECK_EQUAL(true, node->is_black(ctxt));
+            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree2::BLACK);
+
+            ctxt->v_del_node(node);
+            ctxt->v_del_node(left);
+            ctxt->v_del_node(right);
+        }
+
+        UNITTEST_TEST(void_tree)
+        {
+            s32 a = 1;
+            s32 b = 2;
+            s32 c = 3;
+            s32 d = 4;
+            s32 e = 5;
+            s32 f = 6;
+            s32 g = 7;
+            s32 h = 8;
+            s32 i = 9;
+
+            const char *result = nullptr;
+
+            bool inserted;
+            inserted = ntree2::insert(ctxt, &a);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &b);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &b);  // Duplicate insert should fail
+            CHECK_FALSE(inserted);
+            inserted = ntree2::insert(ctxt, &c);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &d);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &e);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &f);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &g);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &h);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &i);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+
+            CHECK_EQUAL(9 + 2, ntree2::size(ctxt));
+
+            ntree2::node_t *node = nullptr;
+            CHECK_EQUAL(true, ntree2::find(ctxt, &a, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &b, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &c, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &d, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &e, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &f, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &g, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &h, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &i, node));
+
+            s32 x(99);
+            CHECK_FALSE(ntree2::find(ctxt, &x, node));
+
+            CHECK_EQUAL(11, ntree2::size(ctxt));
+
+            while (!ntree2::clear(ctxt)) {}
+
+            CHECK_EQUAL(2, ntree2::size(ctxt));
+        }
+
+        UNITTEST_TEST(void_tree_iterate_preorder)
+        {
+            s32 a = 1;
+            s32 b = 2;
+            s32 c = 3;
+            s32 d = 4;
+            s32 e = 5;
+            s32 f = 6;
+            s32 g = 7;
+            s32 h = 8;
+            s32 i = 9;
+
+            CHECK_TRUE(ntree2::insert(ctxt, &a));
+            CHECK_TRUE(ntree2::insert(ctxt, &b));
+            CHECK_TRUE(ntree2::insert(ctxt, &c));
+            CHECK_TRUE(ntree2::insert(ctxt, &d));
+            CHECK_TRUE(ntree2::insert(ctxt, &e));
+            CHECK_TRUE(ntree2::insert(ctxt, &f));
+            CHECK_TRUE(ntree2::insert(ctxt, &g));
+            CHECK_TRUE(ntree2::insert(ctxt, &h));
+            CHECK_TRUE(ntree2::insert(ctxt, &i));
+
+            ntree2::iterator_t iterator = ntree2::iterate(ctxt);
+
+            s32         round      = 0;
+            s32         preorder[] = {d, b, a, c, f, e, h, g, i};
+            void const *data;
+            while (iterator.preorder(ntree2::RIGHT, data))
+            {
+                CHECK_EQUAL(preorder[round++], *(s32 *)data);
+            }
+            CHECK_EQUAL(9, round);
+
+            while (!ntree2::clear(ctxt)) {}
+        }
+
+        UNITTEST_TEST(void_tree_iterate_sortorder)
+        {
+            s32 a = 1;
+            s32 b = 2;
+            s32 c = 3;
+            s32 d = 4;
+            s32 e = 5;
+            s32 f = 6;
+            s32 g = 7;
+            s32 h = 8;
+            s32 i = 9;
+
+            CHECK_TRUE(ntree2::insert(ctxt, &a));
+            CHECK_TRUE(ntree2::insert(ctxt, &b));
+            CHECK_TRUE(ntree2::insert(ctxt, &c));
+            CHECK_TRUE(ntree2::insert(ctxt, &d));
+            CHECK_TRUE(ntree2::insert(ctxt, &e));
+            CHECK_TRUE(ntree2::insert(ctxt, &f));
+            CHECK_TRUE(ntree2::insert(ctxt, &g));
+            CHECK_TRUE(ntree2::insert(ctxt, &h));
+            CHECK_TRUE(ntree2::insert(ctxt, &i));
+
+            ntree2::iterator_t iterator = ntree2::iterate(ctxt);
+
+            s32         round       = 0;
+            s32         sortorder[] = {a, b, c, d, e, f, g, h, i};
+            void const *data;
+            while (iterator.sortorder(ntree2::RIGHT, data))
+            {
+                CHECK_EQUAL(sortorder[round++], *(s32 *)data);
+            }
+            CHECK_EQUAL(9, round);
+
+            while (!ntree2::clear(ctxt)) {}
+        }
+
+        UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
+        {
+            s32 a = 1;
+            s32 b = 2;
+            s32 c = 3;
+            s32 d = 4;
+            s32 e = 5;
+            s32 f = 6;
+            s32 g = 7;
+            s32 h = 8;
+            s32 i = 9;
+
+            CHECK_TRUE(ntree2::insert(ctxt, &a));
+            CHECK_TRUE(ntree2::insert(ctxt, &b));
+            CHECK_TRUE(ntree2::insert(ctxt, &c));
+            CHECK_TRUE(ntree2::insert(ctxt, &d));
+            CHECK_TRUE(ntree2::insert(ctxt, &e));
+            CHECK_TRUE(ntree2::insert(ctxt, &f));
+            CHECK_TRUE(ntree2::insert(ctxt, &g));
+            CHECK_TRUE(ntree2::insert(ctxt, &h));
+            CHECK_TRUE(ntree2::insert(ctxt, &i));
+
+            ntree2::iterator_t iterator = ntree2::iterate(ctxt);
+
+            s32         round       = 0;
+            s32         sortorder[] = {i, h, g, f, e, d, c, b, a};
+            void const *data;
+            while (iterator.sortorder(ntree2::LEFT, data))
+            {
+                CHECK_EQUAL(sortorder[round++], *(s32 *)data);
+            }
+            CHECK_EQUAL(9, round);
+
+            while (!ntree2::clear(ctxt)) {}
+        }
+
+        UNITTEST_TEST(void_tree_iterate_postorder)
+        {
+            s32 a = 1;
+            s32 b = 2;
+            s32 c = 3;
+            s32 d = 4;
+            s32 e = 5;
+            s32 f = 6;
+            s32 g = 7;
+            s32 h = 8;
+            s32 i = 9;
+
+            CHECK_TRUE(ntree2::insert(ctxt, &a));
+            CHECK_TRUE(ntree2::insert(ctxt, &b));
+            CHECK_TRUE(ntree2::insert(ctxt, &c));
+            CHECK_TRUE(ntree2::insert(ctxt, &d));
+            CHECK_TRUE(ntree2::insert(ctxt, &e));
+            CHECK_TRUE(ntree2::insert(ctxt, &f));
+            CHECK_TRUE(ntree2::insert(ctxt, &g));
+            CHECK_TRUE(ntree2::insert(ctxt, &h));
+            CHECK_TRUE(ntree2::insert(ctxt, &i));
+
+            ntree2::iterator_t iterator = ntree2::iterate(ctxt);
+
+            s32 round       = 0;
+            s32 postorder[] = {a, c, b, e, g, i, h, f, d};
+
+            void const *data;
+            while (iterator.postorder(ntree2::RIGHT, data))
+            {
+                CHECK_EQUAL(postorder[round++], *(s32 *)data);
+            }
+            CHECK_EQUAL(9, round);
+
+            while (!ntree2::clear(ctxt)) {}
+        }
+
+        UNITTEST_TEST(void_tree_search)
+        {
+            s32 a = 1;
+            s32 b = 2;
+            s32 c = 3;
+            s32 d = 4;
+            s32 e = 5;
+            s32 f = 6;
+            s32 g = 7;
+            s32 h = 8;
+            s32 i = 9;
+
+            CHECK_TRUE(ntree2::insert(ctxt, &a));
+            CHECK_TRUE(ntree2::insert(ctxt, &b));
+            CHECK_TRUE(ntree2::insert(ctxt, &c));
+            CHECK_TRUE(ntree2::insert(ctxt, &d));
+            CHECK_TRUE(ntree2::insert(ctxt, &e));
+            CHECK_TRUE(ntree2::insert(ctxt, &f));
+            CHECK_TRUE(ntree2::insert(ctxt, &g));
+            CHECK_TRUE(ntree2::insert(ctxt, &h));
+            CHECK_TRUE(ntree2::insert(ctxt, &i));
+
+            ntree2::iterator_t iterator = ntree2::iterate(ctxt);
+
+            s32         dir = ntree2::LEFT;
+            void const *data;
+            void       *find = &f;
+            while (iterator.traverse(dir, data))
+            {
+                s32 const c = compare_s32(find, data);
+                if (c == 0)
+                    break;
+                dir = iterator.getdir(c);
+            }
+            CHECK_EQUAL(0, compare_s32(data, find));
+
+            while (!ntree2::clear(ctxt)) {}
+        }
+
+        UNITTEST_TEST(s32_tree)
+        {
+            s32 a(1);
+            s32 b(2);
+            s32 c(3);
+            s32 d(4);
+
+            const char *result = nullptr;
+
+            bool inserted;
+            inserted = ntree2::insert(ctxt, &a);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &b);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &b);  // Duplicate insert should fail
+            CHECK_FALSE(inserted);
+            inserted = ntree2::insert(ctxt, &c);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+            inserted = ntree2::insert(ctxt, &d);
+            CHECK_TRUE(inserted);
+            CHECK_TRUE(ntree2::validate(ctxt, result));
+
+            CHECK_EQUAL(6, ntree2::size(ctxt));
+
+            ntree2::node_t *node = nullptr;
+            CHECK_EQUAL(true, ntree2::find(ctxt, &a, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &b, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &c, node));
+            CHECK_EQUAL(true, ntree2::find(ctxt, &d, node));
+
+            s32 e(5);
+            CHECK_FALSE(ntree2::find(ctxt, &e, node));
+
+            while (!ntree2::clear(ctxt)) {}
+
+            CHECK_EQUAL(2, ntree2::size(ctxt));
         }
     }
 }

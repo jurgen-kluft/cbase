@@ -26,7 +26,6 @@ namespace ncore
     //    You can also provide a normal implementation where a node just holds a pointer to the
     //    value, parent and children.
     //
-    // TODO implement a couple of different backends
 
     namespace ntree2
     {
@@ -228,6 +227,17 @@ namespace ncore
             return false;
         }
 
+        bool clear(tree_t* tree)
+        {
+            node_t* node   = nullptr;
+            bool    result = rb_clear(tree, node);
+            if (node != nullptr)
+            {
+                tree->v_del_node(node);
+            }
+            return result;
+        }
+
         bool find(tree_t* tree, void const* key, node_t*& found)
         {
             node_t* node = tree->v_get_root();
@@ -298,13 +308,13 @@ namespace ncore
                 return false;
 
             node_t* head = tree->v_get_temp();  // False tree root
-            node_t* fn  = nullptr;              // Found node
-            node_t* fp  = nullptr;              // Found node parent
-            s32     dir = 1;
+            node_t* fn   = nullptr;             // Found node
+            node_t* fp   = nullptr;             // Found node parent
+            s32     dir  = 1;
 
             // Set up our helpers
-            node_t *g = nullptr;
-            node_t *p = nullptr;
+            node_t* g = nullptr;
+            node_t* p = nullptr;
 
             node_t* n = head;
             n->set_black(tree);  // Color it black
@@ -431,10 +441,118 @@ namespace ncore
         iterator_t iterate(tree_t* ctxt)
         {
             iterator_t iter;
-            iter.m_tree = ctxt;
-            iter.m_it   = nullptr;
+            iter.m_tree  = ctxt;
+            iter.m_it    = nullptr;
+            iter.m_stack = 0;
             return iter;
         }
 
+        bool iterator_t::traverse(s32 d, void const*& key)
+        {
+            if (m_it == nullptr)
+            {
+                m_it = m_tree->v_get_root()->get_child(m_tree, d);
+            }
+            else
+            {
+                m_it = m_it->get_child(m_tree, d);
+            }
+
+            if (m_it != nullptr)
+            {
+                key = m_it->get_key(m_tree);
+                return true;
+            }
+            return false;
+        }
+
+        bool iterator_t::preorder(s32 dir, void const*& key)
+        {
+            key = nullptr;
+
+            if (m_it == nullptr)
+            {
+                m_stack = 0;
+                if (m_tree->v_get_root() != nullptr)
+                    m_stack_array[m_stack++] = m_tree->v_get_root();
+            }
+
+            if (m_stack == 0)
+                return false;
+
+            node_t* node = m_stack_array[--m_stack];
+            key          = node->get_key(m_tree);
+
+            node = node->get_child(m_tree, 1 - dir);
+            if (node != nullptr)
+                m_stack_array[m_stack++] = node;
+
+            node = node->get_child(m_tree, dir);
+            if (node != nullptr)
+                m_stack_array[m_stack++] = node;
+
+            return true;
+        }
+
+        bool iterator_t::sortorder(s32 dir, void const*& key)
+        {
+            if (m_it == nullptr && m_stack == 0)
+            {
+                m_stack = 0;
+                m_it    = m_tree->v_get_root();
+                if (m_it == nullptr)
+                    return false;
+                m_stack_array[m_stack++] = m_it;
+            }
+
+            while (m_it != nullptr)
+            {
+                m_stack_array[m_stack++] = m_it;
+                m_it                     = m_it->get_child(m_tree, dir);
+            }
+
+            m_it = m_stack_array[--m_stack];
+            key  = m_it->get_key(m_tree);
+            m_it = m_it->get_child(m_tree, 1 - dir);
+            return true;
+        }
+
+        bool iterator_t::postorder(s32 dir, void const*& key)
+        {
+            if (m_it == nullptr)
+            {
+                m_stack = 0;
+                m_it    = m_tree->v_get_root();
+                if (m_it != nullptr)
+                {
+                    m_stack_array[m_stack++] = m_it;
+                }
+            }
+
+            if (m_stack == 0)
+                return false;
+
+            while (true)
+            {
+                node_t* const node   = m_stack_array[m_stack - 1];
+                node_t* const child1 = node->get_child(m_tree, 1 - dir);
+                node_t* const child2 = node->get_child(m_tree, dir);
+                if ((child1 == m_it || child2 == m_it) || (child1 == nullptr && child2 == nullptr))
+                {
+                    m_it = node;
+                    key  = m_it->get_key(m_tree);
+                    m_stack--;
+                    return true;
+                }
+                else
+                {
+                    if (child1 != nullptr)
+                        m_stack_array[m_stack++] = child1;
+                    if (child2 != nullptr)
+                        m_stack_array[m_stack++] = child2;
+                }
+            }
+            return true;
+        }
     }  // namespace ntree2
 }  // namespace ncore
