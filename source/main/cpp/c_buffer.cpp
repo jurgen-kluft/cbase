@@ -127,15 +127,16 @@ namespace ncore
     /// Binary Reader
     /// ---------------------------------------------------------------------------------------
 
-    u32       binary_reader_t::size() const { return m_cursor; }
-    u32       binary_reader_t::length() const { return m_len; }
-    u32       binary_reader_t::remain() const { return m_len - m_cursor; }
-    cbuffer_t binary_reader_t::get_current_buffer() const { return cbuffer_t(size(), m_buffer + m_cursor); }
-    bool      binary_reader_t::can_read(u32 number_of_bytes) const { return (m_cursor + number_of_bytes) <= m_len; }
-    bool      binary_reader_t::at_end() const { return m_cursor == m_len; }
-    bool      binary_reader_t::seek(u32 cursor)
+    int_t     binary_reader_t::size() const { return m_end - m_begin; }
+    int_t     binary_reader_t::length() const { return m_end - m_begin; }
+    int_t     binary_reader_t::remain() const { return m_end - m_cursor; }
+    cbuffer_t binary_reader_t::get_current_buffer() const { return cbuffer_t(m_begin, m_cursor); }
+    bool      binary_reader_t::can_read(int_t number_of_bytes) const { return (m_cursor + number_of_bytes) <= m_end; }
+    bool      binary_reader_t::at_end() const { return m_cursor == m_end; }
+    bool      binary_reader_t::seek(int_t pos)
     {
-        if (cursor <= m_len)
+        u8 const* cursor = m_begin + pos;
+        if (cursor >= m_begin && cursor <= m_end)
         {
             m_cursor = cursor;
             return true;
@@ -143,13 +144,13 @@ namespace ncore
         return false;
     }
 
-    u32  binary_reader_t::pos() const { return m_cursor; }
-    void binary_reader_t::reset() { m_cursor = 0; }
+    int_t binary_reader_t::pos() const { return m_cursor - m_begin; }
+    void  binary_reader_t::reset() { m_cursor = 0; }
 
-    u32 binary_reader_t::skip(u32 c)
+    int_t binary_reader_t::skip(int_t c)
     {
-        u32 const offset = m_cursor;
-        if (can_read(m_len))
+        int_t const offset = m_cursor - m_begin;
+        if (can_read(c))
         {
             m_cursor += c;
             return offset;
@@ -157,147 +158,114 @@ namespace ncore
         return 0;
     }
 
-    u32 binary_reader_t::read(bool& b)
+    void binary_reader_t::read(bool& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(u8)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += 1;
             b = nuadrw::read_u8(ptr) != 0;
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(u8& b)
+    void binary_reader_t::read(u8& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_u8(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(s8& b)
+    void binary_reader_t::read(s8& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_s8(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(u16& b)
+    void binary_reader_t::read(u16& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_u16(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(s16& b)
+    void binary_reader_t::read(s16& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_s16(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(u32& b)
+    void binary_reader_t::read(u32& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_u32(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(s32& b)
+    void binary_reader_t::read(s32& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_s32(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(u64& b)
+    void binary_reader_t::read(u64& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_u64(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(s64& b)
+    void binary_reader_t::read(s64& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = (u8 const*)m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_s64(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(f32& b)
+    void binary_reader_t::read(f32& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = (u8 const*)m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_f32(ptr);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::read(f64& b)
+    void binary_reader_t::read(f64& b)
     {
-        u32 const offset = m_cursor;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = (u8 const*)m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_f64(ptr);
-            return offset;
         }
-        return -1;
     }
 
     // Peek
@@ -307,7 +275,7 @@ namespace ncore
         u16 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             b             = nuadrw::read_u16(ptr);
         }
         return b;
@@ -318,9 +286,9 @@ namespace ncore
     bool binary_reader_t::read_bool()
     {
         bool b = false;
-        if (can_read(m_len))
+        if (can_read(sizeof(u8)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += 1;
             b = nuadrw::read_u8(ptr) != 0;
         }
@@ -332,7 +300,7 @@ namespace ncore
         u8 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_u8(ptr);
         }
@@ -344,7 +312,7 @@ namespace ncore
         s8 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_s8(ptr);
         }
@@ -356,7 +324,7 @@ namespace ncore
         u16 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_u16(ptr);
         }
@@ -368,7 +336,7 @@ namespace ncore
         s16 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_s16(ptr);
         }
@@ -380,7 +348,7 @@ namespace ncore
         u32 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_u32(ptr);
         }
@@ -392,7 +360,7 @@ namespace ncore
         s32 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_s32(ptr);
         }
@@ -404,7 +372,7 @@ namespace ncore
         u64 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_u64(ptr);
         }
@@ -416,7 +384,7 @@ namespace ncore
         s64 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = (u8 const*)m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_s64(ptr);
         }
@@ -428,7 +396,7 @@ namespace ncore
         f32 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = (u8 const*)m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_f32(ptr);
         }
@@ -440,7 +408,7 @@ namespace ncore
         f64 b = 0;
         if (can_read(sizeof(b)))
         {
-            u8 const* ptr = (u8 const*)m_buffer + m_cursor;
+            u8 const* ptr = m_cursor;
             m_cursor += sizeof(b);
             b = nuadrw::read_f64(ptr);
         }
@@ -449,95 +417,72 @@ namespace ncore
 
     // End Direct Read
 
-    u32 binary_reader_t::read_data(buffer_t& buf)
+    void binary_reader_t::read_data(buffer_t& buf)
     {
         u32 const size = buf.size();
         if (can_read(size))
         {
-            u32 const offset = m_cursor;
-            cbuffer_t to_read(size, m_buffer + m_cursor);
+            cbuffer_t to_read(m_cursor, m_cursor + size);
             buf.writer().write_data(to_read);
             m_cursor += size;
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::view_data(u32 size, cbuffer_t& buf)
+    void binary_reader_t::view_data(u32 size, cbuffer_t& buf)
     {
-        u32 const offset = m_cursor;
-        buf.m_const      = m_buffer + m_cursor;
-        buf.m_len        = size;
+        buf.m_begin = m_cursor;
+        buf.m_end   = m_cursor + size;
         m_cursor += size;
-        return offset;
     }
 
-    u32 binary_reader_t::read_buffer(buffer_t& buf)
+    void binary_reader_t::read_buffer(buffer_t& buf)
     {
         u32 const size = read_u32();
         if (can_read(size))
         {
-            u32 const offset = m_cursor;
-            cbuffer_t to_read(size, m_buffer + m_cursor);
+            cbuffer_t to_read(m_cursor, m_cursor + size);
             buf.writer().write_data(to_read);
             m_cursor += size;
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_reader_t::view_buffer(cbuffer_t& buf)
+    void binary_reader_t::view_buffer(cbuffer_t& buf)
     {
-        u32 const offset = m_cursor;
-        u32 const size   = read_u32();
-        buf.m_const      = m_buffer + m_cursor;
-        buf.m_len        = size;
+        u32 const size = read_u32();
+        buf.m_begin    = m_cursor;
+        buf.m_end      = m_cursor + size;
         m_cursor += size;
-        return offset;
     }
 
-    u32 binary_reader_t::view_string(const char*& out_str, const char*& out_str_end, s8& out_str_type)
+    void binary_reader_t::view_string(const char*& out_str, const char*& out_str_end, s8& out_str_type)
     {
         if (size() == 0)
-            return -1;
-        u32 const offset  = m_cursor;
+            return;
         u32 const datalen = read_u32();
         out_str_type      = read_s8();
-        out_str           = (char const*)(m_buffer + m_cursor);
-        out_str_end       = out_str + datalen;
+        out_str           = (char const*)(m_cursor);
+        out_str_end       = (char const*)(m_cursor + datalen);
         m_cursor += datalen;
-        return offset;
     }
 
     /// ---------------------------------------------------------------------------------------
     /// Binary Writer
     /// ---------------------------------------------------------------------------------------
-    u32 binary_writer_t::size() const { return m_cursor; }
-    u32 binary_writer_t::length() const { return m_len; }
-    u32 binary_writer_t::remain() const { return m_len - m_cursor; }
+    int_t binary_writer_t::size() const { return m_cursor - m_begin; }
+    int_t binary_writer_t::length() const { return m_end - m_begin; }
+    int_t binary_writer_t::remain() const { return m_end - m_cursor; }
 
-    buffer_t binary_writer_t::get_full_buffer() const
+    buffer_t binary_writer_t::get_full_buffer() const { return buffer_t(m_begin, m_end); }
+
+    buffer_t binary_writer_t::get_current_buffer() const { return buffer_t(m_begin, m_cursor); }
+
+    bool binary_writer_t::can_write(int_t num_bytes) const { return ((m_cursor + num_bytes) <= m_end); }
+    bool binary_writer_t::at_end() const { return m_cursor == m_end; }
+
+    bool binary_writer_t::seek(int_t pos)
     {
-        buffer_t buffer;
-        buffer.m_mutable = m_buffer;
-        buffer.m_len     = m_len;
-        return buffer;
-    }
-
-    buffer_t binary_writer_t::get_current_buffer() const
-    {
-        buffer_t buffer;
-        buffer.m_mutable = m_buffer + m_cursor;
-        buffer.m_len     = size();
-        return buffer;
-    }
-
-    bool binary_writer_t::can_write(u32 num_bytes) const { return ((m_cursor + num_bytes) <= m_len); }
-    bool binary_writer_t::at_end() const { return m_cursor == m_len; }
-
-    bool binary_writer_t::seek(u32 cursor)
-    {
-        if (cursor <= m_len)
+        u8* cursor = m_cursor + pos;
+        if (cursor <= m_end)
         {
             m_cursor = cursor;
             return true;
@@ -545,239 +490,194 @@ namespace ncore
         return false;
     }
 
-    u32 binary_writer_t::pos() const { return m_cursor; }
+    int_t binary_writer_t::pos() const { return m_cursor - m_begin; }
+    void  binary_writer_t::reset() { m_cursor = m_begin; }
 
-    void binary_writer_t::reset() { m_cursor = 0; }
-
-    u32 binary_writer_t::skip(u32 c)
+    int_t binary_writer_t::skip(int_t c)
     {
-        u32 const offset = m_cursor;
         if (can_write(c))
         {
+            int_t const offset = m_cursor - m_begin;
             m_cursor += c;
             return offset;
         }
         return -1;
     }
 
-    binary_writer_t binary_writer_t::reserve(u32 len)
+    binary_writer_t binary_writer_t::reserve(int_t len)
     {
         binary_writer_t writer;
         if (can_write(len))
         {
-            writer.m_len    = len;
+            writer.m_begin  = m_cursor;
             writer.m_cursor = m_cursor;
-            writer.m_buffer = m_buffer;
+            writer.m_end    = m_cursor + len;
             m_cursor += len;
         }
         return writer;
     }
 
-    binary_writer_t binary_writer_t::range(u32 from, u32 to) const
+    binary_writer_t binary_writer_t::range(int_t from, int_t to) const
     {
         ASSERT(from < to);
-        ASSERT(from < m_len);
-        ASSERT(to < m_len);
+        ASSERT((m_cursor + from) < m_end);
+        ASSERT((m_cursor + to) < m_end);
 
         binary_writer_t writer;
-        u32 const       len = to - from;
-        writer.m_len        = len;
-        writer.m_cursor     = 0;
-        writer.m_buffer     = m_buffer + from;
+        writer.m_begin      = m_cursor + from;
+        writer.m_cursor     = m_cursor + from;
+        writer.m_end        = m_cursor + to;
         return writer;
     }
 
-    u32 binary_writer_t::write(bool b) { return write(b ? (u8)1 : (u8)0); }
+    void binary_writer_t::write(bool b) { write(b ? (u8)1 : (u8)0); }
 
-    u32 binary_writer_t::write(u8 b)
+    void binary_writer_t::write(u8 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_u8(m_buffer + m_cursor, b);
+            nuadrw::write_u8(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(s8 b)
+    void binary_writer_t::write(s8 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_s8(m_buffer + m_cursor, b);
+            nuadrw::write_s8(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(u16 b)
+    void binary_writer_t::write(u16 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_u16(m_buffer + m_cursor, b);
+            nuadrw::write_u16(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(s16 b)
+    void binary_writer_t::write(s16 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_s16(m_buffer + m_cursor, b);
+            nuadrw::write_s16(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(u32 b)
+    void binary_writer_t::write(u32 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_u32(m_buffer + m_cursor, b);
+            nuadrw::write_u32(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(s32 b)
+    void binary_writer_t::write(s32 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_s32(m_buffer + m_cursor, b);
+            nuadrw::write_s32(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(u64 b)
+    void binary_writer_t::write(u64 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_u64(m_buffer + m_cursor, b);
+            nuadrw::write_u64(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(s64 b)
+    void binary_writer_t::write(s64 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_s64(m_buffer + m_cursor, b);
+            nuadrw::write_s64(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(f32 b)
+    void binary_writer_t::write(f32 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_f32(m_buffer + m_cursor, b);
+            nuadrw::write_f32(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write(f64 b)
+    void binary_writer_t::write(f64 b)
     {
-        u32 const offset = m_cursor;
         if (can_write(sizeof(b)))
         {
-            nuadrw::write_f64(m_buffer + m_cursor, b);
+            nuadrw::write_f64(m_cursor, b);
             m_cursor += sizeof(b);
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write_data(buffer_t const& buf)
+    void binary_writer_t::write_data(buffer_t const& buf)
     {
-        u32 const offset = m_cursor;
         if (can_write(buf.size()))
         {
             u32 const n   = buf.size();
-            u8*       dst = m_buffer + m_cursor;
-            u8 const* src = buf.m_mutable;
+            u8*       dst = m_cursor;
+            u8 const* src = buf.m_begin;
             for (u32 i = 0; i < n; i++)
                 *dst++ = *src++;
             m_cursor += n;
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write_data(cbuffer_t const& buf)
+    void binary_writer_t::write_data(cbuffer_t const& buf)
     {
-        u32 const offset = m_cursor;
         if (can_write(buf.size()))
         {
             u32 const n   = buf.size();
-            u8*       dst = (u8*)m_buffer + m_cursor;
-            u8 const* src = buf.m_const;
+            u8*       dst = m_cursor;
+            u8 const* src = buf.m_begin;
             for (u32 i = 0; i < n; i++)
                 *dst++ = *src++;
             m_cursor += n;
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write_buffer(buffer_t const& buf)
+    void binary_writer_t::write_buffer(buffer_t const& buf)
     {
-        u32 const offset = m_cursor;
         if (can_write(4 + (u32)buf.size()))
         {
             u32 const n = buf.size();
             write(n);
-            u8*       dst = (u8*)m_buffer + m_cursor;
-            u8 const* src = buf.m_mutable;
+            u8*       dst = m_cursor;
+            u8 const* src = buf.m_begin;
             for (u32 i = 0; i < n; i++)
                 *dst++ = *src++;
             m_cursor += n;
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write_buffer(cbuffer_t const& buf)
+    void binary_writer_t::write_buffer(cbuffer_t const& buf)
     {
-        u32 const offset = m_cursor;
         if (can_write(4 + buf.size()))
         {
             u32 const n = buf.size();
             write((u32)n);
-            u8*       dst = (u8*)m_buffer + m_cursor;
-            u8 const* src = buf.m_const;
+            u8*       dst = m_cursor;
+            u8 const* src = buf.m_begin;
             for (u32 i = 0; i < n; i++)
                 *dst++ = *src++;
             m_cursor += n;
-            return offset;
         }
-        return -1;
     }
 
-    u32 binary_writer_t::write_string(const char* str, const char* str_end, s8 str_type)
+    void binary_writer_t::write_string(const char* str, const char* str_end, s8 str_type)
     {
-        u32 const   offset   = m_cursor;
         char const* srcstr   = str;
         char const* srcend   = str_end;
         u32 const   datasize = (u32)(srcend - srcstr);
@@ -786,15 +686,13 @@ namespace ncore
             write((u32)datasize);
             write(str_type);
 
-            char* dststr = (char*)m_buffer + m_cursor;
+            char* dststr = (char*)m_cursor;
             while (srcstr < srcend)
             {
                 *dststr++ = *srcstr++;
             }
             m_cursor += datasize;
-            return offset;
         }
-        return -1;
     }
 
 }  // namespace ncore

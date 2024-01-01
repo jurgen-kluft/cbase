@@ -36,21 +36,21 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             binary_writer_t writer = buffer.writer();
 
             CHECK_EQUAL(0, writer.skip(16));
-            CHECK_EQUAL(16, writer.write(false));
-            CHECK_EQUAL(17, writer.write((u8)1));
-            CHECK_EQUAL(18, writer.write((s8)1));
-            CHECK_EQUAL(19, writer.write((u16)2));
-            CHECK_EQUAL(21, writer.write((s16)3));
-            CHECK_EQUAL(23, writer.write((u32)4));
-            CHECK_EQUAL(27, writer.write((s32)5));
-            CHECK_EQUAL(31, writer.write((u64)6));
-            CHECK_EQUAL(39, writer.write((s64)7));
-            CHECK_EQUAL(47, writer.write((f32)8.0));
-            CHECK_EQUAL(51, writer.write((f64)9.0));
+            CHECK_EQUAL(16, writer.pos()); writer.write(false);
+            CHECK_EQUAL(17, writer.pos()); writer.write((u8)1);
+            CHECK_EQUAL(18, writer.pos()); writer.write((s8)1);
+            CHECK_EQUAL(19, writer.pos()); writer.write((u16)2);
+            CHECK_EQUAL(21, writer.pos()); writer.write((s16)3);
+            CHECK_EQUAL(23, writer.pos()); writer.write((u32)4);
+            CHECK_EQUAL(27, writer.pos()); writer.write((s32)5);
+            CHECK_EQUAL(31, writer.pos()); writer.write((u64)6);
+            CHECK_EQUAL(39, writer.pos()); writer.write((s64)7);
+            CHECK_EQUAL(47, writer.pos()); writer.write((f32)8.0);
+            CHECK_EQUAL(51, writer.pos()); writer.write((f64)9.0);
 			CHECK_EQUAL(59, writer.pos());
 
             const char* cctext = "this is the buffer";
-            cbuffer_t    text(ascii::strlen(cctext), (const u8*)cctext);
+            cbuffer_t    text((const u8*)cctext, (const u8*)cctext + 18);
 
             sbuffer_t<32> bytes;
             bytes.writer().write_data(text);
@@ -72,17 +72,17 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             f64  the_f64;
 
             CHECK_EQUAL(0, reader.skip(16));
-            CHECK_EQUAL(16, reader.read(the_bool));
-            CHECK_EQUAL(17, reader.read(the_u8));
-            CHECK_EQUAL(18, reader.read(the_s8));
-            CHECK_EQUAL(19, reader.read(the_u16));
-            CHECK_EQUAL(21, reader.read(the_s16));
-            CHECK_EQUAL(23, reader.read(the_u32));
-            CHECK_EQUAL(27, reader.read(the_s32));
-            CHECK_EQUAL(31, reader.read(the_u64));
-            CHECK_EQUAL(39, reader.read(the_s64));
-            CHECK_EQUAL(47, reader.read(the_f32));
-            CHECK_EQUAL(51, reader.read(the_f64));
+            CHECK_EQUAL(16, reader.pos()); reader.read(the_bool);
+            CHECK_EQUAL(17, reader.pos()); reader.read(the_u8);
+            CHECK_EQUAL(18, reader.pos()); reader.read(the_s8);
+            CHECK_EQUAL(19, reader.pos()); reader.read(the_u16);
+            CHECK_EQUAL(21, reader.pos()); reader.read(the_s16);
+            CHECK_EQUAL(23, reader.pos()); reader.read(the_u32);
+            CHECK_EQUAL(27, reader.pos()); reader.read(the_s32);
+            CHECK_EQUAL(31, reader.pos()); reader.read(the_u64);
+            CHECK_EQUAL(39, reader.pos()); reader.read(the_s64);
+            CHECK_EQUAL(47, reader.pos()); reader.read(the_f32);
+            CHECK_EQUAL(51, reader.pos()); reader.read(the_f64);
             CHECK_EQUAL(59, reader.pos());
 
             CHECK_EQUAL(false, the_bool);

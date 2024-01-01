@@ -212,8 +212,8 @@ namespace ncore
             u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
-        // return length of string in runes
-        s32 strlen(pcrune str, pcrune& end, pcrune eos);
+        s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
+        s32 strlen(pcrune str, pcrune& end, pcrune eos);        // return length of string in runes
 
     }  // namespace utf8
 
@@ -396,8 +396,8 @@ namespace ncore
         runes_t(utf32::prune _str, utf32::prune _end, u32 _type = utf32::TYPE);
         runes_t(utf32::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf32::TYPE);
 
-        s32  size() const;
-        s32  cap() const;
+        u32  size() const;
+        u32  cap() const;
         bool is_empty() const;
         bool is_valid() const;
         bool is_nil() const;
@@ -418,6 +418,7 @@ namespace ncore
         runes_t& operator+=(const utf32::crunes_t& str);
         runes_t& operator+=(ascii::rune c);
         runes_t& operator+=(utf32::rune c);
+        runes_t& operator=(crunes_t const& other);
         runes_t& operator=(runes_t const& other);
 
         union
@@ -442,7 +443,10 @@ namespace ncore
         crunes_t(ascii::pcrune _bos);
         crunes_t(ascii::pcrune _bos, ascii::pcrune _end);
         crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u32 _flags = ascii::TYPE);
-        crunes_t(ascii::pcrune _bos, u32 _len) : crunes_t(_bos, 0, _len, _len, ascii::TYPE) {}
+        crunes_t(ascii::pcrune _bos, u32 _len)
+            : crunes_t(_bos, 0, _len, _len, ascii::TYPE)
+        {
+        }
 
         crunes_t(utf8::crunes_t const& _str);
         crunes_t(utf8::pcrune _str);
@@ -463,7 +467,7 @@ namespace ncore
         crunes_t(crunes_t const& other);
         crunes_t(crunes_t const& other, u32 from, u32 to);
 
-        s32  size() const;
+        u32  size() const;
         bool is_valid() const;
         bool is_empty() const;
         bool is_nil() const;
@@ -524,6 +528,7 @@ namespace ncore
     crunes_t findSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
     crunes_t findLastSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
     crunes_t findSelectUntilIncluded(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+    crunes_t findSelectUntilIncludedAbortAtOneOf(const crunes_t& inStr, const crunes_t& inFind, const crunes_t& inAbortAny, bool case_sensitive = true);
     crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
     crunes_t findSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
     crunes_t findLastSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
@@ -538,6 +543,7 @@ namespace ncore
     // -------------------------------------------------------------------------------
     // search and select text between delimiters
     // e.g. selectBetween(str, '<', '>');
+    crunes_t selectFromToInclude(const crunes_t& inStr, crunes_t const& inFrom, crunes_t const& inTo);
     crunes_t selectBetween(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
     crunes_t selectNextBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
     crunes_t selectBetweenLast(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
