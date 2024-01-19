@@ -94,8 +94,8 @@ namespace ncore
 
     namespace nhash
     {
-        extern u64 wyrand(u64* seed);
-    }
+        extern void wyrand(u64* seed, u8* buffer, u32 size);
+    }  // namespace nhash
 
     class wyrand_t : public random_t
     {
@@ -106,7 +106,7 @@ namespace ncore
         }
         virtual ~wyrand_t() {}
         virtual void reset(s64 inSeed = 0);
-        virtual u32  generate();
+        virtual void generate(u8* outData, u32 numBytes);
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
     private:
@@ -114,9 +114,9 @@ namespace ncore
     };
 
     void wyrand_t::reset(s64 inSeed) { m_seed = inSeed; }
-    u32  wyrand_t::generate() { return (u32)nhash::wyrand(&m_seed); }
+    void wyrand_t::generate(u8* outData, u32 numBytes) { nhash::wyrand(&m_seed, outData, numBytes); }
 
-} // namespace ncore
+}  // namespace ncore
 
 namespace cbase
 {
@@ -128,7 +128,7 @@ namespace cbase
 
         ncore::console_t::init_default_console();
         ncore::context_t::init(number_of_threads, 16, ncore::get_system_alloc());
-        ncore::context_t::register_thread(); // Should be called once from a created thread
+        ncore::context_t::register_thread();  // Should be called once from a created thread
 
         ncore::alloc_t*       system_allocator = ncore::get_system_alloc();
         ncore::runes_alloc_t* string_allocator = ncore::get_runes_alloc();
@@ -141,7 +141,7 @@ namespace cbase
             ncore::u8*       buffer_data      = (ncore::u8*)system_allocator->allocate(temporary_allocator_size);
             ncore::alloc_t*  stack_allocator  = ncore::get_system_alloc()->construct<ncore::alloc_buffer_t>(buffer_data, temporary_allocator_size);
             ncore::random_t* random_generator = ncore::get_system_alloc()->construct<ncore::wyrand_t>();
-            random_generator->reset((ncore::s64)random_generator); // randomize the seed
+            random_generator->reset((ncore::s64)random_generator);  // randomize the seed
 
             ncore::context_t::set_assert_handler(assert_handler);
             ncore::context_t::set_system_alloc(system_allocator);
@@ -177,4 +177,4 @@ namespace cbase
         ncore::context_t::set_assert_handler(nullptr);
     }
 
-}; // namespace cbase
+};  // namespace cbase

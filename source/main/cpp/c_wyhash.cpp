@@ -154,10 +154,26 @@ namespace ncore
         }
 
         // The wyrand PRNG that pass BigCrush and PractRand
+        // Referenced externally in c_base.cpp
         u64 wyrand(u64* seed)
         {
             *seed += 0xa0761d6478bd642full;
             return _wymix(*seed, *seed ^ 0xe7037ed1a0b428dbull);
+        }
+
+        void wyrand(u64* seed, u8* buffer, u32 size)
+        {
+            u64 s = *seed;
+            u32 i = 0;
+            while (i < size)
+            {
+                s += 0xa0761d6478bd642full;
+                u64 const l = _wymix(s, s ^ 0xe7037ed1a0b428dbull);
+                u8 const* lp = (u8 const*)&l;
+                for (u32 j = 0; j < 8 && i < size; j++, i++)
+                    buffer[i] = lp[j];
+            }
+            *seed = s;
         }
 
         // convert any 64 bit pseudo random numbers to uniform distribution [0,1). It can be combined with wyrand, wyhash64 or wyhash.
