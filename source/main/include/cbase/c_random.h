@@ -5,6 +5,8 @@
 #    pragma once
 #endif
 
+#include "ccore/c_debug.h"
+
 namespace ncore
 {
     class random_t
@@ -34,13 +36,13 @@ namespace ncore
         ASSERT(inBits <= 31);
         return (random_u32(inRandom, inBits + 1) - (1 << inBits));
     }
-    inline f32 rand_f32(random_t* inRandom)
+    inline f32 random_f32(random_t* inRandom)
     {
         u32 r          = random_u32(inRandom);
         u32 fake_float = (r >> (32 - 23)) | 0x3f800000;
         return ((*(f32*)&fake_float) - 1.0f);
     }
-    inline f32 random_f32S(random_t* inRandom) { return ((rand_f32(inRandom) - 0.5f) * 2.0f); }
+    inline f32 random_f32S(random_t* inRandom) { return ((random_f32(inRandom) - 0.5f) * 2.0f); }
 
     s32 random_s32_0_max(random_t* inRandom, s32 maxt);
     s32 random_s32_0_1(random_t* inRandom);
