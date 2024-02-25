@@ -213,7 +213,7 @@ namespace ncore
         };
 
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
-        s32 strlen(pcrune str, pcrune& end, pcrune eos);        // return length of string in runes
+        s32 strlen(pcrune str, pcrune& end, pcrune eos);  // return length of string in runes
 
     }  // namespace utf8
 
@@ -501,377 +501,369 @@ namespace ncore
         inline bool is_utf32() const { return get_type() == utf32::TYPE; }
     };
 
-    class runes_alloc_t
+    namespace nrunes
     {
-    public:
-        virtual ~runes_alloc_t() {}
-        virtual runes_t allocate(s32 len, s32 cap, s32 type) = 0;
-        virtual void    deallocate(runes_t& slice_t)         = 0;
-    };
 
-    // -------------------------------------------------------------------------------
-    // search functions
-    crunes_t find(crunes_t const& str, crunes_t const& find, bool case_sensitive = true);
-    runes_t  find(runes_t const& str, crunes_t const& find, bool case_sensitive = true);
-    crunes_t findLast(crunes_t const& str, crunes_t const& find, bool case_sensitive = true);
-    runes_t  findLast(runes_t const& str, crunes_t const& find, bool case_sensitive = true);
-    crunes_t findOneOf(crunes_t const& str, crunes_t const& set, bool case_sensitive = true);
-    runes_t  findOneOf(runes_t const& str, crunes_t const& set, bool case_sensitive = true);
+        // -------------------------------------------------------------------------------
+        // search functions
+        crunes_t find(crunes_t const& str, crunes_t const& find, bool case_sensitive = true);
+        runes_t  find(runes_t const& str, crunes_t const& find, bool case_sensitive = true);
+        crunes_t findLast(crunes_t const& str, crunes_t const& find, bool case_sensitive = true);
+        runes_t  findLast(runes_t const& str, crunes_t const& find, bool case_sensitive = true);
+        crunes_t findOneOf(crunes_t const& str, crunes_t const& set, bool case_sensitive = true);
+        runes_t  findOneOf(runes_t const& str, crunes_t const& set, bool case_sensitive = true);
 
-    crunes_t find(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    crunes_t findLast(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    crunes_t findOneOf(crunes_t const& str, uchar32 _c, bool case_sensitive = true);
-    runes_t  find(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    runes_t  findLast(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
-    runes_t  findOneOf(runes_t const& str, uchar32 _c, bool case_sensitive = true);
+        crunes_t find(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
+        crunes_t findLast(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
+        crunes_t findOneOf(crunes_t const& str, uchar32 _c, bool case_sensitive = true);
+        runes_t  find(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
+        runes_t  findLast(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
+        runes_t  findOneOf(runes_t const& str, uchar32 _c, bool case_sensitive = true);
 
-    crunes_t findSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findLastSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findSelectUntilIncluded(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findSelectUntilIncludedAbortAtOneOf(const crunes_t& inStr, const crunes_t& inFind, const crunes_t& inAbortAny, bool case_sensitive = true);
-    crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    crunes_t findLastSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        crunes_t findSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        crunes_t findLastSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        crunes_t findSelectUntilIncluded(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        crunes_t findSelectUntilIncludedAbortAtOneOf(const crunes_t& inStr, const crunes_t& inFind, const crunes_t& inAbortAny, bool case_sensitive = true);
+        crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        crunes_t findSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        crunes_t findLastSelectAfter(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
 
-    crunes_t findSelectUntil(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    crunes_t findLastSelectUntil(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    crunes_t findSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    crunes_t findSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    crunes_t findLastSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        crunes_t findSelectUntil(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        crunes_t findLastSelectUntil(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        crunes_t findSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        crunes_t findSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        crunes_t findLastSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
 
-    // -------------------------------------------------------------------------------
-    // search and select text between delimiters
-    // e.g. selectBetween(str, '<', '>');
-    crunes_t selectFromToInclude(const crunes_t& inStr, crunes_t const& inFrom, crunes_t const& inTo);
-    crunes_t selectBetween(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
-    crunes_t selectNextBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
-    crunes_t selectBetweenLast(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
-    crunes_t selectPreviousBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
+        // -------------------------------------------------------------------------------
+        // search and select text between delimiters
+        // e.g. selectBetween(str, '<', '>');
+        crunes_t selectFromToInclude(const crunes_t& inStr, crunes_t const& inFrom, crunes_t const& inTo);
+        crunes_t selectBetween(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
+        crunes_t selectNextBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
+        crunes_t selectBetweenLast(const crunes_t& inStr, uchar32 inLeft, uchar32 inRight);
+        crunes_t selectPreviousBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
 
-    // -------------------------------------------------------------------------------
-    // select before after
-    crunes_t selectBeforeExclude(const crunes_t& inStr, const crunes_t& inSelection);
-    crunes_t selectBeforeInclude(const crunes_t& inStr, const crunes_t& inSelection);
-    crunes_t selectAfterExclude(const crunes_t& inStr, const crunes_t& inSelection);
-    crunes_t selectAfterInclude(const crunes_t& inStr, const crunes_t& inSelection);
-    crunes_t selectOverlap(const crunes_t& inStr, const crunes_t& inRight);
+        // -------------------------------------------------------------------------------
+        // select before after
+        crunes_t selectBeforeExclude(const crunes_t& inStr, const crunes_t& inSelection);
+        crunes_t selectBeforeInclude(const crunes_t& inStr, const crunes_t& inSelection);
+        crunes_t selectAfterExclude(const crunes_t& inStr, const crunes_t& inSelection);
+        crunes_t selectAfterInclude(const crunes_t& inStr, const crunes_t& inSelection);
+        crunes_t selectOverlap(const crunes_t& inStr, const crunes_t& inRight);
 
-    // -------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
 
-    runes_t findSelectUntil(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findLastSelectUntil(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findSelectUntilIncluded(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findLastSelectUntilIncluded(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findSelectAfter(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
-    runes_t findLastSelectAfter(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        runes_t findSelectUntil(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        runes_t findLastSelectUntil(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        runes_t findSelectUntilIncluded(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        runes_t findLastSelectUntilIncluded(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        runes_t findSelectAfter(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
+        runes_t findLastSelectAfter(const runes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
 
-    runes_t findSelectUntil(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    runes_t findLastSelectUntil(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    runes_t findSelectUntilIncluded(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    runes_t findLastSelectUntilIncluded(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    runes_t findSelectAfter(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
-    runes_t findLastSelectAfter(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        runes_t findSelectUntil(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        runes_t findLastSelectUntil(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        runes_t findSelectUntilIncluded(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        runes_t findLastSelectUntilIncluded(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        runes_t findSelectAfter(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+        runes_t findLastSelectAfter(const runes_t& inStr, uchar32 inFind, bool case_sensitive = true);
 
-    // -------------------------------------------------------------------------------
-    // search and select
-    runes_t selectBetween(const runes_t& inStr, uchar32 inLeft, uchar32 inRight);
-    runes_t selectBetweenLast(const runes_t& inStr, uchar32 inLeft, uchar32 inRight);
-    runes_t selectNextBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
-    runes_t selectPreviousBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
-    runes_t selectBeforeExclude(const runes_t& inStr, const runes_t& inSelection);
-    runes_t selectBeforeInclude(const runes_t& inStr, const runes_t& inSelection);
-    runes_t selectAfterExclude(const runes_t& inStr, const runes_t& inSelection);
-    runes_t selectAfterInclude(const runes_t& inStr, const runes_t& inSelection);
-    runes_t selectOverlap(const runes_t& inStr, const runes_t& inRight);
+        // -------------------------------------------------------------------------------
+        // search and select
+        runes_t selectBetween(const runes_t& inStr, uchar32 inLeft, uchar32 inRight);
+        runes_t selectBetweenLast(const runes_t& inStr, uchar32 inLeft, uchar32 inRight);
+        runes_t selectNextBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
+        runes_t selectPreviousBetween(const runes_t& inStr, const runes_t& inSelection, uchar32 inLeft, uchar32 inRight);
+        runes_t selectBeforeExclude(const runes_t& inStr, const runes_t& inSelection);
+        runes_t selectBeforeInclude(const runes_t& inStr, const runes_t& inSelection);
+        runes_t selectAfterExclude(const runes_t& inStr, const runes_t& inSelection);
+        runes_t selectAfterInclude(const runes_t& inStr, const runes_t& inSelection);
+        runes_t selectOverlap(const runes_t& inStr, const runes_t& inRight);
 
-    // -------------------------------------------------------------------------------
-    // compare
-    s32 compare(crunes_t const& str1, crunes_t const& str2, bool case_sensitive = true);
-    s32 compare(runes_t const& str1, runes_t const& str2, bool case_sensitive = true);
+        // -------------------------------------------------------------------------------
+        // compare
+        s32 compare(crunes_t const& str1, crunes_t const& str2, bool case_sensitive = true);
+        s32 compare(runes_t const& str1, runes_t const& str2, bool case_sensitive = true);
 
-    // -------------------------------------------------------------------------------
-    // parse/from_string, to_string
-    crunes_t parse(crunes_t const& str, bool& value);
-    crunes_t parse(crunes_t const& str, s8& value, s32 base = 10);
-    crunes_t parse(crunes_t const& str, s16& value, s32 base = 10);
-    crunes_t parse(crunes_t const& str, s32& value, s32 base = 10);
-    crunes_t parse(crunes_t const& str, s64& value, s32 base = 10);
-    crunes_t parse(crunes_t const& str, u8& value, s32 base = 10);
-    crunes_t parse(crunes_t const& str, u16& value, s32 base = 10);
-    crunes_t parse(crunes_t const& str, u32& value, s32 base = 10);
-    crunes_t parse(crunes_t const& str, u64& value, s32 base = 10);
-    crunes_t parse(crunes_t const& str, f32& value);
-    crunes_t parse(crunes_t const& str, f64& value);
+        // -------------------------------------------------------------------------------
+        // parse/from_string, to_string
+        crunes_t parse(crunes_t const& str, bool& value);
+        crunes_t parse(crunes_t const& str, s8& value, s32 base = 10);
+        crunes_t parse(crunes_t const& str, s16& value, s32 base = 10);
+        crunes_t parse(crunes_t const& str, s32& value, s32 base = 10);
+        crunes_t parse(crunes_t const& str, s64& value, s32 base = 10);
+        crunes_t parse(crunes_t const& str, u8& value, s32 base = 10);
+        crunes_t parse(crunes_t const& str, u16& value, s32 base = 10);
+        crunes_t parse(crunes_t const& str, u32& value, s32 base = 10);
+        crunes_t parse(crunes_t const& str, u64& value, s32 base = 10);
+        crunes_t parse(crunes_t const& str, f32& value);
+        crunes_t parse(crunes_t const& str, f64& value);
 
-    void to_string(runes_t& str, s32 val, s32 base = 10);
-    void to_string(runes_t& str, u32 val, s32 base = 10);
-    void to_string(runes_t& str, s64 val, s32 base = 10);
-    void to_string(runes_t& str, u64 val, s32 base = 10);
-    void to_string(runes_t& str, f32 val, s32 num_fractional_digits = 4);
-    void to_string(runes_t& str, f64 val, s32 num_fractional_digits = 4);
+        void to_string(runes_t& str, s32 val, s32 base = 10);
+        void to_string(runes_t& str, u32 val, s32 base = 10);
+        void to_string(runes_t& str, s64 val, s32 base = 10);
+        void to_string(runes_t& str, u64 val, s32 base = 10);
+        void to_string(runes_t& str, f32 val, s32 num_fractional_digits = 4);
+        void to_string(runes_t& str, f64 val, s32 num_fractional_digits = 4);
 
-    // -------------------------------------------------------------------------------
-    // filters
-    bool is_decimal(crunes_t const& str);
-    bool is_hexadecimal(crunes_t const& str, bool with_prefix = false);
-    bool is_float(crunes_t const& str);
-    bool is_GUID(crunes_t const& str);
-    void to_upper(runes_t& str);
-    void to_lower(runes_t& str);
+        // -------------------------------------------------------------------------------
+        // filters
+        bool is_decimal(crunes_t const& str);
+        bool is_hexadecimal(crunes_t const& str, bool with_prefix = false);
+        bool is_float(crunes_t const& str);
+        bool is_GUID(crunes_t const& str);
+        void to_upper(runes_t& str);
+        void to_lower(runes_t& str);
 
-    inline bool    is_space(uchar32 c) { return ((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
-    inline bool    is_whitespace(uchar32 c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v'; }
-    inline bool    is_upper(uchar32 c) { return ((c >= 'A') && (c <= 'Z')); }
-    inline bool    is_lower(uchar32 c) { return ((c >= 'a') && (c <= 'z')); }
-    inline bool    is_alpha(uchar32 c) { return (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
-    inline bool    is_digit(uchar32 c) { return ((c >= '0') && (c <= '9')); }
-    inline bool    is_hexa(uchar32 c) { return (((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
-    inline uchar32 to_upper(uchar32 c) { return ((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c; }
-    inline uchar32 to_lower(uchar32 c) { return ((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
-    inline u32     to_digit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
-    inline u32     to_number(uchar32 c)
-    {
-        if (is_digit(c))
-            return to_digit(c);
-        else if (c >= 'A' && c <= 'F')
-            return (c - 'A' + 10);
-        else if (c >= 'a' && c <= 'f')
-            return (c - 'a' + 10);
-        return 0;
-    }
-    inline char to_dec_char(u8 val) { return "0123456789??????"[val & 0xf]; }
-    inline char to_hex_char(u8 val, bool lowercase) { return (lowercase) ? "0123456789abcdef"[val & 0xf] : "0123456789ABCDEF"[val & 0xf]; }
-    inline bool is_equal(uchar32 a, uchar32 b) { return (a == b); }
-    inline bool is_equalfold(uchar32 a, uchar32 b) { return (to_lower(a) == to_lower(b)); }
-
-    bool    is_upper(crunes_t const& str);
-    bool    is_lower(crunes_t const& str);
-    bool    is_capitalized(crunes_t const& str);
-    bool    is_delimited(crunes_t const& str, uchar32 delimit_left = '\"', uchar32 delimit_right = '\"');
-    bool    is_quoted(crunes_t const& str, uchar32 quote = '\"');
-    bool    starts_with(crunes_t const& str, uchar32 start);
-    bool    starts_with(crunes_t const& str, crunes_t const& start);
-    bool    ends_with(crunes_t const& str, uchar32 end_char);
-    bool    ends_with(crunes_t const& str, crunes_t const& end);
-    uchar32 first_char(crunes_t const& str);
-    uchar32 last_char(crunes_t const& str);
-
-    // -------------------------------------------------------------------------------
-    // modifiers
-    void removeSelection(runes_t& str, crunes_t const& sel);
-    void keepOnlySelection(runes_t& str, crunes_t const& sel);
-    void replaceSelection(runes_t& str, crunes_t const& sel, crunes_t const& replace);
-    void replaceSelection(runes_t& str, crunes_t const& sel, crunes_t const& replace, runes_alloc_t* allocator, s32 size_alignment);
-    void findReplace(runes_t& str, uchar32 find, uchar32 replace, bool case_sensitive = true);
-    void findReplace(runes_t& str, crunes_t const& find, crunes_t const& replace, bool case_sensitive = true);
-    void insert(runes_t& str, crunes_t const& insert);
-    void insert(runes_t& str, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment);
-    void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert);
-    void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment);
-
-    runes_t expand(runes_t& str, runes_t const& sel);
-    runes_t expand(runes_t& str, crunes_t const& sel);
-
-    void trim(runes_t&);                                             // Trim whitespace from left and right side
-    void trimLeft(runes_t&);                                         // Trim whitespace from left side
-    void trimRight(runes_t&);                                        // Trim whitespace from right side
-    void trim(runes_t&, uchar32 inChar);                             // Trim characters in <inCharSet> from left and right side
-    void trimLeft(runes_t&, uchar32 inChar);                         // Trim character <inChar> from left side
-    void trimRight(runes_t&, uchar32 inChar);                        // Trim character <inChar> from right side
-    void trim(runes_t&, crunes_t const& inCharSet);                  // Trim characters in <inCharSet> from left and right side
-    void trimLeft(runes_t&, crunes_t const& inCharSet);              // Trim characters in <inCharSet> from left side
-    void trimRight(runes_t&, crunes_t const& inCharSet);             // Trim characters in <inCharSet> from right side
-    void trimQuotes(runes_t&);                                       // Trim double quotes from left and right side
-    void trimQuotes(runes_t&, uchar32 quote);                        // Trim double quotes from left and right side
-    void trimDelimiters(runes_t&, uchar32 inLeft, uchar32 inRight);  // Trim delimiters from left and right side
-
-    void trim(crunes_t&);                                             // Trim whitespace from left and right side
-    void trimLeft(crunes_t&);                                         // Trim whitespace from left side
-    void trimRight(crunes_t&);                                        // Trim whitespace from right side
-    void trim(crunes_t&, uchar32 inChar);                             // Trim characters in <inCharSet> from left and right side
-    void trimLeft(crunes_t&, uchar32 inChar);                         // Trim character <inChar> from left side
-    void trimRight(crunes_t&, uchar32 inChar);                        // Trim character <inChar> from right side
-    void trim(crunes_t&, crunes_t const& inCharSet);                  // Trim characters in <inCharSet> from left and right side
-    void trimLeft(crunes_t&, crunes_t const& inCharSet);              // Trim characters in <inCharSet> from left side
-    void trimRight(crunes_t&, crunes_t const& inCharSet);             // Trim characters in <inCharSet> from right side
-    void trimQuotes(crunes_t&);                                       // Trim double quotes from left and right side
-    void trimQuotes(crunes_t&, uchar32 quote);                        // Trim double quotes from left and right side
-    void trimDelimiters(crunes_t&, uchar32 inLeft, uchar32 inRight);  // Trim delimiters from left and right side
-
-    void copy(const crunes_t& src, runes_t& dst);
-    void copy(const crunes_t& src, runes_t& dst, runes_alloc_t* allocator, s32 size_alignment = 8);
-
-    void concatenate(runes_t& str, const crunes_t& concat);
-    void concatenate(runes_t& str, const crunes_t& concat, runes_alloc_t* allocator, s32 size_alignment);
-    void concatenate(runes_t& str, const crunes_t& concat1, const crunes_t& concat2, runes_alloc_t* allocator, s32 size_alignment);
-
-    // -------------------------------------------------------------------------------
-    // global operators for comparison
-    inline bool operator==(const crunes_t& lhs, const crunes_t& rhs) { return compare(lhs, rhs) == 0; }
-    inline bool operator!=(const crunes_t& lhs, const crunes_t& rhs) { return compare(lhs, rhs) != 0; }
-    inline bool operator==(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) == 0; }
-    inline bool operator!=(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) != 0; }
-
-    // -------------------------------------------------------------------------------
-    // helpers for inline sized runes_t
-    template <typename T, s32 L>
-    class runez_t : public runes_t
-    {
-    public:
-        enum
+        inline bool    is_space(uchar32 c) { return ((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
+        inline bool    is_whitespace(uchar32 c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v'; }
+        inline bool    is_upper(uchar32 c) { return ((c >= 'A') && (c <= 'Z')); }
+        inline bool    is_lower(uchar32 c) { return ((c >= 'a') && (c <= 'z')); }
+        inline bool    is_alpha(uchar32 c) { return (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
+        inline bool    is_digit(uchar32 c) { return ((c >= '0') && (c <= '9')); }
+        inline bool    is_hexa(uchar32 c) { return (((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
+        inline uchar32 to_upper(uchar32 c) { return ((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c; }
+        inline uchar32 to_lower(uchar32 c) { return ((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
+        inline u32     to_digit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
+        inline u32     to_number(uchar32 c)
         {
-            SIZE = L
+            if (is_digit(c))
+                return to_digit(c);
+            else if (c >= 'A' && c <= 'F')
+                return (c - 'A' + 10);
+            else if (c >= 'a' && c <= 'f')
+                return (c - 'a' + 10);
+            return 0;
+        }
+        inline char to_dec_char(u8 val) { return "0123456789??????"[val & 0xf]; }
+        inline char to_hex_char(u8 val, bool lowercase) { return (lowercase) ? "0123456789abcdef"[val & 0xf] : "0123456789ABCDEF"[val & 0xf]; }
+        inline bool is_equal(uchar32 a, uchar32 b) { return (a == b); }
+        inline bool is_equalfold(uchar32 a, uchar32 b) { return (to_lower(a) == to_lower(b)); }
+
+        bool    is_upper(crunes_t const& str);
+        bool    is_lower(crunes_t const& str);
+        bool    is_capitalized(crunes_t const& str);
+        bool    is_delimited(crunes_t const& str, uchar32 delimit_left = '\"', uchar32 delimit_right = '\"');
+        bool    is_quoted(crunes_t const& str, uchar32 quote = '\"');
+        bool    starts_with(crunes_t const& str, uchar32 start);
+        bool    starts_with(crunes_t const& str, crunes_t const& start);
+        bool    ends_with(crunes_t const& str, uchar32 end_char);
+        bool    ends_with(crunes_t const& str, crunes_t const& end);
+        uchar32 first_char(crunes_t const& str);
+        uchar32 last_char(crunes_t const& str);
+
+        // -------------------------------------------------------------------------------
+        // modifiers
+        void removeSelection(runes_t& str, crunes_t const& sel);
+        void keepOnlySelection(runes_t& str, crunes_t const& sel);
+        void replaceSelection(runes_t& str, crunes_t const& sel, crunes_t const& replace);
+        void findReplace(runes_t& str, uchar32 find, uchar32 replace, bool case_sensitive = true);
+        void findReplace(runes_t& str, crunes_t const& find, crunes_t const& replace, bool case_sensitive = true);
+        void insert(runes_t& str, crunes_t const& insert);
+        void insert(runes_t& str, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment);
+        void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert);
+        void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment);
+
+        runes_t expand(runes_t& str, runes_t const& sel);
+        runes_t expand(runes_t& str, crunes_t const& sel);
+
+        void trim(runes_t&);                                             // Trim whitespace from left and right side
+        void trimLeft(runes_t&);                                         // Trim whitespace from left side
+        void trimRight(runes_t&);                                        // Trim whitespace from right side
+        void trim(runes_t&, uchar32 inChar);                             // Trim characters in <inCharSet> from left and right side
+        void trimLeft(runes_t&, uchar32 inChar);                         // Trim character <inChar> from left side
+        void trimRight(runes_t&, uchar32 inChar);                        // Trim character <inChar> from right side
+        void trim(runes_t&, crunes_t const& inCharSet);                  // Trim characters in <inCharSet> from left and right side
+        void trimLeft(runes_t&, crunes_t const& inCharSet);              // Trim characters in <inCharSet> from left side
+        void trimRight(runes_t&, crunes_t const& inCharSet);             // Trim characters in <inCharSet> from right side
+        void trimQuotes(runes_t&);                                       // Trim double quotes from left and right side
+        void trimQuotes(runes_t&, uchar32 quote);                        // Trim double quotes from left and right side
+        void trimDelimiters(runes_t&, uchar32 inLeft, uchar32 inRight);  // Trim delimiters from left and right side
+
+        void trim(crunes_t&);                                             // Trim whitespace from left and right side
+        void trimLeft(crunes_t&);                                         // Trim whitespace from left side
+        void trimRight(crunes_t&);                                        // Trim whitespace from right side
+        void trim(crunes_t&, uchar32 inChar);                             // Trim characters in <inCharSet> from left and right side
+        void trimLeft(crunes_t&, uchar32 inChar);                         // Trim character <inChar> from left side
+        void trimRight(crunes_t&, uchar32 inChar);                        // Trim character <inChar> from right side
+        void trim(crunes_t&, crunes_t const& inCharSet);                  // Trim characters in <inCharSet> from left and right side
+        void trimLeft(crunes_t&, crunes_t const& inCharSet);              // Trim characters in <inCharSet> from left side
+        void trimRight(crunes_t&, crunes_t const& inCharSet);             // Trim characters in <inCharSet> from right side
+        void trimQuotes(crunes_t&);                                       // Trim double quotes from left and right side
+        void trimQuotes(crunes_t&, uchar32 quote);                        // Trim double quotes from left and right side
+        void trimDelimiters(crunes_t&, uchar32 inLeft, uchar32 inRight);  // Trim delimiters from left and right side
+
+        bool copy(const crunes_t& src, runes_t& dst);
+        bool concatenate(runes_t& str, const crunes_t& concat);
+        bool concatenate(runes_t& str, const crunes_t& concat1, const crunes_t& concat2);
+
+        // -------------------------------------------------------------------------------
+        // global operators for comparison
+        inline bool operator==(const crunes_t& lhs, const crunes_t& rhs) { return compare(lhs, rhs) == 0; }
+        inline bool operator!=(const crunes_t& lhs, const crunes_t& rhs) { return compare(lhs, rhs) != 0; }
+        inline bool operator==(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) == 0; }
+        inline bool operator!=(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) != 0; }
+
+        // -------------------------------------------------------------------------------
+        // helpers for inline sized runes_t
+        template <typename T, s32 L>
+        class runestr_t : public runes_t
+        {
+        public:
+            enum
+            {
+                SIZE = L
+            };
+            T m_run[SIZE];
+            inline runestr_t()
+                : runes_t(m_run, 0, 0, SIZE - 1)
+            {
+            }
+            inline runestr_t(uchar32 c)
+                : runes_t(m_run, 0, 1, SIZE - 1)
+            {
+                m_run[0] = c;
+                m_run[1] = 0;
+            }
+            inline runestr_t(const char* _str)
+                : runes_t(m_run, 0, 0, SIZE - 1)
+            {
+                crunes_t str((ascii::pcrune)_str);
+                concatenate(*this, str);
+                term();
+            }
         };
-        T m_run[SIZE];
-        inline runez_t()
-            : runes_t(m_run, 0, 0, SIZE - 1)
-        {
-        }
-        inline runez_t(uchar32 c)
-            : runes_t(m_run, 0, 1, SIZE - 1)
-        {
-            m_run[0] = c;
-            m_run[1] = 0;
-        }
-        inline runez_t(const char* _str)
-            : runes_t(m_run, 0, 0, SIZE - 1)
-        {
-            crunes_t str((ascii::pcrune)_str);
-            concatenate(*this, str);
-            term();
-        }
-    };
 
-    template <typename T, s32 L>
-    class crunez_t : public crunes_t
-    {
-    public:
-        enum
+        template <typename T, s32 L>
+        class crunestr_t : public crunes_t
         {
-            SIZE = L
+        public:
+            enum
+            {
+                SIZE = L
+            };
+            T m_run[SIZE];
+
+            inline crunestr_t(uchar32 c)
+                : crunes_t(m_run, 0, 1, SIZE - 1)
+            {
+                m_run[0] = c;
+                m_run[1] = 0;
+            }
         };
-        T m_run[SIZE];
 
-        inline crunez_t(uchar32 c)
-            : crunes_t(m_run, 0, 1, SIZE - 1)
+        // -------------------------------------------------------------------------------
+        // runes reader and writer
+        class ireader_t
         {
-            m_run[0] = c;
-            m_run[1] = 0;
-        }
-    };
+        public:
+            void    reset() { vreset(); }
+            bool    valid() const { return vvalid(); }
+            uchar32 peek(s32 n = 0) const { return vpeek(n); }
+            bool    read(uchar32& c) { return vread(c); }
+            bool    read_line(runes_t& line) { return vread_line(line); }
+            bool    view_line(crunes_t& line) { return vview_line(line); }
+            void    skip(s32 c = 1) { vskip(c); }
 
-    // -------------------------------------------------------------------------------
-    // runes reader and writer
-    class irunes_reader_t
-    {
-    public:
-        void    reset() { vreset(); }
-        bool    valid() const { return vvalid(); }
-        uchar32 peek(s32 n = 0) const { return vpeek(n); }
-        bool    read(uchar32& c) { return vread(c); }
-        bool    read_line(runes_t& line) { return vread_line(line); }
-        bool    view_line(crunes_t& line) { return vview_line(line); }
-        void    skip(s32 c = 1) { vskip(c); }
+            inline uchar32 read()
+            {
+                uchar32 c;
+                vread(c);
+                return c;
+            }
 
-        inline uchar32 read()
+        protected:
+            virtual void    vreset()                   = 0;
+            virtual bool    vvalid() const             = 0;
+            virtual uchar32 vpeek(s32 n) const         = 0;
+            virtual bool    vread(uchar32& c)          = 0;
+            virtual bool    vread_line(runes_t& line)  = 0;
+            virtual bool    vview_line(crunes_t& line) = 0;
+            virtual void    vskip(s32 c)               = 0;
+        };
+
+        class reader_t : public ireader_t
         {
-            uchar32 c;
-            vread(c);
-            return c;
-        }
+        public:
+            reader_t();
+            reader_t(ascii::pcrune str);
+            reader_t(ascii::pcrune str, u32 len);
+            reader_t(ascii::pcrune str, ascii::pcrune str_end);
+            reader_t(utf8::pcrune str, utf8::pcrune str_end);
+            reader_t(utf16::pcrune str, utf16::pcrune str_end);
+            reader_t(utf32::pcrune str, utf32::pcrune str_end);
+            reader_t(crunes_t const& runes);
 
-    protected:
-        virtual void    vreset()                   = 0;
-        virtual bool    vvalid() const             = 0;
-        virtual uchar32 vpeek(s32 n) const         = 0;
-        virtual bool    vread(uchar32& c)          = 0;
-        virtual bool    vread_line(runes_t& line)  = 0;
-        virtual bool    vview_line(crunes_t& line) = 0;
-        virtual void    vskip(s32 c)               = 0;
-    };
+            reader_t select(u32 const& from, u32 to) const;
+            u32      get_cursor() const { return m_cursor; }
+            void     set_cursor(u32 const& c) { m_cursor = c; }
 
-    class runes_reader_t : public irunes_reader_t
-    {
-    public:
-        runes_reader_t();
-        runes_reader_t(ascii::pcrune str);
-        runes_reader_t(ascii::pcrune str, u32 len);
-        runes_reader_t(ascii::pcrune str, ascii::pcrune str_end);
-        runes_reader_t(utf8::pcrune str, utf8::pcrune str_end);
-        runes_reader_t(utf16::pcrune str, utf16::pcrune str_end);
-        runes_reader_t(utf32::pcrune str, utf32::pcrune str_end);
-        runes_reader_t(crunes_t const& runes);
+            crunes_t get_source() const;
+            crunes_t get_current() const;
+            bool     at_end() const;
 
-        runes_reader_t select(u32 const& from, u32 to) const;
-        u32            get_cursor() const { return m_cursor; }
-        void           set_cursor(u32 const& c) { m_cursor = c; }
+        protected:
+            virtual bool    vvalid() const;
+            virtual void    vreset();
+            virtual uchar32 vpeek(s32 n) const;
+            virtual bool    vread(uchar32& c);
+            virtual bool    vread_line(runes_t& line);
+            virtual bool    vview_line(crunes_t& line);
+            virtual void    vskip(s32 c);
 
-        crunes_t get_source() const;
-        crunes_t get_current() const;
-        bool     at_end() const;
+            crunes_t m_runes;
+            u32      m_cursor;
+        };
 
-    protected:
-        virtual bool    vvalid() const;
-        virtual void    vreset();
-        virtual uchar32 vpeek(s32 n) const;
-        virtual bool    vread(uchar32& c);
-        virtual bool    vread_line(runes_t& line);
-        virtual bool    vview_line(crunes_t& line);
-        virtual void    vskip(s32 c);
-
-        crunes_t m_runes;
-        u32      m_cursor;
-    };
-
-    class irunes_writer_t
-    {
-    public:
-        s32  write(uchar32 c) { return vwrite(c); }
-        s32  write(const char* str, const char* end) { return vwrite(str, end); }
-        s32  write(crunes_t const& str) { return vwrite(str); }
-        s32  writeln(crunes_t const& str) { return write(str) + writeln(); }
-        bool writeln()
+        class iwriter_t
         {
-            const char* eos = "\n";
-            return vwrite(eos, eos + 1);
-        }
-        void flush() { vflush(); }
+        public:
+            s32  write(uchar32 c) { return vwrite(c); }
+            s32  write(const char* str, const char* end) { return vwrite(str, end); }
+            s32  write(crunes_t const& str) { return vwrite(str); }
+            s32  writeln(crunes_t const& str) { return write(str) + writeln(); }
+            bool writeln()
+            {
+                const char* eos = "\n";
+                return vwrite(eos, eos + 1);
+            }
+            void flush() { vflush(); }
 
-    protected:
-        virtual ~irunes_writer_t() {}
-        virtual s32  vwrite(uchar32 c)                        = 0;
-        virtual s32  vwrite(const char* str, const char* end) = 0;
-        virtual s32  vwrite(crunes_t const& str)              = 0;
-        virtual void vflush()                                 = 0;
-    };
+        protected:
+            virtual ~iwriter_t() {}
+            virtual s32  vwrite(uchar32 c)                        = 0;
+            virtual s32  vwrite(const char* str, const char* end) = 0;
+            virtual s32  vwrite(crunes_t const& str)              = 0;
+            virtual void vflush()                                 = 0;
+        };
 
-    class runes_writer_t : public irunes_writer_t
-    {
-    public:
-        runes_writer_t(ascii::prune str, ascii::prune str_end);
-        runes_writer_t(utf8::prune str, utf8::prune str_end);
-        runes_writer_t(utf16::prune str, utf16::prune str_end);
-        runes_writer_t(utf32::prune str, utf32::prune str_end);
-        runes_writer_t(runes_t const& runes);
+        class writer_t : public iwriter_t
+        {
+        public:
+            writer_t(ascii::prune str, ascii::prune str_end);
+            writer_t(utf8::prune str, utf8::prune str_end);
+            writer_t(utf16::prune str, utf16::prune str_end);
+            writer_t(utf32::prune str, utf32::prune str_end);
+            writer_t(runes_t const& runes);
 
-        runes_t get_destination() const;
-        runes_t get_current() const;
+            runes_t get_destination() const;
+            runes_t get_current() const;
 
-        void reset();
-        s32  count() const;
+            void reset();
+            s32  count() const;
 
-    protected:
-        virtual s32  vwrite(uchar32 c);
-        virtual s32  vwrite(const char* str, const char* end);
-        virtual s32  vwrite(crunes_t const& str);
-        virtual void vflush();
+        protected:
+            virtual s32  vwrite(uchar32 c);
+            virtual s32  vwrite(const char* str, const char* end);
+            virtual s32  vwrite(crunes_t const& str);
+            virtual void vflush();
 
-        runes_t m_runes;
-        u32     m_cursor;
-        s32     m_count;
-    };
+            runes_t m_runes;
+            u32     m_cursor;
+            s32     m_count;
+        };
 
-};  // namespace ncore
+    }  // namespace nrunes
+};     // namespace ncore
 
 #endif  ///< __CBASE_RUNES2_H__
