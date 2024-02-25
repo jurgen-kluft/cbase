@@ -235,7 +235,7 @@ namespace ncore
 
                 while (p < bEnd)
                 {
-                    h64 ^= to_lower(*p) * xxhash::PRIME64_5;
+                    h64 ^= nrunes::to_lower(*p) * xxhash::PRIME64_5;
                     h64 = xxhash::rotl64(h64, 11) * xxhash::PRIME64_1;
                     p++;
                 }

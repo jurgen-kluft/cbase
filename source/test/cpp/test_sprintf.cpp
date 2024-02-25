@@ -23,7 +23,7 @@ UNITTEST_SUITE_BEGIN(test_sprintf)
 
 		UNITTEST_TEST(format_double)
 		{
-			runez_t<ascii::rune, 256> str;
+			nrunes::runestr_t<ascii::rune, 256> str;
 			crunes_t fmt("%f");
 
 			f64 d = 3.1415;
@@ -34,7 +34,7 @@ UNITTEST_SUITE_BEGIN(test_sprintf)
 
 		UNITTEST_TEST(format_string)
 		{
-			runez_t<ascii::rune, 256> str;
+			nrunes::runestr_t<ascii::rune, 256> str;
 			crunes_t fmt("the %s");
 
 			sprintf(str, fmt, va_t("test string"));

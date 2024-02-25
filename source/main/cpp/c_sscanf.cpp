@@ -9,15 +9,15 @@
 
 namespace ncore
 {
-    // runes_reader_t -> rune_reader_t
+    // nrunes::reader_t -> rune_reader_t
     // CharWriter -> rune_writer_t
 
-    static bool SearchUntilOneOf(irunes_reader_t* reader, utf32::rune const* foo)
+    static bool SearchUntilOneOf(nrunes::ireader_t* reader, utf32::rune const* foo)
     {
         uchar32 c = reader->peek();
         while (c != '\0')
         {
-            c = to_lower(c);
+            c = nrunes::to_lower(c);
             for (s32 i = 0; foo[i] != '\0'; ++i)
             {
                 if (foo[i] == c)
@@ -29,39 +29,39 @@ namespace ncore
         return false;
     }
 
-    static bool MatchBoolStr(irunes_reader_t* str, bool& boolean)
+    static bool MatchBoolStr(nrunes::ireader_t* str, bool& boolean)
     {
         bool        bval = false;
         const char* bstr = nullptr;
         uchar32     c    = str->peek();
-        if (is_equalfold(c, 't'))
+        if (nrunes::is_equalfold(c, 't'))
         {
             bstr = "true";
             bval = true;
         }
-        else if (is_equalfold(c, 'f'))
+        else if (nrunes::is_equalfold(c, 'f'))
         {
             bstr = "false";
         }
-        else if (is_equalfold(c, 'y'))
+        else if (nrunes::is_equalfold(c, 'y'))
         {
             bstr = "yes";
             bval = true;
         }
-        else if (is_equalfold(c, 'n'))
+        else if (nrunes::is_equalfold(c, 'n'))
         {
             bstr = "no";
         }
-        else if (is_equalfold(c, 'o'))
+        else if (nrunes::is_equalfold(c, 'o'))
         {
             str->read();
             c = str->peek();
-            if (is_equalfold(c, 'f'))
+            if (nrunes::is_equalfold(c, 'f'))
             {
                 bstr = "ff";
                 bval = false;
             }
-            else if (is_equalfold(c, 'n'))
+            else if (nrunes::is_equalfold(c, 'n'))
             {
                 bval = true;
                 bstr = "n";
@@ -77,7 +77,7 @@ namespace ncore
                 uchar32 sc = str->read();
                 if (sc == '\0')
                     return false;
-                if (is_equalfold(bc, sc) == false)
+                if (nrunes::is_equalfold(bc, sc) == false)
                     return false;
             }
             return true;
@@ -105,7 +105,7 @@ namespace ncore
      *      atod32 atoi32 atoi64 atof32 atof64
      *------------------------------------------------------------------------------
      */
-    s64 StrToS64(irunes_reader_t* reader, s32 base)
+    s64 StrToS64(nrunes::ireader_t* reader, s32 base)
     {
         ASSERT(reader != nullptr);
         ASSERT(base > 2);
@@ -177,11 +177,11 @@ namespace ncore
     }
 
     // <COMBINE atod64 >
-    s32 StrToS32(irunes_reader_t* reader, s32 base) { return (s32)StrToS64(reader, base); }
+    s32 StrToS32(nrunes::ireader_t* reader, s32 base) { return (s32)StrToS64(reader, base); }
 
     //------------------------------------------------------------------------------
 
-    f64 StrToF64(irunes_reader_t* reader)
+    f64 StrToF64(nrunes::ireader_t* reader)
     {
         // Evaluate sign
         s32 sign = 1;
@@ -374,7 +374,7 @@ namespace ncore
         INT64_SIZE = 8,
     };
 
-    s32 VSScanf(irunes_reader_t* reader, irunes_reader_t* fmt, const va_r_t* argv, s32 argc)
+    s32 VSScanf(nrunes::ireader_t* reader, nrunes::ireader_t* fmt, const va_r_t* argv, s32 argc)
     {
         s32 i        = 0;
         s32 w        = 0;
@@ -453,7 +453,7 @@ namespace ncore
 
                         if (runes != nullptr)
                         {
-                            runes_writer_t str_writer(*runes);
+                            nrunes::writer_t str_writer(*runes);
 
                             l = 0;
                             while (reader->peek() != 0 && reader->peek() != ' ')
@@ -622,7 +622,7 @@ namespace ncore
                                 str[strl] = '\0';
                                 for (s32 j = 0; j < strl; ++j)
                                     str[j] = reader->read();
-                                runes_reader_t str_reader(str, str + strl);
+                                nrunes::reader_t str_reader(str, str + strl);
                                 n2 = StrToS64(&str_reader, 16);
                             }
                             else if (w == 4)
@@ -637,7 +637,7 @@ namespace ncore
                                     if (c == '\0')
                                         break;
                                 }
-                                runes_reader_t str_reader(str, str + strl);
+                                nrunes::reader_t str_reader(str, str + strl);
                                 n2 = StrToS64(&str_reader, 16);
                             }
                             else if (w == 8)
@@ -652,7 +652,7 @@ namespace ncore
                                     if (c == '\0')
                                         break;
                                 }
-                                runes_reader_t str_reader(str, str + strl);
+                                nrunes::reader_t str_reader(str, str + strl);
                                 n2 = StrToS64(&str_reader, 16);
                             }
                             else  // if (w == 16)
@@ -667,7 +667,7 @@ namespace ncore
                                     if (c == '\0')
                                         break;
                                 }
-                                runes_reader_t str_reader(str, str + strl);
+                                nrunes::reader_t str_reader(str, str + strl);
                                 n2 = (u64)StrToS64(&str_reader, 16);
                             }
                         }
@@ -753,8 +753,8 @@ namespace ncore
 
     s32 sscanf_(crunes_t& str, crunes_t const& fmt, const va_r_t* argv, s32 argc)
     {
-        runes_reader_t buf_reader(str);
-        runes_reader_t fmt_reader(fmt);
+        nrunes::reader_t buf_reader(str);
+        nrunes::reader_t fmt_reader(fmt);
         s32            scanned = VSScanf(&buf_reader, &fmt_reader, argv, argc);
         str                    = buf_reader.get_current();
         return scanned;

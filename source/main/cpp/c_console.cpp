@@ -100,42 +100,42 @@ namespace ncore
     void console_default::write(f64 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
-        to_string(tmp, _value, 2);
+        nrunes::to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(s32 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
-        to_string(tmp, _value, 2);
+        nrunes::to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(s64 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
-        to_string(tmp, _value, 2);
+        nrunes::to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(f32 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
-        to_string(tmp, _value, 2);
+        nrunes::to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(u32 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
-        to_string(tmp, _value, 2);
+        nrunes::to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(u64 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
-        to_string(tmp, _value, 2);
+        nrunes::to_string(tmp, _value, 2);
         write(tmp);
     }
 

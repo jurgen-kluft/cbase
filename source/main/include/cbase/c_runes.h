@@ -660,9 +660,7 @@ namespace ncore
         void findReplace(runes_t& str, uchar32 find, uchar32 replace, bool case_sensitive = true);
         void findReplace(runes_t& str, crunes_t const& find, crunes_t const& replace, bool case_sensitive = true);
         void insert(runes_t& str, crunes_t const& insert);
-        void insert(runes_t& str, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment);
         void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert);
-        void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert, runes_alloc_t* allocator, s32 size_alignment);
 
         runes_t expand(runes_t& str, runes_t const& sel);
         runes_t expand(runes_t& str, crunes_t const& sel);
@@ -696,13 +694,6 @@ namespace ncore
         bool copy(const crunes_t& src, runes_t& dst);
         bool concatenate(runes_t& str, const crunes_t& concat);
         bool concatenate(runes_t& str, const crunes_t& concat1, const crunes_t& concat2);
-
-        // -------------------------------------------------------------------------------
-        // global operators for comparison
-        inline bool operator==(const crunes_t& lhs, const crunes_t& rhs) { return compare(lhs, rhs) == 0; }
-        inline bool operator!=(const crunes_t& lhs, const crunes_t& rhs) { return compare(lhs, rhs) != 0; }
-        inline bool operator==(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) == 0; }
-        inline bool operator!=(const runes_t& lhs, const runes_t& rhs) { return compare(lhs, rhs) != 0; }
 
         // -------------------------------------------------------------------------------
         // helpers for inline sized runes_t
@@ -864,6 +855,13 @@ namespace ncore
         };
 
     }  // namespace nrunes
-};     // namespace ncore
+
+    // -------------------------------------------------------------------------------
+    // global operators for comparison
+    inline bool operator==(const crunes_t& lhs, const crunes_t& rhs) { return nrunes::compare(lhs, rhs) == 0; }
+    inline bool operator!=(const crunes_t& lhs, const crunes_t& rhs) { return nrunes::compare(lhs, rhs) != 0; }
+    inline bool operator==(const runes_t& lhs, const runes_t& rhs) { return nrunes::compare(lhs, rhs) == 0; }
+    inline bool operator!=(const runes_t& lhs, const runes_t& rhs) { return nrunes::compare(lhs, rhs) != 0; }
+};  // namespace ncore
 
 #endif  ///< __CBASE_RUNES2_H__

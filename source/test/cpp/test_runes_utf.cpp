@@ -31,7 +31,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             const ascii::rune str[] = {0x66, 0x72, (uchar)0xC3, (uchar)0xA9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
             crunes_t src(str);
-            runes_reader_t reader(src);
+            nrunes::reader_t reader(src);
             CHECK_EQUAL('f', reader.peek());
             CHECK_EQUAL('f', reader.peek());
             CHECK_EQUAL('f', reader.peek());
@@ -42,7 +42,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             const utf8::rune str[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
             crunes_t src(str);
-            runes_reader_t reader(src);
+            nrunes::reader_t reader(src);
             CHECK_EQUAL('f', reader.peek());
             CHECK_EQUAL('f', reader.peek());
             CHECK_EQUAL('f', reader.peek());
@@ -53,7 +53,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             const utf16::rune str[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
             crunes_t src(str);
-            runes_reader_t reader(src);
+            nrunes::reader_t reader(src);
             CHECK_EQUAL('f', reader.peek());
             CHECK_EQUAL('f', reader.peek());
             CHECK_EQUAL('f', reader.peek());
@@ -64,7 +64,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             const utf32::rune str[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
             crunes_t src(str);
-            runes_reader_t reader(src);
+            nrunes::reader_t reader(src);
             CHECK_EQUAL('f', reader.peek());
             CHECK_EQUAL('f', reader.peek());
             CHECK_EQUAL('f', reader.peek());
@@ -75,7 +75,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             const ascii::rune str[] = {0x66, 0x72, (uchar)0xC3, (uchar)0xA9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
             crunes_t src(str);
-            runes_reader_t reader(src);
+            nrunes::reader_t reader(src);
             CHECK_EQUAL('f', reader.read());
             CHECK_EQUAL('r', reader.read());
             CHECK_EQUAL(0xC3, reader.read());
@@ -91,7 +91,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             const utf8::rune str[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
             crunes_t src(str);
-            runes_reader_t reader(src);
+            nrunes::reader_t reader(src);
             CHECK_EQUAL('f', reader.read());
             CHECK_EQUAL('r', reader.read());
             CHECK_EQUAL(0xE9, reader.read());
@@ -107,7 +107,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
 			//\u{66}\u{72}\u{e9}\u{6e}\u{63}\u{68}
             const utf16::rune str[] = {0x66, 0x72, 0xE9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
             crunes_t src(str);
-            runes_reader_t reader(src);
+            nrunes::reader_t reader(src);
             CHECK_EQUAL('f', reader.read());
             CHECK_EQUAL('r', reader.read());
             CHECK_EQUAL(0xE9, reader.read());
@@ -122,7 +122,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             const utf32::rune str[] = {0x66, 0x72, 0xE9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
             crunes_t src(str);
-            runes_reader_t reader(src);
+            nrunes::reader_t reader(src);
             CHECK_EQUAL('f', reader.read());
             CHECK_EQUAL('r', reader.read());
             CHECK_EQUAL(0xE9, reader.read());
@@ -139,7 +139,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
             CHECK_EQUAL('t', src.m_ascii.m_bos[src.m_ascii.m_str]);
             CHECK_EQUAL('e', src.m_ascii.m_bos[src.m_ascii.m_str + 1]);
 
-            runez_t<utf32::rune, 16> dst;
+            nrunes::runestr_t<utf32::rune, 16> dst;
             copy(src, dst);
 
             CHECK_EQUAL('t', dst.m_utf32.m_bos[dst.m_utf32.m_str]);
@@ -149,7 +149,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
         {
             crunes_t  str1((utf8::pcrune) "test");
             crunes_t str11((ascii::pcrune) "test");
-			runes_reader_t reader1(str1);
+			nrunes::reader_t reader1(str1);
             for (s32 i = 0; i < 5; ++i)
             {
                 uchar32 ch = reader1.read();
@@ -159,14 +159,14 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
             const uchar8 str2[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0}; // fr�nch
 
             crunes_t str(str2, nullptr);
-			runes_reader_t reader(str);
+			nrunes::reader_t reader(str);
             uchar32      c;
             c = reader.read();
             c = reader.read();
             c = reader.read();
 
             str = crunes_t(str2);
-			runes_reader_t reader2(str);
+			nrunes::reader_t reader2(str);
 			for (s32 i = 0; i < 6; ++i)
             {
                 c = reader2.read();

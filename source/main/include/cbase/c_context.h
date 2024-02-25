@@ -9,7 +9,6 @@ namespace ncore
 {
     class alloc_t;
     class asserthandler_t;
-    class runes_alloc_t;
     class stack_alloc_t;
     class random_t;
 
@@ -26,7 +25,6 @@ namespace ncore
             RUNTIME_ALLOCATOR = 2,
             FRAME_ALLOCATOR   = 3,
             LOCAL_ALLOCATOR   = 4,
-            STRING_ALLOCATOR  = 5,
             RANDOM_GENERATOR  = 6,
         };
 
@@ -84,14 +82,6 @@ namespace ncore
         class gpu_alloc_t;
         static gpu_alloc_t* gpu_alloc() { return nullptr; } // GPU resource allocations?
 
-        static runes_alloc_t* string_alloc()
-        {
-            s32 const      tidx = thread_index();
-            runes_alloc_t* a;
-            get<runes_alloc_t>(tidx, STRING_ALLOCATOR, a);
-            return a;
-        }
-
         static random_t* random()
         {
             s32 const tidx = thread_index();
@@ -128,12 +118,6 @@ namespace ncore
         {
             s32 const tidx = thread_index();
             set<alloc_t>(tidx, LOCAL_ALLOCATOR, a);
-        }
-
-        static void set_string_alloc(runes_alloc_t* a)
-        {
-            s32 const tidx = thread_index();
-            set<runes_alloc_t>(tidx, STRING_ALLOCATOR, a);
         }
 
         static void set_random(random_t* r)

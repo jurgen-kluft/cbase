@@ -171,7 +171,7 @@ namespace ncore
         (void)maxlen;
         if (str)
         {
-            idx += ((runes_writer_t*)buffer)->write(str, str + n);
+            idx += ((nrunes::writer_t*)buffer)->write(str, str + n);
         }
     }
 
@@ -1077,7 +1077,7 @@ namespace ncore
         return ret;
     }
 
-    s32 vzprintf(irunes_writer_t& writer, const crunes_t& format, const va_t* argv, s32 argc)
+    s32 vzprintf(nrunes::iwriter_t& writer, const crunes_t& format, const va_t* argv, s32 argc)
     {
         va_iter_t   va_iter      = {argv, 0, argc};
         const char* format_begin = &format.m_ascii.m_bos[format.m_ascii.m_str];

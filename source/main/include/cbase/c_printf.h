@@ -20,7 +20,7 @@ namespace ncore
     s32 vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
     s32 cprintf_(crunes_t const& format, const va_t* argv, s32 argc);
     s32 fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
-    s32 vzprintf(irunes_writer_t& writer, const crunes_t& str, const va_t* argv, s32 argc);
+    s32 vzprintf(nrunes::iwriter_t& writer, const crunes_t& str, const va_t* argv, s32 argc);
     s32 sscanf_(crunes_t& str, crunes_t const& format, const va_r_t* argv, s32 argc);
 
     inline void printf(crunes_t const& str)

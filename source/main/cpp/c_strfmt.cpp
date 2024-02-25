@@ -381,7 +381,7 @@ namespace ncore
                 do
                 {
                     value    = moddiv10(value, mod);
-                    *(--dst) = to_dec_char(mod);
+                    *(--dst) = nrunes::to_dec_char(mod);
                 } while (value);
             }
 
@@ -420,7 +420,7 @@ namespace ncore
             {
                 do
                 {
-                    *(--dst) = to_hex_char((u8)value, !uppercase);
+                    *(--dst) = nrunes::to_hex_char((u8)value, !uppercase);
                     value >>= 4U;
                 } while (value);
             }

@@ -14,7 +14,7 @@ UNITTEST_SUITE_BEGIN(test_chars)
 
 		UNITTEST_TEST(test_runez_128)
 		{
-			runez_t<ascii::rune, 128> cz;
+			nrunes::runestr_t<ascii::rune, 128> cz;
 			copy(crunes_t("This is a test string"), cz);
 		}
 	}

@@ -10,88 +10,6 @@
 
 namespace ncore
 {
-    class main_runes_allocator : public runes_alloc_t
-    {
-    public:
-        s64 m_alloc_count;
-
-        main_runes_allocator()
-            : m_alloc_count(0)
-        {
-        }
-
-        virtual runes_t allocate(s32 len, s32 cap, s32 flags)
-        {
-            len = (len + (8 - 1)) & ~(8 - 1);
-            if (len > cap)
-                cap = len;
-            cap = (cap + (8 - 1)) & ~(8 - 1);
-            cap = cap + 7;
-
-            s32 sizeofrune = 1;
-            if (flags == utf32::TYPE)
-                sizeofrune = 4;
-            else if (flags == utf16::TYPE)
-                sizeofrune = 2;
-            else if (flags == utf8::TYPE)
-                sizeofrune = 3;
-
-            alloc_t* sysalloc = context_t::system_alloc();
-
-            runes_t r;
-            r.m_ascii.m_flags = flags;
-            r.m_ascii.m_bos   = (ascii::prune)sysalloc->allocate((cap + 1) * sizeofrune, sizeof(void*));
-            r.m_ascii.m_str   = 0;
-            r.m_ascii.m_end   = len * sizeofrune;
-            r.m_ascii.m_eos   = cap * sizeofrune;
-
-            switch (flags)
-            {
-                case ascii::TYPE:
-                    r.m_ascii.m_bos[r.m_ascii.m_end] = '\0';
-                    r.m_ascii.m_bos[r.m_ascii.m_eos] = '\0';
-                    break;
-                case utf8::TYPE:
-                    r.m_utf8.m_bos[r.m_utf8.m_end] = '\0';
-                    r.m_utf8.m_bos[r.m_utf8.m_eos] = '\0';
-                    break;
-                case utf16::TYPE:
-                    r.m_utf16.m_bos[r.m_utf16.m_end] = '\0';
-                    r.m_utf16.m_bos[r.m_utf16.m_eos] = '\0';
-                    break;
-                case utf32::TYPE:
-                    r.m_utf32.m_bos[r.m_utf32.m_end] = '\0';
-                    r.m_utf32.m_bos[r.m_utf32.m_eos] = '\0';
-                    break;
-            }
-
-            m_alloc_count++;
-            return r;
-        }
-
-        virtual void deallocate(runes_t& r)
-        {
-            if (r.m_ascii.m_bos != nullptr)
-            {
-                m_alloc_count--;
-                alloc_t* sysalloc = context_t::system_alloc();
-                sysalloc->deallocate(r.m_ascii.m_bos);
-                r = runes_t();
-            }
-        }
-    };
-
-    static runes_alloc_t* get_runes_alloc()
-    {
-        static runes_alloc_t* s_main_runes_alloc_ptr = nullptr;
-        if (s_main_runes_alloc_ptr == nullptr)
-        {
-            static main_runes_allocator s_main_runes_alloc;
-            s_main_runes_alloc_ptr = &s_main_runes_alloc;
-        }
-        return s_main_runes_alloc_ptr;
-    }
-
     namespace nhash
     {
         extern void wyrand(u64* seed, u8* buffer, u32 size);
@@ -131,7 +49,6 @@ namespace cbase
         ncore::context_t::register_thread();  // Should be called once from a created thread
 
         ncore::alloc_t*       system_allocator = ncore::get_system_alloc();
-        ncore::runes_alloc_t* string_allocator = ncore::get_runes_alloc();
 
         // The assert handler, system and string allocator are thread safe
         for (ncore::s32 i = 0; i < number_of_threads; i++)
@@ -148,7 +65,6 @@ namespace cbase
             ncore::context_t::set_runtime_alloc(system_allocator);
             ncore::context_t::set_frame_alloc(system_allocator);
             ncore::context_t::set_local_alloc(stack_allocator);
-            ncore::context_t::set_string_alloc(string_allocator);
             ncore::context_t::set_random(random_generator);
         }
     }
@@ -158,13 +74,11 @@ namespace cbase
         ncore::alloc_t*        system_allocator = ncore::context_t::system_alloc();
         ncore::alloc_buffer_t* stack_allocator  = (ncore::alloc_buffer_t*)ncore::context_t::local_alloc();
         ncore::random_t*       random_generator = ncore::context_t::random();
-        ncore::runes_alloc_t*  string_allocator = ncore::get_runes_alloc();
 
         ncore::context_t::set_system_alloc(nullptr);
         ncore::context_t::set_runtime_alloc(nullptr);
         ncore::context_t::set_frame_alloc(nullptr);
         ncore::context_t::set_local_alloc(nullptr);
-        ncore::context_t::set_string_alloc(nullptr);
         ncore::context_t::set_random(nullptr);
 
         system_allocator->deallocate(random_generator);
