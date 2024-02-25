@@ -343,6 +343,8 @@ namespace ncore
         }
 
         s32 length() const { return mLength; }
+        s32 argc() const { return mLength; }
+        const va_t* argv() const { return mArg; }
 
         bool add(const va_t &inArg1)
         {
