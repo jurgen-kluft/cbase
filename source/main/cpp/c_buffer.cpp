@@ -419,7 +419,7 @@ namespace ncore
 
     void binary_reader_t::read_data(buffer_t& buf)
     {
-        u32 const size = buf.size();
+        int_t const size = buf.size();
         if (can_read(size))
         {
             cbuffer_t to_read(m_cursor, m_cursor + size);
@@ -437,7 +437,7 @@ namespace ncore
 
     void binary_reader_t::read_buffer(buffer_t& buf)
     {
-        u32 const size = read_u32();
+        int_t const size = read_u32();
         if (can_read(size))
         {
             cbuffer_t to_read(m_cursor, m_cursor + size);
@@ -448,7 +448,7 @@ namespace ncore
 
     void binary_reader_t::view_buffer(cbuffer_t& buf)
     {
-        u32 const size = read_u32();
+        int_t const size = read_u32();
         buf.m_begin    = m_cursor;
         buf.m_end      = m_cursor + size;
         m_cursor += size;
@@ -626,7 +626,7 @@ namespace ncore
     {
         if (can_write(buf.size()))
         {
-            u32 const n   = buf.size();
+            int_t const n   = buf.size();
             u8*       dst = m_cursor;
             u8 const* src = buf.m_begin;
             for (u32 i = 0; i < n; i++)
@@ -639,7 +639,7 @@ namespace ncore
     {
         if (can_write(buf.size()))
         {
-            u32 const n   = buf.size();
+            int_t const n   = buf.size();
             u8*       dst = m_cursor;
             u8 const* src = buf.m_begin;
             for (u32 i = 0; i < n; i++)
@@ -652,7 +652,7 @@ namespace ncore
     {
         if (can_write(4 + (u32)buf.size()))
         {
-            u32 const n = buf.size();
+            int_t const n = buf.size();
             write(n);
             u8*       dst = m_cursor;
             u8 const* src = buf.m_begin;
@@ -666,7 +666,7 @@ namespace ncore
     {
         if (can_write(4 + buf.size()))
         {
-            u32 const n = buf.size();
+            int_t const n = buf.size();
             write((u32)n);
             u8*       dst = m_cursor;
             u8 const* src = buf.m_begin;

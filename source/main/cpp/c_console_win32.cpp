@@ -17,7 +17,7 @@
 
 namespace ncore
 {
-    class out_writer_t : public irunes_writer_t
+    class out_writer_t : public nrunes::iwriter_t
     {
     public:
         inline out_writer_t() {}
