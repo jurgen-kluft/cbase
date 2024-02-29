@@ -99,13 +99,16 @@ namespace ncore
 
 #define va_arg(va, type) ((va.size < va.max) ? ((type)va.args[va.size++]) : (va_default<type>()))
 
+    // 64 spaces of padding
+    static const char* s_out_padding64 = "                                                                ";
+
     // output function type
-    typedef void (*out_fct_type)(const char* str, u32 n, void* buffer, u64& idx, u64 maxlen);
+    typedef void (*out_fct_type)(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 maxlen);
 
     // wrapper (used as buffer) for output function type
     struct out_fct_wrap_type
     {
-        void (*fct)(const char* str, u32 n, void* arg);
+        void (*fct)(const char* str, u32 strlen, void* arg);
         void* arg;
     };
 
@@ -117,61 +120,58 @@ namespace ncore
     //
 
     // internal buffer output
-    static inline void _out_buffer(const char* str, u32 n, void* buffer, u64& idx, u64 maxlen)
+    static inline void _out_buffer(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
-        while (idx < maxlen && n-- > 0)
+        while (buffer_pos < buffer_cap && strlen-- > 0)
         {
-            ((char*)buffer)[idx++] = *(str++);
+            ((char*)buffer)[buffer_pos++] = *(str++);
         }
     }
 
     // internal null output
-    static inline void _out_null(const char* str, u32 n, void* buffer, u64& idx, u64 maxlen)
+    static inline void _out_null(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
         (void)str;
         (void)buffer;
-        (void)maxlen;
-        idx += n;
+        (void)buffer_cap;
+        buffer_pos += strlen;
     }
 
     // internal _putchar wrapper
-    static inline void _out_char(const char* str, u32 n, void* buffer, u64& idx, u64 maxlen)
+    static inline void _out_char(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
         (void)buffer;
-        (void)maxlen;
+        (void)buffer_cap;
         if (str)
         {
-            while (n-- > 0)
+            while (strlen-- > 0)
             {
-                _putchar(str[idx++]);
+                _putchar(*str++);
+                buffer_pos++;  // emulate writing to buffer
             }
         }
     }
 
     // internal output function wrapper
-    static inline void _out_fct(const char* str, u32 n, void* buffer, u64& idx, u64 maxlen)
+    static inline void _out_fct(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
-        (void)idx;
-        (void)maxlen;
+        (void)buffer_cap;
         if (str)
         {
             // buffer is the output fct pointer
-            //((out_fct_wrap_type*)buffer)->fct(character, ((out_fct_wrap_type*)buffer)->arg);
-            while (idx < maxlen && n-- > 0)
-            {
-                ((out_fct_wrap_type*)buffer)->fct(str, n, ((out_fct_wrap_type*)buffer)->arg);
-            }
+            ((out_fct_wrap_type*)buffer)->fct(str, strlen, ((out_fct_wrap_type*)buffer)->arg);
+            buffer_pos += strlen;
         }
     }
 
     // internal output function wrapper for runes_writer
-    static inline void _out_runeswriter(const char* str, u32 n, void* buffer, u64& idx, u64 maxlen)
+    static inline void _out_runeswriter(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
-        (void)idx;
-        (void)maxlen;
-        if (str)
+        (void)buffer_pos;
+        (void)buffer_cap;
+        if (str && buffer)
         {
-            idx += ((nrunes::writer_t*)buffer)->write(str, str + n);
+            buffer_pos += ((nrunes::writer_t*)buffer)->write(str, str + strlen);
         }
     }
 
@@ -204,40 +204,48 @@ namespace ncore
     }
 
     // output the specified string in reverse, taking care of any zero-padding
-    static u64 _out_rev(out_fct_type out, char* buffer, u64 idx, u64 maxlen, const char* buf, u64 len, u32 width, u32 flags)
+    static u64 _out_rev(out_fct_type out, char* buffer, u64 buffer_pos, u64 maxlen, const char* buf, u64 len, u32 width, u32 flags)
     {
-        const u64 start_idx = idx;
+        const u64 buffer_start = buffer_pos;
 
         // pad spaces up to given width
         if (!(flags & FLAGS_LEFT) && !(flags & FLAGS_ZEROPAD))
         {
-            for (u64 i = len; i < width; i++)
+            u64 amount = width - len;
+            while (amount >= 64)
             {
-                out(" ", 1, buffer, idx, maxlen);
+                out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
+                amount -= 64;
             }
+            if (amount)
+                out(s_out_padding64, amount, buffer, buffer_pos, maxlen);
         }
 
         // reverse string
         while (len)
         {
             --len;
-            out(&buf[len], 1, buffer, idx, maxlen);
+            out(&buf[len], 1, buffer, buffer_pos, maxlen);
         }
 
         // append pad spaces up to given width
         if (flags & FLAGS_LEFT)
         {
-            while (idx - start_idx < width)
+            u64 amount = width - (buffer_pos - buffer_start);
+            while (amount >= 64)
             {
-                out(" ", 1, buffer, idx, maxlen);
+                out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
+                amount -= 64;
             }
+            if (amount)
+                out(s_out_padding64, amount, buffer, buffer_pos, maxlen);
         }
 
-        return idx;
+        return buffer_pos;
     }
 
     // internal itoa format
-    static u64 _ntoa_format(out_fct_type out, char* buffer, u64 idx, u64 maxlen, char* buf, u64 len, bool negative, u32 base, u32 prec, u32 width, u32 flags)
+    static u64 _ntoa_format(out_fct_type out, char* buffer, u64 buffer_pos, u64 maxlen, char* buf, u64 len, bool negative, u32 base, u32 prec, u32 width, u32 flags)
     {
         // pad leading zeros
         if (!(flags & FLAGS_LEFT))
@@ -301,11 +309,11 @@ namespace ncore
             }
         }
 
-        return _out_rev(out, buffer, idx, maxlen, buf, len, width, flags);
+        return _out_rev(out, buffer, buffer_pos, maxlen, buf, len, width, flags);
     }
 
     // internal itoa for 's32' type
-    static u64 _ntoa_long(out_fct_type out, char* buffer, u64 idx, u64 maxlen, u32 value, bool negative, u32 base, u32 prec, u32 width, u32 flags)
+    static u64 _ntoa_long(out_fct_type out, char* buffer, u64 buffer_pos, u64 maxlen, u32 value, bool negative, u32 base, u32 prec, u32 width, u32 flags)
     {
         char buf[PRINTF_NTOA_BUFFER_SIZE];
         u64  len = 0U;
@@ -327,12 +335,12 @@ namespace ncore
             } while (value && (len < PRINTF_NTOA_BUFFER_SIZE));
         }
 
-        return _ntoa_format(out, buffer, idx, maxlen, buf, len, negative, (u32)base, prec, width, flags);
+        return _ntoa_format(out, buffer, buffer_pos, maxlen, buf, len, negative, (u32)base, prec, width, flags);
     }
 
 // internal itoa for 's64' type
 #if defined(PRINTF_SUPPORT_LONG_LONG)
-    static u64 _ntoa_long_long(out_fct_type out, char* buffer, u64 idx, u64 maxlen, u64 value, bool negative, u64 base, u32 prec, u32 width, u32 flags)
+    static u64 _ntoa_long_long(out_fct_type out, char* buffer, u64 buffer_pos, u64 maxlen, u64 value, bool negative, u64 base, u32 prec, u32 width, u32 flags)
     {
         char buf[PRINTF_NTOA_BUFFER_SIZE];
         u64  len = 0U;
@@ -354,7 +362,7 @@ namespace ncore
             } while (value && (len < PRINTF_NTOA_BUFFER_SIZE));
         }
 
-        return _ntoa_format(out, buffer, idx, maxlen, buf, len, negative, (u32)base, prec, width, flags);
+        return _ntoa_format(out, buffer, buffer_pos, maxlen, buf, len, negative, (u32)base, prec, width, flags);
     }
 #endif  // PRINTF_SUPPORT_LONG_LONG
 
@@ -362,11 +370,11 @@ namespace ncore
 
 #    if defined(PRINTF_SUPPORT_EXPONENTIAL)
     // forward declaration so that _ftoa can switch to exp notation for values > PRINTF_MAX_FLOAT
-    static u64 _etoa(out_fct_type out, char* buffer, u64 idx, u64 maxlen, double value, u32 prec, u32 width, u32 flags);
+    static u64 _etoa(out_fct_type out, char* buffer, u64 buffer_pos, u64 maxlen, double value, u32 prec, u32 width, u32 flags);
 #    endif
 
     // internal ftoa for fixed decimal floating point
-    static u64 _ftoa(out_fct_type out, char* buffer, u64 idx, u64 maxlen, double value, u32 prec, u32 width, u32 flags)
+    static u64 _ftoa(out_fct_type out, char* buffer, u64 buffer_pos, u64 maxlen, double value, u32 prec, u32 width, u32 flags)
     {
         char   buf[PRINTF_FTOA_BUFFER_SIZE];
         u64    len  = 0U;
@@ -377,18 +385,18 @@ namespace ncore
 
         // test for special values
         if (value != value)
-            return _out_rev(out, buffer, idx, maxlen, "nan", 3, width, flags);
+            return _out_rev(out, buffer, buffer_pos, maxlen, "nan", 3, width, flags);
         if (value < -DBL_MAX)
-            return _out_rev(out, buffer, idx, maxlen, "fni-", 4, width, flags);
+            return _out_rev(out, buffer, buffer_pos, maxlen, "fni-", 4, width, flags);
         if (value > DBL_MAX)
-            return _out_rev(out, buffer, idx, maxlen, (flags & FLAGS_PLUS) ? "fni+" : "fni", (flags & FLAGS_PLUS) ? 4U : 3U, width, flags);
+            return _out_rev(out, buffer, buffer_pos, maxlen, (flags & FLAGS_PLUS) ? "fni+" : "fni", (flags & FLAGS_PLUS) ? 4U : 3U, width, flags);
 
         // test for very large values
         // standard printf behavior is to print EVERY whole number digit -- which could be 100s of characters overflowing your buffers == bad
         if ((value > PRINTF_MAX_FLOAT) || (value < -PRINTF_MAX_FLOAT))
         {
 #    if defined(PRINTF_SUPPORT_EXPONENTIAL)
-            return _etoa(out, buffer, idx, maxlen, value, prec, width, flags);
+            return _etoa(out, buffer, buffer_pos, maxlen, value, prec, width, flags);
 #    else
             return 0U;
 #    endif
@@ -510,17 +518,17 @@ namespace ncore
             }
         }
 
-        return _out_rev(out, buffer, idx, maxlen, buf, len, width, flags);
+        return _out_rev(out, buffer, buffer_pos, maxlen, buf, len, width, flags);
     }
 
 #    if defined(PRINTF_SUPPORT_EXPONENTIAL)
     // internal ftoa variant for exponential floating-point type, contributed by Martijn Jasperse <m.jasperse@gmail.com>
-    static u64 _etoa(out_fct_type out, char* buffer, u64 idx, u64 maxlen, double value, u32 prec, u32 width, u32 flags)
+    static u64 _etoa(out_fct_type out, char* buffer, u64 buffer_pos, u64 maxlen, double value, u32 prec, u32 width, u32 flags)
     {
         // check for NaN and special values
         if ((value != value) || (value > DBL_MAX) || (value < -DBL_MAX))
         {
-            return _ftoa(out, buffer, idx, maxlen, value, prec, width, flags);
+            return _ftoa(out, buffer, buffer_pos, maxlen, value, prec, width, flags);
         }
 
         // determine the sign
@@ -620,27 +628,34 @@ namespace ncore
         }
 
         // output the floating part
-        const u64 start_idx = idx;
-        idx                 = _ftoa(out, buffer, idx, maxlen, negative ? -value : value, prec, fwidth, flags & ~FLAGS_ADAPT_EXP);
+        const u64 buffer_start = buffer_pos;
+        buffer_pos             = _ftoa(out, buffer, buffer_pos, maxlen, negative ? -value : value, prec, fwidth, flags & ~FLAGS_ADAPT_EXP);
 
         // output the exponent part
         if (minwidth)
         {
             // output the exponential symbol
-            out((flags & FLAGS_UPPERCASE) ? "E" : "e", 1, buffer, idx, maxlen);
+            out((flags & FLAGS_UPPERCASE) ? "E" : "e", 1, buffer, buffer_pos, maxlen);
 
             // output the exponent value
-            idx = _ntoa_long(out, buffer, idx, maxlen, (expval < 0) ? -expval : expval, expval < 0, 10, 0, minwidth - 1, FLAGS_ZEROPAD | FLAGS_PLUS);
+            buffer_pos = _ntoa_long(out, buffer, buffer_pos, maxlen, (expval < 0) ? -expval : expval, expval < 0, 10, 0, minwidth - 1, FLAGS_ZEROPAD | FLAGS_PLUS);
+
             // might need to right-pad spaces
             if (flags & FLAGS_LEFT)
             {
-                // OPTIMIZE: we can call out() with a string instead of single chars
-                //           so we can reduce the calls here
-                while (idx - start_idx < width)
-                    out(" ", 1, buffer, idx, maxlen);
+                u64 n = ((buffer_pos - buffer_start) < width) ? (buffer_pos - buffer_start) - width : 0;
+                while (n >= 64)
+                {
+                    out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
+                    n -= 64;
+                }
+                if (n > 0)
+                {
+                    out(s_out_padding64, (u32)n, buffer, buffer_pos, maxlen);
+                }
             }
         }
-        return idx;
+        return buffer_pos;
     }
 #    endif  // PRINTF_SUPPORT_EXPONENTIAL
 #endif      // PRINTF_SUPPORT_FLOAT
@@ -649,7 +664,7 @@ namespace ncore
     static int _vsnprintf(out_fct_type out, char* buffer, const u64 maxlen, const char* format, const char* format_end, va_iter_t& va)
     {
         u32 flags, width, precision, n;
-        u64 idx = 0U;
+        u64 buffer_pos = 0U;
 
         if (!buffer)
         {
@@ -664,7 +679,7 @@ namespace ncore
             if (f != '%')
             {
                 // no
-                out(format, 1, buffer, idx, maxlen);
+                out(format, 1, buffer, buffer_pos, maxlen);
                 f = *++format;
                 continue;
             }
@@ -676,6 +691,7 @@ namespace ncore
 
             // evaluate flags
             flags = 0U;
+            n     = 1U;
             do
             {
                 switch (f)
@@ -683,27 +699,22 @@ namespace ncore
                     case '0':
                         flags |= FLAGS_ZEROPAD;
                         f = *++format;
-                        n = 1U;
                         break;
                     case '-':
                         flags |= FLAGS_LEFT;
                         f = *++format;
-                        n = 1U;
                         break;
                     case '+':
                         flags |= FLAGS_PLUS;
                         f = *++format;
-                        n = 1U;
                         break;
                     case ' ':
                         flags |= FLAGS_SPACE;
                         f = *++format;
-                        n = 1U;
                         break;
                     case '#':
                         flags |= FLAGS_HASH;
                         f = *++format;
-                        n = 1U;
                         break;
                     default: n = 0U; break;
                 }
@@ -790,11 +801,8 @@ namespace ncore
 
             if (f == 'v' || f == 'V')
             {
-                if (f == 'V')
-                {
-                    flags |= FLAGS_UPPERCASE;
-                }
-                f = va.args[va.size].specifier();  // determine the specifier from the va_t type
+                flags = flags | ((f == 'V') ? FLAGS_UPPERCASE : 0);
+                f     = va.args[va.size].specifier();  // determine the specifier from the va_t type
             }
 
             // evaluate specifier
@@ -815,13 +823,8 @@ namespace ncore
                     u32 base;
                     if (f == 'x' || f == 'X')
                     {
-                        base = 16U;
-
-                        // uppercase
-                        if (f == 'X')
-                        {
-                            flags |= FLAGS_UPPERCASE;
-                        }
+                        base  = 16U;
+                        flags = flags | ((f == 'X') ? FLAGS_UPPERCASE : 0);
                     }
                     else if (f == 'o')
                     {
@@ -829,19 +832,13 @@ namespace ncore
                     }
                     else if (f == 'b' || f == 'B')
                     {
-                        base = 2U;
-                        if (f == 'B')
-                        {
-                            flags |= FLAGS_UPPERCASE;
-                        }
+                        base  = 2U;
+                        flags = flags | ((f == 'B') ? FLAGS_UPPERCASE : 0);
                     }
                     else if (f == 'y' || f == 'Y')
                     {
-                        base = 2U;
-                        if (f == 'Y')
-                        {
-                            flags |= FLAGS_UPPERCASE;
-                        }
+                        base  = 2U;
+                        flags = flags | ((f == 'Y') ? FLAGS_UPPERCASE : 0);
                     }
                     else
                     {
@@ -879,7 +876,7 @@ namespace ncore
                                 boolStr = value ? "True" : "False";
                         }
                         s32 const boolStrLen = _strnlen_s(boolStr, 5);
-                        out(boolStr, boolStrLen, buffer, idx, maxlen);
+                        out(boolStr, boolStrLen, buffer, buffer_pos, maxlen);
                     }
                     else
                     {
@@ -887,12 +884,12 @@ namespace ncore
                         if (va.args[va.size].isUnsignedInteger())
                         {
                             const u64 value = va_arg(va, u64);
-                            idx             = _ntoa_long_long(out, buffer, idx, maxlen, value, false, base, precision, width, flags);
+                            buffer_pos      = _ntoa_long_long(out, buffer, buffer_pos, maxlen, value, false, base, precision, width, flags);
                         }
                         else
                         {
                             const s64 value = va_arg(va, s64);
-                            idx             = _ntoa_long_long(out, buffer, idx, maxlen, (u64)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
+                            buffer_pos      = _ntoa_long_long(out, buffer, buffer_pos, maxlen, (u64)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
                         }
                     }
                     f = *++format;
@@ -902,8 +899,8 @@ namespace ncore
                 case 'F':
                     if (f == 'F')
                         flags |= FLAGS_UPPERCASE;
-                    idx = _ftoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
-                    f   = *++format;
+                    buffer_pos = _ftoa(out, buffer, buffer_pos, maxlen, va_arg(va, double), precision, width, flags);
+                    f          = *++format;
                     break;
                 case 'e':
                 case 'E':
@@ -913,8 +910,8 @@ namespace ncore
                         flags |= FLAGS_ADAPT_EXP;
                     if ((f == 'E') || (f == 'G'))
                         flags |= FLAGS_UPPERCASE;
-                    idx = _etoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
-                    f   = *++format;
+                    buffer_pos = _etoa(out, buffer, buffer_pos, maxlen, va_arg(va, double), precision, width, flags);
+                    f          = *++format;
                     break;
                 case 'c':
                 {
@@ -922,26 +919,38 @@ namespace ncore
                     // pre padding
                     if (!(flags & FLAGS_LEFT))
                     {
-                        // OPTIMIZE: we can call out() with a string instead of single chars
-                        //           so we can reduce the calls here
-                        while (l++ < width)
+                        u64 amount = width > l ? width - l : 0;
+                        while (amount >= 64)
                         {
-                            out(" ", 1, buffer, idx, maxlen);
+                            out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
+                            amount -= 64;
+                            l += 64;
+                        }
+                        if (amount > 0)
+                        {
+                            out(s_out_padding64, (u32)amount, buffer, buffer_pos, maxlen);
+                            l += amount;
                         }
                     }
 
                     // char output
                     const char outChar = va_arg(va, int);
-                    out(&outChar, 1, buffer, idx, maxlen);
+                    out(&outChar, 1, buffer, buffer_pos, maxlen);
 
                     // post padding
                     if (flags & FLAGS_LEFT)
                     {
-                        // OPTIMIZE: we can call out() with a string instead of single chars
-                        //           so we can reduce the calls here
-                        while (l++ < width)
+                        u64 amount = width > l ? width - l : 0;
+                        while (amount >= 64)
                         {
-                            out(" ", 1, buffer, idx, maxlen);
+                            out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
+                            amount -= 64;
+                            l += 64;
+                        }
+                        if (amount > 0)
+                        {
+                            out(s_out_padding64, (u32)amount, buffer, buffer_pos, maxlen);
+                            l += amount;
                         }
                     }
                     f = *++format;
@@ -959,23 +968,39 @@ namespace ncore
                     }
                     if (!(flags & FLAGS_LEFT))
                     {
-                        while (l++ < width)
+                        u64 amount = width > l ? width - l : 0;
+                        while (amount >= 64)
                         {
-                            out(" ", 1, buffer, idx, maxlen);
+                            out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
+                            amount -= 64;
+                            l += 64;
+                        }
+                        if (amount > 0)
+                        {
+                            out(s_out_padding64, (u32)amount, buffer, buffer_pos, maxlen);
+                            l += amount;
                         }
                     }
                     // string output
                     while ((*p != 0) && (!(flags & FLAGS_PRECISION) || precision--))
                     {
                         const char outChar = *(p++);
-                        out(&outChar, 1, buffer, idx, maxlen);
+                        out(&outChar, 1, buffer, buffer_pos, maxlen);
                     }
                     // post padding
                     if (flags & FLAGS_LEFT)
                     {
-                        while (l++ < width)
+                        u64 amount = width > l ? width - l : 0;
+                        while (amount >= 64)
                         {
-                            out(" ", 1, buffer, idx, maxlen);
+                            out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
+                            amount -= 64;
+                            l += 64;
+                        }
+                        if (amount > 0)
+                        {
+                            out(s_out_padding64, (u32)amount, buffer, buffer_pos, maxlen);
+                            l += amount;
                         }
                     }
                     f = *++format;
@@ -990,12 +1015,12 @@ namespace ncore
                     const bool is_ll = sizeof(ptr_t) == sizeof(s64);
                     if (is_ll)
                     {
-                        idx = _ntoa_long_long(out, buffer, idx, maxlen, (ptr_t)va_arg(va, void*), false, 16U, precision, width, flags);
+                        buffer_pos = _ntoa_long_long(out, buffer, buffer_pos, maxlen, (ptr_t)va_arg(va, void*), false, 16U, precision, width, flags);
                     }
                     else
                     {
 #endif
-                        idx = _ntoa_long(out, buffer, idx, maxlen, (u32)((ptr_t)va_arg(va, void*)), false, 16U, precision, width, flags);
+                        buffer_pos = _ntoa_long(out, buffer, buffer_pos, maxlen, (u32)((ptr_t)va_arg(va, void*)), false, 16U, precision, width, flags);
 #if defined(PRINTF_SUPPORT_LONG_LONG)
                     }
 #endif
@@ -1004,23 +1029,23 @@ namespace ncore
                 }
 
                 case '%':
-                    out("%", 1, buffer, idx, maxlen);
+                    out("%", 1, buffer, buffer_pos, maxlen);
                     f = *++format;
                     break;
 
                 default:
-                    out(format, 1, buffer, idx, maxlen);
+                    out(format, 1, buffer, buffer_pos, maxlen);
                     f = *++format;
                     break;
             }
         }
 
         // termination
-        u64 term = idx < maxlen ? idx : maxlen - 1U;
+        u64 term = buffer_pos < maxlen ? buffer_pos : maxlen - 1U;
         out("\0", 1, buffer, term, maxlen);
 
         // return written chars without terminating \0
-        return (int)idx;
+        return (int)buffer_pos;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -1068,7 +1093,7 @@ namespace ncore
         return ret;
     }
 
-    s32 fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc)
+    s32 fctprintf(void (*out)(const char* str, u32 strlen, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t               va_iter      = {argv, 0, argc};
         const out_fct_wrap_type out_fct_wrap = {out, arg};
@@ -1089,15 +1114,16 @@ namespace ncore
 
     s32 sprintf_(runes_t& str, crunes_t const& format, const va_t* argv, s32 argc)
     {
-        const s32 ret     = snprintf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_eos], &format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
-        str.m_ascii.m_end = str.m_ascii.m_str + ret;
+        nrunes::writer_t str_writer(str);
+        const s32 ret     = vzprintf(str_writer, format, argv, argc);
+        str = str_writer.get_current();
         return ret;
     }
 
     s32 cprintf_(crunes_t const& format, const va_t* argv, s32 argc)
     {
-        return vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        const s32 ret = vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        return ret;
     }
-
 
 };  // namespace ncore
