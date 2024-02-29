@@ -2,21 +2,21 @@
 
 ## ccode
 
-Using Go to manage our packages and dependencies and generating Visual Studio projects as well as Tundra build files.
+Using Go to manage our packages and dependencies and generating Visual Studio projects as well as Tundra build files. [Done]
 
 ## cbase
 
 Naming convention:
 
-- DONE -> package starts with c (e.g. cbase, ccore, cstring, callocator, chash, crandom, cfilesystem)
-- DONE -> namespaces start with n (e.g. ncore)
-- DONE -> struct/class ends with _t (e.g. alloc_t)
-- DONE -> global functions start with g_ (e.g. g_min, g_max, g_po2)
-- restyle __xint64, __xint128 to s64, s128
+- package starts with c (e.g. cbase, ccore, cstring, callocator, chash, crandom, cfilesystem) [Done]
+- namespaces start with n (e.g. ncore, nrunes) [Done]
+- struct/class ends with _t (e.g. alloc_t) [Done]
+- global functions start with g_ (e.g. g_min, g_max, g_po2) [Done]
+- static functions start with s_ (e.g. s_min, s_max, s_po2) [Done]
 
 ## cstring (Alpha)
 
-string class (utf32)
+string class (UCS-2, UTF-16)
 
 ## callocator
 
@@ -71,7 +71,7 @@ Progress = Alpha
 
 - thread
 - mutex, event, semaphore
-- per thread a context holding
+- per thread a context holding (this is part of cbase)
   - random number generator
   - string allocator
   - heap allocator
@@ -95,7 +95,7 @@ Progress = Alpha
 
 ## ccmdline
 
-Progress = v1.0
+Very usable.
 
 ## ctext
 

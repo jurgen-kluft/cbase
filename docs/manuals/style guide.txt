@@ -30,6 +30,7 @@ Some packages use the ncore namespace:
 ================================ Functions in the ncore namespace =========================
 
 All functions in the ncore namespace should be prepended with 'g_', for example 'g_BinarySearch'.
+Static functions should be prepended with 's_', for example 's_BinarySearch'.
 
 
 ================================ Enums =========================
@@ -48,20 +49,31 @@ For classes that are prepended with 'c', this means that the class is 'const'.
 
 Interface classes naming convention:
 
-class object_t
+class iobject_t
 {
-	iobject_t*		mImplementation;
 public:
+	// normal functions that defer to the virtual functions
+	void dosomething() { v_dosomething(); }
+
+protected:
+	// pure virtual functions prefixed with 'v_'
+	virtual void v_dosomething() = 0;
 };
 
-For the implementation interface classes we use an 'i' to indicate implementation
-or interface.
+class object_t : public iobject
+{
+public:
+
+protected:
+	// implementations of the virtual functions
+	virtual void v_dosomething() { /* do something */ }
+};
 
 For base classes, the convention is to append '_base' although this indirectly
 means that the base class has either some data or some implementation and is not
 a pure interface/'base class'.
 
-class object_base_t
+class object_base_t;
 
 
 ================================ Defines =========================
