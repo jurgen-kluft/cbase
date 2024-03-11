@@ -103,12 +103,12 @@ namespace ncore
     static const char* s_out_padding64 = "                                                                ";
 
     // output function type
-    typedef void (*out_fct_type)(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 maxlen);
+    typedef void (*out_fct_type)(const char* str, u64 strlen, void* buffer, u64& buffer_pos, u64 maxlen);
 
     // wrapper (used as buffer) for output function type
     struct out_fct_wrap_type
     {
-        void (*fct)(const char* str, u32 strlen, void* arg);
+        void (*fct)(const char* str, u64 strlen, void* arg);
         void* arg;
     };
 
@@ -120,7 +120,7 @@ namespace ncore
     //
 
     // internal buffer output
-    static inline void _out_buffer(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
+    static inline void _out_buffer(const char* str, u64 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
         while (buffer_pos < buffer_cap && strlen-- > 0)
         {
@@ -129,7 +129,7 @@ namespace ncore
     }
 
     // internal null output
-    static inline void _out_null(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
+    static inline void _out_null(const char* str, u64 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
         (void)str;
         (void)buffer;
@@ -138,7 +138,7 @@ namespace ncore
     }
 
     // internal _putchar wrapper
-    static inline void _out_char(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
+    static inline void _out_char(const char* str, u64 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
         (void)buffer;
         (void)buffer_cap;
@@ -153,7 +153,7 @@ namespace ncore
     }
 
     // internal output function wrapper
-    static inline void _out_fct(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
+    static inline void _out_fct(const char* str, u64 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
         (void)buffer_cap;
         if (str)
@@ -165,7 +165,7 @@ namespace ncore
     }
 
     // internal output function wrapper for runes_writer
-    static inline void _out_runeswriter(const char* str, u32 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
+    static inline void _out_runeswriter(const char* str, u64 strlen, void* buffer, u64& buffer_pos, u64 buffer_cap)
     {
         (void)buffer_pos;
         (void)buffer_cap;
@@ -915,7 +915,7 @@ namespace ncore
                     break;
                 case 'c':
                 {
-                    u32 l = 1U;
+                    u64 l = 1U;
                     // pre padding
                     if (!(flags & FLAGS_LEFT))
                     {
@@ -960,7 +960,7 @@ namespace ncore
                 case 's':
                 {
                     const char* p = va_arg(va, const char*);
-                    u32         l = _strnlen_s(p, precision ? precision : (u64)-1);
+                    u64         l = _strnlen_s(p, precision ? precision : (u64)-1);
                     // pre padding
                     if (flags & FLAGS_PRECISION)
                     {
@@ -1093,7 +1093,7 @@ namespace ncore
         return ret;
     }
 
-    s32 fctprintf(void (*out)(const char* str, u32 strlen, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc)
+    s32 fctprintf(void (*out)(const char* str, u64 strlen, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t               va_iter      = {argv, 0, argc};
         const out_fct_wrap_type out_fct_wrap = {out, arg};
