@@ -148,7 +148,9 @@ UNITTEST_SUITE_BEGIN(test_double)
 #ifdef D_IEEE_FLOATS
             const f64 nan          = math::nan64();
             const f64 nan_plus_one = nan + 1.0;
-            CHECK_EQUAL(math::bin(nan), math::bin(nan_plus_one));
+            const u64 nan_bin = math::bin(nan);
+            const u64 nan_bin_plus_one = math::bin(nan_plus_one);
+            CHECK_EQUAL(nan_bin, nan_bin_plus_one);
 #endif
             CHECK_TRUE(math::bin(1.0) == D_CONSTANT_64(0x3ff0000000000000));
             CHECK_TRUE(math::bin(-2.0) == D_CONSTANT_64(0xc000000000000000));

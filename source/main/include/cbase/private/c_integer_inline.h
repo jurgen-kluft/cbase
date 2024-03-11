@@ -156,19 +156,19 @@ namespace ncore
         inline s32 mod(s32 value, s32 inModuloValue) { return value % inModuloValue; }
 
         // Greatest common denominator (biggest modulo value of both integers)
-        inline s32 gcd(s32 inIntegerA, s32 inIntegerB)
+        inline s32 gcd(s32 valueA, s32 valueB)
         {
-            while (inIntegerB != 0)
+            while (valueB != 0)
             {
-                s32 t      = inIntegerA % inIntegerB;
-                inIntegerA = inIntegerB;
-                inIntegerB = t;
+                s32 t      = valueA % valueB;
+                valueA = valueB;
+                valueB = t;
             }
-            return inIntegerA;
+            return valueA;
         }
 
         // Calculate average of A & B without overflow or s64 use
-        inline s32 average(s32 inIntegerA, s32 inIntegerB) { return (inIntegerA & inIntegerB) + ((inIntegerA ^ inIntegerB) >> 1); }
+        inline s32 average(s32 valueA, s32 valueB) { return (valueA & valueB) + ((valueA ^ valueB) >> 1); }
 
         // Check if value is a power-of-two
         inline bool ispo2(s32 value) { return (value != 0) && (((value) & (value - 1)) == 0); }

@@ -66,7 +66,7 @@ namespace ncore
             , m_end(nullptr)
         {
         }
-        inline buffer_t(u8* data, u8* end)
+        inline explicit buffer_t(u8* data, u8* end)
             : m_begin(data)
             , m_end(end)
         {
@@ -109,13 +109,13 @@ namespace ncore
     {
         enum
         {
-            SIZE = (L + 3) / 4
+            SIZE = (L + 7) / 8
         };
 
     public:
         u64 m_data[SIZE];
         inline sbuffer_t()
-            : buffer_t((u8*)m_data, (u8*)m_data + (SIZE * 4))
+            : buffer_t((u8*)m_data, (u8*)m_data + (SIZE * 8))
         {
         }
         buffer_t buffer() const { return buffer_t(*this); }
@@ -355,7 +355,7 @@ namespace ncore
     inline buffer_t buffer_t::operator()(u32 from, u32 to) const
     {
         u8* begin = m_begin + from;
-        u8* end   = m_end + to;
+        u8* end   = m_begin + to;
         if (begin >= m_begin && end <= m_end && begin <= end)
             return buffer_t(begin, end);
         return buffer_t();
