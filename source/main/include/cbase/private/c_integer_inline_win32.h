@@ -6,61 +6,65 @@ namespace ncore
     namespace math
     {
         // find the number of trailing zeros in 16-bit value
-        // if 'value==0' this function returns 0
+        // if 'value==0' this function returns 8
         inline s8 countTrailingZeros(u8 value)
         {
             unsigned long result;
             ::_BitScanForward(&result, value);
-            return (s8)result;
+            return value == 0 ? 8 : (s8)result;
         }
         // find the number of trailing zeros in 16-bit value
-        // if 'value==0' this function returns 0
+        // if 'value==0' this function returns 16
         inline s8 countTrailingZeros(u16 value)
         {
             unsigned long result;
             ::_BitScanForward(&result, value);
-            return (s8)result;
+            return value == 0 ? 16 : (s8)result;
         }
         // find the number of trailing zeros in 32-bit value
-        // if 'value==0' this function returns 0
+        // if 'value==0' this function returns 32
         inline s8 countTrailingZeros(u32 value)
         {
             unsigned long result;
             ::_BitScanForward(&result, value);
-            return (s8)result;
+            return value == 0 ? 32 : (s8)result;
         }
         // find the number of trailing zeros in 64-bit value
-        // if 'value==0' this function returns 0
+        // if 'value==0' this function returns 64
         inline s8 countTrailingZeros(u64 value)
         {
             unsigned long result;
             ::_BitScanForward64(&result, value);
-            return (s8)result;
+            return value == 0 ? 64 :  (s8)result;
         }
 
         // find the number of leading zeros in 8-bit value
         // if 'value==0' this function returns 8
         inline s8 countLeadingZeros(u8 value)
         {
-            return (s8)::__lzcnt16(value) - 8;
+            unsigned long v;
+            return BitScanReverse(&v, value) ? 7 - (s8)v : 8;
         }
         // find the number of leading zeros in 16-bit value
         // if 'value==0' this function returns 16
         inline s8 countLeadingZeros(u16 value)
         {
-            return (s8)::__lzcnt16(value);
+            unsigned long v;
+            return BitScanReverse(&v, value) ? 15 - (s8)v : 16;
         }
         // find the number of leading zeros in 32-bit value
         // if 'value==0' this function returns 32
         inline s8 countLeadingZeros(u32 value)
         {
-            return (s8)::__lzcnt(value);
+            unsigned long v;
+            return BitScanReverse(&v, value) ? 31 - (s8)v : 32;
         }
         // find the number of leading zeros in 64-bit value
         // if 'value==0' this function returns 64
         inline s8 countLeadingZeros(u64 value)
         {
-            return (s8)::__lzcnt64(value);
+            unsigned long v;
+            return BitScanReverse(&v, value) ? 63 - (s8)v : 64;
         }
 
         // Return value but with only the Least Significant Bit "1"

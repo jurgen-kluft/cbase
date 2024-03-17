@@ -3,7 +3,7 @@ namespace ncore
     namespace math
     {
         // find the number of trailing zeros in 16-bit value
-        // if 'v==0' this function returns 0
+        // if 'v==0' this function returns 8
         inline s8 countTrailingZeros(u8 value)
         {
             s8 count = 0;
@@ -21,17 +21,16 @@ namespace ncore
             {
                 count += 1;
                 value = value >> 1;
-                ;
             }
             if ((value & 0x01) == 1)
             {
                 return count;
             }
-            return 0;
+            return 8;
         }
 
         // find the number of trailing zeros in 16-bit value
-        // if 'v==0' this function returns 0
+        // if 'v==0' this function returns 16
         inline s8 countTrailingZeros(u16 value)
         {
             s8 count = 0;
@@ -54,17 +53,16 @@ namespace ncore
             {
                 count += 1;
                 value = value >> 1;
-                ;
             }
             if ((value & 0x00000001) == 1)
             {
                 return count;
             }
-            return 0;
+            return 16;
         }
 
         // find the number of trailing zeros in 32-bit value
-        // if 'v==0' this function returns 0
+        // if 'v==0' this function returns 32
         inline s8 countTrailingZeros(u32 value)
         {
             s8 count = 0;
@@ -98,10 +96,10 @@ namespace ncore
             {
                 return count;
             }
-            return 0;
+            return 32;
         }
         // find the number of trailing zeros in 64-bit value
-        // if 'v==0' this function returns 0
+        // if 'v==0' this function returns 64
         inline s8 countTrailingZeros(u64 value)
         {
             s8 count = 0;
@@ -139,11 +137,11 @@ namespace ncore
             {
                 return count;
             }
-            return 0;
+            return 64; 
         }
 
-        // find the number of leading zeros in 16-bit v
-        // if 'v==0' this function returns 16
+        // find the number of leading zeros in 8-bit
+        // if 'v==0' this function returns 8
         inline s8 countLeadingZeros(u8 value)
         {
             if (value == 0)
