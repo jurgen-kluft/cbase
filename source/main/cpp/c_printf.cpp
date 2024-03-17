@@ -211,7 +211,7 @@ namespace ncore
         // pad spaces up to given width
         if (!(flags & FLAGS_LEFT) && !(flags & FLAGS_ZEROPAD))
         {
-            u64 amount = width - len;
+            u64 amount = (width > len) ? width - len : 0;
             while (amount >= 64)
             {
                 out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
@@ -231,7 +231,7 @@ namespace ncore
         // append pad spaces up to given width
         if (flags & FLAGS_LEFT)
         {
-            u64 amount = width - (buffer_pos - buffer_start);
+            u64 amount = (width > (buffer_pos - buffer_start)) ? (width - (buffer_pos - buffer_start)) : 0;
             while (amount >= 64)
             {
                 out(s_out_padding64, 64, buffer, buffer_pos, maxlen);
@@ -1115,8 +1115,8 @@ namespace ncore
     s32 sprintf_(runes_t& str, crunes_t const& format, const va_t* argv, s32 argc)
     {
         nrunes::writer_t str_writer(str);
-        const s32 ret     = vzprintf(str_writer, format, argv, argc);
-        str = str_writer.get_current();
+        const s32        ret = vzprintf(str_writer, format, argv, argc);
+        str                  = str_writer.get_current();
         return ret;
     }
 

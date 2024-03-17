@@ -5,32 +5,32 @@ namespace ncore
     namespace math
     {
         // find the number of trailing zeros in 8-bit value
-        // if 'v==0' this function returns 0
+        // if 'v==0' this function returns 8
         inline s8 countTrailingZeros(u8 value)
         {
             s8 const count = __builtin_ctz(value);
-            return count & 0x7;
+            return (count & 0x7) | (count >> 5);
         }
         // find the number of trailing zeros in 16-bit value
-        // if 'v==0' this function returns 0
+        // if 'v==0' this function returns 16
         inline s8 countTrailingZeros(u16 value)
         {
             s8 const count = __builtin_ctz(value);
-            return count & 0xF;
+            return (count & 0xF) | (count >> 4);
         }
         // find the number of trailing zeros in 32-bit value
-        // if 'v==0' this function returns 0
+        // if 'v==0' this function returns 32
         inline s8 countTrailingZeros(u32 value)
         {
             s8 const count = __builtin_ctz(value);
-            return count & 0x1F;
+            return count;
         }
         // find the number of trailing zeros in 64-bit value
-        // if 'v==0' this function returns 0
+        // if 'v==0' this function returns 64
         inline s8 countTrailingZeros(u64 value)
         {
-            s8 const count = __builtin_ctzll(value); // when value is 0, this function returns 64
-            return count & 0x3F;
+            s8 const count = __builtin_ctzll(value);  // when value is 0, this function returns 64
+            return count;
         }
 
         // find the number of leading zeros in 8-bit v
@@ -38,27 +38,27 @@ namespace ncore
         inline s8 countLeadingZeros(u8 value)
         {
             s8 const count = __builtin_clz(value);
-            return count-24;
+            return count - 24;
         }
         // find the number of leading zeros in 16-bit v
         // if 'v==0' this function returns 16
         inline s8 countLeadingZeros(u16 value)
         {
             s8 const count = __builtin_clz(value);
-            return count-16;
+            return count - 16;
         }
         // find the number of leading zeros in 32-bit v
         // if 'v==0' this function returns 32
         inline s8 countLeadingZeros(u32 value)
         {
-            s8 const count = __builtin_clz(value); // when value is 0, this function returns 32
+            s8 const count = __builtin_clz(value);  // when value is 0, this function returns 32
             return count;
         }
         // find the number of leading zeros in 64-bit v
         // if 'v==0' this function returns 64
         inline s8 countLeadingZeros(u64 value)
         {
-            s8 const count = __builtin_clzll(value); // when value is 0, this function returns 64
+            s8 const count = __builtin_clzll(value);  // when value is 0, this function returns 64
             return count;
         }
 
@@ -99,34 +99,24 @@ namespace ncore
         }
 
         // find the bit position/index of the first bit from high to low
-        // If 'value == 0' this function will return 8
+        // If 'value == 0x00' this function will return 8
         // If 'value == 0x01' this function will return 0
         // If 'value == 0x80' this function will return 7
         inline s8 findLastBit(u8 value) { return countLeadingZeros(value); }
 
         // find the bit position/index of the first bit from low to high
-        // If 'value == 0' this function will return -1
-        inline s8 findFirstBit(u16 value)
-        {
-            if (value == 0)
-                return -1;
-            return countTrailingZeros(value);
-        }
+        // If 'value == 0' this function will return 16
+        inline s8 findFirstBit(u16 value) { return countTrailingZeros(value); }
 
         // find the bit position/index of the first bit from high to low
-        // If 'value == 0' this function will return 16
-        // If 'value == 0x01' this function will return 15
+        // If 'value == 0x0000' this function will return 16
+        // If 'value == 0x0001' this function will return 15
         // If 'value == 0x8000' this function will return 0
         inline s8 findLastBit(u16 value) { return countLeadingZeros(value); }
 
         // find the bit position/index of the first bit from low to high
-        // If 'value == 0' this function will return -1
-        inline s8 findFirstBit(u32 value)
-        {
-            if (value == 0)
-                return -1;
-            return countTrailingZeros(value);
-        }
+        // If 'value == 0' this function will return 32
+        inline s8 findFirstBit(u32 value) { return countTrailingZeros(value); }
 
         // find the bit position/index of the first bit from high to low
         // If 'value == 0' this function will return 32
@@ -135,13 +125,8 @@ namespace ncore
         inline s8 findLastBit(u32 value) { return countLeadingZeros(value); }
 
         // find the bit position/index of the first bit from low to high
-        // If 'value == 0' this function will return 0
-        inline s8 findFirstBit(u64 value)
-        {
-            if (value == 0)
-                return -1;
-            return countTrailingZeros(value);
-        }
+        // If 'value == 0' this function will return 64
+        inline s8 findFirstBit(u64 value) { return countTrailingZeros(value); }
 
         // find the bit position/index of the first bit from high to low
         // If 'value == 0' this function will return 64
@@ -172,5 +157,5 @@ namespace ncore
             u64 i = value;
             return __builtin_popcountll(i);
         }
-    } // namespace math
-} // namespace ncore
+    }  // namespace math
+}  // namespace ncore
