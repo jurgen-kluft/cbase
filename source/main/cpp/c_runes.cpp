@@ -2533,7 +2533,10 @@ namespace ncore
             while (siter < send)
             {
                 if (diter >= dend)
+                {
+                    _dst = select(_dst, dbegin, diter);
                     return false;
+                }
                 uchar32 c = read(_src, siter);
                 if (c == 0)
                     break;

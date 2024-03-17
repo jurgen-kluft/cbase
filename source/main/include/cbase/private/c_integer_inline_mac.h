@@ -13,54 +13,31 @@ namespace ncore
         }
         // find the number of trailing zeros in 16-bit value
         // if 'v==0' this function returns 16
-        inline s8 countTrailingZeros(u16 value)
-        {
-            s8 const count = __builtin_ctz(value);
-            return (count & 0xF) | (count >> 4);
-        }
+        inline s8 countTrailingZeros(u16 value) { return (value == 0) ? (s8)16 : (s8)__builtin_ctz(value); }
+
         // find the number of trailing zeros in 32-bit value
         // if 'v==0' this function returns 32
-        inline s8 countTrailingZeros(u32 value)
-        {
-            s8 const count = __builtin_ctz(value);
-            return count;
-        }
+        inline s8 countTrailingZeros(u32 value) { return (value == 0) ? (s8)32 : (s8)__builtin_ctz(value); }
+
         // find the number of trailing zeros in 64-bit value
         // if 'v==0' this function returns 64
-        inline s8 countTrailingZeros(u64 value)
-        {
-            s8 const count = __builtin_ctzll(value);  // when value is 0, this function returns 64
-            return count;
-        }
+        inline s8 countTrailingZeros(u64 value) { return (value == 0) ? (s8)64 : (s8)__builtin_ctzll(value); }
 
         // find the number of leading zeros in 8-bit v
         // if 'v==0' this function returns 8
-        inline s8 countLeadingZeros(u8 value)
-        {
-            s8 const count = __builtin_clz(value);
-            return count - 24;
-        }
+        inline s8 countLeadingZeros(u8 value) { return (value == 0) ? (s8)8 : ((s8)__builtin_clz(value) - 24); }
+
         // find the number of leading zeros in 16-bit v
         // if 'v==0' this function returns 16
-        inline s8 countLeadingZeros(u16 value)
-        {
-            s8 const count = __builtin_clz(value);
-            return count - 16;
-        }
+        inline s8 countLeadingZeros(u16 value) { return (value == 0) ? (s8)16 : ((s8)__builtin_clz(value) - 16); }
+
         // find the number of leading zeros in 32-bit v
         // if 'v==0' this function returns 32
-        inline s8 countLeadingZeros(u32 value)
-        {
-            s8 const count = __builtin_clz(value);  // when value is 0, this function returns 32
-            return count;
-        }
+        inline s8 countLeadingZeros(u32 value) { return (value == 0) ? (s8)32 : (s8)__builtin_clz(value); }
+
         // find the number of leading zeros in 64-bit v
         // if 'v==0' this function returns 64
-        inline s8 countLeadingZeros(u64 value)
-        {
-            s8 const count = __builtin_clzll(value);  // when value is 0, this function returns 64
-            return count;
-        }
+        inline s8 countLeadingZeros(u64 value) { return (value == 0) ? (s8)64 : (s8)__builtin_clzll(value); }
 
         // Return v but with only the Least Significant Bit "1"
         inline u32 leastSignificantOneBit(u32 value) { return (value ^ (value & (value - 1))); }
@@ -78,7 +55,7 @@ namespace ncore
         inline s8 leastSignificantBit(u32 value)
         {
             s8 const lsob = countTrailingZeros(value);
-            return lsob;
+            return lsob & 0x1F;
         }
 
         // Return the bit index of the Most Significant Bit "1"

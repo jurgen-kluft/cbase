@@ -173,6 +173,7 @@ namespace ncore
             }
 
             // Make the root black for simplified logic
+            root = tree->v_get_root();
             root->set_black(tree);
 
             return inserted;

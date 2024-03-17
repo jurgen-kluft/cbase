@@ -207,7 +207,7 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			u16 a = 13, b = 64, c = 0, d = -1;
 			CHECK_EQUAL(0, math::countTrailingZeros(a));
 			CHECK_EQUAL(6, math::countTrailingZeros(b));
-			CHECK_EQUAL(0, math::countTrailingZeros(c));
+			CHECK_EQUAL(16, math::countTrailingZeros(c));
 			CHECK_EQUAL(0, math::countTrailingZeros(d));
 		}
 		UNITTEST_TEST(CountTrailingZeros32)
@@ -215,7 +215,7 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			u32 a = 13, b = 64, c = 0, d = -1;
 			CHECK_EQUAL(0, math::countTrailingZeros(a));
 			CHECK_EQUAL(6, math::countTrailingZeros(b));
-			CHECK_EQUAL(0, math::countTrailingZeros(c));
+			CHECK_EQUAL(32, math::countTrailingZeros(c));
 			CHECK_EQUAL(0, math::countTrailingZeros(d));
 		}
 		UNITTEST_TEST(CountTrailingZeros64)
@@ -223,7 +223,7 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			u64 a = 13, b = 64, c = 0, d = -1, e = 0xffff000000000000UL;
 			CHECK_EQUAL( 0, math::countTrailingZeros(a));
 			CHECK_EQUAL( 6, math::countTrailingZeros(b));
-			CHECK_EQUAL( 0, math::countTrailingZeros(c));
+			CHECK_EQUAL(64, math::countTrailingZeros(c));
 			CHECK_EQUAL( 0, math::countTrailingZeros(d));
 			CHECK_EQUAL(48, math::countTrailingZeros(e));
 		}
@@ -291,7 +291,7 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(2, math::findFirstBit(a));
 			CHECK_EQUAL(6, math::findFirstBit(b));
-			CHECK_EQUAL(-1, math::findFirstBit(c));
+			CHECK_EQUAL(32, math::findFirstBit(c));
 		}
 
 		UNITTEST_TEST(FindLastBit_u16)
