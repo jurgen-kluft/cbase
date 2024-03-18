@@ -3,13 +3,11 @@
 Cross platform base library
 
 - cbase
-  - types (s8/u8 .. s64/u64, f32/f64, uchar/../uchar32)
-  - allocator
+  - systm allocator
   - binary search
   - bitfield
   - buffer / binary reader / binary writer
   - console
-  - debug (assert)
   - endian
   - hierarchical bitset (hbb_t)
   - integer (min/max, clamp, align, ilog2, findLastBit, findFirstBit, countBits, countTrailingZeros/countLeadingZeros)
