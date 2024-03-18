@@ -2,7 +2,7 @@
 
 Cross platform base library
 
-- cbase (depends on ccore)
+- cbase (depends on [ccore](https://github.com/jurgen-kluft/ccore))
   - system allocator
   - binary search
   - bitfield
