@@ -275,7 +275,7 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(2, math::leastSignificantBit(a));
 			CHECK_EQUAL(6, math::leastSignificantBit(b));
-			CHECK_EQUAL(0, math::leastSignificantBit(c));
+			CHECK_EQUAL(32, math::leastSignificantBit(c));
 		}
 
 		UNITTEST_TEST(MostSignificantBit)
@@ -283,7 +283,7 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			u32 a = 12, b = 64, c = 0;
 			CHECK_EQUAL(3, math::mostSignificantBit(a));
 			CHECK_EQUAL(6, math::mostSignificantBit(b));
-			CHECK_EQUAL(-1, math::mostSignificantBit(c));
+			CHECK_EQUAL(32, math::mostSignificantBit(c));
 		}
 
 		UNITTEST_TEST(FindFirstBit)

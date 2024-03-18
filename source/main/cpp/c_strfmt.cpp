@@ -18,9 +18,9 @@ namespace ncore
         constexpr char digits_hex_uppercase[]{"0123456789ABCDEF"};
         constexpr char digits_hex_lowercase[]{"0123456789abcdef"};
 
-        class cstr_t
+        class cstrspan_t
         {
-            friend class str_t;
+            friend class strspan_t;
 
             enum
             {
@@ -31,20 +31,40 @@ namespace ncore
             } m_type;
 
         public:
-            cstr_t() noexcept              = delete;
-            cstr_t(const cstr_t&) noexcept = default;
-            cstr_t(cstr_t&&) noexcept      = default;
-
-            cstr_t(const char* str) noexcept : m_type(Type_Ascii), m_begin{str}, m_end{str} { m_end += compute_length(); }
-
-            cstr_t(const char* str, const uint_t length) : m_type(Type_Ascii), m_begin{str}, m_end{str + length} { FMT_CHECK(length >= 0, std::runtime_error); }
-
-            cstr_t(const char* first, const char* last) : m_type(Type_Ascii), m_begin{first}, m_end{last} { FMT_CHECK(first <= last, std::runtime_error); }
+            cstrspan_t() noexcept                  = delete;
+            cstrspan_t(const cstrspan_t&) noexcept = default;
+            cstrspan_t(cstrspan_t&&) noexcept      = default;
+            cstrspan_t(const char* str) noexcept
+                : m_type(Type_Ascii)
+                , m_begin{str}
+                , m_end{str}
+            {
+                m_end += compute_length();
+                FMT_CHECK(m_begin <= m_end, std::runtime_error);
+            }
+            cstrspan_t(const char* str, const uint_t length)
+                : m_type(Type_Ascii)
+                , m_begin{str}
+                , m_end{str + length}
+            {
+                FMT_CHECK(length >= 0, std::runtime_error);
+            }
+            cstrspan_t(const char* first, const char* last)
+                : m_type(Type_Ascii)
+                , m_begin{first}
+                , m_end{last}
+            {
+                if (m_end == nullptr)
+                {
+                    m_end = m_begin + compute_length();
+                }
+                FMT_CHECK(m_begin <= m_end, std::runtime_error);
+            }
 
             // -------- ASSIGNMENT ------------------------------------------------
 
-            cstr_t& operator=(const cstr_t&) noexcept = default;
-            cstr_t& operator=(cstr_t&&) noexcept      = default;
+            cstrspan_t& operator=(const cstrspan_t&) noexcept = default;
+            cstrspan_t& operator=(cstrspan_t&&) noexcept      = default;
 
             inline uchar32 operator*() const noexcept { return peek(); }
 
@@ -74,7 +94,7 @@ namespace ncore
             const char* m_end;
         };
 
-        uchar32 cstr_t::peek(s32 n) const noexcept
+        uchar32 cstrspan_t::peek(s32 n) const noexcept
         {
             if (m_type == Type_Ascii)
             {
@@ -86,7 +106,7 @@ namespace ncore
             return '\0';
         }
 
-        uchar32 cstr_t::read() noexcept
+        uchar32 cstrspan_t::read() noexcept
         {
             if (m_type == Type_Ascii)
             {
@@ -98,7 +118,7 @@ namespace ncore
             return '\0';
         }
 
-        void cstr_t::skip(s32 n) noexcept
+        void cstrspan_t::skip(s32 n) noexcept
         {
             if (m_type == Type_Ascii)
             {
@@ -113,9 +133,14 @@ namespace ncore
             }
         }
 
-        str_t::str_t(char* first, char* last) : m_type(Type_Ascii), m_begin{first}, m_end{last} {}
+        strspan_t::strspan_t(char* first, char* last)
+            : m_type(Type_Ascii)
+            , m_begin{first}
+            , m_end{last}
+        {
+        }
 
-        void str_t::skip(const uint_t n)
+        void strspan_t::skip(const uint_t n)
         {
             if (m_type == Type_Ascii)
             {
@@ -123,7 +148,7 @@ namespace ncore
             }
         }
 
-        void str_t::write(uchar32 c)
+        void strspan_t::write(uchar32 c)
         {
             if (m_type == Type_Ascii)
             {
@@ -138,11 +163,11 @@ namespace ncore
             }
         }
 
-        void str_t::write(cstr_t const& str)
+        void strspan_t::write(cstrspan_t const& str)
         {
             if (m_type == Type_Ascii)
             {
-                if (str.m_type == cstr_t::Type_Ascii)
+                if (str.m_type == cstrspan_t::Type_Ascii)
                 {
                     const char* src = static_cast<const char*>(str.m_begin);
                     while (src != static_cast<const char*>(str.m_end))
@@ -167,7 +192,7 @@ namespace ncore
                 }
             }
 
-            inline static void assign(str_t& dst, char ch, ptr_t count) noexcept
+            inline static void assign(strspan_t& dst, char ch, ptr_t count) noexcept
             {
                 while ((count--) > 0)
                 {
@@ -175,7 +200,7 @@ namespace ncore
                 }
             }
 
-            inline static void copy(str_t& dst, const char* src, ptr_t count) noexcept
+            inline static void copy(strspan_t& dst, const char* src, ptr_t count) noexcept
             {
                 while ((count--) > 0)
                 {
@@ -183,9 +208,9 @@ namespace ncore
                 }
             }
 
-            inline static void copy(str_t& dst, const cstr_t& str, ptr_t count) noexcept
+            inline static void copy(strspan_t& dst, const cstrspan_t& str, ptr_t count) noexcept
             {
-                cstr_t src(str);
+                cstrspan_t src(str);
                 while ((count--) > 0)
                 {
                     uchar32 c = src.read();
@@ -630,7 +655,7 @@ namespace ncore
 
         // Writes the alignment (sign, prefix and fill before) for any
         // argument type. Returns the fill counter to write after argument.
-        s32 state_t::write_alignment(str_t& it, s32 characters, const bool negative) const
+        s32 state_t::write_alignment(strspan_t& it, s32 characters, const bool negative) const
         {
             characters += sign_width(negative) + prefix_width();
 
@@ -674,7 +699,7 @@ namespace ncore
             return fill_after;
         }
 
-        void state_t::write_sign(str_t& it, const bool negative) const noexcept
+        void state_t::write_sign(strspan_t& it, const bool negative) const noexcept
         {
             if (negative)
             {
@@ -689,7 +714,7 @@ namespace ncore
             }
         }
 
-        void state_t::write_prefix(str_t& it) const noexcept
+        void state_t::write_prefix(strspan_t& it) const noexcept
         {
             // Alternative format is valid for hexadecimal (including
             // pointers), octal, binary and all floating point types.
@@ -718,9 +743,9 @@ namespace ncore
             // PUBLIC MEMBER FUNCTIONS
             // --------------------------------------------------------------------
 
-            format_t(cstr_t& fmt, const s32 arg_count)
+            format_t(cstrspan_t& fmt, const s64 arg_count)
             {
-                cstr_t it = fmt;
+                cstrspan_t it = fmt;
 
                 // Parse argument index
                 if (*it >= '0' && *it <= '9')
@@ -898,11 +923,11 @@ namespace ncore
             // Parses the input as a positive integer that fits into a `u8` type. This
             // function assumes that the first character is a digit and terminates parsing
             // at the presence of the first non-digit character or when value overflows.
-            static u8 parse_positive_small_int(cstr_t& it, const s32 max_value)
+            static u8 parse_positive_small_int(cstrspan_t& it, const s64 max_value)
             {
                 ASSERT(max_value < 256);
 
-                s32     value = 0;
+                s64     value = 0;
                 uchar32 c     = 0;
                 do
                 {
@@ -930,27 +955,29 @@ namespace ncore
             state_t state;
         };
 
-        bool state_t::format_string(str_t& it, state_t& state, const char* str, const char* end)
+        bool state_t::format_string(strspan_t& it, state_t& state, const char* str, const char* end)
         {
-            cstr_t strview(str, end);
+            cstrspan_t strview(str, end);
             return format_string(it, state, strview);
         }
 
-        bool state_t::format_string(str_t& it, state_t& state, const cstr_t& str)
+        bool state_t::format_string(strspan_t& it, state_t& state, const cstrspan_t& str)
         {
             // Test for argument type / format match
-            FMT_CHECK(state.type_is_none() || state.type_is_string(), std::runtime_error);
+            if (state.type_is_none() || state.type_is_string())
+            {
+                // TODO Characters and strings align to left by default.
+                // default_align_left();
 
-            // TODO Characters and strings align to left by default.
-            // default_align_left();
+                // If precision is specified use it up to string size.
+                const s32 str_length = (state.precision() == -1) ? static_cast<s32>(str.length()) : math::min(static_cast<s32>(state.precision()), static_cast<s32>(str.length()));
 
-            // If precision is specified use it up to string size.
-            const s32 str_length = (state.precision() == -1) ? static_cast<s32>(str.length()) : math::min(static_cast<s32>(state.precision()), static_cast<s32>(str.length()));
-
-            return format_string(it, state, str, str_length);
+                return format_string(it, state, str, str_length, false);
+            }
+            return false;
         }
 
-        bool state_t::format_string(str_t& it, const state_t& state, const cstr_t& str, const s32 str_length, const bool negative)
+        bool state_t::format_string(strspan_t& it, const state_t& state, const cstrspan_t& str, const s32 str_length, const bool negative)
         {
             const s32 fill_after = state.write_alignment(it, str_length, negative);
 
@@ -969,24 +996,35 @@ namespace ncore
             using iterator       = char*;
             using const_iterator = const char*;
 
-            static bool format(u8 argType, u64 argValue, str_t& it, state_t& format)
+            static bool format(encoded_arg_t const& argValue, strspan_t& it, state_t& format)
             {
-                switch (argType)
+                switch (argValue.type.value)
                 {
-                    case TypeId::kBool: return format_bool(it, format, arg_t<bool>::decode(argValue)); break;
-                    case TypeId::kChar: return format_char(it, format, arg_t<char>::decode(argValue)); break;
-                    case TypeId::kInt8: return format_integer(it, format, arg_t<s8>::decode(argValue)); break;
-                    case TypeId::kInt16: return format_integer(it, format, arg_t<s16>::decode(argValue)); break;
-                    case TypeId::kInt32: return format_integer(it, format, arg_t<s32>::decode(argValue)); break;
-                    case TypeId::kUint8: return format_unsigned_integer(it, format, arg_t<u8>::decode(argValue)); break;
-                    case TypeId::kUint16: return format_unsigned_integer(it, format, arg_t<u16>::decode(argValue)); break;
-                    case TypeId::kUint32: return format_unsigned_integer(it, format, arg_t<u32>::decode(argValue)); break;
-                    case TypeId::kInt64: return format_integer(it, format, arg_t<s64>::decode(argValue)); break;
-                    case TypeId::kUint64: return format_unsigned_integer(it, format, arg_t<u64>::decode(argValue)); break;
-                    case TypeId::kPointer: return format_pointer(it, format, argValue); break;
-                    case TypeId::kFloat: return format_float(it, format, arg_t<float>::decode(argValue)); break;
-                    case TypeId::kDouble: return format_float(it, format, arg_t<double>::decode(argValue)); break;
-                    case TypeId::kString: return state_t::format_string(it, format, arg_t<const char*>::decode(argValue)); break;
+                    case TypeId::kBool: return format_bool(it, format, arg_t<bool>::decode(argValue));
+                    case TypeId::kChar: return format_char(it, format, arg_t<char>::decode(argValue));
+                    case TypeId::kInt8: return format_integer(it, format, arg_t<s8>::decode(argValue));
+                    case TypeId::kInt16: return format_integer(it, format, arg_t<s16>::decode(argValue));
+                    case TypeId::kInt32: return format_integer(it, format, arg_t<s32>::decode(argValue));
+                    case TypeId::kUint8: return format_unsigned_integer(it, format, arg_t<u8>::decode(argValue));
+                    case TypeId::kUint16: return format_unsigned_integer(it, format, arg_t<u16>::decode(argValue));
+                    case TypeId::kUint32: return format_unsigned_integer(it, format, arg_t<u32>::decode(argValue));
+                    case TypeId::kInt64: return format_integer(it, format, arg_t<s64>::decode(argValue));
+                    case TypeId::kUint64: return format_unsigned_integer(it, format, arg_t<u64>::decode(argValue));
+                    case TypeId::kVoidPointer: return format_pointer(it, format, (int_t)argValue.first.vp);
+                    case TypeId::kConstVoidPointer: return format_pointer(it, format, (int_t)argValue.first.cvp);
+                    case TypeId::kFloat: return format_float(it, format, arg_t<float>::decode(argValue));
+                    case TypeId::kDouble: return format_float(it, format, arg_t<double>::decode(argValue));
+                    case TypeId::kString:
+                    case TypeId::kConstString:
+                    {
+                        cstrspan_t const cstr(argValue.first.cstr);
+                        return state_t::format_string(it, format, cstr);
+                    }
+                    case TypeId::kStrSpan:
+                    {
+						cstrspan_t const cstr(argValue.first.cstr, argValue.second.cstr);
+						return state_t::format_string(it, format, cstr);
+                    }
                 }
                 return false;
             }
@@ -996,13 +1034,13 @@ namespace ncore
             // PRIVATE STATIC FUNCTIONS
             // --------------------------------------------------------------------
 
-            static bool format_bool(str_t& it, const state_t& state, const bool value)
+            static bool format_bool(strspan_t& it, const state_t& state, const bool value)
             {
                 if (state.type_is_none())
                 {
-                    s32 const len = value ? 4 : 5;
-                    cstr_t    src(value ? "true" : "false", len);
-                    return state_t::format_string(it, state, src, len);
+                    s32 const  len = value ? 4 : 5;
+                    cstrspan_t src(value ? "true" : "false", len);
+                    return state_t::format_string(it, state, src, len, false);
                 }
                 else if (state.type_is_integer())
                 {
@@ -1016,7 +1054,7 @@ namespace ncore
                 return true;
             }
 
-            static bool format_char(str_t& it, state_t& state, const char value)
+            static bool format_char(strspan_t& it, state_t& state, const char value)
             {
                 if (state.type_is_none() || state.type_is_char())
                 {
@@ -1042,7 +1080,7 @@ namespace ncore
                 return true;
             }
 
-            static bool format_integer(str_t& it, const state_t& state, const s64 value)
+            static bool format_integer(strspan_t& it, const state_t& state, const s64 value)
             {
                 const bool negative = (value < 0);
                 const auto uvalue   = (negative ? -value : value);
@@ -1050,7 +1088,7 @@ namespace ncore
                 return format_unsigned_integer(it, state, uvalue, negative);
             }
 
-            static bool format_unsigned_integer(str_t& it, const state_t& state, const u64 value, const bool negative = false)
+            static bool format_unsigned_integer(strspan_t& it, const state_t& state, const u64 value, const bool negative = false)
             {
                 s32 fill_after = 0;
 
@@ -1061,7 +1099,7 @@ namespace ncore
                     fill_after        = state.write_alignment(it, digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_dec(dst, value);
-                    cstr_t src(buffer, digits);
+                    cstrspan_t src(buffer, digits);
                     it.write(src);
                 }
                 else if (state.type_is_integer_hex())
@@ -1071,7 +1109,7 @@ namespace ncore
                     fill_after        = state.write_alignment(it, digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_hex(dst, value, state.uppercase());
-                    cstr_t src(buffer, digits);
+                    cstrspan_t src(buffer, digits);
                     it.write(src);
                 }
                 else if (state.type_is_integer_oct())
@@ -1081,7 +1119,7 @@ namespace ncore
                     fill_after        = state.write_alignment(it, digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_oct(dst, value);
-                    cstr_t src(buffer, digits);
+                    cstrspan_t src(buffer, digits);
                     it.write(src);
                 }
                 else if (state.type_is_integer_bin())
@@ -1091,7 +1129,7 @@ namespace ncore
                     fill_after        = state.write_alignment(it, digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_bin(dst, value);
-                    cstr_t src(buffer, digits);
+                    cstrspan_t src(buffer, digits);
                     it.write(src);
                 }
                 else
@@ -1103,7 +1141,7 @@ namespace ncore
                 return true;
             }
 
-            static bool format_pointer(str_t& it, const state_t& state, const uint_t value)
+            static bool format_pointer(strspan_t& it, const state_t& state, const uint_t value)
             {
                 if (state.type_is_none() || state.type_is_pointer())
                 {
@@ -1113,7 +1151,7 @@ namespace ncore
                     char       buffer[Integer::kMaxDigitsPointer];
                     char*      dst = buffer + digits;
                     Integer::convert_hex(dst, ivalue, state.uppercase());
-                    cstr_t src(buffer, digits);
+                    cstrspan_t src(buffer, digits);
                     it.write(src);
                     CharTraits::assign(it, state.fill_char(), fill_after);
                 }
@@ -1125,7 +1163,7 @@ namespace ncore
                 return true;
             }
 
-            static bool format_float(str_t& it, const state_t& state, double value)
+            static bool format_float(strspan_t& it, const state_t& state, double value)
             {
                 char format_char;
                 s8   precision;
@@ -1143,6 +1181,10 @@ namespace ncore
                 if (state.uppercase())
                 {
                     flags |= DoubleConvert::FLAG_UPPERCASE;
+                }
+                if (state.m_width > 0)
+                {
+                    flags |= DoubleConvert::FLAG_HAVE_WIDTH;
                 }
 
                 // s32 dconvstr_print(char** outbuf, s32* outbuf_size,
@@ -1162,7 +1204,7 @@ namespace ncore
             }
         };
 
-        void parse_format_string(str_t& str, cstr_t& fmt)
+        void parse_format_string(strspan_t& str, cstrspan_t& fmt)
         {
             while (!fmt.at_end() && !str.at_end())
             {
@@ -1197,7 +1239,7 @@ namespace ncore
             }
         }
 
-        bool process(str_t& str, cstr_t& fmt, const args_t& args)
+        bool process(strspan_t& str, cstrspan_t& fmt, const args_t& args)
         {
             // Argument's sequential index
             s32 arg_seq_index = 0;
@@ -1221,11 +1263,11 @@ namespace ncore
 
                 if (args.funcs != nullptr && args.funcs[arg_index] != nullptr)
                 {
-                    args.funcs[arg_index](args.types[arg_index], args.args[arg_index], str, format.state);
+                    args.funcs[arg_index](args.args[arg_index], str, format.state);
                 }
                 else
                 {
-                    if (!argument_t::format(args.types[arg_index], args.args[arg_index], str, format.state))
+                    if (!argument_t::format(args.args[arg_index], str, format.state))
                         result = false;
                 }
 
@@ -1236,9 +1278,9 @@ namespace ncore
 
         bool toStr(ascii::prune str, ascii::prune end, ascii::pcrune fmt, args_t const& args)
         {
-            str_t  str_span(str, end);
-            cstr_t fmt_view(fmt);
-            bool   result = process(str_span, fmt_view, args);
+            strspan_t  str_span(str, end);
+            cstrspan_t fmt_view(fmt);
+            bool       result = process(str_span, fmt_view, args);
             str_span.write();
             return result;
         }

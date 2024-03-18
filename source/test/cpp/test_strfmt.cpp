@@ -15,9 +15,9 @@ namespace ncore
     namespace fmt
     {
         // should we have a boolean return value to indicate whether the format is correctly handled?
-        void FormatDateTime(u8 argType, u64 argValue, fmt::str_t& dst, fmt::state_t& state)
+        void FormatDateTime(encoded_arg_t const& argValue, fmt::strspan_t& dst, fmt::state_t& state)
         {
-            DateTime dt = {argValue};
+            DateTime dt = {argValue.first.u64};
 
             char buf[128];
             fmt::toStr(buf, 128, "{}/{:02d}/{:02d}", 2023, 12, 25);
@@ -29,8 +29,8 @@ namespace ncore
         template <>
         struct arg_t<DateTime>
         {
-            static inline u64           encode(DateTime v) { return *((u64*)(&v.ticks)); }
-            static inline DateTime      decode(u64 v) { return DateTime{v}; }
+            static inline encoded_arg_t encode(DateTime v) { encoded_arg_t e; e.first.u64 = v.ticks; return e; }
+            static inline DateTime      decode(encoded_arg_t const& v) { return DateTime{v.first.u64}; }
             static inline format_func_t formatter() { return FormatDateTime; }
         };
 
@@ -838,7 +838,7 @@ UNITTEST_SUITE_BEGIN(test_strfmt)
             fmt::toStr(str, 128, "{:s}", s4);
             CHECK_EQUAL(str, "str");
 
-            fmt::str_t sv(s1);
+            fmt::strspan_t sv(s1);
             fmt::toStr(str, 128, "{}", sv);
             CHECK_EQUAL(str, "str");
             fmt::toStr(str, 128, "{:s}", sv);

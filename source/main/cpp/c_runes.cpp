@@ -2566,7 +2566,7 @@ namespace ncore
 
         bool concatenate(runes_t& str, const crunes_t& concat1, const crunes_t& concat2)
         {
-            s32 const required = str.size() + concat1.size() + concat2.size();
+            u32 const required = str.size() + concat1.size() + concat2.size();
             if (required > str.cap())
                 return false;
             concatenate(str, concat1);
