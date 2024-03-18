@@ -3,7 +3,7 @@
 Cross platform base library
 
 - cbase
-  - systm allocator
+  - system allocator
   - binary search
   - bitfield
   - buffer / binary reader / binary writer
