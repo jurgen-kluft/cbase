@@ -941,35 +941,6 @@ UNITTEST_SUITE_BEGIN(test_strfmt)
             CHECK_EQUAL(str, "abracadabra");
         }
 
-        static bool test_float_conversion(const double value)
-        {
-            const char types[]{'f', 'e', 'g'};
-
-            for (int t = 0; t < 3; ++t)  // Test fixed, scientific and general format
-            {
-                for (int p = 0; p <= 9; ++p)  // Test precision from 0 to 9
-                {
-                    char std_str[64]{};
-                    char usf_str[64]{};
-
-                    char std_fmt[8]{'%', '.', "0123456789"[p], types[t], 0};
-                    char usf_fmt[8]{'{', ':', '.', "0123456789"[p], types[t], '}', 0};
-
-                    UnitTest::gStringPrint(std_str, 64 - 1, std_fmt, value);
-
-                    fmt::toStr(usf_str, 64 - 1, usf_fmt, value);
-
-                    bool result_ok = UnitTest::gAreStringsEqual(usf_str, std_str);
-                    if (!result_ok)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
         // Some random floating point numbers to test...
         constexpr double test_values_fp[]{
           0.00085499999999999997,
@@ -1028,9 +999,29 @@ UNITTEST_SUITE_BEGIN(test_strfmt)
 
         UNITTEST_TEST(test_float_conversion)
         {
+            const char types[]{'f', 'e', 'g'};
             for (s32 i = 0; i < sizeof(test_values_fp) / sizeof(test_values_fp[0]); ++i)
             {
-                CHECK_TRUE(test_float_conversion(test_values_fp[i]));
+                const double value = test_values_fp[i];
+
+                for (int t = 0; t < 3; ++t)  // Test fixed, scientific and general format
+                {
+                    for (int p = 0; p <= 9; ++p)  // Test precision from 0 to 9
+                    {
+                        char std_str[64]{};
+                        char usf_str[64]{};
+
+                        char std_fmt[8]{'%', '.', "0123456789"[p], types[t], 0};
+                        char usf_fmt[8]{'{', ':', '.', "0123456789"[p], types[t], '}', 0};
+
+                        UnitTest::gStringPrint(std_str, 64 - 1, std_fmt, value);
+                        fmt::toStr(usf_str, 64 - 1, usf_fmt, value);
+
+                        //CHECK_TRUE( UnitTest::gAreStringsEqual(usf_str, std_str) );
+                        CHECK_EQUAL(usf_str, std_str);
+                    }
+                }
+
             }
         }
     }
