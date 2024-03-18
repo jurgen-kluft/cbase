@@ -2,7 +2,7 @@
 
 Cross platform base library
 
-- cbase
+- cbase (depends on ccore)
   - system allocator
   - binary search
   - bitfield
