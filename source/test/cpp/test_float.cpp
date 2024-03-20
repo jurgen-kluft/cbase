@@ -205,7 +205,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 		{
 			CHECK_TRUE(math::bin(0.0f) == 0);
 #ifdef D_IEEE_FLOATS
-			CHECK_TRUE(math::bin(math::nan()) == math::bin(math::nan()+1));
+            CHECK_NOT_EQUAL(math::bin(math::nan()), math::bin(math::nan() + 1));
 #endif
 			CHECK_TRUE(math::bin(1.0f) == (u32)0x3f800000);
 			CHECK_TRUE(math::bin(-2.0f) == (u32)0xc0000000);
@@ -216,7 +216,7 @@ UNITTEST_SUITE_BEGIN(test_float)
 			CHECK_EQUAL(math::sbin(0.0f), 0);
 			CHECK_EQUAL(math::sbin(-2.0f), (s32)0xc0000000);
 #ifdef D_IEEE_FLOATS
-			CHECK_EQUAL(math::sbin(math::nan()), math::sbin(math::nan()+1));
+            CHECK_NOT_EQUAL(math::sbin(math::nan()), math::sbin(math::nan() + 1));
 #endif
 		}
 

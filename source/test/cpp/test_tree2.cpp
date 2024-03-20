@@ -854,16 +854,17 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
     UNITTEST_FIXTURE(tree2)
     {
-        static ctxt_tree2_t    ctxt_instance;
-        static ntree2::tree_t *ctxt = &ctxt_instance;
-
         UNITTEST_ALLOCATOR;
 
-        UNITTEST_FIXTURE_SETUP() { ctxt_instance.init(Allocator); }
-        UNITTEST_FIXTURE_TEARDOWN() { ctxt_instance.exit(); }
+        UNITTEST_FIXTURE_SETUP() {}
+        UNITTEST_FIXTURE_TEARDOWN() {}
 
         UNITTEST_TEST(tree_node)
         {
+            ctxt_tree2_t ctxt_instance;
+            ctxt_instance.init(Allocator);
+            ntree2::tree_t *ctxt = &ctxt_instance;
+
             s32 const key = 0;
 
             ntree2::node_t *node  = ctxt->v_new_node(&key, nullptr);
@@ -930,10 +931,18 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             ctxt->v_del_node(node);
             ctxt->v_del_node(left);
             ctxt->v_del_node(right);
+
+            CHECK_EQUAL(1, ntree2::size(ctxt));
+
+            ctxt_instance.exit();
         }
 
         UNITTEST_TEST(void_tree)
         {
+            ctxt_tree2_t ctxt_instance;
+            ctxt_instance.init(Allocator);
+            ntree2::tree_t *ctxt = &ctxt_instance;
+
             s32 a = 1;
             s32 b = 2;
             s32 c = 3;
@@ -977,7 +986,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_TRUE(inserted);
             CHECK_TRUE(ntree2::validate(ctxt, result));
 
-            CHECK_EQUAL(9 + 2, ntree2::size(ctxt));
+            CHECK_EQUAL(9 + 1, ntree2::size(ctxt));
 
             ntree2::node_t *node = nullptr;
             CHECK_EQUAL(true, ntree2::find(ctxt, &a, node));
@@ -993,15 +1002,21 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             s32 x(99);
             CHECK_FALSE(ntree2::find(ctxt, &x, node));
 
-            CHECK_EQUAL(11, ntree2::size(ctxt));
+            CHECK_EQUAL(10, ntree2::size(ctxt));
 
             while (!ntree2::clear(ctxt)) {}
 
-            CHECK_EQUAL(2, ntree2::size(ctxt));
+            CHECK_EQUAL(1, ntree2::size(ctxt));
+
+            ctxt_instance.exit();
         }
 
         UNITTEST_TEST(void_tree_iterate_preorder)
         {
+            ctxt_tree2_t ctxt_instance;
+            ctxt_instance.init(Allocator);
+            ntree2::tree_t *ctxt = &ctxt_instance;
+
             s32 a = 1;
             s32 b = 2;
             s32 c = 3;
@@ -1035,10 +1050,16 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_EQUAL(9, round);
 #endif
             while (!ntree2::clear(ctxt)) {}
+
+            ctxt_instance.exit();
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder)
         {
+            ctxt_tree2_t ctxt_instance;
+            ctxt_instance.init(Allocator);
+            ntree2::tree_t *ctxt = &ctxt_instance;
+
             s32 a = 1;
             s32 b = 2;
             s32 c = 3;
@@ -1073,10 +1094,16 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 #endif
 
             while (!ntree2::clear(ctxt)) {}
+
+            ctxt_instance.exit();
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
         {
+            ctxt_tree2_t ctxt_instance;
+            ctxt_instance.init(Allocator);
+            ntree2::tree_t *ctxt = &ctxt_instance;
+
             s32 a = 1;
             s32 b = 2;
             s32 c = 3;
@@ -1111,10 +1138,16 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 #endif
 
             while (!ntree2::clear(ctxt)) {}
+
+            ctxt_instance.exit();
         }
 
         UNITTEST_TEST(void_tree_iterate_postorder)
         {
+            ctxt_tree2_t ctxt_instance;
+            ctxt_instance.init(Allocator);
+            ntree2::tree_t *ctxt = &ctxt_instance;
+
             s32 a = 1;
             s32 b = 2;
             s32 c = 3;
@@ -1150,10 +1183,16 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 #endif
 
             while (!ntree2::clear(ctxt)) {}
+
+            ctxt_instance.exit();
         }
 
         UNITTEST_TEST(void_tree_search)
         {
+            ctxt_tree2_t ctxt_instance;
+            ctxt_instance.init(Allocator);
+            ntree2::tree_t *ctxt = &ctxt_instance;
+
             s32 a = 1;
             s32 b = 2;
             s32 c = 3;
@@ -1189,10 +1228,16 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_EQUAL(0, compare_s32(data, find));
 
             while (!ntree2::clear(ctxt)) {}
+
+            ctxt_instance.exit();
         }
 
         UNITTEST_TEST(s32_tree)
         {
+            ctxt_tree2_t ctxt_instance;
+            ctxt_instance.init(Allocator);
+            ntree2::tree_t *ctxt = &ctxt_instance;
+
             s32 a(1);
             s32 b(2);
             s32 c(3);
@@ -1216,7 +1261,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_TRUE(inserted);
             CHECK_TRUE(ntree2::validate(ctxt, result));
 
-            CHECK_EQUAL(6, ntree2::size(ctxt));
+            CHECK_EQUAL(5, ntree2::size(ctxt));
 
             ntree2::node_t *node = nullptr;
             CHECK_EQUAL(true, ntree2::find(ctxt, &a, node));
@@ -1229,7 +1274,9 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             while (!ntree2::clear(ctxt)) {}
 
-            CHECK_EQUAL(2, ntree2::size(ctxt));
+            CHECK_EQUAL(1, ntree2::size(ctxt));
+
+            ctxt_instance.exit();
         }
     }
 }

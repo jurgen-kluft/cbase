@@ -452,7 +452,8 @@ namespace ncore
         {
             if (m_it == nullptr)
             {
-                m_it = m_tree->v_get_root()->get_child(m_tree, d);
+                //m_it = m_tree->v_get_root()->get_child(m_tree, d);
+                m_it = m_tree->v_get_root();
             }
             else
             {
