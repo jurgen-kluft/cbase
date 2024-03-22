@@ -160,7 +160,7 @@ namespace ncore
         {
             while (valueB != 0)
             {
-                s32 t      = valueA % valueB;
+                s32 t  = valueA % valueB;
                 valueA = valueB;
                 valueB = t;
             }
@@ -177,6 +177,7 @@ namespace ncore
 
         // Return the power-of-two larger than or equal to value
         inline u32 ceilpo2(u32 value) { return 1 << (32 - countLeadingZeros(value - 1)); }
+        
         // Return the power-of-two smaller than or equal to value
         inline u32 floorpo2(u32 value) { return 1 << (31 - countLeadingZeros(value)); }
 
@@ -192,26 +193,8 @@ namespace ncore
             return n;
         }
 
-        inline s8 ilog2(u32 value)
-        {
-            value |= value >> 1;
-            value |= value >> 2;    
-            value |= value >> 4;
-            value |= value >> 8;
-            value |= value >> 16;
-            return countBits(value) - 1;
-        }
-
-        inline s8 ilog2(u64 value)
-        {
-            value |= value >> 1;
-            value |= value >> 2;
-            value |= value >> 4;
-            value |= value >> 8;
-            value |= value >> 16;
-            value |= value >> 32;
-            return countBits(value) - 1;
-        }
+        inline s8 ilog2(u32 value) { return 31 - countLeadingZeros(value); }
+        inline s8 ilog2(u64 value) { return 63 - countLeadingZeros(value); }
 
         // Roll all the bits in value to the left by shift number of bits
         inline u32 rol32(u32 value, u32 shift)
