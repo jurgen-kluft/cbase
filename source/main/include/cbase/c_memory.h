@@ -29,18 +29,18 @@ namespace ncore
     ///@note:			In DEBUG these functions should perform sanity checks on the source and destination memory blocks
     namespace nmem
     {
-        void* memset(void* inDest, u32 inValue, ptr_t inLength);
-        void* memcpy(void* inDest, const void* inSrc, ptr_t inLength);
-        s32   memcmp(const void* inLHS, const void* inRHS, u32 inLength);
-        void  memswap(void* inLHS, void* inRHS, u32 inLength);
-        void* memmove(void* inDest, const void* inSrc, u32 inLength);
+        void* memset(void* inDest, u32 inValue, int_t inLength);
+        void* memcpy(void* inDest, const void* inSrc, int_t inLength);
+        s32   memcmp(const void* inLHS, const void* inRHS, int_t inLength);
+        void  memswap(void* inLHS, void* inRHS, int_t inLength);
+        void* memmove(void* inDest, const void* inSrc, int_t inLength);
 
         template <class T> inline void memswap(T& inLHS, T& inRHS) { memswap(&inLHS, &inRHS, sizeof(T)); }
-        inline void                    memclr(void* inDest, u32 inLength) { memset(inDest, 0, inLength); }
+        inline void                    memclr(void* inDest, int_t inLength) { memset(inDest, 0, inLength); }
 
         ///@name Pointer arithmetic
-        inline void* ptr_add(void* ptr, s32 size) { return (void*)((u8*)ptr + size); }
-        inline void* ptr_add_clamp(void* ptr, s32 size, void* lower, void* upper)
+        inline void* ptr_add(void* ptr, int_t size) { return (void*)((u8*)ptr + size); }
+        inline void* ptr_add_clamp(void* ptr, int_t size, void* lower, void* upper)
         {
             void* p = (void*)((u8*)ptr + size);
             if (p < lower)
@@ -131,13 +131,13 @@ namespace ncore
         b = c;
     }
 
-    inline void g_memset(void* inDest, u32 inValue, u32 inLength) { nmem::memset(inDest, inValue, inLength); }
-    inline void g_memclr(void* inDest, u32 inLength) { nmem::memclr(inDest, inLength); }
-    inline void g_memcpy(void* inDest, const void* inSource, u32 inLength) { nmem::memcpy(inDest, inSource, inLength); }
-    inline s32  g_memcmp(const void* inLHS, const void* inRHS, u32 inLength) { return nmem::memcmp(inLHS, inRHS, inLength); }
-    inline void g_memswap(void* inLHS, void* inRHS, u32 inLength) { nmem::memswap(inLHS, inRHS, inLength); }
+    inline void g_memset(void* inDest, u32 inValue, int_t inLength) { nmem::memset(inDest, inValue, inLength); }
+    inline void g_memclr(void* inDest, int_t inLength) { nmem::memclr(inDest, inLength); }
+    inline void g_memcpy(void* inDest, const void* inSource, int_t inLength) { nmem::memcpy(inDest, inSource, inLength); }
+    inline s32  g_memcmp(const void* inLHS, const void* inRHS, int_t inLength) { return nmem::memcmp(inLHS, inRHS, inLength); }
+    inline void g_memswap(void* inLHS, void* inRHS, int_t inLength) { nmem::memswap(inLHS, inRHS, inLength); }
 
-    inline s32 g_memcmp2(const u16* inLHS, const u16* inRHS, u32 inLength)
+    inline s32 g_memcmp2(const u16* inLHS, const u16* inRHS, int_t inLength)
     {
         for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
         {
@@ -148,7 +148,7 @@ namespace ncore
         }
         return 0;
     }
-    inline s32 g_memcmp4(const u32* inLHS, const u32* inRHS, u32 inLength)
+    inline s32 g_memcmp4(const u32* inLHS, const u32* inRHS, int_t inLength)
     {
         for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
         {
@@ -159,7 +159,7 @@ namespace ncore
         }
         return 0;
     }
-    inline s32 g_memcmp8(const u64* inLHS, const u64* inRHS, u32 inLength)
+    inline s32 g_memcmp8(const u64* inLHS, const u64* inRHS, int_t inLength)
     {
         for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
         {
@@ -171,31 +171,31 @@ namespace ncore
         return 0;
     }
 
-    inline void g_memzero(void* inBlock, s32 inLength) { g_memset(inBlock, 0, inLength); }
-    inline void g_memcopy2(u16* inDest, const u16* inSource, u32 inLength)
+    inline void g_memzero(void* inBlock, int_t inLength) { g_memset(inBlock, 0, inLength); }
+    inline void g_memcopy2(u16* inDest, const u16* inSource, int_t inLength)
     {
         for (u32 i = 0; i < inLength; i++)
             *inDest++ = *inSource++;
     }
     ///< Copy <inLength> aligned 16-bit integers from <inSource> to <inDest>
-    inline void g_memcopy4(u32* inDest, const u32* inSource, u32 inLength)
+    inline void g_memcopy4(u32* inDest, const u32* inSource, int_t inLength)
     {
         for (u32 i = 0; i < inLength; i++)
             *inDest++ = *inSource++;
     }
     ///< Copy <inLength> aligned 32-bit integers from <inSource> to <inDest>
-    inline void g_memcopy8(u64* inDest, const u64* inSource, u32 inLength)
+    inline void g_memcopy8(u64* inDest, const u64* inSource, int_t inLength)
     {
         for (u32 i = 0; i < inLength; i++)
             *inDest++ = *inSource++;
     }
     ///< Copy <inLength> aligned 128-bit integers from <inSource> to <inDest>
 
-    inline void* g_memmove(void* inDest, const void* inSource, u32 inLength) { return nmem::memmove(inDest, inSource, inLength); }
-    inline void  g_memcopy(void* inDest, const void* inSource, u32 inLength) { g_memcpy(inDest, inSource, inLength); }
-    inline s32   g_memcompare(const void* inBlock1, const void* inBlock2, u32 inLength) { return g_memcmp(inBlock1, inBlock2, inLength); }
+    inline void* g_memmove(void* inDest, const void* inSource, int_t inLength) { return nmem::memmove(inDest, inSource, inLength); }
+    inline void  g_memcopy(void* inDest, const void* inSource, int_t inLength) { g_memcpy(inDest, inSource, inLength); }
+    inline s32   g_memcompare(const void* inBlock1, const void* inBlock2, int_t inLength) { return g_memcmp(inBlock1, inBlock2, inLength); }
     ///< Return the result of the lexicographical compare between memory block <inBlock1> and <inBlock2> of length <inLength>, return <0 if inBlock1<inBlock2, >0 if inBlock1>inBlock2 and 0 if inBlock1==inBlock2
-    inline bool g_memequal(const void* inBlock1, const void* inBlock2, u32 inLength) { return (g_memcompare(inBlock1, inBlock2, inLength) == 0); }
+    inline bool g_memequal(const void* inBlock1, const void* inBlock2, int_t inLength) { return (g_memcompare(inBlock1, inBlock2, inLength) == 0); }
 
 } // namespace ncore
 #endif ///< __C_MEMORY_STD_H__

@@ -6,7 +6,7 @@ namespace ncore
 	{
 #define	wsize	sizeof(u32)
 #define	wmask	(wsize - 1)
-		void* memcpy(void* dst0, const void* src0, ptr_t length)
+		void* memcpy(void* dst0, const void* src0, int_t length)
 		{
 			// Copy a block of memory, handling overlap.
 			// This is the routine that actually implements
@@ -75,7 +75,7 @@ namespace ncore
 			return (dst0);
 		}
 
-        void* memset(void* dest, u32 c, ptr_t n) 
+        void* memset(void* dest, u32 c, int_t n) 
 		{
 			unsigned char *s = (unsigned char *)dest;
 			ptr_t k;
@@ -114,9 +114,9 @@ namespace ncore
 			return dest;
 		}
 
-        void* memmove(void* inDest, const void* inSrc, u32 inLength) { return memcpy(inDest, inSrc, inLength); }
+        void* memmove(void* inDest, const void* inSrc, int_t inLength) { return memcpy(inDest, inSrc, inLength); }
         
-		s32 memcmp(const void* p1, const void* p2, u32 n) 
+		s32 memcmp(const void* p1, const void* p2, int_t inLength) 
 		{ 
 			u32 i;
 
@@ -132,23 +132,23 @@ namespace ncore
 			}
 
 			// This for loop does the comparing and pointer moving...
-			for(i = 0; (i < n) && (*(u8*)p1 == *(u8*)p2); i++, p1 = 1 + (u8*)p1, p2 = 1 + (u8*)p2)
+			for(i = 0; (i < inLength) && (*(u8*)p1 == *(u8*)p2); i++, p1 = 1 + (u8*)p1, p2 = 1 + (u8*)p2)
 			{
 				// empty body
 			}
 
 			// if i == length, then we have passed the test
-			return (i == n) ? 0 : (*(u8*)p1 - *(u8*)p2);
+			return (i == inLength) ? 0 : (*(u8*)p1 - *(u8*)p2);
 		}
 
-        void memswap(void* inLHS, void* inRHS, u32 n)
+        void memswap(void* inLHS, void* inRHS, int_t inLength)
         {
 			char *p1 = (char *)inLHS;
 			char *p2 = (char *)inRHS;
-			ASSERT(((p1 < p2) && ((p1 + n) <= p2)) || ((p2 < p1) && ((p2 + n) <= p1)));
+			ASSERT(((p1 < p2) && ((p1 + inLength) <= p2)) || ((p2 < p1) && ((p2 + inLength) <= p1)));
             u8* lhs = (u8*)inLHS;
             u8* rhs = (u8*)inRHS;
-            for (u32 i = 0; i < n; i++)
+            for (u32 i = 0; i < inLength; i++)
             {
                 const u8 t = lhs[i];
                 lhs[i]     = rhs[i];
