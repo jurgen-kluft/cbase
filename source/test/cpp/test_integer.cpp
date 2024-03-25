@@ -194,13 +194,21 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			CHECK_EQUAL(1, math::countBits(b));
 		}
 
-		UNITTEST_TEST(Log2)
-		{
-			s32 a = 13, b = 64, c = 1;
-			CHECK_EQUAL(3, math::ilog2(a));
-			CHECK_EQUAL(6, math::ilog2(b));
-			CHECK_EQUAL(0, math::ilog2(c));
-		}
+		UNITTEST_TEST(Log2_s32)
+        {
+            s32 a = 13, b = 64, c = 1;
+            CHECK_EQUAL(3, math::ilog2(a));
+            CHECK_EQUAL(6, math::ilog2(b));
+            CHECK_EQUAL(0, math::ilog2(c));
+        }
+
+		UNITTEST_TEST(Log2_u32)
+        {
+            u32 a = 0x1, b = 0x10000, c = 0x80000000;
+            CHECK_EQUAL(0, math::ilog2(a));
+            CHECK_EQUAL(16, math::ilog2(b));
+            CHECK_EQUAL(31, math::ilog2(c));
+        }
 
 		UNITTEST_TEST(CountTrailingZeros16)
 		{

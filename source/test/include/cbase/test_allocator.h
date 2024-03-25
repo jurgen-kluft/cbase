@@ -23,7 +23,7 @@ public:
 };
 
 #define UNITTEST_ALLOCATOR                         \
-    static test_alloc_t TestAlloc(&TestAllocator); \
+    static test_alloc_t TestAlloc(&FixtureAllocator); \
     static alloc_t*     Allocator = &TestAlloc
 
 #endif // __TEST_ALLOCATOR_H__

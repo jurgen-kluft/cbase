@@ -39,28 +39,28 @@ namespace ncore
         inline s8 countLeadingZeros(u8 value)
         {
             unsigned long v;
-            return ::_BitScanReverse(&v, value) ? 7 - (s8)v : (s8)8;
+            return ::_BitScanReverse(&v, value) ? (s8)7 - (s8)v : (s8)8;
         }
         // find the number of leading zeros in 16-bit value
         // if 'value==0' this function returns 16
         inline s8 countLeadingZeros(u16 value)
         {
             unsigned long v;
-            return ::_BitScanReverse(&v, value) ? 15 - (s8)v : (s8)16;
+            return ::_BitScanReverse(&v, value) ? (s8)15 - (s8)v : (s8)16;
         }
         // find the number of leading zeros in 32-bit value
         // if 'value==0' this function returns 32
         inline s8 countLeadingZeros(u32 value)
         {
             unsigned long v;
-            return ::_BitScanReverse(&v, value) ? 31 - (s8)v : 32;
+            return ::_BitScanReverse(&v, value) ? (s8)31 - (s8)v : 32;
         }
         // find the number of leading zeros in 64-bit value
         // if 'value==0' this function returns 64
         inline s8 countLeadingZeros(u64 value)
         {
             unsigned long v;
-            return ::_BitScanReverse64(&v, value) ? 63 - (s8)v : (s8)64;
+            return ::_BitScanReverse64(&v, value) ? (s8)63 - (s8)v : (s8)64;
         }
 
         // Return value but with only the Least Significant Bit "1"
