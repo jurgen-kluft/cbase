@@ -79,14 +79,11 @@ namespace ncore
             return ptr;
         }
 
-        virtual u32 v_deallocate(void* ptr)
+        virtual void v_deallocate(void* ptr)
         {
             --mAllocationCount;
             mac_aligned_free(ptr);
-            return 0;
         }
-
-        virtual void v_release() {}
 
         s32 mInitialized;
         s32 mDefaultAlignment;

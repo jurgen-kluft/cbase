@@ -60,7 +60,7 @@ namespace ncore
             return mem;
         }
 
-        virtual u32 v_deallocate(void* ptr)
+        virtual void v_deallocate(void* ptr)
         {
             --mAllocationCount;
 #ifdef COMPILER_MSVC
@@ -70,15 +70,6 @@ namespace ncore
             _aligned_free(ptr);
 #endif
 #endif
-            return 0;
-        }
-
-        virtual void v_release()
-        {
-            ASSERTS(mAllocationCount == 0, "ERROR: System Allocator is being released but still has allocations that are not freed");
-            mInitialized      = 0;
-            mDefaultAlignment = 0;
-            mAllocationCount  = 0;
         }
 
         s32 mInitialized;

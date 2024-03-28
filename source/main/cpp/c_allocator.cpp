@@ -78,13 +78,12 @@ namespace ncore
         return get_item_ptr(m_data, freeitem, m_sizeof);
     }
 
-    u32 fsadexed_array_t::v_deallocate(void* p)
+    void fsadexed_array_t::v_deallocate(void* p)
     {
         u32 const idx  = ptr2idx(p);
         u32*      item = (u32*)p;
         *item          = m_freelist;
         m_freelist     = idx;
-        return m_sizeof;
     }
 
     void* fsadexed_array_t::v_idx2ptr(u32 index) const
@@ -104,5 +103,4 @@ namespace ncore
         return i;
     }
 
-    void fsadexed_array_t::v_release() {}
 };  // namespace ncore

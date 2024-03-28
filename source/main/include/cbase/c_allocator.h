@@ -32,8 +32,7 @@ namespace ncore
     public:
         inline u32   size() const { return v_size(); }
         inline void* allocate() { return v_allocate(); }
-        inline u32   deallocate(void* ptr) { return v_deallocate(ptr); }
-        inline void  release() { v_release(); }
+        inline void  deallocate(void* ptr) { v_deallocate(ptr); }
 
         template <typename T, typename... Args>
         T* construct(Args... args)
@@ -54,8 +53,7 @@ namespace ncore
     protected:
         virtual u32   v_size() const      = 0;
         virtual void* v_allocate()        = 0;
-        virtual u32   v_deallocate(void*) = 0;
-        virtual void  v_release()         = 0;
+        virtual void  v_deallocate(void*) = 0;
 
         virtual ~fsa_t() {}
     };
@@ -77,8 +75,7 @@ namespace ncore
     protected:
         virtual u32   v_size() const { return m_size; }
         virtual void* v_allocate() { return m_allocator->allocate(m_size, sizeof(void*)); }
-        virtual u32   v_deallocate(void* p) { return m_allocator->deallocate(p); }
-        virtual void  v_release() { return m_allocator->release(); }
+        virtual void  v_deallocate(void* p) { m_allocator->deallocate(p); }
 
     private:
         alloc_t* m_allocator;
@@ -187,11 +184,10 @@ namespace ncore
 
     protected:
         virtual void* v_allocate();
-        virtual u32   v_deallocate(void*);
+        virtual void  v_deallocate(void*);
         virtual u32   v_size() const;
         virtual void* v_idx2ptr(u32 index) const;
         virtual u32   v_ptr2idx(void* ptr) const;
-        virtual void  v_release();
 
     private:
         void* m_data;
