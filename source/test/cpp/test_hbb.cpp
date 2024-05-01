@@ -27,12 +27,13 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             clear_bitmap();
 
             hbb_t hbb;
-            hbb.init(256, 1, bitmap);
-            CHECK_TRUE(hbb.m_hbb[0] == 0x000000FF);
+            hbb.init(256, bitmap);
+            CHECK_TRUE(hbb.m_hbb[0] == 0xFFFFFFFF);
+            CHECK_TRUE(hbb.m_hbb[1+7] == 0xFFFFFFFF);
 
-            hbb.init(248, 1, bitmap);
-            CHECK_TRUE(hbb.m_hbb[0] == 0x000000FF);
-            CHECK_TRUE(hbb.m_hbb[1+7] == 0x00FFFFFF);
+            hbb.init(248, false, bitmap);
+            CHECK_TRUE(hbb.m_hbb[0] == 0xFFFFFF00);
+            CHECK_TRUE(hbb.m_hbb[1+7] == 0xFF000000);
         }
 
         UNITTEST_TEST(set_and_is_set)
@@ -40,11 +41,10 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             clear_bitmap();
 
             u32 const maxbits = 8192;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) < 4096);
 
             hbb_t hbb;
-            hbb.init(maxbits, 0, bitmap);
-            hbb.reset(0);
+            hbb.init(maxbits, true, bitmap);
+            hbb.reset(false);
 
             CHECK_EQUAL(false, hbb.is_set(10));
             hbb.set(10);
@@ -56,7 +56,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             clear_bitmap();
 
             u32 const maxbits = 8192;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) < 4096);
+            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == (256 + 8 + 1));
 
             hbb_t hbb; 
             hbb.init(maxbits, 0, bitmap);
@@ -71,7 +71,18 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
                 CHECK_TRUE(hbb.find(b1));
                 CHECK_EQUAL(b, b1);
                 hbb.clr(b);
-                CHECK_FALSE(hbb.find(b1));
+            }
+            
+            for (s32 b=0; b<1024; b++)
+            {
+                hbb.set(b);
+            }
+
+            for (s32 b=0; b < 1024; b++)
+            {
+                CHECK_TRUE(hbb.find(b1));
+                CHECK_EQUAL(b, b1);
+                hbb.clr(b);
             }
         }
 
@@ -80,8 +91,9 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             clear_bitmap();
 
             u32 const maxbits = 8192;
+            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == (256 + 8 + 1));
+
             hbb_t hbb;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) < 4096);
             hbb.init(maxbits, 0, bitmap);
             hbb.reset(0);
 
@@ -104,8 +116,9 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             clear_bitmap();
 
             u32 const maxbits = 8192;
+            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == (256 + 8 + 1));
+
             hbb_t hbb;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) < 4096);
             hbb.init(maxbits, 0, bitmap);
             hbb.reset(0);
 
@@ -126,8 +139,9 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             clear_bitmap();
 
             u32 const maxbits = 8192;
+            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == (256 + 8 + 1));
+
             hbb_t hbb;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) < 4096);
             hbb.init(maxbits, 0, bitmap);
             hbb.reset(0);
 
