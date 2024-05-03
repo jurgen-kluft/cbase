@@ -37,7 +37,7 @@ namespace ncore
         inline s8 countLeadingZeros(u64 value) { return (value == 0) ? (s8)64 : (s8)__builtin_clzll(value); }
 
         // Return v but with only the Least Significant Bit "1"
-        inline u32 leastSignificantOneBit(u32 value) {return (value ^ (value & (value - 1))); }
+        inline u32 leastSignificantOneBit(u32 value) { return (value ^ (value & (value - 1))); }
 
         // Return v but with only the Most Significant Bit "1"
         // If 'value == 0' this function will return 0
@@ -103,16 +103,7 @@ namespace ncore
             return __builtin_popcount(i);
         }
 
-        inline s8 countBits(u32 value)
-        {
-            u32 i = value;
-            return __builtin_popcount(i);
-        }
-
-        inline s8 countBits(u64 value)
-        {
-            u64 i = value;
-            return __builtin_popcountll(i);
-        }
+        inline s8 countBits(u32 value) { return __builtin_popcount(value); }
+        inline s8 countBits(u64 value) { return __builtin_popcountll(value); }
     }  // namespace math
 }  // namespace ncore
