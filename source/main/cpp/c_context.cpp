@@ -10,9 +10,6 @@ namespace ncore
     // - A local thread allocator (local to the thread)
     // - A random generator
 
-    static s32 sThreadIndexCount = 0;
-    thread_local s32 sThreadIndex;
-
     void** context_t::m_slots = nullptr;
     s32    context_t::m_max_num_threads = 0;
     s32    context_t::m_max_num_slots = 0;
@@ -32,6 +29,8 @@ namespace ncore
         m_slots = nullptr;
     }
 
+    thread_local s32 sThreadIndex;
+    static s32 sThreadIndexCount = 0;
     s32 context_t::register_thread()
     {
         // Is this thread-safe ?

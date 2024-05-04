@@ -4,9 +4,7 @@
 
 Using Go to manage our packages and dependencies and generating Visual Studio projects as well as Tundra build files. [Done]
 
-## cbase
-
-Naming convention:
+## Style & Naming Conventions
 
 - package starts with c (e.g. cbase, ccore, cstring, callocator, chash, crandom, cfilesystem) [Done]
 - namespaces start with n (e.g. ncore, nrunes) [Done]
@@ -18,10 +16,11 @@ Naming convention:
 
 string class (UCS-2, UTF-16)
 
-## callocator
+## csuperalloc
 
 The package csuperalloc contains a virtual memory allocator.
-Also, split of debugging allocators like memento to cdealloc
+
+- split of debugging allocators like memento to cdealloc
 
 ## catomic
 
