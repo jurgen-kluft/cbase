@@ -9,6 +9,18 @@ namespace ncore
 {
     struct crunes_t;
 
+    class hasher_t
+    {
+    public:
+        virtual ~hasher_t() {}
+        
+        virtual s32  size() const                         = 0;
+        virtual void reset()                              = 0;
+        virtual void begin()                              = 0;
+        virtual void hash(const u8* begin, const u8* end) = 0;
+        virtual void end(u8* out_hash, s32 size)          = 0;
+    };
+
     namespace nhash
     {
         u64 datahash(u8 const* data, u32 size, u64 seed = 0);
@@ -27,21 +39,21 @@ namespace ncore
         u32 strhash32_lowercase(const char* str, const char* end, u64 seed = 0);
         u32 strhash32_lowercase(crunes_t const& str, u64 seed = 0);
 
-        template <typename K> class hasher_t
+        template <typename K> class hashing_t
         {
         public:
             bool is_hashable() const { return false; }
             u64  hash(K const& k) const { return static_cast<u64>(k); }
         };
 
-        template <> class hasher_t<void*>
+        template <> class hashing_t<void*>
         {
         public:
             bool is_hashable() const { return false; }
             u64  hash(void* const k) const { return (u64)k; }
         };
 
-        template <> class hasher_t<const char*>
+        template <> class hashing_t<const char*>
         {
         public:
             bool is_hashable() const { return true; }

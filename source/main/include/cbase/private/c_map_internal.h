@@ -3,7 +3,7 @@
 
 namespace ncore
 {
-    template <typename T, typename K, typename V, typename H = nhash::hasher_t<K>>
+    template <typename T, typename K, typename V, typename H = nhash::hashing_t<K>>
     class map_tree_ctxt_t : public ntree::tree_t
     {
     public:

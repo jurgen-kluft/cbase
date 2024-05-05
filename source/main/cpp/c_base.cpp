@@ -15,6 +15,8 @@ namespace ncore
         extern void wyrand(u64* seed, u8* buffer, u32 size);
     }  // namespace nhash
 
+    // Note: This is the default random generator that is used by context_t
+    // The user is able to change the random generator by calling context_t::set_random()
     class wyrand_t : public random_t
     {
     public:
@@ -40,17 +42,15 @@ namespace cbase
 {
     void init(ncore::s32 number_of_threads, ncore::s32 temporary_allocator_size)
     {
-        ncore::asserthandler_t* assert_handler = gSetAssertHandler();
-
         ncore::init_system_alloc();
 
         ncore::console_t::init_default_console();
         ncore::context_t::init(number_of_threads, 16, ncore::get_system_alloc());
         ncore::context_t::register_thread();  // Should be called once from a created thread
 
-        ncore::alloc_t*       system_allocator = ncore::get_system_alloc();
-
         // The assert handler, system and string allocator are thread safe
+        ncore::alloc_t*         system_allocator = ncore::get_system_alloc();
+        ncore::asserthandler_t* assert_handler   = gSetAssertHandler();
         for (ncore::s32 i = 0; i < number_of_threads; i++)
         {
             const ncore::s32 slot = i;
