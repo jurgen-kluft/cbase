@@ -173,7 +173,7 @@ namespace ncore
 
                 hbb_data_t hbb_dst = nullptr;
                 g_hbb_init(hdr_dst, maxbits);
-                g_hbb_init(hdr_dst, hbb_dst, -1, alloc);
+                g_hbb_init(hdr_dst, hbb_dst, init_all_set, alloc);
 
                 u32 dst_offsets[5];
                 s_get_level_offsets(hdr_dst, dst_offsets);
