@@ -30,14 +30,14 @@ namespace ncore
     class fsa_t
     {
     public:
-        inline u32   size() const { return v_size(); }
+        inline u32   allocsize() const { return v_allocsize(); }
         inline void* allocate() { return v_allocate(); }
         inline void  deallocate(void* ptr) { v_deallocate(ptr); }
 
         template <typename T, typename... Args>
         T* construct(Args... args)
         {
-            ASSERT(sizeof(T) <= size());
+            ASSERT(sizeof(T) <= allocsize());
             void* mem    = v_allocate();
             T*    object = new (mem) T(args...);
             return object;
@@ -51,7 +51,7 @@ namespace ncore
         }
 
     protected:
-        virtual u32   v_size() const      = 0;
+        virtual u32   v_allocsize() const = 0;
         virtual void* v_allocate()        = 0;
         virtual void  v_deallocate(void*) = 0;
 
