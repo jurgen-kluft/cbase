@@ -6,6 +6,8 @@ Using Go to manage our packages and dependencies and generating Visual Studio pr
 
 ## Style & Naming Conventions
 
+Use `clang-format -i -style=file **/*.cpp` to automatically format all C++ files in a project.
+
 - package starts with c (e.g. cbase, ccore, cstring, callocator, chash, crandom, cfilesystem) [Done]
 - namespaces start with n (e.g. ncore, nrunes) [Done]
 - struct/class ends with _t (e.g. alloc_t) [Done]
