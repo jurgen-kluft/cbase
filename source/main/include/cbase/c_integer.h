@@ -1,4 +1,4 @@
-// x_integer.h - Basic bit/int trick operations
+// c_integer.h - Basic integer math
 #ifndef __CBASE_INTEGER_UTILS_H__
 #define __CBASE_INTEGER_UTILS_H__
 #include "ccore/c_target.h"
@@ -17,9 +17,6 @@ namespace ncore
 #undef log2
 #endif
 
-#ifndef __GNU_C__
-#define D_INTU_OPTIMIZED
-#endif
     namespace math
     {
         template <class T> T min(T integerA, T integerB);             ///< Return the smallest value of 2
