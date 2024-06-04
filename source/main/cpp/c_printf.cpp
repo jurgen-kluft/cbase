@@ -82,8 +82,6 @@ namespace ncore
 #define FLAGS_PRECISION (1U << 10U)
 #define FLAGS_ADAPT_EXP (1U << 11U)
 
-#define DBL_MAX D_F64_MAX
-
     struct va_iter_t
     {
         const va_t* args;
@@ -386,9 +384,9 @@ namespace ncore
         // test for special values
         if (value != value)
             return _out_rev(out, buffer, buffer_pos, maxlen, "nan", 3, width, flags);
-        if (value < -DBL_MAX)
+        if (value < f64_min)
             return _out_rev(out, buffer, buffer_pos, maxlen, "fni-", 4, width, flags);
-        if (value > DBL_MAX)
+        if (value > f64_max)
             return _out_rev(out, buffer, buffer_pos, maxlen, (flags & FLAGS_PLUS) ? "fni+" : "fni", (flags & FLAGS_PLUS) ? 4U : 3U, width, flags);
 
         // test for very large values
@@ -526,7 +524,7 @@ namespace ncore
     static u64 _etoa(out_fct_type out, char* buffer, u64 buffer_pos, u64 maxlen, double value, u32 prec, u32 width, u32 flags)
     {
         // check for NaN and special values
-        if ((value != value) || (value > DBL_MAX) || (value < -DBL_MAX))
+        if ((value != value) || (value > f64_max) || (value < f64_min))
         {
             return _ftoa(out, buffer, buffer_pos, maxlen, value, prec, width, flags);
         }

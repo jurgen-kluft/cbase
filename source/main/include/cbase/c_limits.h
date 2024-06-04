@@ -7,41 +7,44 @@
 
 namespace ncore
 {
-#define D_U8_MIN (0)
-#define D_U8_MAX (255)
+static const u8 u8_min = 0;
+static const u8 u8_max = 0xFF;
 
-#define D_U16_MIN (0)
-#define D_U16_MAX (65535)
+static const u16 u16_min = 0;
+static const u16 u16_max = 0xFFFF;
 
-#define D_U32_MIN (0)
-#define D_U32_MAX (D_CONSTANT_U32(4294967295))
+static const u32 u32_min = 0;
+static const u32 u32_max = 0xFFFFFFFF;
 
-#define D_U64_MIN (D_CONSTANT_U64(0))
-#define D_U64_MAX (D_CONSTANT_U64(18446744073709551615))
+static const u64 u64_min = 0;
+static const u64 u64_max = 0xFFFFFFFFFFFFFFFF;
 
-#define D_S8_MIN -(128)
-#define D_S8_MAX (127)
+static const s8 s8_min = -128;
+static const s8 s8_max = 127;
 
-#define D_S16_MIN -(32768)
-#define D_S16_MAX (32767)
+static const s16 s16_min = -32768;
+static const s16 s16_max = 32767;
 
-#define D_S32_MIN (0x80000000L)
-#define D_S32_MAX (2147483647)
+static const s32 s32_min = 0x80000000L;
+static const s32 s32_max = 2147483647;
 
-#define D_S64_MIN (0x8000000000000000LL)
-#define D_S64_MAX (D_CONSTANT_64(9223372036854775807))
+static const s64 s64_min = 0x8000000000000000LL;
+static const s64 s64_max = 0x7FFFFFFFFFFFFFFFLL;
 
-#define D_F32_MIN -3.402823466e+38f
-#define D_F32_MAX 3.402823466e+38f
+static const f32 f32_min = -3.402823466e+38f;
+static const f32 f32_max = 3.402823466e+38f;
 
-#define D_F64_MIN -1.7976931348623158e+308
-#define D_F64_MAX 1.7976931348623158e+308
+static const f64 f64_min = -1.7976931348623158e+308;
+static const f64 f64_max = 1.7976931348623158e+308;
 
-#define D_BYTE_MIN D_U8_MIN
-#define D_BYTE_MAX D_U8_MAX
+static const byte byte_min = 0;
+static const byte byte_max = 0xFF;
 
-#define D_WCHAR_MIN U16_MIN
-#define D_WCHAR_MAX U16_MAX
+static const sbyte sbyte_min = -128;
+static const sbyte sbyte_max = 127;
+
+static const wchar wchar_min = 0;
+static const wchar wchar_max = 0xFFFF;
 
     /**
      * Description:
@@ -125,8 +128,8 @@ namespace ncore
     public:
         typedef u8 __type;
 
-        static __type  min() { return D_U8_MIN; }
-        static __type  max() { return D_U8_MAX; }
+        static __type  min() { return u8_min; }
+        static __type  max() { return u8_max; }
         static bool    has_sign() { return false; }
         static type_id id() { return type_id(type_id::UInt8); }
     };
@@ -137,8 +140,8 @@ namespace ncore
     public:
         typedef u16 __type;
 
-        static __type  min() { return D_U16_MIN; }
-        static __type  max() { return D_U16_MAX; }
+        static __type  min() { return u16_min; }
+        static __type  max() { return u16_max; }
         static bool    has_sign() { return false; }
         static type_id id() { return type_id(type_id::UInt16); }
     };
@@ -149,8 +152,8 @@ namespace ncore
     public:
         typedef u32 __type;
 
-        static __type  min() { return D_U32_MIN; }
-        static __type  max() { return D_U32_MAX; }
+        static __type  min() { return u32_min; }
+        static __type  max() { return u32_max; }
         static bool    has_sign() { return false; }
         static type_id id() { return type_id(type_id::UInt32); }
     };
@@ -161,8 +164,8 @@ namespace ncore
     public:
         typedef u64 __type;
 
-        static __type  min() { return D_U64_MIN; }
-        static __type  max() { return D_U64_MAX; }
+        static __type  min() { return u64_min; }
+        static __type  max() { return u64_max; }
         static bool    has_sign() { return false; }
         static type_id id() { return type_id(type_id::UInt64); }
     };
@@ -173,8 +176,8 @@ namespace ncore
     public:
         typedef s8 __type;
 
-        static __type  min() { return D_S8_MIN; }
-        static __type  max() { return D_S8_MAX; }
+        static __type  min() { return s8_min; }
+        static __type  max() { return s8_max; }
         static bool    has_sign() { return true; }
         static type_id id() { return type_id(type_id::Int8); }
     };
@@ -185,8 +188,8 @@ namespace ncore
     public:
         typedef s16 __type;
 
-        static __type  min() { return D_S16_MIN; }
-        static __type  max() { return D_S16_MAX; }
+        static __type  min() { return s16_min; }
+        static __type  max() { return s16_max; }
         static bool    has_sign() { return true; }
         static type_id id() { return type_id(type_id::Int16); }
     };
@@ -197,8 +200,8 @@ namespace ncore
     public:
         typedef s32 __type;
 
-        static __type  min() { return D_S32_MIN; }
-        static __type  max() { return D_S32_MAX; }
+        static __type  min() { return s32_min; }
+        static __type  max() { return s32_max; }
         static bool    has_sign() { return true; }
         static type_id id() { return type_id(type_id::Int32); }
     };
@@ -209,8 +212,8 @@ namespace ncore
     public:
         typedef s64 __type;
 
-        static __type  min() { return D_S64_MIN; }
-        static __type  max() { return D_S64_MAX; }
+        static __type  min() { return s64_min; }
+        static __type  max() { return s64_max; }
         static bool    has_sign() { return true; }
         static type_id id() { return type_id(type_id::Int64); }
     };
@@ -221,8 +224,8 @@ namespace ncore
     public:
         typedef f32 __type;
 
-        static __type  min() { return D_F32_MIN; }
-        static __type  max() { return D_F32_MAX; }
+        static __type  min() { return f32_min; }
+        static __type  max() { return f32_max; }
         static bool    has_sign() { return true; }
         static type_id id() { return type_id(type_id::Float); }
     };
@@ -233,12 +236,12 @@ namespace ncore
     public:
         typedef f64 __type;
 
-        static __type  min() { return D_F64_MIN; }
-        static __type  max() { return D_F64_MAX; }
+        static __type  min() { return f64_min; }
+        static __type  max() { return f64_max; }
         static bool    has_sign() { return true; }
         static type_id id() { return type_id(type_id::Double); }
     };
 
 };  // namespace ncore
 
-#endif  ///< END __CBASE_LIMITS_H__
+#endif
