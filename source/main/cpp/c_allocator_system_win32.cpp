@@ -5,14 +5,10 @@
 #define USE_MALLOC_DBG
 #endif
 
-#include <string.h>
-
 #ifdef USE_MALLOC_DBG
 #    include <crtdbg.h>
 #endif
 
-#include "cbase/c_memory.h"
-#include "cbase/c_integer.h"
 #include "cbase/c_allocator.h"
 
 namespace ncore

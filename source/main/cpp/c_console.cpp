@@ -1,12 +1,10 @@
-#include "ccore/c_debug.h"
-#include "cbase/c_memory.h"
-#include "cbase/c_va_list.h"
 #include "cbase/c_console.h"
 #include "cbase/c_runes.h"
-#include "cbase/c_printf.h"
 
 namespace ncore
 {
+    class va_t;
+
 #define D_CONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
     type::rune local_var_name##Buffer[size];               \
     runes_t    local_var_name(local_var_name##Buffer, 0, 0, (u32)size, type::TYPE);
