@@ -67,7 +67,7 @@ namespace ncore
     class asserthandler_release_t : public asserthandler_t
     {
     public:
-        bool handle_assert(u32& flags, const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) { return false; }
+        bool handle_assert(const char* fileName, s32 lineNumber, const char* exprString, const char* messageString) { return false; }
     };
 
     static asserthandler_release_t sBaseAssertHandler;
