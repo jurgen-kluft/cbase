@@ -286,7 +286,7 @@ namespace math
      */
     inline f32 minimumIncrement(f32 inFloat)
     {
-        u32 exponent = (u32)(exponentBinary(inFloat) - FF_FRACTION_BITS);
+        u32 exponent = (u32)(exponentBinary(inFloat) - (s32)FF_FRACTION_BITS);
 
         if (exponent > FF_EXPONENT_MASK >> FF_GET_EXPONENT_SHIFT)
             exponent = FF_EXPONENT_MASK >> FF_GET_EXPONENT_SHIFT;
