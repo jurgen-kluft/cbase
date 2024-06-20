@@ -166,12 +166,12 @@ namespace math
     /**
      * And. To 'And' a f64 with a binary value. Used for abs for example
      */
-    inline f64 binaryAnd(f64 inNumber, s32 inB) { return toF64(bin(inNumber) & inB); }
+    inline f64 binaryAnd(f64 inNumber, u64 inB) { return toF64(bin(inNumber) & inB); }
 
     /**
      * Or. To 'or' a f64 with a binary value
      */
-    inline f64 binaryOr(f64 inNumber, s32 inB) { return toF64(bin(inNumber) | inB); }
+    inline f64 binaryOr(f64 inNumber, u64 inB) { return toF64(bin(inNumber) | inB); }
 
     /**
      * Fraction. Returns the Fractional part of the f64 point value

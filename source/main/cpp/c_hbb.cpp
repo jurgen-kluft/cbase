@@ -15,10 +15,10 @@ namespace ncore
     // level 3 -> 1024+32+1                (11) (1_048_576 bits)
     // level 4 -> 32768+1024+32+1          (16) (33_554_432 bits)
 
-    static inline u32 s_get_num_dwords(u32 maxbits, u8 numlevels)
+    static inline u32 s_get_num_dwords(u32 maxbits, s8 numlevels)
     {
         u32       n      = 0;
-        u32 const levels = numlevels;
+        s8 const levels = numlevels;
         u32       len    = (maxbits + 31) >> 5;
         switch (levels)
         {
@@ -34,7 +34,7 @@ namespace ncore
     u32 g_hbb_sizeof_data(u32 maxbits)
     {
         u32       n      = 0;
-        u32 const levels = (math::mostSignificantBit(maxbits - 1) / 5);
+        s8 const levels = (s8)(math::mostSignificantBit(maxbits - 1) / 5);
         u32       len    = (maxbits + 31) >> 5;
         switch (levels)
         {
@@ -51,7 +51,7 @@ namespace ncore
     {
         u32       offset = 0;
         u32 const count  = hdr.get_max_bits();
-        u32 const levels = hdr.get_num_levels();
+        s8 const levels = hdr.get_num_levels();
         u32       len    = (count + 31) >> 5;
         switch (levels)
         {
@@ -65,7 +65,7 @@ namespace ncore
 
     static inline void s_get_level_offsets(hbb_hdr_t const& hdr, u32 offsets[5])
     {
-        u32 const levels     = hdr.get_num_levels();
+        s8 const levels     = hdr.get_num_levels();
         u32       len        = hdr.get_max_bits();
         u32       lengths[5] = {1, 0, 0, 0, 0};
         switch (levels)
@@ -77,17 +77,17 @@ namespace ncore
             case 0: break;
         }
         offsets[0] = 0;
-        for (u32 i = 1; i <= levels; ++i)
+        for (s8 i = 1; i <= levels; ++i)
             offsets[i] = offsets[i - 1] + lengths[i - 1];
     }
 
-    static inline u32 s_num_dwords(u32 bits) { return (bits + 31) / 32; }
+    //static inline u32 s_num_dwords(u32 bits) { return (bits + 31) / 32; }
 
     static void s_hbb_init(hbb_hdr_t& hdr_dst, u32 maxbits)
     {
         // We can have a maximum of 5 levels, each level holds 5 bits
         ASSERT(maxbits < (1 << 25));
-        u8 const levels   = (math::mostSignificantBit(maxbits - 1) / 5);
+        u8 const levels   = (u8)(math::mostSignificantBit(maxbits - 1) / 5);
         hdr_dst.m_maxbits = (maxbits << 4) | levels;
         hdr_dst.m_offset  = s_get_lowest_level_offset(hdr_dst);
     }
@@ -347,7 +347,7 @@ namespace ncore
             u32 dword0       = level[dwordIndex];
             if (dword0 == 0)
                 return false;
-            dwordBit = math::findFirstBit(dword0);
+            dwordBit = (u32)math::findFirstBit(dword0);
             i += 1;
         }
         bit = (dwordIndex * 32) + dwordBit;
@@ -388,7 +388,7 @@ namespace ncore
             u32        w     = level[iw] & im;
             if (w != 0)
             {
-                iw = (iw * 32) + math::findFirstBit(w);
+                iw = (iw * 32) + (u32)math::findFirstBit(w);
                 if (il == ml)
                 {
                     bit = iw;
@@ -454,7 +454,7 @@ namespace ncore
             u32        w     = level[iw] & im;
             if (w != 0)
             {
-                iw = (iw * 32) + math::findFirstBit(w);
+                iw = (iw * 32) + (u32)math::findFirstBit(w);
                 if (il == ml)
                 {
                     bit = iw;

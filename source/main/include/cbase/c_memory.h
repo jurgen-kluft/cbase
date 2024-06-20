@@ -113,8 +113,8 @@ namespace ncore
             UI16 >>= 8;
         }
 
-        inline u16 makeu16(u8 inLow, u8 inHigh) { return (inLow | (inHigh << 8)); }
-        inline u32 makeu32(u16 inLow, u16 inHigh) { return (inLow | (inHigh << 16)); }
+        inline u16 makeu16(u8 inLow, u8 inHigh) { return (u16)(((u32)inLow | ((u32)inHigh << 8)) & 0xffff); }
+        inline u32 makeu32(u16 inLow, u16 inHigh) { return ((u32)inLow | ((u32)inHigh << 16)); }
         inline u32 makeu32(u8 inB0, u8 inB1, u8 inB2, u8 inB3) { return ((u32)inB0 | ((u32)inB1 << 8) | ((u32)inB2 << 16) | ((u32)inB3 << 24)); }
         inline u64 makeu64(u16 inW0, u16 inW1, u16 inW2, u16 inW3) { return (((u64)inW0) | (((u64)inW1) << 16) | (((u64)inW2) << 32) | (((u64)inW3) << 48)); }
         inline u64 makeu64(u32 inLow, u32 inHigh) { return ((u64)inLow | (((u64)inHigh) << 32)); }

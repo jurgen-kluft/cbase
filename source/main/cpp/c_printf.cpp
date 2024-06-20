@@ -169,7 +169,7 @@ namespace ncore
         (void)buffer_cap;
         if (str && buffer)
         {
-            buffer_pos += ((nrunes::writer_t*)buffer)->write(str, str + strlen);
+            buffer_pos += (u64)((nrunes::writer_t*)buffer)->write(str, str + strlen);
         }
     }
 
@@ -420,7 +420,7 @@ namespace ncore
             prec--;
         }
 
-        int    whole = (int)value;
+        s32    whole = (s32)value;
         double tmp   = (value - whole) * pow10[prec];
         u32    frac  = (u32)tmp;
         diff         = tmp - frac;
@@ -551,12 +551,12 @@ namespace ncore
         } conv;
 
         conv.F   = value;
-        int exp2 = (int)((conv.U >> 52U) & 0x07FFU) - 1023;             // effectively log2
+        s32 exp2 = (s32)((conv.U >> 52U) & 0x07FFU) - 1023;             // effectively log2
         conv.U   = (conv.U & ((1ULL << 52U) - 1U)) | (1023ULL << 52U);  // drop the exponent so conv.F is now in [1,2)
         // now approximate log10 from the log2 integer part and an expansion of ln around 1.5
-        int expval = (int)(0.1760912590558 + exp2 * 0.301029995663981 + (conv.F - 1.5) * 0.289529654602168);
+        s32 expval = (s32)(0.1760912590558 + exp2 * 0.301029995663981 + (conv.F - 1.5) * 0.289529654602168);
         // now we want to compute 10^expval but we want to be sure it won't overflow
-        exp2            = (int)(expval * 3.321928094887362 + 0.5);
+        exp2            = (s32)(expval * 3.321928094887362 + 0.5);
         const double z  = expval * 2.302585092994046 - exp2 * 0.6931471805599453;
         const double z2 = z * z;
         conv.U          = (u64)(exp2 + 1023) << 52U;
@@ -578,9 +578,9 @@ namespace ncore
             // do we want to fall-back to "%f" mode?
             if ((value >= 1e-4) && (value < 1e6))
             {
-                if ((int)prec > expval)
+                if ((s32)prec > expval)
                 {
-                    prec = (unsigned)((int)prec - expval - 1);
+                    prec = (unsigned)((s32)prec - expval - 1);
                 }
                 else
                 {
@@ -636,7 +636,7 @@ namespace ncore
             out((flags & FLAGS_UPPERCASE) ? "E" : "e", 1, buffer, buffer_pos, maxlen);
 
             // output the exponent value
-            buffer_pos = _ntoa_long(out, buffer, buffer_pos, maxlen, (expval < 0) ? -expval : expval, expval < 0, 10, 0, minwidth - 1, FLAGS_ZEROPAD | FLAGS_PLUS);
+            buffer_pos = _ntoa_long(out, buffer, buffer_pos, maxlen, (expval < 0) ? (u32)-expval : (u32)expval, expval < 0, 10, 0, minwidth - 1, FLAGS_ZEROPAD | FLAGS_PLUS);
 
             // might need to right-pad spaces
             if (flags & FLAGS_LEFT)
@@ -659,7 +659,7 @@ namespace ncore
 #endif      // PRINTF_SUPPORT_FLOAT
 
     // internal vsnprintf
-    static int _vsnprintf(out_fct_type out, char* buffer, const u64 maxlen, const char* format, const char* format_end, va_iter_t& va)
+    static s32 _vsnprintf(out_fct_type out, char* buffer, const u64 maxlen, const char* format, const char* format_end, va_iter_t& va)
     {
         u32 flags, width, precision, n;
         u64 buffer_pos = 0U;
@@ -670,7 +670,7 @@ namespace ncore
             out = _out_null;
         }
 
-        uchar32 f = *format;
+        char f = *format;
         while (f != '\0' && format < format_end)
         {
             // format specifier?  %[flags][width][.precision][length]
@@ -727,7 +727,7 @@ namespace ncore
             }
             else if (f == '*')
             {
-                const int w = va_arg(va, int);
+                const s32 w = va_arg(va, s32);
                 if (w < 0)
                 {
                     flags |= FLAGS_LEFT;  // reverse padding
@@ -753,7 +753,7 @@ namespace ncore
                 }
                 else if (f == '*')
                 {
-                    const int prec = (int)va_arg(va, int);
+                    const s32 prec = (s32)va_arg(va, s32);
                     precision      = prec > 0 ? (u32)prec : 0U;
                     f              = *++format;
                 }
@@ -873,7 +873,7 @@ namespace ncore
                             if (flags & FLAGS_HASH)
                                 boolStr = value ? "True" : "False";
                         }
-                        s32 const boolStrLen = _strnlen_s(boolStr, 5);
+                        u32 const boolStrLen = _strnlen_s(boolStr, 5);
                         out(boolStr, boolStrLen, buffer, buffer_pos, maxlen);
                     }
                     else
@@ -932,7 +932,7 @@ namespace ncore
                     }
 
                     // char output
-                    const char outChar = va_arg(va, int);
+                    const char outChar = va_arg(va, char);
                     out(&outChar, 1, buffer, buffer_pos, maxlen);
 
                     // post padding
@@ -1013,7 +1013,7 @@ namespace ncore
                     const bool is_ll = sizeof(ptr_t) == sizeof(s64);
                     if (is_ll)
                     {
-                        buffer_pos = _ntoa_long_long(out, buffer, buffer_pos, maxlen, (ptr_t)va_arg(va, void*), false, 16U, precision, width, flags);
+                        buffer_pos = _ntoa_long_long(out, buffer, buffer_pos, maxlen, (u64)va_arg(va, void*), false, 16U, precision, width, flags);
                     }
                     else
                     {
@@ -1043,13 +1043,13 @@ namespace ncore
         out("\0", 1, buffer, term, maxlen);
 
         // return written chars without terminating \0
-        return (int)buffer_pos;
+        return (s32)buffer_pos;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     s32 vsnprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, va_iter_t& va)
     {
-        const u64 maxlen = buffer_end - buffer;
+        const u64 maxlen = (u64)(buffer_end - buffer);
         const s32 ret    = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va);
         _putflush();
         return ret;
@@ -1067,7 +1067,7 @@ namespace ncore
     s32 sprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t va_iter = {argv, 0, argc};
-        const u64 maxlen  = buffer_end - buffer;
+        const u64 maxlen  = (u64)(buffer_end - buffer);
         const s32 ret     = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va_iter);
         _putflush();
         return ret;
@@ -1076,7 +1076,7 @@ namespace ncore
     s32 snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc)
     {
         va_iter_t va_iter = {argv, 0, argc};
-        const u64 maxlen  = buffer_end - buffer;
+        const u64 maxlen  = (u64)(buffer_end - buffer);
         const s32 ret     = _vsnprintf(_out_buffer, buffer, maxlen, format, format_end, va_iter);
         _putflush();
         return ret;

@@ -100,7 +100,7 @@ UNITTEST_SUITE_BEGIN(test_bitfield)
 			CHECK_TRUE(nflags::get_state(b1, TEST_BIT_03)==nflags::BITS_CLEARED);
 			CHECK_TRUE(nflags::get_state(b1, (TEST_BIT_03|TEST_BIT_04))==nflags::BITS_MIXED);
 		}
-		
+
 		UNITTEST_TEST(set1)
 		{
 			u32 b1 = 0;
@@ -157,7 +157,7 @@ UNITTEST_SUITE_BEGIN(test_bitfield)
 			CHECK_TRUE(nflags::is_cleared(b1, TEST_BIT_10));
 		}
 
-		UNITTEST_TEST(_clearAll) 
+		UNITTEST_TEST(_clearAll)
 		{
 			u32 b1(TEST_BITS);
 			CHECK_EQUAL(TEST_BITS, b1);

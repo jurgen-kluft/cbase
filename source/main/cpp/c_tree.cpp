@@ -543,7 +543,7 @@ namespace ncore
 
         bool validate(tree_t* ctxt, const char*& error_str)
         {
-            s32 depth = tree_internal_t::tree_validate(ctxt, ctxt->v_get_root()->get_left(ctxt), error_str);
+            tree_internal_t::tree_validate(ctxt, ctxt->v_get_root()->get_left(ctxt), error_str);
             return (error_str == nullptr);
         }
 

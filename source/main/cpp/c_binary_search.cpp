@@ -30,9 +30,9 @@ namespace ncore
         else if (r == 0)
             return 0;
 
-        r = predicate(inItem, inData, inLength - 1);
+        r = predicate(inItem, inData, (s64)inLength - 1);
         if (r == 1)
-            return inLength;
+            return (s64)inLength;
 
         s64 bounds[2] = {0, (s64)inLength};
         s64 mid       = bounds[1] / 2;
@@ -52,7 +52,7 @@ namespace ncore
             }
 
             bounds[(1 - r) >> 1] = mid;
-            u64 const distance   = ((bounds[1] - bounds[0]) / 2);
+            s64 const distance   = ((bounds[1] - bounds[0]) / 2);
             if (distance == 0)
             {
                 mid -= (1 - r) >> 1;
@@ -72,11 +72,11 @@ namespace ncore
         if (r == -1)
             return 0;
 
-        r = predicate(inItem, inData, inLength - 1);
+        r = predicate(inItem, inData, (s64)inLength - 1);
         if (r == 1)
-            return inLength - 1;
+            return (s64)inLength - 1;
         else if (r == 0)
-            return inLength - 1;
+            return (s64)inLength - 1;
 
         s64 bounds[2] = {0, (s64)inLength};
         s64 mid       = bounds[1] / 2;

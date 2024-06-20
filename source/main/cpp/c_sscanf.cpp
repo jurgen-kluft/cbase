@@ -73,7 +73,7 @@ namespace ncore
         {
             while (*bstr != '\0')
             {
-                uchar32 bc = *bstr++;
+                uchar32 bc = (uchar32)*bstr++;
                 uchar32 sc = str->read();
                 if (sc == '\0')
                     return false;
@@ -137,15 +137,15 @@ namespace ncore
             s32 validBase = 0;
             if ((c >= '0') && (c <= '9'))
             {
-                validBase = c - '0';
+                validBase = (s32)(c - '0');
             }
             else if (base == 16 && (c >= 'a') && (c <= 'f'))
             {
-                validBase = c - 'a' + 10;
+                validBase = (s32)(c - 'a' + 10);
             }
             else if (base == 16 && (c >= 'A') && (c <= 'F'))
             {
-                validBase = c - 'A' + 10;
+                validBase = (s32)(c - 'A' + 10);
             }
             else if (c == '_' || c == ':')
             {
@@ -607,7 +607,7 @@ namespace ncore
 
                         if (w == 0)
                         {
-                            u32 const varsize = argv[i].sizeInBytes();
+                            s32 const varsize = argv[i].sizeInBytes();
                             w                 = varsize * 2;
                         }
 
@@ -617,17 +617,17 @@ namespace ncore
                         {
                             if (w == 2)
                             {
-                                u32 const strl = 2;
+                                s32 const strl = 2;
                                 uchar32   str[strl + 1];
                                 str[strl] = '\0';
                                 for (s32 j = 0; j < strl; ++j)
                                     str[j] = reader->read();
                                 nrunes::reader_t str_reader(str, str + strl);
-                                n2 = StrToS64(&str_reader, 16);
+                                n2 = (u64)StrToS64(&str_reader, 16);
                             }
                             else if (w == 4)
                             {
-                                u32 const strl = 4;
+                                s32 const strl = 4;
                                 uchar32   str[strl + 1];
                                 str[strl] = '\0';
                                 for (s32 j = 0; j < strl; ++j)
@@ -638,11 +638,11 @@ namespace ncore
                                         break;
                                 }
                                 nrunes::reader_t str_reader(str, str + strl);
-                                n2 = StrToS64(&str_reader, 16);
+                                n2 = (u64)StrToS64(&str_reader, 16);
                             }
                             else if (w == 8)
                             {
-                                u32 const strl = 8;
+                                s32 const strl = 8;
                                 uchar32   str[strl + 1];
                                 str[strl] = '\0';
                                 for (s32 j = 0; j < strl; ++j)
@@ -653,11 +653,11 @@ namespace ncore
                                         break;
                                 }
                                 nrunes::reader_t str_reader(str, str + strl);
-                                n2 = StrToS64(&str_reader, 16);
+                                n2 = (u64)StrToS64(&str_reader, 16);
                             }
                             else  // if (w == 16)
                             {
-                                u32 const strl = 16;
+                                s32 const strl = 16;
                                 uchar32   str[strl + 1];
                                 str[strl] = '\0';
                                 for (s32 j = 0; j < strl; ++j)

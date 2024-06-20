@@ -163,7 +163,8 @@ namespace ncore
                     if (g != nullptr)
                         t = g;
 
-                    g = p, p = n;
+                    g = p;
+                    p = n;
                     n = n->get_child(tree, dir);
                 }
 
@@ -329,7 +330,7 @@ namespace ncore
                 const s32 last = dir;
 
                 // Move the helpers down
-                g = p, p = n;
+                g = p; p = n;
                 n   = n->get_child(tree, dir);
                 dir = tree->v_compare_insert(key, n);
 

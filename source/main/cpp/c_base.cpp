@@ -33,7 +33,7 @@ namespace ncore
         u64 m_seed;
     };
 
-    void wyrand_t::reset(s64 inSeed) { m_seed = inSeed; }
+    void wyrand_t::reset(s64 inSeed) { m_seed = (u64)inSeed; }
     void wyrand_t::generate(u8* outData, u32 numBytes) { nhash::wyrand(&m_seed, outData, numBytes); }
 
 }  // namespace ncore
@@ -53,9 +53,7 @@ namespace cbase
         ncore::asserthandler_t* assert_handler   = gSetAssertHandler();
         for (ncore::s32 i = 0; i < number_of_threads; i++)
         {
-            const ncore::s32 slot = i;
-
-            ncore::u8*       buffer_data      = (ncore::u8*)system_allocator->allocate(temporary_allocator_size);
+            ncore::u8*       buffer_data      = (ncore::u8*)system_allocator->allocate((ncore::u32)temporary_allocator_size);
             ncore::alloc_t*  stack_allocator  = ncore::get_system_alloc()->construct<ncore::alloc_buffer_t>(buffer_data, temporary_allocator_size);
             ncore::random_t* random_generator = ncore::get_system_alloc()->construct<ncore::wyrand_t>();
             random_generator->reset((ncore::s64)random_generator);  // randomize the seed

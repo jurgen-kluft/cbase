@@ -18,7 +18,7 @@ namespace ncore
     {
         m_max_num_threads = max_num_threads;
         m_max_num_slots = max_num_slots;
-        m_slots = (void**)allocator->allocate(max_num_threads * max_num_slots * sizeof(void*), sizeof(void*));
+        m_slots = (void**)allocator->allocate((u32)(max_num_threads * max_num_slots * (s32)sizeof(void*)), sizeof(void*));
     }
 
     void context_t::exit(alloc_t* allocator)

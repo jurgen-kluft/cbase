@@ -91,13 +91,13 @@ namespace ncore
             inline constexpr bool operator==(EFlag rhs) const noexcept { return value == rhs; }
             inline constexpr bool operator!=(EFlag rhs) const noexcept { return value != rhs; }
 
-            inline constexpr Flags& operator=(EFlag rhs) noexcept
+            inline Flags& operator=(EFlag rhs) noexcept
             {
                 value = rhs;
                 return *this;
             }
 
-            inline constexpr Flags& operator|=(EFlag rhs) noexcept
+            inline Flags& operator|=(EFlag rhs) noexcept
             {
                 value |= rhs;
                 return *this;

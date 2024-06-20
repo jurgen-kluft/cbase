@@ -4,7 +4,7 @@ namespace ncore
 {
 	namespace nmem
 	{
-#define	wsize	sizeof(u32)
+#define	wsize	(int_t)sizeof(u32)
 #define	wmask	(wsize - 1)
 		void* memcpy(void* dst0, const void* src0, int_t length)
 		{
@@ -75,7 +75,7 @@ namespace ncore
 			return (dst0);
 		}
 
-        void* memset(void* dest, u32 c, int_t n) 
+        void* memset(void* dest, u32 c, int_t n)
 		{
 			unsigned char *s = (unsigned char *)dest;
 			ptr_t k;
@@ -85,12 +85,12 @@ namespace ncore
 			// offsets are well-defined and in the dest region.
 
 			if (!n) return dest;
-			s[0] = s[n-1] = c;
+			s[0] = s[n-1] = (unsigned char)c;
 			if (n <= 2) return dest;
-			s[1] = s[n-2] = c;
-			s[2] = s[n-3] = c;
+			s[1] = s[n-2] = (unsigned char)c;
+			s[2] = s[n-3] = (unsigned char)c;
 			if (n <= 6) return dest;
-			s[3] = s[n-4] = c;
+			s[3] = s[n-4] = (unsigned char)c;
 			if (n <= 8) return dest;
 
 			// Advance pointer to align it at a 4-byte boundary,
@@ -115,9 +115,9 @@ namespace ncore
 		}
 
         void* memmove(void* inDest, const void* inSrc, int_t inLength) { return memcpy(inDest, inSrc, inLength); }
-        
-		s32 memcmp(const void* p1, const void* p2, int_t inLength) 
-		{ 
+
+		s32 memcmp(const void* p1, const void* p2, int_t inLength)
+		{
 			u32 i;
 
 			if(!p1)
@@ -173,7 +173,7 @@ namespace ncore
         {
             u8 byte0 = *(const u8*)(inAddress);
             u8 byte1 = *((const u8*)(inAddress) + 1);
-            outValue = ((u16)byte0 << 8) | byte1;
+            outValue = (u16)(((u16)byte0 << 8) | (u16)byte1);
             return (u16 const*)((const u8*)(inAddress) + 2);
         }
 
@@ -231,17 +231,17 @@ namespace ncore
         }
         u32* writeunaligned24(u32* inAddress, u32 inData)
         {
-            *((u8*)(inAddress) + 0) = inData >> 16;
-            *((u8*)(inAddress) + 1) = inData >> 8;
-            *((u8*)(inAddress) + 2) = inData & 0xff;
+            *((u8*)(inAddress) + 0) = (u8)(inData >> 16);
+            *((u8*)(inAddress) + 1) = (u8)(inData >> 8);
+            *((u8*)(inAddress) + 2) = (u8)(inData & 0xff);
             return (u32*)((u8*)(inAddress) + 3);
         }
         u32* writeunaligned32(u32* inAddress, u32 inData)
         {
-            *((u8*)(inAddress) + 0) = inData >> 24;
-            *((u8*)(inAddress) + 1) = inData >> 16;
-            *((u8*)(inAddress) + 2) = inData >> 8;
-            *((u8*)(inAddress) + 3) = inData & 0xff;
+            *((u8*)(inAddress) + 0) = (u8)(inData >> 24);
+            *((u8*)(inAddress) + 1) = (u8)(inData >> 16);
+            *((u8*)(inAddress) + 2) = (u8)(inData >> 8);
+            *((u8*)(inAddress) + 3) = (u8)(inData & 0xff);
             return (u32*)((u8*)(inAddress) + 4);
         }
         u64* writeunaligned64(u64* inAddress, u64 inData)
@@ -260,9 +260,9 @@ namespace ncore
         u16 const* readnative16(u16 const* inSrc, u16& outValue)
         {
 #ifdef D_LITTLE_ENDIAN
-            outValue = ((u32)((u8*)inSrc)[0]) | ((u32)((u8*)inSrc)[1] << 8);
+            outValue = (u16)(((u16)((u8*)inSrc)[0]) | ((u16)((u8*)inSrc)[1] << 8));
 #else
-        outValue = ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2]);
+            outValue = (u16)(((u16)((u8*)inSrc)[1] << 8) | ((u16)((u8*)inSrc)[2]));
 #endif
             return (u16 const*)((u8*)(inSrc) + 2);
         }
@@ -272,7 +272,7 @@ namespace ncore
 #ifdef D_LITTLE_ENDIAN
             outValue = ((u32)((u8*)inSrc)[0]) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2] << 16);
 #else
-        outValue = ((u32)((u8*)inSrc)[0] << 16) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2]);
+            outValue = ((u32)((u8*)inSrc)[0] << 16) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2]);
 #endif
             return (u32 const*)((u8*)(inSrc) + 3);
         }
@@ -282,7 +282,7 @@ namespace ncore
 #ifdef D_LITTLE_ENDIAN
             outValue = ((u32)((u8*)inSrc)[0]) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[2] << 16) | ((u32)((u8*)inSrc)[3] << 24);
 #else
-        outValue = ((u32)((u8*)inSrc)[0] << 24) | ((u32)((u8*)inSrc)[1] << 16) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[3]);
+            outValue = ((u32)((u8*)inSrc)[0] << 24) | ((u32)((u8*)inSrc)[1] << 16) | ((u32)((u8*)inSrc)[1] << 8) | ((u32)((u8*)inSrc)[3]);
 #endif
             return (u32 const*)((u8 const*)(inSrc) + 4);
         }

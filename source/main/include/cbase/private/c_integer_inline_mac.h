@@ -94,16 +94,16 @@ namespace ncore
         inline s8 countBits(u8 value)
         {
             u32 i = value;
-            return __builtin_popcount(i);
+            return (s8)__builtin_popcount(i);
         }
 
         inline s8 countBits(u16 value)
         {
             u32 i = value;
-            return __builtin_popcount(i);
+            return (s8)__builtin_popcount(i);
         }
 
-        inline s8 countBits(u32 value) { return __builtin_popcount(value); }
-        inline s8 countBits(u64 value) { return __builtin_popcountll(value); }
+        inline s8 countBits(u32 value) { return (s8)__builtin_popcount(value); }
+        inline s8 countBits(u64 value) { return (s8)__builtin_popcountll(value); }
     }  // namespace math
 }  // namespace ncore

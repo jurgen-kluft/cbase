@@ -34,7 +34,7 @@ namespace ncore
     inline s32 random_s32(random_t* inRandom, u32 inBits = 31)
     {
         ASSERT(inBits <= 31);
-        return (random_u32(inRandom, inBits + 1) - (1 << inBits));
+        return ((s32)random_u32(inRandom, inBits + 1) - (s32)(1 << inBits));
     }
     inline f32 random_f32(random_t* inRandom)
     {

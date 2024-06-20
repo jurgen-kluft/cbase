@@ -45,7 +45,7 @@ namespace ncore
         {
             tmp        = *((u8 *)a);
             *((u8 *)a) = *((u8 *)b);
-            *((u8 *)b) = tmp;
+            *((u8 *)b) = (u8)tmp;
             ((u8 *&)a)++;
             ((u8 *&)b)++;
         }

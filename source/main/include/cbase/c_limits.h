@@ -25,11 +25,11 @@ static const s8 s8_max = 127;
 static const s16 s16_min = -32768;
 static const s16 s16_max = 32767;
 
-static const s32 s32_min = 0x80000000L;
+static const s32 s32_min = (s32)0x80000000;
 static const s32 s32_max = 2147483647;
 
-static const s64 s64_min = 0x8000000000000000LL;
-static const s64 s64_max = 0x7FFFFFFFFFFFFFFFLL;
+static const s64 s64_min = (s64)0x8000000000000000LL;
+static const s64 s64_max = (s64)0x7FFFFFFFFFFFFFFFLL;
 
 static const f32 f32_min = -3.402823466e+38f;
 static const f32 f32_max = 3.402823466e+38f;

@@ -24,7 +24,10 @@ namespace ncore
 #define WYHASH_32BIT_MUM 0
 
         // 128bit multiply function
+#if (WYHASH_32BIT_MUM)
         static inline u64  _wyrot(u64 x) { return (x >> 32) | (x << 32); }
+#endif
+    
         static inline void _wymum(u64* A, u64* B)
         {
 #if (WYHASH_32BIT_MUM)
@@ -142,16 +145,16 @@ namespace ncore
         }
 
         // the default secret parameters
-        static const u64 _wyp[4] = {0xa0761d6478bd642full, 0xe7037ed1a0b428dbull, 0x8ebc6af09c88c6e3ull, 0x589965cc75374cc3ull};
+        // static const u64 _wyp[4] = {0xa0761d6478bd642full, 0xe7037ed1a0b428dbull, 0x8ebc6af09c88c6e3ull, 0x589965cc75374cc3ull};
 
         // a useful 64bit-64bit mix function to produce deterministic pseudo random numbers that can pass BigCrush and PractRand
-        static inline u64 wyhash64(u64 A, u64 B)
-        {
-            A ^= 0xa0761d6478bd642full;
-            B ^= 0xe7037ed1a0b428dbull;
-            _wymum(&A, &B);
-            return _wymix(A ^ 0xa0761d6478bd642full, B ^ 0xe7037ed1a0b428dbull);
-        }
+    //         static inline u64 wyhash64(u64 A, u64 B)
+    //         {
+    //             A ^= 0xa0761d6478bd642full;
+    //             B ^= 0xe7037ed1a0b428dbull;
+    //             _wymum(&A, &B);
+    //             return _wymix(A ^ 0xa0761d6478bd642full, B ^ 0xe7037ed1a0b428dbull);
+    //         }
 
         // The wyrand PRNG that pass BigCrush and PractRand
         // Referenced externally in c_base.cpp
@@ -177,18 +180,18 @@ namespace ncore
         }
 
         // convert any 64 bit pseudo random numbers to uniform distribution [0,1). It can be combined with wyrand, wyhash64 or wyhash.
-        static inline double wy2u01(u64 r)
-        {
-            const double _wynorm = 1.0 / (1ull << 52);
-            return (r >> 12) * _wynorm;
-        }
+//        static inline double wy2u01(u64 r)
+//        {
+//            const double _wynorm = 1.0 / (1ull << 52);
+//            return (r >> 12) * _wynorm;
+//        }
 
         // convert any 64 bit pseudo random numbers to APPROXIMATE Gaussian distribution. It can be combined with wyrand, wyhash64 or wyhash.
-        static inline double wy2gau(u64 r)
-        {
-            const double _wynorm = 1.0 / (1ull << 20);
-            return ((r & 0x1fffff) + ((r >> 21) & 0x1fffff) + ((r >> 42) & 0x1fffff)) * _wynorm - 3.0;
-        }
+//        static inline double wy2gau(u64 r)
+//        {
+//            const double _wynorm = 1.0 / (1ull << 20);
+//            return ((r & 0x1fffff) + ((r >> 21) & 0x1fffff) + ((r >> 42) & 0x1fffff)) * _wynorm - 3.0;
+//        }
 
 #if (!WYHASH_32BIT_MUM)
         // fast range integer random number generation on [0,k) credit to Daniel Lemire. May not work when WYHASH_32BIT_MUM=1. It can be combined with wyrand, wyhash64 or wyhash.
@@ -296,18 +299,18 @@ namespace ncore
             u64 sig;
             do
             {
-                sig = h2 = wyhash(key, key_size, i, secret);
+                sig = h2 = wyhash(key, (uint_t)key_size, (u32)i, secret);
                 i++;
             } while (_unlikely_(!sig));
 
 #ifdef WYHASHMAP_WEAK_SMALL_FAST
             u64 i0 = wy2u0k(h2, idx_size);
 #else
-            u64 i0 = wy2u0k(wyhash(key, key_size, 0, secret), idx_size);
+            u64 i0 = wy2u0k(wyhash(key, (u32)key_size, 0, secret), (u64)idx_size);
 #endif
-            for (i = i0; i < idx_size && idx[i] && idx[i] != sig; i++) {}
+            for (i = i0; i < (u64)idx_size && idx[i] && idx[i] != sig; i++) {}
 
-            if (_unlikely_(i == idx_size))
+            if (_unlikely_(i == (u64)idx_size))
             {
                 for (i = 0; i < i0 && idx[i] && idx[i] != sig; i++)
                     ;
@@ -350,8 +353,8 @@ namespace ncore
             m_allocator = allocator;
             m_size      = size;
             m_count     = 0;
-            m_index     = (u64*)m_allocator->allocate(sizeof(u64) * m_size);
-            nmem::memset(m_index, 0, sizeof(u64) * m_size);
+            m_index     = (u64*)m_allocator->allocate((u32)sizeof(u64) * (u32)m_size);
+            nmem::memset(m_index, 0, (s64)((s32)sizeof(u64) * m_size));
             make_secret(seed, m_secret);
         }
 

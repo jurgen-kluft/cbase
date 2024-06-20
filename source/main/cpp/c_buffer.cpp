@@ -12,112 +12,116 @@ namespace ncore
         static inline s8  read_s8(u8 const* ptr) { return (s8)*ptr; }
         static inline u16 read_u16(u8 const* ptr)
         {
-            u16 b0 = *ptr++;
-            u16 b1 = *ptr++;
+            const u16 b0 = *ptr++;
+            const u16 b1 = *ptr++;
             return (u16)((b1 << 8) | b0);
         }
         static inline s16 read_s16(u8 const* ptr)
         {
-            u16 b0 = *ptr++;
-            u16 b1 = *ptr++;
-            return (s16)((b1 << 8) | b0);
+            u16 const c = read_u16(ptr);
+            return *((s16*)&c);
         }
         static inline u32 read_u32(u8 const* ptr)
         {
-            u32 b0 = *ptr++;
-            u32 b1 = *ptr++;
-            u32 b2 = *ptr++;
-            u32 b3 = *ptr++;
+            const u32 b0 = *ptr++;
+            const u32 b1 = *ptr++;
+            const u32 b2 = *ptr++;
+            const u32 b3 = *ptr++;
             return (u32)((b3 << 24) | (b2 << 16) | (b1 << 8) | (b0));
         }
         static inline s32 read_s32(u8 const* ptr)
         {
-            u32 b0 = *ptr++;
-            u32 b1 = *ptr++;
-            u32 b2 = *ptr++;
-            u32 b3 = *ptr++;
-            return (s32)((b3 << 24) | (b2 << 16) | (b1 << 8) | (b0));
+            u32 const c = read_u32(ptr);
+            return *((s32*)&c);
         }
         static inline f32 read_f32(u8 const* ptr)
         {
-            u32 b0 = *ptr++;
-            u32 b1 = *ptr++;
-            u32 b2 = *ptr++;
-            u32 b3 = *ptr++;
-            u32 u  = ((b3 << 24) | (b2 << 16) | (b1 << 8) | (b0));
+            u32 u = read_u32(ptr);
             return *((f32*)&u);
         }
         static inline u64 read_u64(u8 const* ptr)
         {
-            u64 l0 = read_u32(ptr);
-            u64 l1 = read_u32(ptr + 4);
-            return (u64)((l1 << 32) | l0);
+            const u32 b0 = *ptr++;
+            const u32 b1 = *ptr++;
+            const u32 b2 = *ptr++;
+            const u32 b3 = *ptr++;
+            const u32 b4 = *ptr++;
+            const u32 b5 = *ptr++;
+            const u32 b6 = *ptr++;
+            const u32 b7 = *ptr++;
+            return (u64)(((u64)b7 << 56) | ((u64)b6 << 48) | ((u64)b5 << 40) | ((u64)b4 << 32) | ((u64)b3 << 24) | ((u64)b2 << 16) | ((u64)b1 << 8) | (u64)b0);
         }
         static inline s64 read_s64(u8 const* ptr)
         {
-            u64 l0 = read_u32(ptr);
-            u64 l1 = read_u32(ptr + 4);
-            return (s64)((l1 << 32) | l0);
+            u64 const c = read_u64(ptr);
+            return *((s64*)&c);
         }
         static inline f64 read_f64(u8 const* ptr)
         {
-            u64 l0 = read_u32(ptr);
-            u64 l1 = read_u32(ptr + 4);
-            u64 ll = (u64)((l1 << 32) | l0);
-            return *((f64*)&ll);
+            u64 const c = read_u64(ptr);
+            return *((f64*)&c);
         }
 
         static inline void write_u8(u8* ptr, u8 b) { *ptr = b; }
-        static inline void write_s8(u8* ptr, s8 b) { *ptr = b; }
+        static inline void write_s8(u8* ptr, s8 b) { *ptr = (u8)b; }
         static inline void write_u16(u8* ptr, u16 b)
         {
             ptr[0] = (u8)(b);
-            ptr[1] = (u8)(b >> 8);
+            b      = b >> 8;
+            ptr[1] = (u8)(b);
         }
         static inline void write_s16(u8* ptr, s16 b)
         {
-            ptr[0] = (u8)(b);
-            ptr[1] = (u8)(b >> 8);
+            u16 const c = *((u16*)&b);
+            write_u16(ptr, c);
         }
         static inline void write_u32(u8* ptr, u32 b)
         {
             ptr[0] = (u8)(b);
-            ptr[1] = (u8)(b >> 8);
-            ptr[2] = (u8)(b >> 16);
-            ptr[3] = (u8)(b >> 24);
+            b      = b >> 8;
+            ptr[1] = (u8)(b);
+            b      = b >> 8;
+            ptr[2] = (u8)(b);
+            b      = b >> 8;
+            ptr[3] = (u8)(b);
         }
         static inline void write_s32(u8* ptr, s32 b)
         {
             u32 const c = *((u32*)&b);
-            ptr[0]      = (u8)(c);
-            ptr[1]      = (u8)(c >> 8);
-            ptr[2]      = (u8)(c >> 16);
-            ptr[3]      = (u8)(c >> 24);
+            write_u32(ptr, c);
         }
         static inline void write_f32(u8* ptr, f32 f)
         {
             u32 const c = *((u32*)&f);
-            ptr[0]      = (u8)(c);
-            ptr[1]      = (u8)(c >> 8);
-            ptr[2]      = (u8)(c >> 16);
-            ptr[3]      = (u8)(c >> 24);
+            write_u32(ptr, c);
         }
         static inline void write_u64(u8* ptr, u64 b)
         {
-            write_u16(ptr, (u32)((b >> 0) & 0xFFFFFFFF));
-            write_u16(ptr + 4, (u32)((b >> 32) & 0xFFFFFFFF));
+            ptr[0] = (u8)(b);
+            b      = b >> 8;
+            ptr[1] = (u8)(b);
+            b      = b >> 8;
+            ptr[2] = (u8)(b);
+            b      = b >> 8;
+            ptr[3] = (u8)(b);
+            b      = b >> 8;
+            ptr[4] = (u8)(b);
+            b      = b >> 8;
+            ptr[5] = (u8)(b);
+            b      = b >> 8;
+            ptr[6] = (u8)(b);
+            b      = b >> 8;
+            ptr[7] = (u8)(b);
         }
         static inline void write_s64(u8* ptr, s64 b)
         {
             u64 const c = *((u64*)&b);
-            write_u32(ptr, (u32)((c >> 0) & 0xFFFFFFFF));
-            write_u32(ptr + 4, (u32)((c >> 32) & 0xFFFFFFFF));
+            write_u64(ptr, c);
         }
         static inline void write_f64(u8* ptr, f64 f)
         {
             u64 const c = *((u64*)&f);
-            write_u32(ptr, (u32)((c >> 0) & 0xFFFFFFFF));
-            write_u32(ptr + 4, (u32)((c >> 32) & 0xFFFFFFFF));
+            write_u64(ptr, c);
         }
     }  // namespace nuadrw
 
@@ -447,8 +451,8 @@ namespace ncore
     void binary_reader_t::view_buffer(cbuffer_t& buf)
     {
         int_t const size = read_u32();
-        buf.m_begin    = m_cursor;
-        buf.m_end      = m_cursor + size;
+        buf.m_begin      = m_cursor;
+        buf.m_end        = m_cursor + size;
         m_cursor += size;
     }
 
@@ -522,9 +526,9 @@ namespace ncore
         ASSERT((m_cursor + to) < m_end);
 
         binary_writer_t writer;
-        writer.m_begin      = m_cursor + from;
-        writer.m_cursor     = m_cursor + from;
-        writer.m_end        = m_cursor + to;
+        writer.m_begin  = m_cursor + from;
+        writer.m_cursor = m_cursor + from;
+        writer.m_end    = m_cursor + to;
         return writer;
     }
 
@@ -625,8 +629,8 @@ namespace ncore
         if (can_write(buf.size()))
         {
             int_t const n   = buf.size();
-            u8*       dst = m_cursor;
-            u8 const* src = buf.m_begin;
+            u8*         dst = m_cursor;
+            u8 const*   src = buf.m_begin;
             for (u32 i = 0; i < n; i++)
                 *dst++ = *src++;
             m_cursor += n;
@@ -638,8 +642,8 @@ namespace ncore
         if (can_write(buf.size()))
         {
             int_t const n   = buf.size();
-            u8*       dst = m_cursor;
-            u8 const* src = buf.m_begin;
+            u8*         dst = m_cursor;
+            u8 const*   src = buf.m_begin;
             for (u32 i = 0; i < n; i++)
                 *dst++ = *src++;
             m_cursor += n;

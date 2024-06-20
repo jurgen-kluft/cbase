@@ -12,7 +12,7 @@ namespace ncore
     // Output a character to a custom device like UART, used by the printf() function.
     // This function is declared here, you have to write your custom implementation.
     void _putchar(char character);
-    void _putflush(); // Indicate that we are done 
+    void _putflush(); // Indicate that we are done
 
     s32 printf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
     s32 sprintf_(runes_t& str, crunes_t const& format, const va_t* argv, s32 argc);
@@ -43,8 +43,8 @@ namespace ncore
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-        int ret = snprintf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_eos], &format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
-        str.m_ascii.m_end = str.m_ascii.m_str + ret;
+        s32 ret = snprintf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_eos], &format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        str.m_ascii.m_end = str.m_ascii.m_str + (u32)ret;
     }
 
     template <typename... Args>

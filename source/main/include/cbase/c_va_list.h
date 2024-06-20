@@ -440,8 +440,8 @@ namespace ncore
         va_r_t(u16 *inRef) : mType(TYPE_UINT16), mSize(sizeof(u16)), mCap(0), mDummy(0) { mRef = (ptr_t)inRef; }
         va_r_t(s32 *inRef) : mType(TYPE_INT32), mSize(sizeof(s32)), mCap(0), mDummy(0) { mRef = (ptr_t)inRef; }
         va_r_t(u32 *inRef) : mType(TYPE_UINT32), mSize(sizeof(u32)), mCap(0), mDummy(0) { mRef = (ptr_t)inRef; }
-        va_r_t(s32 *inRef, s32 inCap) : mType(TYPE_AINT32), mSize(0), mCap(inCap), mDummy(0) { mRef = (ptr_t)inRef; }
-        va_r_t(u32 *inRef, s32 inCap) : mType(TYPE_AUINT32), mSize(0), mCap(inCap), mDummy(0) { mRef = (ptr_t)inRef; }
+        va_r_t(s32 *inRef, u16 inCap) : mType(TYPE_AINT32), mSize(0), mCap(inCap), mDummy(0) { mRef = (ptr_t)inRef; }
+        va_r_t(u32 *inRef, u16 inCap) : mType(TYPE_AUINT32), mSize(0), mCap(inCap), mDummy(0) { mRef = (ptr_t)inRef; }
         va_r_t(s64 *inRef) : mType(TYPE_INT64), mSize(sizeof(s64)), mCap(0), mDummy(0) { mRef = (ptr_t)inRef; }
         va_r_t(u64 *inRef) : mType(TYPE_UINT64), mSize(sizeof(u64)), mCap(0), mDummy(0) { mRef = (ptr_t)inRef; }
         va_r_t(bool *inRef) : mType(TYPE_BOOL), mSize(sizeof(bool)), mCap(0), mDummy(0) { mRef = (ptr_t)inRef; }

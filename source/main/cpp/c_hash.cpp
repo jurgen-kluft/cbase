@@ -257,17 +257,17 @@ namespace ncore
         {
             const char* end = str;
             while (*end++ != '\0') {}
-            return xxhash::Hash(str, (s32)(end - str), seed);
+            return xxhash::Hash(str, (u32)(end - str), seed);
         }
 
-        u64 strhash(const char* str, const char* end, u64 seed) { return xxhash::Hash(str, (s32)(end - str), seed); }
+        u64 strhash(const char* str, const char* end, u64 seed) { return xxhash::Hash(str, (u32)(end - str), seed); }
         u64 strhash_lowercase(const char* str, u64 seed)
         {
             const char* end = str;
             while (*end++ != '\0') {}
-            return xxhash_lowercase::Hash(str, (s32)(end - str), seed);
+            return xxhash_lowercase::Hash(str, (u32)(end - str), seed);
         }
-        u64 strhash_lowercase(const char* str, const char* end, u64 seed) { return xxhash_lowercase::Hash(str, (s32)(end - str), seed); }
+        u64 strhash_lowercase(const char* str, const char* end, u64 seed) { return xxhash_lowercase::Hash(str, (u32)(end - str), seed); }
 
         static u32 hash64_to_hash32(u64 key)
         {

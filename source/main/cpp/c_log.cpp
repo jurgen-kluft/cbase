@@ -202,8 +202,8 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
-		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
-		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
+		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
+		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
 
 		log_t::writeLine(log_t::INFO, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)
@@ -243,8 +243,8 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Warning CHANNEL:%s";
-		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
-		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
+		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
+		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
 
 		log_t::writeLine(log_t::WARNING, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)
@@ -284,8 +284,8 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
-		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, ascii::strlen(logformat));
-		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, ascii::strlen(msgFormat));
+		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
+		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
 
 		log_t::writeLine(log_t::ERROR, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)

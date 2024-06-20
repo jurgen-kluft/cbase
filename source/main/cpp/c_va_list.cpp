@@ -10,15 +10,15 @@ namespace ncore
     va_t::va_t(const char* inVar)
         : mArg3(TYPE_PCRUNES)
     {
-        mArg = (u64)inVar;
+        mArg = (ptr_t)inVar;
         mArg3 |= ascii::TYPE;
-        mArg2 = ascii::strlen(inVar);
+        mArg2 = (u32)ascii::strlen(inVar);
     }
 
     va_t::va_t(const wchar_t* inVar)
         : mArg3(TYPE_PCRUNES)
     {
-        mArg = (u64)inVar;
+        mArg = (ptr_t)inVar;
         mArg3 |= ascii::TYPE;
         mArg2             = 0;
         const wchar_t* it = inVar;
@@ -35,10 +35,10 @@ namespace ncore
         mArg3 |= (str.m_ascii.m_flags & 0x0F);
         switch (str.m_ascii.m_flags & 0x0F)
         {
-            case ascii::TYPE: mArg = (u64)(&str.m_ascii.m_bos[str.m_ascii.m_str]); break;
-            case utf8::TYPE: mArg = (u64)(&str.m_utf8.m_bos[str.m_utf8.m_str]); break;
-            case utf16::TYPE: mArg = (u64)(&str.m_utf16.m_bos[str.m_utf16.m_str]); break;
-            case utf32::TYPE: mArg = (u64)(&str.m_utf32.m_bos[str.m_utf32.m_str]); break;
+            case ascii::TYPE: mArg = (ptr_t)(&str.m_ascii.m_bos[str.m_ascii.m_str]); break;
+            case utf8::TYPE: mArg = (ptr_t)(&str.m_utf8.m_bos[str.m_utf8.m_str]); break;
+            case utf16::TYPE: mArg = (ptr_t)(&str.m_utf16.m_bos[str.m_utf16.m_str]); break;
+            case utf32::TYPE: mArg = (ptr_t)(&str.m_utf32.m_bos[str.m_utf32.m_str]); break;
             default: break;
         }
         mArg2 = str.m_ascii.m_end - str.m_ascii.m_str;
@@ -66,7 +66,6 @@ namespace ncore
 
     void va_t::convertToRunes(runes_t& str) const
     {
-        u32 i = 0;
         switch (mArg3 & TYPE_MASK)
         {
             case TYPE_BOOL:
@@ -83,7 +82,7 @@ namespace ncore
             break;
             case TYPE_INT32:
             {
-                s32 v = (*(u32*)&mArg);
+                s32 v = (*(s32*)&mArg);
                 nrunes::to_string(str, v);
             }
             break;
@@ -418,15 +417,15 @@ namespace ncore
         switch (mType)
         {
             case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
-            case TYPE_UINT32: *((u32*)mRef) = rhs; break;
-            case TYPE_INT32: *((s32*)mRef) = rhs; break;
-            case TYPE_AINT32: *((s32*)mRef) = rhs; break;
-            case TYPE_UINT8: *((u8*)mRef) = rhs; break;
-            case TYPE_INT8: *((s8*)mRef) = rhs; break;
-            case TYPE_UINT16: *((u16*)mRef) = rhs; break;
-            case TYPE_INT16: *((s16*)mRef) = rhs; break;
-            case TYPE_UINT64: *((u64*)mRef) = rhs; break;
-            case TYPE_INT64: *((s64*)mRef) = rhs; break;
+            case TYPE_UINT32: *((u32*)mRef) = (u32)rhs; break;
+            case TYPE_INT32: *((s32*)mRef) = (s32)rhs; break;
+            case TYPE_AINT32: *((s32*)mRef) = (s32)rhs; break;
+            case TYPE_UINT8: *((u8*)mRef) = (u8)rhs; break;
+            case TYPE_INT8: *((s8*)mRef) = (s8)rhs; break;
+            case TYPE_UINT16: *((u16*)mRef) = (u16)rhs; break;
+            case TYPE_INT16: *((s16*)mRef) = (s16)rhs; break;
+            case TYPE_UINT64: *((u64*)mRef) = (u64)rhs; break;
+            case TYPE_INT64: *((s64*)mRef) = (s64)rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
             default: break;  // Fall through
@@ -445,16 +444,16 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
-            case TYPE_UINT32: *((u32*)mRef) = rhs; break;
-            case TYPE_INT32: *((s32*)mRef) = rhs; break;
-            case TYPE_AINT32: *((s32*)mRef) = rhs; break;
+            case TYPE_BOOL: *((bool*)mRef) = (bool)rhs != 0 ? true : false; break;
+            case TYPE_UINT32: *((u32*)mRef) = (u32)rhs; break;
+            case TYPE_INT32: *((s32*)mRef) = (s32)rhs; break;
+            case TYPE_AINT32: *((s32*)mRef) = (s32)rhs; break;
             case TYPE_UINT8: *((u8*)mRef) = (u8)rhs; break;
             case TYPE_INT8: *((s8*)mRef) = (s8)rhs; break;
-            case TYPE_UINT16: *((u16*)mRef) = rhs; break;
-            case TYPE_INT16: *((s16*)mRef) = rhs; break;
-            case TYPE_UINT64: *((u64*)mRef) = rhs; break;
-            case TYPE_INT64: *((s64*)mRef) = rhs; break;
+            case TYPE_UINT16: *((u16*)mRef) = (u16)rhs; break;
+            case TYPE_INT16: *((s16*)mRef) = (s16)rhs; break;
+            case TYPE_UINT64: *((u64*)mRef) = (u64)rhs; break;
+            case TYPE_INT64: *((s64*)mRef) = (s64)rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
             default: break;  // Fall through
@@ -473,16 +472,16 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
-            case TYPE_UINT32: *((u32*)mRef) = rhs; break;
-            case TYPE_INT32: *((s32*)mRef) = rhs; break;
-            case TYPE_AINT32: *((s32*)mRef) = rhs; break;
+            case TYPE_BOOL: *((bool*)mRef) = (bool)rhs != 0 ? true : false; break;
+            case TYPE_UINT32: *((u32*)mRef) = (u32)rhs; break;
+            case TYPE_INT32: *((s32*)mRef) = (s32)rhs; break;
+            case TYPE_AINT32: *((s32*)mRef) = (s32)rhs; break;
             case TYPE_UINT8: *((u8*)mRef) = (u8)rhs; break;
             case TYPE_INT8: *((s8*)mRef) = (s8)rhs; break;
             case TYPE_UINT16: *((u16*)mRef) = (u16)rhs; break;
             case TYPE_INT16: *((s16*)mRef) = (s16)rhs; break;
-            case TYPE_UINT64: *((u64*)mRef) = rhs; break;
-            case TYPE_INT64: *((s64*)mRef) = rhs; break;
+            case TYPE_UINT64: *((u64*)mRef) = (u64)rhs; break;
+            case TYPE_INT64: *((s64*)mRef) = (s64)rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
             default: break;  // Fall through
@@ -501,7 +500,7 @@ namespace ncore
     {
         switch (mType)
         {
-            case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
+            case TYPE_BOOL: *((bool*)mRef) = (bool)rhs != 0 ? true : false; break;
             case TYPE_UINT32: *((u32*)mRef) = (u32)rhs; break;
             case TYPE_INT32: *((s32*)mRef) = (s32)rhs; break;
             case TYPE_AINT32: *((s32*)mRef) = (s32)rhs; break;
@@ -509,7 +508,7 @@ namespace ncore
             case TYPE_INT8: *((s8*)mRef) = (s8)rhs; break;
             case TYPE_UINT16: *((u16*)mRef) = (u16)rhs; break;
             case TYPE_INT16: *((s16*)mRef) = (s16)rhs; break;
-            case TYPE_UINT64: *((u64*)mRef) = rhs; break;
+            case TYPE_UINT64: *((u64*)mRef) = (u64)rhs; break;
             case TYPE_INT64: *((s64*)mRef) = rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
@@ -642,7 +641,7 @@ namespace ncore
         switch (mType)
         {
             case TYPE_BOOL: *((bool*)mRef) = rhs != 0 ? true : false; break;
-            case TYPE_UINT32: *((u32*)mRef) = rhs; break;
+            case TYPE_UINT32: *((u32*)mRef) = (u32)rhs; break;
             case TYPE_INT32: *((s32*)mRef) = rhs; break;
             case TYPE_AINT32:
                 if (mSize < mCap)
@@ -652,8 +651,8 @@ namespace ncore
             case TYPE_INT8: *((s8*)mRef) = (s8)rhs; break;
             case TYPE_UINT16: *((u16*)mRef) = (u16)rhs; break;
             case TYPE_INT16: *((s16*)mRef) = (s16)rhs; break;
-            case TYPE_UINT64: *((u64*)mRef) = rhs; break;
-            case TYPE_INT64: *((s64*)mRef) = rhs; break;
+            case TYPE_UINT64: *((u64*)mRef) = (u64)rhs; break;
+            case TYPE_INT64: *((s64*)mRef) = (s64)rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = (f32)rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = (f64)rhs; break;
             default: break;  // Fall through

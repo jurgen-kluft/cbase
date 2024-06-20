@@ -40,7 +40,7 @@ namespace ncore
         }
 
         inline u32 get_max_bits() const { return m_maxbits >> 4; }
-        inline u8  get_num_levels() const { return m_maxbits & 0x0F; } // Actually this is the number of levels - 1
+        inline s8  get_num_levels() const { return (s8)(m_maxbits & 0x0F); } // Actually this is the number of levels - 1
 
         u32 m_maxbits;  // u32 m_maxbits : 25, m_numlevels : 4;
         u32 m_offset;  // Offset to the lowest level

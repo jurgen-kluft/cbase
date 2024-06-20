@@ -15,9 +15,6 @@ namespace ncore
 #define USF_FALLTHROUGH                /*fall through*/
 #define FMT_CHECK(cond, except)        ((!!(cond)) ? static_cast<void>(0) : USF_CONTRACT_VIOLATION(except))
 
-        constexpr char digits_hex_uppercase[]{"0123456789ABCDEF"};
-        constexpr char digits_hex_lowercase[]{"0123456789abcdef"};
-
         class cstrspan_t
         {
             friend class strspan_t;
@@ -68,7 +65,7 @@ namespace ncore
 
             inline uchar32 operator*() const noexcept { return peek(); }
 
-            uint_t length() const noexcept { return m_end - m_begin; }
+            uint_t length() const noexcept { return (uint_t)(m_end - m_begin); }
             bool   at_end() const noexcept { return m_begin >= m_end; }
 
             uchar32 peek(s32 n = 0) const noexcept;
@@ -84,7 +81,7 @@ namespace ncore
                 {
                     ++iter;
                 }
-                return iter - m_begin;
+                return (uint_t)(iter - m_begin);
             }
 
             // --------------------------------------------------------------------
@@ -112,7 +109,7 @@ namespace ncore
             {
                 if (m_begin < m_end)
                 {
-                    return *m_begin++;
+                    return (uchar32)*m_begin++;
                 }
             }
             return '\0';
@@ -188,7 +185,7 @@ namespace ncore
             {
                 while ((count--) > 0)
                 {
-                    *dst++ = (static_cast<char>(ch));
+                    *dst++ = ch;
                 }
             }
 
@@ -196,7 +193,7 @@ namespace ncore
             {
                 while ((count--) > 0)
                 {
-                    dst.write(static_cast<char>(ch));
+                    dst.write((uchar32)ch);
                 }
             }
 
@@ -204,7 +201,7 @@ namespace ncore
             {
                 while ((count--) > 0)
                 {
-                    dst.write(static_cast<char>(*src++));
+                    dst.write((uchar32)*src++);
                 }
             }
 
@@ -260,7 +257,7 @@ namespace ncore
             }
 
             // -------- COUNT DIGITS ----------------------------------------------
-            static s32 count_digits_dec(const u64 n) noexcept
+            static u32 count_digits_dec(const u64 n) noexcept
             {
                 if (n < 10)
                     return 1;
@@ -277,7 +274,7 @@ namespace ncore
                         ASSERT(index > 0);
                         if (n >= pow10_uint64_lut[index - 1])
                         {
-                            return index;
+                            return (u32)index;
                         }
                         right = index - 1;
                     }
@@ -286,14 +283,14 @@ namespace ncore
                         left = index + 1;
                     }
                 }
-                return index + 1;
+                return (u32)index + 1;
             }
 
-            static s32 count_digits_dec(const u32 n) noexcept { return count_digits_dec((u64)n); }
+            static u32 count_digits_dec(const u32 n) noexcept { return count_digits_dec((u64)n); }
 
-            static s32 count_digits_bin(u64 n) noexcept
+            static u32 count_digits_bin(u64 n) noexcept
             {
-                s8 c = 0;
+                u32 c = 0;
                 if (n > 0xFFFFFFFFUL)
                 {
                     n >>= 32;
@@ -319,15 +316,15 @@ namespace ncore
                     n >>= 1;
                     c += 1;
                 }
-                c += (s8)(n);
+                c += (u32)(n);
                 return c == 0 ? 1 : c;
             }
 
-            static s32 count_digits_bin(const u32 n) noexcept { return count_digits_bin((u64)n); }
+            static u32 count_digits_bin(const u32 n) noexcept { return count_digits_bin((u64)n); }
 
-            static s32 count_digits_oct(u64 n) noexcept
+            static u32 count_digits_oct(u64 n) noexcept
             {
-                s8 c = 0;
+                u32 c = 0;
                 while (n > 0xFFF)
                 {
                     c += 4;
@@ -341,11 +338,11 @@ namespace ncore
                 return c == 0 ? 1 : c;
             }
 
-            static s32 count_digits_oct(u32 n) noexcept { return count_digits_oct((u64)n); }
+            static u32 count_digits_oct(u32 n) noexcept { return count_digits_oct((u64)n); }
 
-            static inline s32 count_digits_hex(u64 n) noexcept
+            static inline u32 count_digits_hex(u64 n) noexcept
             {
-                s8 c = 0;
+                u32 c = 0;
                 while (n > 0xFFFF)
                 {
                     n >>= 16;
@@ -365,7 +362,7 @@ namespace ncore
                 return c == 0 ? 1 : c;
             }
 
-            static inline s32 count_digits_hex(u32 n) noexcept { return count_digits_hex((u64)n); }
+            static inline u32 count_digits_hex(u32 n) noexcept { return count_digits_hex((u64)n); }
 
             // -------- DIVIDE BY 10 WITH REMAINDER-------------------------------
             static u32 moddiv10(const u32 n, s8& mod) noexcept
@@ -406,7 +403,7 @@ namespace ncore
                 do
                 {
                     value    = moddiv10(value, mod);
-                    *(--dst) = nrunes::to_dec_char(mod);
+                    *(--dst) = nrunes::to_dec_char((u8)mod);
                 } while (value);
             }
 
@@ -468,8 +465,8 @@ namespace ncore
                 u64 ipart = 0;
                 u64 fpart = 0;
 
-                s32 ipart_digits = 0;
-                s32 fpart_digits = 0;
+                u32 ipart_digits = 0;
+                u32 fpart_digits = 0;
 
                 s32 fpart_padding = 0;
 
@@ -482,7 +479,7 @@ namespace ncore
                     fpart        = static_cast<u64>(value);
                     fpart_digits = Integer::count_digits_dec(fpart);
 
-                    exponent = fpart_digits - 20;
+                    exponent = (s32)fpart_digits - 20;
 
                     fpart_padding = -exponent - 1;
 
@@ -503,9 +500,9 @@ namespace ncore
                     fpart        = static_cast<u64>((value - static_cast<double>(ipart)) * 1e14);
                     fpart_digits = Integer::count_digits_dec(fpart);
 
-                    exponent = ipart_digits - 1;
+                    exponent = (s32)ipart_digits - 1;
 
-                    fpart_padding = 14 - fpart_digits;
+                    fpart_padding = 14 - (s32)fpart_digits;
                 }
 
                 const auto round_index = 1 + precision + (format_fixed ? exponent : 0);
@@ -669,7 +666,7 @@ namespace ncore
             }
             else
             {
-                s32         fill_count = width() - characters;
+                s32         fill_count = (s32)width() - characters;
                 const Align al         = align();
                 if (al == Align::kLeft)
                 {
@@ -765,7 +762,7 @@ namespace ncore
                     it.skip(1);
 
                     // Try to parse alignment flag at second character of format spec.
-                    state.m_flags = parse_align_flag(it.peek(1));
+                    state.m_flags = parse_align_flag((char)it.peek(1));
 
                     if (state.m_flags != Flags::None)
                     {
@@ -775,14 +772,14 @@ namespace ncore
                         // The fill character can be any character except '{' or '}'.
                         FMT_CHECK(*it != '{' && *it != '}', std::runtime_error);
 
-                        state.m_fill_char = *it;
+                        state.m_fill_char = (char)*it;
                         it.skip(2);
                     }
                     else
                     {
                         // Alignment flag not present at the second character of format spec.
                         // Try to parse the alignment flag at the first character instead...
-                        state.m_flags = parse_align_flag(*it);
+                        state.m_flags = parse_align_flag((char)*it);
 
                         if (state.m_flags != Flags::None)
                         {
@@ -843,7 +840,7 @@ namespace ncore
                     // Parse type
                     if (*it != '}')
                     {
-                        uchar c = it.read();
+                        uchar32 c = it.read();
                         switch (c)
                         {
                             case 'c': state.m_type = Type::kChar; break;
@@ -1010,8 +1007,8 @@ namespace ncore
                     case TypeId::kUint32: return format_unsigned_integer(it, format, arg_t<u32>::decode(argValue));
                     case TypeId::kInt64: return format_integer(it, format, arg_t<s64>::decode(argValue));
                     case TypeId::kUint64: return format_unsigned_integer(it, format, arg_t<u64>::decode(argValue));
-                    case TypeId::kVoidPointer: return format_pointer(it, format, (int_t)argValue.first.vp);
-                    case TypeId::kConstVoidPointer: return format_pointer(it, format, (int_t)argValue.first.cvp);
+                    case TypeId::kVoidPointer: return format_pointer(it, format, (uint_t)argValue.first.vp);
+                    case TypeId::kConstVoidPointer: return format_pointer(it, format, (uint_t)argValue.first.cvp);
                     case TypeId::kFloat: return format_float(it, format, arg_t<float>::decode(argValue));
                     case TypeId::kDouble: return format_float(it, format, arg_t<double>::decode(argValue));
                     case TypeId::kString:
@@ -1039,7 +1036,7 @@ namespace ncore
                 if (state.type_is_none())
                 {
                     s32 const  len = value ? 4 : 5;
-                    cstrspan_t src(value ? "true" : "false", len);
+                    cstrspan_t src(value ? "true" : "false", (u32)len);
                     return state_t::format_string(it, state, src, len, false);
                 }
                 else if (state.type_is_integer())
@@ -1062,7 +1059,7 @@ namespace ncore
                     // state.default_align_left();
 
                     const s32 fill_after = state.write_alignment(it, 1, false);
-                    it.write(value);
+                    it.write((uchar32)value);
                     CharTraits::assign(it, state.fill_char(), fill_after);
                 }
                 else if (state.type_is_integer())
@@ -1083,7 +1080,7 @@ namespace ncore
             static bool format_integer(strspan_t& it, const state_t& state, const s64 value)
             {
                 const bool negative = (value < 0);
-                const auto uvalue   = (negative ? -value : value);
+                const auto uvalue   = (u64)(negative ? -value : value);
 
                 return format_unsigned_integer(it, state, uvalue, negative);
             }
@@ -1096,7 +1093,7 @@ namespace ncore
                 {
                     char       buffer[Integer::kMaxDigitsDec];
                     const auto digits = Integer::count_digits_dec(value);
-                    fill_after        = state.write_alignment(it, digits, negative);
+                    fill_after        = state.write_alignment(it, (s32)digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_dec(dst, value);
                     cstrspan_t src(buffer, digits);
@@ -1106,7 +1103,7 @@ namespace ncore
                 {
                     char       buffer[Integer::kMaxDigitsHex];
                     const auto digits = Integer::count_digits_hex(value);
-                    fill_after        = state.write_alignment(it, digits, negative);
+                    fill_after        = state.write_alignment(it, (s32)digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_hex(dst, value, state.uppercase());
                     cstrspan_t src(buffer, digits);
@@ -1116,7 +1113,7 @@ namespace ncore
                 {
                     char       buffer[Integer::kMaxDigitsOct];
                     const auto digits = Integer::count_digits_oct(value);
-                    fill_after        = state.write_alignment(it, digits, negative);
+                    fill_after        = state.write_alignment(it, (s32)digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_oct(dst, value);
                     cstrspan_t src(buffer, digits);
@@ -1126,7 +1123,7 @@ namespace ncore
                 {
                     char       buffer[Integer::kMaxDigitsBin];
                     const auto digits = Integer::count_digits_bin(value);
-                    fill_after        = state.write_alignment(it, digits, negative);
+                    fill_after        = state.write_alignment(it, (s32)digits, negative);
                     char* dst         = buffer + digits;
                     Integer::convert_bin(dst, value);
                     cstrspan_t src(buffer, digits);
@@ -1147,7 +1144,7 @@ namespace ncore
                 {
                     const auto ivalue     = static_cast<u64>(value);
                     const auto digits     = Integer::count_digits_hex(ivalue);
-                    const auto fill_after = state.write_alignment(it, digits, false);
+                    const auto fill_after = state.write_alignment(it, (s32)digits, false);
                     char       buffer[Integer::kMaxDigitsPointer];
                     char*      dst = buffer + digits;
                     Integer::convert_hex(dst, ivalue, state.uppercase());
@@ -1283,19 +1280,6 @@ namespace ncore
             bool       result = process(str_span, fmt_view, args);
             str_span.write();
             return result;
-        }
-
-        static void Test()
-        {
-            char s[128];
-            toStr(s, 128, "Hello {:s}!", "world");
-
-            char str[128];
-            toStr(str, 128, "{:14}", false);
-            toStr(str, 128, "{0}{1}", false, 100.0f);
-            toStr(str, 128, "{0}{1}{2}", false, 100.0f, 10);
-            toStr(str, 128, "{0}{1}{2}{3}", false, 100.0f, 10, "test");
-            toStr(str, 128, "{0}{1}{2}{3}{4}", false, 100.0f, 10, "test", 'a');
         }
 
     }  // namespace fmt

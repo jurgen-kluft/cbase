@@ -493,7 +493,7 @@ namespace ncore
             utf32::crunes_t m_utf32;
         };
 
-        inline void set_type(u8 _type) { m_ascii.m_flags = m_ascii.m_flags & 0xFFFFFFF0 | _type; }
+        inline void set_type(u8 _type) { m_ascii.m_flags = (m_ascii.m_flags & 0xFFFFFFF0) | _type; }
         inline u8   get_type() const { return m_ascii.m_flags & 0xF; }
         inline bool is_ascii() const { return get_type() == ascii::TYPE; }
         inline bool is_utf8() const { return get_type() == utf8::TYPE; }
@@ -622,8 +622,8 @@ namespace ncore
         inline bool    is_alpha(uchar32 c) { return (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))); }
         inline bool    is_digit(uchar32 c) { return ((c >= '0') && (c <= '9')); }
         inline bool    is_hexa(uchar32 c) { return (((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
-        inline uchar32 to_upper(uchar32 c) { return ((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c; }
-        inline uchar32 to_lower(uchar32 c) { return ((c >= 'A') && (c <= 'Z')) ? c + ('a' - 'A') : c; }
+        inline uchar32 to_upper(uchar32 c) { return ((c >= 'a') && (c <= 'z')) ? c + (uchar32)('A' - 'a') : c; }
+        inline uchar32 to_lower(uchar32 c) { return ((c >= 'A') && (c <= 'Z')) ? c + (uchar32)('a' - 'A') : c; }
         inline u32     to_digit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
         inline u32     to_number(uchar32 c)
         {

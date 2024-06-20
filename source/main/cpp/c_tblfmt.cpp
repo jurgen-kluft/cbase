@@ -177,7 +177,7 @@ namespace ncore
 
             // convert the utf32 row string to utf8
             runes_t        utf_8(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf8::TYPE);
-            crunes_t       utf_32((utf32::pcrune)state.row_, 0, state.row_len_, state.row_len_);
+            crunes_t       utf_32((utf32::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
             nrunes::writer_t writer(utf_8);
             writer.write(utf_32);
         }
@@ -190,7 +190,7 @@ namespace ncore
 
             // convert the utf32 row string to utf16
             runes_t        utf_16(str, 0, distance_to_size32(str, end), distance_to_size32(str,end), utf16::TYPE);
-            crunes_t       utf_32((utf32::pcrune)state.row_, 0, state.row_len_, state.row_len_);
+            crunes_t       utf_32((utf32::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
             nrunes::writer_t writer(utf_16);
             writer.write(utf_32);
         }

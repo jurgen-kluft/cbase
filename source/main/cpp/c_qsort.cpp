@@ -13,12 +13,12 @@ namespace ncore
 	namespace __xqsort
 	{
 		static inline u8*			sMed3(u8*, u8*, u8*, s32(*)(const void* const, const void* const, void*), void*);
-		static inline void				sSwapFunc(u8*, u8*, s32, s32);
+		static inline void			sSwapFunc(u8*, u8*, s32, s32);
 
 		#define __xqsort_MIN(a, b)	(a) < (b) ? a : b
 
 		#define __xqsort_SwapCode(TYPE, parmi, parmj, n) { 		\
-			u32 i = (n) / sizeof (TYPE); 						\
+			s32 i = (n) / (s32)sizeof (TYPE); 						\
 			TYPE *pi = (TYPE *) (parmi); 						\
 			TYPE *pj = (TYPE *) (parmj); 						\
 			do { 												\
@@ -31,11 +31,11 @@ namespace ncore
 		// Determine the swap functionality to use
 		// single byte copy
 		// 4-byte copy
-		#define __xqsort_SWAPINIT(a, es) swaptype = (((u8*)a - (u8*)0) % sizeof(u32) || es % sizeof(u32)) ? 2 : es == sizeof(u32)? 0 : 1;
+		#define __xqsort_SWAPINIT(a, es) swaptype = ((u64)a % sizeof(u32) || (es) % (s32)sizeof(u32)) ? 2 : (es) == (s32)sizeof(u32)? 0 : 1
 
 		static inline void sSwapFunc(u8* a, u8* b, s32 n, s32 swaptype)
 		{
-			if (swaptype <= 1) 
+			if (swaptype <= 1)
 				__xqsort_SwapCode(u32, a, b, n)
 			else
 				__xqsort_SwapCode(u8, a, b, n)
@@ -64,9 +64,9 @@ namespace ncore
 	{
 		u8 *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 		s32 d, r, swaptype, swap_cnt;
-	loop:	
+	loop:
 		__xqsort_SWAPINIT(a, es);
-		swap_cnt = 0;
+        swap_cnt = 0;
 		if (n < 7)
 		{
 			for (pm = (u8*) a + es; pm < (u8*) a + n * es; pm += es)
@@ -114,7 +114,7 @@ namespace ncore
 				}
 				pc -= es;
 			}
-		
+
 			if (pb > pc)
 				break;
 
@@ -140,9 +140,9 @@ namespace ncore
 
 		if ((r = (s32)(pb - pa)) > es)
 			g_qsort((u8*)a, r / es, es, cmp, data);
-	
+
 		if ((r = (s32)(pd - pc)) > es)
-		{ 
+		{
 			// Iterate rather than recurse to save stack space
 			a = pn - r;
 			n = r / es;

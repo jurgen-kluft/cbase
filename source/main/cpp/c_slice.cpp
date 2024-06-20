@@ -97,7 +97,7 @@ namespace ncore
             data->mItemCount = to - from;
             data->mItemSize  = mItemSize;
             data->mCapacity  = capacity;
-            data->mData      = (u8*)mAllocator->allocate(data->mItemSize * data->mCapacity, sizeof(void*));
+            data->mData      = (u8*)mAllocator->allocate((u32)(data->mItemSize * data->mCapacity), sizeof(void*));
             nmem::memcpy(data->mData, mData + from * mItemSize, data->mItemSize * data->mItemCount);
             if (memclear)
             {
@@ -114,7 +114,7 @@ namespace ncore
             if (to > mItemCount)
             {
                 s32 const to_itemcount = to;
-                u8*       data         = (u8*)mAllocator->allocate((to_itemcount * mItemSize), sizeof(void*));
+                u8*       data         = (u8*)mAllocator->allocate((u32)(to_itemcount * mItemSize), sizeof(void*));
                 nmem::memcpy(data, mData, to_itemcount * mItemSize);
                 mItemCount = to_itemcount;
             }
@@ -126,7 +126,7 @@ namespace ncore
         if (mAllocator != nullptr)
         {
             s32 const to_itemcount = mItemCount + count;
-            u8*       data         = (u8*)mAllocator->allocate((to_itemcount * mItemSize), sizeof(void*));
+            u8*       data         = (u8*)mAllocator->allocate((u32)(to_itemcount * mItemSize), sizeof(void*));
             s32 const head2copy    = at * mItemSize;
             s32 const gap2skip     = count * mItemSize;
             s32 const tail2copy    = (mItemCount - at) * mItemSize;
@@ -150,7 +150,7 @@ namespace ncore
         {
             s32 const to_itemsize  = mItemSize;
             s32 const to_itemcount = mItemCount - count;
-            u8*       data         = (u8*)mAllocator->allocate((to_itemcount * to_itemsize), sizeof(void*));
+            u8*       data         = (u8*)mAllocator->allocate((u32)(to_itemcount * to_itemsize), sizeof(void*));
             s32 const head2copy    = at * mItemSize;
             s32 const gap2close    = count * mItemSize;
             s32 const tail2copy    = (mItemCount - at) * mItemSize - gap2close;
@@ -174,7 +174,7 @@ namespace ncore
             capacity = itemcount;
 
         slice_data_t* data = (slice_data_t*)allocator->allocate(sizeof(slice_data_t), sizeof(void*));
-        data->mData        = (u8*)allocator->allocate((capacity * itemsize), sizeof(void*));
+        data->mData        = (u8*)allocator->allocate((u32)(capacity * itemsize), sizeof(void*));
         data->mRefCount    = 1;
         data->mItemCount   = itemcount;
         data->mItemSize    = itemsize;
@@ -322,7 +322,7 @@ namespace ncore
             return nullptr;
         else if (index > mTo)
             return nullptr;
-        u32 const data_offset = mData->mItemSize * index;
+        s32 const data_offset = mData->mItemSize * index;
         return &mData->mData[data_offset];
     }
 
@@ -335,7 +335,7 @@ namespace ncore
             return nullptr;
         else if (index > mTo)
             return nullptr;
-        u32 const data_offset = mData->mItemSize * index;
+        s32 const data_offset = mData->mItemSize * index;
         return &mData->mData[data_offset];
     }
 

@@ -107,7 +107,7 @@ namespace ncore
         inline bool isAligned(s32 value, u32 alignment)
         {
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
-            return value == ((value) & (~(alignment - 1)));
+            return value == (s32)((u32)(value) & (~(alignment - 1)));
         }
 
         inline bool isAligned(u32 value, u32 alignment)
@@ -119,7 +119,7 @@ namespace ncore
         inline bool isAligned(s64 value, u32 alignment)
         {
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
-            return value == ((value) & (~((u64)alignment - 1)));
+            return value == (s64)(((u64)value) & (~((u64)alignment - 1)));
         }
 
         inline bool isAligned(u64 value, u32 alignment)

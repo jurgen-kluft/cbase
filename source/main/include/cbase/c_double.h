@@ -56,8 +56,8 @@ namespace ncore
         inline bool isEqual(f64 inNumber, f64 inG);
         inline bool isNotEqual(f64 inNumber, f64 inG);
 
-        inline f64 binaryAnd(f64 inNumber, s32 inB);
-        inline f64 binaryOr(f64 inNumber, s32 inB);
+        inline f64 binaryAnd(f64 inNumber, u64 inB);
+        inline f64 binaryOr(f64 inNumber, u64 inB);
 
         inline s64 fraction(f64 inNumber);
         inline s32 exponentBinary(f64 inNumber);
