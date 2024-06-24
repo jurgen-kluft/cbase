@@ -2,7 +2,7 @@
 #define __CBASE_THREAD_CONTEXT_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 namespace ncore
@@ -25,7 +25,10 @@ namespace ncore
             RUNTIME_ALLOCATOR = 2,
             FRAME_ALLOCATOR   = 3,
             LOCAL_ALLOCATOR   = 4,
-            RANDOM_GENERATOR  = 6,
+            RANDOM_GENERATOR  = 5,
+            EMPTY_SLOT_0      = 6,
+            EMPTY_SLOT_1      = 7,
+            EMPTY_SLOT_2      = 8,
         };
 
         static void init(s32 max_num_threads, s32 max_num_slots, alloc_t* allocator);
@@ -33,6 +36,7 @@ namespace ncore
 
         static s32 register_thread();
         static s32 thread_index();
+        static s32 max_threads();
 
         static asserthandler_t* assert_handler()
         {
@@ -74,13 +78,13 @@ namespace ncore
             return a;
         }
 
-        static alloc_t* global_alloc() { return runtime_alloc(); }  // application life-time allocations
-        static alloc_t* heap_alloc() { return runtime_alloc(); }    // long life-time allocations
-        static alloc_t* frame_alloc() { return frame_allocator(); } // specific duration tagged allocations
-        static alloc_t* stack_alloc() { return local_alloc(); }     // function life-time allocations
+        static alloc_t* global_alloc() { return runtime_alloc(); }   // application life-time allocations
+        static alloc_t* heap_alloc() { return runtime_alloc(); }     // long life-time allocations
+        static alloc_t* frame_alloc() { return frame_allocator(); }  // specific duration tagged allocations
+        static alloc_t* stack_alloc() { return local_alloc(); }      // function life-time allocations
 
         class gpu_alloc_t;
-        static gpu_alloc_t* gpu_alloc() { return nullptr; } // GPU resource allocations?
+        static gpu_alloc_t* gpu_alloc() { return nullptr; }  // GPU resource allocations?
 
         static random_t* random()
         {
@@ -126,8 +130,13 @@ namespace ncore
             set<random_t>(tidx, RANDOM_GENERATOR, r);
         }
 
-        template <class T> inline static void set(s32 tidx, s32 slot, T* inData) { vset(tidx, slot, reinterpret_cast<void*>(inData)); }
-        template <class T> inline static void get(s32 tidx, s32 slot, T*& outData)
+        template <class T>
+        inline static void set(s32 tidx, s32 slot, T* inData)
+        {
+            vset(tidx, slot, reinterpret_cast<void*>(inData));
+        }
+        template <class T>
+        inline static void get(s32 tidx, s32 slot, T*& outData)
         {
             void* p = nullptr;
             vget(tidx, slot, p);
@@ -142,6 +151,6 @@ namespace ncore
         static s32    m_max_num_threads;
         static s32    m_max_num_slots;
     };
-} // namespace ncore
+}  // namespace ncore
 
-#endif // __CBASE_THREAD_CONTEXT_H__
+#endif  // __CBASE_THREAD_CONTEXT_H__

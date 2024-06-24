@@ -29,23 +29,28 @@ namespace ncore
         m_slots = nullptr;
     }
 
+    s32 context_t::max_threads()
+    {
+        return m_max_num_threads;
+    }
+
     thread_local s32 sThreadIndex;
-    static s32 sThreadIndexCount = 0;
     s32 context_t::register_thread()
     {
         // Is this thread-safe ?
+        static s32 sThreadIndexCount = 0;
         sThreadIndex = sThreadIndexCount++;
         return sThreadIndex;
     }
 
-    void context_t::vset(s32 tidx, s32 slot, void* pvData) 
-    { 
+    void context_t::vset(s32 tidx, s32 slot, void* pvData)
+    {
         if (m_slots == nullptr) { return; }
         else { m_slots[tidx*m_max_num_slots + slot] = pvData; }
     }
 
-    void context_t::vget(s32 tidx, s32 slot, void*& pvData) 
-    { 
+    void context_t::vget(s32 tidx, s32 slot, void*& pvData)
+    {
         if (m_slots == nullptr) { pvData = nullptr; return; }
         else { pvData = m_slots[tidx*m_max_num_slots + slot]; }
     }
