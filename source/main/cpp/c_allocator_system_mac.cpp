@@ -44,9 +44,9 @@ namespace ncore
             alignment = math::alignUp(alignment, mDefaultAlignment);
 
             void* ptr;
-            //ptr = aligned_alloc(alignment, size);
+            ptr = ::aligned_alloc(alignment, size); // This works on MacOS >= 10.15
             //posix_memalign(&ptr, alignment, size);
-            ptr = ::malloc(size);
+            //ptr = ::malloc(size);
             ++mAllocationCount;
             return ptr;
         }
