@@ -120,7 +120,8 @@ UNITTEST_SUITE_BEGIN(test_allocator)
         UNITTEST_TEST(test_alloc_buffer)
         {
             u8 inplace[256];
-            alloc_buffer_t sa(inplace, sizeof(inplace));
+            alloc_buffer_t sa;
+            sa.init(inplace, sizeof(inplace));
             test_object4* obj = sa.construct<test_object4>();
             sa.destruct<>(obj);
         }
