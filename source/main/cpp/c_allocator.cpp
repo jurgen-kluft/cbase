@@ -3,7 +3,7 @@
 
 namespace ncore
 {
-    
+
     static inline u32 get_item_idx(void* array_item, void* item, u32 sizeof_item)
     {
         u32 const index = (u32)(((u64)item - (u64)array_item) / sizeof_item);
@@ -55,7 +55,7 @@ namespace ncore
         ASSERT(m_sizeof >= sizeof(u32));  // Can only deal with items that are 4 bytes or more
     }
 
-    u32 fsadexed_array_t::v_size() const { return m_sizeof; }
+    u32 fsadexed_array_t::v_allocsize() const { return m_sizeof; }
 
     void* fsadexed_array_t::v_allocate()
     {

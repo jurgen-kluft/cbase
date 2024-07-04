@@ -185,7 +185,7 @@ namespace ncore
     protected:
         virtual void* v_allocate();
         virtual void  v_deallocate(void*);
-        virtual u32   v_size() const;
+        virtual u32   v_allocsize() const;
         virtual void* v_idx2ptr(u32 index) const;
         virtual u32   v_ptr2idx(void* ptr) const;
 
