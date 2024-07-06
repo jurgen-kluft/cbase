@@ -3,14 +3,13 @@
 
 namespace ncore
 {
-
-    static inline u32 get_item_idx(void* array_item, void* item, u32 sizeof_item)
+    static inline u32 s_get_item_idx(void* array_item, void* item, u32 sizeof_item)
     {
         u32 const index = (u32)(((u64)item - (u64)array_item) / sizeof_item);
         return index;
     }
 
-    static inline u8* get_item_ptr(void* array_item, u32 index, u32 sizeof_item) { return (u8*)array_item + (index * sizeof_item); }
+    static inline u8* s_get_item_ptr(void* array_item, u32 index, u32 sizeof_item) { return (u8*)array_item + (index * sizeof_item); }
 
     dexed_array_t::dexed_array_t(void* array_item, u32 sizeof_item, u32 countof_item)
         : m_data(array_item)
@@ -24,14 +23,14 @@ namespace ncore
         if (index == 0xffffffff)
             return nullptr;
         ASSERT(index < m_countof);
-        return get_item_ptr(m_data, index, m_sizeof);
+        return s_get_item_ptr(m_data, index, m_sizeof);
     }
 
     u32 dexed_array_t::v_ptr2idx(void* ptr) const
     {
         if (ptr == nullptr)
             return 0xffffffff;
-        u32 const i = get_item_idx(m_data, ptr, m_sizeof);
+        u32 const i = s_get_item_idx(m_data, ptr, m_sizeof);
         ASSERT(i < m_countof);
         return i;
     }
@@ -63,7 +62,7 @@ namespace ncore
         if (m_freelist != 0xffffffff)
         {
             freeitem   = m_freelist;
-            m_freelist = *(u32*)get_item_ptr(m_data, m_freelist, m_sizeof);
+            m_freelist = *(u32*)s_get_item_ptr(m_data, m_freelist, m_sizeof);
         }
         else if (m_freeindex < m_countof)
         {
@@ -73,7 +72,7 @@ namespace ncore
         if (freeitem == 0xffffffff)
             return nullptr;
 
-        return get_item_ptr(m_data, freeitem, m_sizeof);
+        return s_get_item_ptr(m_data, freeitem, m_sizeof);
     }
 
     void fsadexed_array_t::v_deallocate(void* p)
@@ -89,14 +88,14 @@ namespace ncore
         if (index == 0xffffffff)
             return nullptr;
         ASSERT(index < m_freeindex);
-        return get_item_ptr(m_data, index, m_sizeof);
+        return s_get_item_ptr(m_data, index, m_sizeof);
     }
 
     u32 fsadexed_array_t::v_ptr2idx(void* ptr) const
     {
         if (ptr == nullptr)
             return 0xffffffff;
-        u32 const i = get_item_idx(m_data, ptr, m_sizeof);
+        u32 const i = s_get_item_idx(m_data, ptr, m_sizeof);
         ASSERT(i < m_freeindex);
         return i;
     }
