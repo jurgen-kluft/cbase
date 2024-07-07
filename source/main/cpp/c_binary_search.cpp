@@ -7,8 +7,8 @@ namespace ncore
         s64 bounds[2] = {0, (s64)inLength - 1};
         while (bounds[0] <= bounds[1])
         {
-            const s64 mid = (bounds[0] + bounds[1]) >> 1;
-            const s8  r   = predicate(inItem, inData, mid);
+            const s64 mid        = (bounds[0] + bounds[1]) >> 1;
+            const s8  r          = predicate(inItem, inData, mid);
             bounds[(1 - r) >> 1] = mid + r;
             if (r == 0)
             {
@@ -18,7 +18,7 @@ namespace ncore
             }
         }
 
-        return -bounds[0]; // return the (negative) index where the value should be inserted
+        return -bounds[0];  // return the (negative) index where the value should be inserted
     }
     s64 g_LowerBound(const void* inItem, const void* inData, u64 inLength, compare_predicate_fn predicate)
     {
@@ -108,4 +108,37 @@ namespace ncore
         return mid;
     }
 
-}; // namespace ncore
+    // Mono Bound
+    template <typename T>
+    s32 g_BinarySearch_mb_T(T const* array, u32 array_size, T key)
+    {
+        if (array_size == 0)
+            return -1;
+
+        u32 bot = 0;
+        u32 top = array_size;
+        while (top > 1)
+        {
+            u32 const mid = top >> 1;
+            if (key >= array[bot + mid])
+            {
+                bot += mid;
+            }
+            top -= mid;
+        }
+
+        if (key == array[bot])
+        {
+            return bot;
+        }
+        return -1;
+    }
+
+    s32 g_BinarySearch_mb(s16 const* array, u32 array_size, s16 key) { return g_BinarySearch_mb_T(array, array_size, key); }
+    s32 g_BinarySearch_mb(s32 const* array, u32 array_size, s32 key) { return g_BinarySearch_mb_T(array, array_size, key); }
+    s32 g_BinarySearch_mb(s64 const* array, u32 array_size, s64 key) { return g_BinarySearch_mb_T(array, array_size, key); }
+    s32 g_BinarySearch_mb(u16 const* array, u32 array_size, u16 key) { return g_BinarySearch_mb_T(array, array_size, key); }
+    s32 g_BinarySearch_mb(u32 const* array, u32 array_size, u32 key) { return g_BinarySearch_mb_T(array, array_size, key); }
+    s32 g_BinarySearch_mb(u64 const* array, u32 array_size, u64 key) { return g_BinarySearch_mb_T(array, array_size, key); }
+
+};  // namespace ncore
