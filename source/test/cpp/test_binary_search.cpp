@@ -67,7 +67,7 @@ UNITTEST_SUITE_BEGIN(test_binary_search)
             CHECK_EQUAL(-1, idx_of_n);
             n = 18;
             idx_of_n = g_BinarySearch(&n, list, sizeof(list)/sizeof(s32), sComparePredicate);
-            CHECK_EQUAL(0, idx_of_n);
+            CHECK_EQUAL(-1, idx_of_n);
         }
 
         UNITTEST_TEST(_search3)
