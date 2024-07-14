@@ -14,8 +14,8 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
 
         UNITTEST_TEST(test_buffer32)
         {
-            sbuffer_t<32> buf1;
-            sbuffer_t<32> buf2;
+            memory_t<32> buf1;
+            memory_t<32> buf2;
             buf1.reset(1);
             buf2.reset(2);
 
@@ -32,8 +32,8 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
 
         UNITTEST_TEST(test_binary_reader)
         {
-            sbuffer_t<2048>   buffer;
-            binary_writer_t writer = buffer.writer();
+            memory_t<2048>   buffer;
+            binary_writer_t writer = buffer.buffer().writer();
 
             CHECK_EQUAL(0, writer.skip(16));
             CHECK_EQUAL(16, writer.pos()); writer.write(false);
@@ -52,12 +52,12 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             const char* cctext = "this is the buffer";
             cbuffer_t    text((const u8*)cctext, (const u8*)cctext + 18);
 
-            sbuffer_t<32> bytes;
-            bytes.writer().write_data(text);
+            memory_t<32> bytes;
+            bytes.buffer().writer().write_data(text);
             writer.write_data(text);
-            writer.write_data(bytes);
+            writer.write_data(bytes.cbuffer());
 
-            binary_reader_t reader = (buffer.reader());
+            binary_reader_t reader = (buffer.cbuffer().reader());
 
             bool the_bool;
             u8   the_u8;
@@ -98,8 +98,8 @@ UNITTEST_SUITE_BEGIN(test_buffer_t)
             CHECK_EQUAL(9.0, the_f64);
 
             s32         len = ascii::strlen(cctext);
-            sbuffer_t<32> rdata;
-            buffer_t    rdatalen = rdata(0, len);
+            memory_t<32> rdata;
+            buffer_t    rdatalen = rdata.buffer()(0, len);
             reader.read_data(rdatalen);
 			CHECK_EQUAL(rdatalen.size(), len);
 
