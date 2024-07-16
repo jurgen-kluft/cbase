@@ -8,30 +8,31 @@ namespace ncore
     // Reference counted slice data.
     // ----------------------------------------------------------------------------------------
 
-    struct slice_data_t
+    struct slice_t::data_t
     {
-        slice_data_t();
+        data_t();
 
-        static slice_data_t sNull;
+        static data_t sNull;
 
-        slice_data_t* incref();
-        slice_data_t* incref() const;
-        slice_data_t* decref();
+        void    incref();
+        void    incref() const;
+        data_t* decref();
 
-        // This function makes a new 'slice_data_t' with content copied from this
-        slice_data_t* copy(s32 from, s32 to, s32 capacity, bool memclear);
+        // This function makes a new 'data_t' with content copied from this
+        data_t* copy(s32 from, s32 to, s32 capacity, bool memclear);
 
         // These functions do not 'reallocate' this
         void resize(s32 from, s32 to);
         void insert(s32 at, s32 count);
         void remove(s32 at, s32 count);
 
-        static slice_data_t* allocate(alloc_t* allocator, s32 itemcount, s32 itemsize, s32 capacity, bool memclear);
+        static data_t* allocate(alloc_t* allocator, s32 itemcount, s32 itemsize, s32 capacity, bool memclear);
+        static void    deallocate(alloc_t* allocator, data_t* _data);
 
         mutable s32 mRefCount;
-        s32         mItemCount; // Count of total items
-        s32         mItemSize;  // Size of one item
-        s32         mCapacity;  // Total capacity of the data
+        s32         mItemCount;  // Count of total items
+        s32         mItemSize;   // Size of one item
+        s32         mCapacity;   // Total capacity of the data
         u8*         mData;
         alloc_t*    mAllocator;
     };
@@ -40,29 +41,20 @@ namespace ncore
     // SLICE DATA
     // ============================================================================
 
-    slice_data_t::slice_data_t()
+    slice_t::data_t::data_t()
+        : mRefCount(0)
+        , mItemCount(0)
+        , mItemSize(0)
+        , mCapacity(0)
+        , mData(nullptr)
+        , mAllocator(nullptr)
     {
-        mAllocator = nullptr;
-        mRefCount  = 0;
-        mItemCount = 0;
-        mItemSize  = 1;
-        mData      = nullptr;
     }
 
-    slice_data_t* slice_data_t::incref()
-    {
-        if (mAllocator != nullptr)
-            mRefCount++;
-        return (slice_data_t*)this;
-    }
-    slice_data_t* slice_data_t::incref() const
-    {
-        if (mAllocator != nullptr)
-            mRefCount++;
-        return (slice_data_t*)this;
-    }
+    void slice_t::data_t::incref() { mRefCount += (mAllocator != nullptr) ? 1 : 0; }
+    void slice_t::data_t::incref() const { mRefCount += (mAllocator != nullptr) ? 1 : 0; }
 
-    slice_data_t* slice_data_t::decref()
+    slice_t::data_t* slice_t::data_t::decref()
     {
         if (mAllocator == nullptr)
             return this;
@@ -72,8 +64,7 @@ namespace ncore
             return &sNull;
         if (refs == 1)
         {
-            mAllocator->deallocate(this->mData);
-            mAllocator->deallocate(this);
+            deallocate(this->mAllocator, this);
             return &sNull;
         }
 
@@ -81,9 +72,9 @@ namespace ncore
         return this;
     }
 
-    slice_data_t* slice_data_t::copy(s32 from, s32 to, s32 capacity, bool memclear)
+    slice_t::data_t* slice_t::data_t::copy(s32 from, s32 to, s32 capacity, bool memclear)
     {
-        slice_data_t* data = &sNull;
+        data_t* data = &sNull;
         if (mAllocator != nullptr)
         {
             math::clampRange(from, to, 0, mItemCount);
@@ -91,7 +82,7 @@ namespace ncore
             if (capacity < (to - from))
                 capacity = to - from;
 
-            data             = (slice_data_t*)mAllocator->allocate(sizeof(slice_data_t), sizeof(void*));
+            data             = (data_t*)mAllocator->allocate(sizeof(data_t), sizeof(void*));
             data->mAllocator = mAllocator;
             data->mRefCount  = 1;
             data->mItemCount = to - from;
@@ -107,7 +98,7 @@ namespace ncore
         return data;
     }
 
-    void slice_data_t::resize(s32 from, s32 to)
+    void slice_t::data_t::resize(s32 from, s32 to)
     {
         if (mAllocator != nullptr)
         {
@@ -121,8 +112,9 @@ namespace ncore
         }
     }
 
-    void slice_data_t::insert(s32 at, s32 count)
+    void slice_t::data_t::insert(s32 at, s32 count)
     {
+        // TODO check if the capacity is enough to handle the insert
         if (mAllocator != nullptr)
         {
             s32 const to_itemcount = mItemCount + count;
@@ -144,8 +136,9 @@ namespace ncore
         }
     }
 
-    void slice_data_t::remove(s32 at, s32 count)
+    void slice_t::data_t::remove(s32 at, s32 count)
     {
+        // TODO should we always re-allocate ?
         if (mAllocator != nullptr)
         {
             s32 const to_itemsize  = mItemSize;
@@ -168,18 +161,18 @@ namespace ncore
         }
     }
 
-    slice_data_t* slice_data_t::allocate(alloc_t* allocator, s32 itemcount, s32 itemsize, s32 capacity, bool memclear)
+    slice_t::data_t* slice_t::data_t::allocate(alloc_t* allocator, s32 itemcount, s32 itemsize, s32 capacity, bool memclear)
     {
         if (capacity < itemcount)
             capacity = itemcount;
 
-        slice_data_t* data = (slice_data_t*)allocator->allocate(sizeof(slice_data_t), sizeof(void*));
-        data->mData        = (u8*)allocator->allocate((u32)(capacity * itemsize), sizeof(void*));
-        data->mRefCount    = 1;
-        data->mItemCount   = itemcount;
-        data->mItemSize    = itemsize;
-        data->mCapacity    = capacity;
-        data->mAllocator   = allocator;
+        data_t* data     = (data_t*)allocator->allocate(sizeof(data_t), sizeof(void*));
+        data->mData      = (u8*)allocator->allocate((u32)(capacity * itemsize), sizeof(void*));
+        data->mRefCount  = 1;
+        data->mItemCount = itemcount;
+        data->mItemSize  = itemsize;
+        data->mCapacity  = capacity;
+        data->mAllocator = allocator;
         if (memclear)
         {
             nmem::memset(data->mData, 0, data->mItemSize * data->mCapacity);
@@ -187,32 +180,37 @@ namespace ncore
         return data;
     }
 
-    slice_data_t slice_data_t::sNull;
+    void slice_t::data_t::deallocate(alloc_t* allocator, data_t* _data)
+    {
+        ASSERT(_data != nullptr);
+        if (_data == &sNull)
+            return;
+        allocator->deallocate(_data->mData);
+        allocator->deallocate(_data);
+    }
+
+    slice_t::data_t slice_t::data_t::sNull;
 
     // ============================================================================
     // SLICE
     // ============================================================================
 
     slice_t::slice_t()
+
+        : mData(&slice_t::data_t::sNull)
+        , mFrom(0)
+        , mTo(0)
     {
-        mData = &slice_data_t::sNull;
-        mFrom = 0;
-        mTo   = 0;
     }
-    slice_t::~slice_t() 
+
+    slice_t::~slice_t()
     {
-        if (mData != &slice_data_t::sNull)
-        {
-            mData->decref();
-        }
-        mData = nullptr;
-        mFrom = 0;
-        mTo   = 0;
+        release();
     }
 
     void slice_t::allocate(slice_t& slice, alloc_t* allocator, s32 item_count, s32 item_size)
     {
-        slice.mData = slice_data_t::allocate(allocator, item_count, item_size, item_count, true);
+        slice.mData = slice_t::data_t::allocate(allocator, item_count, item_size, item_count, true);
         slice.mFrom = 0;
         slice.mTo   = item_count;
     }
@@ -231,7 +229,7 @@ namespace ncore
     void slice_t::release()
     {
         mData->decref();
-        mData = &slice_data_t::sNull;
+        mData = &slice_t::data_t::sNull;
         mFrom = 0;
         mTo   = 0;
     }
@@ -242,12 +240,13 @@ namespace ncore
         math::clampRange(from, to, 0, (mTo - mFrom));
         if (to > from)
         {
-            s.mData = mData->incref();
+            mData->incref();
+            s.mData = mData;
             s.mFrom = mFrom + from;
             s.mTo   = mFrom + to;
             return s;
         }
-        s.mData = &slice_data_t::sNull;
+        s.mData = &slice_t::data_t::sNull;
         return s;
     }
 
@@ -255,14 +254,15 @@ namespace ncore
     {
         if ((slice.mFrom + mid) <= slice.mTo)
         {
-            left.mData = slice.mData->incref();
+            slice.mData->incref();
+            left.mData = slice.mData;
             left.mFrom = slice.mFrom;
             left.mTo   = slice.mFrom + mid;
 
-            right.mData = slice.mData->incref();
+            slice.mData->incref();
+            right.mData = slice.mData;
             right.mFrom = slice.mFrom + mid;
             right.mTo   = slice.mTo;
-
             return true;
         }
         return false;
@@ -271,15 +271,15 @@ namespace ncore
     slice_t slice_t::join(slice_t const& sliceA, slice_t const& sliceB)
     {
         slice_t slice;
-        slice.mData         = slice_data_t::allocate(sliceA.mData->mAllocator, sliceA.size() + sliceB.size(), sliceA.mData->mItemSize, sliceA.size() + sliceB.size(), false);
+        slice.mData         = slice_t::data_t::allocate(sliceA.mData->mAllocator, sliceA.size() + sliceB.size(), sliceA.mData->mItemSize, sliceA.size() + sliceB.size(), false);
         slice.mFrom         = 0;
         slice.mTo           = slice.size();
         s32 const head2copy = sliceA.size() * sliceA.mData->mItemSize;
-        s32 const tail2copy = sliceB.size() * sliceB.mData->mItemSize;
         if (head2copy > 0)
         {
             nmem::memcpy(slice.mData->mData, sliceA.mData->mData + sliceA.mFrom * sliceA.mData->mItemSize, head2copy);
         }
+        s32 const tail2copy = sliceB.size() * sliceB.mData->mItemSize;
         if (tail2copy > 0)
         {
             nmem::memcpy(slice.mData->mData + head2copy, sliceB.mData->mData + sliceB.mFrom * sliceB.mData->mItemSize, tail2copy);
@@ -287,14 +287,15 @@ namespace ncore
         return slice;
     }
 
-    void*       slice_t::begin() { return at(mFrom); }
-    void const* slice_t::begin() const { return at(mFrom); }
-    void*       slice_t::end() { return at(mTo); }
-    void const* slice_t::end() const { return at(mTo); }
-    bool        slice_t::next(void*& ptr) const
+    void*       slice_t::vbegin() { return vat(mFrom); }
+    void const* slice_t::vbegin() const { return vat(mFrom); }
+    void*       slice_t::vend() { return vat(mTo); }
+    void const* slice_t::vend() const { return vat(mTo); }
+    
+    bool        slice_t::vnext(void*& ptr) const
     {
-        ASSERT(ptr >= begin() && ptr <= end());
-        if (ptr < end())
+        ASSERT(ptr >= vbegin() && ptr <= vend());
+        if (ptr < vend())
         {
             ptr = (u8*)ptr + mData->mItemSize;
             return true;
@@ -302,10 +303,10 @@ namespace ncore
         return false;
     }
 
-    bool slice_t::next(void const*& ptr) const
+    bool slice_t::vnext(void const*& ptr) const
     {
-        ASSERT(ptr >= begin() && ptr <= end());
-        if (ptr < end())
+        ASSERT(ptr >= vbegin() && ptr <= vend());
+        if (ptr < vend())
         {
             ptr = (u8 const*)ptr + mData->mItemSize;
             return true;
@@ -313,9 +314,9 @@ namespace ncore
         return false;
     }
 
-    void* slice_t::at(s32 index)
+    void* slice_t::vat(s32 index)
     {
-        if (mData == &slice_data_t::sNull)
+        if (mData == &slice_t::data_t::sNull)
             return nullptr;
         index += mFrom;
         if (index < 0)
@@ -326,9 +327,9 @@ namespace ncore
         return &mData->mData[data_offset];
     }
 
-    void const* slice_t::at(s32 index) const
+    void const* slice_t::vat(s32 index) const
     {
-        if (mData == &slice_data_t::sNull)
+        if (mData == &slice_t::data_t::sNull)
             return nullptr;
         index += mFrom;
         if (index < 0)
@@ -339,4 +340,4 @@ namespace ncore
         return &mData->mData[data_offset];
     }
 
-} // namespace ncore
+}  // namespace ncore

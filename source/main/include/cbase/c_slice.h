@@ -2,7 +2,7 @@
 #define __CBASE_SLICE_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "cbase/c_allocator.h"
@@ -10,8 +10,6 @@
 
 namespace ncore
 {
-    struct slice_data_t;
-
     //==============================================================================
     // A reference counted slice_t owning a memory block with a view/window (from,to).
     //==============================================================================
@@ -39,25 +37,77 @@ namespace ncore
         void overwrite(slice_t const& other);
         void remove(slice_t const& other);
 
-        void*       begin();
-        void const* begin() const;
-        void*       end();
-        void const* end() const;
-        bool        next(void*& ptr) const;
-        bool        next(void const*& ptr) const;
-        void*       at(s32 index);
-        void const* at(s32 index) const;
+        void*       vbegin();
+        void const* vbegin() const;
+        void*       vend();
+        void const* vend() const;
+
+        bool vnext(void*& ptr) const;
+        bool vnext(void const*& ptr) const;
+
+        void*       vat(s32 index);
+        void const* vat(s32 index) const;
+
+        template <typename T>
+        inline T* begin()
+        {
+            return (T*)vbegin();
+        }
+        template <typename T>
+        T const* begin() const
+        {
+            return (T*)vbegin();
+        }
+        template <typename T>
+        T* end()
+        {
+            return (T*)vend();
+        }
+        template <typename T>
+        T const* end() const
+        {
+            return (T const*)vend();
+        }
+
+        template <typename T>
+        void* at(s32 index)
+        {
+            return (T*)vat(index);
+        }
+        template <typename T>
+        void const* at(s32 index) const
+        {
+            return (T const*)vat(index);
+        }
+
+        template <typename T>
+        bool next(T*& ptr) const
+        {
+            void* p = ptr;
+            bool  r = vnext(p);
+            ptr     = (T*)p;
+            return r;
+        }
+
+        template <typename T>
+        bool next(T const*& ptr) const
+        {
+            void const* p = ptr;
+            bool        r = vnext(p);
+            ptr           = (T const*)p;
+            return r;
+        }
 
     protected:
-        friend struct slice_data_t;
+        struct data_t;
 
-        s32  refcnt() const;
+        s32 refcnt() const;
 
-        slice_data_t* mData;
-        s32           mFrom;
-        s32           mTo;
+        data_t* mData;
+        s32     mFrom;
+        s32     mTo;
     };
 
-} // namespace ncore
+}  // namespace ncore
 
 #endif
