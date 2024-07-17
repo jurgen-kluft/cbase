@@ -20,27 +20,28 @@ namespace ncore
 
         static void    allocate(slice_t& slice_t, alloc_t* allocator, s32 item_count, s32 item_size);
         static slice_t duplicate(slice_t const& slice);
-        static bool    split(slice_t const& slice, s32 mid, slice_t& left, slice_t& right);
+
+        static bool    split(slice_t const& slice, s32 at, slice_t& left, slice_t& right);
         static slice_t join(slice_t const& sliceA, slice_t const& sliceB);
 
         void release();
 
-        s32 size() const;
-        s32 from() const { return mFrom; }
-        s32 to() const { return mTo; }
+        inline s32 size() const { return mTo - mFrom; }
+        inline s32 from() const { return mFrom; }
+        inline s32 to() const { return mTo; }
 
-        slice_t view() const { return view(0, size()); }
-        slice_t view(s32 to) const { return view(0, to); }
-        slice_t view(s32 from, s32 to) const;
+        slice_t slice() const { return slice(0, size()); }
+        slice_t slice(s32 to) const { return slice(0, to); }
+        slice_t slice(s32 from, s32 to) const;
 
         void insert(slice_t const& other);
-        void overwrite(slice_t const& other);
         void remove(slice_t const& other);
+        void overwrite(slice_t const& other);
 
-        void*       vbegin();
-        void const* vbegin() const;
-        void*       vend();
-        void const* vend() const;
+        void*       vbegin() { return vat(mFrom); }
+        void const* vbegin() const { return vat(mFrom); }
+        void*       vend() { return vat(mTo); }
+        void const* vend() const { return vat(mTo); }
 
         bool vnext(void*& ptr) const;
         bool vnext(void const*& ptr) const;

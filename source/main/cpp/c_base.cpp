@@ -24,7 +24,8 @@ namespace ncore
             : m_seed(0)
         {
         }
-        virtual ~wyrand_t() {}
+        ~wyrand_t() {}
+        
         virtual void reset(s64 inSeed = 0);
         virtual void generate(u8* outData, u32 numBytes);
 

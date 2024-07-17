@@ -133,7 +133,7 @@ namespace ncore
         template <class T>
         inline static void set(s32 tidx, s32 slot, T* inData)
         {
-            vset(tidx, slot, reinterpret_cast<void*>(inData));
+            vset(tidx, slot, (void*)inData);
         }
         template <class T>
         inline static void get(s32 tidx, s32 slot, T*& outData)

@@ -23,8 +23,24 @@ namespace ncore
 
         // These functions do not 'reallocate' this
         void resize(s32 from, s32 to);
-        void insert(s32 at, s32 count);
+        void insert(s32 at, s32 count, void const* _data = nullptr);
         void remove(s32 at, s32 count);
+        void overwrite(s32 from, s32 to, u8 const* _data, s32 count);
+
+        bool clamp(s32& i, s32 from, s32 to)
+        {
+            if (i < from)
+            {
+                i = from;
+                return true;
+            }
+            if (i >= to)
+            {
+                i = to;
+                return true;
+            }
+            return false;
+        }
 
         static data_t* allocate(alloc_t* allocator, s32 itemcount, s32 itemsize, s32 capacity, bool memclear);
         static void    deallocate(alloc_t* allocator, data_t* _data);
@@ -40,13 +56,14 @@ namespace ncore
     // ============================================================================
     // SLICE DATA
     // ============================================================================
+    static byte s_null_data[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     slice_t::data_t::data_t()
         : mRefCount(0)
         , mItemCount(0)
-        , mItemSize(0)
+        , mItemSize(1)
         , mCapacity(0)
-        , mData(nullptr)
+        , mData(s_null_data)
         , mAllocator(nullptr)
     {
     }
@@ -112,7 +129,7 @@ namespace ncore
         }
     }
 
-    void slice_t::data_t::insert(s32 at, s32 count)
+    void slice_t::data_t::insert(s32 at, s32 count, void const* _data)
     {
         // TODO check if the capacity is enough to handle the insert
         if (mAllocator != nullptr)
@@ -125,6 +142,10 @@ namespace ncore
             if (head2copy > 0)
             {
                 nmem::memcpy(data, this->mData, head2copy);
+            }
+            if (_data != nullptr)
+            {
+                nmem::memcpy(data + head2copy, _data, count);
             }
             if (tail2copy > 0)
             {
@@ -158,6 +179,18 @@ namespace ncore
             mItemCount -= count;
             mAllocator->deallocate(this->mData);
             this->mData = data;
+        }
+    }
+
+    void slice_t::data_t::overwrite(s32 from, s32 to, u8 const* _data, s32 _count)
+    {
+        u8*       dst     = (u8*)mData + from;
+        u8 const* dst_end = dst + to;
+        u8 const* src     = _data;
+        u8 const* src_end = _data + _count;
+        while (dst < dst_end && src < src_end)
+        {
+            *dst++ = *src++;
         }
     }
 
@@ -203,10 +236,7 @@ namespace ncore
     {
     }
 
-    slice_t::~slice_t()
-    {
-        release();
-    }
+    slice_t::~slice_t() { release(); }
 
     void slice_t::allocate(slice_t& slice, alloc_t* allocator, s32 item_count, s32 item_size)
     {
@@ -224,7 +254,6 @@ namespace ncore
         return newslice;
     }
 
-    s32  slice_t::size() const { return mTo - mFrom; }
     s32  slice_t::refcnt() const { return mData->mRefCount; }
     void slice_t::release()
     {
@@ -234,34 +263,54 @@ namespace ncore
         mTo   = 0;
     }
 
-    slice_t slice_t::view(s32 from, s32 to) const
+    slice_t slice_t::slice(s32 from, s32 to) const
     {
         slice_t s;
-        math::clampRange(from, to, 0, (mTo - mFrom));
+        from += mFrom;
+        to += mFrom;
+        if (from > mTo)
+        {
+            from = mTo;
+            to   = mTo;
+        }
         if (to > from)
         {
             mData->incref();
             s.mData = mData;
-            s.mFrom = mFrom + from;
-            s.mTo   = mFrom + to;
+            s.mFrom = from;
+            s.mTo   = to;
             return s;
         }
         s.mData = &slice_t::data_t::sNull;
         return s;
     }
 
-    bool slice_t::split(slice_t const& slice, s32 mid, slice_t& left, slice_t& right)
+    void slice_t::insert(slice_t const& other)
     {
-        if ((slice.mFrom + mid) <= slice.mTo)
+        if (mData->mItemSize == other.mData->mItemSize)
+            mData->insert(mFrom, other.size(), other.mData->mData);
+    }
+
+    void slice_t::overwrite(slice_t const& _other)
+    {
+        if (mData->mItemSize == _other.mData->mItemSize)
+            mData->overwrite(mFrom, mTo, _other.mData->mData + _other.mFrom, _other.size());
+    }
+
+    void slice_t::remove(slice_t const& other) {}
+
+    bool slice_t::split(slice_t const& slice, s32 at, slice_t& left, slice_t& right)
+    {
+        if ((slice.mFrom + at) <= slice.mTo)
         {
             slice.mData->incref();
             left.mData = slice.mData;
             left.mFrom = slice.mFrom;
-            left.mTo   = slice.mFrom + mid;
+            left.mTo   = slice.mFrom + at;
 
             slice.mData->incref();
             right.mData = slice.mData;
-            right.mFrom = slice.mFrom + mid;
+            right.mFrom = slice.mFrom + at;
             right.mTo   = slice.mTo;
             return true;
         }
@@ -287,12 +336,7 @@ namespace ncore
         return slice;
     }
 
-    void*       slice_t::vbegin() { return vat(mFrom); }
-    void const* slice_t::vbegin() const { return vat(mFrom); }
-    void*       slice_t::vend() { return vat(mTo); }
-    void const* slice_t::vend() const { return vat(mTo); }
-    
-    bool        slice_t::vnext(void*& ptr) const
+    bool slice_t::vnext(void*& ptr) const
     {
         ASSERT(ptr >= vbegin() && ptr <= vend());
         if (ptr < vend())

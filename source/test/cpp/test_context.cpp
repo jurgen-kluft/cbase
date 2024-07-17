@@ -22,13 +22,13 @@ UNITTEST_SUITE_BEGIN(test_context_t)
         {
 			gInstance.mInteger = 1;
 			gInstance.mFloat = 2.0f;
-			context_t::set(0, 5, &gInstance);
+			context_t::set(0, context_t::EMPTY_SLOT_0, &gInstance);
 		}
 
 		UNITTEST_TEST(get)
 		{
 			OurTlsObject* obj;
-			context_t::get(0, 5, obj);
+			context_t::get(0, context_t::EMPTY_SLOT_0, obj);
 			CHECK_EQUAL(1, obj->mInteger);
 			CHECK_EQUAL(2.0f, obj->mFloat);
 		}

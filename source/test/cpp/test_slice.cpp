@@ -6,7 +6,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_slice)
+UNITTEST_SUITE_BEGIN(slice)
 {
 	UNITTEST_FIXTURE(main)
 	{
@@ -20,6 +20,21 @@ UNITTEST_SUITE_BEGIN(test_slice)
 			slice_t s;
 			slice_t::allocate(s, Allocator, 100, 4);
 			s.release();
+		}
+
+		UNITTEST_TEST(duplicate)
+		{
+			return;
+			
+			slice_t s;
+			slice_t::allocate(s, Allocator, 100, 4);
+
+			slice_t d = slice_t::duplicate(s);
+			s.release();
+
+			CHECK_EQUAL(100, d.size());
+			CHECK_EQUAL(0, d.from());
+			CHECK_EQUAL(100, d.to());
 		}
 	}
 }
