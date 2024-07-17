@@ -319,10 +319,19 @@ namespace ncore
 
     slice_t slice_t::join(slice_t const& sliceA, slice_t const& sliceB)
     {
+        if (sliceA.mData == sliceB.mData && sliceA.mTo == sliceB.mFrom)
+        {
+            slice_t slice;
+            slice.mData = sliceA.mData;
+            slice.mFrom = sliceA.mFrom;
+            slice.mTo   = sliceB.mTo;
+            return slice;
+        }
+
         slice_t slice;
         slice.mData         = slice_t::data_t::allocate(sliceA.mData->mAllocator, sliceA.size() + sliceB.size(), sliceA.mData->mItemSize, sliceA.size() + sliceB.size(), false);
         slice.mFrom         = 0;
-        slice.mTo           = slice.size();
+        slice.mTo           = sliceA.size() + sliceB.size();
         s32 const head2copy = sliceA.size() * sliceA.mData->mItemSize;
         if (head2copy > 0)
         {
