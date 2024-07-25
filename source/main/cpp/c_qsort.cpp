@@ -6,7 +6,8 @@ namespace ncore
     // Custom QuickSort
     namespace __qsort
     {
-#define __qsort_MIN(a, b) (a) < (b) ? a : b
+		template <typename T>
+		static inline T minimum(T a, T b) { return (a) < (b) ? a : b; }
 
         static inline void sSwap(u8* a, u8* b, s32 n)
         {
@@ -143,10 +144,10 @@ namespace ncore
         }
 
         pn = (u8*)a + n * es;
-        r  = (s32)(__qsort_MIN(pa - (u8*)a, pb - pa));
+        r  = (s32)(__qsort::minimum(pa - (u8*)a, pb - pa));
         //__qsort_VecSwap((u8*)a, pb - r, r);
         __qsort::sSwap((u8*)a, pb - r, r);
-        r = (s32)(__qsort_MIN(pd - pc, pn - pd - es));
+        r = (s32)(__qsort::minimum(pd - pc, pn - pd - es));
         //__qsort_VecSwap(pb, pn - r, r);
         __qsort::sSwap(pb, pn - r, r);
 
@@ -234,9 +235,9 @@ namespace ncore
         }
 
         pn = (u16*)a + n * 1;
-        r  = (s32)(__qsort_MIN(pa - (u16*)a, pb - pa));
+        r  = (s32)(__qsort::minimum(pa - (u16*)a, pb - pa));
         __qsort::sSwap2((u16*)a, pb - r, r);
-        r = (s32)(__qsort_MIN(pd - pc, pn - pd - 1));
+        r = (s32)(__qsort::minimum(pd - pc, pn - pd - 1));
         __qsort::sSwap2(pb, pn - r, r);
 
         if ((r = (s32)(pb - pa)) > 1)
@@ -323,9 +324,9 @@ namespace ncore
         }
 
         pn = (u32*)a + n * 1;
-        r  = (s32)(__qsort_MIN(pa - (u32*)a, pb - pa));
+        r  = (s32)(__qsort::minimum(pa - (u32*)a, pb - pa));
         __qsort::sSwap4((u32*)a, pb - r, r);
-        r = (s32)(__qsort_MIN(pd - pc, pn - pd - 1));
+        r = (s32)(__qsort::minimum(pd - pc, pn - pd - 1));
         __qsort::sSwap4(pb, pn - r, r);
 
         if ((r = (s32)(pb - pa)) > 1)
@@ -412,9 +413,9 @@ namespace ncore
         }
 
         pn = (u64*)a + n * 1;
-        r  = (s32)(__qsort_MIN(pa - (u64*)a, pb - pa));
+        r  = (s32)(__qsort::minimum(pa - (u64*)a, pb - pa));
         __qsort::sSwap8((u64*)a, pb - r, r);
-        r = (s32)(__qsort_MIN(pd - pc, pn - pd - 1));
+        r = (s32)(__qsort::minimum(pd - pc, pn - pd - 1));
         __qsort::sSwap8(pb, pn - r, r);
 
         if ((r = (s32)(pb - pa)) > 1)
@@ -428,7 +429,6 @@ namespace ncore
             goto loop;
         }
     }
-
 
     void g_qsort(void* a, s32 n, s32 es, s32 (*cmp)(const void*, const void*, void*), void* user_data)
 	{
@@ -448,7 +448,5 @@ namespace ncore
 			break;
 		}
 	}
-
-#undef __qsort_MIN
 
 };  // namespace ncore
