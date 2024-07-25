@@ -97,6 +97,17 @@ UNITTEST_SUITE_BEGIN(slice)
 			CHECK_EQUAL(50, d.to());
 		}
 
+		UNITTEST_TEST(slice2)
+		{			
+			slice_t s;
+			slice_t::allocate(s, Allocator, 100, 4);
+
+			slice_t d = s.slice(50, 75);
+
+			CHECK_EQUAL(25, d.size());
+			CHECK_EQUAL(50, d.from());
+			CHECK_EQUAL(75, d.to());
+		}
 	}
 }
 UNITTEST_SUITE_END
