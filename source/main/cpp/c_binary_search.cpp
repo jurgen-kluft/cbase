@@ -58,37 +58,4 @@ namespace ncore
         return bounds[0];  // could not find item
     }
 
-    // Mono Bound
-    template <typename T>
-    s32 g_BinarySearch_mb_T(T const* array, u32 array_size, T key)
-    {
-        if (array_size == 0)
-            return -1;
-
-        u32 bot = 0;
-        u32 top = array_size;
-        while (top > 1)
-        {
-            u32 const mid = top >> 1;
-            if (key >= array[bot + mid])
-            {
-                bot += mid;
-            }
-            top -= mid;
-        }
-
-        if (key == array[bot])
-        {
-            return bot;
-        }
-        return -1;
-    }
-
-    s32 g_BinarySearch_mb(s16 const* array, u32 array_size, s16 key) { return g_BinarySearch_mb_T(array, array_size, key); }
-    s32 g_BinarySearch_mb(s32 const* array, u32 array_size, s32 key) { return g_BinarySearch_mb_T(array, array_size, key); }
-    s32 g_BinarySearch_mb(s64 const* array, u32 array_size, s64 key) { return g_BinarySearch_mb_T(array, array_size, key); }
-    s32 g_BinarySearch_mb(u16 const* array, u32 array_size, u16 key) { return g_BinarySearch_mb_T(array, array_size, key); }
-    s32 g_BinarySearch_mb(u32 const* array, u32 array_size, u32 key) { return g_BinarySearch_mb_T(array, array_size, key); }
-    s32 g_BinarySearch_mb(u64 const* array, u32 array_size, u64 key) { return g_BinarySearch_mb_T(array, array_size, key); }
-
 };  // namespace ncore
