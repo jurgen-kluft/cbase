@@ -5,6 +5,8 @@
 #define USE_MALLOC_DBG
 #endif
 
+#include <string>
+
 #ifdef USE_MALLOC_DBG
 #    include <crtdbg.h>
 #endif
