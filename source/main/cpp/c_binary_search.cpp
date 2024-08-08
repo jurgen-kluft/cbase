@@ -2,7 +2,7 @@
 
 namespace ncore
 {
-    s64 g_BinarySearch(const void* inItem, const void* inData, u64 inLength, compare_predicate_fn predicate)
+    s64 g_BinarySearch(const void* inItem, const void* inData, s64 inLength, compare_predicate_fn predicate)
     {
         s64 bounds[2] = {0, (s64)inLength - 1};
         while (bounds[0] <= bounds[1])
@@ -20,7 +20,7 @@ namespace ncore
         }
         return -1;  // could not find item
     }
-    s64 g_LowerBound(const void* inItem, const void* inData, u64 inLength, compare_predicate_fn predicate)
+    s64 g_LowerBound(const void* inItem, const void* inData, s64 inLength, compare_predicate_fn predicate)
     {
         s64 bounds[2] = {0, (s64)inLength - 1};
         while (bounds[0] <= bounds[1])
@@ -39,7 +39,7 @@ namespace ncore
         return bounds[0];  // could not find item
     }
 
-    s64 g_UpperBound(const void* inItem, const void* inData, u64 inLength, compare_predicate_fn predicate)
+    s64 g_UpperBound(const void* inItem, const void* inData, s64 inLength, compare_predicate_fn predicate)
     {
         s64 bounds[2] = {0, (s64)inLength - 1};
         while (bounds[0] <= bounds[1])
