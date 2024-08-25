@@ -50,6 +50,89 @@ namespace ncore
     f32 random_f32_0_1(random_t* inRandom);
     f64 random_f64_0_1(random_t* inRandom);
 
+    class xor_random_t : public random_t
+    {
+        u64 s0, s1;
+
+        inline u64 next(void)
+        {
+            u64 ss1    = s0;
+            u64 ss0    = s1;
+            u64 result = ss0 + ss1;
+            s0         = ss0;
+            ss1 ^= ss1 << 23;
+            s1 = ss1 ^ ss0 ^ (ss1 >> 18) ^ (ss0 >> 5);
+            return result;
+        }
+
+    public:
+        inline xor_random_t(u64 seed = 0x1234567890abcdef)
+            : s0(seed)
+            , s1(0)
+        {
+            next();
+            next();
+        }
+
+        void reset(s64 seed) override
+        {
+            s0 = seed;
+            s1 = 0;
+            next();
+            next();
+        }
+
+        void generate(u8* outData, u32 numBytes) override
+        {
+            if (numBytes == 0)
+                return;
+
+            // Head
+            s32 n = (8 - ((u64)outData & 0x07)) & 0x07;
+            if (n > 0)
+            {
+                u64 const val = next();
+                u8 const* p   = (u8 const*)&val;
+                if (n > numBytes)
+                    n = numBytes;
+                numBytes -= n;
+                switch (n)
+                {
+                    case 7: *outData++ = *p++;
+                    case 6: *outData++ = *p++;
+                    case 5: *outData++ = *p++;
+                    case 4: *outData++ = *p++;
+                    case 3: *outData++ = *p++;
+                    case 2: *outData++ = *p++;
+                    case 1: *outData++ = *p++;
+                }
+            }
+
+            // Words
+            u32 const numWords = numBytes >> 3;
+            for (u32 i = 0; i < numWords; ++i)
+                *outData++ = next();
+
+            // Tail
+            numBytes &= 0x07;
+            if (numBytes > 0)
+            {
+                u64 const val = next();
+                u8 const* p   = (u8 const*)&val;
+                switch (numBytes)
+                {
+                    case 7: *outData++ = *p++;
+                    case 6: *outData++ = *p++;
+                    case 5: *outData++ = *p++;
+                    case 4: *outData++ = *p++;
+                    case 3: *outData++ = *p++;
+                    case 2: *outData++ = *p++;
+                    case 1: *outData++ = *p++;
+                }
+            }
+        }
+    };
+
 };  // namespace ncore
 
 #endif  // __CBASE_RANDOM_H__

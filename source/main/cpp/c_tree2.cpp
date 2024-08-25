@@ -24,7 +24,7 @@ namespace ncore
     //
     // Example 4:
     //    You can also provide a normal implementation where a node just holds a pointer to the
-    //    value, parent and children.
+    //    key, value, color and children.
     //
 
     namespace ntree2
@@ -36,15 +36,15 @@ namespace ncore
             inline node_t*     get_right(tree_t const* c) const { return c->v_get_node(this, RIGHT); }
             inline void        set_left(tree_t* c, node_t* child) { c->v_set_node(this, LEFT, child); }
             inline void        set_right(tree_t* c, node_t* child) { c->v_set_node(this, RIGHT, child); }
-            inline node_t*     get_child(tree_t const* c, s32 child) const { return c->v_get_node(this, (node_e)child); }
-            inline void        set_child(tree_t* c, s32 child, node_t* n) { c->v_set_node(this, (node_e)child, n); }
+            inline node_t*     get_child(tree_t const* c, s32 child) const { return c->v_get_node(this, (echild_t)child); }
+            inline void        set_child(tree_t* c, s32 child, node_t* n) { c->v_set_node(this, (echild_t)child, n); }
 
             inline bool is_red(tree_t const* c) const { return c->v_get_color(this) == RED; }
             inline bool is_black(tree_t const* c) const { return c->v_get_color(this) == BLACK; }
             inline void set_red(tree_t* c) { c->v_set_color(this, RED); }
             inline void set_black(tree_t* c) { c->v_set_color(this, BLACK); }
             inline s32  get_color(tree_t const* c) const { return c->v_get_color(this); }
-            inline void set_color(tree_t* c, s32 color) { c->v_set_color(this, (color_e)color); }
+            inline void set_color(tree_t* c, s32 color) { c->v_set_color(this, (ecolor_t)color); }
         };
 
         static inline s32 is_red(tree_t* tree, node_t* n) { return n != nullptr && n->is_red(tree); }

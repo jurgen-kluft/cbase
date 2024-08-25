@@ -15,13 +15,13 @@ namespace ncore
         class tree_t;
         struct node_t;
 
-        enum node_e
+        enum echild_t
         {
             LEFT  = 0,
             RIGHT = 1,
         };
 
-        enum color_e
+        enum ecolor_t
         {
             RED   = LEFT,
             BLACK = RIGHT
@@ -37,12 +37,12 @@ namespace ncore
             virtual node_t*     v_get_root() const                                             = 0;
             virtual void        v_set_root(node_t* node)                                       = 0;
             virtual node_t*     v_get_temp() const                                             = 0;
-            virtual void        v_set_color(node_t* node, color_e color)                       = 0;
-            virtual color_e     v_get_color(node_t const* node) const                          = 0;
+            virtual void        v_set_color(node_t* node, ecolor_t color)                      = 0;
+            virtual ecolor_t    v_get_color(node_t const* node) const                          = 0;
             virtual void const* v_get_key(node_t const* node) const                            = 0;
             virtual void const* v_get_value(node_t const* node) const                          = 0;
-            virtual node_t*     v_get_node(node_t const* node, node_e ne) const                = 0;
-            virtual void        v_set_node(node_t* node, node_e ne, node_t* set)               = 0;
+            virtual node_t*     v_get_node(node_t const* node, echild_t ne) const              = 0;
+            virtual void        v_set_node(node_t* node, echild_t ne, node_t* set)             = 0;
             virtual node_t*     v_new_node(void const* key, void const* value)                 = 0;
             virtual void        v_del_node(node_t* node)                                       = 0;
             virtual s32         v_compare_nodes(node_t const* node, node_t const* other) const = 0;

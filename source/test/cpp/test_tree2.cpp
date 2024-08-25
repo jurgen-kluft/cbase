@@ -776,9 +776,9 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         virtual s32 v_size() const final { return m_size; }
         virtual s32 v_capacity() const final { return m_cap; }
 
-        virtual void            v_set_color(ntree2::node_t *node, ntree2::color_e color) final { ((node16_t *)node)->m_color = color; }
-        virtual ntree2::color_e v_get_color(ntree2::node_t const *node) const final { return (ntree2::color_e)((node16_t const *)node)->m_color; }
-        virtual void const     *v_get_key(ntree2::node_t const *node) const final
+        virtual void             v_set_color(ntree2::node_t *node, ntree2::ecolor_t color) final { ((node16_t *)node)->m_color = color; }
+        virtual ntree2::ecolor_t v_get_color(ntree2::node_t const *node) const final { return (ntree2::ecolor_t)((node16_t const *)node)->m_color; }
+        virtual void const      *v_get_key(ntree2::node_t const *node) const final
         {
             u16 const index = (u16)((node16_t const *)node - m_nodes);
             return (void const *)&m_keys[index];
@@ -788,12 +788,12 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             u16 const index = (u16)((node16_t const *)node - m_nodes);
             return (void const *)&m_keys[index];
         }
-        virtual ntree2::node_t *v_get_node(ntree2::node_t const *node, ntree2::node_e ne) const final
+        virtual ntree2::node_t *v_get_node(ntree2::node_t const *node, ntree2::echild_t ne) const final
         {
             u16 const index = ((node16_t const *)node)->m_branches[ne];
             return (index == 0) ? nullptr : (ntree2::node_t *)(&m_nodes[index]);
         }
-        virtual void v_set_node(ntree2::node_t *node, ntree2::node_e ne, ntree2::node_t *set) final
+        virtual void v_set_node(ntree2::node_t *node, ntree2::echild_t ne, ntree2::node_t *set) final
         {
             u16 const index                    = (set == nullptr) ? 0 : (u16)((node16_t *)set - m_nodes);
             ((node16_t *)node)->m_branches[ne] = index;
