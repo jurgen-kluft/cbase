@@ -6,8 +6,9 @@ namespace ncore
 
     void* malloc(u64 size, u16 align)
     {
+        ASSERT(size > 0 && size < 0x7FFFFFFF);
         alloc_t* allocator = context_t::runtime_alloc();
-        return allocator->allocate (size, align);
+        return allocator->allocate ((u32)size, align);
     }
 
     void  free(void* ptr)

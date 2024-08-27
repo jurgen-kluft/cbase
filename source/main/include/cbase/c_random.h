@@ -88,8 +88,8 @@ namespace ncore
                 return;
 
             // Head
-            s32 n = (8 - ((u64)outData & 0x07)) & 0x07;
-            if (n > 0)
+            u32 n = (8 - ((u64)outData & 0x07)) & 0x07;
+            if (n != 0)
             {
                 u64 const val = next();
                 u8 const* p   = (u8 const*)&val;
@@ -110,12 +110,14 @@ namespace ncore
 
             // Words
             u32 const numWords = numBytes >> 3;
+            u64*      words    = (u64*)outData;
             for (u32 i = 0; i < numWords; ++i)
-                *outData++ = next();
+                *words++ = next();
+            outData = (u8*)words;
 
             // Tail
             numBytes &= 0x07;
-            if (numBytes > 0)
+            if (numBytes != 0)
             {
                 u64 const val = next();
                 u8 const* p   = (u8 const*)&val;
