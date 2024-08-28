@@ -164,9 +164,9 @@ namespace ncore
             }
 
             prune m_bos;    // begin of string
-            u32   m_str;    // &m_bos[m_end] -> string
+            u32   m_str;    // &m_bos[m_str] -> string
             u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32   m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
             u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
@@ -206,9 +206,9 @@ namespace ncore
             }
 
             pcrune m_bos;    // begin of string
-            u32    m_str;    // &m_bos[m_end] -> string
+            u32    m_str;    // &m_bos[m_str] -> string
             u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32    m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
             u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
@@ -246,9 +246,9 @@ namespace ncore
             }
 
             prune m_bos;    // begin of string
-            u32   m_str;    // &m_bos[m_end] -> string
+            u32   m_str;    // &m_bos[m_str] -> string
             u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32   m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
             u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
@@ -288,9 +288,9 @@ namespace ncore
             }
 
             pcrune m_bos;    // begin of string
-            u32    m_str;    // &m_bos[m_end] -> string
+            u32    m_str;    // &m_bos[m_str] -> string
             u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32    m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
             u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
@@ -327,9 +327,9 @@ namespace ncore
             }
 
             prune m_bos;    // begin of string
-            u32   m_str;    // &m_bos[m_end] -> string
+            u32   m_str;    // &m_bos[m_str] -> string
             u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32   m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
             u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
@@ -369,9 +369,9 @@ namespace ncore
             }
 
             pcrune m_bos;    // begin of string
-            u32    m_str;    // &m_bos[m_end] -> string
+            u32    m_str;    // &m_bos[m_str] -> string
             u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
+            u32    m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
             u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
         };
 
@@ -407,7 +407,7 @@ namespace ncore
 
         bool    at_end(u32 cursor) const;
         bool    is_valid(u32 cursor) const;
-        uchar32 peek(u32 cursor) const;
+        uchar32 peek(u32 cursor, u32& next) const;
         uchar32 read(u32& cursor) const;
         bool    write(uchar32 c);
 
@@ -476,7 +476,7 @@ namespace ncore
 
         bool    at_end(u32 cursor) const;
         bool    is_valid(u32 cursor) const;
-        uchar32 peek(u32 cursor) const;
+        uchar32 peek(u32 cursor, u32& next) const;
         uchar32 read(u32& cursor) const;
 
         bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const;  // scan until we reach one of the 'chars'
@@ -513,12 +513,13 @@ namespace ncore
         crunes_t findOneOf(crunes_t const& str, crunes_t const& set, bool case_sensitive = true);
         runes_t  findOneOf(runes_t const& str, crunes_t const& set, bool case_sensitive = true);
 
+        bool contains(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
+        bool contains(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
+
         crunes_t find(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
         crunes_t findLast(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
-        crunes_t findOneOf(crunes_t const& str, uchar32 _c, bool case_sensitive = true);
         runes_t  find(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
         runes_t  findLast(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
-        runes_t  findOneOf(runes_t const& str, uchar32 _c, bool case_sensitive = true);
 
         crunes_t findSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
         crunes_t findLastSelectUntil(const crunes_t& inStr, const crunes_t& inFind, bool case_sensitive = true);
@@ -608,13 +609,6 @@ namespace ncore
 
         // -------------------------------------------------------------------------------
         // filters
-        bool is_decimal(crunes_t const& str);
-        bool is_hexadecimal(crunes_t const& str, bool with_prefix = false);
-        bool is_float(crunes_t const& str);
-        bool is_GUID(crunes_t const& str);
-        void to_upper(runes_t& str);
-        void to_lower(runes_t& str);
-
         inline bool    is_space(uchar32 c) { return ((c == 0x09) || (c == 0x0A) || (c == 0x0D) || (c == ' ')); }
         inline bool    is_whitespace(uchar32 c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v'; }
         inline bool    is_upper(uchar32 c) { return ((c >= 'A') && (c <= 'Z')); }
@@ -625,28 +619,25 @@ namespace ncore
         inline uchar32 to_upper(uchar32 c) { return ((c >= 'a') && (c <= 'z')) ? c + (uchar32)('A' - 'a') : c; }
         inline uchar32 to_lower(uchar32 c) { return ((c >= 'A') && (c <= 'Z')) ? c + (uchar32)('a' - 'A') : c; }
         inline u32     to_digit(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
-        inline u32     to_number(uchar32 c)
-        {
-            if (is_digit(c))
-                return to_digit(c);
-            else if (c >= 'A' && c <= 'F')
-                return (c - 'A' + 10);
-            else if (c >= 'a' && c <= 'f')
-                return (c - 'a' + 10);
-            return 0;
-        }
-        inline char to_dec_char(u8 val) { return "0123456789??????"[val & 0xf]; }
-        inline char to_hex_char(u8 val, bool lowercase) { return (lowercase) ? "0123456789abcdef"[val & 0xf] : "0123456789ABCDEF"[val & 0xf]; }
-        inline bool is_equal(uchar32 a, uchar32 b) { return (a == b); }
-        inline bool is_equalfold(uchar32 a, uchar32 b) { return (to_lower(a) == to_lower(b)); }
+        inline u32     hex_to_number(uchar32 c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : ((c >= 'A') && (c <= 'F')) ? (c - 'A' + 10) : ((c >= 'a') && (c <= 'f')) ? (c - 'a' + 10) : 0; }
+        inline char    to_dec_char(u8 val) { return "0123456789??????"[val & 0xf]; }
+        inline char    to_hex_char(u8 val, bool lowercase) { return (lowercase) ? "0123456789abcdef"[val & 0xf] : "0123456789ABCDEF"[val & 0xf]; }
+        inline bool    is_equal(uchar32 a, uchar32 b) { return (a == b); }
+        inline bool    is_equalfold(uchar32 a, uchar32 b) { return (to_lower(a) == to_lower(b)); }
 
+        bool    is_decimal(crunes_t const& str);
+        bool    is_hexadecimal(crunes_t const& str, bool with_prefix = false);
+        bool    is_float(crunes_t const& str);
+        bool    is_GUID(crunes_t const& str);
+        void    to_upper(runes_t& str);
+        void    to_lower(runes_t& str);
         bool    is_upper(crunes_t const& str);
         bool    is_lower(crunes_t const& str);
         bool    is_capitalized(crunes_t const& str);
         bool    is_delimited(crunes_t const& str, uchar32 delimit_left = '\"', uchar32 delimit_right = '\"');
         bool    is_quoted(crunes_t const& str, uchar32 quote = '\"');
         bool    starts_with(crunes_t const& str, uchar32 start);
-        bool    starts_with(crunes_t const& str, crunes_t const& start);
+        bool    starts_with(crunes_t const& str, crunes_t const& start, bool case_sensitive = true);
         bool    ends_with(crunes_t const& str, uchar32 end_char);
         bool    ends_with(crunes_t const& str, crunes_t const& end);
         uchar32 first_char(crunes_t const& str);
@@ -661,9 +652,6 @@ namespace ncore
         void findReplace(runes_t& str, crunes_t const& find, crunes_t const& replace, bool case_sensitive = true);
         void insert(runes_t& str, crunes_t const& insert);
         void insert(runes_t& str, crunes_t const& sel, crunes_t const& insert);
-
-        runes_t expand(runes_t& str, runes_t const& sel);
-        runes_t expand(runes_t& str, crunes_t const& sel);
 
         void trim(runes_t&);                                             // Trim whitespace from left and right side
         void trimLeft(runes_t&);                                         // Trim whitespace from left side

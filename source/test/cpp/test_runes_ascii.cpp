@@ -58,7 +58,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 			crunes_t str3 = "SYSTEM";
 			CHECK_TRUE(nrunes::find(str1, str3).is_empty());
 			CHECK_FALSE(nrunes::find(str1, str3, false).is_empty());
-		
+
 			crunes_t str4 = "adMin!";
 			CHECK_TRUE(nrunes::find(str1, str4).is_empty());
 			CHECK_FALSE(nrunes::find(str1, str4, false).is_empty());
@@ -372,10 +372,10 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             CHECK_EQUAL(3, nrunes::to_digit('3'));
             CHECK_EQUAL(9, nrunes::to_digit('9'));
 
-            CHECK_EQUAL(5, nrunes::to_number('5'));
-            CHECK_EQUAL(10, nrunes::to_number('a'));
-            CHECK_EQUAL(11, nrunes::to_number('B'));
-            CHECK_EQUAL(15, nrunes::to_number('F'));
+            CHECK_EQUAL(5, nrunes::hex_to_number('5'));
+            CHECK_EQUAL(10, nrunes::hex_to_number('a'));
+            CHECK_EQUAL(11, nrunes::hex_to_number('B'));
+            CHECK_EQUAL(15, nrunes::hex_to_number('F'));
         }
 
         UNITTEST_TEST(is_upper)
@@ -570,7 +570,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             CHECK_EQUAL(100, myint);
         }
 
-	
+
         // ---------------------------------------------------------------------------
 		UNITTEST_TEST(path_parser_1)
 		{
