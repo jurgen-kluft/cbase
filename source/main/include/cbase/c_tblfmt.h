@@ -34,9 +34,18 @@ namespace ncore
                 Bottom = 0x80,
             };
 
-            inline Border() : value((u8)LSR | (u8)Single) {}
-            inline Border(EBorder value) : value((u8)value) {}
-            inline Border(s32 value) : value((u8)value) {}
+            inline Border()
+                : value((u8)LSR | (u8)Single)
+            {
+            }
+            inline Border(EBorder value)
+                : value((u8)value)
+            {
+            }
+            inline Border(s32 value)
+                : value((u8)value)
+            {
+            }
 
             u8 value;
         };
@@ -77,7 +86,7 @@ namespace ncore
         void tbl_row_to_utf16(tbl_state_t& state, utf16::prune str, utf16::pcrune end);
 
         // A table formatter (helper) that uses a (given) fixed size array to store a table row.
-        // 
+        //
         template <uint_t C, uint_t W>
         struct table_t
         {
@@ -179,16 +188,16 @@ namespace ncore
 
             const char* str_utf8()
             {
-                row_to_utf8(row_utf8_, &row_utf8_[W * 3 - 3]);
+                row_to_utf8((utf8::prune)row_utf8_, (utf8::prune)&row_utf8_[W * 3 - 3]);
                 return ((const char*)row_utf8_);
             }
 
-            s8      widths_[C];
-            s8      colors_[C];
-            Flags   flags_[C];
-            Border  borders_[C];
-            uchar32 row_[W];
-            uchar8  row_utf8_[W * 3];
+            s8          widths_[C];
+            s8          colors_[C];
+            Flags       flags_[C];
+            Border      borders_[C];
+            uchar32     row_[W];
+            uchar8      row_utf8_[W * 3];
             tbl_state_t state_;
         };
 

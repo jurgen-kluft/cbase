@@ -25,8 +25,8 @@ namespace ncore
         {
             const s8 tens = width / 10;
             const s8 ones = width - tens * 10;
-            s8 i = 0;
-            format[i++] = '%';
+            s8       i    = 0;
+            format[i++]   = '%';
             if (tens > 0)
                 format[i++] = '0' + tens;
             format[i++] = '0' + ones;
@@ -51,8 +51,8 @@ namespace ncore
                 const char* format_end = UpdateStringFormat(format_begin, state.widths_[i]);
                 crunes_t    format(format_begin, format_end);
 
-                nrunes::writer_t writer(state.row_ + offset, state.row_ + offset + state.widths_[i]);
-                s32            n       = vzprintf(writer, format, argv + i, 1);
+                nrunes::writer_t writer((utf32::prune)state.row_ + offset, (utf32::prune)state.row_ + offset + state.widths_[i]);
+                s32              n           = vzprintf(writer, format, argv + i, 1);
                 state.row_[offset + n] = ' ';
 
                 offset += state.widths_[i] + 1;  // skip the width (content) plus one spacing character
@@ -144,15 +144,15 @@ namespace ncore
             // Finally write the right border
             if (column_border_count == state.columns_size_)
             {
-                const s32 column_sep = column_border[state.columns_size_ - 1].value & 7;
+                const s32 column_sep       = column_border[state.columns_size_ - 1].value & 7;
                 state.row_[offset++] = GetBorder(line_style, BorderFlip(column_sep) & Border::LS_);
             }
             state.row_[offset++] = '\n';
-            state.row_len_       = offset;
+            state.row_len_             = offset;
 
             // And end the row with string terminators
             for (s32 i = offset; i < state.row_size_; ++i)
-                state.row_[i] = '\0';
+                state.row_[i] = {'\0'};
         }
 
         void tbl_flags(tbl_state_t& state, Flags const* flags, s32 count)
@@ -163,7 +163,7 @@ namespace ncore
             }
         }
 
-        template<typename T>
+        template <typename T>
         inline static u32 distance_to_size32(T const* str, T const* end)
         {
             return (u32)((uint_t)end - (uint_t)str);
@@ -173,11 +173,11 @@ namespace ncore
         {
             utf8::prune iter = str;
             while (iter < end)
-                *iter++ = 0;
+                *iter++ = {0};
 
             // convert the utf32 row string to utf8
-            runes_t        utf_8(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf8::TYPE);
-            crunes_t       utf_32((utf32::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
+            runes_t          utf_8(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf8::TYPE);
+            crunes_t         utf_32((utf32::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
             nrunes::writer_t writer(utf_8);
             writer.write(utf_32);
         }
@@ -186,11 +186,11 @@ namespace ncore
         {
             utf16::prune iter = str;
             while (iter < end)
-                *iter++ = 0;
+                *iter++ = {0};
 
             // convert the utf32 row string to utf16
-            runes_t        utf_16(str, 0, distance_to_size32(str, end), distance_to_size32(str,end), utf16::TYPE);
-            crunes_t       utf_32((utf32::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
+            runes_t          utf_16(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf16::TYPE);
+            crunes_t         utf_32((utf32::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
             nrunes::writer_t writer(utf_16);
             writer.write(utf_32);
         }

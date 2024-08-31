@@ -34,85 +34,6 @@ namespace ncore
         static const u32    TYPE         = 1;
         static const u64    EMPTY_STRING = 0;
 
-        struct runes_t
-        {
-            runes_t()
-                : m_bos(nullptr)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            runes_t(prune bos, u32 str, u32 end, u32 eos)
-                : m_bos(bos)
-                , m_str(str)
-                , m_end(end)
-                , m_eos(eos)
-                , m_flags(TYPE)
-            {
-            }
-
-            prune m_bos;    // begin of string
-            u32   m_str;    // &m_bos[m_end] -> string
-            u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
-        };
-
-        struct crunes_t
-        {
-            crunes_t()
-                : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, u32 len)
-                : m_bos(str)
-                , m_str(0)
-                , m_end(len)
-                , m_eos(len)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, pcrune end)
-                : m_bos(str)
-                , m_str(0)
-                , m_end((u32)(end - str))
-                , m_eos((u32)(end - str))
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune bos, u32 str, u32 end, u32 eos)
-                : m_bos(bos)
-                , m_str(str)
-                , m_end(end)
-                , m_eos(eos)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(const runes_t& other)
-                : m_bos(other.m_bos)
-                , m_str(other.m_str)
-                , m_end(other.m_end)
-                , m_eos(other.m_eos)
-                , m_flags(other.m_flags)
-            {
-            }
-
-            pcrune m_bos;    // begin of string
-            u32    m_str;    // &m_bos[m_end] -> string
-            u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;    // &m_bos[m_end], end of string, points to a TERMINATOR
-            u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
-        };
-
-        s32  strlen(pcrune str, pcrune* end = nullptr, pcrune eos = nullptr);
-        s32  compare(pcrune left, pcrune right);
-        s32  compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2);
         void reverse(char* str, char* end);
 
         // return false when there is not enough space in the output
@@ -133,84 +54,41 @@ namespace ncore
         };
         char* btoa(bool val, char* cursor, char const* end, s8 caseType = TrueFalse | LowerCase);
 
+        s32 compare(pcrune left, pcrune right);
+        s32 compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2);
+        s32 strlen(pcrune str, pcrune* end = nullptr, pcrune eos = nullptr);
     }  // namespace ascii
+
+    namespace ucs2
+    {
+        struct rune
+        {
+            u16 value;
+            inline bool isEOS() const { return value == 0; }
+        };
+        typedef rune*       prune;
+        typedef const rune* pcrune;
+        static const u32    TYPE         = 8;
+        static const rune   TERMINATOR   = {'\0'};
+        static const u64    EMPTY_STRING = 0;
+
+        s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
+        s32 strlen(pcrune str, pcrune& end, pcrune eos);  // return length of string in runes
+
+    }  // namespace ucs2
 
     namespace utf8
     {
-        typedef u8          rune;
+        struct rune
+        {
+            u8 value;
+            inline bool isEOS() const { return value == 0; }
+        };
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const u32    TYPE         = 3;
-        static const rune   TERMINATOR   = '\0';
+        static const u32    TYPE         = 16;
+        static const rune   TERMINATOR   = {'\0'};
         static const u64    EMPTY_STRING = 0;
-
-        struct runes_t
-        {
-            runes_t()
-                : m_bos(nullptr)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            runes_t(prune bos, u32 str, u32 end, u32 eos)
-                : m_bos(bos)
-                , m_str(str)
-                , m_end(end)
-                , m_eos(eos)
-                , m_flags(TYPE)
-            {
-            }
-
-            prune m_bos;    // begin of string
-            u32   m_str;    // &m_bos[m_str] -> string
-            u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
-            u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
-        };
-
-        struct crunes_t
-        {
-            crunes_t()
-                : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, pcrune end)
-                : m_bos(str)
-                , m_str(0)
-                , m_end((u32)(end - str))
-                , m_eos((u32)(end - str))
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune bos, u32 str, u32 end, u32 eos)
-                : m_bos(bos)
-                , m_str(str)
-                , m_end(end)
-                , m_eos(eos)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(const runes_t& other)
-                : m_bos(other.m_bos)
-                , m_str(other.m_str)
-                , m_end(other.m_end)
-                , m_eos(other.m_eos)
-                , m_flags(other.m_flags)
-            {
-            }
-
-            pcrune m_bos;    // begin of string
-            u32    m_str;    // &m_bos[m_str] -> string
-            u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
-            u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
-        };
 
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);  // return length of string in runes
@@ -219,162 +97,38 @@ namespace ncore
 
     namespace utf16
     {
-        typedef u16         rune;
+        struct rune
+        {
+            u16         value;
+            inline bool isEOS() const { return value == 0; }
+            inline bool operator==(rune other) const { return value == other.value; }
+            inline bool operator!=(rune other) const { return value != other.value; }
+        };
         typedef rune*       prune;
         typedef const rune* pcrune;
         static const u32    TYPE         = 2;
-        static const rune   TERMINATOR   = '\0';
+        static const rune   TERMINATOR   = {'\0'};
         static const u64    EMPTY_STRING = 0;
 
-        struct runes_t
-        {
-            runes_t()
-                : m_bos(nullptr)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            runes_t(prune bos, u32 str, u32 end, u32 eos)
-                : m_bos(bos)
-                , m_str(str)
-                , m_end(end)
-                , m_eos(eos)
-                , m_flags(TYPE)
-            {
-            }
-
-            prune m_bos;    // begin of string
-            u32   m_str;    // &m_bos[m_str] -> string
-            u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
-            u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
-        };
-
-        struct crunes_t
-        {
-            crunes_t()
-                : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, pcrune end)
-                : m_bos(str)
-                , m_str(0)
-                , m_end((u32)(end - str))
-                , m_eos((u32)(end - str))
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune bos, u32 str, u32 end, u32 eos)
-                : m_bos(bos)
-                , m_str(str)
-                , m_end(end)
-                , m_eos(eos)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(const runes_t& other)
-                : m_bos(other.m_bos)
-                , m_str(other.m_str)
-                , m_end(other.m_end)
-                , m_eos(other.m_eos)
-                , m_flags(other.m_flags)
-            {
-            }
-
-            pcrune m_bos;    // begin of string
-            u32    m_str;    // &m_bos[m_str] -> string
-            u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
-            u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
-        };
-
+        s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
 
     }  // namespace utf16
 
     namespace utf32
     {
-        typedef u32         rune;
+        struct rune
+        {
+            u32 value;
+            inline bool isEOS() const { return value == 0; }
+        };
         typedef rune*       prune;
         typedef const rune* pcrune;
         static const u32    TYPE         = 4;
-        static const rune   TERMINATOR   = '\0';
+        static const rune   TERMINATOR   = {'\0'};
         static const u64    EMPTY_STRING = 0;
 
-        struct runes_t
-        {
-            runes_t()
-                : m_bos(nullptr)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            runes_t(prune bos, u32 str, u32 end, u32 eos)
-                : m_bos(bos)
-                , m_str(str)
-                , m_end(end)
-                , m_eos(eos)
-                , m_flags(TYPE)
-            {
-            }
-
-            prune m_bos;    // begin of string
-            u32   m_str;    // &m_bos[m_str] -> string
-            u32   m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32   m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
-            u32   m_flags;  // type (ascii, utf-8, utf-16, utf-32)
-        };
-
-        struct crunes_t
-        {
-            crunes_t()
-                : m_bos((pcrune)&EMPTY_STRING)
-                , m_str(0)
-                , m_end(0)
-                , m_eos(0)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune str, pcrune end)
-                : m_bos(str)
-                , m_str(0)
-                , m_end((u32)(end - str))
-                , m_eos((u32)(end - str))
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(pcrune bos, u32 str, u32 end, u32 eos)
-                : m_bos(bos)
-                , m_str(str)
-                , m_end(end)
-                , m_eos(eos)
-                , m_flags(TYPE)
-            {
-            }
-            crunes_t(const runes_t& other)
-                : m_bos(other.m_bos)
-                , m_str(other.m_str)
-                , m_end(other.m_end)
-                , m_eos(other.m_eos)
-                , m_flags(other.m_flags)
-            {
-            }
-
-            pcrune m_bos;    // begin of string
-            u32    m_str;    // &m_bos[m_str] -> string
-            u32    m_end;    // &m_bos[m_end], does not necessarily point at TERMINATOR
-            u32    m_eos;    // &m_bos[m_eos], end of string, points to a TERMINATOR
-            u32    m_flags;  // type (ascii, utf-8, utf-16, utf-32)
-        };
-
+        s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
     }  // namespace utf32
 
@@ -414,8 +168,8 @@ namespace ncore
         bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const;  // scan until we reach one of the 'chars'
         void skip(u32& cursor, const crunes_t& skip_chars) const;                         // skip until we reach a character not part of 'chars'
 
-        runes_t& operator+=(const ascii::crunes_t& str);
-        runes_t& operator+=(const utf32::crunes_t& str);
+        runes_t& operator+=(const crunes_t& str);
+        runes_t& operator+=(const runes_t& str);
         runes_t& operator+=(ascii::rune c);
         runes_t& operator+=(utf32::rune c);
         runes_t& operator=(crunes_t const& other);
@@ -423,14 +177,20 @@ namespace ncore
 
         union
         {
-            ascii::runes_t m_ascii;
-            utf8::runes_t  m_utf8;
-            utf16::runes_t m_utf16;
-            utf32::runes_t m_utf32;
+            ascii::prune m_ascii;
+            ucs2::prune m_ucs2;
+            utf8::prune  m_utf8;
+            utf16::prune m_utf16;
+            utf32::prune m_utf32;
         };
+        u32 m_str;
+        u32 m_end;
+        u32 m_eos;
+        u32 m_flags;
 
-        inline u32  get_type() const { return m_ascii.m_flags & 0xF; }
+        inline u32  get_type() const { return m_flags & 0xFF; }
         inline bool is_ascii() const { return get_type() == ascii::TYPE; }
+        inline bool is_ucs2() const { return get_type() == ucs2::TYPE; }
         inline bool is_utf8() const { return get_type() == utf8::TYPE; }
         inline bool is_utf16() const { return get_type() == utf16::TYPE; }
         inline bool is_utf32() const { return get_type() == utf32::TYPE; }
@@ -439,7 +199,7 @@ namespace ncore
     struct crunes_t
     {
         crunes_t();
-        crunes_t(ascii::crunes_t const& _str);
+
         crunes_t(ascii::pcrune _bos);
         crunes_t(ascii::pcrune _bos, ascii::pcrune _end);
         crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u32 _flags = ascii::TYPE);
@@ -448,17 +208,14 @@ namespace ncore
         {
         }
 
-        crunes_t(utf8::crunes_t const& _str);
         crunes_t(utf8::pcrune _str);
         crunes_t(utf8::pcrune _str, utf8::pcrune _end);
         crunes_t(utf8::pcrune _bos, u32 _str, u32 _end, u32 _eos);
 
-        crunes_t(utf16::crunes_t const& _str);
         crunes_t(utf16::pcrune _str);
         crunes_t(utf16::pcrune _str, utf16::pcrune _end);
         crunes_t(utf16::pcrune _bos, u32 _str, u32 _end, u32 _eos);
 
-        crunes_t(utf32::crunes_t const& _str);
         crunes_t(utf32::pcrune _str);
         crunes_t(utf32::pcrune _str, utf32::pcrune _end);
         crunes_t(utf32::pcrune _bos, u32 _str, u32 _end, u32 _eos);
@@ -487,15 +244,21 @@ namespace ncore
 
         union
         {
-            ascii::crunes_t m_ascii;
-            utf8::crunes_t  m_utf8;
-            utf16::crunes_t m_utf16;
-            utf32::crunes_t m_utf32;
+            ascii::pcrune m_ascii;
+            ucs2::pcrune  m_ucs2;
+            utf8::pcrune  m_utf8;
+            utf16::pcrune m_utf16;
+            utf32::pcrune m_utf32;
         };
+        u32 m_str;
+        u32 m_end;
+        u32 m_eos;
+        u32 m_flags;
 
-        inline void set_type(u8 _type) { m_ascii.m_flags = (m_ascii.m_flags & 0xFFFFFFF0) | _type; }
-        inline u8   get_type() const { return m_ascii.m_flags & 0xF; }
+        inline void set_type(u8 _type) { m_flags = (m_flags & 0xFFFFFF00) | _type; }
+        inline u8   get_type() const { return m_flags & 0xFF; }
         inline bool is_ascii() const { return get_type() == ascii::TYPE; }
+        inline bool is_ucs2() const { return get_type() == ucs2::TYPE; }
         inline bool is_utf8() const { return get_type() == utf8::TYPE; }
         inline bool is_utf16() const { return get_type() == utf16::TYPE; }
         inline bool is_utf32() const { return get_type() == utf32::TYPE; }
@@ -698,11 +461,11 @@ namespace ncore
                 : runes_t(m_run, 0, 0, SIZE - 1)
             {
             }
-            inline runestr_t(uchar32 c)
+            inline runestr_t(T c)
                 : runes_t(m_run, 0, 1, SIZE - 1)
             {
                 m_run[0] = c;
-                m_run[1] = 0;
+                m_run[1] = {0};
             }
             inline runestr_t(const char* _str)
                 : runes_t(m_run, 0, 0, SIZE - 1)
@@ -723,11 +486,11 @@ namespace ncore
             };
             T m_run[SIZE];
 
-            inline crunestr_t(uchar32 c)
+            inline crunestr_t(T c)
                 : crunes_t(m_run, 0, 1, SIZE - 1)
             {
                 m_run[0] = c;
-                m_run[1] = 0;
+                m_run[1] = {0};
             }
         };
 

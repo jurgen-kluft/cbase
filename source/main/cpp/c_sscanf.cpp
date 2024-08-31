@@ -18,9 +18,9 @@ namespace ncore
         while (c != '\0')
         {
             c = nrunes::to_lower(c);
-            for (s32 i = 0; foo[i] != '\0'; ++i)
+            for (s32 i = 0; foo[i].value != '\0'; ++i)
             {
-                if (foo[i] == c)
+                if (foo[i].value == c)
                     return true;
             }
             reader->skip();
@@ -615,61 +615,18 @@ namespace ncore
                         static const utf32::rune allHexChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
                         if (SearchUntilOneOf(reader, allHexChars))
                         {
-                            if (w == 2)
+                            s32 const maxstrlen = 16;
+                            uchar32   str[maxstrlen + 1];
+                            str[16]    = '\0';
+                            s32 strlen = 0;
+                            for (; strlen < w && strlen < maxstrlen; ++strlen)
                             {
-                                s32 const strl = 2;
-                                uchar32   str[strl + 1];
-                                str[strl] = '\0';
-                                for (s32 j = 0; j < strl; ++j)
-                                    str[j] = reader->read();
-                                nrunes::reader_t str_reader(str, str + strl);
-                                n2 = (u64)StrToS64(&str_reader, 16);
+                                str[strlen] = reader->read();
+                                if (str[strlen] == '\0')
+                                    break;
                             }
-                            else if (w == 4)
-                            {
-                                s32 const strl = 4;
-                                uchar32   str[strl + 1];
-                                str[strl] = '\0';
-                                for (s32 j = 0; j < strl; ++j)
-                                {
-                                    uchar32 c = reader->read();
-                                    str[j]    = c;
-                                    if (c == '\0')
-                                        break;
-                                }
-                                nrunes::reader_t str_reader(str, str + strl);
-                                n2 = (u64)StrToS64(&str_reader, 16);
-                            }
-                            else if (w == 8)
-                            {
-                                s32 const strl = 8;
-                                uchar32   str[strl + 1];
-                                str[strl] = '\0';
-                                for (s32 j = 0; j < strl; ++j)
-                                {
-                                    uchar32 c = reader->read();
-                                    str[j]    = c;
-                                    if (c == '\0')
-                                        break;
-                                }
-                                nrunes::reader_t str_reader(str, str + strl);
-                                n2 = (u64)StrToS64(&str_reader, 16);
-                            }
-                            else  // if (w == 16)
-                            {
-                                s32 const strl = 16;
-                                uchar32   str[strl + 1];
-                                str[strl] = '\0';
-                                for (s32 j = 0; j < strl; ++j)
-                                {
-                                    uchar32 c = reader->read();
-                                    str[j]    = c;
-                                    if (c == '\0')
-                                        break;
-                                }
-                                nrunes::reader_t str_reader(str, str + strl);
-                                n2 = (u64)StrToS64(&str_reader, 16);
-                            }
+                            nrunes::reader_t str_reader((utf32::pcrune)str, (utf32::pcrune)str + strlen);
+                            n2 = (u64)StrToS64(&str_reader, 16);
                         }
 
                         if (!suppress)
@@ -755,8 +712,8 @@ namespace ncore
     {
         nrunes::reader_t buf_reader(str);
         nrunes::reader_t fmt_reader(fmt);
-        s32            scanned = VSScanf(&buf_reader, &fmt_reader, argv, argc);
-        str                    = buf_reader.get_current();
+        s32              scanned = VSScanf(&buf_reader, &fmt_reader, argv, argc);
+        str                      = buf_reader.get_current();
         return scanned;
     }
 

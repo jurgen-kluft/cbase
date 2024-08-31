@@ -32,16 +32,16 @@ namespace ncore
     va_t::va_t(crunes_t const& str)
         : mArg3(TYPE_PCRUNES)
     {
-        mArg3 |= (str.m_ascii.m_flags & 0x0F);
-        switch (str.m_ascii.m_flags & 0x0F)
+        mArg3 |= (str.m_flags & 0x0F);
+        switch (str.m_flags & 0x0F)
         {
-            case ascii::TYPE: mArg = (ptr_t)(&str.m_ascii.m_bos[str.m_ascii.m_str]); break;
-            case utf8::TYPE: mArg = (ptr_t)(&str.m_utf8.m_bos[str.m_utf8.m_str]); break;
-            case utf16::TYPE: mArg = (ptr_t)(&str.m_utf16.m_bos[str.m_utf16.m_str]); break;
-            case utf32::TYPE: mArg = (ptr_t)(&str.m_utf32.m_bos[str.m_utf32.m_str]); break;
+            case ascii::TYPE: mArg = (ptr_t)(&str.m_ascii[str.m_str]); break;
+            case utf8::TYPE: mArg = (ptr_t)(&str.m_utf8[str.m_str]); break;
+            case utf16::TYPE: mArg = (ptr_t)(&str.m_utf16[str.m_str]); break;
+            case utf32::TYPE: mArg = (ptr_t)(&str.m_utf32[str.m_str]); break;
             default: break;
         }
-        mArg2 = str.m_ascii.m_end - str.m_ascii.m_str;
+        mArg2 = str.m_end - str.m_str;
     }
 
     char va_t::specifier() const

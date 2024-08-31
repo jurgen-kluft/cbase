@@ -19,7 +19,7 @@ namespace ncore
 	}
 
 	log_to_console_imp	sLogDefaultToConsole;
-	logger_t*			log_t::sLogger[log_t::COUNT] = 
+	logger_t*			log_t::sLogger[log_t::COUNT] =
 	{
 		&sLogDefaultToConsole,
 		&sLogDefaultToConsole,
@@ -65,7 +65,7 @@ namespace ncore
 	}
 
 	//-------------------------------------------------------------------------------------------------
-	// 
+	//
 	//-------------------------------------------------------------------------------------------------
 	void 				log_t::write(elevel inLevel, bool _value)
 	{
@@ -166,7 +166,7 @@ namespace ncore
 		sLogger[inLevel]->writeLine(format, argv, argc);
 	}
 
-	
+
 	#ifdef D_LOG
 
 	//==============================================================================
@@ -182,7 +182,7 @@ namespace ncore
 	 * Summary:
 	 *     Output log message.
 	 * Arguments:
-	 *     channel        - Message channel. This is only a string to output. 
+	 *     channel        - Message channel. This is only a string to output.
 	 *                      No affect for function.
 	 *     messageFormat  - Message format. See format for x_sprintf() for detail.
 	 *     args           - The arguments output consists with message format.
@@ -202,8 +202,8 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
-		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
-		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
+		crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
+		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
 
 		log_t::writeLine(log_t::INFO, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)
@@ -223,7 +223,7 @@ namespace ncore
 	 * Summary:
 	 *     Output log warning.
 	 * Arguments:
-	 *     channel        - Warning channel. This is only a string to output. 
+	 *     channel        - Warning channel. This is only a string to output.
 	 *                      No affect for function.
 	 *     messageFormat  - Warning format. See format for x_sprintf() for detail.
 	 *     args           - The arguments output consists with warning format.
@@ -243,8 +243,8 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Warning CHANNEL:%s";
-		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
-		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
+		crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
+		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
 
 		log_t::writeLine(log_t::WARNING, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)
@@ -264,7 +264,7 @@ namespace ncore
 	 * Summary:
 	 *     Output log error.
 	 * Arguments:
-	 *     channel        - Error channel. This is only a string to output. 
+	 *     channel        - Error channel. This is only a string to output.
 	 *                      No affect for function.
 	 *     messageFormat  - Error format. See format for x_sprintf() for detail.
 	 *     args           - The arguments output consists with error format.
@@ -284,8 +284,8 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
-		ascii::crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
-		ascii::crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
+		crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
+		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
 
 		log_t::writeLine(log_t::ERROR, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)

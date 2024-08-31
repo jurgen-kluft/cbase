@@ -10,6 +10,10 @@
 
 namespace ncore
 {
+    static s32 write_ascii(ascii::pcrune _str, u32 _begin, u32 _end);
+    static s32 write_utf16(utf16::pcrune _str, u32 _begin, u32 _end);
+    static s32 write_utf32(utf32::pcrune _str, u32 _begin, u32 _end);
+
     class out_writer_t : public nrunes::iwriter_t
     {
     public:
@@ -17,23 +21,23 @@ namespace ncore
 
         virtual s32 vwrite(uchar32 c)
         {
-            utf32::crunes_t src(&c, 0, 1, 1);
-            return write_utf32(src);
+            utf32::rune src[2] = {c, 0};
+            return write_utf32(src, 0, 1);
         }
 
         virtual s32 vwrite(const char* str, const char* end)
         {
-            ascii::crunes_t src(str, end);
-            return write_ascii(src) != 0;
+            u32 len = end - str;
+            return write_ascii(str, 0, len);
         }
 
         virtual s32 vwrite(crunes_t const& str)
         {
             switch (str.get_type())
             {
-                case ascii::TYPE: return write_ascii(str.m_ascii);
-                case utf16::TYPE: return write_utf16(str.m_utf16);
-                case utf32::TYPE: return write_utf32(str.m_utf32);
+                case ascii::TYPE: return write_ascii(str.m_ascii, str.m_str, str.m_end);
+                case utf16::TYPE: return write_utf16(str.m_utf16, str.m_str, str.m_end);
+                case utf32::TYPE: return write_utf32(str.m_utf32, str.m_str, str.m_end);
                 default:  //@todo: UTF-8
                     break;
             }
@@ -81,79 +85,71 @@ namespace ncore
             return 0;
         }
 
-        static s32 write_ascii(const ascii::crunes_t& str)
+        static s32 write_ascii(ascii::pcrune _str, u32 _begin, u32 _end)
         {
             const s32 maxlen = 252;
             char      str8[maxlen + 4];
 
             s32           l   = 0;
-            ascii::pcrune src = &str.m_bos[str.m_str];
-            ascii::pcrune end = &str.m_bos[str.m_end];
+            ascii::pcrune src = _str + _begin;
+            ascii::pcrune end = _str + _end;
             while (src < end)
             {
                 char* dst8 = (char*)str8;
                 char* end8 = dst8 + maxlen;
-                s32   ll   = 0;
                 while (src < end && dst8 < end8)
                 {
                     *dst8++ = (char)(*src++);
-                    ll += 1;
                 }
-                str8[ll] = 0;
+                *dst8 = 0;
                 ::printf("%s", (const char*)str8);
-                l += ll;
+                l += dst8 - str8;
             }
             return l;
         }
 
-        static s32 write_utf16(const utf16::crunes_t& str)
+        static s32 write_utf16(utf16::pcrune _str, u32 _begin, u32 _end)
         {
             const s32 maxlen = 252;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf16::pcrune src = &str.m_bos[str.m_str];
-            utf16::pcrune end = &str.m_bos[str.m_end];
+            utf16::pcrune src = _str + _begin;
+            utf16::pcrune end = _str + _end;
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
                 uchar16* end16 = dst16 + maxlen;
-                s32      ll    = 0;
                 while (src < end && dst16 < end16)
                 {
-                    uchar32 c = *src++;
-                    write_utf16(c, dst16, end16);
-                    ll += 1;
+                    *dst16++ = (*src++).value;
                 }
-                str16[ll] = 0;
+                *dst16 = 0;
                 ::wprintf(L"%s", (const wchar_t*)str16);
-                l += ll;
+                l += dst16 - str16;
             }
             return l;
         }
 
-        static s32 write_utf32(const utf32::crunes_t& str)
+        static s32 write_utf32(utf32::pcrune _str, u32 _begin, u32 _end)
         {
             const s32 maxlen = 255;
             uchar32   str32[maxlen + 1];
 
             s32           l   = 0;
-            utf32::pcrune src = &str.m_bos[str.m_str];
-            utf32::pcrune end = &str.m_bos[str.m_end];
+            utf32::pcrune src = _str + _begin;
+            utf32::pcrune end = _str + _end;
             while (src < end)
             {
                 uchar32* dst32 = (uchar32*)str32;
                 uchar32* end32 = dst32 + maxlen;
-                s32      ll    = 0;
                 while (src < end && dst32 < end32)
                 {
-                    uchar32 c = *src++;
-                    *dst32++  = c;
-                    ll += 1;
+                    *dst32++ = (*src++).value;
                 }
-                str32[ll] = 0;
+                *dst32 = 0;
                 ::wprintf(L"%s", (const wchar_t*)str32);
-                l += ll;
+                l += dst32 - str32;
             }
             return l;
         }
@@ -223,18 +219,17 @@ namespace ncore
 
         virtual void writeln()
         {
-            ascii::rune     line32[] = {'\n', 0};
-            ascii::crunes_t line(line32, 1);
-            out_writer_t::write_ascii(line);
+            ascii::rune line32[] = {'\n', 0};
+            out_writer_t::write_ascii(line32, 0, 1);
         }
 
         virtual s32 write(const crunes_t& str)
         {
             switch (str.get_type())
             {
-                case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii);
-                case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16);
-                case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32);
+                case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii, str.m_str, str.m_end);
+                case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16, str.m_str, str.m_end);
+                case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32, str.m_str, str.m_end);
                 default:  //@todo: UTF-8
                     break;
             }

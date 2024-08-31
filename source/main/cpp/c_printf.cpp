@@ -1103,8 +1103,8 @@ namespace ncore
     s32 vzprintf(nrunes::iwriter_t& writer, const crunes_t& format, const va_t* argv, s32 argc)
     {
         va_iter_t   va_iter      = {argv, 0, argc};
-        const char* format_begin = &format.m_ascii.m_bos[format.m_ascii.m_str];
-        const char* format_end   = &format.m_ascii.m_bos[format.m_ascii.m_end];
+        const char* format_begin = &format.m_ascii[format.m_str];
+        const char* format_end   = &format.m_ascii[format.m_end];
         const s32   ret          = _vsnprintf(_out_runeswriter, (char*)(ptr_t)&writer, (u64)-1, format_begin, format_end, va_iter);
         writer.flush();
         return ret;
@@ -1120,7 +1120,7 @@ namespace ncore
 
     s32 cprintf_(crunes_t const& format, const va_t* argv, s32 argc)
     {
-        const s32 ret = vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        const s32 ret = vprintf_(&format.m_ascii[format.m_str], &format.m_ascii[format.m_end], argv, argc);
         return ret;
     }
 

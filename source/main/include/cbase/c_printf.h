@@ -27,7 +27,7 @@ namespace ncore
     {
         const va_t* argv = nullptr;
         const s32   argc = 0;
-        printf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_end], argv, argc);
+        printf_(&str.m_ascii[str.m_str], &str.m_ascii[str.m_end], argv, argc);
     }
 
     template <typename... Args>
@@ -35,7 +35,7 @@ namespace ncore
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-        printf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        printf_(&format.m_ascii[format.m_str], &format.m_ascii[format.m_end], argv, argc);
     }
 
     template <typename... Args>
@@ -43,8 +43,8 @@ namespace ncore
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-        s32 ret = snprintf_(&str.m_ascii.m_bos[str.m_ascii.m_str], &str.m_ascii.m_bos[str.m_ascii.m_eos], &format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
-        str.m_ascii.m_end = str.m_ascii.m_str + (u32)ret;
+        s32 ret = snprintf_(&str.m_ascii[str.m_str], &str.m_ascii[str.m_eos], &format.m_ascii[format.m_str], &format.m_ascii[format.m_end], argv, argc);
+        str.m_end = str.m_str + (u32)ret;
     }
 
     template <typename... Args>
@@ -52,7 +52,7 @@ namespace ncore
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-        return vprintf_(&format.m_ascii.m_bos[format.m_ascii.m_str], &format.m_ascii.m_bos[format.m_ascii.m_end], argv, argc);
+        return vprintf_(&format.m_ascii[format.m_str], &format.m_ascii[format.m_end], argv, argc);
     }
 
     template <typename... Args>

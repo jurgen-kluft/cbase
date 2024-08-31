@@ -309,10 +309,10 @@ namespace ncore
         // the hash algorithm.
         u64 strhash(crunes_t const& strdata, u64 seed)
         {
-            if ((strdata.m_ascii.m_flags & 7) == ascii::TYPE)
+            if ((strdata.m_flags & 7) == ascii::TYPE)
             {
-                const char* begin = &strdata.m_ascii.m_bos[strdata.m_ascii.m_str];
-                const char* end   = &strdata.m_ascii.m_bos[strdata.m_ascii.m_str];
+                const char* begin = &strdata.m_ascii[strdata.m_str];
+                const char* end   = &strdata.m_ascii[strdata.m_str];
                 return strhash(begin, end, seed);
             }
 
@@ -324,10 +324,10 @@ namespace ncore
 
         u64 strhash_lowercase(crunes_t const& strdata, u64 seed)
         {
-            if ((strdata.m_ascii.m_flags & 7) == ascii::TYPE)
+            if ((strdata.m_flags & 7) == ascii::TYPE)
             {
-                const char* begin = &strdata.m_ascii.m_bos[strdata.m_ascii.m_str];
-                const char* end   = &strdata.m_ascii.m_bos[strdata.m_ascii.m_str];
+                const char* begin = &strdata.m_ascii[strdata.m_str];
+                const char* end   = &strdata.m_ascii[strdata.m_str];
                 return strhash_lowercase(begin, end, seed);
             }
 
@@ -339,10 +339,10 @@ namespace ncore
 
         u32 strhash32(crunes_t const& str, u64 seed)
         {
-            if ((str.m_ascii.m_flags & 7) == ascii::TYPE)
+            if ((str.m_flags & 7) == ascii::TYPE)
             {
-                const char* begin = &str.m_ascii.m_bos[str.m_ascii.m_str];
-                const char* end   = &str.m_ascii.m_bos[str.m_ascii.m_str];
+                const char* begin = &str.m_ascii[str.m_str];
+                const char* end   = &str.m_ascii[str.m_str];
                 return strhash32(begin, end, seed);
             }
 
@@ -354,10 +354,10 @@ namespace ncore
 
         u32 strhash32_lowercase(crunes_t const& str, u64 seed)
         {
-            if ((str.m_ascii.m_flags & 7) == ascii::TYPE)
+            if ((str.m_flags & 7) == ascii::TYPE)
             {
-                const char* begin = &str.m_ascii.m_bos[str.m_ascii.m_str];
-                const char* end   = &str.m_ascii.m_bos[str.m_ascii.m_str];
+                const char* begin = &str.m_ascii[str.m_str];
+                const char* end   = &str.m_ascii[str.m_str];
                 return strhash32_lowercase(begin, end, seed);
             }
 
