@@ -13,11 +13,10 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-
         UNITTEST_TEST(size)
         {
-			crunes_t str1 = "";
-			CHECK_EQUAL(0, str1.size());
+            crunes_t str1 = "";
+            CHECK_EQUAL(0, str1.size());
 
             crunes_t str2 = "this is a system string";
             CHECK_EQUAL(23, str2.size());
@@ -27,19 +26,27 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         {
             crunes_t str("this is a system string");
 
-            nrunes::runestr_t<ascii::rune, 32> dst;
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
+
             nrunes::copy(str, dst);
 
-            CHECK_EQUAL(0, compare(str, dst));
+            CHECK_EQUAL(0, nrunes::compare(str, dst));
             CHECK_EQUAL(23, str.size());
 
-            nrunes::runestr_t<ascii::rune, 17> str2;
+            utf32::rune str2_runes[256];
+            str2_runes[0] = {0};
+            str2_runes[1] = {0};
+            runes_t str2(str2_runes, 0, 0, 256);
+
             nrunes::copy(str, str2);
 
             CHECK_EQUAL(16, str2.size());
-            CHECK_EQUAL(-1, compare(str2, str));
+            CHECK_EQUAL(-1, nrunes::compare(str2, str));
 
-            CHECK_EQUAL(0, compare(str2, crunes_t("this is a system")));
+            CHECK_EQUAL(0, nrunes::compare(str2, crunes_t("this is a system")));
         }
 
         UNITTEST_TEST(find)
@@ -55,14 +62,14 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             crunes_t found  = nrunes::find(str1, tofind);
             CHECK_TRUE(found == crunes_t("system"));
 
-			crunes_t str3 = "SYSTEM";
-			CHECK_TRUE(nrunes::find(str1, str3).is_empty());
-			CHECK_FALSE(nrunes::find(str1, str3, false).is_empty());
+            crunes_t str3 = "SYSTEM";
+            CHECK_TRUE(nrunes::find(str1, str3).is_empty());
+            CHECK_FALSE(nrunes::find(str1, str3, false).is_empty());
 
-			crunes_t str4 = "adMin!";
-			CHECK_TRUE(nrunes::find(str1, str4).is_empty());
-			CHECK_FALSE(nrunes::find(str1, str4, false).is_empty());
-		}
+            crunes_t str4 = "adMin!";
+            CHECK_TRUE(nrunes::find(str1, str4).is_empty());
+            CHECK_FALSE(nrunes::find(str1, str4, false).is_empty());
+        }
 
         UNITTEST_TEST(find_one_of)
         {
@@ -73,14 +80,18 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             CHECK_TRUE(found == crunes_t("e"));
 
             crunes_t set2 = "BCDE";
-            found              = nrunes::findOneOf(str1, set2, false);
+            found         = nrunes::findOneOf(str1, set2, false);
             CHECK_TRUE(found == crunes_t("e"));
         }
 
         UNITTEST_TEST(replace)
         {
-            nrunes::runestr_t<ascii::rune, 128> dst;
-            crunes_t     str1 = "this is a system string";
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
+
+            crunes_t str1 = "this is a system string";
             nrunes::copy(str1, dst);
             crunes_t str2 = "this is a copied string";
 
@@ -89,9 +100,9 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             CHECK_TRUE(found == crunes_t("system"));
 
             crunes_t replace_str = "copied";
-            findReplace(dst, find_str, replace_str);
+            nrunes::findReplace(dst, find_str, replace_str);
 
-            CHECK_EQUAL(0, compare(dst, str2));
+            CHECK_EQUAL(0, nrunes::compare(dst, str2));
         }
 
         UNITTEST_TEST(compare)
@@ -119,8 +130,12 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(concatenate)
         {
-            nrunes::runestr_t<ascii::rune, 128> dst;
-            crunes_t     str1 = "this is a ";
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
+
+            crunes_t str1 = "this is a ";
             nrunes::copy(str1, dst);
 
             crunes_t str2 = "copied string";
@@ -132,7 +147,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(parse_bool)
         {
-            bool          value;
+            bool     value;
             crunes_t str = "True";
             nrunes::parse(str, value);
             CHECK_EQUAL(true, value);
@@ -155,7 +170,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(parse_s32)
         {
-            s32           value;
+            s32      value;
             crunes_t str = "1";
             nrunes::parse(str, value);
             CHECK_EQUAL(1, value);
@@ -169,7 +184,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(parse_u32)
         {
-            u32           value;
+            u32      value;
             crunes_t str = "1";
             nrunes::parse(str, value);
             CHECK_EQUAL(1, value);
@@ -183,7 +198,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(parse_s64)
         {
-            s64           value;
+            s64      value;
             crunes_t str = "1";
             nrunes::parse(str, value);
             CHECK_EQUAL(1, value);
@@ -197,7 +212,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(parse_u64)
         {
-            u64           value;
+            u64      value;
             crunes_t str = "1";
             nrunes::parse(str, value);
             CHECK_EQUAL(1, value);
@@ -211,7 +226,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(parse_f32)
         {
-            f32           value;
+            f32      value;
             crunes_t str = "1.1";
             nrunes::parse(str, value);
             CHECK_EQUAL(1.1f, value);
@@ -225,7 +240,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(parse_f64)
         {
-            f64           value;
+            f64      value;
             crunes_t str = "1.1";
             nrunes::parse(str, value);
             CHECK_EQUAL(1.1, value);
@@ -273,8 +288,12 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(tostring_s32)
         {
-            nrunes::runestr_t<ascii::rune, 32> str;
-            s32              value = 31415;
+            utf32::rune str_runes[256];
+            str_runes[0] = {0};
+            str_runes[1] = {0};
+            runes_t str(str_runes, 0, 0, 256);
+
+            s32 value = 31415;
             nrunes::to_string(str, value);
             CHECK_EQUAL(5, str.size());
             CHECK_EQUAL(0, nrunes::compare(str, "31415"));
@@ -282,8 +301,12 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(tostring_u32)
         {
-            nrunes::runestr_t<ascii::rune, 32> str;
-            u32              value = 31415;
+            utf32::rune str_runes[256];
+            str_runes[0] = {0};
+            str_runes[1] = {0};
+            runes_t str(str_runes, 0, 0, 256);
+
+            u32 value = 31415;
             nrunes::to_string(str, value);
             CHECK_EQUAL(5, str.size());
             CHECK_EQUAL(0, nrunes::compare(str, "31415"));
@@ -291,8 +314,12 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(tostring_s64)
         {
-            nrunes::runestr_t<ascii::rune, 32> str;
-            s64              value = 31415;
+            utf32::rune str_runes[256];
+            str_runes[0] = {0};
+            str_runes[1] = {0};
+            runes_t str(str_runes, 0, 0, 256);
+
+            s64 value = 31415;
             nrunes::to_string(str, value);
             CHECK_EQUAL(5, str.size());
             CHECK_EQUAL(0, nrunes::compare(str, "31415"));
@@ -300,29 +327,41 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(tostring_u64)
         {
-            nrunes::runestr_t<ascii::rune, 32> str;
-            u64              value = 31415;
-            to_string(str, value);
+            utf32::rune str_runes[256];
+            str_runes[0] = {0};
+            str_runes[1] = {0};
+            runes_t str(str_runes, 0, 0, 256);
+
+            u64 value = 31415;
+            nrunes::to_string(str, value);
             CHECK_EQUAL(5, str.size());
-            CHECK_EQUAL(0, compare(str, "31415"));
+            CHECK_EQUAL(0, nrunes::compare(str, "31415"));
         }
 
         UNITTEST_TEST(tostring_f32)
         {
-            nrunes::runestr_t<ascii::rune, 32> str;
-            f32              value = 3.1415f;
-            to_string(str, value, 4);
+            utf32::rune str_runes[256];
+            str_runes[0] = {0};
+            str_runes[1] = {0};
+            runes_t str(str_runes, 0, 0, 256);
+
+            f32 value = 3.1415f;
+            nrunes::to_string(str, value, 4);
             CHECK_EQUAL(6, str.size());
-            CHECK_EQUAL(0, compare(str, "3.1415"));
+            CHECK_EQUAL(0, nrunes::compare(str, "3.1415"));
         }
 
         UNITTEST_TEST(tostring_f64)
         {
-            nrunes::runestr_t<ascii::rune, 32> str;
-            f64              value = 3.1415;
-            to_string(str, value, 4);
+            utf32::rune str_runes[256];
+            str_runes[0] = {0};
+            str_runes[1] = {0};
+            runes_t str(str_runes, 0, 0, 256);
+
+            f64 value = 3.1415;
+            nrunes::to_string(str, value, 4);
             CHECK_EQUAL(6, str.size());
-            CHECK_EQUAL(0, compare(str, "3.1415"));
+            CHECK_EQUAL(0, nrunes::compare(str, "3.1415"));
         }
 
         UNITTEST_TEST(is)
@@ -420,22 +459,30 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(to_upper)
         {
-            nrunes::runestr_t<ascii::rune, 128> str;
-            crunes_t     str1 = "this is a lower case string";
-            crunes_t     str2 = "THIS IS A LOWER CASE STRING";
-            copy(str1, str);
-            to_upper(str);
-            CHECK_EQUAL(0, compare(str2, str));
+            utf32::rune str_runes[256];
+            str_runes[0] = {0};
+            str_runes[1] = {0};
+            runes_t str(str_runes, 0, 0, 256);
+
+            crunes_t                            str1 = "this is a lower case string";
+            crunes_t                            str2 = "THIS IS A LOWER CASE STRING";
+            nrunes::copy(str1, str);
+            nrunes::to_upper(str);
+            CHECK_EQUAL(0, nrunes::compare(str2, str));
         }
 
         UNITTEST_TEST(to_lower)
         {
-            nrunes::runestr_t<ascii::rune, 128> str;
-            crunes_t     str1 = "THIS IS AN UPPER CASE STRING";
-            crunes_t     str2 = "this is an upper case string";
-            copy(str1, str);
-            to_lower(str);
-            CHECK_EQUAL(0, compare(str2, str));
+            utf32::rune str_runes[256];
+            str_runes[0] = {0};
+            str_runes[1] = {0};
+            runes_t str(str_runes, 0, 0, 256);
+
+            crunes_t                            str1 = "THIS IS AN UPPER CASE STRING";
+            crunes_t                            str2 = "this is an upper case string";
+            nrunes::copy(str1, str);
+            nrunes::to_lower(str);
+            CHECK_EQUAL(0, nrunes::compare(str2, str));
         }
 
         UNITTEST_TEST(starts_with)
@@ -459,101 +506,114 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(cprintf)
         {
-            s32 const     i   = 100;
-            crunes_t str = "hello";
+            s32 const i   = 100;
+            crunes_t  str = "hello";
 
             crunes_t fmt    = "%d %s";
-            s32           length = cprintf(fmt, va_t(i), va_t(str));
+            s32      length = cprintf(fmt, va_t(i), va_t(str));
             CHECK_EQUAL(9, length);
 
-            nrunes::runestr_t<ascii::rune, 32> buffer;
-            sprintf(buffer, fmt, va_t(i), va_t(str));
-            CHECK_EQUAL(0, compare(buffer, crunes_t("100 hello")));
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
+
+            sprintf(dst, fmt, va_t(i), va_t(str));
+            CHECK_EQUAL(0, nrunes::compare(dst, crunes_t("100 hello")));
         }
 
         UNITTEST_TEST(vcprintf)
         {
-            s32           i      = 100;
+            s32      i      = 100;
             crunes_t str    = "hello";
             crunes_t fmt    = "%d %s";
-            s32           length = cprintf(fmt, va_t(i), va_t(str));
+            s32      length = cprintf(fmt, va_t(i), va_t(str));
             CHECK_EQUAL(9, length);
         }
 
         UNITTEST_TEST(sprintf)
         {
-            nrunes::runestr_t<ascii::rune, 32> buffer;
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
 
             s32 i = 100;
 
             crunes_t str = "hello";
             crunes_t fmt = "%d %s";
 
-            sprintf(buffer, fmt, va_t(i), va_t(str));
-            CHECK_EQUAL(9, buffer.size());
-            CHECK_TRUE(compare(buffer, "100 hello") == 0);
+            sprintf(dst, fmt, va_t(i), va_t(str));
+            CHECK_EQUAL(9, dst.size());
+            CHECK_TRUE(nrunes::compare(dst, "100 hello") == 0);
 
             // Check all format functionality?
         }
 
         UNITTEST_TEST(sprintf_bool)
         {
-            nrunes::runestr_t<ascii::rune, 32> buffer;
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
 
             // ---------------------------------------------------------------------------
             // Boolean, True/False and Yes/No verification
-            buffer.reset();
-            sprintf(buffer, "%b", va_t(true));
-            CHECK_EQUAL(buffer.size(), 4);
-            CHECK_TRUE(compare(buffer, "true") == 0);
+            dst.reset();
+            sprintf(dst, "%b", va_t(true));
+            CHECK_EQUAL(dst.size(), 4);
+            CHECK_TRUE(nrunes::compare(dst, "true") == 0);
 
-            buffer.reset();
-            sprintf(buffer, "%B", va_t(true));
-            CHECK_EQUAL(buffer.size(), 4);
-            CHECK_TRUE(compare(buffer, "TRUE") == 0);
+            dst.reset();
+            sprintf(dst, "%B", va_t(true));
+            CHECK_EQUAL(dst.size(), 4);
+            CHECK_TRUE(nrunes::compare(dst, "TRUE") == 0);
 
-            buffer.reset();
-            sprintf(buffer, "%b", va_t(false));
-            CHECK_EQUAL(buffer.size(), 5);
-            CHECK_TRUE(compare(buffer, "false") == 0);
+            dst.reset();
+            sprintf(dst, "%b", va_t(false));
+            CHECK_EQUAL(dst.size(), 5);
+            CHECK_TRUE(nrunes::compare(dst, "false") == 0);
 
-            buffer.reset();
-            sprintf(buffer, "%#b", va_t(false));
-            CHECK_EQUAL(buffer.size(), 5);
-            CHECK_TRUE(compare(buffer, "False") == 0);
+            dst.reset();
+            sprintf(dst, "%#b", va_t(false));
+            CHECK_EQUAL(dst.size(), 5);
+            CHECK_TRUE(nrunes::compare(dst, "False") == 0);
 
-            buffer.reset();
-            sprintf(buffer, "%y", va_t(true));
-            CHECK_EQUAL(buffer.size(), 3);
-            CHECK_TRUE(compare(buffer, "yes") == 0);
+            dst.reset();
+            sprintf(dst, "%y", va_t(true));
+            CHECK_EQUAL(dst.size(), 3);
+            CHECK_TRUE(nrunes::compare(dst, "yes") == 0);
 
-            buffer.reset();
-            sprintf(buffer, "%y", va_t(false));
-            CHECK_EQUAL(buffer.size(), 2);
-            CHECK_TRUE(compare(buffer, "no") == 0);
+            dst.reset();
+            sprintf(dst, "%y", va_t(false));
+            CHECK_EQUAL(dst.size(), 2);
+            CHECK_TRUE(nrunes::compare(dst, "no") == 0);
 
-            buffer.reset();
-            sprintf(buffer, "%Y", va_t(true));
-            CHECK_EQUAL(buffer.size(), 3);
-            CHECK_TRUE(compare(buffer, "YES") == 0);
+            dst.reset();
+            sprintf(dst, "%Y", va_t(true));
+            CHECK_EQUAL(dst.size(), 3);
+            CHECK_TRUE(nrunes::compare(dst, "YES") == 0);
 
-            buffer.reset();
-            sprintf(buffer, "%#y", va_t(true));
-            CHECK_EQUAL(buffer.size(), 3);
-            CHECK_TRUE(compare(buffer, "Yes") == 0);
+            dst.reset();
+            sprintf(dst, "%#y", va_t(true));
+            CHECK_EQUAL(dst.size(), 3);
+            CHECK_TRUE(nrunes::compare(dst, "Yes") == 0);
             // ---------------------------------------------------------------------------
         }
 
         UNITTEST_TEST(vsprintf)
         {
-            nrunes::runestr_t<ascii::rune, 32> buffer;
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
 
-            s32           i   = 100;
+            s32      i   = 100;
             crunes_t str = "hello";
             crunes_t fmt = "%d %s";
-            sprintf(buffer, fmt, va_t(i), va_t(str));
-            CHECK_EQUAL(9, buffer.size());
-            CHECK_TRUE(compare(buffer, "100 hello") == 0);
+            sprintf(dst, fmt, va_t(i), va_t(str));
+            CHECK_EQUAL(9, dst.size());
+            CHECK_TRUE(nrunes::compare(dst, "100 hello") == 0);
         }
 
         UNITTEST_TEST(sscanf)
@@ -570,75 +630,74 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             CHECK_EQUAL(100, myint);
         }
 
-
         // ---------------------------------------------------------------------------
-		UNITTEST_TEST(path_parser_1)
-		{
-			crunes_t fullpath("C:\\projects\\binary_reader\\bin\\binary_reader.cpp.old");
-			crunes_t out_device;
-			crunes_t out_path;
-			crunes_t out_filename;
-			crunes_t out_extension;
-			crunes_t out_first_folder;
+        UNITTEST_TEST(path_parser_1)
+        {
+            crunes_t fullpath("C:\\projects\\binary_reader\\bin\\binary_reader.cpp.old");
+            crunes_t out_device;
+            crunes_t out_path;
+            crunes_t out_filename;
+            crunes_t out_extension;
+            crunes_t out_first_folder;
 
-			crunes_t slash("\\");
-			crunes_t devicesep(":\\");
-			out_device = nrunes::findSelectUntilIncluded(fullpath, devicesep);
-			crunes_t filepath = nrunes::selectAfterExclude(fullpath, out_device);
-			out_path = nrunes::findLastSelectUntilIncluded(filepath, slash);
-			out_filename = nrunes::selectAfterExclude(fullpath, out_path);
-			out_filename = nrunes::findLastSelectUntil(out_filename, '.');
-			out_extension = nrunes::selectAfterExclude(fullpath, out_filename);
+            crunes_t slash("\\");
+            crunes_t devicesep(":\\");
+            out_device        = nrunes::findSelectUntilIncluded(fullpath, devicesep);
+            crunes_t filepath = nrunes::selectAfterExclude(fullpath, out_device);
+            out_path          = nrunes::findLastSelectUntilIncluded(filepath, slash);
+            out_filename      = nrunes::selectAfterExclude(fullpath, out_path);
+            out_filename      = nrunes::findLastSelectUntil(out_filename, '.');
+            out_extension     = nrunes::selectAfterExclude(fullpath, out_filename);
 
-			nrunes::trimRight(out_device, devicesep);
+            nrunes::trimRight(out_device, devicesep);
 
-			out_first_folder = nrunes::findSelectUntil(out_path, slash);
+            out_first_folder = nrunes::findSelectUntil(out_path, slash);
 
-			crunes_t device("C");
-			CHECK_TRUE(device == out_device);
-			crunes_t path("projects\\binary_reader\\bin\\");
-			CHECK_TRUE(path == out_path);
-			crunes_t filename("binary_reader.cpp");
-			CHECK_TRUE(filename == out_filename);
-			crunes_t extension(".old");
-			CHECK_TRUE(extension == out_extension);
-			crunes_t first_folder("projects");
-			CHECK_TRUE(first_folder == out_first_folder);
-		}
+            crunes_t device("C");
+            CHECK_TRUE(device == out_device);
+            crunes_t path("projects\\binary_reader\\bin\\");
+            CHECK_TRUE(path == out_path);
+            crunes_t filename("binary_reader.cpp");
+            CHECK_TRUE(filename == out_filename);
+            crunes_t extension(".old");
+            CHECK_TRUE(extension == out_extension);
+            crunes_t first_folder("projects");
+            CHECK_TRUE(first_folder == out_first_folder);
+        }
 
-		UNITTEST_TEST(path_parser_2)
-		{
-			crunes_t fullpath("C:\\binary_reader.cpp.old");
-			crunes_t out_device;
-			crunes_t out_path;
-			crunes_t out_filename;
-			crunes_t out_extension;
-			crunes_t out_first_folder;
+        UNITTEST_TEST(path_parser_2)
+        {
+            crunes_t fullpath("C:\\binary_reader.cpp.old");
+            crunes_t out_device;
+            crunes_t out_path;
+            crunes_t out_filename;
+            crunes_t out_extension;
+            crunes_t out_first_folder;
 
-			crunes_t slash("\\");
-			crunes_t devicesep(":\\");
-			out_device = nrunes::findSelectUntilIncluded(fullpath, devicesep);
-			crunes_t filepath = nrunes::selectAfterExclude(fullpath, out_device);
-			out_path = nrunes::findLastSelectUntilIncluded(filepath, slash);
-			out_filename = nrunes::selectAfterExclude(fullpath, out_path);
-			out_filename = nrunes::findLastSelectUntil(out_filename, '.');
-			out_extension = nrunes::selectAfterExclude(fullpath, out_filename);
+            crunes_t slash("\\");
+            crunes_t devicesep(":\\");
+            out_device        = nrunes::findSelectUntilIncluded(fullpath, devicesep);
+            crunes_t filepath = nrunes::selectAfterExclude(fullpath, out_device);
+            out_path          = nrunes::findLastSelectUntilIncluded(filepath, slash);
+            out_filename      = nrunes::selectAfterExclude(fullpath, out_path);
+            out_filename      = nrunes::findLastSelectUntil(out_filename, '.');
+            out_extension     = nrunes::selectAfterExclude(fullpath, out_filename);
 
-			nrunes::trimRight(out_device, devicesep);
+            nrunes::trimRight(out_device, devicesep);
 
-			out_first_folder = nrunes::findSelectUntil(out_path, slash);
+            out_first_folder = nrunes::findSelectUntil(out_path, slash);
 
-			crunes_t device("C");
-			CHECK_TRUE(device == out_device);
-			crunes_t path("");
-			CHECK_TRUE(path == out_path);
-			crunes_t filename("binary_reader.cpp");
-			CHECK_TRUE(filename == out_filename);
-			crunes_t extension(".old");
-			CHECK_TRUE(extension == out_extension);
-			crunes_t first_folder("");
-			CHECK_TRUE(first_folder == out_first_folder);
-		}
-	}
+            crunes_t device("C");
+            CHECK_TRUE(device == out_device);
+            crunes_t path("");
+            CHECK_TRUE(path == out_path);
+            crunes_t filename("binary_reader.cpp");
+            CHECK_TRUE(filename == out_filename);
+            crunes_t extension(".old");
+            CHECK_TRUE(extension == out_extension);
+            crunes_t first_folder("");
+            CHECK_TRUE(first_folder == out_first_folder);
+        }
+    }
 }
 UNITTEST_SUITE_END

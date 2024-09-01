@@ -309,7 +309,7 @@ namespace ncore
         // the hash algorithm.
         u64 strhash(crunes_t const& strdata, u64 seed)
         {
-            if ((strdata.m_flags & 7) == ascii::TYPE)
+            if ((strdata.m_type) == ascii::TYPE)
             {
                 const char* begin = &strdata.m_ascii[strdata.m_str];
                 const char* end   = &strdata.m_ascii[strdata.m_str];
@@ -324,7 +324,7 @@ namespace ncore
 
         u64 strhash_lowercase(crunes_t const& strdata, u64 seed)
         {
-            if ((strdata.m_flags & 7) == ascii::TYPE)
+            if ((strdata.m_type) == ascii::TYPE)
             {
                 const char* begin = &strdata.m_ascii[strdata.m_str];
                 const char* end   = &strdata.m_ascii[strdata.m_str];
@@ -339,7 +339,7 @@ namespace ncore
 
         u32 strhash32(crunes_t const& str, u64 seed)
         {
-            if ((str.m_flags & 7) == ascii::TYPE)
+            if ((str.m_type) == ascii::TYPE)
             {
                 const char* begin = &str.m_ascii[str.m_str];
                 const char* end   = &str.m_ascii[str.m_str];
@@ -354,7 +354,7 @@ namespace ncore
 
         u32 strhash32_lowercase(crunes_t const& str, u64 seed)
         {
-            if ((str.m_flags & 7) == ascii::TYPE)
+            if ((str.m_type) == ascii::TYPE)
             {
                 const char* begin = &str.m_ascii[str.m_str];
                 const char* end   = &str.m_ascii[str.m_str];

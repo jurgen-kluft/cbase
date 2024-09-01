@@ -147,10 +147,15 @@ UNITTEST_SUITE_BEGIN(test_guid_t)
 		UNITTEST_TEST(toString)
 		{
 			guid_t id(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
-			nrunes::runestr_t<ascii::rune, 256> strBuffer;
+
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
+
 			crunes_t guidStr("11335577:22446688:557799BB:88AACCEE");
-			id.toString(strBuffer);
-			CHECK_EQUAL(0, compare(strBuffer, guidStr));
+			id.toString(dst);
+			CHECK_EQUAL(0, nrunes::compare(dst, guidStr));
 		}
 
 		UNITTEST_TEST(fromString)

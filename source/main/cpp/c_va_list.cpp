@@ -32,8 +32,8 @@ namespace ncore
     va_t::va_t(crunes_t const& str)
         : mArg3(TYPE_PCRUNES)
     {
-        mArg3 |= (str.m_flags & 0x0F);
-        switch (str.m_flags & 0x0F)
+        mArg3 |= (str.m_type);
+        switch (str.m_type)
         {
             case ascii::TYPE: mArg = (ptr_t)(&str.m_ascii[str.m_str]); break;
             case utf8::TYPE: mArg = (ptr_t)(&str.m_utf8[str.m_str]); break;

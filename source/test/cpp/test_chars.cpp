@@ -4,7 +4,6 @@
 
 using namespace ncore;
 
-
 UNITTEST_SUITE_BEGIN(test_chars)
 {
 	UNITTEST_FIXTURE(main)
@@ -14,8 +13,12 @@ UNITTEST_SUITE_BEGIN(test_chars)
 
 		UNITTEST_TEST(test_runez_128)
 		{
-			nrunes::runestr_t<ascii::rune, 128> cz;
-			copy(crunes_t("This is a test string"), cz);
+            utf32::rune dst_runes[256];
+            dst_runes[0] = {0};
+            dst_runes[1] = {0};
+            runes_t dst(dst_runes, 0, 0, 256);
+
+			nrunes::copy(crunes_t("This is a test string"), dst);
 		}
 	}
 }

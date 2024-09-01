@@ -139,8 +139,9 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
             CHECK_EQUAL('t', src.m_ascii[src.m_str]);
             CHECK_EQUAL('e', src.m_ascii[src.m_str + 1]);
 
-            nrunes::runestr_t<utf32::rune, 16> dst;
-            copy(src, dst);
+            utf32::rune dst_runes[16];
+            runes_t     dst(dst_runes, 0, 0, 16);
+            nrunes::copy(src, dst);
 
             CHECK_EQUAL('t', dst.m_utf32[dst.m_str].value);
         }
