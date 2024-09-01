@@ -225,6 +225,7 @@ namespace ncore
         crunes_t(crunes_t const& other, u32 from, u32 to);
 
         u32  size() const;
+        u32  len() const { return m_end - m_str; }
         bool is_valid() const;
         bool is_empty() const;
         bool is_nil() const;
