@@ -86,13 +86,13 @@ namespace ncore
         inline void write(const char* str)
         {
             crunes_t r(str);
-            write(r.m_ascii);
+            write(r);
         }
 
         inline void write(const char* str, const char* end)
         {
             crunes_t r(str, end);
-            write(r.m_ascii);
+            write(r);
         }
 
         virtual void writeLine() = 0;
@@ -136,13 +136,13 @@ namespace ncore
         inline void writeLine(const char* str)
         {
             crunes_t r(str);
-            writeLine(r.m_ascii);
+            writeLine(r);
         }
 
         inline void writeLine(const char* str, const va_t* argv, s32 argc)
         {
             crunes_t r(str);
-            writeLine(r.m_ascii, argv, argc);
+            writeLine(r, argv, argc);
         }
 
         inline void writeLine(const crunes_t& str)

@@ -24,13 +24,14 @@ namespace ncore
 
         virtual s32        vwrite(uchar32 c)
         {
-            utf32::crunes_t src(&c, 0, 1, 1);
+            utf32::rune str[2] = {c, 0};
+            crunes_t src(str, 0, 1, 1);
             return write_utf32(src);
         }
 
         virtual s32 vwrite(const char* str, const char* end)
         {
-            ascii::crunes_t src(str, end);
+            crunes_t src(str, end);
             return write_ascii(src)!=0;
         }
 
@@ -87,14 +88,14 @@ namespace ncore
             }
         }
 
-        static s32 write_ascii(const ascii::crunes_t& str)
+        static s32 write_ascii(const crunes_t& str)
         {
             const s32 maxlen = 124;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            ascii::pcrune src = &str.m_bos[ str.m_str ];
-            ascii::pcrune end = &str.m_bos[ str.m_end ];
+            ascii::pcrune src = &str.m_ascii[ str.m_str ];
+            ascii::pcrune end = &str.m_ascii[ str.m_end ];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -114,14 +115,14 @@ namespace ncore
             return l;
         }
 
-        static s32 write_utf16(const utf16::crunes_t& str)
+        static s32 write_utf16(const crunes_t& str)
         {
             const s32 maxlen = 124;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf16::pcrune src = &str.m_bos[ str.m_str];
-            utf16::pcrune end = &str.m_bos[ str.m_end];
+            utf16::pcrune src = &str.m_utf16[ str.m_str];
+            utf16::pcrune end = &str.m_utf16[ str.m_end];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -129,8 +130,8 @@ namespace ncore
                 s32      ll    = 0;
                 while (src < end && dst16 < end16)
                 {
-                    uchar32 c = *src++;
-                    write_utf16(c, dst16, end16);
+                    utf16::rune c = *src++;
+                    write_utf16(c.value, dst16, end16);
                     ll += 1;
                 }
                 str16[ll] = 0;
@@ -141,14 +142,14 @@ namespace ncore
             return l;
         }
 
-        static s32 write_utf32(const utf32::crunes_t& str)
+        static s32 write_utf32(const crunes_t& str)
         {
             const s32 maxlen = 124;
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf32::pcrune src = &str.m_bos[str.m_str];
-            utf32::pcrune end = &str.m_bos[str.m_end];
+            utf32::pcrune src = &str.m_utf32[str.m_str];
+            utf32::pcrune end = &str.m_utf32[str.m_end];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -156,8 +157,8 @@ namespace ncore
                 s32      ll    = 0;
                 while (src < end && dst16 < end16)
                 {
-                    uchar32 c = *src++;
-                    write_utf16(c, dst16, end16);
+                    utf32::rune c = *src++;
+                    write_utf16(c.value, dst16, end16);
                     ll += 1;
                 }
                 str16[ll] = 0;
@@ -177,7 +178,7 @@ namespace ncore
         virtual void writeln()
         {
             ascii::rune line32[] = {'\r', 0};
-            ascii::crunes_t line(line32, 1);
+            crunes_t line(line32, 1);
             out_writer_t::write_ascii(line);
         }
 
