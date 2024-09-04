@@ -3488,6 +3488,35 @@ namespace ncore
         return false;
     }
 
+    crunes_t crunes_t::view(u32 from) const
+    {
+        if ((m_str + from) >= m_end)
+            from = m_end - m_str;
+        crunes_t r;
+        r.m_type  = m_type;
+        r.m_ascii = m_ascii;
+        r.m_str   = m_str + from;
+        r.m_end   = m_end;
+        r.m_eos   = m_eos;
+        return r;
+    }
+
+    crunes_t crunes_t::view(u32 from, u32 to) const
+    {
+        if ((m_str + from) >= m_end)
+            from = m_end - m_str;
+        if ((m_str + to) >= m_end)
+            to = m_end - m_str;
+
+        crunes_t r;
+        r.m_type  = m_type;
+        r.m_ascii = m_ascii;
+        r.m_str   = m_str + from;
+        r.m_end   = m_str + to;
+        r.m_eos   = m_eos;
+        return r;
+    }
+
     namespace nrunes
     {
         // ------------------------------------------------------------------------------------------------------------------

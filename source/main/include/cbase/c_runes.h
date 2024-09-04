@@ -243,6 +243,9 @@ namespace ncore
 
         crunes_t& operator=(crunes_t const& other);
 
+        crunes_t view(u32 from) const;
+        crunes_t view(u32 from, u32 to) const;
+
         union
         {  // ptr
             ascii::pcrune m_ascii;
