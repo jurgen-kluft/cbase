@@ -202,8 +202,11 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
-		crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
-		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
+        u32 const logstrlen = ascii::strlen(logformat);
+        u32 const msgstrlen = ascii::strlen(msgFormat);
+
+		crunes_t logformatrunes((ascii::pcrune)logformat, (ascii::pcrune)logformat + logstrlen);
+		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (ascii::pcrune)msgFormat + msgstrlen);
 
 		log_t::writeLine(log_t::INFO, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)
@@ -243,8 +246,10 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Warning CHANNEL:%s";
-		crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
-		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
+        u32 const logstrlen = ascii::strlen(logformat);
+        u32 const msgstrlen = ascii::strlen(msgFormat);
+		crunes_t logformatrunes((ascii::pcrune)logformat, (ascii::pcrune)logformat + logstrlen);
+		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (ascii::pcrune)msgFormat + msgstrlen);
 
 		log_t::writeLine(log_t::WARNING, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)
@@ -284,8 +289,10 @@ namespace ncore
 		log_info_t& info = sGetLogInfoFunc();
 
 		const char* logformat = "%s(%d) : SEQUENCE:%d TYPE:Info CHANNEL:%s";
-		crunes_t logformatrunes((ascii::pcrune)logformat, (u32)ascii::strlen(logformat));
-		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (u32)ascii::strlen(msgFormat));
+        u32 const logstrlen = ascii::strlen(logformat);
+        u32 const msgstrlen = ascii::strlen(msgFormat);
+		crunes_t logformatrunes((ascii::pcrune)logformat, (ascii::pcrune)logformat + logstrlen);
+		crunes_t msgformatrunes((ascii::pcrune)msgFormat, (ascii::pcrune)msgFormat + msgstrlen);
 
 		log_t::writeLine(log_t::ERROR, logformatrunes, va_t(info.mLogFileName), va_t(info.mLogLineNumber), va_t(info.mSequenceCount++), va_t(channel));
 		if (argc > 0)

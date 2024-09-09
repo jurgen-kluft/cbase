@@ -444,16 +444,16 @@ namespace ncore
                         while (reader->peek() != 0 && reader->peek() == ' ')
                             reader->read();
 
-                        runes_t* runes = nullptr;
+                        runes_t runes("", 0, 0, 0);
                         if (i < argc)
                         {
                             va_r_t r = argv[i++];
                             runes    = r.getRunes();
                         }
 
-                        if (runes != nullptr)
+                        if (runes.cap() > 0)
                         {
-                            nrunes::writer_t str_writer(*runes);
+                            nrunes::writer_t str_writer(runes);
 
                             l = 0;
                             while (reader->peek() != 0 && reader->peek() != ' ')

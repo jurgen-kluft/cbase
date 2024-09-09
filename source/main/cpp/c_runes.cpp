@@ -2911,6 +2911,23 @@ namespace ncore
         m_type  = _type;
     }
 
+    runes_t::runes_t(ucs2::prune _str, ucs2::prune _end, u32 _type)
+    {
+        m_ucs2 = _str;
+        m_ucs2 = 0;
+        m_end  = (u32)(_end - _str);
+        m_eos  = (u32)(_end - _str);
+        m_type = _type;
+    }
+    runes_t::runes_t(ucs2::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
+    {
+        m_ucs2 = _bos;
+        m_str  = _str;
+        m_end  = _end;
+        m_eos  = _eos;
+        m_type = _type;
+    }
+
     runes_t::runes_t(utf8::prune _str, utf8::prune _end, u32 _type)
     {
         m_utf8 = _str;
@@ -3153,6 +3170,15 @@ namespace ncore
         m_eos   = _str.m_eos;
     }
 
+    crunes_t::crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u8 _type)
+    {
+        m_ascii = _bos;
+        m_str   = _str;
+        m_end   = _end;
+        m_eos   = _eos;
+        m_type  = _type;
+    }
+
     crunes_t::crunes_t(ascii::pcrune _str)
     {
         m_ascii           = _str;
@@ -3171,13 +3197,42 @@ namespace ncore
         m_eos   = (u32)(_end - _str);
         m_type  = ascii::TYPE;
     }
-    crunes_t::crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u32 _flags)
+
+    crunes_t::crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos)
     {
         m_ascii = _bos;
         m_str   = _str;
         m_end   = _end;
         m_eos   = _eos;
-        m_type  = _flags;
+        m_type  = ascii::TYPE;
+    }
+
+    crunes_t::crunes_t(ucs2::pcrune _str)
+    {
+        m_ucs2           = _str;
+        m_ucs2           = 0;
+        ucs2::pcrune end = utf::endof(_str, nullptr);
+        m_end            = (u32)(end - _str);
+        m_eos            = m_end;
+        m_type           = ucs2::TYPE;
+    }
+
+    crunes_t::crunes_t(ucs2::pcrune _str, ucs2::pcrune _end)
+    {
+        m_ucs2 = _str;
+        m_ucs2 = 0;
+        m_end  = (u32)(_end - _str);
+        m_eos  = (u32)(_end - _str);
+        m_type = ucs2::TYPE;
+    }
+
+    crunes_t::crunes_t(ucs2::pcrune _bos, u32 _str, u32 _end, u32 _eos)
+    {
+        m_ucs2 = _bos;
+        m_str  = _str;
+        m_end  = _end;
+        m_eos  = _eos;
+        m_type = ucs2::TYPE;
     }
 
     crunes_t::crunes_t(utf8::pcrune _str)

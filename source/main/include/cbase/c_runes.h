@@ -65,6 +65,8 @@ namespace ncore
         {
             u16         value;
             inline bool isEOS() const { return value == 0; }
+            inline bool operator==(rune other) const { return value == other.value; }
+            inline bool operator!=(rune other) const { return value != other.value; }
         };
         typedef rune*       prune;
         typedef const rune* pcrune;
@@ -83,6 +85,8 @@ namespace ncore
         {
             u8          value;
             inline bool isEOS() const { return value == 0; }
+            inline bool operator==(rune other) const { return value == other.value; }
+            inline bool operator!=(rune other) const { return value != other.value; }
         };
         typedef rune*       prune;
         typedef const rune* pcrune;
@@ -140,6 +144,9 @@ namespace ncore
 
         runes_t(ascii::prune _str, ascii::prune _end, u32 _type = ascii::TYPE);
         runes_t(ascii::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ascii::TYPE);
+
+        runes_t(ucs2::prune _str, ucs2::prune _end, u32 _type = ucs2::TYPE);
+        runes_t(ucs2::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ucs2::TYPE);
 
         runes_t(utf8::prune _str, utf8::prune _end, u32 _type = utf8::TYPE);
         runes_t(utf8::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf8::TYPE);
@@ -200,13 +207,15 @@ namespace ncore
     {
         crunes_t();
 
+        crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u8 _type);
+
         crunes_t(ascii::pcrune _bos);
         crunes_t(ascii::pcrune _bos, ascii::pcrune _end);
-        crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u32 _flags = ascii::TYPE);
-        crunes_t(ascii::pcrune _bos, u32 _len)
-            : crunes_t(_bos, 0, _len, _len, ascii::TYPE)
-        {
-        }
+        crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos);
+
+        crunes_t(ucs2::pcrune _bos);
+        crunes_t(ucs2::pcrune _bos, ucs2::pcrune _end);
+        crunes_t(ucs2::pcrune _bos, u32 _str, u32 _end, u32 _eos);
 
         crunes_t(utf8::pcrune _str);
         crunes_t(utf8::pcrune _str, utf8::pcrune _end);

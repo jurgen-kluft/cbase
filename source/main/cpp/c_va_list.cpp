@@ -606,7 +606,36 @@ namespace ncore
             case TYPE_INT64: nrunes::parse(rhs, *((s64*)mRef)); break;
             case TYPE_FLOAT32: nrunes::parse(rhs, *((f32*)mRef)); break;
             case TYPE_FLOAT64: nrunes::parse(rhs, *((f64*)mRef)); break;
-            case TYPE_PRUNES: break;
+            case TYPE_ASCII_STR:
+            {
+                runes_t dst((char*)mRef, 0, 0, mCap, ascii::TYPE);
+                nrunes::copy(rhs, dst);
+            }
+            break;
+            case TYPE_USC2_STR:
+            {
+                runes_t dst((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
+                nrunes::copy(rhs, dst);
+            }
+            break;
+            case TYPE_UTF8_STR:
+            {
+                runes_t dst((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
+                nrunes::copy(rhs, dst);
+            }
+            break;
+            case TYPE_UTF16_STR:
+            {
+                runes_t dst((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
+                nrunes::copy(rhs, dst);
+            }
+            break;
+            case TYPE_UTF32_STR:
+            {
+                runes_t dst((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
+                nrunes::copy(rhs, dst);
+            }
+            break;
             default: break;  // Fall through
         };
 
@@ -629,7 +658,36 @@ namespace ncore
             case TYPE_INT64: *((s64*)mRef) = rhs; break;
             case TYPE_FLOAT32: *((f32*)mRef) = rhs; break;
             case TYPE_FLOAT64: *((f64*)mRef) = rhs; break;
-            case TYPE_PRUNES: rhs.convertToRunes(*(runes_t*)mRef); break;
+            case TYPE_ASCII_STR:
+            {
+                runes_t dst((char*)mRef, 0, 0, mCap, ascii::TYPE);
+                rhs.convertToRunes(dst);
+            }
+            break;
+            case TYPE_USC2_STR:
+            {
+                runes_t dst((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
+                rhs.convertToRunes(dst);
+            }
+            break;
+            case TYPE_UTF8_STR:
+            {
+                runes_t dst((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
+                rhs.convertToRunes(dst);
+            }
+            break;
+            case TYPE_UTF16_STR:
+            {
+                runes_t dst((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
+                rhs.convertToRunes(dst);
+            }
+            break;
+            case TYPE_UTF32_STR:
+            {
+                runes_t dst((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
+                rhs.convertToRunes(dst);
+            }
+            break;
             default: break;  // Fall through
         };
 
