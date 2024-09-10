@@ -178,7 +178,7 @@ namespace ncore
         virtual void writeln()
         {
             ascii::rune line32[] = {'\r', 0};
-            crunes_t line(line32, 1);
+            crunes_t    line(line32, line32 + 1);
             out_writer_t::write_ascii(line);
         }
 
