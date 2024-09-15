@@ -119,7 +119,7 @@ namespace ncore
     public:
         u8 m_data[L];
         inline memory_t() {}
-        
+
         inline u32 size() const { return L; }
 
         buffer_t   buffer() const { return buffer_t((u8*)m_data, (u8*)m_data + size()); }
@@ -148,18 +148,6 @@ namespace ncore
             : m_begin(nullptr)
             , m_cursor(nullptr)
             , m_end(nullptr)
-        {
-        }
-        inline binary_reader_t(buffer_t const& b)
-            : m_begin(b.m_begin)
-            , m_cursor(b.m_begin)
-            , m_end(b.m_end)
-        {
-        }
-        inline binary_reader_t(cbuffer_t const& b)
-            : m_begin(b.m_begin)
-            , m_cursor(b.m_begin)
-            , m_end(b.m_end)
         {
         }
         inline binary_reader_t(u8 const* _buffer, u8 const* _end)
@@ -223,12 +211,6 @@ namespace ncore
             : m_begin(nullptr)
             , m_cursor(nullptr)
             , m_end(nullptr)
-        {
-        }
-        inline binary_writer_t(buffer_t const& _buffer)
-            : m_begin(_buffer.m_begin)
-            , m_cursor(_buffer.m_begin)
-            , m_end(_buffer.m_end)
         {
         }
         inline binary_writer_t(u8* _buffer, u8* _end)
