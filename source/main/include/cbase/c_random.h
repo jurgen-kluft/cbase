@@ -21,7 +21,7 @@ namespace ncore
     {
         u8 val;
         inRandom->generate(&val, 1);
-        return val == 0;
+        return val < 128;
     }
     inline u32 random_u32(random_t* inRandom, u32 inBits = 32)
     {
