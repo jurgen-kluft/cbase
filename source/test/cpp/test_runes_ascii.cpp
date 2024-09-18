@@ -86,7 +86,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
 
         UNITTEST_TEST(replace)
         {
-            utf32::rune dst_runes[256];
+            ascii::rune dst_runes[256];
             dst_runes[0] = {0};
             dst_runes[1] = {0};
             runes_t dst(dst_runes, 0, 0, 256-1);

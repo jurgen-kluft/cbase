@@ -97,10 +97,10 @@ namespace ncore
 
                 // compute character encoding length, checking for overlong sequences (i.e. characters that don't use the shortest possible encoding).
                 u8       value       = data[0].value;
-                s8 const leadingOnes = math::countLeadingZeros(value);
+                s8 const leadingOnes = math::countLeadingZeros((u8)(~value));
                 u8 const size        = (c_utf8_sizes >> (leadingOnes << 2)) & 0xF;
 
-                if (size > 0)
+                if (size == 0)
                 {
                     ++str;
                     return s_invalid;
@@ -1035,8 +1035,6 @@ namespace ncore
         static u32     get_eos(runes_t const& str);
         static runes_t select(runes_t const& str, u32 from, u32 to);
         static bool    backwards(runes_t const& str, u32& cursor, s32 step = 1);
-        static uchar32 peek(runes_t const& str, u32 cursor, u32& next);
-        static uchar32 read(runes_t const& str, u32& cursor);
         static bool    write(runes_t const& str, u32& cursor, uchar32 c);
 
         static u32         get_begin(crunes_t const& str);
@@ -1044,17 +1042,15 @@ namespace ncore
         static crunes_t    select(crunes_t const& str, u32 from, u32 to);
         static bool        forwards(crunes_t const& str, u32& cursor, s32 step = 1);
         static bool        backwards(crunes_t const& str, u32& cursor, s32 step = 1);
-        static uchar32     peek(crunes_t const& str, u32 cursor, u32& next);
-        static uchar32     read(crunes_t const& str, u32& cursor);
         static bool        is_valid(crunes_t const& str, u32 const& cursor);
         static inline bool is_in(crunes_t const& str, crunes_t const& selection) { return (selection.m_ascii == str.m_ascii && selection.m_str >= str.m_str && selection.m_end <= str.m_end); }
 
         static inline runes_t crunes_to_runes(runes_t const& str, crunes_t const& sel)
         {
             runes_t r(str);
-            r.m_str = sel.m_str;
-            r.m_end = sel.m_end;
-            r.m_eos = sel.m_eos;
+            r.m_str  = sel.m_str;
+            r.m_end  = sel.m_end;
+            r.m_eos  = sel.m_eos;
             r.m_type = sel.m_type;
             return r;
         }
@@ -1076,10 +1072,32 @@ namespace ncore
             {
             }
 
-            inline uchar32 peek(u32& next_cursor) const { return nrunes::peek(m_str, m_cursor, next_cursor); }
-            inline uchar32 read() { return nrunes::read(m_str, m_cursor); }
-            inline bool    is_end() const { return m_cursor >= get_end(m_str); }
-            inline void    set_cursor(u32 cursor) { m_cursor = cursor; }
+            inline uchar32 peek(u32& next_cursor) const
+            {
+                next_cursor = m_cursor;
+                switch (m_str.get_type())
+                {
+                    case ascii::TYPE: return utf::reading::read(m_str.m_ascii, next_cursor, m_str.m_end);
+                    case utf8::TYPE: return utf::reading::read(m_str.m_utf8, next_cursor, m_str.m_end);
+                    case utf16::TYPE: return utf::reading::read(m_str.m_utf16, next_cursor, m_str.m_end);
+                    case utf32::TYPE: return utf::reading::read(m_str.m_utf32, next_cursor, m_str.m_end);
+                }
+                return '\0';
+            }
+
+            inline uchar32 read()
+            {
+                switch (m_str.get_type())
+                {
+                    case ascii::TYPE: return utf::reading::read(m_str.m_ascii, m_cursor, m_str.m_end);
+                    case utf8::TYPE: return utf::reading::read(m_str.m_utf8, m_cursor, m_str.m_end);
+                    case utf16::TYPE: return utf::reading::read(m_str.m_utf16, m_cursor, m_str.m_end);
+                    case utf32::TYPE: return utf::reading::read(m_str.m_utf32, m_cursor, m_str.m_end);
+                }
+                return '\0';
+            }
+            inline bool is_end() const { return m_cursor >= get_end(m_str); }
+            inline void set_cursor(u32 cursor) { m_cursor = cursor; }
 
             inline crunes_t select_until() const { return select(m_str, get_begin(m_str), m_cursor); }
             inline crunes_t select_after() const { return select(m_str, m_cursor + 1, get_end(m_str)); }
@@ -1097,10 +1115,32 @@ namespace ncore
                 , m_cursor(get_begin(_str))
             {
             }
-            inline uchar32 peek(u32& next_cursor) const { return nrunes::peek(m_str, m_cursor, next_cursor); }
-            inline uchar32 read() { return nrunes::read(m_str, m_cursor); }
-            inline bool    is_end() const { return m_cursor >= get_end(m_str); }
-            inline void    set_cursor(u32 cursor) { m_cursor = cursor; }
+            inline uchar32 peek(u32& next_cursor) const
+            {
+                next_cursor = m_cursor;
+                switch (m_str.get_type())
+                {
+                    case ascii::TYPE: return utf::reading::read(m_str.m_ascii, next_cursor, m_str.m_end);
+                    case utf8::TYPE: return utf::reading::read(m_str.m_utf8, next_cursor, m_str.m_end);
+                    case utf16::TYPE: return utf::reading::read(m_str.m_utf16, next_cursor, m_str.m_end);
+                    case utf32::TYPE: return utf::reading::read(m_str.m_utf32, next_cursor, m_str.m_end);
+                }
+                return '\0';
+            }
+
+            inline uchar32 read()
+            {
+                switch (m_str.get_type())
+                {
+                    case ascii::TYPE: return utf::reading::read(m_str.m_ascii, m_cursor, m_str.m_end);
+                    case utf8::TYPE: return utf::reading::read(m_str.m_utf8, m_cursor, m_str.m_end);
+                    case utf16::TYPE: return utf::reading::read(m_str.m_utf16, m_cursor, m_str.m_end);
+                    case utf32::TYPE: return utf::reading::read(m_str.m_utf32, m_cursor, m_str.m_end);
+                }
+                return '\0';
+            }
+            inline bool is_end() const { return m_cursor >= get_end(m_str); }
+            inline void set_cursor(u32 cursor) { m_cursor = cursor; }
 
             inline runes_t select_until() const { return select(m_str, get_begin(m_str), m_cursor); }
             inline runes_t select_after() const { return select(m_str, m_cursor + 1, get_end(m_str)); }
@@ -1112,26 +1152,23 @@ namespace ncore
         crunes_t find(crunes_t const& _str, uchar32 _c, bool _casesensitive)
         {
             crreader_t reader(_str);
-            if (_casesensitive)
+            while (!reader.is_end())
             {
-                while (!reader.is_end())
+                u32           next_cursor;
+                uchar32 const c = reader.peek(next_cursor);
+                if (_casesensitive)
                 {
-                    u32 next_cursor;
-                    if (reader.peek(next_cursor) == _c)
+                    if (c == _c)
                         return reader.select_current();
-                    reader.set_cursor(next_cursor);
                 }
-            }
-            else
-            {
-                while (!reader.is_end())
+                else
                 {
-                    u32 next_cursor;
-                    if (is_equalfold(reader.peek(next_cursor), _c))
+                    if (is_equalfold(c, _c))
                         return reader.select_current();
-                    reader.set_cursor(next_cursor);
                 }
+                reader.set_cursor(next_cursor);
             }
+
             return nothing_found(_str);
         }
 
@@ -1152,7 +1189,7 @@ namespace ncore
                 backwards(_str, iter);
 
                 u32        next;
-                uchar32    c     = peek(_str, iter, next);
+                uchar32    c     = _str.peek(iter, next);
                 bool const equal = _casesensitive ? is_equal(c, _c) : is_equalfold(c, _c);
                 if (equal)
                 {
@@ -1250,13 +1287,15 @@ namespace ncore
             u32 end  = get_end(_str);
             while (iter < end)
             {
-                u32     pos = iter;
-                uchar32 c   = read(_str, iter);
+                u32     next = iter;
+                uchar32 c    = _str.peek(iter, next);
 
                 // See if this char can be found in the 'set'
                 crunes_t found = find(_any, c, _casesensitive);
                 if (!found.is_empty())
-                    return select(_str, pos, iter);
+                    return select(_str, iter, next);
+
+                iter = next;
             }
             return nothing_found(_str);
         }
@@ -1393,7 +1432,7 @@ namespace ncore
                     return select(inStr, iter, iter + inFind.size());  // TODO, this is incorrect (size is in runes, not bytes, and if the types are different, this will not work)
 
                 u32           next;
-                uchar32 const c = peek(inStr, iter, next);
+                uchar32 const c = inStr.peek(iter, next);
 
                 // See if this char can be found in the 'set'
                 if (contains(inAbortAnyOneOf, c, case_sensitive))
@@ -1609,16 +1648,16 @@ namespace ncore
             {
                 do
                 {
-                    lc = read(_lstr, lcursor);
-                    rc = read(_rstr, rcursor);
+                    lc = _lstr.read(lcursor);
+                    rc = _rstr.read(rcursor);
                 } while (lc == rc && lcursor < lend && rcursor < rend);
             }
             else
             {
                 do
                 {
-                    lc = read(_lstr, lcursor);
-                    rc = read(_rstr, rcursor);
+                    lc = _lstr.read(lcursor);
+                    rc = _rstr.read(rcursor);
                     lc = to_lower(lc);
                     rc = to_lower(rc);
                 } while (lc == rc && lcursor < lend && rcursor < rend);
@@ -1903,7 +1942,7 @@ namespace ncore
         }
 
         //------------------------------------------------------------------------------
-        static uchar32 const sWhitespaceChars[] = {' ', '\t', '\n', '\r', 0};
+        static uchar32 const sWhitespaceChars[]    = {' ', '\t', '\n', '\r', 0};
         static u32 const     sWhitespaceCharsCount = 4;
 
         //------------------------------------------------------------------------------
@@ -1914,14 +1953,14 @@ namespace ncore
             while (iter < end)
             {
                 u32     next;
-                uchar32 c = peek(_str, iter, next);
+                uchar32 c = _str.peek(iter, next);
                 if (c != '-')
                     break;
                 iter = next;
             }
             while (iter < end)
             {
-                uchar32 c = read(_str, iter);
+                uchar32 c = _str.read(iter);
                 if (c < '0' || c > '9')
                     return false;
             }
@@ -1938,7 +1977,7 @@ namespace ncore
             s32     pos = 0;
             while (iter < end)
             {
-                uchar32 c = read(_str, iter);
+                uchar32 c = _str.read(iter);
                 if (c == 'x')
                 {
                     if (pos == 1 && with_prefix && p == '0')
@@ -1974,7 +2013,7 @@ namespace ncore
             u32 end  = get_end(_str);
             while (iter < end)
             {
-                uchar32 c = read(_str, iter);
+                uchar32 c = _str.read(iter);
                 if (c >= '0' && c <= '9')
                     continue;
                 if (!contains(f32chars, c))
@@ -1994,7 +2033,7 @@ namespace ncore
             s32 l = 0;
             while (iter < end)
             {
-                uchar32 c = read(_str, iter);
+                uchar32 c = _str.read(iter);
                 if (c >= '0' && c <= '9')
                 {
                     n++;
@@ -2112,7 +2151,7 @@ namespace ncore
             u32 end  = get_end(_str);
             while (iter < end)
             {
-                uchar32 c = read(_str, iter);
+                uchar32 c = _str.read(iter);
                 if (is_lower(c))
                     return false;
             }
@@ -2125,7 +2164,7 @@ namespace ncore
             u32 end  = get_end(_str);
             while (iter < end)
             {
-                uchar32 c = read(_str, iter);
+                uchar32 c = _str.read(iter);
                 if (is_upper(c))
                     return false;
             }
@@ -2139,7 +2178,7 @@ namespace ncore
             u32  end  = get_end(_str);
             while (iter < end)
             {
-                uchar32 c = read(_str, iter);
+                uchar32 c = _str.read(iter);
                 if (is_upper(c) != b)
                     return false;
                 b = (c == ' ');
@@ -2171,7 +2210,7 @@ namespace ncore
             while (iter < end)
             {
                 u32     next;
-                uchar32 c = peek(_str, iter, next);
+                uchar32 c = _str.peek(iter, next);
                 if ((c >= 'a') && (c <= 'z'))
                 {
                     c += (uchar32)('A' - 'a');
@@ -2191,7 +2230,7 @@ namespace ncore
             while (iter < end)
             {
                 u32     next;
-                uchar32 c = peek(_str, iter, next);
+                uchar32 c = _str.peek(iter, next);
                 if ((c >= 'A') && (c <= 'Z'))
                 {
                     c += (uchar32)('a' - 'A');
@@ -2207,7 +2246,7 @@ namespace ncore
         {
             u32     next;
             u32     iter = get_begin(_str);
-            uchar32 c    = peek(_str, iter, next);
+            uchar32 c    = _str.peek(iter, next);
             return start_char == c;
         }
 
@@ -2222,8 +2261,8 @@ namespace ncore
             u32 rend  = get_end(_start);
             while (liter < lend && riter < rend)
             {
-                uchar32 lc = read(_str, liter);
-                uchar32 rc = read(_start, riter);
+                uchar32 lc = _str.read(liter);
+                uchar32 rc = _start.read(riter);
                 if (_casesensitive)
                 {
                     if (lc != rc)
@@ -2245,7 +2284,7 @@ namespace ncore
             backwards(_str, last, 1);
             if (is_valid(_str, last))
             {
-                uchar32 c = read(_str, last);
+                uchar32 c = _str.read(last);
                 return end_char == c;
             }
             return false;
@@ -2264,8 +2303,8 @@ namespace ncore
 
             while (liter < lend && riter < rend)
             {
-                uchar32 lc = read(_str, liter);
-                uchar32 rc = read(_end, riter);
+                uchar32 lc = _str.read(liter);
+                uchar32 rc = _end.read(riter);
                 if (lc != rc)
                     return false;
             }
@@ -2276,7 +2315,7 @@ namespace ncore
         {
             u32     next;
             u32     iter = get_begin(_str);
-            uchar32 c    = peek(_str, iter, next);
+            uchar32 c    = _str.peek(iter, next);
             return c;
         }
 
@@ -2286,7 +2325,7 @@ namespace ncore
             u32 last = iter;
             backwards(_str, last, 1);
             u32     next;
-            uchar32 c = peek(_str, last, next);
+            uchar32 c = _str.peek(last, next);
             return c;
         }
 
@@ -2466,12 +2505,12 @@ namespace ncore
             u32       l    = get_begin(_str);
             while (iter < end && trim)
             {
-                uchar32 c1    = read(_str, iter);
+                uchar32 c1    = _str.read(iter);
                 u32     citer = get_begin(_charset);
                 trim          = false;
                 while (citer < cend)
                 {
-                    uchar32 c2 = read(_charset, citer);
+                    uchar32 c2 = _charset.read(citer);
                     if (c1 == c2)
                     {
                         trim = true;
@@ -2495,11 +2534,11 @@ namespace ncore
                 trim = false;
                 backwards(_str, iter, 1);
                 u32           next;
-                uchar32 const c1    = peek(_str, iter, next);
+                uchar32 const c1    = _str.peek(iter, next);
                 u32           citer = get_begin(_charset);
                 while (citer < cend)
                 {
-                    uchar32 const c2 = read(_charset, citer);
+                    uchar32 const c2 = _charset.read(citer);
                     if (c1 == c2)
                     {
                         trim = true;
@@ -2590,12 +2629,12 @@ namespace ncore
             u32       l    = get_begin(_str);
             while (iter < end && trim)
             {
-                uchar32 c1    = read(_str, iter);
+                uchar32 c1    = _str.read(iter);
                 u32     citer = get_begin(_charset);
                 trim          = false;
                 while (citer < cend)
                 {
-                    uchar32 c2 = read(_charset, citer);
+                    uchar32 c2 = _charset.read(citer);
                     if (c1 == c2)
                     {
                         trim = true;
@@ -2618,12 +2657,12 @@ namespace ncore
             {
                 backwards(_str, iter, 1);
                 u32     next;
-                uchar32 c1    = peek(_str, iter, next);
+                uchar32 c1    = _str.peek(iter, next);
                 u32     citer = get_begin(_charset);
                 trim          = false;
                 while (citer < cend)
                 {
-                    uchar32 c2 = read(_charset, citer);
+                    uchar32 c2 = _charset.read(citer);
                     if (c1 == c2)
                     {
                         trim = true;
@@ -2669,7 +2708,7 @@ namespace ncore
                     _dst = select(_dst, dbegin, dend);
                     return false;
                 }
-                uchar32 c = read(_src, siter);
+                uchar32 c = _src.read(siter);
                 if (c == 0)
                     break;
                 write(_dst, diter, c);
@@ -2689,7 +2728,7 @@ namespace ncore
             {
                 if (diter >= dend)
                     return false;
-                uchar32 c = read(_con, siter);
+                uchar32 c = _con.read(siter);
                 write(_dst, diter, c);
             }
             _dst = select(_dst, dbegin, diter);
@@ -2823,7 +2862,6 @@ namespace ncore
             }
             return n < 0;
         }
-
 
         static inline bool is_valid(crunes_t const& str, u32 const& cursor) { return cursor >= str.m_str && cursor < str.m_end; }
     }  // namespace nrunes
@@ -3031,7 +3069,7 @@ namespace ncore
         while (cursor < m_end)
         {
             u32     next;
-            uchar32 c    = peek(cursor, next);
+            uchar32 c = peek(cursor, next);
             if (nrunes::contains(until_chars, c))
             {
                 encountered = c;
@@ -3048,7 +3086,7 @@ namespace ncore
         while (cursor < m_end)
         {
             u32     next;
-            uchar32 c    = peek(cursor, next);
+            uchar32 c = peek(cursor, next);
             if (!nrunes::contains(skip_chars, c))
                 break;
             cursor = next;
@@ -3111,14 +3149,14 @@ namespace ncore
     crunes_t::crunes_t()
     {
         m_ascii = sNullAsciiString;
-        m_str = 0;
+        m_str   = 0;
         m_end   = 0;
         m_eos   = 0;
         m_type  = ascii::TYPE;
     }
 
-    crunes_t::crunes_t(runes_t const& _str) 
-    { 
+    crunes_t::crunes_t(runes_t const& _str)
+    {
         m_ascii = _str.m_ascii;
         m_str   = _str.m_str;
         m_end   = _str.m_end;
@@ -3126,9 +3164,9 @@ namespace ncore
         m_type  = _str.m_type;
     }
 
-    crunes_t::crunes_t(crunes_t const& _str) 
-    { 
-        m_ascii = _str.m_ascii; 
+    crunes_t::crunes_t(crunes_t const& _str)
+    {
+        m_ascii = _str.m_ascii;
         m_str   = _str.m_str;
         m_end   = _str.m_end;
         m_eos   = _str.m_eos;
@@ -3338,8 +3376,8 @@ namespace ncore
     bool crunes_t::at_end(u32 cursor) const { return cursor >= m_end; }
     bool crunes_t::is_valid(u32 cursor) const { return (cursor >= m_str && cursor < m_end); }
 
-    uchar32 crunes_t::peek(u32 cursor, u32& next) const 
-    { 
+    uchar32 crunes_t::peek(u32 cursor, u32& next) const
+    {
         next = cursor;
         switch (m_type)
         {
@@ -3378,7 +3416,7 @@ namespace ncore
                     while (cursor < m_end)
                     {
                         u32 next = cursor;
-                        c = utf::reading::read(m_utf8, next, m_end);
+                        c        = utf::reading::read(m_utf8, next, m_end);
                         if (until_chars.contains(c))
                         {
                             encountered = c;
@@ -3443,7 +3481,7 @@ namespace ncore
                 while (cursor < m_end)
                 {
                     u32     next = cursor;
-                    uchar32 c    = utf::read(m_utf8,  next);
+                    uchar32 c    = utf::reading::read(m_utf8, next, m_end);
                     if (!skip_chars.contains(c))
                         break;
                     cursor = next;
@@ -3453,7 +3491,7 @@ namespace ncore
                 while (cursor < m_end)
                 {
                     u32     next = cursor;
-                    uchar32 c    = utf::read(m_utf16, next);
+                    uchar32 c    = utf::reading::read(m_utf16, next, m_end);
                     if (!skip_chars.contains(c))
                         break;
                     cursor = next;
@@ -3463,7 +3501,7 @@ namespace ncore
                 while (cursor < m_end)
                 {
                     u32     next = cursor;
-                    uchar32 c    = utf::read(m_utf32, next);
+                    uchar32 c    = utf::reading::read(m_utf32, next, m_end);
                     if (!skip_chars.contains(c))
                         break;
                     cursor = next;
@@ -3495,7 +3533,7 @@ namespace ncore
                 while (cursor < m_end)
                 {
                     u32     next = cursor;
-                    uchar32 c    = utf::read(m_utf8,  next);
+                    uchar32 c    = utf::reading::read(m_utf8, next, m_end);
                     if (c == contains)
                         return true;
                     cursor = next;
@@ -3508,7 +3546,7 @@ namespace ncore
                 while (cursor < m_end)
                 {
                     u32     next = cursor;
-                    uchar32 c    = utf::read(m_utf16,  next);
+                    uchar32 c    = utf::reading::read(m_utf16, next, m_end);
                     if (c == contains)
                         return true;
                     cursor = next;
@@ -3521,7 +3559,7 @@ namespace ncore
                 while (cursor < m_end)
                 {
                     u32     next = cursor;
-                    uchar32 c    = utf::read(m_utf32,  next);
+                    uchar32 c    = utf::reading::read(m_utf32, next, m_end);
                     if (c == contains)
                         return true;
                     cursor = next;
@@ -3641,7 +3679,7 @@ namespace ncore
                 switch (m_runes.get_type())
                 {
                     case ascii::TYPE: c = m_runes.m_ascii[m_cursor] & 0xff; break;
-                    case utf8::TYPE: c = utf::reading::read(m_runes.m_utf8,  next, m_runes.m_end); break;
+                    case utf8::TYPE: c = utf::reading::read(m_runes.m_utf8, next, m_runes.m_end); break;
                     case utf16::TYPE: c = utf::reading::read(m_runes.m_utf16, next, m_runes.m_end); break;
                     case utf32::TYPE: c = m_runes.m_utf32[m_cursor].value; break;
                     default: ASSERT(false); break;
@@ -3704,10 +3742,10 @@ namespace ncore
                     line.m_str  = m_cursor;
                     line.m_eos  = m_runes.m_eos;
                     line.m_end  = m_runes.m_end;
-                    while (!at_end() && utf::reading::read(m_runes.m_utf8,  next, m_runes.m_end) != '\n')
+                    while (!at_end() && utf::reading::read(m_runes.m_utf8, next, m_runes.m_end) != '\n')
                         m_cursor = next;
                     if (!at_end())
-                        utf::read(m_runes.m_utf8, m_cursor);
+                        utf::reading::read(m_runes.m_utf8, m_cursor, m_runes.m_end);
                     line.m_end = m_cursor;
                     break;
                 case utf16::TYPE:
@@ -3718,7 +3756,7 @@ namespace ncore
                     while (!at_end() && utf::reading::read(m_runes.m_utf16, next, m_runes.m_end) != '\n')
                         m_cursor = next;
                     if (!at_end())
-                        utf::read(m_runes.m_utf16, m_cursor);
+                        utf::reading::read(m_runes.m_utf16, m_cursor, m_runes.m_end);
                     line.m_end = m_cursor;
                     break;
                 case utf32::TYPE:
@@ -3768,19 +3806,19 @@ namespace ncore
         {
             for (u32 i = 0; i < num_chars; i++)
             {
-				if (chars[i] == c)
-					return true;
-			}
-			return false;
-		}
+                if (chars[i] == c)
+                    return true;
+            }
+            return false;
+        }
 
         s32 reader_t::vskip_any(uchar32 const* chars, u32 num_chars)
         {
             s32     skipped = -1;
-            uchar32 c = 0;
+            uchar32 c       = 0;
             switch (m_runes.get_type())
             {
-                case ascii::TYPE: 
+                case ascii::TYPE:
                     while (m_cursor < m_runes.m_end)
                     {
                         skipped += 1;
@@ -3795,18 +3833,18 @@ namespace ncore
                     {
                         u32 next = m_cursor;
                         skipped += 1;
-                        c = utf::read(m_runes.m_utf8,  next);
-						if (!s_contains_char(chars, num_chars, c))
+                        c = utf::reading::read(m_runes.m_utf8, next, m_runes.m_end);
+                        if (!s_contains_char(chars, num_chars, c))
                             break;
                         m_cursor = next;
-					}
-					break;
-                case utf16::TYPE: 
+                    }
+                    break;
+                case utf16::TYPE:
                     while (m_cursor < m_runes.m_end)
                     {
                         u32 next = m_cursor;
                         skipped += 1;
-                        c = utf::read(m_runes.m_utf16,  next);
+                        c = utf::reading::read(m_runes.m_utf16, next, m_runes.m_end);
                         if (!s_contains_char(chars, num_chars, c))
                             break;
                         m_cursor = next;
@@ -3820,8 +3858,8 @@ namespace ncore
                         if (!s_contains_char(chars, num_chars, c))
                             break;
                         m_cursor += 1;
-					}
-					break;
+                    }
+                    break;
                 default: ASSERT(false); break;
             }
             return skipped;
@@ -3848,7 +3886,7 @@ namespace ncore
                     {
                         u32 next = m_cursor;
                         skipped += 1;
-                        c = utf::read(m_runes.m_utf8,  next);
+                        c = utf::reading::read(m_runes.m_utf8, next, m_runes.m_end);
                         if (s_contains_char(chars, num_chars, c))
                             return skipped;
                         m_cursor = next;
@@ -3859,7 +3897,7 @@ namespace ncore
                     {
                         u32 next = m_cursor;
                         skipped += 1;
-                        c = utf::read(m_runes.m_utf16,  next);
+                        c = utf::reading::read(m_runes.m_utf16, next, m_runes.m_end);
                         if (s_contains_char(chars, num_chars, c))
                             return skipped;
                         m_cursor = next;
