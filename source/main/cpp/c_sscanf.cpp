@@ -358,17 +358,17 @@ namespace ncore
         INT64_SIZE = 8,
     };
 
-    static const uchar32 sAllDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-    static const u32 sAllDecimalCharsCount 	= 11;
+    static const uchar32 sAllDecimalChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+    static const u32     sAllDecimalCharsCount = 11;
 
     static const uchar32 sAllHexChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
-    static const u32 sAllHexCharsCount 	= 23;
+    static const u32     sAllHexCharsCount = 23;
 
     static const uchar32 sAllOctalChars[]    = {'1', '2', '3', '4', '5', '6', '7', '0', '-', '+', 0};
-    static const u32 sAllOctalCharsCount 	= 9;
+    static const u32     sAllOctalCharsCount = 9;
 
     static const uchar32 sAllFloatChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
-    static const u32 sAllFloatCharsCount 	= 14;
+    static const u32     sAllFloatCharsCount = 14;
 
     s32 VSScanf(nrunes::ireader_t* reader, nrunes::ireader_t* fmt, const va_r_t* argv, s32 argc)
     {
@@ -384,7 +384,16 @@ namespace ncore
         {
             if (fmt->peek() != '%' && !parsing)
             {
-                fmt->read();
+                uchar32 const c = fmt->read();
+                if (nrunes::is_whitespace(c))
+                {
+                    fmt->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                    reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                }
+                else
+                {
+                    reader->read();
+                }
             }
             else
             {
@@ -502,8 +511,8 @@ namespace ncore
                         s64 n1 = 0;
                         if (reader->skip_until_one_of(sAllDecimalChars, sAllDecimalCharsCount) >= 0)
                         {
-							n1 = StrToS64(reader, 10);
-						}
+                            n1 = StrToS64(reader, 10);
+                        }
 
                         if (!suppress)
                         {
