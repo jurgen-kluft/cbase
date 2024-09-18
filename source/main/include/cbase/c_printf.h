@@ -20,7 +20,7 @@ namespace ncore
     s32 vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
     s32 cprintf_(crunes_t const& format, const va_t* argv, s32 argc);
     s32 fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
-    s32 vzprintf(nrunes::iwriter_t& writer, const crunes_t& str, const va_t* argv, s32 argc);
+    s32 vzprintf(nrunes::iwriter_t* writer, const crunes_t& str, const va_t* argv, s32 argc);
     s32 sscanf_(crunes_t& str, crunes_t const& format, const va_r_t* argv, s32 argc);
 
     inline void printf(crunes_t const& str)
@@ -43,7 +43,7 @@ namespace ncore
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-        s32 ret = snprintf_(&str.m_ascii[str.m_str], &str.m_ascii[str.m_eos], &format.m_ascii[format.m_str], &format.m_ascii[format.m_end], argv, argc);
+        s32 ret = sprintf_(str, format, argv, argc);
         str.m_end = str.m_str + (u32)ret;
     }
 

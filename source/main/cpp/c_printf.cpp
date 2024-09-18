@@ -1100,20 +1100,20 @@ namespace ncore
         return ret;
     }
 
-    s32 vzprintf(nrunes::iwriter_t& writer, const crunes_t& format, const va_t* argv, s32 argc)
+    s32 vzprintf(nrunes::iwriter_t* writer, const crunes_t& format, const va_t* argv, s32 argc)
     {
         va_iter_t   va_iter      = {argv, 0, argc};
         const char* format_begin = &format.m_ascii[format.m_str];
         const char* format_end   = &format.m_ascii[format.m_end];
-        const s32   ret          = _vsnprintf(_out_runeswriter, (char*)(ptr_t)&writer, (u64)-1, format_begin, format_end, va_iter);
-        writer.flush();
+        const s32   ret          = _vsnprintf(_out_runeswriter, (char*)(ptr_t)writer, (u64)-1, format_begin, format_end, va_iter);
+        writer->flush();
         return ret;
     }
 
     s32 sprintf_(runes_t& str, crunes_t const& format, const va_t* argv, s32 argc)
     {
         nrunes::writer_t str_writer(str);
-        const s32        ret = vzprintf(str_writer, format, argv, argc);
+        const s32        ret = vzprintf(&str_writer, format, argv, argc);
         str                  = str_writer.get_current();
         return ret;
     }

@@ -52,7 +52,7 @@ namespace ncore
                 crunes_t    format(format_begin, format_end);
 
                 nrunes::writer_t writer((utf32::prune)state.row_ + offset, (utf32::prune)state.row_ + offset + state.widths_[i]);
-                s32              n           = vzprintf(writer, format, argv + i, 1);
+                s32              n           = vzprintf(&writer, format, argv + i, 1);
                 state.row_[offset + n] = ' ';
 
                 offset += state.widths_[i] + 1;  // skip the width (content) plus one spacing character

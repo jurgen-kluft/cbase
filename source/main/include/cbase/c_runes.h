@@ -484,6 +484,8 @@ namespace ncore
             bool    read_line(runes_t& line) { return vread_line(line); }
             bool    view_line(crunes_t& line) { return vview_line(line); }
             void    skip(s32 c = 1) { vskip(c); }
+            s32     skip_any(uchar32 const* chars, u32 num_chars) { return vskip_any(chars, num_chars); }
+            s32     skip_until_one_of(uchar32 const* chars, u32 num_chars) { return vskip_until_one_of(chars, num_chars); }
 
             inline uchar32 read()
             {
@@ -500,6 +502,8 @@ namespace ncore
             virtual bool    vread_line(runes_t& line)  = 0;
             virtual bool    vview_line(crunes_t& line) = 0;
             virtual void    vskip(s32 c)               = 0;
+            virtual s32     vskip_any(uchar32 const* chars, u32 num_chars)          = 0; // return -1 if end of string is reached, otherwise return the number of characters skipped
+            virtual s32     vskip_until_one_of(uchar32 const* chars, u32 num_chars) = 0; // return -1 if end of string is reached, otherwise return the number of characters skipped
         };
 
         class reader_t : public ireader_t
@@ -530,6 +534,8 @@ namespace ncore
             virtual bool    vread_line(runes_t& line);
             virtual bool    vview_line(crunes_t& line);
             virtual void    vskip(s32 c);
+            virtual s32     vskip_any(uchar32 const* chars, u32 num_chars);
+            virtual s32     vskip_until_one_of(uchar32 const* chars, u32 num_chars);
 
             crunes_t m_runes;
             u32      m_cursor;

@@ -29,17 +29,17 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             utf32::rune dst_runes[256];
             dst_runes[0] = {0};
             dst_runes[1] = {0};
-            runes_t dst(dst_runes, 0, 0, 256);
+            runes_t dst(dst_runes, 0, 0, 256-1);
 
             nrunes::copy(str, dst);
 
             CHECK_EQUAL(0, nrunes::compare(str, dst));
             CHECK_EQUAL(23, str.size());
 
-            utf32::rune str2_runes[256];
+            utf32::rune str2_runes[16+1];
             str2_runes[0] = {0};
             str2_runes[1] = {0};
-            runes_t str2(str2_runes, 0, 0, 256);
+            runes_t str2(str2_runes, 0, 0, 16);
 
             nrunes::copy(str, str2);
 
@@ -89,7 +89,7 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             utf32::rune dst_runes[256];
             dst_runes[0] = {0};
             dst_runes[1] = {0};
-            runes_t dst(dst_runes, 0, 0, 256);
+            runes_t dst(dst_runes, 0, 0, 256-1);
 
             crunes_t str1 = "this is a system string";
             nrunes::copy(str1, dst);

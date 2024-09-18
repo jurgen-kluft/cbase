@@ -198,7 +198,7 @@ namespace ncore
         virtual s32 write(const crunes_t& str, const va_t* argv, s32 argc)
         {
             out_writer_t dstwriter;
-            vzprintf(dstwriter, str, argv, argc);
+            vzprintf(&dstwriter, str, argv, argc);
             return 0;
         }
     };

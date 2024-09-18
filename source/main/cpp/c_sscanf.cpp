@@ -12,23 +12,6 @@ namespace ncore
     // nrunes::reader_t -> rune_reader_t
     // CharWriter -> rune_writer_t
 
-    static bool SearchUntilOneOf(nrunes::ireader_t* reader, utf32::rune const* foo)
-    {
-        uchar32 c = reader->peek();
-        while (c != '\0')
-        {
-            c = nrunes::to_lower(c);
-            for (s32 i = 0; foo[i].value != '\0'; ++i)
-            {
-                if (foo[i].value == c)
-                    return true;
-            }
-            reader->skip();
-            c = reader->peek();
-        }
-        return false;
-    }
-
     static bool MatchBoolStr(nrunes::ireader_t* str, bool& boolean)
     {
         bool        bval = false;
@@ -105,6 +88,10 @@ namespace ncore
      *      atod32 atoi32 atoi64 atof32 atof64
      *------------------------------------------------------------------------------
      */
+    //------------------------------------------------------------------------------
+    static uchar32 const sWhitespaceChars[]    = {' ', '\t', '\n', '\r', 0};
+    static u32 const     sWhitespaceCharsCount = 4;
+
     s64 StrToS64(nrunes::ireader_t* reader, s32 base)
     {
         ASSERT(reader != nullptr);
@@ -112,10 +99,7 @@ namespace ncore
         ASSERT(base <= (26 + 26 + 10));
 
         // skip whitespace.
-        while (reader->peek() == ' ')
-        {
-            reader->read();
-        }
+        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
         uchar32 c;                      // Current character.
         c            = reader->peek();  // Save sign indication.
@@ -374,6 +358,18 @@ namespace ncore
         INT64_SIZE = 8,
     };
 
+    static const uchar32 sAllDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+    static const u32 sAllDecimalCharsCount 	= 11;
+
+    static const uchar32 sAllHexChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
+    static const u32 sAllHexCharsCount 	= 23;
+
+    static const uchar32 sAllOctalChars[]    = {'1', '2', '3', '4', '5', '6', '7', '0', '-', '+', 0};
+    static const u32 sAllOctalCharsCount 	= 9;
+
+    static const uchar32 sAllFloatChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
+    static const u32 sAllFloatCharsCount 	= 14;
+
     s32 VSScanf(nrunes::ireader_t* reader, nrunes::ireader_t* fmt, const va_r_t* argv, s32 argc)
     {
         s32 i        = 0;
@@ -441,8 +437,7 @@ namespace ncore
                         fmt->skip();
 
                         s32 i = 0;
-                        while (reader->peek() != 0 && reader->peek() == ' ')
-                            reader->read();
+                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
                         runes_t runes("", 0, 0, 0);
                         if (i < argc)
@@ -472,10 +467,7 @@ namespace ncore
                         }
                         else
                         {
-                            while (reader->peek() != 0 && reader->peek() != ' ')
-                            {
-                                reader->read();
-                            }
+                            reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
                         }
                         scanned++;
                         parsing = 0;
@@ -505,15 +497,13 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        while (reader->peek() != 0 && reader->peek() == ' ')
-                            reader->read();
+                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
-                        s64                      n1                = 0;
-                        static const utf32::rune allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-                        if (SearchUntilOneOf(reader, allDecimalChars))
+                        s64 n1 = 0;
+                        if (reader->skip_until_one_of(sAllDecimalChars, sAllDecimalCharsCount) >= 0)
                         {
-                            n1 = StrToS64(reader, 10);
-                        }
+							n1 = StrToS64(reader, 10);
+						}
 
                         if (!suppress)
                         {
@@ -537,12 +527,10 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        while (reader->peek() != 0 && reader->peek() == ' ')
-                            reader->read();
+                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
-                        s64                      n2                = 0;
-                        static const utf32::rune allDecimalChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
-                        if (SearchUntilOneOf(reader, allDecimalChars))
+                        s64 n2 = 0;
+                        if (reader->skip_until_one_of(sAllDecimalChars, sAllDecimalCharsCount) >= 0)
                         {
                             n2 = StrToS64(reader, 10);
                         }
@@ -569,12 +557,10 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        while (reader->peek() != 0 && reader->peek() == ' ')
-                            reader->read();
+                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
-                        s64                      n2              = 0;
-                        static const utf32::rune allOctalChars[] = {'1', '2', '3', '4', '5', '6', '7', '0', '-', '+', 0};
-                        if (SearchUntilOneOf(reader, allOctalChars))
+                        s64 n2 = 0;
+                        if (reader->skip_until_one_of(sAllOctalChars, sAllOctalCharsCount) >= 0)
                         {
                             n2 = StrToS64(reader, 8);
                         }
@@ -602,8 +588,7 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        while (reader->peek() != 0 && reader->peek() == ' ')
-                            reader->read();
+                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
                         if (w == 0)
                         {
@@ -611,9 +596,8 @@ namespace ncore
                             w                 = varsize * 2;
                         }
 
-                        u64                      n2            = 0;
-                        static const utf32::rune allHexChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
-                        if (SearchUntilOneOf(reader, allHexChars))
+                        u64 n2 = 0;
+                        if (reader->skip_until_one_of(sAllHexChars, sAllHexCharsCount) >= 0)
                         {
                             s32 const maxstrlen = 16;
                             uchar32   str[maxstrlen + 1];
@@ -655,12 +639,10 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        while (reader->peek() != 0 && reader->peek() == ' ')
-                            reader->read();
+                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
-                        f64                      n3              = 0;
-                        static const utf32::rune allFloatChars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
-                        if (SearchUntilOneOf(reader, allFloatChars))
+                        f64 n3 = 0;
+                        if (reader->skip_until_one_of(sAllFloatChars, sAllFloatCharsCount) >= 0)
                         {
                             n3 = StrToF64(reader);
                         }
