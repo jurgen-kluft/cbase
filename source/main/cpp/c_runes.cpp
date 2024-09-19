@@ -1055,8 +1055,8 @@ namespace ncore
             return r;
         }
 
-        static inline runes_t  nothing_found(runes_t const& str) { return runes_t(str.m_ascii, str.m_eos, str.m_eos, str.m_eos, str.get_type()); }
-        static inline crunes_t nothing_found(crunes_t const& str) { return crunes_t(str.m_ascii, str.m_eos, str.m_eos, str.m_eos, str.get_type()); }
+        static inline runes_t  nothing_found(runes_t const& str) { return runes_t(str.m_ascii, str.m_str, str.m_str, str.m_eos, str.get_type()); }
+        static inline crunes_t nothing_found(crunes_t const& str) { return crunes_t(str.m_ascii, str.m_str, str.m_str, str.m_eos, str.get_type()); }
 
         // Readers
 
@@ -1384,7 +1384,7 @@ namespace ncore
             crunes_t sel = find(_str, _find, _casesensitive);
             if (sel.is_empty())
                 return nothing_found(_str);
-            return crunes_t(_str.m_ascii, _str.m_str, sel.m_end, _str.m_eos, _str.get_type());
+            return crunes_t(_str.m_ascii, _str.m_str, sel.m_str, _str.m_eos, _str.get_type());
         }
 
         crunes_t findLastSelectUntil(const crunes_t& _str, uchar32 _c, bool _casesensitive)
@@ -1392,7 +1392,7 @@ namespace ncore
             utf32::rune dst_runes[2];
             dst_runes[0] = {_c};
             dst_runes[1] = {0};
-            runes_t _find(dst_runes, 0, 0, 16);
+            crunes_t _find(dst_runes, 0, 1, 1);
             return findLastSelectUntil(_str, _find, _casesensitive);
         }
 
@@ -1401,7 +1401,7 @@ namespace ncore
             crunes_t sel = findLast(_str, _find, _casesensitive);
             if (sel.is_empty())
                 return nothing_found(_str);
-            return crunes_t(_str.m_ascii, _str.m_str, sel.m_end, _str.m_eos, _str.get_type());
+            return crunes_t(_str.m_ascii, _str.m_str, sel.m_str, _str.m_eos, _str.get_type());
         }
 
         crunes_t findSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
@@ -1409,7 +1409,7 @@ namespace ncore
             utf32::rune dst_runes[2];
             dst_runes[0] = {_c};
             dst_runes[1] = {0};
-            runes_t _find(dst_runes, 0, 0, 16);
+            crunes_t _find(dst_runes, 0, 1, 1);
             return findSelectUntilIncluded(_str, _find, _casesensitive);
         }
 
@@ -1448,7 +1448,7 @@ namespace ncore
             utf32::rune dst_runes[2];
             dst_runes[0] = {_c};
             dst_runes[1] = {0};
-            runes_t _find(dst_runes, 0, 0, 16);
+            crunes_t _find(dst_runes, 0, 1, 1);
             return findLastSelectUntilIncluded(_str, _find, _casesensitive);
         }
 
@@ -1456,7 +1456,7 @@ namespace ncore
         {
             crunes_t sel = findLast(_str, _find, _casesensitive);
             if (sel.is_empty())
-                return nothing_found(_str);
+                return sel;
             return crunes_t(_str.m_ascii, _str.m_str, sel.m_end, _str.m_eos, _str.get_type());
         }
 
@@ -1471,7 +1471,7 @@ namespace ncore
                 sel.m_end   = _str.m_end;
                 return sel;
             }
-            return nothing_found(_str);
+            return _sel;
         }
 
         crunes_t findSelectAfter(const crunes_t& _str, uchar32 _find, bool _casesensitive)
@@ -2426,12 +2426,12 @@ namespace ncore
             utf32::rune find_runes[2];
             find_runes[0] = {_find};
             find_runes[1] = {0};
-            runes_t find(find_runes, 0, 0, 16);
+            crunes_t find(find_runes, 0, 1, 1);
 
             utf32::rune replace_runes[2];
             replace_runes[0] = {_replace};
             replace_runes[1] = {0};
-            runes_t replace(replace_runes, 0, 0, 16);
+            runes_t replace(replace_runes, 0, 1, 1);
 
             findReplace(_str, find, replace, _casesensitive);
         }
