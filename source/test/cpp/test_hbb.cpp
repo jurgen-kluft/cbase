@@ -1,6 +1,9 @@
 #include "cbase/c_context.h"
 #include "cbase/c_hbb.h"
 #include "cbase/c_memory.h"
+
+#include "cbase/test_allocator.h"
+
 #include "cunittest/cunittest.h"
 
 using namespace ncore;
@@ -9,192 +12,165 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
 {
     UNITTEST_FIXTURE(main)
     {
+        UNITTEST_ALLOCATOR;
+
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        static u32 bitmap[512];
-        static void clear_bitmap()
-        {
-            for (s32 i=0; i<512; ++i)
-                bitmap[i] = 0;
-        }
-
         UNITTEST_TEST(some_sizes)
         {
-            CHECK_TRUE(g_hbb_sizeof_data(1024) == 32 + 1);
-            CHECK_TRUE(g_hbb_sizeof_data(8192) == (256 + 8 + 1));
+            CHECK_EQUAL(128 + 32, binmap_t::sizeof_data(1024));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(8192));
 
-            clear_bitmap();
+            binmap_t hbb;
+            hbb.init_all_used(256, Allocator);
+            CHECK_TRUE(hbb.m_l0 == 0xFFFFFFFF);
+            CHECK_TRUE(hbb.m_l[0][7] == 0xFFFFFFFF);
+            hbb.release(Allocator);
 
-            hbb_t hbb;
-            hbb.init(256, bitmap);
-            CHECK_TRUE(hbb.m_hbb[0] == 0xFFFFFFFF);
-            CHECK_TRUE(hbb.m_hbb[1+7] == 0xFFFFFFFF);
-
-            hbb.init(248, false, bitmap);
-            CHECK_TRUE(hbb.m_hbb[0] == 0xFFFFFF00);
-            CHECK_TRUE(hbb.m_hbb[1+7] == 0xFF000000);
+            hbb.init_all_free(248, Allocator);
+            CHECK_EQUAL(1, hbb.levels());
+            CHECK_TRUE(hbb.m_l0 == 0xFFFFFF00);
+            CHECK_TRUE(hbb.m_l[0][7] == 0xFF000000);
+            hbb.release(Allocator);
         }
 
         UNITTEST_TEST(set_and_is_set)
         {
-            clear_bitmap();
-
             u32 const maxbits = 8192;
 
-            hbb_t hbb;
-            hbb.init(maxbits, true, bitmap);
-            hbb.reset(false);
+            binmap_t hbb;
+            hbb.init_all_free(maxbits, Allocator);
 
-            CHECK_EQUAL(false, hbb.is_set(10));
-            hbb.set(10);
-            CHECK_EQUAL(true, hbb.is_set(10));
+            CHECK_EQUAL(false, hbb.is_used(10));
+            hbb.set_used(10);
+            CHECK_EQUAL(true, hbb.is_used(10));
+
+            hbb.release(Allocator);
         }
 
         UNITTEST_TEST(set_and_is_set_many)
         {
-            clear_bitmap();
-
             u32 const maxbits = 8192;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == (256 + 8 + 1));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
 
-            hbb_t hbb; 
-            hbb.init(maxbits, 0, bitmap);
-            hbb.reset(0);
+            binmap_t hbb;
+            hbb.init_all_free(maxbits, Allocator);
 
-            u32 b1;
-            CHECK_FALSE(hbb.find(b1));
+            u32 b1 = 0;
+            CHECK_FALSE(hbb.is_used(b1));
 
-            for (s32 b=0; b<1024; b++)
+            for (s32 b = 0; b < 1024; b++)
             {
-                hbb.set(b);
-                CHECK_TRUE(hbb.find(b1));
-                CHECK_EQUAL(b, b1);
-                hbb.clr(b);
-            }
-            
-            for (s32 b=0; b<1024; b++)
-            {
-                hbb.set(b);
+                hbb.set_used(b);
+                CHECK_TRUE(hbb.is_used(b));
+                hbb.set_free(b);
             }
 
-            for (s32 b=0; b < 1024; b++)
+            for (s32 b = 0; b < 1024; b++)
             {
-                CHECK_TRUE(hbb.find(b1));
-                CHECK_EQUAL(b, b1);
-                hbb.clr(b);
+                hbb.set_used(b);
+                for (s32 b1 = 0; b1 <= b; b1++)
+                {
+                    CHECK_TRUE(hbb.is_used(b1));
+                }
             }
+
+            for (s32 b = 0; b < 1024; b++)
+            {
+                CHECK_TRUE(hbb.is_used(b));
+                hbb.set_free(b);
+                for (s32 b0 = 0; b0 <= b; b0++)
+                {
+                    CHECK_TRUE(hbb.is_free(b0));
+                }
+            }
+
+            hbb.release(Allocator);
         }
 
         UNITTEST_TEST(find_free_bit_1)
         {
-            clear_bitmap();
-
             u32 const maxbits = 8192;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == (256 + 8 + 1));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
 
-            hbb_t hbb;
-            hbb.init(maxbits, 0, bitmap);
-            hbb.reset(0);
+            binmap_t hbb;
+            hbb.init_all_used(maxbits, Allocator);
 
-            for (s32 b=0; b<1024; b++)
+            for (s32 b = 0; b < 1024; b++)
             {
-                hbb.set(b);
+                hbb.set_free(b);
+                for (s32 b1 = 0; b1 <= b; b1++)
+                {
+                    CHECK_TRUE(hbb.is_free(b1));
+                }
             }
 
-            for (s32 b=0; b<1024; b++)
+            for (s32 b = 0; b < 1024; b++)
             {
-                u32 free_bit;
-                hbb.find(free_bit);
+                s32 free_bit = hbb.find();
                 CHECK_EQUAL(b, free_bit);
-                hbb.clr(b);
+                hbb.set_used(b);
             }
+
+            hbb.release(Allocator);
         }
 
         UNITTEST_TEST(find_free_bit_2)
         {
-            clear_bitmap();
-
             u32 const maxbits = 8192;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == (256 + 8 + 1));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
 
-            hbb_t hbb;
-            hbb.init(maxbits, 0, bitmap);
-            hbb.reset(0);
+            binmap_t hbb;
+            hbb.init_all_used(maxbits, Allocator);
 
-            // Should not be able to hbb.find any '1'
-            u32 free_bit;
-            CHECK_EQUAL(false, hbb.find(free_bit));
+            // Should not be able to hbb.find any '0'
+            s32 free_bit = hbb.find();
+            CHECK_EQUAL(false, free_bit >= 0);
 
-            for (s32 b=1024-1; b>=0; --b)
+            for (s32 b = 1024 - 1; b >= 0; --b)
             {
-                hbb.set(b);
-                hbb.find(free_bit);
+                hbb.set_free(b);
+                free_bit = hbb.find();
                 CHECK_EQUAL(b, free_bit);
             }
+
+            hbb.release(Allocator);
         }
 
         UNITTEST_TEST(iterator)
         {
-            clear_bitmap();
-
             u32 const maxbits = 8192;
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == (256 + 8 + 1));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
 
-            hbb_t hbb;
-            hbb.init(maxbits, 0, bitmap);
-            hbb.reset(0);
+            binmap_t hbb;
+            hbb.init_all_used(maxbits, Allocator);
 
-            u32 const numbits = 2500;
-            for (s32 b=0; b < numbits; b += 5)
+            u32 const numbits = 100;
+            for (s32 b = 0; b < numbits; b += 5)
             {
-                hbb.set(b);
-                u32 free_bit;
-                hbb.find(free_bit);
+                hbb.set_free(b);
+                s32 free_bit = hbb.find();
                 CHECK_EQUAL(b, free_bit);
-                hbb.clr(b);
+                hbb.set_used(b);
             }
 
-            for (s32 b=0; b < numbits; b += 5)
+            for (s32 b = 0; b < numbits; b += 5)
             {
-                hbb.set(b);
+                hbb.set_free(b);
             }
 
-            s32 i = 0;
-            hbb_iter_t iter = hbb.iterator(0, maxbits);
-            while (!iter.end())
+            s32              i = 0;
+            binmap_t::iter_t iter(&hbb, 0, numbits);
+            iter.begin();
+            while (!iter.end() && i < numbits)
             {
-                CHECK_TRUE(iter.m_cur == i);
+                CHECK_TRUE(iter.get() == i);
                 i += 5;
                 iter.next();
             }
-        }
 
-        UNITTEST_TEST(resize)
-        {
-            clear_bitmap();
-
-            u32 const maxbits = 1024;            
-            CHECK_TRUE(g_hbb_sizeof_data(maxbits) == 32 + 1);
-
-            hbb_t hbb;
-            alloc_t* alloc = context_t::system_alloc();
-            hbb.init(maxbits, 0, alloc);
-
-            u32 const numbits = 1024;
-            for (s32 b=0; b < numbits; b++)
-            {
-                hbb.set(b);
-            }
-
-            hbb.resize(8192, 0, alloc);
-
-            for (s32 b=0; b < numbits; b++)
-            {
-                CHECK_TRUE(hbb.is_set(b));
-            }
-
-            hbb.release(alloc);
+            hbb.release(Allocator);
         }
     }
 }
