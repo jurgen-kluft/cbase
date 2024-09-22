@@ -223,6 +223,30 @@ namespace ncore
             return count;
         }
 
+        static s32 skip(ucs2::pcrune const str, u32& cursor, u32 const begin, u32 const end, s32 count)
+        {
+            if (count < 0)
+            {
+                u32 const n = (u32)-count;
+                cursor -= n;
+                if (cursor < begin)
+                {
+                    count  = (s32)begin - (s32)(cursor + n);
+                    cursor = begin;
+                }
+            }
+            else
+            {
+                cursor += (u32)count;
+                if (cursor >= end)
+                {
+                    count  = (s32)end - (s32)(cursor - (u32)count);
+                    cursor = end;
+                }
+            }
+            return count;
+        }
+
         static s32 skip(utf8::pcrune const str, u32& cursor, u32 const begin, u32 const end, s32 count)
         {
             ASSERT(cursor >= begin);
@@ -1078,6 +1102,7 @@ namespace ncore
                 switch (m_str.get_type())
                 {
                     case ascii::TYPE: return utf::reading::read(m_str.m_ascii, next_cursor, m_str.m_end);
+                    case ucs2::TYPE: return utf::reading::read(m_str.m_ucs2, next_cursor, m_str.m_end);
                     case utf8::TYPE: return utf::reading::read(m_str.m_utf8, next_cursor, m_str.m_end);
                     case utf16::TYPE: return utf::reading::read(m_str.m_utf16, next_cursor, m_str.m_end);
                     case utf32::TYPE: return utf::reading::read(m_str.m_utf32, next_cursor, m_str.m_end);
@@ -1090,6 +1115,7 @@ namespace ncore
                 switch (m_str.get_type())
                 {
                     case ascii::TYPE: return utf::reading::read(m_str.m_ascii, m_cursor, m_str.m_end);
+                    case ucs2::TYPE: return utf::reading::read(m_str.m_ucs2, m_cursor, m_str.m_end);
                     case utf8::TYPE: return utf::reading::read(m_str.m_utf8, m_cursor, m_str.m_end);
                     case utf16::TYPE: return utf::reading::read(m_str.m_utf16, m_cursor, m_str.m_end);
                     case utf32::TYPE: return utf::reading::read(m_str.m_utf32, m_cursor, m_str.m_end);
@@ -1121,6 +1147,7 @@ namespace ncore
                 switch (m_str.get_type())
                 {
                     case ascii::TYPE: return utf::reading::read(m_str.m_ascii, next_cursor, m_str.m_end);
+                    case ucs2::TYPE: return utf::reading::read(m_str.m_ucs2, next_cursor, m_str.m_end);
                     case utf8::TYPE: return utf::reading::read(m_str.m_utf8, next_cursor, m_str.m_end);
                     case utf16::TYPE: return utf::reading::read(m_str.m_utf16, next_cursor, m_str.m_end);
                     case utf32::TYPE: return utf::reading::read(m_str.m_utf32, next_cursor, m_str.m_end);
@@ -1133,6 +1160,7 @@ namespace ncore
                 switch (m_str.get_type())
                 {
                     case ascii::TYPE: return utf::reading::read(m_str.m_ascii, m_cursor, m_str.m_end);
+                    case ucs2::TYPE: return utf::reading::read(m_str.m_ucs2, m_cursor, m_str.m_end);
                     case utf8::TYPE: return utf::reading::read(m_str.m_utf8, m_cursor, m_str.m_end);
                     case utf16::TYPE: return utf::reading::read(m_str.m_utf16, m_cursor, m_str.m_end);
                     case utf32::TYPE: return utf::reading::read(m_str.m_utf32, m_cursor, m_str.m_end);
@@ -2773,6 +2801,7 @@ namespace ncore
             switch (str.get_type())
             {
                 case ascii::TYPE: return utf::skip(str.m_ascii, cursor, str.m_str, str.m_end, -step);
+                case ucs2::TYPE: return utf::skip(str.m_ucs2, cursor, str.m_str, str.m_end, -step);
                 case utf8::TYPE: return utf::skip(str.m_utf8, cursor, str.m_str, str.m_end, -step);
                 case utf16::TYPE: return utf::skip(str.m_utf16, cursor, str.m_str, str.m_end, -step);
                 case utf32::TYPE: return utf::skip(str.m_utf32, cursor, str.m_str, str.m_end, -step);
@@ -2786,6 +2815,7 @@ namespace ncore
             switch (str.get_type())
             {
                 case ascii::TYPE: return utf::read2(str.m_ascii, next);
+                case ucs2::TYPE: return utf::read2(str.m_ucs2, next);
                 case utf8::TYPE: return utf::read2(str.m_utf8, next);
                 case utf16::TYPE: return utf::read2(str.m_utf16, next);
                 case utf32::TYPE: return utf::read2(str.m_utf32, next);
@@ -2798,6 +2828,7 @@ namespace ncore
             switch (str.get_type())
             {
                 case ascii::TYPE: return utf::read2(str.m_ascii, cursor);
+                case ucs2::TYPE: return utf::read2(str.m_ucs2, cursor);
                 case utf8::TYPE: return utf::read2(str.m_utf8, cursor);
                 case utf16::TYPE: return utf::read2(str.m_utf16, cursor);
                 case utf32::TYPE: return utf::read2(str.m_utf32, cursor);
@@ -2810,6 +2841,7 @@ namespace ncore
             switch (str.get_type())
             {
                 case ascii::TYPE: return utf::write(c, str.m_ascii, cursor, str.m_eos); break;
+                case ucs2::TYPE: return utf::write(c, str.m_ucs2, cursor, str.m_eos); break;
                 case utf16::TYPE: return utf::write(c, str.m_utf16, cursor, str.m_eos); break;
                 case utf32::TYPE: return utf::write(c, str.m_utf32, cursor, str.m_eos); break;
                 default: return false;
@@ -2842,6 +2874,7 @@ namespace ncore
             switch (str.get_type())
             {
                 case ascii::TYPE: n = utf::skip(str.m_ascii, cursor, str.m_str, str.m_end, step); break;
+                case ucs2::TYPE: n = utf::skip(str.m_ucs2, cursor, str.m_str, str.m_end, step); break;
                 case utf8::TYPE: n = utf::skip(str.m_utf8, cursor, str.m_str, str.m_end, step); break;
                 case utf16::TYPE: n = utf::skip(str.m_utf16, cursor, str.m_str, str.m_end, step); break;
                 case utf32::TYPE: n = utf::skip(str.m_utf32, cursor, str.m_str, str.m_end, step); break;
@@ -2856,6 +2889,7 @@ namespace ncore
             switch (str.get_type())
             {
                 case ascii::TYPE: n = utf::skip(str.m_ascii, cursor, str.m_str, str.m_end, -step); break;
+                case ucs2::TYPE: n = utf::skip(str.m_ucs2, cursor, str.m_str, str.m_end, -step); break;
                 case utf8::TYPE: n = utf::skip(str.m_utf8, cursor, str.m_str, str.m_end, -step); break;
                 case utf16::TYPE: n = utf::skip(str.m_utf16, cursor, str.m_str, str.m_end, -step); break;
                 case utf32::TYPE: n = utf::skip(str.m_utf32, cursor, str.m_str, str.m_end, -step); break;
@@ -2976,6 +3010,7 @@ namespace ncore
         switch (get_type())
         {
             case ascii::TYPE: size = (m_end - m_str); break;
+            case ucs2::TYPE: size = (m_end - m_str); break;
             case utf32::TYPE: size = (m_end - m_str); break;
             case utf16::TYPE:
             {
@@ -3007,6 +3042,7 @@ namespace ncore
         switch (get_type())
         {
             case ascii::TYPE: cap = (u32)((m_eos - m_str)); break;
+            case ucs2::TYPE: cap = (u32)((m_eos - m_str)); break;
             case utf8::TYPE: cap = (u32)((m_eos - m_str)); break;
             case utf16::TYPE: cap = (u32)((m_eos - m_str)); break;
             case utf32::TYPE: cap = (u32)((m_eos - m_str)); break;
@@ -3028,6 +3064,7 @@ namespace ncore
         switch (get_type())
         {
             case ascii::TYPE: m_ascii[m_end] = ascii::TERMINATOR; break;
+            case ucs2::TYPE: m_ucs2[m_end] = ucs2::TERMINATOR; break;
             case utf32::TYPE: m_utf32[m_end] = utf32::TERMINATOR; break;
             case utf16::TYPE: m_utf16[m_end] = utf16::TERMINATOR; break;
             case utf8::TYPE: m_utf8[m_end] = utf8::TERMINATOR; break;
@@ -3343,6 +3380,7 @@ namespace ncore
         switch (get_type())
         {
             case ascii::TYPE: size = (m_end - m_str); break;
+            case ucs2::TYPE: size = (m_end - m_str); break;
             case utf32::TYPE: size = (m_end - m_str); break;
             case utf16::TYPE:
             {
@@ -3401,6 +3439,22 @@ namespace ncore
                     while (cursor < m_end)
                     {
                         c = (uchar32)m_ascii[cursor];
+                        if (until_chars.contains(c))
+                        {
+                            encountered = c;
+                            return true;
+                        }
+                        cursor++;
+                    }
+                }
+                break;
+            case ucs2::TYPE:
+                if (cursor >= m_str)
+                {
+                    while (cursor < m_end)
+                    {
+                        u32 next = cursor;
+                        c        = utf::reading::read(m_ucs2, next, m_end);
                         if (until_chars.contains(c))
                         {
                             encountered = c;
@@ -3471,7 +3525,18 @@ namespace ncore
             case ascii::TYPE:
                 while (cursor < m_end)
                 {
-                    uchar32 c = (uchar32)m_ascii[cursor];
+                    u32     next = cursor;
+                    uchar32 c    = utf::reading::read(m_ascii, next, m_end);
+                    if (!skip_chars.contains(c))
+                        break;
+                    cursor++;
+                }
+                break;
+            case ucs2::TYPE:
+                while (cursor < m_end)
+                {
+                    u32     next = cursor;
+                    uchar32 c    = utf::reading::read(m_ucs2, next, m_end);
                     if (!skip_chars.contains(c))
                         break;
                     cursor++;
@@ -3521,6 +3586,19 @@ namespace ncore
                 while (cursor < m_end)
                 {
                     uchar32 c = (uchar32)m_ascii[cursor];
+                    if (c == contains)
+                        return true;
+                    cursor++;
+                }
+            }
+            break;
+            case ucs2::TYPE:
+            {
+                u32 cursor = m_str;
+                while (cursor < m_end)
+                {
+                    u32     next = cursor;
+                    uchar32 c    = utf::reading::read(m_ucs2, next, m_end);
                     if (c == contains)
                         return true;
                     cursor++;
@@ -3679,6 +3757,7 @@ namespace ncore
                 switch (m_runes.get_type())
                 {
                     case ascii::TYPE: c = m_runes.m_ascii[m_cursor] & 0xff; break;
+                    case ucs2::TYPE: c = utf::reading::read(m_runes.m_ucs2, next, m_runes.m_end); break;
                     case utf8::TYPE: c = utf::reading::read(m_runes.m_utf8, next, m_runes.m_end); break;
                     case utf16::TYPE: c = utf::reading::read(m_runes.m_utf16, next, m_runes.m_end); break;
                     case utf32::TYPE: c = m_runes.m_utf32[m_cursor].value; break;
@@ -3700,6 +3779,7 @@ namespace ncore
                 switch (m_runes.get_type())
                 {
                     case ascii::TYPE: c = m_runes.m_ascii[m_cursor++] & 0xff; break;
+                    case ucs2::TYPE: c = utf::reading::read(m_runes.m_ucs2, m_cursor, m_runes.m_end); break;
                     case utf8::TYPE: c = utf::reading::read(m_runes.m_utf8, m_cursor, m_runes.m_end); break;
                     case utf16::TYPE: c = utf::reading::read(m_runes.m_utf16, m_cursor, m_runes.m_end); break;
                     case utf32::TYPE: c = m_runes.m_utf32[m_cursor++].value; break;
@@ -3735,6 +3815,17 @@ namespace ncore
                         m_cursor++;
                     if (!at_end())
                         m_cursor++;
+                    line.m_end = m_cursor;
+                    break;
+                case ucs2::TYPE:
+                    line.m_ucs2 = m_runes.m_ucs2;
+                    line.m_str   = m_cursor;
+                    line.m_eos   = m_runes.m_eos;
+                    line.m_end   = m_runes.m_end;
+                    while (!at_end() && utf::reading::read(m_runes.m_ucs2, next, m_runes.m_end) != '\n')
+                        m_cursor = next;
+                    if (!at_end())
+                        utf::reading::read(m_runes.m_ucs2, m_cursor, m_runes.m_end);
                     line.m_end = m_cursor;
                     break;
                 case utf8::TYPE:
@@ -3788,6 +3879,14 @@ namespace ncore
                     }
                     break;
 
+                case ucs2::TYPE:
+                    while (c > 0 && !at_end())
+                    {
+                        m_cursor += 1;
+                        c -= 1;
+                    }
+                    break;
+
                 case utf8::TYPE: utf::skip(m_runes.m_utf8, m_cursor, m_runes.m_str, m_runes.m_end, c); break;
                 case utf16::TYPE: utf::skip(m_runes.m_utf16, m_cursor, m_runes.m_str, m_runes.m_end, c); break;
 
@@ -3823,6 +3922,17 @@ namespace ncore
                     {
                         skipped += 1;
                         uchar32 c = m_runes.m_ascii[m_cursor] & 0xff;
+                        if (!s_contains_char(chars, num_chars, c))
+                            break;
+                        m_cursor += 1;
+                    }
+                    break;
+                case ucs2::TYPE:
+                    while (m_cursor < m_runes.m_end)
+                    {
+                        u32 next = m_cursor;
+                        skipped += 1;
+                        c = utf::reading::read(m_runes.m_ucs2, next, m_runes.m_end);
                         if (!s_contains_char(chars, num_chars, c))
                             break;
                         m_cursor += 1;
@@ -3881,6 +3991,17 @@ namespace ncore
                         m_cursor += 1;
                     }
                     break;
+                case ucs2::TYPE:
+                    while (m_cursor < m_runes.m_end)
+                    {
+                        u32 next = m_cursor;
+                        skipped += 1;
+                        c = utf::reading::read(m_runes.m_ucs2, next, m_runes.m_end);
+                        if (s_contains_char(chars, num_chars, c))
+                            return skipped;
+                        m_cursor = next;
+                    }
+                    break;
                 case utf8::TYPE:
                     while (m_cursor < m_runes.m_end)
                     {
@@ -3937,6 +4058,13 @@ namespace ncore
         {
             u32 const len = (u32)(str_end - str);
             m_runes       = runes_t(str, 0, len, len, ascii::TYPE);
+            m_cursor      = 0;
+            m_count       = 0;
+        }
+        writer_t::writer_t(ucs2::prune str, ucs2::prune str_end)
+        {
+            u32 const len = (u32)(str_end - str);
+            m_runes       = runes_t(str, 0, len, len, ucs2::TYPE);
             m_cursor      = 0;
             m_count       = 0;
         }
@@ -4017,6 +4145,14 @@ namespace ncore
                         while (reader.read(c) && !at_end(m_cursor, m_runes))
                         {
                             m_runes.m_ascii[m_cursor] = (ascii::rune)c;
+                            m_cursor += 1;
+                            m_count += 1;
+                        }
+                        return m_count - count;
+                    case ucs2::TYPE:
+                        while (reader.read(c) && !at_end(m_cursor, m_runes))
+                        {
+                            m_runes.m_ucs2[m_cursor].value = c;
                             m_cursor += 1;
                             m_count += 1;
                         }

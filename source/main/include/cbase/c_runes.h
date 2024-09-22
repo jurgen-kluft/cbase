@@ -567,6 +567,7 @@ namespace ncore
         {
         public:
             writer_t(ascii::prune str, ascii::prune str_end);
+            writer_t(ucs2::prune str, ucs2::prune str_end);
             writer_t(utf8::prune str, utf8::prune str_end);
             writer_t(utf16::prune str, utf16::prune str_end);
             writer_t(utf32::prune str, utf32::prune str_end);
