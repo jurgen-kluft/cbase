@@ -86,23 +86,23 @@ namespace ncore
     class dexer_t
     {
     public:
-        inline void* idx2ptr(u32 index) const { return v_idx2ptr(index); }
-        inline u32   ptr2idx(void* ptr) const { return v_ptr2idx(ptr); }
+        inline void* idx2ptr(u32 index)  { return v_idx2ptr(index); }
+        inline u32   ptr2idx(void const* ptr) const { return v_ptr2idx(ptr); }
 
         template <typename T>
-        inline T* idx2obj(u32 index) const
+        inline T* idx2obj(u32 index)
         {
             return static_cast<T*>(v_idx2ptr(index));
         }
         template <typename T>
-        inline u32 obj2idx(T* ptr) const
+        inline u32 obj2idx(T const* ptr) const
         {
             return v_ptr2idx(ptr);
         }
 
     protected:
-        virtual void* v_idx2ptr(u32 index) const = 0;
-        virtual u32   v_ptr2idx(void* ptr) const = 0;
+        virtual void* v_idx2ptr(u32 index) = 0;
+        virtual u32   v_ptr2idx(void const* ptr) const = 0;
     };
 
     class fsadexed_t : public fsa_t, public dexer_t
