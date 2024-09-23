@@ -223,7 +223,7 @@ namespace ncore
             ASSERT(bi >= 0 && bi < 32);
         }
 
-        s32 const bin = (wi << 5) + bi;
+        u32 const bin = (wi << 5) + bi;
         return (bin < size()) ? bin : -1;
     }
 
