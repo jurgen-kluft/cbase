@@ -41,28 +41,28 @@ namespace ncore
 
             static inline s8 utf8_octet_count(utf8::rune c)
             {
-                if (c.value < 0x80)
+                if (c.r < 0x80)
                     return 1;  // 0xxxxxxx
-                else if (c.value < 0xc0)
+                else if (c.r < 0xc0)
                     return -1;  // 10xxxxxx -- in the middle of a multibyte character, counts as one invalid character.
-                else if (c.value < 0xe0)
+                else if (c.r < 0xe0)
                     return 2;  // 110xxxxx
-                else if (c.value < 0xf0)
+                else if (c.r < 0xf0)
                     return 3;  // 1110xxxx
-                else if (c.value < 0xf8)
+                else if (c.r < 0xf8)
                     return 4;  // 11110xxx
-                else if (c.value < 0xfc)
+                else if (c.r < 0xfc)
                     return 5;  // 111110xx
-                else if (c.value < 0xfe)
+                else if (c.r < 0xfe)
                     return 6;  // 1111110x
                 return -1;     // invalid sequence.  dunno how many bytes to skip so skip one.
             }
 
             static inline s8 utf16_octet_count(utf16::rune c)
             {
-                if (c.value < 0xd800)
+                if (c.r < 0xd800)
                     return 1;
-                else if (c.value < 0xdc00)
+                else if (c.r < 0xdc00)
                     return 2;
                 return 1;
             }
@@ -81,8 +81,8 @@ namespace ncore
             static inline uchar32 read(ucs2::pcrune bos, u32& str, u32 const end)
             {
                 if (str < end)
-                    return (uchar32)bos[str++].value;
-                return ucs2::TERMINATOR.value;
+                    return (uchar32)bos[str++].r;
+                return ucs2::TERMINATOR;
             }
 
             // Mask can be computed as (0x7f >> leadingOnes)
@@ -96,7 +96,7 @@ namespace ncore
                 data = data + str;
 
                 // compute character encoding length, checking for overlong sequences (i.e. characters that don't use the shortest possible encoding).
-                u8       value       = data[0].value;
+                u8       value       = data[0].r;
                 s8 const leadingOnes = math::countLeadingZeros((u8)(~value));
                 u8 const size        = (c_utf8_sizes >> (leadingOnes << 2)) & 0xF;
 
@@ -116,7 +116,7 @@ namespace ncore
                 u32 c = value & ((u32)0x7f >> leadingOnes);
                 for (u32 i = 1; i < size; i++)
                 {
-                    value = data[i].value;
+                    value = data[i].r;
                     if ((value & 0xc0) != 0x80)
                     {
                         // check that all bytes after the first have the pattern 10xxxxxx.
@@ -146,14 +146,14 @@ namespace ncore
                 if (str >= end)
                     return cEOS;
 
-                uchar16 const c = bos[str].value;
+                uchar16 const c = bos[str].r;
                 u32 const     l = (c < 0xd800) ? 1 : (c < 0xdc00) ? 2 : 0;
 
                 if ((str + l) <= end)
                 {
                     uchar32 out_c = 0;
                     for (u32 i = 0; i < l; i++)
-                        out_c = (out_c << 16) | bos[str + i].value;
+                        out_c = (out_c << 16) | bos[str + i].r;
                     str += l;
                     return out_c;
                 }
@@ -166,7 +166,7 @@ namespace ncore
             {
                 if (str >= end)
                     return cEOS;
-                uchar32 c = bos[str].value;
+                uchar32 c = bos[str].r;
                 if (c != cEOS)
                     str++;
                 return c;
@@ -264,7 +264,7 @@ namespace ncore
                     ptr--;
                     cursor--;
                     c++;
-                    while ((cursor > begin) && ((*ptr).value & 0xC0) == 0x80)
+                    while ((cursor > begin) && ((*ptr).r & 0xC0) == 0x80)
                     {
                         ptr--;
                         cursor--;
@@ -278,11 +278,11 @@ namespace ncore
                 s32          c   = count;
                 while (c > 0 && (cursor < end))
                 {
-                    if (((*ptr).value & 0xC0) == 0xC0)
+                    if (((*ptr).r & 0xC0) == 0xC0)
                     {
                         ptr++;
                         c--;
-                        while ((cursor < end) && ((*ptr).value & 0xC0) == 0x80)
+                        while ((cursor < end) && ((*ptr).r & 0xC0) == 0x80)
                         {
                             ptr++;
                         }
@@ -406,10 +406,10 @@ namespace ncore
             {
                 while (!end->isEOS())
                 {
-                    if (((*end).value & 0xC0) == 0xC0)
+                    if (((*end).r & 0xC0) == 0xC0)
                     {
                         end++;
-                        while (((*end).value & 0xC0) == 0x80)
+                        while (((*end).r & 0xC0) == 0x80)
                         {
                             end++;
                         }
@@ -424,10 +424,10 @@ namespace ncore
             {
                 while (end < eos && !end->isEOS())
                 {
-                    if (((*end).value & 0xC0) == 0xC0)
+                    if (((*end).r & 0xC0) == 0xC0)
                     {
                         end++;
-                        while ((end < eos) && ((*end).value & 0xC0) == 0x80)
+                        while ((end < eos) && ((*end).r & 0xC0) == 0x80)
                         {
                             end++;
                         }
@@ -449,7 +449,7 @@ namespace ncore
             utf16::pcrune end = str;
             if (eos == nullptr)
             {
-                while (*end != utf16::TERMINATOR)
+                while (!end->isEOS())
                 {
                     utf16::rune c = *end;
                     u32 const   l = reading::utf16_octet_count(c);
@@ -458,7 +458,7 @@ namespace ncore
             }
             else
             {
-                while (*end != utf16::TERMINATOR && end < eos)
+                while (!end->isEOS() && end < eos)
                 {
                     utf16::rune c = *end;
                     u32 const   l = reading::utf16_octet_count(c);
@@ -506,11 +506,11 @@ namespace ncore
                 // ucs-4 (utf-32) to ucs-2 (utf-16) conversion
                 if (c < 0x10000)
                 {
-                    bos[cursor++].value = (uchar16)c;
+                    bos[cursor++].r = (uchar16)c;
                 }
                 else
                 {
-                    bos[cursor++].value = (uchar16)s_replacement;
+                    bos[cursor++].r = (uchar16)s_replacement;
                 }
                 return true;
             }
@@ -523,7 +523,7 @@ namespace ncore
             {  // one octet
                 if (cursor < end)
                 {
-                    bos[cursor++].value = static_cast<uchar8>(cp);
+                    bos[cursor++].r = static_cast<uchar8>(cp);
                     return true;
                 }
             }
@@ -531,8 +531,8 @@ namespace ncore
             {  // two octets
                 if ((cursor + 1) < end)
                 {
-                    bos[cursor++].value = static_cast<uchar8>((cp >> 6) | 0xc0);
-                    bos[cursor++].value = static_cast<uchar8>((cp & 0x3f) | 0x80);
+                    bos[cursor++].r = static_cast<uchar8>((cp >> 6) | 0xc0);
+                    bos[cursor++].r = static_cast<uchar8>((cp & 0x3f) | 0x80);
                     return true;
                 }
             }
@@ -540,9 +540,9 @@ namespace ncore
             {  // three octets
                 if ((cursor + 2) < end)
                 {
-                    bos[cursor++].value = static_cast<uchar8>((cp >> 12) | 0xe0);
-                    bos[cursor++].value = static_cast<uchar8>(((cp >> 6) & 0x3f) | 0x80);
-                    bos[cursor++].value = static_cast<uchar8>((cp & 0x3f) | 0x80);
+                    bos[cursor++].r = static_cast<uchar8>((cp >> 12) | 0xe0);
+                    bos[cursor++].r = static_cast<uchar8>(((cp >> 6) & 0x3f) | 0x80);
+                    bos[cursor++].r = static_cast<uchar8>((cp & 0x3f) | 0x80);
                     return true;
                 }
             }
@@ -550,10 +550,10 @@ namespace ncore
             {  // four octets
                 if ((cursor + 3) < end)
                 {
-                    bos[cursor++].value = static_cast<uchar8>((cp >> 18) | 0xf0);
-                    bos[cursor++].value = static_cast<uchar8>(((cp >> 12) & 0x3f) | 0x80);
-                    bos[cursor++].value = static_cast<uchar8>(((cp >> 6) & 0x3f) | 0x80);
-                    bos[cursor++].value = static_cast<uchar8>((cp & 0x3f) | 0x80);
+                    bos[cursor++].r = static_cast<uchar8>((cp >> 18) | 0xf0);
+                    bos[cursor++].r = static_cast<uchar8>(((cp >> 12) & 0x3f) | 0x80);
+                    bos[cursor++].r = static_cast<uchar8>(((cp >> 6) & 0x3f) | 0x80);
+                    bos[cursor++].r = static_cast<uchar8>((cp & 0x3f) | 0x80);
                     return true;
                 }
             }
@@ -567,15 +567,15 @@ namespace ncore
             {
                 if (len == 1 && cursor < end)
                 {
-                    bos[cursor++].value = (uchar16)rune;
+                    bos[cursor++].r = (uchar16)rune;
                     return true;
                 }
                 else if ((cursor + 1) < end)
                 {
                     // 20-bit intermediate value
                     u32 const iv        = rune - 0x10000;
-                    bos[cursor++].value = static_cast<uchar16>((iv >> 10) + 0xd800);
-                    bos[cursor++].value = static_cast<uchar16>((iv & 0x03ff) + 0xdc00);
+                    bos[cursor++].r = static_cast<uchar16>((iv >> 10) + 0xd800);
+                    bos[cursor++].r = static_cast<uchar16>((iv & 0x03ff) + 0xdc00);
                     return true;
                 }
             }
@@ -586,7 +586,7 @@ namespace ncore
         {
             if (cursor < end)
             {
-                bos[cursor++].value = c;
+                bos[cursor++].r = c;
                 return true;
             }
             return false;
@@ -3015,7 +3015,7 @@ namespace ncore
             case utf16::TYPE:
             {
                 u32 str = m_str;
-                while (m_utf16[str].value != 0 && str < m_end)
+                while (m_utf16[str].r != 0 && str < m_end)
                 {
                     size += 1;
                     utf::reading::read(m_utf16, str, m_end);
@@ -3025,7 +3025,7 @@ namespace ncore
             case utf8::TYPE:
             {
                 u32 str = m_str;
-                while (m_utf8[str].value != 0 && str < m_end)
+                while (m_utf8[str].r != 0 && str < m_end)
                 {
                     size += 1;
                     utf::reading::read(m_utf8, str, m_end);
@@ -3760,7 +3760,7 @@ namespace ncore
                     case ucs2::TYPE: c = utf::reading::read(m_runes.m_ucs2, next, m_runes.m_end); break;
                     case utf8::TYPE: c = utf::reading::read(m_runes.m_utf8, next, m_runes.m_end); break;
                     case utf16::TYPE: c = utf::reading::read(m_runes.m_utf16, next, m_runes.m_end); break;
-                    case utf32::TYPE: c = m_runes.m_utf32[m_cursor].value; break;
+                    case utf32::TYPE: c = m_runes.m_utf32[m_cursor].r; break;
                     default: ASSERT(false); break;
                 }
             }
@@ -3782,7 +3782,7 @@ namespace ncore
                     case ucs2::TYPE: c = utf::reading::read(m_runes.m_ucs2, m_cursor, m_runes.m_end); break;
                     case utf8::TYPE: c = utf::reading::read(m_runes.m_utf8, m_cursor, m_runes.m_end); break;
                     case utf16::TYPE: c = utf::reading::read(m_runes.m_utf16, m_cursor, m_runes.m_end); break;
-                    case utf32::TYPE: c = m_runes.m_utf32[m_cursor++].value; break;
+                    case utf32::TYPE: c = m_runes.m_utf32[m_cursor++].r; break;
                     default: ASSERT(false); break;
                 }
                 return true;
@@ -3855,7 +3855,7 @@ namespace ncore
                     line.m_str   = m_cursor;
                     line.m_eos   = m_runes.m_eos;
                     line.m_end   = m_runes.m_end;
-                    while (!at_end() && line.m_utf32[m_cursor].value != '\n')
+                    while (!at_end() && line.m_utf32[m_cursor].r != '\n')
                         m_cursor++;
                     if (!at_end())
                         m_cursor++;
@@ -3964,7 +3964,7 @@ namespace ncore
                     while (m_cursor < m_runes.m_end)
                     {
                         skipped += 1;
-                        c = m_runes.m_utf32[m_cursor].value;
+                        c = m_runes.m_utf32[m_cursor].r;
                         if (!s_contains_char(chars, num_chars, c))
                             break;
                         m_cursor += 1;
@@ -4028,7 +4028,7 @@ namespace ncore
                     while (m_cursor < m_runes.m_end)
                     {
                         skipped += 1;
-                        c = m_runes.m_utf32[m_cursor].value;
+                        c = m_runes.m_utf32[m_cursor].r;
                         if (s_contains_char(chars, num_chars, c))
                             return skipped;
                         m_cursor += 1;
@@ -4152,7 +4152,7 @@ namespace ncore
                     case ucs2::TYPE:
                         while (reader.read(c) && !at_end(m_cursor, m_runes))
                         {
-                            m_runes.m_ucs2[m_cursor].value = c;
+                            m_runes.m_ucs2[m_cursor].r = c;
                             m_cursor += 1;
                             m_count += 1;
                         }
@@ -4174,7 +4174,7 @@ namespace ncore
                     case utf32::TYPE:
                         while (reader.read(c) && !at_end(m_cursor, m_runes))
                         {
-                            m_runes.m_utf32[m_cursor].value = c;
+                            m_runes.m_utf32[m_cursor].r = c;
                             m_cursor += 1;
                             m_count += 1;
                         }

@@ -30,8 +30,8 @@ namespace ncore
         typedef char        rune;
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const rune   TERMINATOR   = '\0';
-        static const u32    TYPE         = 1;
+        static const char   TERMINATOR   = '\0';
+        static const u8     TYPE         = 1;
         static const u64    EMPTY_STRING = 0;
 
         void reverse(char* str, char* end);
@@ -61,18 +61,25 @@ namespace ncore
 
     namespace ucs2
     {
+        static const u8      TYPE         = 8;
+        static const uchar16 TERMINATOR   = {'\0'};
+        static const u64     EMPTY_STRING = 0;
+
         struct rune
         {
-            u16         value;
-            inline bool isEOS() const { return value == 0; }
-            inline bool operator==(rune other) const { return value == other.value; }
-            inline bool operator!=(rune other) const { return value != other.value; }
+            uchar16 r;
+            bool    isEOS() const { return r == TERMINATOR; }
+            uchar16 operator*() const { return r; }
+            rune&   operator=(uchar16 c)
+            {
+                r = c;
+                return *this;
+            }
+            bool operator==(const rune& c) const { return c.r == r; }
+            bool operator!=(const rune& c) const { return c.r != r; }
         };
-        typedef rune*       prune;
-        typedef const rune* pcrune;
-        static const u32    TYPE         = 8;
-        static const rune   TERMINATOR   = {'\0'};
-        static const u64    EMPTY_STRING = 0;
+        typedef rune*        prune;
+        typedef const rune*  pcrune;
 
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);  // return length of string in runes
@@ -81,18 +88,29 @@ namespace ncore
 
     namespace utf8
     {
+        static const u8  TYPE         = 16;
+        static const u8  TERMINATOR   = '\0';
+        static const u64 EMPTY_STRING = 0;
         struct rune
         {
-            u8          value;
-            inline bool isEOS() const { return value == 0; }
-            inline bool operator==(rune other) const { return value == other.value; }
-            inline bool operator!=(rune other) const { return value != other.value; }
+            u8    r;
+            bool  isEOS() const { return r == TERMINATOR; }
+            u8    operator*() const { return r; }
+            rune& operator=(const rune& c)
+            {
+                r = c.r;
+                return *this;
+            }
+            rune& operator=(u8 c)
+            {
+                r = c;
+                return *this;
+            }
+            bool operator==(const rune& c) const { return c.r == r; }
+            bool operator!=(const rune& c) const { return c.r != r; }
         };
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const u32    TYPE         = 16;
-        static const rune   TERMINATOR   = {'\0'};
-        static const u64    EMPTY_STRING = 0;
 
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);  // return length of string in runes
@@ -101,18 +119,29 @@ namespace ncore
 
     namespace utf16
     {
+        static const u8      TYPE         = 2;
+        static const uchar16 TERMINATOR   = '\0';
+        static const u64     EMPTY_STRING = 0;
         struct rune
         {
-            u16         value;
-            inline bool isEOS() const { return value == 0; }
-            inline bool operator==(rune other) const { return value == other.value; }
-            inline bool operator!=(rune other) const { return value != other.value; }
+            uchar16 r;
+            bool    isEOS() const { return r == TERMINATOR; }
+            uchar16 operator*() const { return r; }
+            rune&   operator=(const rune& c)
+            {
+                r = c.r;
+                return *this;
+            }
+            rune& operator=(uchar16 c)
+            {
+                r = c;
+                return *this;
+            }
+            bool operator==(const rune& c) const { return c.r == r; }
+            bool operator!=(const rune& c) const { return c.r != r; }
         };
-        typedef rune*       prune;
-        typedef const rune* pcrune;
-        static const u32    TYPE         = 2;
-        static const rune   TERMINATOR   = {'\0'};
-        static const u64    EMPTY_STRING = 0;
+        typedef rune*        prune;
+        typedef const rune*  pcrune;
 
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
@@ -121,16 +150,29 @@ namespace ncore
 
     namespace utf32
     {
+        static const u8      TYPE         = 4;
+        static const uchar32 TERMINATOR   = '\0';
+        static const u64     EMPTY_STRING = 0;
         struct rune
         {
-            u32         value;
-            inline bool isEOS() const { return value == 0; }
+            uchar32 r;
+            bool    isEOS() const { return r == TERMINATOR;}
+            uchar32 operator*() const { return r; }
+            rune&   operator=(const rune& c)
+            {
+                r = c.r;
+                return *this;
+            }
+            rune& operator=(uchar32 c)
+            {
+                r = c;
+                return *this;
+            }
+            bool operator==(const rune& c) const { return c.r == r; }
+            bool operator!=(const rune& c) const { return c.r != r; }
         };
         typedef rune*       prune;
         typedef const rune* pcrune;
-        static const u32    TYPE         = 4;
-        static const rune   TERMINATOR   = {'\0'};
-        static const u64    EMPTY_STRING = 0;
 
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
@@ -495,15 +537,15 @@ namespace ncore
             }
 
         protected:
-            virtual void    vreset()                   = 0;
-            virtual bool    vvalid() const             = 0;
-            virtual uchar32 vpeek(s32 n) const         = 0;
-            virtual bool    vread(uchar32& c)          = 0;
-            virtual bool    vread_line(runes_t& line)  = 0;
-            virtual bool    vview_line(crunes_t& line) = 0;
-            virtual void    vskip(s32 c)               = 0;
-            virtual s32     vskip_any(uchar32 const* chars, u32 num_chars)          = 0; // return -1 if end of string is reached, otherwise return the number of characters skipped
-            virtual s32     vskip_until_one_of(uchar32 const* chars, u32 num_chars) = 0; // return -1 if end of string is reached, otherwise return the number of characters skipped
+            virtual void    vreset()                                                = 0;
+            virtual bool    vvalid() const                                          = 0;
+            virtual uchar32 vpeek(s32 n) const                                      = 0;
+            virtual bool    vread(uchar32& c)                                       = 0;
+            virtual bool    vread_line(runes_t& line)                               = 0;
+            virtual bool    vview_line(crunes_t& line)                              = 0;
+            virtual void    vskip(s32 c)                                            = 0;
+            virtual s32     vskip_any(uchar32 const* chars, u32 num_chars)          = 0;  // return -1 if end of string is reached, otherwise return the number of characters skipped
+            virtual s32     vskip_until_one_of(uchar32 const* chars, u32 num_chars) = 0;  // return -1 if end of string is reached, otherwise return the number of characters skipped
         };
 
         class reader_t : public ireader_t

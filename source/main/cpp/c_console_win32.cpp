@@ -131,7 +131,7 @@ namespace ncore
                 while (src < end && dst16 < end16)
                 {
                     utf16::rune c = *src++;
-                    write_utf16(c.value, dst16, end16);
+                    write_utf16(c.r, dst16, end16);
                     ll += 1;
                 }
                 str16[ll] = 0;
@@ -158,7 +158,7 @@ namespace ncore
                 while (src < end && dst16 < end16)
                 {
                     utf32::rune c = *src++;
-                    write_utf16(c.value, dst16, end16);
+                    write_utf16(c.r, dst16, end16);
                     ll += 1;
                 }
                 str16[ll] = 0;
