@@ -25,7 +25,7 @@ namespace ncore
         {
         }
         ~wyrand_t() {}
-        
+
         virtual void reset(s64 inSeed = 0);
         virtual void generate(u8* outData, u32 numBytes);
 
@@ -43,8 +43,8 @@ namespace cbase
 {
     void init(ncore::s32 number_of_threads, ncore::s32 temporary_allocator_size)
     {
-        ncore::init_system_alloc();
-        ncore::alloc_t* system_allocator = ncore::get_system_alloc();
+        ncore::g_init_system_alloc();
+        ncore::alloc_t* system_allocator = ncore::g_get_system_alloc();
 
         ncore::console_t::init_default_console();
         ncore::context_t::init(number_of_threads, 16, system_allocator);
@@ -74,7 +74,7 @@ namespace cbase
 
     void exit()
     {
-        ncore::alloc_t* system_alloc = ncore::get_system_alloc();
+        ncore::alloc_t* system_alloc = ncore::g_get_system_alloc();
 
         ncore::s32 number_of_threads = ncore::context_t::max_threads();
         for (ncore::s32 i = 0; i < number_of_threads; i++)
@@ -102,7 +102,7 @@ namespace cbase
         }
 
         ncore::context_t::exit(system_alloc);
-        ncore::exit_system_alloc();
+        ncore::g_exit_system_alloc();
         system_alloc = nullptr;
 
         ncore::context_t::set_assert_handler(nullptr);

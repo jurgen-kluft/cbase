@@ -48,7 +48,7 @@ namespace ncore
                 }
                 else
                 {
-                    newitems = reallocate(alloc, items, cur_size*sizeof_item, new_capacity*sizeof_item);
+                    newitems = g_reallocate(alloc, items, cur_size*sizeof_item, new_capacity*sizeof_item);
                 }
 
                 if (!newitems)

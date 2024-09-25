@@ -122,7 +122,7 @@ namespace ncore
                 uchar16* end16 = dst16 + maxlen;
                 while (src < end && dst16 < end16)
                 {
-                    *dst16++ = (*src++).value;
+                    *dst16++ = (*src++).r;
                 }
                 *dst16 = 0;
                 ::wprintf(L"%s", (const wchar_t*)str16);
@@ -145,7 +145,7 @@ namespace ncore
                 uchar32* end32 = dst32 + maxlen;
                 while (src < end && dst32 < end32)
                 {
-                    *dst32++ = (*src++).value;
+                    *dst32++ = (*src++).r;
                 }
                 *dst32 = 0;
                 ::wprintf(L"%s", (const wchar_t*)str32);

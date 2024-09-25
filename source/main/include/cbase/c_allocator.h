@@ -8,23 +8,17 @@
 #include "ccore/c_allocator.h"
 #include "ccore/c_debug.h"
 #include "cbase/c_context.h"
-#include "cbase/c_memory.h"
 
 namespace ncore
 {
     class buffer_t;
 
-    void     init_system_alloc();
-    void     exit_system_alloc();
-    alloc_t* get_system_alloc();
+    void     g_init_system_alloc();
+    void     g_exit_system_alloc();
+    alloc_t* g_get_system_alloc();
 
-    inline void* reallocate(alloc_t* alloc, void* ptr, u32 size, u32 new_size, u32 alignment = sizeof(void*))
-    {
-        void* newptr = alloc->allocate(new_size, alignment);
-        nmem::memcpy(newptr, ptr, size);
-        alloc->deallocate(ptr);
-        return newptr;
-    }
+    void* g_reallocate(alloc_t* alloc, void* ptr, u32 size, u32 new_size, u32 alignment = sizeof(void*));
+    void* g_allocate_and_clear(alloc_t* alloc, u32 size);
 
     // fixed-size allocator
     class fsa_t

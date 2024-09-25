@@ -22,7 +22,7 @@ namespace ncore
         {
             if (m_allocator == nullptr)
             {
-                m_allocator = get_system_alloc();
+                m_allocator = g_get_system_alloc();
             }
 
             if (max_items <= type_t<u16>::max())
@@ -66,7 +66,7 @@ namespace ncore
         {
             if (m_allocator == nullptr)
             {
-                m_allocator = get_system_alloc();
+                m_allocator = g_get_system_alloc();
             }
 
             if (max_items <= type_t<u16>::max())
@@ -79,10 +79,10 @@ namespace ncore
             }
         }
 
-        ~set_t() 
+        ~set_t()
         {
             while (!ntree::clear(m_ctxt)) {}
-            m_allocator->destruct(m_ctxt); 
+            m_allocator->destruct(m_ctxt);
         }
 
         bool insert(K const& key) { return ntree::insert(m_ctxt, &key, nullptr); }

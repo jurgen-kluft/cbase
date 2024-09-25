@@ -108,6 +108,28 @@ namespace ncore
         m_count          = (levels << 28) | count;
     }
 
+    void binmap_t::tick_all_free_lazy(u32 bit)
+    {
+        u32 wi = bit;
+        for (s8 l = levels() - 1; l >= 0; --l)
+        {
+            const u32 li = wi & (32 - 1);
+            wi           = wi >> 5;
+            const u32 wd = (li == 0) ? 0xffffffff : m_l[l][wi];
+            const u32 bi = (u32)1 << li;
+            m_l[l][wi]   = wd & ~bi;
+            if (wd != 0xffffffff)
+                return;
+        }
+        m_l0 = m_l0 & ~((u32)1 << (wi & (32 - 1)));
+    }
+
+
+    void binmap_t::init_all_used_lazy()
+    {
+        m_l0   = 0xffffffff;
+    }
+
     void binmap_t::init_all_used_lazy(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len)
     {
         ASSERT((l3len == 0 || l3 != nullptr) && (l2len == 0 || l2 != nullptr) && (l1len == 0 || l1 != nullptr) && (l0len > 0));
@@ -120,6 +142,33 @@ namespace ncore
         u32 const levels = (l3len > 0) ? 3 : (l2len > 0) ? 2 : ((l1len > 0) ? 1 : 0);
         m_count          = (levels << 28) | count;
     }
+
+    void binmap_t::init_all_used_lazy(u32 count, alloc_t* allocator)
+    {
+        u32 l0, l1, l2, l3;
+        compute_levels(count, l0, l1, l2, l3);
+        u32* d1 = (l1 > 0) ? (u32*)allocator->allocate(sizeof(u32) * l1) : nullptr;
+        u32* d2 = (l2 > 0) ? (u32*)allocator->allocate(sizeof(u32) * l2) : nullptr;
+        u32* d3 = (l3 > 0) ? (u32*)allocator->allocate(sizeof(u32) * l3) : nullptr;
+        init_all_used_lazy(count, l0, d1, l1, d2, l2, d3, l3);
+    }
+
+    void binmap_t::tick_all_used_lazy(u32 bit)
+    {
+        u32 wi = bit;
+        for (s8 l = levels() - 1; l >= 0; --l)
+        {
+            const u32 li = wi & (32 - 1);
+            wi           = wi >> 5;
+            u32 wd       = li == 0 ? 0xfffffffe : m_l[l][wi];
+            wd |= (u32)1 << li;
+            m_l[l][wi] = wd;
+            if (wd != 0xffffffff)
+                return;
+        }
+        m_l0 = m_l0 | ((u32)1 << (wi & (32 - 1)));
+    }
+
 
     void binmap_t::init_all_free(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len)
     {
@@ -346,38 +395,6 @@ namespace ncore
             }
         };
         return -1;
-    }
-
-    void binmap_t::init_all_free_lazy(u32 bit)
-    {
-        u32 wi = bit;
-        for (s8 l = levels() - 1; l >= 0; --l)
-        {
-            const u32 li = wi & (32 - 1);
-            wi           = wi >> 5;
-            const u32 wd = (li == 0) ? 0xffffffff : m_l[l][wi];
-            const u32 bi = (u32)1 << li;
-            m_l[l][wi]   = wd & ~bi;
-            if (wd != 0xffffffff)
-                return;
-        }
-        m_l0 = m_l0 & ~((u32)1 << (wi & (32 - 1)));
-    }
-
-    void binmap_t::init_all_used_lazy(u32 bit)
-    {
-        u32 wi = bit;
-        for (s8 l = levels() - 1; l >= 0; --l)
-        {
-            const u32 li = wi & (32 - 1);
-            wi           = wi >> 5;
-            u32 wd       = li == 0 ? 0xfffffffe : m_l[l][wi];
-            wd |= (u32)1 << li;
-            m_l[l][wi] = wd;
-            if (wd != 0xffffffff)
-                return;
-        }
-        m_l0 = m_l0 | ((u32)1 << (wi & (32 - 1)));
     }
 
     void binmap_t::iter_t::begin()

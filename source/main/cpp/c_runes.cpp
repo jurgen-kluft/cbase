@@ -1418,8 +1418,8 @@ namespace ncore
         crunes_t findLastSelectUntil(const crunes_t& _str, uchar32 _c, bool _casesensitive)
         {
             utf32::rune dst_runes[2];
-            dst_runes[0] = {_c};
-            dst_runes[1] = {0};
+            dst_runes[0] = _c;
+            dst_runes[1] = 0;
             crunes_t _find(dst_runes, 0, 1, 1);
             return findLastSelectUntil(_str, _find, _casesensitive);
         }
@@ -1435,8 +1435,8 @@ namespace ncore
         crunes_t findSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
         {
             utf32::rune dst_runes[2];
-            dst_runes[0] = {_c};
-            dst_runes[1] = {0};
+            dst_runes[0] = _c;
+            dst_runes[1] = 0;
             crunes_t _find(dst_runes, 0, 1, 1);
             return findSelectUntilIncluded(_str, _find, _casesensitive);
         }
@@ -1474,8 +1474,8 @@ namespace ncore
         crunes_t findLastSelectUntilIncluded(const crunes_t& _str, uchar32 _c, bool _casesensitive)
         {
             utf32::rune dst_runes[2];
-            dst_runes[0] = {_c};
-            dst_runes[1] = {0};
+            dst_runes[0] = _c;
+            dst_runes[1] = 0;
             crunes_t _find(dst_runes, 0, 1, 1);
             return findLastSelectUntilIncluded(_str, _find, _casesensitive);
         }
@@ -2452,13 +2452,13 @@ namespace ncore
         void findReplace(runes_t& _str, uchar32 _find, uchar32 _replace, bool _casesensitive)
         {
             utf32::rune find_runes[2];
-            find_runes[0] = {_find};
-            find_runes[1] = {0};
+            find_runes[0] = _find;
+            find_runes[1] = 0;
             crunes_t find(find_runes, 0, 1, 1);
 
             utf32::rune replace_runes[2];
-            replace_runes[0] = {_replace};
-            replace_runes[1] = {0};
+            replace_runes[0] = _replace;
+            replace_runes[1] = 0;
             runes_t replace(replace_runes, 0, 1, 1);
 
             findReplace(_str, find, replace, _casesensitive);

@@ -173,7 +173,7 @@ namespace ncore
         {
             utf8::prune iter = str;
             while (iter < end)
-                *iter++ = {0};
+                *iter++ = 0;
 
             // convert the utf32 row string to utf8
             runes_t          utf_8(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf8::TYPE);
@@ -186,7 +186,7 @@ namespace ncore
         {
             utf16::prune iter = str;
             while (iter < end)
-                *iter++ = {0};
+                *iter++ = 0;
 
             // convert the utf32 row string to utf16
             runes_t          utf_16(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf16::TYPE);

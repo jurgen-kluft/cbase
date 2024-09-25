@@ -37,10 +37,12 @@ namespace ncore
         void init_all_used(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len);
 
         void init_all_free_lazy(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len);  // Do not not clear the levels, only the ends
-        void init_all_free_lazy(u32 bit);
+        void tick_all_free_lazy(u32 bit);
 
+        void init_all_used_lazy();
         void init_all_used_lazy(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len);  // Do not not clear the levels, only the ends
-        void init_all_used_lazy(u32 bit);                                                                           // Progressive lazy initialization
+        void init_all_used_lazy(u32 count, alloc_t* allocator);
+        void tick_all_used_lazy(u32 bit);                                                                           // Progressive lazy initialization
 
         void set_free(u32 bit);
         void set_used(u32 bit);

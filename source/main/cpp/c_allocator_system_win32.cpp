@@ -1,17 +1,17 @@
 #include "ccore/c_target.h"
 #ifdef TARGET_PC
 
-#ifdef TARGET_DEBUG
-#define USE_MALLOC_DBG
-#endif
+#    ifdef TARGET_DEBUG
+#        define USE_MALLOC_DBG
+#    endif
 
-#include <string>
+#    include <string>
 
-#ifdef USE_MALLOC_DBG
-#    include <crtdbg.h>
-#endif
+#    ifdef USE_MALLOC_DBG
+#        include <crtdbg.h>
+#    endif
 
-#include "cbase/c_allocator.h"
+#    include "cbase/c_allocator.h"
 
 namespace ncore
 {
@@ -45,15 +45,15 @@ namespace ncore
 
         virtual void* v_allocate(u32 size, u32 alignment)
         {
-#ifdef COMPILER_MSVC
-#ifdef USE_MALLOC_DBG
+#    ifdef COMPILER_MSVC
+#        ifdef USE_MALLOC_DBG
             void* mem = _aligned_malloc_dbg(size, alignment, nullptr, 0);
-#else
+#        else
             void* mem = _aligned_malloc(size, alignment);
-#endif
-#else
+#        endif
+#    else
             void* mem = nullptr;
-#endif
+#    endif
             ++mAllocationCount;
             return mem;
         }
@@ -61,13 +61,13 @@ namespace ncore
         virtual void v_deallocate(void* ptr)
         {
             --mAllocationCount;
-#ifdef COMPILER_MSVC
-#ifdef USE_MALLOC_DBG
+#    ifdef COMPILER_MSVC
+#        ifdef USE_MALLOC_DBG
             _aligned_free_dbg(ptr);
-#else
+#        else
             _aligned_free(ptr);
-#endif
-#endif
+#        endif
+#    endif
         }
 
         s32 mInitialized;
@@ -76,14 +76,14 @@ namespace ncore
     };
 
     allocator_win32_system sSystemAllocator;
-    void                     init_system_alloc()
+    void                   g_init_system_alloc()
     {
         if (!sSystemAllocator.isInitialized())
         {
             sSystemAllocator.init();
         }
     }
-    void exit_system_alloc()
+    void g_exit_system_alloc()
     {
         if (sSystemAllocator.isInitialized())
         {
@@ -91,8 +91,8 @@ namespace ncore
         }
     }
 
-    alloc_t* get_system_alloc() { return &sSystemAllocator; }
+    alloc_t* g_get_system_alloc() { return &sSystemAllocator; }
 
-}; // namespace ncore
+};  // namespace ncore
 
 #endif

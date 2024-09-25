@@ -1,14 +1,14 @@
 #include "ccore/c_target.h"
 #ifdef TARGET_MAC
 
-#include <stdlib.h>
-#include <cstring>
-#include <stdio.h>
+#    include <stdlib.h>
+#    include <cstring>
+#    include <stdio.h>
 
-#include "cbase/c_memory.h"
-#include "cbase/c_integer.h"
-#include "cbase/c_allocator.h"
-#include "cbase/c_context.h"
+#    include "cbase/c_memory.h"
+#    include "cbase/c_integer.h"
+#    include "cbase/c_allocator.h"
+#    include "cbase/c_context.h"
 
 namespace ncore
 {
@@ -44,9 +44,9 @@ namespace ncore
             alignment = math::alignUp(alignment, mDefaultAlignment);
 
             void* ptr;
-            ptr = ::aligned_alloc(alignment, size); // This works on MacOS >= 10.15
-            //posix_memalign(&ptr, alignment, size);
-            //ptr = ::malloc(size);
+            ptr = ::aligned_alloc(alignment, size);  // This works on MacOS >= 10.15
+            // posix_memalign(&ptr, alignment, size);
+            // ptr = ::malloc(size);
             ++mAllocationCount;
             return ptr;
         }
@@ -64,7 +64,7 @@ namespace ncore
 
     allocator_macos_system sSystemAllocator;
 
-    void init_system_alloc()
+    void g_init_system_alloc()
     {
         if (!sSystemAllocator.isInitialized())
         {
@@ -72,7 +72,7 @@ namespace ncore
         }
     }
 
-    void exit_system_alloc()
+    void g_exit_system_alloc()
     {
         if (sSystemAllocator.isInitialized())
         {
@@ -80,9 +80,8 @@ namespace ncore
         }
     }
 
-    alloc_t* get_system_alloc() { return &sSystemAllocator; }
+    alloc_t* g_get_system_alloc() { return &sSystemAllocator; }
 
-
-}; // namespace ncore
+};  // namespace ncore
 
 #endif
