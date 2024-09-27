@@ -74,12 +74,22 @@ namespace ncore
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return (value) & (~(alignment - 1));
         }
+        inline u32 align(u32 value, s32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return (value) & (~((u32)alignment - 1));
+        }
 
         // Return the floor based aligned value of value
         inline u32 alignDown(u32 value, u32 alignment)
         {
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return (value) & (~(alignment - 1));
+        }
+        inline u32 alignDown(u32 value, s32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return (value) & (~((u32)alignment - 1));
         }
 
         // Return the ceiling based aligned value of value
@@ -95,19 +105,34 @@ namespace ncore
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return ((value + (alignment - 1)) & (~(alignment - 1)));
         }
+        inline u32 alignUp(u32 value, s32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return ((value + ((u32)alignment - 1)) & (~((u32)alignment - 1)));
+        }
 
         // Return the ceiling based aligned value of value
-        inline u64 alignUp(u64 value, u64 alignment)
+        inline u64 alignUp(u64 value, u32 alignment)
         {
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return ((value + (alignment - 1)) & (~(alignment - 1)));
         }
+        inline u64 alignUp(u64 value, s32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return ((value + ((u32)alignment - 1)) & (~((u32)alignment - 1)));
+        }
 
         // Check if value is aligned
+        inline bool isAligned(s32 value, s32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return value == (s32)((u32)(value) & (~((u32)alignment - 1)));
+        }
         inline bool isAligned(s32 value, u32 alignment)
         {
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
-            return value == (s32)((u32)(value) & (~(alignment - 1)));
+            return value == (s32)(value & (~(alignment - 1)));
         }
 
         inline bool isAligned(u32 value, u32 alignment)
@@ -115,14 +140,29 @@ namespace ncore
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return value == ((value) & (~(alignment - 1)));
         }
+        inline bool isAligned(u32 value, s32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return value == ((value) & (~((u32)alignment - 1)));
+        }
 
         inline bool isAligned(s64 value, u32 alignment)
         {
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return value == (s64)(((u64)value) & (~((u64)alignment - 1)));
         }
+        inline bool isAligned(s64 value, s32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return value == (s64)(((u64)value) & (~((u64)alignment - 1)));
+        }
 
         inline bool isAligned(u64 value, u32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return value == ((value) & (~((u64)alignment - 1)));
+        }
+        inline bool isAligned(u64 value, s32 alignment)
         {
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return value == ((value) & (~((u64)alignment - 1)));
@@ -177,7 +217,7 @@ namespace ncore
 
         // Return the power-of-two larger than or equal to value
         inline u32 ceilpo2(u32 value) { return 1 << (32 - countLeadingZeros(value - 1)); }
-        
+
         // Return the power-of-two smaller than or equal to value
         inline u32 floorpo2(u32 value) { return 1 << (31 - countLeadingZeros(value)); }
 
