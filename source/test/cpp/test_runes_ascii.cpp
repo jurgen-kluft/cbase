@@ -27,8 +27,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             crunes_t str("this is a system string");
 
             utf32::rune dst_runes[256];
-            dst_runes[0] = {0};
-            dst_runes[1] = {0};
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
             runes_t dst(dst_runes, 0, 0, 256-1);
 
             nrunes::copy(str, dst);
@@ -37,8 +37,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             CHECK_EQUAL(23, str.size());
 
             utf32::rune str2_runes[16+1];
-            str2_runes[0] = {0};
-            str2_runes[1] = {0};
+            str2_runes[0] = 0;
+            str2_runes[1] = 0;
             runes_t str2(str2_runes, 0, 0, 16);
 
             nrunes::copy(str, str2);
@@ -87,8 +87,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(replace)
         {
             ascii::rune dst_runes[256];
-            dst_runes[0] = {0};
-            dst_runes[1] = {0};
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
             runes_t dst(dst_runes, 0, 0, 256-1);
 
             crunes_t str1 = "this is a system string";
@@ -131,8 +131,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(concatenate)
         {
             utf32::rune dst_runes[256];
-            dst_runes[0] = {0};
-            dst_runes[1] = {0};
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
             runes_t dst(dst_runes, 0, 0, 256);
 
             crunes_t str1 = "this is a ";
@@ -289,8 +289,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(tostring_s32)
         {
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
             s32 value = 31415;
@@ -302,8 +302,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(tostring_u32)
         {
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
             u32 value = 31415;
@@ -315,8 +315,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(tostring_s64)
         {
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
             s64 value = 31415;
@@ -328,8 +328,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(tostring_u64)
         {
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
             u64 value = 31415;
@@ -341,8 +341,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(tostring_f32)
         {
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
             f32 value = 3.1415f;
@@ -354,8 +354,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(tostring_f64)
         {
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
             f64 value = 3.1415;
@@ -460,8 +460,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(to_upper)
         {
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
             crunes_t                            str1 = "this is a lower case string";
@@ -474,8 +474,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(to_lower)
         {
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
             crunes_t                            str1 = "THIS IS AN UPPER CASE STRING";
@@ -514,8 +514,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
             CHECK_EQUAL(9, length);
 
             utf32::rune dst_runes[256];
-            dst_runes[0] = {0};
-            dst_runes[1] = {0};
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
             runes_t dst(dst_runes, 0, 0, 256);
 
             sprintf(dst, fmt, va_t(i), va_t(str));
@@ -534,8 +534,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(sprintf)
         {
             utf32::rune dst_runes[256];
-            dst_runes[0] = {0};
-            dst_runes[1] = {0};
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
             runes_t dst(dst_runes, 0, 0, 256);
 
             s32 i = 100;
@@ -553,8 +553,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(sprintf_bool)
         {
             utf32::rune dst_runes[256];
-            dst_runes[0] = {0};
-            dst_runes[1] = {0};
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
             runes_t dst(dst_runes, 0, 0, 256);
 
             // ---------------------------------------------------------------------------
@@ -604,8 +604,8 @@ UNITTEST_SUITE_BEGIN(test_string_ascii)
         UNITTEST_TEST(vsprintf)
         {
             utf32::rune dst_runes[256];
-            dst_runes[0] = {0};
-            dst_runes[1] = {0};
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
             runes_t dst(dst_runes, 0, 0, 256);
 
             s32      i   = 100;

@@ -48,7 +48,7 @@ UNITTEST_SUITE_BEGIN(test_allocator)
         UNITTEST_TEST(_DCORE_CLASS_PLACEMENT_NEW_DELETE)
         {
             void*         object1_tmp = Allocator->allocate(sizeof(test_object1), 4);
-            test_object1* object1     = new (object1_tmp) test_object1;
+            test_object1* object1     = new (signature_t(), object1_tmp) test_object1;
             CHECK_NOT_NULL(object1);
             CHECK_TRUE(1 == object1->mInteger);
             CHECK_TRUE(2.0 == object1->mFloat);

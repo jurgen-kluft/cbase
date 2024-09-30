@@ -79,6 +79,11 @@ namespace ncore
             ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
             return (value) & (~((u32)alignment - 1));
         }
+        inline s32 align(s32 value, s32 alignment)
+        {
+            ASSERTS(ispo2(alignment) == true, "Error: alignment value should be a power of 2");
+            return (s32)((u32)(value) & (~((u32)alignment - 1)));
+        }
 
         // Return the floor based aligned value of value
         inline u32 alignDown(u32 value, u32 alignment)

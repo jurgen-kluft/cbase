@@ -143,7 +143,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
             runes_t     dst(dst_runes, 0, 0, 16);
             nrunes::copy(src, dst);
 
-            CHECK_EQUAL('t', dst.m_utf32[dst.m_str].value);
+            CHECK_EQUAL('t', dst.m_utf32[dst.m_str].r);
         }
 
         UNITTEST_TEST(read1_utf8)
@@ -154,7 +154,7 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
             for (s32 i = 0; i < 5; ++i)
             {
                 uchar32 ch = reader1.read();
-                CHECK_EQUAL(str11.m_utf8[str11.m_str + i].value, ch);
+                CHECK_EQUAL(str11.m_utf8[str11.m_str + i].r, ch);
             }
 
             const utf8::rune str2[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
@@ -177,11 +177,11 @@ UNITTEST_SUITE_BEGIN(test_string_utf)
                 }
                 else if (i > 2)
                 {
-                    CHECK_EQUAL(c, (uchar32)str2[i + 1].value);
+                    CHECK_EQUAL(c, (uchar32)str2[i + 1].r);
                 }
                 else
                 {
-                    CHECK_EQUAL(c, (uchar32)str2[i].value);
+                    CHECK_EQUAL(c, (uchar32)str2[i].r);
                 }
             }
         }
