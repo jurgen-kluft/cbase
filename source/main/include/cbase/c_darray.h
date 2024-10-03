@@ -34,7 +34,7 @@ namespace ncore
 
             alloc_t*    alloc = context_t::runtime_alloc();
             void*       mem   = alloc->allocate(sizeof(array_t<T>), sizeof(void*));
-            array_t<T>* array = new (signature_t(), mem) array_t<T>();
+            array_t<T>* array = new (mem) array_t<T>();
             array->m_memory   = memory;
             array->m_cap_cur  = 0;
             array->m_size     = 0;

@@ -82,6 +82,9 @@ namespace ncore
 
     alloc_t* g_get_system_alloc() { return &sSystemAllocator; }
 
+    void* g_malloc(u64 size, u16 align) { return g_get_system_alloc()->allocate(size, align); }
+    void g_free(void* ptr) { g_get_system_alloc()->deallocate(ptr); }
+
 };  // namespace ncore
 
 #endif

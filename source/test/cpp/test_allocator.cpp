@@ -7,8 +7,6 @@
 
 using namespace ncore;
 
-
-
 UNITTEST_SUITE_BEGIN(test_allocator)
 {
     UNITTEST_FIXTURE(main)
@@ -39,7 +37,11 @@ UNITTEST_SUITE_BEGIN(test_allocator)
 
         struct test_object1
         {
-            test_object1() : mInteger(1), mFloat(2.0) {}
+            test_object1()
+                : mInteger(1)
+                , mFloat(2.0)
+            {
+            }
             s32 mInteger;
             f32 mFloat;
             DCORE_CLASS_PLACEMENT_NEW_DELETE
@@ -48,7 +50,7 @@ UNITTEST_SUITE_BEGIN(test_allocator)
         UNITTEST_TEST(_DCORE_CLASS_PLACEMENT_NEW_DELETE)
         {
             void*         object1_tmp = Allocator->allocate(sizeof(test_object1), 4);
-            test_object1* object1     = new (signature_t(), object1_tmp) test_object1;
+            test_object1* object1     = new (object1_tmp) test_object1;
             CHECK_NOT_NULL(object1);
             CHECK_TRUE(1 == object1->mInteger);
             CHECK_TRUE(2.0 == object1->mFloat);
@@ -60,7 +62,11 @@ UNITTEST_SUITE_BEGIN(test_allocator)
 
         struct test_object2
         {
-            test_object2() : mInteger(3), mFloat(4.0) {}
+            test_object2()
+                : mInteger(3)
+                , mFloat(4.0)
+            {
+            }
             s32             mInteger;
             f32             mFloat;
             static alloc_t* get_allocator() { return Allocator; }
@@ -79,7 +85,11 @@ UNITTEST_SUITE_BEGIN(test_allocator)
 
         struct test_object3
         {
-            test_object3() : mInteger(2), mFloat(3.0) {}
+            test_object3()
+                : mInteger(2)
+                , mFloat(3.0)
+            {
+            }
             s32             mInteger;
             f32             mFloat;
             static alloc_t* get_allocator() { return Allocator; }
@@ -103,7 +113,11 @@ UNITTEST_SUITE_BEGIN(test_allocator)
 
         struct test_object4
         {
-            test_object4() : mInteger(2), mFloat(3.0) {}
+            test_object4()
+                : mInteger(2)
+                , mFloat(3.0)
+            {
+            }
             s32             mInteger;
             f32             mFloat;
             static alloc_t* get_allocator() { return Allocator; }
@@ -119,13 +133,12 @@ UNITTEST_SUITE_BEGIN(test_allocator)
 
         UNITTEST_TEST(test_alloc_buffer)
         {
-            u8 inplace[256];
+            u8             inplace[256];
             alloc_buffer_t sa;
             sa.init(inplace, sizeof(inplace));
             test_object4* obj = sa.construct<test_object4>();
             sa.destruct<>(obj);
         }
-
     }
 }
 UNITTEST_SUITE_END

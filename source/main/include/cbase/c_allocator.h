@@ -80,7 +80,7 @@ namespace ncore
     class dexer_t
     {
     public:
-        inline void* idx2ptr(u32 index)  { return v_idx2ptr(index); }
+        inline void* idx2ptr(u32 index) { return v_idx2ptr(index); }
         inline u32   ptr2idx(void const* ptr) const { return v_ptr2idx(ptr); }
 
         template <typename T>
@@ -95,7 +95,7 @@ namespace ncore
         }
 
     protected:
-        virtual void* v_idx2ptr(u32 index) = 0;
+        virtual void* v_idx2ptr(u32 index)             = 0;
         virtual u32   v_ptr2idx(void const* ptr) const = 0;
     };
 
