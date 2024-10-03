@@ -5,29 +5,6 @@
 
 namespace ncore
 {
-    //
-    // The tree_t::tree_t interface allows you to construct a tree with any kind of
-    // back-end to store the nodes, colors and values.
-    //
-    // Example 1:
-    //    If you know that you will have less than 65536 nodes, you can use a fixed size
-    //    array to store the nodes, and use the array index as the 16 bit node id. Then
-    //    for the values you can have a seperate array.
-    //    You will also need a bit-array for storing the red/black color.
-    //
-    // Example 2:
-    //    The most common case is to use a fixed size array to store the nodes, and use
-    //    the array index as the 32 bit node id. Then for the values you can use a seperate
-    //    array as well as for the red/black color.
-    //
-    // Example 3:
-    //    You could also for each member of a node create a seperate array (SOA).
-    //
-    // Example 4:
-    //    You can also provide a normal implementation where a node just holds a pointer to the
-    //    key, value, color and children.
-    //
-
     namespace ntree32
     {
         static inline node_t rotate_single(tree_t& tree, node_t node, s32 dir)
