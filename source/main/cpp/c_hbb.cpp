@@ -124,11 +124,7 @@ namespace ncore
         m_l0 = m_l0 & ~((u32)1 << (wi & (32 - 1)));
     }
 
-
-    void binmap_t::init_all_used_lazy()
-    {
-        m_l0   = 0xffffffff;
-    }
+    void binmap_t::init_all_used_lazy() { m_l0 = 0xffffffff; }
 
     void binmap_t::init_all_used_lazy(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len)
     {
@@ -168,7 +164,6 @@ namespace ncore
         }
         m_l0 = m_l0 | ((u32)1 << (wi & (32 - 1)));
     }
-
 
     void binmap_t::init_all_free(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len)
     {
@@ -279,6 +274,36 @@ namespace ncore
     s32 binmap_t::find_and_set()
     {
         s32 const bi = find();
+        if (bi >= 0)
+            set_used(bi);
+        return bi;
+    }
+
+    s32 binmap_t::find_upper() const
+    {
+        if (m_l0 == 0xffffffff)
+            return -1;
+
+        u32 const l  = levels();
+        u32       wi = 0;
+        ASSERT(~m_l0 != 0);
+        s8 bi = 31 - math::findLastBit(~m_l0);
+        ASSERT(bi >= 0 && bi < 32);
+        for (u32 i = 0; i < l; ++i)
+        {
+            wi = (wi << 5) + bi;
+            ASSERT(~m_l[i][wi] != 0);
+            bi = 31 - math::findLastBit(~m_l[i][wi]);
+            ASSERT(bi >= 0 && bi < 32);
+        }
+
+        u32 const bin = (wi << 5) + bi;
+        return (bin < size()) ? bin : -1;
+    }
+
+    s32 binmap_t::find_upper_and_set()
+    {
+        s32 const bi = find_upper();
         if (bi >= 0)
             set_used(bi);
         return bi;

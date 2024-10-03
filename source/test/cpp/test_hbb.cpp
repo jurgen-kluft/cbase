@@ -138,6 +138,33 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             hbb.release(Allocator);
         }
 
+        UNITTEST_TEST(find_upper)
+        {
+            u32 const maxbits = 8192;
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
+
+            binmap_t hbb;
+            hbb.init_all_used(maxbits, Allocator);
+
+            // Should not be able to hbb.find any '0'
+            s32 free_bit = hbb.find_upper();
+            CHECK_EQUAL(false, free_bit >= 0);
+
+            hbb.set_free(maxbits / 2);
+            free_bit = hbb.find_upper();
+            CHECK_EQUAL((maxbits / 2), free_bit);
+            hbb.set_used(maxbits / 2);
+
+            for (s32 b = 0; b < maxbits; --b)
+            {
+                hbb.set_free(b);
+                free_bit = hbb.find();
+                CHECK_EQUAL(b, free_bit);
+            }
+
+            hbb.release(Allocator);
+        }
+
         UNITTEST_TEST(iterator)
         {
             u32 const maxbits = 8192;

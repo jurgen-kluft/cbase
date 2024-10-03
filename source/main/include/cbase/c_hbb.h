@@ -42,7 +42,7 @@ namespace ncore
         void init_all_used_lazy();
         void init_all_used_lazy(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len);  // Do not not clear the levels, only the ends
         void init_all_used_lazy(u32 count, alloc_t* allocator);
-        void tick_all_used_lazy(u32 bit);                                                                           // Progressive lazy initialization
+        void tick_all_used_lazy(u32 bit);  // Progressive lazy initialization
 
         void set_free(u32 bit);
         void set_used(u32 bit);
@@ -50,11 +50,13 @@ namespace ncore
         bool is_free(u32 bit) const { return !get(bit); }
         bool is_used(u32 bit) const { return get(bit); }
 
-        s32 find() const;    // Finds the first free bit returns the bit index
-        s32 find_and_set();  // Finds the first free bit and sets it to used and returns the bit index
+        s32 find() const;          // Finds the first free bit and returns the bit index
+        s32 find_and_set();        // Finds the first free bit and sets it to used and returns the bit index
+        s32 find_upper() const;    // Finds the last free bit and returns the bit index
+        s32 find_upper_and_set();  // Finds the last free bit and sets it to used and returns the bit index
 
-        s32 upper(u32 pivot); // Finds the first free bit greater than the pivot
-        s32 lower(u32 pivot); // Finds the first free bit less than the pivot (high to low)
+        s32 upper(u32 pivot);  // Finds the first free bit greater than the pivot
+        s32 lower(u32 pivot);  // Finds the first free bit less than the pivot (high to low)
 
         inline u32 size() const { return m_count & 0x0FFFFFFF; }
         inline s8  levels() const { return m_count >> 28; }
