@@ -23,11 +23,11 @@ UNITTEST_SUITE_BEGIN(test_map32_and_set32)
 
             for (s32 v = 0; v < c_num_keys; ++v)
             {
-                s32        k = v + 65536;
-                s32 const* f = nullptr;
+                s32 k = v + 65536;
+                s32 f;
                 CHECK_TRUE(map.insert(k, v));
                 CHECK_TRUE(map.find(k, f));
-                CHECK_EQUAL(v, *f);
+                CHECK_EQUAL(v, f);
                 CHECK_TRUE(map.remove(k));
             }
             for (s32 v = 0; v < c_num_keys; ++v)
@@ -37,10 +37,10 @@ UNITTEST_SUITE_BEGIN(test_map32_and_set32)
             }
             for (s32 v = 0; v < c_num_keys; ++v)
             {
-                s32        k = v + 65536;
-                s32 const* f = nullptr;
+                s32 k = v + 65536;
+                s32 f;
                 CHECK_TRUE(map.find(k, f));
-                CHECK_EQUAL(v, *f);
+                CHECK_EQUAL(v, f);
                 CHECK_TRUE(map.remove(k));
             }
         }
@@ -61,7 +61,7 @@ UNITTEST_SUITE_BEGIN(test_map32_and_set32)
 
             for (s32 v = 0; v < c_num_keys; ++v)
             {
-                s32        k = v + 65536;
+                s32 k = v + 65536;
                 CHECK_TRUE(set.insert(k));
                 CHECK_TRUE(set.contains(k));
                 CHECK_TRUE(set.remove(k));
@@ -73,7 +73,7 @@ UNITTEST_SUITE_BEGIN(test_map32_and_set32)
             }
             for (s32 v = 0; v < c_num_keys; ++v)
             {
-                s32        k = v + 65536;
+                s32 k = v + 65536;
                 CHECK_TRUE(set.contains(k));
                 CHECK_TRUE(set.remove(k));
             }

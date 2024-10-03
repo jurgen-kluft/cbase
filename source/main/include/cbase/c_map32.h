@@ -12,24 +12,34 @@ namespace ncore
 {
     // Note:
     // The map and set provided here assume that a key and value are very simple POD types.
-    // There is no handling for 'constrution' or 'destruction', furthermore there is also
+    // There is no handling for 'construction' or 'destruction', furthermore there is also
     // NO hashing done on the key.
+    // The index of a node that that is managed by the tree is the same index at which you
+    // can find the key/value, so here there is no indirection between the index at which
+    // you can find the key/value and the node index.
 
     template <typename K, typename V>
     class map32_t
     {
-        alloc_t*        m_allocator;
-        ntree32::tree_t m_tree;
-        K*              m_keys;
-        V*              m_values;
-
-        static s8 compare_keys(const void* _keyA, const void* _keyB)
+        alloc_t* m_allocator;
+        struct data_t
         {
-            K const* keyA = (K*)_keyA;
-            K const* keyB = (K*)_keyB;
-            if (*keyA < *keyB)
+            ntree32::tree_t m_tree;
+            u32             m_empty;
+            K*              m_keys;
+            V*              m_values;
+        };
+
+        data_t m_data;
+
+        static s8 s_compare(u32 _key, u32 _item, void const* user_data)
+        {
+            data_t* data = (data_t*)user_data;
+            K&      key  = data->m_keys[_key];
+            K&      item = data->m_keys[_item];
+            if (key < item)
                 return -1;
-            else if (*keyA > *keyB)
+            else if (key > item)
                 return 1;
             return 0;
         }
@@ -37,55 +47,58 @@ namespace ncore
     public:
         inline map32_t(alloc_t* a, u32 max_items = 65535)
             : m_allocator(a)
-            , m_tree()
+            , m_data()
         {
-            m_keys   = static_cast<K*>(m_allocator->allocate((max_items + 1) * sizeof(K)));
-            m_values = static_cast<V*>(m_allocator->allocate((max_items + 1) * sizeof(V)));
-
-            ntree32::create_tree(m_allocator, m_tree, max_items, compare_keys, m_keys, sizeof(K), m_values, sizeof(V));
+            m_data.m_empty  = max_items;
+            m_data.m_keys   = static_cast<K*>(m_allocator->allocate((max_items + 1) * sizeof(K)));
+            m_data.m_values = static_cast<V*>(m_allocator->allocate((max_items + 1) * sizeof(V)));
+            ntree32::create_tree(m_allocator, m_data.m_tree, max_items);
         }
 
         inline ~map32_t()
         {
             ntree32::node_t n;
-            while (!ntree32::clear(m_tree, n))
+            while (!ntree32::clear(m_data.m_tree, n))
             {
-                // We assume that K and V do not have destructors.
+                m_data.m_tree.v_del_node(n);
             }
-            ntree32::destroy_tree(m_allocator, m_tree);
-            m_allocator->deallocate(m_keys);
-            m_allocator->deallocate(m_values);
+            ntree32::destroy_tree(m_allocator, m_data.m_tree);
+            m_allocator->deallocate(m_data.m_keys);
+            m_allocator->deallocate(m_data.m_values);
         }
 
         bool insert(K const& _key, V const& _value)
         {
-            ntree32::node_t n = m_tree.v_new_node();
-            m_keys[n]         = _key;
-            m_values[n]       = _value;
-            if (!ntree32::insert(m_tree, n))
+            m_data.m_keys[m_data.m_empty] = _key;
+            ntree32::node_t inserted;
+            if (!ntree32::insert(m_data.m_tree, m_data.m_empty, s_compare, &m_data, inserted))
             {
-                m_tree.v_del_node(n);
                 return false;
             }
+            m_data.m_keys[inserted]   = _key;
+            m_data.m_values[inserted] = _value;
             return true;
         }
 
         bool remove(K const& key)
         {
+            m_data.m_keys[m_data.m_empty] = key;
             ntree32::node_t removed;
-            if (ntree32::remove(m_tree, &key, removed))
+            if (ntree32::remove(m_data.m_tree, m_data.m_empty, s_compare, &m_data, removed))
             {
+                m_data.m_tree.v_del_node(removed);
                 return true;
             }
             return false;
         }
 
-        bool find(K const& _key, V const*& _value) const
+        bool find(K const& _key, V& _value) const
         {
+            m_data.m_keys[m_data.m_empty] = _key;
             ntree32::node_t found;
-            bool            result = ntree32::find(m_tree, &_key, found);
+            bool            result = ntree32::find(m_data.m_tree, m_data.m_empty, s_compare, &m_data, found);
             if (found != ntree32::c_invalid_node)
-                _value = &m_values[found];
+                _value = m_data.m_values[found];
             return result;
         }
     };
@@ -93,19 +106,23 @@ namespace ncore
     template <typename K>
     class set32_t
     {
-        alloc_t*        m_allocator;
-        ntree32::tree_t m_tree;
-        K*              m_keys;
-
-        inline void* operator new(u64, void* where) { return where; }
-
-        static s8 compare_keys(const void* _keyA, const void* _keyB)
+        alloc_t* m_allocator;
+        struct data_t
         {
-            K const* keyA = (K*)_keyA;
-            K const* keyB = (K*)_keyB;
-            if (*keyA < *keyB)
+            ntree32::tree_t m_tree;
+            u32             m_empty;
+            K*              m_keys;
+        };
+        data_t m_data;
+
+        static s8 s_compare(u32 _key, u32 _item, void const* user_data)
+        {
+            data_t* data = (data_t*)user_data;
+            K&      key  = data->m_keys[_key];
+            K&      item = data->m_keys[_item];
+            if (key < item)
                 return -1;
-            else if (*keyA > *keyB)
+            else if (key > item)
                 return 1;
             return 0;
         }
@@ -113,46 +130,49 @@ namespace ncore
     public:
         inline set32_t(alloc_t* a, u32 max_items = 65535)
             : m_allocator(a)
-            , m_tree()
+            , m_data()
         {
-            m_keys = static_cast<K*>(m_allocator->allocate((max_items + 1) * sizeof(K)));
-            ntree32::create_tree(m_allocator, m_tree, max_items, compare_keys, m_keys, sizeof(K), nullptr, 0);
+            m_data.m_empty = max_items;
+            m_data.m_keys  = static_cast<K*>(m_allocator->allocate((max_items + 1) * sizeof(K)));
+            ntree32::create_tree(m_allocator, m_data.m_tree, max_items);
         }
 
         ~set32_t()
         {
             ntree32::node_t n;
-            while (!ntree32::clear(m_tree, n))
+            while (!ntree32::clear(m_data.m_tree, n))
             {
-                // We assume that K does not have a destructor
+                m_data.m_tree.v_del_node(n);
             }
-            ntree32::destroy_tree(m_allocator, m_tree);
-            m_allocator->deallocate(m_keys);
+            ntree32::destroy_tree(m_allocator, m_data.m_tree);
+            m_allocator->deallocate(m_data.m_keys);
         }
 
         bool insert(K const& _key)
         {
-            ntree32::node_t n = m_tree.v_new_node();
-            m_keys[n]         = _key;
-            if (!ntree32::insert(m_tree, n))
+            m_data.m_keys[m_data.m_empty] = _key;
+            ntree32::node_t inserted;
+            if (!ntree32::insert(m_data.m_tree, m_data.m_empty, s_compare, &m_data, inserted))
             {
-                m_tree.v_del_node(n);
                 return false;
             }
+            m_data.m_keys[inserted] = _key;
             return true;
         }
 
         bool contains(K const& key) const
         {
+            m_data.m_keys[m_data.m_empty] = key;
             ntree32::node_t found  = ntree32::c_invalid_node;
-            bool            result = ntree32::find(m_tree, &key, found);
+            bool            result = ntree32::find(m_data.m_tree, m_data.m_empty, s_compare, &m_data, found);
             return result;
         }
 
         bool remove(K const& key)
         {
+            m_data.m_keys[m_data.m_empty] = key;
             ntree32::node_t removed;
-            bool            result = ntree32::remove(m_tree, &key, removed);
+            bool            result = ntree32::remove(m_data.m_tree, m_data.m_empty, s_compare, &m_data, removed);
             return result;
         }
     };

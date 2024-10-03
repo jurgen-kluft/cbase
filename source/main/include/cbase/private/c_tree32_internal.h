@@ -11,10 +11,6 @@ namespace ncore
             , m_nodes_free_head(c_invalid_node)
             , m_children(nullptr)
             , m_colors(nullptr)
-            , m_keys_array(nullptr)
-            , m_sizeof_key(0)
-            , m_sizeof_value(0)
-            , m_values_array(nullptr)
         {
         }
 
@@ -39,17 +35,6 @@ namespace ncore
             index_t iw = node >> 3;
             index_t ib = node & 0x7;
             return ((m_colors[iw] >> ib) & 1);
-        }
-
-        inline key_t tree_t::v_get_key(node_t const node) const
-        {
-            ASSERT(node != c_invalid_index);
-            return &m_keys_array[node * m_sizeof_key];
-        }
-        inline value_t tree_t::v_get_value(node_t const node) const
-        {
-            ASSERT(node != c_invalid_index);
-            return m_values_array != nullptr ? &m_values_array[node * m_sizeof_value] : c_invalid_value;
         }
 
         inline node_t tree_t::v_get_node(node_t const node, s8 ne) const
@@ -89,22 +74,6 @@ namespace ncore
             m_children[node].m_child[LEFT] = c_invalid_index;
             m_nodes_free_head              = node;
             m_num_nodes_current -= 1;
-        }
-
-        inline s32 tree_t::v_compare_nodes(node_t const node, node_t const other) const
-        {
-            ASSERT(node != c_invalid_index);
-            ASSERT(other != c_invalid_index);
-            key_t key1 = &m_keys_array[node * m_sizeof_key];
-            key_t key2 = &m_keys_array[other * m_sizeof_key];
-            return m_compare_keys(key1, key2);
-        }
-
-        inline s32 tree_t::v_compare_insert(key_t key, node_t const node) const
-        {
-            ASSERT(node != c_invalid_index);
-            key_t key2 = &m_keys_array[node * m_sizeof_key];
-            return m_compare_keys(key, key2);
         }
 
     }  // namespace ntree32

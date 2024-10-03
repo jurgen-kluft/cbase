@@ -77,18 +77,17 @@ namespace ncore
 
         static inline s32 is_red(tree_t& tree, node_t n) { return n != c_invalid_node && tree.v_get_color(n) == RED; }
 
-        bool insert(tree_t& tree, node_t new_node)
+        bool insert(tree_t& tree, index_t key, compare_fn comparer, void const* user_data, node_t& inserted)
         {
-            key_t new_key = tree.v_get_key(new_node);
-
-            bool   inserted = false;
-            node_t root     = tree.v_get_root();
+            inserted    = c_invalid_node;
+            node_t root = tree.v_get_root();
             if (root == c_invalid_node)
             {
                 // We have an empty tree; attach the
                 // new node directly to the root
+                node_t new_node = tree.v_new_node();
                 tree.v_set_root(new_node);
-                inserted = true;
+                inserted = new_node;
             }
             else
             {
@@ -112,9 +111,22 @@ namespace ncore
                     if (n == c_invalid_node)
                     {
                         // Insert a new node at the first null link
-                        n = new_node;
+                        n = tree.v_new_node();
                         tree.v_set_node(p, dir, n);
-                        inserted = true;
+
+                        if (is_red(tree, n) && is_red(tree, p))
+                        {
+                            // Hard red violation: rotations necessary
+                            const s32 dir2 = (tree.v_get_node(t, RIGHT) == g) ? 1 : 0;
+
+                            if (n == tree.v_get_node(p, last))
+                                tree.v_set_node(t, dir2, rotate_single(tree, g, 1 - last));
+                            else
+                                tree.v_set_node(t, dir2, rotate_double(tree, g, 1 - last));
+                        }
+
+                        inserted = n;
+                        break;
                     }
                     else if (is_red(tree, tree.v_get_node(n, LEFT)) && is_red(tree, tree.v_get_node(n, RIGHT)))
                     {
@@ -138,7 +150,7 @@ namespace ncore
                     // Stop working if we inserted a node. This
                     // check also disallows duplicates in the tree
                     last = dir;
-                    dir  = tree.v_compare_insert(new_key, n);
+                    dir  = comparer(key, n, user_data);
                     if (dir == 0)
                         break;
                     dir = ((dir + 1) >> 1);
@@ -162,7 +174,7 @@ namespace ncore
             root = tree.v_get_root();
             tree.v_set_color(root, BLACK);
 
-            return inserted;
+            return inserted != c_invalid_node;
         }
 
         bool rb_clear(tree_t& tree, node_t& removed_node)
@@ -227,12 +239,12 @@ namespace ncore
             return result;
         }
 
-        bool find(tree_t const& tree, key_t key, node_t& found)
+        bool find(tree_t const& tree, index_t key, compare_fn comparer, void const* user_data, node_t& found)
         {
             node_t node = tree.v_get_root();
             while (node != c_invalid_node)
             {
-                const s32 c = tree.v_compare_insert(key, node);
+                const s32 c = comparer(key, node, user_data);
                 if (c == 0)
                 {
                     found = node;
@@ -245,7 +257,7 @@ namespace ncore
         }
 
         // validate the tree (return violation description in 'result'), also returns black height
-        static s32 rb_validate(tree_t& tree, node_t root, const char*& result)
+        static s32 rb_validate(tree_t& tree, node_t root, const char*& result, compare_fn comparer, void const* user_data)
         {
             if (root == c_invalid_node)
             {
@@ -268,11 +280,11 @@ namespace ncore
                     }
                 }
 
-                s32 lh = rb_validate(tree, ln, result);
-                s32 rh = rb_validate(tree, rn, result);
+                s8 lh = rb_validate(tree, ln, result, comparer, user_data);
+                s8 rh = rb_validate(tree, rn, result, comparer, user_data);
 
                 // Invalid binary search tree
-                if ((ln != c_invalid_node && tree.v_compare_nodes(ln, root) >= 0) || (rn != c_invalid_node && tree.v_compare_nodes(rn, root) <= 0))
+                if ((ln != c_invalid_node && comparer(ln, root, user_data) >= 0) || (rn != c_invalid_node && comparer(rn, root, user_data) <= 0))
                 {
                     result = "Binary tree violation";
                     return 0;
@@ -292,7 +304,7 @@ namespace ncore
             return 0;
         }
 
-        bool remove(tree_t& tree, key_t key, node_t& out_removed)
+        bool remove(tree_t& tree, index_t key, compare_fn comparer, void const* user_data, node_t& out_removed)
         {
             node_t root = tree.v_get_root();
             if (root == c_invalid_node)
@@ -322,7 +334,7 @@ namespace ncore
                 g   = p;
                 p   = n;
                 n   = tree.v_get_node(n, dir);
-                dir = tree.v_compare_insert(key, n);
+                dir = comparer(key, n, user_data);
 
                 // Save the node with matching data and keep
                 // going; we'll do removal tasks at the end
@@ -419,7 +431,7 @@ namespace ncore
                         root = c_invalid_node;
                 }
 
-                tree.v_del_node(fn);
+                // tree.v_del_node(fn); // User must delete the node
                 out_removed = fn;
             }
 
@@ -431,10 +443,10 @@ namespace ncore
             return true;
         }
 
-        bool validate(tree_t& tree, const char*& error_str)
+        bool validate(tree_t& tree, const char*& error_str, compare_fn comparer, void const* user_data)
         {
             node_t root = tree.v_get_root();
-            rb_validate(tree, root, error_str);
+            rb_validate(tree, root, error_str, comparer, user_data);
             return error_str == nullptr;
         }
 
@@ -446,86 +458,85 @@ namespace ncore
             return iter;
         }
 
-        bool iterator_t::traverse(s32 d, key_t& key, value_t& value)
+        bool iterator_t::traverse(tree_t& tree, s32 d, node_t& out_node)
         {
             if (m_it == c_invalid_node)
             {
-                m_it = m_tree.v_get_root();
+                m_it = tree.v_get_root();
             }
             else
             {
-                m_it = m_tree.v_get_node(m_it, d);
+                m_it = tree.v_get_node(m_it, d);
             }
 
             if (m_it != c_invalid_node)
             {
-                key   = m_tree.v_get_key(m_it);
-                value = m_tree.v_get_value(m_it);
+                out_node = m_it;
                 return true;
             }
             return false;
         }
 
-        bool iterator_t::preorder(s32 dir, key_t& key, value_t& value)
+        bool iterator_t::preorder(tree_t& tree, s32 dir, node_t& out_node)
         {
             if (m_stack == -1)
             {
                 m_stack = 0;
-                if (m_tree.v_get_root() != c_invalid_node)
+                if (tree.v_get_root() != c_invalid_node)
                 {
-                    m_stack_array[m_stack++] = m_tree.v_get_root();
+                    m_stack_array[m_stack++] = tree.v_get_root();
                 }
             }
 
-            key = c_invalid_key;
             if (m_stack == 0)
+            {
+                out_node = c_invalid_node;
                 return false;
+            }
 
-            m_it  = m_stack_array[--m_stack];
-            key   = m_tree.v_get_key(m_it);
-            value = m_tree.v_get_value(m_it);
+            m_it = m_stack_array[--m_stack];
 
-            node_t child1 = m_tree.v_get_node(m_it, 1 - dir);
+            node_t child1 = tree.v_get_node(m_it, 1 - dir);
             if (child1 != c_invalid_node)
                 m_stack_array[m_stack++] = child1;
 
-            node_t child2 = m_tree.v_get_node(m_it, dir);
+            node_t child2 = tree.v_get_node(m_it, dir);
             if (child2 != c_invalid_node)
                 m_stack_array[m_stack++] = child2;
 
+            out_node = m_it;
             return true;
         }
 
-        bool iterator_t::sortorder(s32 dir, key_t& key, value_t& value)
+        bool iterator_t::sortorder(tree_t& tree, s32 dir, node_t& out_node)
         {
             if (m_stack == -1)
             {
                 m_stack = 0;
-                m_it    = m_tree.v_get_root();
+                m_it    = tree.v_get_root();
             }
 
             while (m_it != c_invalid_node)
             {
                 m_stack_array[m_stack++] = m_it;
-                m_it                     = m_tree.v_get_node(m_it, dir);
+                m_it                     = tree.v_get_node(m_it, dir);
             }
 
             if (m_stack == 0)
                 return false;
 
-            m_it  = m_stack_array[--m_stack];
-            key   = m_tree.v_get_key(m_it);
-            value = m_tree.v_get_value(m_it);
-            m_it  = m_tree.v_get_node(m_it, 1 - dir);
+            m_it     = m_stack_array[--m_stack];
+            out_node = m_it;
+            m_it     = tree.v_get_node(m_it, 1 - dir);
             return true;
         }
 
-        bool iterator_t::postorder(s32 dir, key_t& key, value_t& value)
+        bool iterator_t::postorder(tree_t& tree, s32 dir, node_t& out_node)
         {
             if (m_stack == -1)
             {
                 m_stack = 0;
-                m_it    = m_tree.v_get_root();
+                m_it    = tree.v_get_root();
                 if (m_it != c_invalid_node)
                 {
                     m_stack_array[m_stack++] = m_it;
@@ -538,13 +549,12 @@ namespace ncore
             while (true)
             {
                 node_t const node   = m_stack_array[m_stack - 1];
-                node_t const child1 = m_tree.v_get_node(node, 1 - dir);
-                node_t const child2 = m_tree.v_get_node(node, dir);
+                node_t const child1 = tree.v_get_node(node, 1 - dir);
+                node_t const child2 = tree.v_get_node(node, dir);
                 if ((child1 == m_it || child2 == m_it) || (child1 == c_invalid_node && child2 == c_invalid_node))
                 {
-                    m_it  = node;
-                    key   = m_tree.v_get_key(m_it);
-                    value = m_tree.v_get_value(m_it);
+                    m_it     = node;
+                    out_node = m_it;
                     m_stack--;
                     return true;
                 }
@@ -559,19 +569,14 @@ namespace ncore
             return true;
         }
 
-        void create_tree(alloc_t* allocator, tree_t& c, u32 max_nodes, compare_keys_fn comparer, void const* keys_array, u32 sizeof_key, void const* values_array, u32 sizeof_value)
+        void create_tree(alloc_t* allocator, tree_t& c, u32 max_nodes)
         {
-            c.m_compare_keys                  = comparer;
             c.m_num_nodes_current             = 0;
             c.m_num_nodes_max                 = max_nodes;
             c.m_nodes_free_index              = 0;
             c.m_nodes_free_head               = c_invalid_index;
             c.m_children                      = (tree_t::children_t*)allocator->allocate(sizeof(tree_t::children_t) * (max_nodes + 1));
             c.m_colors                        = (u8*)allocator->allocate((((max_nodes + 1) + 7) >> 3) * sizeof(u8));
-            c.m_keys_array                    = (const byte*)keys_array;
-            c.m_values_array                  = (const byte*)values_array;
-            c.m_sizeof_key                    = sizeof_key;
-            c.m_sizeof_value                  = sizeof_value;
             c.m_root                          = c_invalid_node;
             c.m_temp                          = max_nodes;
             c.m_children[c.m_temp].m_child[0] = c_invalid_node;
