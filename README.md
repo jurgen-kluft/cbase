@@ -9,7 +9,7 @@ Cross platform base library
   - buffer / binary reader / binary writer
   - console
   - endian
-  - hierarchical bitset (hbb_t)
+  - hierarchical binmap (hbb_t)
   - integer (min/max, clamp, align, ilog2, findLastBit, findFirstBit, countBits, countTrailingZeros/countLeadingZeros)
   - limits (minimum/maximum value of system types)
   - log (logging to console)
@@ -19,5 +19,6 @@ Cross platform base library
   - low-level string functions
   - slice
   - sort
+  - tree and tree32 (red-black tree)
   - tls
   - va-list (va_t)

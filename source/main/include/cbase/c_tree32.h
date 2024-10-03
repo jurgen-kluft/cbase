@@ -48,22 +48,22 @@ namespace ncore
             node_t v_new_node();
             void   v_del_node(node_t node);
 
-            node_t m_root;  // root node is always index 0 of the node array
-            node_t m_temp;  // temp node is always index 1 of the node array
+            node_t m_root;
+            node_t m_temp;  // temp node is always at m_nodes[m_num_nodes_max]
 
             u32 m_num_nodes_current;
             u32 m_num_nodes_max;
             u32 m_nodes_free_index;
             u32 m_nodes_free_head;
 
-            struct children_t
+            struct nnode_t
             {
                 node_t m_child[2];
             };
 
-            children_t* m_children;
-            u8*         m_colors;
-            u32*        m_items;
+            nnode_t* m_nodes;
+            u8*      m_colors;
+            u32*     m_items;
         };
 
         struct iterator_t
