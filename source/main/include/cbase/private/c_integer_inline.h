@@ -35,6 +35,11 @@ namespace ncore
             return r;
         }
 
+        template <class T> T max(T integerA, T integerB, T integerC)
+        {
+            return max(integerC, max(integerA, integerB));
+        }
+
         // Function template, integerA = smallest value, integerB = biggest value
         template <class T>
         inline void sort(T& integerA, T& integerB)
