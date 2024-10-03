@@ -7,526 +7,423 @@
 
 using namespace ncore;
 
-s32 compare_s32(void const* p1, void const* p2)
-{
-    s32 const s1 = *(s32 const*)p1;
-    s32 const s2 = *(s32 const*)p2;
-    if (s1 < s2)
-        return -1;
-    else if (s1 > s2)
-        return 1;
-    return 0;
-}
-
-class ctxt_tree_t : public ncore::ntree::tree_t
-{
-    alloc_t* m_allocator;
-    s32      m_size;
-    s32      m_cap;
-
-    struct node16_t
-    {
-        s32 m_data;
-        u16 m_color;
-        u16 m_branches[3];
-    };
-
-    node16_t* m_nodes;
-    s32       m_freeindex;
-    node16_t* m_freelist;
-    s32*      m_keys;
-    node16_t* m_nill;
-    node16_t* m_root;
-
-public:
-    ctxt_tree_t()
-        : m_allocator(nullptr)
-        , m_size(0)
-        , m_cap(0)
-        , m_nodes(nullptr)
-        , m_freeindex(0)
-        , m_freelist(nullptr)
-        , m_keys(nullptr)
-        , m_nill(nullptr)
-        , m_root(nullptr)
-    {
-    }
-
-    void init(alloc_t* allocator)
-    {
-        m_allocator                      = allocator;
-        m_size                           = 0;
-        m_cap                            = 8192;
-        m_nodes                          = (node16_t*)m_allocator->allocate(sizeof(node16_t) * m_cap);
-        m_freeindex                      = 0;
-        m_freelist                       = nullptr;
-        m_keys                           = (s32*)m_allocator->allocate(sizeof(s32) * m_cap);
-        m_nodes[m_cap - 1].m_branches[0] = 0xffff;
-        m_nodes[m_cap - 1].m_branches[1] = 0xffff;
-        m_nodes[m_cap - 1].m_branches[2] = 0xffff;
-
-        m_root = (node16_t*)v_new_node(nullptr, nullptr);
-        m_nill = (node16_t*)v_new_node(nullptr, nullptr);
-
-        ntree::node_t*& root = (ntree::node_t*&)m_root;
-        ntree::node_t*& nill = (ntree::node_t*&)m_nill;
-        ntree::initialize(this, nill, root);
-    }
-
-    void exit()
-    {
-        m_allocator->deallocate(m_nodes);
-        m_nodes = nullptr;
-        m_allocator->deallocate(m_keys);
-        m_keys = nullptr;
-    }
-
-    virtual s32            v_size() const final { return m_size; }
-    virtual s32            v_capacity() const final { return m_cap; }
-    virtual ntree::node_t* v_get_nill() const final { return (ntree::node_t*)m_nill; }
-    virtual ntree::node_t* v_get_root() const final { return (ntree::node_t*)m_root; }
-
-    virtual void           v_set_color(ntree::node_t* node, ntree::color_e color) final { ((node16_t*)node)->m_color = color; }
-    virtual ntree::color_e v_get_color(ntree::node_t const* node) const final { return (ntree::color_e)((node16_t const*)node)->m_color; }
-    virtual void const*    v_get_key(ntree::node_t const* node) const final
-    {
-        u16 const index = (u16)((node16_t const*)node - m_nodes);
-        return (void const*)&m_keys[index];
-    }
-    virtual void const* v_get_value(ntree::node_t const* node) const final
-    {
-        u16 const index = (u16)((node16_t const*)node - m_nodes);
-        return (void const*)&m_keys[index];
-    }
-    virtual ntree::node_t* v_get_node(ntree::node_t const* node, ntree::node_e ne) const final { return (ntree::node_t*)(&m_nodes[((node16_t const*)node)->m_branches[ne]]); }
-    virtual void           v_set_node(ntree::node_t* node, ntree::node_e ne, ntree::node_t* set) final { ((node16_t*)node)->m_branches[ne] = (u16)((node16_t*)set - m_nodes); }
-    virtual ntree::node_t* v_new_node(void const* key, void const* value) final
-    {
-        node16_t* node = nullptr;
-        if (m_freelist != nullptr)
-        {
-            node       = m_freelist;
-            m_freelist = (node->m_branches[2] == 0xffff) ? nullptr : &m_nodes[node->m_branches[2]];
-        }
-        else if (m_freeindex < m_cap)
-        {
-            node = &m_nodes[m_freeindex++];
-        }
-        else
-        {
-            return nullptr;
-        }
-
-        u16 const index     = (u16)(node - m_nodes);
-        m_keys[index]       = key != nullptr ? *((const s32*)key) : 0;
-        node->m_color       = ntree::RED;
-        node->m_data        = index;
-        node->m_branches[0] = 0;
-        node->m_branches[1] = 0;
-        node->m_branches[2] = 0;
-        m_size++;
-        return (ntree::node_t*)node;
-    }
-    virtual void v_del_node(ntree::node_t* node)
-    {
-        if (node == nullptr)
-            return;
-        node16_t* n      = (node16_t*)node;
-        n->m_branches[0] = 0;
-        n->m_branches[1] = 0;
-        if (m_freelist == nullptr)
-        {
-            n->m_branches[2] = 0xffff;
-        }
-        else 
-        {
-            n->m_branches[2] = (u16)(m_freelist - m_nodes);
-        }
-        m_freelist = n;
-        m_size--;
-        if (m_size == 0)
-        {
-            m_freelist = nullptr;
-            m_freeindex = 0;
-        }
-    }
-    virtual s32 v_compare_nodes(ntree::node_t const* node, ntree::node_t const* other) const { return compare_s32(v_get_key(node), v_get_key(other)); }
-    virtual s32 v_compare_insert(void const* key, ntree::node_t const* node) const { return compare_s32(key, v_get_key(node)); }
-};
-
 UNITTEST_SUITE_BEGIN(test_tree)
 {
     UNITTEST_FIXTURE(main)
     {
-        static ctxt_tree_t    ctxt_instance;
-        static ntree::tree_t* ctxt = &ctxt_instance;
+        static ntree::tree_t s_tree;
+
+        // the values here should not touch bit 0
+        static void* a = (void*)2;
+        static void* b = (void*)4;
+        static void* c = (void*)6;
+        static void* d = (void*)8;
+        static void* e = (void*)10;
+        static void* f = (void*)12;
+        static void* g = (void*)14;
+        static void* h = (void*)16;
+        static void* i = (void*)18;
+
+        static void* x = (void*)100;
+
+        s8 compare_key_with_item(void const* key, void const* item)
+        {
+            ASSERT(key == a || key == b || key == c || key == d || key == e || key == f || key == g || key == h || key == i || key == x);
+            ASSERT(item == a || item == b || item == c || item == d || item == e || item == f || item == g || item == h || item == i || item == x);
+
+            int_t a = (int_t)key;
+            int_t b = (int_t)item;
+            if (a < b)
+                return -1;
+            else if (a > b)
+                return 1;
+            return 0;
+        }
+
+        s8 compare_items(void const* itemA, void const* itemB)
+        {
+            ASSERT(itemA == a || itemA == b || itemA == c || itemA == d || itemA == e || itemA == f || itemA == g || itemA == h || itemA == i || itemA == x);
+            ASSERT(itemB == a || itemB == b || itemB == c || itemB == d || itemB == e || itemB == f || itemB == g || itemB == h || itemB == i || itemB == x);
+
+            int_t a = (int_t)itemA;
+            int_t b = (int_t)itemB;
+            if (a < b)
+                return -1;
+            else if (a > b)
+                return 1;
+            return 0;
+        }
 
         UNITTEST_ALLOCATOR;
 
-        UNITTEST_FIXTURE_SETUP() { ctxt_instance.init(Allocator); }
-        UNITTEST_FIXTURE_TEARDOWN() { ctxt_instance.exit(); }
+        UNITTEST_FIXTURE_SETUP() { ntree::setup_tree(Allocator, s_tree); }
+        UNITTEST_FIXTURE_TEARDOWN() { ntree::teardown_tree(Allocator, s_tree); }
 
         UNITTEST_TEST(tree_node)
         {
-            s32 const key = 0;
+            void* key = (void*)1;
 
-            ntree::node_t* node  = ctxt->v_new_node(&key, nullptr);
-            ntree::node_t* left  = ctxt->v_new_node(&key, nullptr);
-            ntree::node_t* right = ctxt->v_new_node(&key, nullptr);
+            ntree::node_t* node  = s_tree.v_new_node(key);
+            ntree::node_t* left  = s_tree.v_new_node(key);
+            ntree::node_t* right = s_tree.v_new_node(key);
 
             ntree::node_t* left_ptr = left;
-            // node->set_left(ctxt, left_ptr);
-            ctxt->v_set_node(node, ntree::LEFT, left_ptr);
+            // node->set_left(s_tree, left_ptr);
+            s_tree.v_set_node(node, ntree::LEFT, left_ptr);
 
-            // CHECK_EQUAL(left_ptr, node->get_left(ctxt));
-            CHECK_EQUAL(left_ptr, ctxt->v_get_node(node, ntree::LEFT));
+            // CHECK_EQUAL(left_ptr, node->get_left(s_tree));
+            CHECK_EQUAL(left_ptr, s_tree.v_get_node(node, ntree::LEFT));
 
             ntree::node_t* right_ptr = right;
-            // node->set_right(ctxt, right_ptr);
-            ctxt->v_set_node(node, ntree::RIGHT, right_ptr);
-            // CHECK_EQUAL(right_ptr, node->get_right(ctxt));
-            CHECK_EQUAL(right_ptr, ctxt->v_get_node(node, ntree::RIGHT));
+            // node->set_right(s_tree, right_ptr);
+            s_tree.v_set_node(node, ntree::RIGHT, right_ptr);
+            // CHECK_EQUAL(right_ptr, node->get_right(s_tree));
+            CHECK_EQUAL(right_ptr, s_tree.v_get_node(node, ntree::RIGHT));
 
-            // CHECK_EQUAL(true, node->is_red(ctxt));
-            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree::RED);
+            // CHECK_EQUAL(true, node->is_red(s_tree));
+            CHECK_EQUAL(true, s_tree.v_get_color(node) == ntree::RED);
 
-            // node->set_black(ctxt);
-            // CHECK_EQUAL(false, node->is_red(ctxt));
-            // node->set_red(ctxt);
-            // CHECK_EQUAL(true, node->is_red(ctxt));
-            // node->set_black(ctxt);
-            // CHECK_EQUAL(false, node->is_red(ctxt));
-            // CHECK_EQUAL(true, node->is_black(ctxt));
-            ctxt->v_set_color(node, ntree::BLACK);
-            CHECK_EQUAL(false, ctxt->v_get_color(node) == ntree::RED);
-            ctxt->v_set_color(node, ntree::RED);
-            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree::RED);
-            ctxt->v_set_color(node, ntree::BLACK);
-            CHECK_EQUAL(false, ctxt->v_get_color(node) == ntree::RED);
-            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree::BLACK);
+            // node->set_black(s_tree);
+            // CHECK_EQUAL(false, node->is_red(s_tree));
+            // node->set_red(s_tree);
+            // CHECK_EQUAL(true, node->is_red(s_tree));
+            // node->set_black(s_tree);
+            // CHECK_EQUAL(false, node->is_red(s_tree));
+            // CHECK_EQUAL(true, node->is_black(s_tree));
+            s_tree.v_set_color(node, ntree::BLACK);
+            CHECK_EQUAL(false, s_tree.v_get_color(node) == ntree::RED);
+            s_tree.v_set_color(node, ntree::RED);
+            CHECK_EQUAL(true, s_tree.v_get_color(node) == ntree::RED);
+            s_tree.v_set_color(node, ntree::BLACK);
+            CHECK_EQUAL(false, s_tree.v_get_color(node) == ntree::RED);
+            CHECK_EQUAL(true, s_tree.v_get_color(node) == ntree::BLACK);
 
             left_ptr  = left;
             right_ptr = right;
-            // node->set_left(ctxt, left_ptr);
-            // node->set_right(ctxt, right_ptr);
-            // CHECK_EQUAL(left_ptr, node->get_child(ctxt, 0));
-            // CHECK_EQUAL(right_ptr, node->get_child(ctxt, 1));
-            // CHECK_EQUAL(true, node->is_black(ctxt));
-            ctxt->v_set_node(node, ntree::LEFT, left_ptr);
-            ctxt->v_set_node(node, ntree::RIGHT, right_ptr);
-            CHECK_EQUAL(left_ptr, ctxt->v_get_node(node, ntree::LEFT));
-            CHECK_EQUAL(right_ptr, ctxt->v_get_node(node, ntree::RIGHT));
-            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree::BLACK);
+            // node->set_left(s_tree, left_ptr);
+            // node->set_right(s_tree, right_ptr);
+            // CHECK_EQUAL(left_ptr, node->get_child(s_tree, 0));
+            // CHECK_EQUAL(right_ptr, node->get_child(s_tree, 1));
+            // CHECK_EQUAL(true, node->is_black(s_tree));
+            s_tree.v_set_node(node, ntree::LEFT, left_ptr);
+            s_tree.v_set_node(node, ntree::RIGHT, right_ptr);
+            CHECK_EQUAL(left_ptr, s_tree.v_get_node(node, ntree::LEFT));
+            CHECK_EQUAL(right_ptr, s_tree.v_get_node(node, ntree::RIGHT));
+            CHECK_EQUAL(true, s_tree.v_get_color(node) == ntree::BLACK);
 
-            // node->set_child(ctxt, 0, left_ptr);
-            // node->set_child(ctxt, 1, right_ptr);
-            ctxt->v_set_node(node, ntree::LEFT, left_ptr);
-            ctxt->v_set_node(node, ntree::RIGHT, right_ptr);
+            // node->set_child(s_tree, 0, left_ptr);
+            // node->set_child(s_tree, 1, right_ptr);
+            s_tree.v_set_node(node, ntree::LEFT, left_ptr);
+            s_tree.v_set_node(node, ntree::RIGHT, right_ptr);
 
-            // CHECK_EQUAL(left_ptr, node->get_child(ctxt, 0));
-            // CHECK_EQUAL(right_ptr, node->get_child(ctxt, 1));
-            CHECK_EQUAL(left_ptr, ctxt->v_get_node(node, ntree::LEFT));
-            CHECK_EQUAL(right_ptr, ctxt->v_get_node(node, ntree::RIGHT));
+            // CHECK_EQUAL(left_ptr, node->get_child(s_tree, 0));
+            // CHECK_EQUAL(right_ptr, node->get_child(s_tree, 1));
+            CHECK_EQUAL(left_ptr, s_tree.v_get_node(node, ntree::LEFT));
+            CHECK_EQUAL(right_ptr, s_tree.v_get_node(node, ntree::RIGHT));
 
-            // CHECK_EQUAL(true, node->is_black(ctxt));
-            CHECK_EQUAL(true, ctxt->v_get_color(node) == ntree::BLACK);
+            // CHECK_EQUAL(true, node->is_black(s_tree));
+            CHECK_EQUAL(true, s_tree.v_get_color(node) == ntree::BLACK);
 
-            ctxt->v_del_node(node);
-            ctxt->v_del_node(left);
-            ctxt->v_del_node(right);
+            s_tree.v_del_node(node);
+            s_tree.v_del_node(left);
+            s_tree.v_del_node(right);
+        }
+
+        UNITTEST_TEST(insert_find_remove)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                bool           inserted;
+                ntree::node_t* inserted_node;
+                inserted = ntree::insert(s_tree, a, compare_key_with_item, inserted_node);
+                CHECK_TRUE(inserted);
+
+                const char* result = nullptr;
+                CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+
+                ntree::node_t* found;
+                CHECK_EQUAL(true, ntree::find(s_tree, a, compare_key_with_item, found));
+
+                CHECK_FALSE(ntree::find(s_tree, x, compare_items, found));
+
+                ntree::node_t* removed;
+                CHECK_TRUE(ntree::remove(s_tree, a, compare_items, removed));
+                s_tree.v_del_node(removed);
+            }
+
+            ntree::node_t* remove;
+            while (!ntree::clear(s_tree, remove))
+            {
+                s_tree.v_del_node(remove);
+            }
+
+            CHECK_EQUAL(0, ntree::size(s_tree));
         }
 
         UNITTEST_TEST(void_tree)
         {
-            s32 a = 1;
-            s32 b = 2;
-            s32 c = 3;
-            s32 d = 4;
-            s32 e = 5;
-            s32 f = 6;
-            s32 g = 7;
-            s32 h = 8;
-            s32 i = 9;
-
             const char* result = nullptr;
 
-            bool inserted;
-            inserted = ntree::insert(ctxt, &a);
+            bool           inserted;
+            ntree::node_t* inserted_node;
+            inserted = ntree::insert(s_tree, a, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &b);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, b, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &b);  // Duplicate insert should fail
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, b, compare_key_with_item, inserted_node);  // Duplicate insert should fail
             CHECK_FALSE(inserted);
-            inserted = ntree::insert(ctxt, &c);
+            inserted = ntree::insert(s_tree, c, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &d);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, d, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &e);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, e, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &f);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, f, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &g);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, g, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &h);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, h, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &i);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, i, compare_key_with_item, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
 
-            CHECK_EQUAL(9+2, ntree::size(ctxt));
+            CHECK_EQUAL(9, ntree::size(s_tree));
 
-            ntree::node_t* node = nullptr;
-            CHECK_EQUAL(true, ntree::find(ctxt, &a, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &b, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &c, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &d, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &e, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &f, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &g, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &h, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &i, node));
+            ntree::node_t* found;
+            CHECK_EQUAL(true, ntree::find(s_tree, a, compare_items, found));
+            CHECK_EQUAL(true, ntree::find(s_tree, b, compare_items, found));
+            CHECK_EQUAL(true, ntree::find(s_tree, c, compare_items, found));
+            CHECK_EQUAL(true, ntree::find(s_tree, d, compare_items, found));
+            CHECK_EQUAL(true, ntree::find(s_tree, e, compare_items, found));
+            CHECK_EQUAL(true, ntree::find(s_tree, f, compare_items, found));
+            CHECK_EQUAL(true, ntree::find(s_tree, g, compare_items, found));
+            CHECK_EQUAL(true, ntree::find(s_tree, h, compare_items, found));
+            CHECK_EQUAL(true, ntree::find(s_tree, i, compare_items, found));
 
-            s32 x(99);
-            CHECK_FALSE(ntree::find(ctxt, &x, node));
+            CHECK_FALSE(ntree::find(s_tree, x, compare_items, found));
 
-            CHECK_EQUAL(11, ntree::size(ctxt));
+            CHECK_EQUAL(9, ntree::size(s_tree));
 
-            while (!ntree::clear(ctxt)) {}
+            ntree::node_t* remove;
+            while (!ntree::clear(s_tree, remove))
+            {
+                s_tree.v_del_node(remove);
+            }
 
-            CHECK_EQUAL(2, ntree::size(ctxt));
+            CHECK_EQUAL(0, ntree::size(s_tree));
         }
 
         UNITTEST_TEST(void_tree_iterate_preorder)
         {
-            s32 a = 1;
-            s32 b = 2;
-            s32 c = 3;
-            s32 d = 4;
-            s32 e = 5;
-            s32 f = 6;
-            s32 g = 7;
-            s32 h = 8;
-            s32 i = 9;
+            ntree::node_t* inserted_node;
+            CHECK_TRUE(ntree::insert(s_tree, a, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, b, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, c, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, d, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, e, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, f, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, g, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, h, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, i, compare_items, inserted_node));
 
-            CHECK_TRUE(ntree::insert(ctxt, &a));
-            CHECK_TRUE(ntree::insert(ctxt, &b));
-            CHECK_TRUE(ntree::insert(ctxt, &c));
-            CHECK_TRUE(ntree::insert(ctxt, &d));
-            CHECK_TRUE(ntree::insert(ctxt, &e));
-            CHECK_TRUE(ntree::insert(ctxt, &f));
-            CHECK_TRUE(ntree::insert(ctxt, &g));
-            CHECK_TRUE(ntree::insert(ctxt, &h));
-            CHECK_TRUE(ntree::insert(ctxt, &i));
+            ntree::iterator_t iterator = ntree::iterate();
 
-            ntree::iterator_t iterator = ntree::iterate(ctxt);
-
-            s32         round      = 0;
-            s32         preorder[] = {d, b, a, c, f, e, h, g, i};
-            void const* data;
-            while (iterator.preorder(ntree::RIGHT, data))
+            s32   round      = 0;
+            void* preorder[] = {d, b, a, c, f, e, h, g, i};
+            void* data;
+            while (iterator.preorder(s_tree, ntree::LEFT, data))
             {
-                CHECK_EQUAL(preorder[round++], *(s32*)data);
+                CHECK_EQUAL(preorder[round++], data);
             }
             CHECK_EQUAL(9, round);
 
-            while (!ntree::clear(ctxt)) {}
+            ntree::node_t* remove;
+            while (!ntree::clear(s_tree, remove))
+            {
+                s_tree.v_del_node(remove);
+            }
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder)
         {
-            s32 a = 1;
-            s32 b = 2;
-            s32 c = 3;
-            s32 d = 4;
-            s32 e = 5;
-            s32 f = 6;
-            s32 g = 7;
-            s32 h = 8;
-            s32 i = 9;
+            ntree::node_t* inserted_node;
+            CHECK_TRUE(ntree::insert(s_tree, a, compare_key_with_item, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, b, compare_key_with_item, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, c, compare_key_with_item, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, d, compare_key_with_item, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, e, compare_key_with_item, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, f, compare_key_with_item, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, g, compare_key_with_item, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, h, compare_key_with_item, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, i, compare_key_with_item, inserted_node));
 
-            CHECK_TRUE(ntree::insert(ctxt, &a));
-            CHECK_TRUE(ntree::insert(ctxt, &b));
-            CHECK_TRUE(ntree::insert(ctxt, &c));
-            CHECK_TRUE(ntree::insert(ctxt, &d));
-            CHECK_TRUE(ntree::insert(ctxt, &e));
-            CHECK_TRUE(ntree::insert(ctxt, &f));
-            CHECK_TRUE(ntree::insert(ctxt, &g));
-            CHECK_TRUE(ntree::insert(ctxt, &h));
-            CHECK_TRUE(ntree::insert(ctxt, &i));
+            ntree::iterator_t iterator = ntree::iterate();
 
-            ntree::iterator_t iterator = ntree::iterate(ctxt);
-
-            s32         round       = 0;
-            s32         sortorder[] = {a, b, c, d, e, f, g, h, i};
-            void const* data;
-            while (iterator.sortorder(ntree::RIGHT, data))
+            s32   round       = 0;
+            void* sortorder[] = {a, b, c, d, e, f, g, h, i};
+            void* data;
+            while (iterator.sortorder(s_tree, ntree::LEFT, data))
             {
-                CHECK_EQUAL(sortorder[round++], *(s32*)data);
+                CHECK_EQUAL(sortorder[round++], data);
             }
             CHECK_EQUAL(9, round);
 
-            while (!ntree::clear(ctxt)) {}
+            ntree::node_t* remove;
+            while (!ntree::clear(s_tree, remove))
+            {
+                s_tree.v_del_node(remove);
+            }
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
         {
-            s32 a = 1;
-            s32 b = 2;
-            s32 c = 3;
-            s32 d = 4;
-            s32 e = 5;
-            s32 f = 6;
-            s32 g = 7;
-            s32 h = 8;
-            s32 i = 9;
+            ntree::node_t* inserted_node;
+            CHECK_TRUE(ntree::insert(s_tree, a, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, b, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, c, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, d, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, e, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, f, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, g, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, h, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, i, compare_items, inserted_node));
 
-            CHECK_TRUE(ntree::insert(ctxt, &a));
-            CHECK_TRUE(ntree::insert(ctxt, &b));
-            CHECK_TRUE(ntree::insert(ctxt, &c));
-            CHECK_TRUE(ntree::insert(ctxt, &d));
-            CHECK_TRUE(ntree::insert(ctxt, &e));
-            CHECK_TRUE(ntree::insert(ctxt, &f));
-            CHECK_TRUE(ntree::insert(ctxt, &g));
-            CHECK_TRUE(ntree::insert(ctxt, &h));
-            CHECK_TRUE(ntree::insert(ctxt, &i));
+            ntree::iterator_t iterator = ntree::iterate();
 
-            ntree::iterator_t iterator = ntree::iterate(ctxt);
-
-            s32         round       = 0;
-            s32         sortorder[] = {i, h, g, f, e, d, c, b, a};
-            void const* data;
-            while (iterator.sortorder(ntree::LEFT, data))
+            s32   round       = 0;
+            void* sortorder[] = {i, h, g, f, e, d, c, b, a};
+            void* data;
+            while (iterator.sortorder(s_tree, ntree::RIGHT, data))
             {
-                CHECK_EQUAL(sortorder[round++], *(s32*)data);
+                CHECK_EQUAL(sortorder[round++], data);
             }
             CHECK_EQUAL(9, round);
 
-            while (!ntree::clear(ctxt)) {}
+            ntree::node_t* remove;
+            while (!ntree::clear(s_tree, remove))
+            {
+                s_tree.v_del_node(remove);
+            }
         }
 
         UNITTEST_TEST(void_tree_iterate_postorder)
         {
-            s32 a = 1;
-            s32 b = 2;
-            s32 c = 3;
-            s32 d = 4;
-            s32 e = 5;
-            s32 f = 6;
-            s32 g = 7;
-            s32 h = 8;
-            s32 i = 9;
+            ntree::node_t* inserted_node;
+            CHECK_TRUE(ntree::insert(s_tree, a, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, b, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, c, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, d, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, e, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, f, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, g, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, h, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, i, compare_items, inserted_node));
 
-            CHECK_TRUE(ntree::insert(ctxt, &a));
-            CHECK_TRUE(ntree::insert(ctxt, &b));
-            CHECK_TRUE(ntree::insert(ctxt, &c));
-            CHECK_TRUE(ntree::insert(ctxt, &d));
-            CHECK_TRUE(ntree::insert(ctxt, &e));
-            CHECK_TRUE(ntree::insert(ctxt, &f));
-            CHECK_TRUE(ntree::insert(ctxt, &g));
-            CHECK_TRUE(ntree::insert(ctxt, &h));
-            CHECK_TRUE(ntree::insert(ctxt, &i));
+            ntree::iterator_t iterator = ntree::iterate();
 
-            ntree::iterator_t iterator = ntree::iterate(ctxt);
+            s32   round       = 0;
+            void* postorder[] = {a, c, b, e, g, i, h, f, d};
 
-            s32 round       = 0;
-            s32 postorder[] = {a, c, b, e, g, i, h, f, d};
-
-            void const* data;
-            while (iterator.postorder(ntree::RIGHT, data))
+            void* data;
+            while (iterator.postorder(s_tree, ntree::LEFT, data))
             {
-                CHECK_EQUAL(postorder[round++], *(s32*)data);
+                CHECK_EQUAL(postorder[round++], data);
             }
             CHECK_EQUAL(9, round);
 
-            while (!ntree::clear(ctxt)) {}
+            ntree::node_t* remove;
+            while (!ntree::clear(s_tree, remove))
+            {
+                s_tree.v_del_node(remove);
+            }
         }
 
         UNITTEST_TEST(void_tree_search)
         {
-            s32 a = 1;
-            s32 b = 2;
-            s32 c = 3;
-            s32 d = 4;
-            s32 e = 5;
-            s32 f = 6;
-            s32 g = 7;
-            s32 h = 8;
-            s32 i = 9;
+            ntree::node_t* inserted_node;
+            CHECK_TRUE(ntree::insert(s_tree, a, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, b, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, c, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, d, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, e, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, f, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, g, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, h, compare_items, inserted_node));
+            CHECK_TRUE(ntree::insert(s_tree, i, compare_items, inserted_node));
 
-            CHECK_TRUE(ntree::insert(ctxt, &a));
-            CHECK_TRUE(ntree::insert(ctxt, &b));
-            CHECK_TRUE(ntree::insert(ctxt, &c));
-            CHECK_TRUE(ntree::insert(ctxt, &d));
-            CHECK_TRUE(ntree::insert(ctxt, &e));
-            CHECK_TRUE(ntree::insert(ctxt, &f));
-            CHECK_TRUE(ntree::insert(ctxt, &g));
-            CHECK_TRUE(ntree::insert(ctxt, &h));
-            CHECK_TRUE(ntree::insert(ctxt, &i));
+            ntree::iterator_t iterator = ntree::iterate();
 
-            ntree::iterator_t iterator = ntree::iterate(ctxt);
-
-            s32         dir = ntree::LEFT;
-            void const* data;
-            void*       find = &f;
-            while (iterator.traverse(dir, data))
+            s32   dir = ntree::LEFT;
+            void* data;
+            void* find = f;
+            while (iterator.traverse(s_tree, dir, data))
             {
-                s32 const c = compare_s32(find, data);
+                s32 const c = compare_items(find, data);
                 if (c == 0)
                     break;
                 dir = iterator.getdir(c);
             }
-            CHECK_EQUAL(0, compare_s32(data, find));
+            CHECK_EQUAL(0, compare_items(data, find));
 
-            while (!ntree::clear(ctxt)) {}
+            ntree::node_t* remove;
+            while (!ntree::clear(s_tree, remove))
+            {
+                s_tree.v_del_node(remove);
+            }
         }
 
         UNITTEST_TEST(s32_tree)
         {
-            s32 a(1);
-            s32 b(2);
-            s32 c(3);
-            s32 d(4);
-
             const char* result = nullptr;
 
-            bool inserted;
-            inserted = ntree::insert(ctxt, &a);
+            bool           inserted;
+            ntree::node_t* inserted_node;
+            inserted = ntree::insert(s_tree, a, compare_items, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &b);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, b, compare_items, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &b);  // Duplicate insert should fail
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, b, compare_items, inserted_node);  // Duplicate insert should fail
             CHECK_FALSE(inserted);
-            inserted = ntree::insert(ctxt, &c);
+            inserted = ntree::insert(s_tree, c, compare_items, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
-            inserted = ntree::insert(ctxt, &d);
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
+            inserted = ntree::insert(s_tree, d, compare_items, inserted_node);
             CHECK_TRUE(inserted);
-            CHECK_TRUE(ntree::validate(ctxt, result));
+            CHECK_TRUE(ntree::validate(s_tree, result, compare_items));
 
-            CHECK_EQUAL(6, ntree::size(ctxt));
+            CHECK_EQUAL(4, ntree::size(s_tree));
 
-            ntree::node_t* node = nullptr;
-            CHECK_EQUAL(true, ntree::find(ctxt, &a, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &b, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &c, node));
-            CHECK_EQUAL(true, ntree::find(ctxt, &d, node));
+            ntree::node_t* found;
+            CHECK_EQUAL(true, ntree::find(s_tree, a, compare_items, found));
+            CHECK_EQUAL(a, s_tree.v_get_item(found));
+            CHECK_EQUAL(true, ntree::find(s_tree, b, compare_items, found));
+            CHECK_EQUAL(b, s_tree.v_get_item(found));
+            CHECK_EQUAL(true, ntree::find(s_tree, c, compare_items, found));
+            CHECK_EQUAL(c, s_tree.v_get_item(found));
+            CHECK_EQUAL(true, ntree::find(s_tree, d, compare_items, found));
+            CHECK_EQUAL(d, s_tree.v_get_item(found));
 
-            s32 e(5);
-            CHECK_FALSE(ntree::find(ctxt, &e, node));
+            CHECK_FALSE(ntree::find(s_tree, x, compare_items, found));
+            CHECK_NULL(found);
 
-            while (!ntree::clear(ctxt)) {}
+            ntree::node_t* remove;
+            while (!ntree::clear(s_tree, remove))
+            {
+                s_tree.v_del_node(remove);
+            }
 
-            CHECK_EQUAL(2, ntree::size(ctxt));
+            CHECK_EQUAL(0, ntree::size(s_tree));
         }
     }
 }

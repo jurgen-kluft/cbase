@@ -2,107 +2,257 @@
 #define __CBASE_MAP_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "cbase/c_allocator.h"
-#include "cbase/c_integer.h"
-#include "cbase/c_limits.h"
-#include "cbase/private/c_std.h"
-#include "cbase/private/c_map_internal.h"
+#include "cbase/c_tree.h"
 
 namespace ncore
 {
-    template <typename K, typename V, typename H = nhash::hashing_t<K>> class map_t
-    {
-    public:
-        inline map_t(alloc_t* a = nullptr, u32 max_items = 65535)
-            : m_allocator(a)
-            , m_ctxt(nullptr)
-        {
-            if (m_allocator == nullptr)
-            {
-                m_allocator = g_get_system_alloc();
-            }
+    // Note:
+    // The map and set provided here assume that a key and value are very simple POD types.
+    // There is no handling for 'construction' or 'destruction', furthermore there is also
+    // NO hashing done on the key.
 
-            if (max_items <= type_t<u16>::max())
+    template <typename K, typename V>
+    class map_t
+    {
+        alloc_t*      m_allocator;
+        ntree::tree_t m_tree;
+
+        struct item_t
+        {
+            item_t(K const& _key, V const& _value)
+                : key(_key)
+                , value(_value)
             {
-                m_ctxt = m_allocator->construct<map_tree_ctxt_t<u16, K, V, H>>(a, max_items);
             }
-            else if (max_items <= type_t<u32>::max())
-            {
-                m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, V, H>>(a, max_items);
-            }
+            K key;
+            V value;
+
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
+        };
+
+        static inline s8 compare_key_with_item(const void* _key, const void* _item)
+        {
+            K const*      key  = (K*)_key;
+            item_t const* item = (item_t const*)_item;
+            if (*key < item->key)
+                return -1;
+            else if (*key > item->key)
+                return 1;
+            return 0;
+        }
+
+        static inline s8 compare_items(const void* _itemA, const void* _itemB)
+        {
+            item_t const* itemA = (item_t*)_itemA;
+            item_t const* itemB = (item_t*)_itemB;
+            if (itemA->key < itemB->key)
+                return -1;
+            else if (itemA->key > itemB->key)
+                return 1;
+            return 0;
+        }
+
+    public:
+        inline map_t(alloc_t* a)
+            : m_allocator(a)
+            , m_tree()
+        {
+            ntree::setup_tree(m_allocator, m_tree);
         }
 
         inline ~map_t()
         {
-            while (!ntree::clear(m_ctxt)) {}
-            m_allocator->destruct(m_ctxt);
+            ntree::node_t* n;
+            while (!ntree::clear(m_tree, n))
+            {
+                item_t* item = (item_t*)m_tree.v_get_item(n);
+                m_allocator->destruct(item);
+                m_tree.v_del_node(n);
+            }
+            ntree::teardown_tree(m_allocator, m_tree);
         }
 
-        bool insert(K const& key, V const& value) { return ntree::insert(m_ctxt, &key, &value); }
-        bool remove(K const& key) { return ntree::remove(m_ctxt, &key); }
-        bool find(K const& key, V const*& value) const
+        inline int_t size() const { return ntree::size(m_tree); }
+        inline bool  empty() const { return ntree::size(m_tree) == 0; }
+
+        inline bool insert(K const& _key, V const& _value)
+        {
+            item_t*        item = m_allocator->construct<item_t>(_key, _value);
+            ntree::node_t* inserted;
+            if (!ntree::insert(m_tree, &item, compare_items, inserted))
+            {
+                m_allocator->destruct(item);
+                return false;
+            }
+            return true;
+        }
+
+        inline bool find(K const& _key, V& _value) const
         {
             ntree::node_t* found;
-            bool            result = ntree::find(m_ctxt, &key, found);
-            if (found != nullptr)
-                value= (V const*)m_ctxt->v_get_value(found);
-            return result;
+            if (ntree::find(m_tree, (void const*)&_key, compare_key_with_item, found))
+            {
+                item_t* item = (item_t*)m_tree.v_get_item(found);
+                _value       = item->value;
+                return true;
+            }
+            return false;
         }
 
-    private:
-        alloc_t*        m_allocator;
-        ntree::tree_t* m_ctxt;
+        inline bool remove(K const& key)
+        {
+            ntree::node_t* removed;
+            if (ntree::remove(m_tree, (void const*)&key, compare_key_with_item, removed))
+            {
+                item_t* item = (item_t*)m_tree.v_get_item(removed);
+                m_allocator->destruct(item);
+                m_tree.v_del_node(removed);
+                return true;
+            }
+            return false;
+        }
+
+        struct iterator_t
+        {
+            inline bool traverse(s32 d, item_t& item) { return m_iter.traverse(*m_tree, d, item); }
+            inline bool preorder(s32 d, item_t& item) { return m_iter.preorder(*m_tree, d, item); }
+            inline bool sortorder(s32 d, item_t& item) { return m_iter.sortorder(*m_tree, d, item); }
+            inline bool postorder(s32 d, item_t& item) { return m_iter.postorder(*m_tree, d, item); }
+
+        protected:
+            iterator_t(ntree::tree_t const* tree)
+                : m_tree(tree)
+                , m_iter()
+            {
+            }
+
+        private:
+            ntree::tree_t const* m_tree;
+            ntree::iterator_t    m_iter;
+        };
+
+        inline iterator_t iterate() const { return iterator_t(&m_tree); }
     };
 
-    template <typename K, typename H = nhash::hashing_t<K>> class set_t
+    template <typename K>
+    class set_t
     {
-    public:
-        inline set_t(alloc_t* a = nullptr, u32 max_items = 65535)
-            : m_allocator(a)
-            , m_ctxt(nullptr)
-        {
-            if (m_allocator == nullptr)
-            {
-                m_allocator = g_get_system_alloc();
-            }
+        alloc_t*      m_allocator;
+        ntree::tree_t m_tree;
 
-            if (max_items <= type_t<u16>::max())
+        struct item_t
+        {
+            item_t(K const& _key)
+                : key(_key)
             {
-                m_ctxt = m_allocator->construct<map_tree_ctxt_t<u16, K, u8, H>>(a, max_items, false);
             }
-            else if (max_items <= type_t<u32>::max())
-            {
-                m_ctxt = m_allocator->construct<map_tree_ctxt_t<u32, K, u8, H>>(a, max_items, false);
-            }
+            K key;
+
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
+        };
+
+        static inline s8 compare_key_with_item(const void* _key, const void* _item)
+        {
+            K const*      key  = (K*)_key;
+            item_t const* item = (item_t const*)_item;
+            if (*key < item->key)
+                return -1;
+            else if (*key > item->key)
+                return 1;
+            return 0;
+        }
+
+        static inline s8 compare_items(const void* _itemA, const void* _itemB)
+        {
+            item_t const* itemA = (item_t*)_itemA;
+            item_t const* itemB = (item_t*)_itemB;
+            if (itemA->key < itemB->key)
+                return -1;
+            else if (itemA->key > itemB->key)
+                return 1;
+            return 0;
+        }
+
+    public:
+        inline set_t(alloc_t* a)
+            : m_allocator(a)
+            , m_tree()
+        {
+            ntree::setup_tree(m_allocator, m_tree);
         }
 
         ~set_t()
         {
-            while (!ntree::clear(m_ctxt)) {}
-            m_allocator->destruct(m_ctxt);
+            ntree::node_t* n;
+            while (!ntree::clear(m_tree, n))
+            {
+                item_t* item = (item_t*)m_tree.v_get_item(n);
+                m_allocator->destruct(item);
+                m_tree.v_del_node(n);
+            }
+            ntree::teardown_tree(m_allocator, m_tree);
         }
 
-        bool insert(K const& key) { return ntree::insert(m_ctxt, &key, nullptr); }
-        bool contains(K const& key) const
+        inline int_t size() const { return ntree::size(m_tree); }
+        inline bool  empty() const { return ntree::size(m_tree) == 0; }
+
+        inline bool insert(K const& _key)
         {
-            ntree::node_t* found  = nullptr;
-            bool            result = ntree::find(m_ctxt, &key, found);
-            return result;
-        }
-        bool remove(K const& key)
-        {
-            bool result = ntree::remove(m_ctxt, &key);
-            return result;
+            item_t*        item = m_allocator->construct<item_t>(_key);
+            ntree::node_t* inserted;
+            if (!ntree::insert(m_tree, &item, compare_items, inserted))
+            {
+                m_allocator->destruct(item);
+                return false;
+            }
+            return true;
         }
 
-    private:
-        alloc_t*        m_allocator;
-        ntree::tree_t* m_ctxt;
+        inline bool contains(K const& _key) const
+        {
+            ntree::node_t* found;
+            return ntree::find(m_tree, (void const*)&_key, compare_key_with_item, found);
+        }
+
+        inline bool remove(K const& key)
+        {
+            ntree::node_t* removed;
+            if (ntree::remove(m_tree, (void const*)&key, compare_key_with_item, removed))
+            {
+                item_t* item = (item_t*)m_tree.v_get_item(removed);
+                m_allocator->destruct(item);
+                m_tree.v_del_node(removed);
+                return true;
+            }
+            return false;
+        }
+
+        struct iterator_t
+        {
+            inline bool traverse(s32 d, item_t& item) { return m_iter.traverse(*m_tree, d, item); }
+            inline bool preorder(s32 d, item_t& item) { return m_iter.preorder(*m_tree, d, item); }
+            inline bool sortorder(s32 d, item_t& item) { return m_iter.sortorder(*m_tree, d, item); }
+            inline bool postorder(s32 d, item_t& item) { return m_iter.postorder(*m_tree, d, item); }
+
+        protected:
+            inline iterator_t(ntree::tree_t const* tree)
+                : m_tree(tree)
+                , m_iter()
+            {
+            }
+
+        private:
+            ntree::tree_t const* m_tree;
+            ntree::iterator_t    m_iter;
+        };
+
+        inline iterator_t iterate() const { return iterator_t(&m_tree); }
     };
 
-}; // namespace ncore
+};  // namespace ncore
 
-#endif // __CBASE_MAP_H__
+#endif  // __CBASE_MAP_H__

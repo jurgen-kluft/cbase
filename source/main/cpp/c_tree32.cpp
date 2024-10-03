@@ -1,7 +1,7 @@
 #include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
 #include "cbase/c_bit_field.h"
-#include "cbase/c_tree.h"
+#include "cbase/c_tree32.h"
 
 namespace ncore
 {
@@ -28,19 +28,11 @@ namespace ncore
     //    key, value, color and children.
     //
 
-    namespace ntree
+    namespace ntree32
     {
-        static inline void s_init_node(tree_t& tree, node_t* node)
+        static inline node_t rotate_single(tree_t& tree, node_t node, s32 dir)
         {
-            node->m_child[LEFT]  = nullptr;
-            node->m_child[RIGHT] = nullptr;
-            node->m_item         = nullptr;
-            tree.v_set_color(node, RED);
-        }
-
-        static inline node_t* rotate_single(tree_t& tree, node_t* node, s32 dir)
-        {
-            node_t* save = tree.v_get_node(node, 1 - dir);
+            node_t save = tree.v_get_node(node, 1 - dir);
             tree.v_set_node(node, 1 - dir, tree.v_get_node(save, dir));
             tree.v_set_node(save, dir, node);
             tree.v_set_color(node, RED);
@@ -48,9 +40,9 @@ namespace ncore
             return save;
         }
 
-        static inline node_t* rotate_single_track_parent(tree_t& tree, node_t* node, s32 dir, node_t* fn, node_t*& fp)
+        static inline node_t rotate_single_track_parent(tree_t& tree, node_t node, s32 dir, node_t fn, node_t& fp)
         {
-            node_t* save = tree.v_get_node(node, 1 - dir);
+            node_t save = tree.v_get_node(node, 1 - dir);
             tree.v_set_node(node, 1 - dir, tree.v_get_node(save, dir));
             tree.v_set_node(save, dir, node);
             tree.v_set_color(node, RED);
@@ -64,76 +56,65 @@ namespace ncore
             return save;
         }
 
-        static inline node_t* rotate_double(tree_t& tree, node_t* node, s32 dir)
+        static inline node_t rotate_double(tree_t& tree, node_t node, s32 dir)
         {
             tree.v_set_node(node, 1 - dir, rotate_single(tree, tree.v_get_node(node, 1 - dir), 1 - dir));
             return rotate_single(tree, node, dir);
         }
 
-        static inline node_t* rotate_double_track_parent(tree_t& tree, node_t* node, s32 dir, node_t* fn, node_t*& fp)
+        static inline node_t rotate_double_track_parent(tree_t& tree, node_t node, s32 dir, node_t fn, node_t& fp)
         {
-            node_t* child = rotate_single_track_parent(tree, tree.v_get_node(node, 1 - dir), 1 - dir, fn, fp);
+            node_t child = rotate_single_track_parent(tree, tree.v_get_node(node, 1 - dir), 1 - dir, fn, fp);
             tree.v_set_node(node, 1 - dir, child);
 
             if (fn == child)  // never triggered
                 fp = node;
-            node_t* save = rotate_single_track_parent(tree, node, dir, fn, fp);
+            node_t save = rotate_single_track_parent(tree, node, dir, fn, fp);
             if (fn == node)
                 fp = save;
             return save;
         }
 
-        static inline s32 is_red(tree_t& tree, node_t* n) { return n != nullptr && tree.v_get_color(n) == RED; }
+        static inline s32 is_red(tree_t& tree, node_t n) { return n != c_invalid_node && tree.v_get_color(n) == RED; }
 
-        bool insert(tree_t& tree, void* key, compare_fn comparer, node_t*& _inserted)
+        bool insert(tree_t& tree, node_t new_node)
         {
-            _inserted    = nullptr;
-            node_t* root = tree.v_get_root();
-            if (root == nullptr)
+            key_t new_key = tree.v_get_key(new_node);
+
+            bool   inserted = false;
+            node_t root     = tree.v_get_root();
+            if (root == c_invalid_node)
             {
-                // We have an empty tree; attach the new node directly to the root
-                root      = tree.v_new_node(key);
-                _inserted = root;
+                // We have an empty tree; attach the
+                // new node directly to the root
+                tree.v_set_root(new_node);
+                inserted = true;
             }
             else
             {
-                node_t  head;   // False tree root
-                node_t *g, *t;  // Grandparent & parent
-                node_t *p, *n;  // Iterator & parent
-                s8      dir = 0, last = 0;
+                node_t head = tree.v_get_temp();  // False tree root
+                node_t g, t;                      // Grandparent & parent
+                node_t p, n;                      // Iterator & parent
+                s32    dir = 0, last = 0;
 
                 // Set up our helpers
-                t         = &head;
-                t->m_item = nullptr;
+                t = head;
                 tree.v_set_color(t, BLACK);
                 tree.v_set_node(t, RIGHT, root);
-                tree.v_set_node(t, LEFT, nullptr);
+                tree.v_set_node(t, LEFT, c_invalid_node);
 
-                g = p = nullptr;
+                g = p = c_invalid_node;
                 n     = root;
 
                 // Search down the tree for a place to insert
                 for (;;)
                 {
-                    if (n == nullptr)
+                    if (n == c_invalid_node)
                     {
                         // Insert a new node at the first null link
-                        n = tree.v_new_node(key);
+                        n = new_node;
                         tree.v_set_node(p, dir, n);
-
-                        if (is_red(tree, n) && is_red(tree, p))
-                        {
-                            // Hard red violation: rotations necessary
-                            const s32 dir2 = (tree.v_get_node(t, RIGHT) == g) ? 1 : 0;
-
-                            if (n == tree.v_get_node(p, last))
-                                tree.v_set_node(t, dir2, rotate_single(tree, g, 1 - last));
-                            else
-                                tree.v_set_node(t, dir2, rotate_double(tree, g, 1 - last));
-                        }
-
-                        _inserted = n;
-                        break;
+                        inserted = true;
                     }
                     else if (is_red(tree, tree.v_get_node(n, LEFT)) && is_red(tree, tree.v_get_node(n, RIGHT)))
                     {
@@ -154,15 +135,16 @@ namespace ncore
                             tree.v_set_node(t, dir2, rotate_double(tree, g, 1 - last));
                     }
 
-                    // This check disallows duplicates in the tree
+                    // Stop working if we inserted a node. This
+                    // check also disallows duplicates in the tree
                     last = dir;
-                    dir  = comparer(key, tree.v_get_item(n));
+                    dir  = tree.v_compare_insert(new_key, n);
                     if (dir == 0)
                         break;
                     dir = ((dir + 1) >> 1);
 
                     // Move the helpers down
-                    if (g != nullptr)
+                    if (g != c_invalid_node)
                         t = g;
 
                     g = p;
@@ -171,31 +153,33 @@ namespace ncore
                 }
 
                 // Update the root (it may be different)
-                root = tree.v_get_node(&head, RIGHT);
+                // root = head->get_right(tree);
+                root = tree.v_get_node(head, RIGHT);
+                tree.v_set_root(root);
             }
 
             // Make the root black for simplified logic
-            tree.v_set_root(root);
+            root = tree.v_get_root();
             tree.v_set_color(root, BLACK);
 
-            return _inserted != nullptr;
+            return inserted;
         }
 
-        bool rb_clear(tree_t& tree, node_t*& removed_node)
+        bool rb_clear(tree_t& tree, node_t& removed_node)
         {
-            removed_node = nullptr;
+            removed_node = c_invalid_node;
 
-            node_t* node = tree.v_get_root();
-            if (node == nullptr)
+            node_t node = tree.v_get_root();
+            if (node == c_invalid_node)
                 return true;
 
-            node_t* todelete = node;
+            node_t todelete = node;
 
-            if (tree.v_get_node(node, LEFT) == nullptr)
+            if (tree.v_get_node(node, LEFT) == c_invalid_node)
             {
                 tree.v_set_root(tree.v_get_node(node, RIGHT));
             }
-            else if (tree.v_get_node(node, RIGHT) == nullptr)
+            else if (tree.v_get_node(node, RIGHT) == c_invalid_node)
             {
                 tree.v_set_root(tree.v_get_node(node, LEFT));
             }
@@ -204,22 +188,22 @@ namespace ncore
                 // We have left and right branches
                 // Take right branch and place it
                 // somewhere down the left branch
-                node_t* branch = tree.v_get_node(node, RIGHT);
-                tree.v_set_node(node, RIGHT, nullptr);
+                node_t branch = tree.v_get_node(node, RIGHT);
+                tree.v_set_node(node, RIGHT, c_invalid_node);
 
                 // Find a node in the left branch that does not
                 // have both a left and right branch and place
                 // our branch there.
-                node_t* iter = tree.v_get_node(node, LEFT);
-                while (tree.v_get_node(iter, LEFT) != nullptr && tree.v_get_node(iter, RIGHT) != nullptr)
+                node_t iter = tree.v_get_node(node, LEFT);
+                while (tree.v_get_node(iter, LEFT) != c_invalid_node && tree.v_get_node(iter, RIGHT) != c_invalid_node)
                 {
                     iter = tree.v_get_node(iter, LEFT);
                 }
-                if (tree.v_get_node(iter, LEFT) == nullptr)
+                if (tree.v_get_node(iter, LEFT) == c_invalid_node)
                 {
                     tree.v_set_node(iter, LEFT, branch);
                 }
-                else if (tree.v_get_node(iter, RIGHT) == nullptr)
+                else if (tree.v_get_node(iter, RIGHT) == c_invalid_node)
                 {
                     tree.v_set_node(iter, RIGHT, branch);
                 }
@@ -231,20 +215,24 @@ namespace ncore
             return false;
         }
 
-        bool clear(tree_t& tree, node_t*& n)
+        bool clear(tree_t& tree, node_t& n)
         {
-            node_t* node   = nullptr;
-            bool    result = rb_clear(tree, node);
-            n              = node;
+            node_t node   = c_invalid_node;
+            bool   result = rb_clear(tree, node);
+            if (node != c_invalid_node)
+            {
+                n = node;
+                tree.v_del_node(node);
+            }
             return result;
         }
 
-        bool find(tree_t const& tree, void const* key, compare_fn comparer, node_t*& found)
+        bool find(tree_t const& tree, key_t key, node_t& found)
         {
-            node_t* node = tree.v_get_root();
-            while (node != nullptr)
+            node_t node = tree.v_get_root();
+            while (node != c_invalid_node)
             {
-                const s8 c = comparer(key, tree.v_get_item(node));
+                const s32 c = tree.v_compare_insert(key, node);
                 if (c == 0)
                 {
                     found = node;
@@ -252,23 +240,23 @@ namespace ncore
                 }
                 node = tree.v_get_node(node, (c + 1) >> 1);
             }
-            found = nullptr;
+            found = c_invalid_node;
             return false;
         }
 
         // validate the tree (return violation description in 'result'), also returns black height
-        static s32 rb_validate(tree_t& tree, node_t* root, const char*& result, compare_fn comparer)
+        static s32 rb_validate(tree_t& tree, node_t root, const char*& result)
         {
-            if (root == nullptr)
+            if (root == c_invalid_node)
             {
                 return 1;
             }
             else
             {
-                // node_t* ln = root->get_left(tree);
-                // node_t* rn = root->get_right(tree);
-                node_t* ln = tree.v_get_node(root, LEFT);
-                node_t* rn = tree.v_get_node(root, RIGHT);
+                // node_t ln = root->get_left(tree);
+                // node_t rn = root->get_right(tree);
+                node_t ln = tree.v_get_node(root, LEFT);
+                node_t rn = tree.v_get_node(root, RIGHT);
 
                 // Consecutive red links
                 if (is_red(tree, root))
@@ -280,11 +268,11 @@ namespace ncore
                     }
                 }
 
-                s8 lh = rb_validate(tree, ln, result, comparer);
-                s8 rh = rb_validate(tree, rn, result, comparer);
+                s32 lh = rb_validate(tree, ln, result);
+                s32 rh = rb_validate(tree, rn, result);
 
                 // Invalid binary search tree
-                if ((ln != nullptr && comparer(tree.v_get_item(ln), tree.v_get_item(root)) >= 0) || (rn != nullptr && comparer(tree.v_get_item(rn), tree.v_get_item(root)) <= 0))
+                if ((ln != c_invalid_node && tree.v_compare_nodes(ln, root) >= 0) || (rn != c_invalid_node && tree.v_compare_nodes(rn, root) <= 0))
                 {
                     result = "Binary tree violation";
                     return 0;
@@ -304,37 +292,37 @@ namespace ncore
             return 0;
         }
 
-        bool remove(tree_t& tree, void const* key, compare_fn comparer, node_t*& out_removed)
+        bool remove(tree_t& tree, key_t key, node_t& out_removed)
         {
-            node_t* root = tree.v_get_root();
-            if (root == nullptr)
+            node_t root = tree.v_get_root();
+            if (root == c_invalid_node)
                 return false;
 
-            node_t  head;           // False tree root
-            node_t* fn  = nullptr;  // Found node
-            node_t* fp  = nullptr;  // Found node parent
-            s8      dir = 1;
+            node_t head = tree.v_get_temp();  // False tree root
+            node_t fn   = c_invalid_node;     // Found node
+            node_t fp   = c_invalid_node;     // Found node parent
+            s32    dir  = 1;
 
             // Set up our helpers
-            node_t* g = nullptr;
-            node_t* p = nullptr;
+            node_t g = c_invalid_node;
+            node_t p = c_invalid_node;
 
-            node_t* n = &head;
+            node_t n = head;
             tree.v_set_color(n, BLACK);  // Color it black
             tree.v_set_node(n, RIGHT, root);
-            tree.v_set_node(n, LEFT, nullptr);
+            tree.v_set_node(n, LEFT, c_invalid_node);
 
             // Search and push a red node down
             // to fix red violations as we go
-            while (tree.v_get_node(n, dir) != nullptr)
+            while (tree.v_get_node(n, dir) != c_invalid_node)
             {
-                const s8 last = dir;
+                const s32 last = dir;
 
                 // Move the helpers down
                 g   = p;
                 p   = n;
                 n   = tree.v_get_node(n, dir);
-                dir = comparer(key, tree.v_get_item(n));
+                dir = tree.v_compare_insert(key, n);
 
                 // Save the node with matching data and keep
                 // going; we'll do removal tasks at the end
@@ -350,7 +338,7 @@ namespace ncore
                 {
                     if (is_red(tree, tree.v_get_node(n, 1 - dir)))
                     {
-                        node_t* r = rotate_single_track_parent(tree, n, dir, fn, fp);
+                        node_t r = rotate_single_track_parent(tree, n, dir, fn, fp);
                         tree.v_set_node(p, last, r);
                         if (fn == r)  // never triggered
                             fp = p;
@@ -358,8 +346,8 @@ namespace ncore
                     }
                     else if (!is_red(tree, tree.v_get_node(n, 1 - dir)))
                     {
-                        node_t* s = tree.v_get_node(p, 1 - last);
-                        if (s != nullptr)
+                        node_t s = tree.v_get_node(p, 1 - last);
+                        if (s != c_invalid_node)
                         {
                             if (!is_red(tree, tree.v_get_node(s, 1 - last)) && !is_red(tree, tree.v_get_node(s, last)))
                             {
@@ -374,7 +362,7 @@ namespace ncore
                                 const s32 dir2 = tree.v_get_node(g, RIGHT) == p ? 1 : 0;
                                 if (is_red(tree, tree.v_get_node(s, last)))
                                 {
-                                    node_t* r = rotate_double_track_parent(tree, p, last, fn, fp);
+                                    node_t r = rotate_double_track_parent(tree, p, last, fn, fp);
                                     // g->set_child(tree, dir2, r);
                                     tree.v_set_node(g, dir2, r);
                                     if (fn == r)  // never triggered
@@ -382,7 +370,7 @@ namespace ncore
                                 }
                                 else if (is_red(tree, tree.v_get_node(s, 1 - last)))
                                 {
-                                    node_t* r = rotate_single_track_parent(tree, p, last, fn, fp);
+                                    node_t r = rotate_single_track_parent(tree, p, last, fn, fp);
                                     // g->set_child(tree, dir2, r);
                                     tree.v_set_node(g, dir2, r);
                                     if (fn == r)  // never triggered
@@ -402,15 +390,15 @@ namespace ncore
             }
 
             // Update the root (it may be different)
-            root = tree.v_get_node(&head, RIGHT);
+            root = tree.v_get_node(head, RIGHT);
 
             // Replace and remove the saved node
-            if (fn != nullptr)
+            if (fn != c_invalid_node)
             {
                 ASSERT(tree.v_get_node(fp, RIGHT) == fn || tree.v_get_node(fp, LEFT) == fn);
                 ASSERT(tree.v_get_node(p, RIGHT) == n || tree.v_get_node(p, LEFT) == n);
 
-                node_t* child1 = tree.v_get_node(n, tree.v_get_node(n, LEFT) == nullptr);
+                node_t child1 = tree.v_get_node(n, tree.v_get_node(n, LEFT) == c_invalid_node);
                 tree.v_set_node(p, tree.v_get_node(p, RIGHT) == n, child1);
 
                 if (fn != n)
@@ -428,114 +416,117 @@ namespace ncore
                 else
                 {
                     if (root == fn)
-                        root = nullptr;
+                        root = c_invalid_node;
                 }
 
-                // tree.v_del_node(fn);
-                out_removed = fn;  // User is responsible for deleting the node
+                tree.v_del_node(fn);
+                out_removed = fn;
             }
 
             // Make the root black for simplified logic
-            if (root != nullptr)
+            if (root != c_invalid_node)
                 tree.v_set_color(root, BLACK);
 
             tree.v_set_root(root);
             return true;
         }
 
-        bool validate(tree_t& tree, const char*& error_str, compare_fn comparer)
+        bool validate(tree_t& tree, const char*& error_str)
         {
-            node_t* root = tree.v_get_root();
-            rb_validate(tree, root, error_str, comparer);
+            node_t root = tree.v_get_root();
+            rb_validate(tree, root, error_str);
             return error_str == nullptr;
         }
 
-        iterator_t iterate()
+        iterator_t iterate(tree_t& ctxt)
         {
-            iterator_t iter;
-            iter.m_it    = nullptr;
+            iterator_t iter(ctxt);
+            iter.m_it    = c_invalid_node;
             iter.m_stack = -1;
             return iter;
         }
 
-        bool iterator_t::traverse(tree_t const& tree, s32 d, void*& item)
+        bool iterator_t::traverse(s32 d, key_t& key, value_t& value)
         {
-            if (m_it == nullptr)
+            if (m_it == c_invalid_node)
             {
-                m_it = tree.v_get_root();
+                m_it = m_tree.v_get_root();
             }
             else
             {
-                m_it = tree.v_get_node(m_it, d);
+                m_it = m_tree.v_get_node(m_it, d);
             }
 
-            if (m_it != nullptr)
+            if (m_it != c_invalid_node)
             {
-                item = tree.v_get_item(m_it);
+                key   = m_tree.v_get_key(m_it);
+                value = m_tree.v_get_value(m_it);
                 return true;
             }
             return false;
         }
 
-        bool iterator_t::preorder(tree_t const& tree, s32 dir, void*& item)
+        bool iterator_t::preorder(s32 dir, key_t& key, value_t& value)
         {
             if (m_stack == -1)
             {
                 m_stack = 0;
-                if (tree.v_get_root() != nullptr)
+                if (m_tree.v_get_root() != c_invalid_node)
                 {
-                    m_stack_array[m_stack++] = tree.v_get_root();
+                    m_stack_array[m_stack++] = m_tree.v_get_root();
                 }
             }
 
-            item = nullptr;
+            key = c_invalid_key;
             if (m_stack == 0)
                 return false;
 
-            node_t* node = m_stack_array[--m_stack];
-            item         = tree.v_get_item(node);
+            m_it  = m_stack_array[--m_stack];
+            key   = m_tree.v_get_key(m_it);
+            value = m_tree.v_get_value(m_it);
 
-            node_t* child1 = tree.v_get_node(node, 1 - dir);
-            if (child1 != nullptr)
+            node_t child1 = m_tree.v_get_node(m_it, 1 - dir);
+            if (child1 != c_invalid_node)
                 m_stack_array[m_stack++] = child1;
 
-            node_t* child2 = tree.v_get_node(node, dir);
-            if (child2 != nullptr)
+            node_t child2 = m_tree.v_get_node(m_it, dir);
+            if (child2 != c_invalid_node)
                 m_stack_array[m_stack++] = child2;
 
             return true;
         }
 
-        bool iterator_t::sortorder(tree_t const& tree, s32 dir, void*& item)
+        bool iterator_t::sortorder(s32 dir, key_t& key, value_t& value)
         {
             if (m_stack == -1)
             {
                 m_stack = 0;
-                m_it    = tree.v_get_root();
+                m_it    = m_tree.v_get_root();
             }
 
-            while (m_it != nullptr)
+            while (m_it != c_invalid_node)
             {
                 m_stack_array[m_stack++] = m_it;
-                m_it                     = tree.v_get_node(m_it, dir);
+                m_it                     = m_tree.v_get_node(m_it, dir);
             }
 
             if (m_stack == 0)
                 return false;
 
-            m_it = m_stack_array[--m_stack];
-            item = tree.v_get_item(m_it);
-            m_it = tree.v_get_node(m_it, 1 - dir);
+            m_it  = m_stack_array[--m_stack];
+            key   = m_tree.v_get_key(m_it);
+            value = m_tree.v_get_value(m_it);
+            m_it  = m_tree.v_get_node(m_it, 1 - dir);
             return true;
         }
 
-        bool iterator_t::postorder(tree_t const& tree, s32 dir, void*& item)
+        bool iterator_t::postorder(s32 dir, key_t& key, value_t& value)
         {
             if (m_stack == -1)
             {
                 m_stack = 0;
-                m_it    = tree.v_get_root();
-                if (m_it != nullptr)
+                m_it    = m_tree.v_get_root();
+                if (m_it != c_invalid_node)
                 {
                     m_stack_array[m_stack++] = m_it;
                 }
@@ -546,34 +537,56 @@ namespace ncore
 
             while (true)
             {
-                node_t* const node   = m_stack_array[m_stack - 1];
-                node_t* const child1 = tree.v_get_node(node, 1 - dir);
-                node_t* const child2 = tree.v_get_node(node, dir);
-                if ((child1 == m_it || child2 == m_it) || (child1 == nullptr && child2 == nullptr))
+                node_t const node   = m_stack_array[m_stack - 1];
+                node_t const child1 = m_tree.v_get_node(node, 1 - dir);
+                node_t const child2 = m_tree.v_get_node(node, dir);
+                if ((child1 == m_it || child2 == m_it) || (child1 == c_invalid_node && child2 == c_invalid_node))
                 {
-                    m_it = node;
-                    item = tree.v_get_item(m_it);
+                    m_it  = node;
+                    key   = m_tree.v_get_key(m_it);
+                    value = m_tree.v_get_value(m_it);
                     m_stack--;
                     return true;
                 }
                 else
                 {
-                    if (child1 != nullptr)
+                    if (child1 != c_invalid_node)
                         m_stack_array[m_stack++] = child1;
-                    if (child2 != nullptr)
+                    if (child2 != c_invalid_node)
                         m_stack_array[m_stack++] = child2;
                 }
             }
             return true;
         }
 
-        void setup_tree(alloc_t* allocator, tree_t& c)
+        void create_tree(alloc_t* allocator, tree_t& c, u32 max_nodes, compare_keys_fn comparer, void const* keys_array, u32 sizeof_key, void const* values_array, u32 sizeof_value)
         {
-            c.m_alloc = allocator;
-            c.m_root  = nullptr;
+            c.m_compare_keys                  = comparer;
+            c.m_num_nodes_current             = 0;
+            c.m_num_nodes_max                 = max_nodes;
+            c.m_nodes_free_index              = 0;
+            c.m_nodes_free_head               = c_invalid_index;
+            c.m_children                      = (tree_t::children_t*)allocator->allocate(sizeof(tree_t::children_t) * (max_nodes + 1));
+            c.m_colors                        = (u8*)allocator->allocate((((max_nodes + 1) + 7) >> 3) * sizeof(u8));
+            c.m_keys_array                    = (const byte*)keys_array;
+            c.m_values_array                  = (const byte*)values_array;
+            c.m_sizeof_key                    = sizeof_key;
+            c.m_sizeof_value                  = sizeof_value;
+            c.m_root                          = c_invalid_node;
+            c.m_temp                          = max_nodes;
+            c.m_children[c.m_temp].m_child[0] = c_invalid_node;
+            c.m_children[c.m_temp].m_child[1] = c_invalid_node;
+            c.v_set_color(c.m_temp, RED);
         }
 
-        void teardown_tree(alloc_t* allocator, tree_t& c) {}
+        void destroy_tree(alloc_t* allocator, tree_t& c)
+        {
+            allocator->deallocate(c.m_children);
+            allocator->deallocate(c.m_colors);
 
-    }  // namespace ntree
+            c.m_children = nullptr;
+            c.m_colors   = nullptr;
+        }
+
+    }  // namespace ntree32
 }  // namespace ncore
