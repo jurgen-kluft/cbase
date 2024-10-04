@@ -191,6 +191,25 @@ namespace ncore
         u32   m_freeindex;
     };
 
+    void* g_malloc(u64 size, u16 align = sizeof(void*));
+    void  g_free(void* ptr);
+
+    // Type malloc and free
+    template <typename T, typename... Args>
+    T* g_new(Args... args)
+    {
+        void* mem = g_malloc(sizeof(T));
+        T*    obj = new (mem) T(args...);
+        return obj;
+    }
+
+    template <class T>
+    inline void g_delete(T* p)
+    {
+        p->~T();
+        g_free(p);
+    }
+
 };  // namespace ncore
 
 #endif  ///< __CBASE_ALLOCATOR_H__

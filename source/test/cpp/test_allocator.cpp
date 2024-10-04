@@ -139,6 +139,20 @@ UNITTEST_SUITE_BEGIN(test_allocator)
             test_object4* obj = sa.construct<test_object4>();
             sa.destruct<>(obj);
         }
+
+        struct my_type
+        {
+            s32 value;
+
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
+        };
+
+        UNITTEST_TEST(malloc_typed_and_free_typed)
+        {
+            my_type* p = ncore::g_new<my_type>();
+            CHECK_TRUE(p != nullptr);
+            ncore::g_delete(p);
+        }
     }
 }
 UNITTEST_SUITE_END
