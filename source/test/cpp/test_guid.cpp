@@ -149,9 +149,9 @@ UNITTEST_SUITE_BEGIN(test_guid_t)
 			guid_t id(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
 
             utf32::rune dst_runes[256];
-            dst_runes[0] = {0};
-            dst_runes[1] = {0};
-            dst_runes[255] = {0};
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
+            dst_runes[255] = 0;
             runes_t dst(dst_runes, 0, 0, 256 - 1);
 
 			crunes_t guidStr("11335577:22446688:557799BB:88AACCEE");

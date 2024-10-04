@@ -24,8 +24,8 @@ UNITTEST_SUITE_BEGIN(test_sprintf)
 		UNITTEST_TEST(format_double)
 		{
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
 			crunes_t fmt("%f");
@@ -39,8 +39,8 @@ UNITTEST_SUITE_BEGIN(test_sprintf)
 		UNITTEST_TEST(format_string)
 		{
             utf32::rune str_runes[256];
-            str_runes[0] = {0};
-            str_runes[1] = {0};
+            str_runes[0] = 0;
+            str_runes[1] = 0;
             runes_t str(str_runes, 0, 0, 256);
 
 

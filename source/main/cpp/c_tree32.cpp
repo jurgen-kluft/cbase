@@ -546,14 +546,14 @@ namespace ncore
             return true;
         }
 
-        void create_tree(alloc_t* allocator, tree_t& c, u32 max_nodes)
+        void setup_tree(tree_t& c, u32 max_nodes, void* nodes, void* colors)
         {
             c.m_num_nodes_current          = 0;
             c.m_num_nodes_max              = max_nodes;
             c.m_nodes_free_index           = 0;
             c.m_nodes_free_head            = c_invalid_index;
-            c.m_nodes                      = (tree_t::nnode_t*)allocator->allocate(sizeof(tree_t::nnode_t) * (max_nodes + 1));
-            c.m_colors                     = (u8*)allocator->allocate((((max_nodes + 1) + 7) >> 3) * sizeof(u8));
+            c.m_nodes                      = (tree_t::nnode_t*)nodes;
+            c.m_colors                     = (u8*)colors;
             c.m_root                       = c_invalid_node;
             c.m_temp                       = max_nodes;
             c.m_nodes[c.m_temp].m_child[0] = c_invalid_node;
@@ -561,13 +561,16 @@ namespace ncore
             c.v_set_color(c.m_temp, RED);
         }
 
-        void destroy_tree(alloc_t* allocator, tree_t& c)
+        void teardown_tree(tree_t& c)
         {
-            allocator->deallocate(c.m_nodes);
-            allocator->deallocate(c.m_colors);
-
-            c.m_nodes  = nullptr;
-            c.m_colors = nullptr;
+            c.m_num_nodes_current          = 0;
+            c.m_num_nodes_max              = 0;
+            c.m_nodes_free_index           = 0;
+            c.m_nodes_free_head            = c_invalid_index;
+            c.m_nodes                      = nullptr;
+            c.m_colors                     = nullptr;
+            c.m_root                       = c_invalid_node;
+            c.m_temp                       = c_invalid_node;
         }
 
     }  // namespace ntree32

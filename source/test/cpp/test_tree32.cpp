@@ -757,12 +757,14 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        const u32 c_max_nodes = 1024;
+        const u32                c_max_nodes = 1024;
+        ntree32::tree_t::nnode_t m_nodes[c_max_nodes + 1];
+        u8                       m_colors[(c_max_nodes + 1 + 7) >> 3];
 
         UNITTEST_TEST(tree_node)
         {
             ntree32::tree_t tree;
-            ntree32::create_tree(Allocator, tree, c_max_nodes);
+            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
             s_init_keys();
 
             ntree32::index_t const key = 0;
@@ -834,13 +836,13 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             CHECK_EQUAL(0, ntree32::size(tree));
 
-            ntree32::destroy_tree(Allocator, tree);
+            ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(insert_remove)
         {
             ntree32::tree_t tree;
-            ntree32::create_tree(Allocator, tree, c_max_nodes);
+            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -865,13 +867,13 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             CHECK_EQUAL(0, ntree32::size(tree));
 
-            ntree32::destroy_tree(Allocator, tree);
+            ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_iterate_preorder)
         {
             ntree32::tree_t tree;
-            ntree32::create_tree(Allocator, tree, c_max_nodes);
+            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < 9; ++i)
@@ -896,13 +898,13 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 #endif
             while (!ntree32::clear(tree, node)) {}
 
-            ntree32::destroy_tree(Allocator, tree);
+            ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder)
         {
             ntree32::tree_t tree;
-            ntree32::create_tree(Allocator, tree, c_max_nodes);
+            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -927,13 +929,13 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             while (!ntree32::clear(tree, node)) {}
 
-            ntree32::destroy_tree(Allocator, tree);
+            ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
         {
             ntree32::tree_t tree;
-            ntree32::create_tree(Allocator, tree, c_max_nodes);
+            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -959,13 +961,13 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             while (!ntree32::clear(tree, node)) {}
 
-            ntree32::destroy_tree(Allocator, tree);
+            ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_iterate_postorder)
         {
             ntree32::tree_t tree;
-            ntree32::create_tree(Allocator, tree, c_max_nodes);
+            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < 9; ++i)
@@ -992,13 +994,13 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             while (!ntree32::clear(tree, node)) {}
 
-            ntree32::destroy_tree(Allocator, tree);
+            ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_search)
         {
             ntree32::tree_t tree;
-            ntree32::create_tree(Allocator, tree, c_max_nodes);
+            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -1013,7 +1015,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             s32             dir = ntree32::LEFT;
             ntree32::node_t node;
-            s32             find = (c_num_keys / 2); // find the key at s_keys[find]
+            s32             find = (c_num_keys / 2);  // find the key at s_keys[find]
             while (iterator.traverse(tree, dir, node))
             {
                 s8 const c = s_compare_keys(find, node, &s_keys);
@@ -1025,13 +1027,13 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             while (!ntree32::clear(tree, node)) {}
 
-            ntree32::destroy_tree(Allocator, tree);
+            ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(s32_tree)
         {
             ntree32::tree_t tree;
-            ntree32::create_tree(Allocator, tree, c_max_nodes);
+            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -1061,7 +1063,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
 
             CHECK_EQUAL(0, ntree32::size(tree));
 
-            ntree32::destroy_tree(Allocator, tree);
+            ntree32::teardown_tree(tree);
         }
     }
 }

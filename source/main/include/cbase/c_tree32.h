@@ -63,7 +63,6 @@ namespace ncore
 
             nnode_t* m_nodes;
             u8*      m_colors;
-            u32*     m_items;
         };
 
         struct iterator_t
@@ -85,8 +84,8 @@ namespace ncore
             s32    m_stack;
         };
 
-        void create_tree(alloc_t* allocator, tree_t& c, u32 max_nodes);
-        void destroy_tree(alloc_t* allocator, tree_t& c);
+        void setup_tree(tree_t& c, u32 max_nodes, void* nodes, void* colors);
+        void teardown_tree(tree_t& c);
 
         inline int_t size(tree_t& c) { return c.v_size(); }
         inline int_t capacity(tree_t& c) { return c.v_capacity(); }

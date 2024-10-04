@@ -19,6 +19,13 @@ namespace ncore
         inline f32 clamp(f32 number, f32 low, f32 high);
 
         //---------------------------------------------------------------------------------------------------------------------
+        // Conversion
+        //---------------------------------------------------------------------------------------------------------------------
+
+        inline f32 deg_to_rad(f32 inDeg) { return inDeg * 0.0174532925f; }
+        inline f32 rad_to_deg(f32 inRad) { return inRad * 57.2957795f; }
+
+        //---------------------------------------------------------------------------------------------------------------------
         // Limits and const values
         //---------------------------------------------------------------------------------------------------------------------
 #ifdef D_IEEE_FLOATS
@@ -99,7 +106,7 @@ namespace ncore
         inline bool isNegative(f32 inNumber);
         inline bool isLessPositive(f32 inLHS, f32 inRHS);
         inline bool isGreater(f32 inLHS, f32 inRHS);
-    }; 
+    };
 
 #include "private/c_float_inline.h"
 

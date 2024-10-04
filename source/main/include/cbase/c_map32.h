@@ -24,10 +24,12 @@ namespace ncore
         alloc_t* m_allocator;
         struct data_t
         {
-            ntree32::tree_t m_tree;
-            u32             m_empty;
-            K*              m_keys;
-            V*              m_values;
+            ntree32::tree_t           m_tree;
+            u32                       m_empty;
+            ntree32::tree_t::nnode_t* m_nodes;
+            u8*                       m_colors;
+            K*                        m_keys;
+            V*                        m_values;
         };
 
         data_t m_data;
@@ -50,9 +52,11 @@ namespace ncore
             , m_data()
         {
             m_data.m_empty  = max_items;
-            m_data.m_keys   = static_cast<K*>(m_allocator->allocate((max_items + 1) * sizeof(K)));
-            m_data.m_values = static_cast<V*>(m_allocator->allocate((max_items + 1) * sizeof(V)));
-            ntree32::create_tree(m_allocator, m_data.m_tree, max_items);
+            m_data.m_nodes  = g_allocate_array<ntree32::tree_t::nnode_t>(m_allocator, max_items + 1);
+            m_data.m_colors = g_allocate_array<u8>(m_allocator, (max_items + 1 + 31) >> 5);
+            m_data.m_keys   = g_allocate_array<K>(m_allocator, max_items + 1);
+            m_data.m_values = g_allocate_array<V>(m_allocator, max_items + 1);
+            ntree32::setup_tree(m_data.m_tree, max_items, m_data.m_nodes, m_data.m_colors);
         }
 
         inline ~map32_t()
@@ -62,9 +66,11 @@ namespace ncore
             {
                 m_data.m_tree.v_del_node(n);
             }
-            ntree32::destroy_tree(m_allocator, m_data.m_tree);
-            m_allocator->deallocate(m_data.m_keys);
-            m_allocator->deallocate(m_data.m_values);
+            ntree32::teardown_tree(m_data.m_tree);
+            g_deallocate_array(m_allocator, m_data.m_keys);
+            g_deallocate_array(m_allocator, m_data.m_values);
+            g_deallocate_array(m_allocator, m_data.m_colors);
+            g_deallocate_array(m_allocator, m_data.m_nodes);
         }
 
         bool insert(K const& _key, V const& _value)
@@ -109,9 +115,11 @@ namespace ncore
         alloc_t* m_allocator;
         struct data_t
         {
-            ntree32::tree_t m_tree;
-            u32             m_empty;
-            K*              m_keys;
+            ntree32::tree_t           m_tree;
+            u32                       m_empty;
+            ntree32::tree_t::nnode_t* m_nodes;
+            u8*                       m_colors;
+            K*                        m_keys;
         };
         data_t m_data;
 
@@ -132,9 +140,11 @@ namespace ncore
             : m_allocator(a)
             , m_data()
         {
-            m_data.m_empty = max_items;
-            m_data.m_keys  = static_cast<K*>(m_allocator->allocate((max_items + 1) * sizeof(K)));
-            ntree32::create_tree(m_allocator, m_data.m_tree, max_items);
+            m_data.m_empty  = max_items;
+            m_data.m_nodes  = g_allocate_array<ntree32::tree_t::nnode_t>(m_allocator, max_items + 1);
+            m_data.m_colors = g_allocate_array<u8>(m_allocator, (max_items + 1 + 31) >> 5);
+            m_data.m_keys   = g_allocate_array<K>(m_allocator, max_items + 1);
+            ntree32::setup_tree(m_data.m_tree, max_items, m_data.m_nodes, m_data.m_colors);
         }
 
         ~set32_t()
@@ -144,8 +154,10 @@ namespace ncore
             {
                 m_data.m_tree.v_del_node(n);
             }
-            ntree32::destroy_tree(m_allocator, m_data.m_tree);
-            m_allocator->deallocate(m_data.m_keys);
+            ntree32::teardown_tree(m_data.m_tree);
+            g_deallocate_array(m_allocator, m_data.m_keys);
+            g_deallocate_array(m_allocator, m_data.m_colors);
+            g_deallocate_array(m_allocator, m_data.m_nodes);
         }
 
         bool insert(K const& _key)
@@ -163,8 +175,8 @@ namespace ncore
         bool contains(K const& key) const
         {
             m_data.m_keys[m_data.m_empty] = key;
-            ntree32::node_t found  = ntree32::c_invalid_node;
-            bool            result = ntree32::find(m_data.m_tree, m_data.m_empty, s_compare, &m_data, found);
+            ntree32::node_t found         = ntree32::c_invalid_node;
+            bool            result        = ntree32::find(m_data.m_tree, m_data.m_empty, s_compare, &m_data, found);
             return result;
         }
 

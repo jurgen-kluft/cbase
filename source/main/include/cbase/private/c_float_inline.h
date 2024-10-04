@@ -26,6 +26,7 @@ namespace math
         ASSERTS(low <= high, "Error: low > high");
         return number < low ? low : (number > high ? high : number);
     }
+    inline f32 floor(f32 inNumber) { return (f32)((s32)inNumber); }
 
     // float power function
     inline f32 powf(f32 x, s32 p)
