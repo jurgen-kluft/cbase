@@ -43,9 +43,10 @@ namespace ncore
             void    v_set_color(node_t* node, u8 color);
             u8      v_get_color(node_t* const node) const;
             void*   v_get_item(node_t* const node) const;
+            void    v_set_item(node_t* const node, void* item) const;
             node_t* v_get_node(node_t* const node, u8 ne) const;
             void    v_set_node(node_t* node, u8 ne, node_t* set);
-            node_t* v_new_node(void* item);
+            node_t* v_new_node();
             void    v_del_node(node_t* node);
 
             node_t*  m_root;
@@ -57,7 +58,7 @@ namespace ncore
         {
             iterator_t()
                 : m_it(nullptr)
-                , m_stack(0)
+                , m_stack(-1)
             {
             }
 
@@ -79,7 +80,7 @@ namespace ncore
 
         bool       clear(tree_t& c, node_t*& n);  // Repeatedly call 'clear' until true is returned
         bool       find(tree_t const& c, void const* key, compare_fn comparer, node_t*& found);
-        bool       insert(tree_t& c, void* key, compare_fn comparer, node_t*& inserted);
+        bool       insert(tree_t& c, void const* key, compare_fn comparer, node_t*& inserted);
         bool       remove(tree_t& c, void const* key, compare_fn comparer, node_t*& removed);
         bool       validate(tree_t& c, const char*& error_str, compare_fn comparer);
         iterator_t iterate();

@@ -21,19 +21,6 @@ namespace ncore
         alloc_t*      m_allocator;
         ntree::tree_t m_tree;
 
-        struct item_t
-        {
-            item_t(K const& _key, V const& _value)
-                : key(_key)
-                , value(_value)
-            {
-            }
-            K key;
-            V value;
-
-            DCORE_CLASS_PLACEMENT_NEW_DELETE
-        };
-
         static inline s8 compare_key_with_item(const void* _key, const void* _item)
         {
             K const*      key  = (K*)_key;
@@ -64,6 +51,19 @@ namespace ncore
             ntree::setup_tree(m_allocator, m_tree);
         }
 
+        struct item_t
+        {
+            item_t(K const& _key, V const& _value)
+                : key(_key)
+                , value(_value)
+            {
+            }
+            K key;
+            V value;
+
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
+        };
+
         inline ~map_t()
         {
             ntree::node_t* n;
@@ -81,13 +81,13 @@ namespace ncore
 
         inline bool insert(K const& _key, V const& _value)
         {
-            item_t*        item = m_allocator->construct<item_t>(_key, _value);
             ntree::node_t* inserted;
-            if (!ntree::insert(m_tree, &item, compare_items, inserted))
+            if (!ntree::insert(m_tree, (void const*)&_key, compare_key_with_item, inserted))
             {
-                m_allocator->destruct(item);
                 return false;
             }
+            item_t* item = m_allocator->construct<item_t>(_key, _value);
+            m_tree.v_set_item(inserted, item);
             return true;
         }
 
@@ -118,12 +118,16 @@ namespace ncore
 
         struct iterator_t
         {
-            inline bool traverse(s32 d, item_t& item) { return m_iter.traverse(*m_tree, d, item); }
-            inline bool preorder(s32 d, item_t& item) { return m_iter.preorder(*m_tree, d, item); }
-            inline bool sortorder(s32 d, item_t& item) { return m_iter.sortorder(*m_tree, d, item); }
-            inline bool postorder(s32 d, item_t& item) { return m_iter.postorder(*m_tree, d, item); }
+            inline bool          traverse(s32 d = ntree::LEFT) { return m_iter.traverse(*m_tree, d, m_item); }
+            inline bool          preorder(s32 d = ntree::LEFT) { return m_iter.preorder(*m_tree, d, m_item); }
+            inline bool          sortorder(s32 d = ntree::LEFT) { return m_iter.sortorder(*m_tree, d, m_item); }
+            inline bool          postorder(s32 d = ntree::LEFT) { return m_iter.postorder(*m_tree, d, m_item); }
+            inline bool          next() { return traverse(); }
+            inline bool          order() { return sortorder(); }
+            inline item_t const* item() const { return (item_t const*)m_item; }
 
         protected:
+            friend class map_t;
             iterator_t(ntree::tree_t const* tree)
                 : m_tree(tree)
                 , m_iter()
@@ -133,6 +137,7 @@ namespace ncore
         private:
             ntree::tree_t const* m_tree;
             ntree::iterator_t    m_iter;
+            void*                m_item;
         };
 
         inline iterator_t iterate() const { return iterator_t(&m_tree); }
@@ -143,17 +148,6 @@ namespace ncore
     {
         alloc_t*      m_allocator;
         ntree::tree_t m_tree;
-
-        struct item_t
-        {
-            item_t(K const& _key)
-                : key(_key)
-            {
-            }
-            K key;
-
-            DCORE_CLASS_PLACEMENT_NEW_DELETE
-        };
 
         static inline s8 compare_key_with_item(const void* _key, const void* _item)
         {
@@ -185,6 +179,17 @@ namespace ncore
             ntree::setup_tree(m_allocator, m_tree);
         }
 
+        struct item_t
+        {
+            item_t(K const& _key)
+                : key(_key)
+            {
+            }
+            K key;
+
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
+        };
+
         ~set_t()
         {
             ntree::node_t* n;
@@ -202,13 +207,13 @@ namespace ncore
 
         inline bool insert(K const& _key)
         {
-            item_t*        item = m_allocator->construct<item_t>(_key);
             ntree::node_t* inserted;
-            if (!ntree::insert(m_tree, &item, compare_items, inserted))
+            if (!ntree::insert(m_tree, (void const*)&_key, compare_key_with_item, inserted))
             {
-                m_allocator->destruct(item);
                 return false;
             }
+            item_t* item = m_allocator->construct<item_t>(_key);
+            m_tree.v_set_item(inserted, item);
             return true;
         }
 
@@ -233,12 +238,16 @@ namespace ncore
 
         struct iterator_t
         {
-            inline bool traverse(s32 d, item_t& item) { return m_iter.traverse(*m_tree, d, item); }
-            inline bool preorder(s32 d, item_t& item) { return m_iter.preorder(*m_tree, d, item); }
-            inline bool sortorder(s32 d, item_t& item) { return m_iter.sortorder(*m_tree, d, item); }
-            inline bool postorder(s32 d, item_t& item) { return m_iter.postorder(*m_tree, d, item); }
+            inline bool          traverse(s32 d = ntree::LEFT) { return m_iter.traverse(*m_tree, d, m_item); }
+            inline bool          preorder(s32 d = ntree::LEFT) { return m_iter.preorder(*m_tree, d, m_item); }
+            inline bool          sortorder(s32 d = ntree::LEFT) { return m_iter.sortorder(*m_tree, d, m_item); }
+            inline bool          postorder(s32 d = ntree::LEFT) { return m_iter.postorder(*m_tree, d, m_item); }
+            inline bool          next() { return traverse(); }
+            inline bool          order() { return sortorder(); }
+            inline item_t const* item() const { return (item_t const*)m_item; }
 
         protected:
+            friend class set_t;
             inline iterator_t(ntree::tree_t const* tree)
                 : m_tree(tree)
                 , m_iter()
@@ -248,6 +257,7 @@ namespace ncore
         private:
             ntree::tree_t const* m_tree;
             ntree::iterator_t    m_iter;
+            void*                m_item;
         };
 
         inline iterator_t iterate() const { return iterator_t(&m_tree); }

@@ -62,14 +62,14 @@ namespace ncore
 
         static inline s32 is_red(tree_t& tree, node_t* n) { return n != nullptr && tree.v_get_color(n) == RED; }
 
-        bool insert(tree_t& tree, void* key, compare_fn comparer, node_t*& _inserted)
+        bool insert(tree_t& tree, void const* key, compare_fn comparer, node_t*& _inserted)
         {
             _inserted    = nullptr;
             node_t* root = tree.v_get_root();
             if (root == nullptr)
             {
                 // We have an empty tree; attach the new node directly to the root
-                root      = tree.v_new_node(key);
+                root      = tree.v_new_node();
                 _inserted = root;
             }
             else
@@ -95,7 +95,7 @@ namespace ncore
                     if (n == nullptr)
                     {
                         // Insert a new node at the first null link
-                        n = tree.v_new_node(key);
+                        n = tree.v_new_node();
                         tree.v_set_node(p, dir, n);
 
                         if (is_red(tree, n) && is_red(tree, p))

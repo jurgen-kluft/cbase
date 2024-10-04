@@ -33,6 +33,12 @@ namespace ncore
             return (void*)((ptr_t)node->m_item & ~1);
         }
 
+        inline void tree_t::v_set_item(node_t* const node, void* item) const
+        {
+            ASSERT(node != nullptr);
+            node->m_item = (void*)((ptr_t)item | ((ptr_t)node->m_item & 1));
+        }
+
         inline node_t* tree_t::v_get_node(node_t* const node, u8 ne) const
         {
             ASSERT(node != nullptr);
@@ -44,12 +50,12 @@ namespace ncore
             node->m_child[ne] = set;
         }
 
-        inline node_t* tree_t::v_new_node(void* item)
+        inline node_t* tree_t::v_new_node()
         {
             node_t* new_node     = (node_t*)m_alloc->allocate(sizeof(node_t));
             new_node->m_child[0] = nullptr;
             new_node->m_child[1] = nullptr;
-            new_node->m_item     = item;
+            new_node->m_item     = nullptr;
             v_set_color(new_node, RED);
             m_size += 1;
             return new_node;
