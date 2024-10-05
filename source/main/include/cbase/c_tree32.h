@@ -30,6 +30,7 @@ namespace ncore
             BLACK = RIGHT
         };
 
+        // a and b are the indices of nodes/items to compare, user_data is a pointer to the data that is passed to the tree
         typedef s8 (*compare_fn)(u32 a, u32 b, void const* user_data);
 
         struct tree_t

@@ -33,7 +33,7 @@ namespace ncore
 
         virtual s32 vwrite(crunes_t const& str)
         {
-            switch (str.get_type())
+            switch (str.m_type)
             {
                 case ascii::TYPE: return write_ascii(str.m_ascii, str.m_str, str.m_end);
                 case utf16::TYPE: return write_utf16(str.m_utf16, str.m_str, str.m_end);
@@ -225,7 +225,7 @@ namespace ncore
 
         virtual s32 write(const crunes_t& str)
         {
-            switch (str.get_type())
+            switch (str.m_type)
             {
                 case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii, str.m_str, str.m_end);
                 case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16, str.m_str, str.m_end);

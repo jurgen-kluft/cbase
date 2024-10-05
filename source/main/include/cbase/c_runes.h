@@ -68,18 +68,9 @@ namespace ncore
         struct rune
         {
             uchar16 r;
-            bool    isEOS() const { return r == TERMINATOR; }
-            uchar16 operator*() const { return r; }
-            rune&   operator=(uchar16 c)
-            {
-                r = c;
-                return *this;
-            }
-            bool operator==(const rune& c) const { return c.r == r; }
-            bool operator!=(const rune& c) const { return c.r != r; }
         };
-        typedef rune*        prune;
-        typedef const rune*  pcrune;
+        typedef rune*       prune;
+        typedef const rune* pcrune;
 
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);  // return length of string in runes
@@ -94,20 +85,6 @@ namespace ncore
         struct rune
         {
             u8    r;
-            bool  isEOS() const { return r == TERMINATOR; }
-            u8    operator*() const { return r; }
-            rune& operator=(const rune& c)
-            {
-                r = c.r;
-                return *this;
-            }
-            rune& operator=(u8 c)
-            {
-                r = c;
-                return *this;
-            }
-            bool operator==(const rune& c) const { return c.r == r; }
-            bool operator!=(const rune& c) const { return c.r != r; }
         };
         typedef rune*       prune;
         typedef const rune* pcrune;
@@ -125,23 +102,9 @@ namespace ncore
         struct rune
         {
             uchar16 r;
-            bool    isEOS() const { return r == TERMINATOR; }
-            uchar16 operator*() const { return r; }
-            rune&   operator=(const rune& c)
-            {
-                r = c.r;
-                return *this;
-            }
-            rune& operator=(uchar16 c)
-            {
-                r = c;
-                return *this;
-            }
-            bool operator==(const rune& c) const { return c.r == r; }
-            bool operator!=(const rune& c) const { return c.r != r; }
         };
-        typedef rune*        prune;
-        typedef const rune*  pcrune;
+        typedef rune*       prune;
+        typedef const rune* pcrune;
 
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
@@ -156,20 +119,6 @@ namespace ncore
         struct rune
         {
             uchar32 r;
-            bool    isEOS() const { return r == TERMINATOR;}
-            uchar32 operator*() const { return r; }
-            rune&   operator=(const rune& c)
-            {
-                r = c.r;
-                return *this;
-            }
-            rune& operator=(uchar32 c)
-            {
-                r = c;
-                return *this;
-            }
-            bool operator==(const rune& c) const { return c.r == r; }
-            bool operator!=(const rune& c) const { return c.r != r; }
         };
         typedef rune*       prune;
         typedef const rune* pcrune;
@@ -181,49 +130,6 @@ namespace ncore
     struct crunes_t;
     struct runes_t
     {
-        runes_t();
-        runes_t(runes_t const& other);
-
-        runes_t(ascii::prune _str, ascii::prune _end, u32 _type = ascii::TYPE);
-        runes_t(ascii::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ascii::TYPE);
-
-        runes_t(ucs2::prune _str, ucs2::prune _end, u32 _type = ucs2::TYPE);
-        runes_t(ucs2::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ucs2::TYPE);
-
-        runes_t(utf8::prune _str, utf8::prune _end, u32 _type = utf8::TYPE);
-        runes_t(utf8::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf8::TYPE);
-
-        runes_t(utf16::prune _str, utf16::prune _end, u32 _type = utf16::TYPE);
-        runes_t(utf16::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf16::TYPE);
-
-        runes_t(utf32::prune _str, utf32::prune _end, u32 _type = utf32::TYPE);
-        runes_t(utf32::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf32::TYPE);
-
-        u32  size() const;
-        u32  cap() const;
-        bool is_empty() const;
-        bool is_valid() const;
-        bool is_nil() const;
-        void reset();
-        void clear();
-        void term();
-
-        bool    at_end(u32 cursor) const;
-        bool    is_valid(u32 cursor) const;
-        uchar32 peek(u32 cursor, u32& next_cursor) const;
-        uchar32 read(u32& cursor) const { return peek(cursor, cursor); }
-        bool    write(uchar32 c);
-
-        bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const;  // scan until we reach one of the 'chars'
-        void skip(u32& cursor, const crunes_t& skip_chars) const;                         // skip until we reach a character not part of 'chars'
-
-        runes_t& operator+=(const crunes_t& str);
-        runes_t& operator+=(const runes_t& str);
-        runes_t& operator+=(ascii::rune c);
-        runes_t& operator+=(utf32::rune c);
-        runes_t& operator=(crunes_t const& other);
-        runes_t& operator=(runes_t const& other);
-
         union
         {
             ascii::prune m_ascii;
@@ -232,71 +138,35 @@ namespace ncore
             utf16::prune m_utf16;
             utf32::prune m_utf32;
         };
-        u32 m_str;
-        u32 m_end;
-        u32 m_eos;
-        u32 m_type;
-
-        inline u32  get_type() const { return m_type & 0xFF; }
-        inline bool is_ascii() const { return get_type() == ascii::TYPE; }
-        inline bool is_ucs2() const { return get_type() == ucs2::TYPE; }
-        inline bool is_utf8() const { return get_type() == utf8::TYPE; }
-        inline bool is_utf16() const { return get_type() == utf16::TYPE; }
-        inline bool is_utf32() const { return get_type() == utf32::TYPE; }
+        u32 m_str;   // ptr[m_str] is the first character
+        u32 m_end;   // ptr[m_end] is one past the last character
+        u32 m_eos;   // ptr[m_eos] is the end of the string but always points to a terminator
+        u8  m_type;  // type of string (ascii, ucs2, utf8, utf16, utf32)
     };
+
+    runes_t make_runes();
+    runes_t make_runes(runes_t const& other);
+
+    runes_t make_runes(ascii::prune _str, ascii::prune _end, u32 _type = ascii::TYPE);
+    runes_t make_runes(ascii::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ascii::TYPE);
+
+    runes_t make_runes(ucs2::prune _str, ucs2::prune _end, u32 _type = ucs2::TYPE);
+    runes_t make_runes(ucs2::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ucs2::TYPE);
+
+    runes_t make_runes(utf8::prune _str, utf8::prune _end, u32 _type = utf8::TYPE);
+    runes_t make_runes(utf8::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf8::TYPE);
+
+    runes_t make_runes(utf16::prune _str, utf16::prune _end, u32 _type = utf16::TYPE);
+    runes_t make_runes(utf16::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf16::TYPE);
+
+    runes_t make_runes(utf32::prune _str, utf32::prune _end, u32 _type = utf32::TYPE);
+    runes_t make_runes(utf32::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf32::TYPE);
+
+    inline void reset(runes_t& str) { str.m_str = str.m_end; }
+    inline bool is_empty(runes_t const& str) { return str.m_str == str.m_end || str.m_ascii == nullptr; }
 
     struct crunes_t
     {
-        crunes_t();
-
-        crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u8 _type);
-
-        crunes_t(ascii::pcrune _bos);
-        crunes_t(ascii::pcrune _bos, ascii::pcrune _end);
-        crunes_t(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos);
-
-        crunes_t(ucs2::pcrune _bos);
-        crunes_t(ucs2::pcrune _bos, ucs2::pcrune _end);
-        crunes_t(ucs2::pcrune _bos, u32 _str, u32 _end, u32 _eos);
-
-        crunes_t(utf8::pcrune _str);
-        crunes_t(utf8::pcrune _str, utf8::pcrune _end);
-        crunes_t(utf8::pcrune _bos, u32 _str, u32 _end, u32 _eos);
-
-        crunes_t(utf16::pcrune _str);
-        crunes_t(utf16::pcrune _str, utf16::pcrune _end);
-        crunes_t(utf16::pcrune _bos, u32 _str, u32 _end, u32 _eos);
-
-        crunes_t(utf32::pcrune _str);
-        crunes_t(utf32::pcrune _str, utf32::pcrune _end);
-        crunes_t(utf32::pcrune _bos, u32 _str, u32 _end, u32 _eos);
-
-        crunes_t(runes_t const& other);
-        crunes_t(crunes_t const& other);
-        crunes_t(crunes_t const& other, u32 from, u32 to);
-
-        u32  size() const;
-        u32  len() const { return m_end - m_str; }
-        bool is_valid() const;
-        bool is_empty() const;
-        bool is_nil() const;
-        void reset();
-        void clear();
-
-        bool    at_end(u32 cursor) const;
-        bool    is_valid(u32 cursor) const;
-        uchar32 peek(u32 cursor, u32& next_cursor) const;
-        uchar32 read(u32& cursor) const { return peek(cursor, cursor); }
-
-        bool scan(u32& cursor, const crunes_t& until_chars, uchar32& encountered) const;  // scan until we reach one of the 'chars' and return the character that was 'encountered'
-        void skip(u32& cursor, const crunes_t& skip_chars) const;                         // skip until we reach a character not part of 'chars'
-        bool contains(uchar32 c) const;
-
-        crunes_t& operator=(crunes_t const& other);
-
-        crunes_t view(u32 from) const;
-        crunes_t view(u32 from, u32 to) const;
-
         union
         {  // ptr
             ascii::pcrune m_ascii;
@@ -305,20 +175,42 @@ namespace ncore
             utf16::pcrune m_utf16;
             utf32::pcrune m_utf32;
         };
-        u32 m_str;                         // ptr[m_str] is the first character
-        u32 m_end;                         // ptr[m_end] is one past the last character
-        u32 m_eos;                         // ptr[m_eos] is the end of the string but always points to a terminator
-        u8  m_type;                        // type of string (ascii, ucs2, utf8, utf16, utf32)
-        u8  m_dummy1, m_dummy2, m_dummy3;  // padding
-
-        inline void set_type(u8 _type) { m_type = _type; }
-        inline u8   get_type() const { return m_type; }
-        inline bool is_ascii() const { return m_type == ascii::TYPE; }
-        inline bool is_ucs2() const { return m_type == ucs2::TYPE; }
-        inline bool is_utf8() const { return m_type == utf8::TYPE; }
-        inline bool is_utf16() const { return m_type == utf16::TYPE; }
-        inline bool is_utf32() const { return m_type == utf32::TYPE; }
+        u32 m_str;   // ptr[m_str] is the first character
+        u32 m_end;   // ptr[m_end] is one past the last character
+        u32 m_eos;   // ptr[m_eos] is the end of the string but always points to a terminator
+        u8  m_type;  // type of string (ascii, ucs2, utf8, utf16, utf32)
     };
+
+    crunes_t make_crunes();
+
+    crunes_t make_crunes(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos, u8 _type);
+
+    crunes_t make_crunes(ascii::pcrune _bos);
+    crunes_t make_crunes(ascii::pcrune _bos, ascii::pcrune _end);
+    crunes_t make_crunes(ascii::pcrune _bos, u32 _str, u32 _end, u32 _eos);
+
+    crunes_t make_crunes(ucs2::pcrune _bos);
+    crunes_t make_crunes(ucs2::pcrune _bos, ucs2::pcrune _end);
+    crunes_t make_crunes(ucs2::pcrune _bos, u32 _str, u32 _end, u32 _eos);
+
+    crunes_t make_crunes(utf8::pcrune _str);
+    crunes_t make_crunes(utf8::pcrune _str, utf8::pcrune _end);
+    crunes_t make_crunes(utf8::pcrune _bos, u32 _str, u32 _end, u32 _eos);
+
+    crunes_t make_crunes(utf16::pcrune _str);
+    crunes_t make_crunes(utf16::pcrune _str, utf16::pcrune _end);
+    crunes_t make_crunes(utf16::pcrune _bos, u32 _str, u32 _end, u32 _eos);
+
+    crunes_t make_crunes(utf32::pcrune _str);
+    crunes_t make_crunes(utf32::pcrune _str, utf32::pcrune _end);
+    crunes_t make_crunes(utf32::pcrune _bos, u32 _str, u32 _end, u32 _eos);
+
+    crunes_t make_crunes(runes_t const& other);
+    crunes_t make_crunes(runes_t const& other, u32 from, u32 to);
+    crunes_t make_crunes(crunes_t const& other);
+    crunes_t make_crunes(crunes_t const& other, u32 from, u32 to);
+
+    inline bool is_empty(crunes_t const& str) { return str.m_str == str.m_end || str.m_ascii == nullptr; }
 
     namespace nrunes
     {
@@ -355,6 +247,10 @@ namespace ncore
         crunes_t findLastSelectUntilIncluded(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
         crunes_t findSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
         crunes_t findLastSelectAfter(const crunes_t& inStr, uchar32 inFind, bool case_sensitive = true);
+
+        // -------------------------------------------------------------------------------
+        // expand
+        bool selectMoreRight(crunes_t& inStr, uchar32 inChar);
 
         // -------------------------------------------------------------------------------
         // select
@@ -404,7 +300,9 @@ namespace ncore
         // -------------------------------------------------------------------------------
         // compare
         s32 compare(crunes_t const& str1, crunes_t const& str2, bool case_sensitive = true);
+        s32 compare(crunes_t const& str1, runes_t const& str2, bool case_sensitive = true);
         s32 compare(runes_t const& str1, runes_t const& str2, bool case_sensitive = true);
+        s32 compare(runes_t const& str1, crunes_t const& str2, bool case_sensitive = true);
 
         // -------------------------------------------------------------------------------
         // parse/from_string, to_string
@@ -519,15 +417,17 @@ namespace ncore
         class ireader_t
         {
         public:
-            void    reset() { vreset(); }
-            bool    valid() const { return vvalid(); }
-            uchar32 peek(s32 n = 0) const { return vpeek(n); }
-            bool    read(uchar32& c) { return vread(c); }
-            bool    read_line(runes_t& line) { return vread_line(line); }
-            bool    view_line(crunes_t& line) { return vview_line(line); }
-            void    skip(s32 c = 1) { vskip(c); }
-            s32     skip_any(uchar32 const* chars, u32 num_chars) { return vskip_any(chars, num_chars); }
-            s32     skip_until_one_of(uchar32 const* chars, u32 num_chars) { return vskip_until_one_of(chars, num_chars); }
+            void reset() { vreset(); }
+            bool valid() const { return vvalid(); }
+            uchar32 peek() const { uchar32 c; vpeek(0, c); return c; }
+            bool peek(uchar32& c) const { return vpeek(0, c); }
+            bool peek(s32 n, uchar32& c) const { return vpeek(n, c); }
+            bool read(uchar32& c) { return vread(c); }
+            bool read_line(runes_t& line) { return vread_line(line); }
+            bool view_line(crunes_t& line) { return vview_line(line); }
+            void skip(s32 c = 1) { vskip(c); }
+            s32  skip_any(uchar32 const* chars, u32 num_chars) { return vskip_any(chars, num_chars); }
+            s32  skip_until_one_of(uchar32 const* chars, u32 num_chars) { return vskip_until_one_of(chars, num_chars); }
 
             inline uchar32 read()
             {
@@ -537,15 +437,15 @@ namespace ncore
             }
 
         protected:
-            virtual void    vreset()                                                = 0;
-            virtual bool    vvalid() const                                          = 0;
-            virtual uchar32 vpeek(s32 n) const                                      = 0;
-            virtual bool    vread(uchar32& c)                                       = 0;
-            virtual bool    vread_line(runes_t& line)                               = 0;
-            virtual bool    vview_line(crunes_t& line)                              = 0;
-            virtual void    vskip(s32 c)                                            = 0;
-            virtual s32     vskip_any(uchar32 const* chars, u32 num_chars)          = 0;  // return -1 if end of string is reached, otherwise return the number of characters skipped
-            virtual s32     vskip_until_one_of(uchar32 const* chars, u32 num_chars) = 0;  // return -1 if end of string is reached, otherwise return the number of characters skipped
+            virtual void vreset()                                                = 0;
+            virtual bool vvalid() const                                          = 0;
+            virtual bool vpeek(s32 n, uchar32& c) const                          = 0;
+            virtual bool vread(uchar32& c)                                       = 0;
+            virtual bool vread_line(runes_t& line)                               = 0;
+            virtual bool vview_line(crunes_t& line)                              = 0;
+            virtual void vskip(s32 c)                                            = 0;
+            virtual s32  vskip_any(uchar32 const* chars, u32 num_chars)          = 0;  // return -1 if end of string is reached, otherwise return the number of characters skipped
+            virtual s32  vskip_until_one_of(uchar32 const* chars, u32 num_chars) = 0;  // return -1 if end of string is reached, otherwise return the number of characters skipped
         };
 
         class reader_t : public ireader_t
@@ -569,15 +469,15 @@ namespace ncore
             bool     at_end() const;
 
         protected:
-            virtual bool    vvalid() const;
-            virtual void    vreset();
-            virtual uchar32 vpeek(s32 n) const;
-            virtual bool    vread(uchar32& c);
-            virtual bool    vread_line(runes_t& line);
-            virtual bool    vview_line(crunes_t& line);
-            virtual void    vskip(s32 c);
-            virtual s32     vskip_any(uchar32 const* chars, u32 num_chars);
-            virtual s32     vskip_until_one_of(uchar32 const* chars, u32 num_chars);
+            virtual bool vvalid() const;
+            virtual void vreset();
+            virtual bool vpeek(s32 n, uchar32& c) const;
+            virtual bool vread(uchar32& c);
+            virtual bool vread_line(runes_t& line);
+            virtual bool vview_line(crunes_t& line);
+            virtual void vskip(s32 c);
+            virtual s32  vskip_any(uchar32 const* chars, u32 num_chars);
+            virtual s32  vskip_until_one_of(uchar32 const* chars, u32 num_chars);
 
             crunes_t m_runes;
             u32      m_cursor;
@@ -586,9 +486,15 @@ namespace ncore
         class iwriter_t
         {
         public:
-            s32  write(uchar32 c) { return vwrite(c); }
-            s32  write(const char* str, const char* end) { return vwrite(str, end); }
+            s32 write(uchar32 c) { return vwrite(c); }
+            s32 write(const char* str, const char* end) { return vwrite(str, end); }
+            s32 write(runes_t const& str)
+            {
+                crunes_t cstr = make_crunes(str);
+                return vwrite(cstr);
+            }
             s32  write(crunes_t const& str) { return vwrite(str); }
+            s32  writeln(runes_t const& str) { return write(str) + writeln(); }
             s32  writeln(crunes_t const& str) { return write(str) + writeln(); }
             bool writeln()
             {

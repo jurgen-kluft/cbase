@@ -23,8 +23,8 @@ UNITTEST_SUITE_BEGIN(test_sscanf)
 
 		UNITTEST_TEST(scan_hash128)
 		{
-			crunes_t example = "00112233445566778899AABBCCDDEEFF";
-			crunes_t fmt = "%02x%02x%02x%02x";
+			crunes_t example = make_crunes("00112233445566778899AABBCCDDEEFF");
+			crunes_t fmt = make_crunes("%02x%02x%02x%02x");
 
 			u8 d[16];
 			for (s32 i=0; i<16; i+=4)
@@ -39,8 +39,8 @@ UNITTEST_SUITE_BEGIN(test_sscanf)
 
 		UNITTEST_TEST(test_va_r_t)
 		{
-			crunes_t example = "512,768 -> 256,128";
-			crunes_t fmt = "%u,%u -> %u,%u";
+			crunes_t example = make_crunes("512,768 -> 256,128");
+			crunes_t fmt = make_crunes("%u,%u -> %u,%u");
 
 			u16 d[4];
 			sscanf(example, fmt, va_r_t(&d[0]), va_r_t(&d[1]), va_r_t(&d[2]), va_r_t(&d[3]));
@@ -52,11 +52,11 @@ UNITTEST_SUITE_BEGIN(test_sscanf)
 
 		UNITTEST_TEST(test_va_r_list_t)
 		{
-			crunes_t example = "512,768 -> 256,128";
-			crunes_t fmt = "%u,%u -> %u,%u";
+			crunes_t example = make_crunes("512,768 -> 256,128");
+			crunes_t fmt = make_crunes("%u,%u -> %u,%u");
 
 			u16 d[4];
-			
+
 			sscanf(example, fmt, &d[0], &d[1], &d[2], &d[3]);
 			u16 t[] = {512,768,256,128};
 

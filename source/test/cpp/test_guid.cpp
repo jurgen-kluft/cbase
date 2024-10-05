@@ -149,19 +149,19 @@ UNITTEST_SUITE_BEGIN(test_guid_t)
 			guid_t id(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);
 
             utf32::rune dst_runes[256];
-            dst_runes[0] = 0;
-            dst_runes[1] = 0;
-            dst_runes[255] = 0;
-            runes_t dst(dst_runes, 0, 0, 256 - 1);
+            dst_runes[0].r = 0;
+            dst_runes[1].r = 0;
+            dst_runes[255].r = 0;
+            runes_t dst = make_runes(dst_runes, 0, 0, 256 - 1);
 
-			crunes_t guidStr("11335577:22446688:557799BB:88AACCEE");
+			crunes_t guidStr = make_crunes("11335577:22446688:557799BB:88AACCEE");
 			id.toString(dst);
 			CHECK_EQUAL(0, nrunes::compare(dst, guidStr));
 		}
 
 		UNITTEST_TEST(fromString)
 		{
-			crunes_t guidStr("11335577:22446688:557799BB:88AACCEE");
+			crunes_t guidStr = make_crunes("11335577:22446688:557799BB:88AACCEE");
 			guid_t id1;
 			id1.fromString(guidStr);
 			guid_t id2(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);

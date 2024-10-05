@@ -80,18 +80,19 @@ namespace ncore
         virtual void write(u32 _value)  = 0;
         virtual void write(u64 _value)  = 0;
 
+        virtual void write(const runes_t& str)                              = 0;
         virtual void write(const crunes_t& str)                             = 0;
         virtual void write(const crunes_t& fmt, const va_t* argv, s32 argc) = 0;
 
         inline void write(const char* str)
         {
-            crunes_t r(str);
+            crunes_t r = make_crunes(str);
             write(r);
         }
 
         inline void write(const char* str, const char* end)
         {
-            crunes_t r(str, end);
+            crunes_t r = make_crunes(str, end);
             write(r);
         }
 
@@ -135,13 +136,13 @@ namespace ncore
 
         inline void writeLine(const char* str)
         {
-            crunes_t r(str);
+            crunes_t r = make_crunes(str);
             writeLine(r);
         }
 
         inline void writeLine(const char* str, const va_t* argv, s32 argc)
         {
-            crunes_t r(str);
+            crunes_t r = make_crunes(str);
             writeLine(r, argv, argc);
         }
 

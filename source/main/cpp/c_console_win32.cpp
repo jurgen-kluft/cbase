@@ -25,13 +25,13 @@ namespace ncore
         virtual s32        vwrite(uchar32 c)
         {
             utf32::rune str[2] = {c, 0};
-            crunes_t src(str, 0, 1, 1);
+            crunes_t src = make_crunes(str, 0, 1, 1);
             return write_utf32(src);
         }
 
         virtual s32 vwrite(const char* str, const char* end)
         {
-            crunes_t src(str, end);
+            crunes_t src = make_crunes(str, end);
             return write_ascii(src)!=0;
         }
 
@@ -178,7 +178,7 @@ namespace ncore
         virtual void writeln()
         {
             ascii::rune line32[] = {'\r', 0};
-            crunes_t    line(line32, line32 + 1);
+            crunes_t    line = make_crunes(line32, line32 + 1);
             out_writer_t::write_ascii(line);
         }
 
@@ -210,5 +210,5 @@ namespace ncore
     }
 
 }; // namespace ncore
-    
+
 #endif

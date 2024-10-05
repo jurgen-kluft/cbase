@@ -122,7 +122,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch = make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::copy(ch, str);
             }
             break;
@@ -221,7 +221,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch = make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -274,7 +274,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch= make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -330,7 +330,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch= make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -383,7 +383,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch= make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 bool     b = false;
                 nrunes::parse(ch, b);
                 i = b ? 1 : 0;
@@ -402,7 +402,7 @@ namespace ncore
         {
             case TYPE_PCRUNES:
             {
-                crunes_t ch((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch= make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 return ch;
             }
             default: break;  // Fall through
@@ -608,31 +608,31 @@ namespace ncore
             case TYPE_FLOAT64: nrunes::parse(rhs, *((f64*)mRef)); break;
             case TYPE_ASCII_STR:
             {
-                runes_t dst((char*)mRef, 0, 0, mCap, ascii::TYPE);
+                runes_t dst = make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
             case TYPE_USC2_STR:
             {
-                runes_t dst((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
+                runes_t dst = make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
             case TYPE_UTF8_STR:
             {
-                runes_t dst((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
+                runes_t dst = make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
             case TYPE_UTF16_STR:
             {
-                runes_t dst((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
+                runes_t dst = make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
             case TYPE_UTF32_STR:
             {
-                runes_t dst((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
+                runes_t dst = make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
@@ -660,31 +660,31 @@ namespace ncore
             case TYPE_FLOAT64: *((f64*)mRef) = rhs; break;
             case TYPE_ASCII_STR:
             {
-                runes_t dst((char*)mRef, 0, 0, mCap, ascii::TYPE);
+                runes_t dst = make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_USC2_STR:
             {
-                runes_t dst((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
+                runes_t dst = make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF8_STR:
             {
-                runes_t dst((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
+                runes_t dst = make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF16_STR:
             {
-                runes_t dst((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
+                runes_t dst = make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF32_STR:
             {
-                runes_t dst((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
+                runes_t dst = make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;

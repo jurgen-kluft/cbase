@@ -7,7 +7,7 @@ namespace ncore
 
 #define D_CONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
     type::rune local_var_name##Buffer[size];               \
-    runes_t    local_var_name(local_var_name##Buffer, 0, 0, (u32)size, type::TYPE);
+    runes_t    local_var_name = make_runes(local_var_name##Buffer, 0, 0, (u32)size, type::TYPE);
 
     class console_null : public console_t
     {
@@ -29,6 +29,7 @@ namespace ncore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
+        virtual void write(const runes_t& str);
         virtual void write(const crunes_t& str);
         virtual void write(const crunes_t& fmt, const va_t* args, s32 argc);
 
@@ -45,6 +46,7 @@ namespace ncore
     void console_null::write(f32 _value) {}
     void console_null::write(u32 _value) {}
     void console_null::write(u64 _value) {}
+    void console_null::write(const runes_t& str) {}
     void console_null::write(const crunes_t& str) {}
     void console_null::write(const crunes_t& fmt, const va_t* args, s32 argc) {}
     void console_null::writeLine() {}
@@ -74,6 +76,7 @@ namespace ncore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
+        virtual void write(const runes_t& str);
         virtual void write(const crunes_t& str);
         virtual void write(const crunes_t& fmt, const va_t* args, s32 argc);
 
@@ -90,8 +93,8 @@ namespace ncore
     static const char* falseStr = "false";
     void console_default::write(bool _value)
     {
-        crunes_t truestr(trueStr, trueStr+4);
-        crunes_t falsestr(falseStr, falseStr+5);
+        crunes_t truestr = make_crunes(trueStr, trueStr+4);
+        crunes_t falsestr = make_crunes(falseStr, falseStr+5);
         write(_value ? truestr : falsestr);
     }
 
@@ -135,6 +138,12 @@ namespace ncore
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
         nrunes::to_string(tmp, _value, 2);
         write(tmp);
+    }
+
+    void console_default::write(const runes_t& str)
+    {
+        crunes_t cstr = make_crunes(str);
+        mOut->write(cstr);
     }
 
     void console_default::write(const crunes_t& str)

@@ -16,7 +16,8 @@ namespace ncore
     {
         bool        bval = false;
         const char* bstr = nullptr;
-        uchar32     c    = str->peek();
+        uchar32     c;
+        str->peek(c);
         if (nrunes::is_equalfold(c, 't'))
         {
             bstr = "true";
@@ -38,7 +39,7 @@ namespace ncore
         else if (nrunes::is_equalfold(c, 'o'))
         {
             str->read();
-            c = str->peek();
+            str->peek(c);
             if (nrunes::is_equalfold(c, 'f'))
             {
                 bstr = "ff";
@@ -102,7 +103,7 @@ namespace ncore
         reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
         uchar32 c;                      // Current character.
-        c            = reader->peek();  // Save sign indication.
+        reader->peek(c);  // Save sign indication.
         uchar32 sign = c;               // If '-', then negative, otherwise positive.
 
         // skip sign.
@@ -116,7 +117,7 @@ namespace ncore
         // Decode the rest of the string
         while (true)
         {
-            c = reader->peek();
+            reader->peek(c);
 
             s32 validBase = 0;
             if ((c >= '0') && (c <= '9'))
@@ -169,22 +170,22 @@ namespace ncore
     {
         // Evaluate sign
         s32 sign = 1;
-        if (reader->peek() == '-')
+        uchar32 c;
+        if (reader->peek(c) && c == '-')
         {
             sign = -1;
             reader->read();
         }
 
         // skip trailing zeros
-        while (reader->peek() == '0')
+        while (reader->peek(c) && c == '0')
             reader->read();
 
         // Convert integer part
         f64 result = 0;
         f64 value;
-        while (true)
+        while (reader->peek(c))
         {
-            uchar32 c = reader->peek();
             if (c >= '0' && c <= '9')
             {
                 value = c - '0';
@@ -201,14 +202,12 @@ namespace ncore
         // Detect floating point & mantissa
         f64 mantissa = 0;
         f64 divisor  = 1;
-        if (reader->peek() == '.')
+        if (reader->peek(c) && c == '.')
         {
             reader->read();
-
-            while (true)
+            while (reader->peek(c))
             {
-                uchar32 c = reader->peek();
-                if (c >= '0' && c <= '9')
+                if ((c >= '0' && c <= '9'))
                 {
                     value = c - '0';
                     mantissa *= 10.0;
@@ -231,12 +230,11 @@ namespace ncore
         // Detect exponent
         u32 power = 0;
 
-        uchar32 c = reader->peek();
+        reader->peek(c);
         if (c == 'e' || c == 'E')
         {
             reader->read();
-
-            c = reader->peek();
+            reader->peek(c);
             if (c == '-')
             {
                 sign = -1;
@@ -380,9 +378,10 @@ namespace ncore
         s32 scanned  = 0;
         s32 suppress = 0;
 
-        while (fmt->peek() != '\0')
+        uchar32 c;
+        while (fmt->peek(c)&& c != '\0')
         {
-            if (fmt->peek() != '%' && !parsing)
+            if (fmt->peek(c) && c != '%' && !parsing)
             {
                 uchar32 const c = fmt->read();
                 if (nrunes::is_whitespace(c))
@@ -397,7 +396,7 @@ namespace ncore
             }
             else
             {
-                if (fmt->peek() == '%')
+                if (fmt->peek(c) && c == '%')
                 {
                     fmt->skip();
 
@@ -409,7 +408,8 @@ namespace ncore
                     l        = 0;
                 }
 
-                switch (fmt->peek())
+                fmt->peek(c);
+                switch (c)
                 {
                     case '1':
                     case '2':
@@ -448,19 +448,18 @@ namespace ncore
                         s32 i = 0;
                         reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
-                        runes_t runes("", 0, 0, 0);
+                        runes_t runes = make_runes("", 0, 0, 0);
                         if (i < argc)
                         {
                             va_r_t r = argv[i++];
                             runes    = r.getRunes();
                         }
 
-                        if (runes.cap() > 0)
                         {
                             nrunes::writer_t str_writer(runes);
 
                             l = 0;
-                            while (reader->peek() != 0 && reader->peek() != ' ')
+                            while (reader->peek(c) && c != 0 && c != ' ')
                             {
                                 if (!(flag & SPACE_PAD))
                                 {
@@ -474,10 +473,7 @@ namespace ncore
                                 reader->read();
                             }
                         }
-                        else
-                        {
-                            reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
-                        }
+
                         scanned++;
                         parsing = 0;
                     }

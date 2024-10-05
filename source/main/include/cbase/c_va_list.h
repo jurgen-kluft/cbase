@@ -728,13 +728,13 @@ namespace ncore
         {
             switch (mType)
             {
-                case TYPE_ASCII_STR: return runes_t((ascii::prune)mRef, 0, 0, mCap);
-                case TYPE_USC2_STR: return runes_t((ucs2::prune)mRef, 0, 0, mCap);
-                case TYPE_UTF8_STR: return runes_t((utf8::prune)mRef, 0, 0, mCap);
-                case TYPE_UTF16_STR: return runes_t((utf16::prune)mRef, 0, 0, mCap);
-                case TYPE_UTF32_STR: return runes_t((utf32::prune)mRef, 0, 0, mCap);
+                case TYPE_ASCII_STR: return make_runes((ascii::prune)mRef, 0, 0, mCap);
+                case TYPE_USC2_STR: return make_runes((ucs2::prune)mRef, 0, 0, mCap);
+                case TYPE_UTF8_STR: return make_runes((utf8::prune)mRef, 0, 0, mCap);
+                case TYPE_UTF16_STR: return make_runes((utf16::prune)mRef, 0, 0, mCap);
+                case TYPE_UTF32_STR: return make_runes((utf32::prune)mRef, 0, 0, mCap);
             }
-            return runes_t("", 0, 0, 0);
+            return make_runes("", 0, 0, 0);
         }
 
         static va_r_t sEmpty;
