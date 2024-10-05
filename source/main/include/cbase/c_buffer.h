@@ -138,7 +138,7 @@ namespace ncore
     };
 
     //
-    // Helper classes for reading and writing to buffers
+    // Helper class for reading types from binary data
     //
 
     class binary_reader_t
@@ -203,6 +203,10 @@ namespace ncore
         u8 const* m_cursor;
         u8 const* m_end;
     };
+
+    //
+    // Helper class for writing types and strings to binary data
+    //
 
     class binary_writer_t
     {
