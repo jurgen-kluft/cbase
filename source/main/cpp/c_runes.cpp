@@ -3026,8 +3026,8 @@ namespace ncore
 
     crunes_t make_crunes(crunes_t const& _str, u32 from, u32 to)
     {
-        ASSERT(from >= _str.m_str && from < _str.m_eos);
-        ASSERT(to >= _str.m_str && to < _str.m_eos);
+        ASSERT(from >= _str.m_str && from <= _str.m_eos);
+        ASSERT(to >= _str.m_str && to <= _str.m_eos);
         ASSERT(from <= to);
         crunes_t c;
         c.m_ascii = _str.m_ascii;
