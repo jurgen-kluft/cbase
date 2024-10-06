@@ -81,7 +81,7 @@ namespace ncore
 
         bool       clear(tree_t& c, node_t& root, node_t& n);  // Repeatedly call 'clear' until true is returned
         bool       find(tree_t const& c, node_t root, index_t key, compare_fn comparer, void const* user_data, node_t& found);
-        bool       insert(tree_t& c, node_t& root, node_t temp, index_t key, compare_fn comparer, void const* user_data, node_t& inserted);
+        bool       insert(tree_t& c, node_t& root, node_t temp, index_t key, compare_fn comparer, void const* user_data, node_t& inserted_or_found);
         bool       remove(tree_t& c, node_t& root, node_t temp, index_t key, compare_fn comparer, void const* user_data, node_t& removed);
         bool       validate(tree_t& c, node_t root, const char*& error_str, compare_fn comparer, void const* user_data);
         iterator_t iterate(tree_t& c, node_t root);

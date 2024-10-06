@@ -54,9 +54,10 @@ namespace ncore
 
         static inline s32 is_red(tree_t& tree, node_t n) { return n != c_invalid_node && tree.v_get_color(n) == RED; }
 
-        bool insert(tree_t& tree, node_t& root, node_t temp, index_t key, compare_fn comparer, void const* user_data, node_t& inserted)
+        bool insert(tree_t& tree, node_t& root, node_t temp, index_t key, compare_fn comparer, void const* user_data, node_t& inserted_or_found)
         {
-            inserted = c_invalid_node;
+            node_t inserted = c_invalid_node;
+            node_t found    = c_invalid_node;
             if (root == c_invalid_node)
             {
                 // We have an empty tree; attach the
@@ -128,7 +129,10 @@ namespace ncore
                     last = dir;
                     dir  = comparer(key, n, user_data);
                     if (dir == 0)
+                    {
+                        found = n;
                         break;
+                    }
                     dir = ((dir + 1) >> 1);
 
                     // Move the helpers down
@@ -148,6 +152,7 @@ namespace ncore
             // Make the root black for simplified logic
             tree.v_set_color(root, BLACK);
 
+            inserted_or_found = (inserted == c_invalid_node) ? found : inserted;
             return inserted != c_invalid_node;
         }
 
