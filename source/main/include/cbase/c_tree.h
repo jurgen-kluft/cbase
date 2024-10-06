@@ -14,8 +14,13 @@ namespace ncore
     {
         struct node_t
         {
+            void    set_color(u8 color);
+            u8      get_color() const;
+            void    set_child(u8 ne, node_t* set);
+            node_t* get_child(u8 ne) const;
+
+        private:
             node_t* m_child[2];
-            void*   m_item;
         };
 
         enum echild_t
@@ -30,29 +35,9 @@ namespace ncore
             BLACK = RIGHT
         };
 
-        typedef s8 (*compare_fn)(void const* item1, void const* item2);
-
-        struct tree_t
-        {
-            tree_t();
-
-            s32     v_size() const;
-            s32     v_capacity() const;
-            node_t* v_get_root() const;
-            void    v_set_root(node_t* node);
-            void    v_set_color(node_t* node, u8 color);
-            u8      v_get_color(node_t* const node) const;
-            void*   v_get_item(node_t* const node) const;
-            void    v_set_item(node_t* const node, void* item) const;
-            node_t* v_get_node(node_t* const node, u8 ne) const;
-            void    v_set_node(node_t* node, u8 ne, node_t* set);
-            node_t* v_new_node();
-            void    v_del_node(node_t* node);
-
-            node_t*  m_root;
-            alloc_t* m_alloc;
-            u32      m_size;
-        };
+        typedef s8 (*compare_key_and_node_fn)(void const* key, node_t const* node);
+        typedef s8 (*compare_node_and_node_fn)(node_t const* node1, node_t const* node2);
+        typedef node_t* (*new_node_fn)(void* user_data);
 
         struct iterator_t
         {
@@ -62,29 +47,22 @@ namespace ncore
             {
             }
 
-            bool              traverse(tree_t const& tree, s32 d, void*& item);
-            bool              preorder(tree_t const& tree, s32 d, void*& item);
-            bool              sortorder(tree_t const& tree, s32 d, void*& item);
-            bool              postorder(tree_t const& tree, s32 d, void*& item);
+            bool              traverse(node_t const* root, s32 d, node_t const*& node);
+            bool              preorder(node_t const* root, s32 d, node_t const*& node);
+            bool              sortorder(node_t const* root, s32 d, node_t const*& node);
+            bool              postorder(node_t const* root, s32 d, node_t const*& node);
             static inline s32 getdir(s32 compare) { return (compare + 1) >> 1; }
 
-            node_t* m_it;
-            node_t* m_stack_array[32];
-            s32     m_stack;
+            node_t const* m_it;
+            node_t const* m_stack_array[32];
+            s32           m_stack;
         };
 
-        void setup_tree(alloc_t* allocator, tree_t& c);
-        void teardown_tree(alloc_t* allocator, tree_t& c);
-
-        inline int_t size(tree_t& c) { return c.v_size(); }
-
-        bool       clear(tree_t& c, node_t*& n);  // Repeatedly call 'clear' until true is returned
-        bool       find(tree_t const& c, void const* key, compare_fn comparer, node_t*& found);
-        bool       insert(tree_t& c, void const* key, compare_fn comparer, node_t*& inserted);
-        bool       remove(tree_t& c, void const* key, compare_fn comparer, node_t*& removed);
-        bool       validate(tree_t& c, const char*& error_str, compare_fn comparer);
-        iterator_t iterate();
-
+        bool clear(node_t*& root, node_t*& n);  // Repeatedly call 'clear' until true is returned
+        bool find(node_t* root, void const* key, compare_key_and_node_fn comparer, node_t*& found);
+        bool insert(node_t*& root, node_t* temp, void const* key, compare_key_and_node_fn comparer, new_node_fn new_node, void* user_data, node_t*& _inserted);
+        bool remove(node_t*& root, node_t* temp, void const* key, compare_key_and_node_fn comparer, node_t*& removed_node);
+        bool validate(node_t const* root, const char*& error_str, compare_node_and_node_fn comparer);
     }  // namespace ntree
 
 }  // namespace ncore

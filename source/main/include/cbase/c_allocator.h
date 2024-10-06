@@ -108,18 +108,18 @@ namespace ncore
 
     // Global new and delete
     template <typename T, typename... Args>
-    T* g_New(Args... args)
+    T* g_new(alloc_t* alloc, Args... args)
     {
-        void* mem    = context_t::runtime_alloc()->allocate(sizeof(T));
+        void* mem    = alloc->allocate(sizeof(T));
         T*    object = new (mem) T(args...);
         return object;
     }
 
     template <typename T>
-    void g_Delete(T* p)
+    void g_delete(alloc_t* alloc, T* p)
     {
         p->~T();
-        context_t::runtime_alloc()->deallocate(p);
+        alloc->deallocate(p);
     }
 
     template <class T>

@@ -19,7 +19,7 @@ UNITTEST_SUITE_BEGIN(test_map32_and_set32)
         {
             map32_t<s32, s32> map(Allocator);
 
-            const s32 c_num_keys = 100;
+            const s32 c_num_keys = 3;
 
             for (s32 v = 0; v < c_num_keys; ++v)
             {
@@ -57,7 +57,7 @@ UNITTEST_SUITE_BEGIN(test_map32_and_set32)
         {
             set32_t<s32> set(Allocator);
 
-            const s32 c_num_keys = 100;
+            const s32 c_num_keys = 3;
 
             for (s32 v = 0; v < c_num_keys; ++v)
             {

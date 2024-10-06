@@ -3,17 +3,11 @@ namespace ncore
     namespace ntree32
     {
         inline tree_t::tree_t()
-            : m_count(0)
+            : m_nodes(nullptr)
+            , m_colors(nullptr)
             , m_free_index(0)
             , m_free_head(c_invalid_node)
-            , m_nodes(nullptr)
-            , m_colors(nullptr)
         {
-        }
-
-        inline node_t tree_t::v_get_temp() const
-        {
-            return m_count + 1;
         }
 
         inline void tree_t::v_set_color(node_t node, u8 color)
@@ -40,7 +34,6 @@ namespace ncore
         inline void tree_t::v_set_node(node_t node, s8 ne, node_t set)
         {
             ASSERT(node != c_invalid_index);
-            ASSERT(set == c_invalid_index);
             m_nodes[node].m_child[ne] = set;
         }
 
@@ -60,7 +53,6 @@ namespace ncore
             m_nodes[node].m_child[1] = c_invalid_node;
             v_set_color(node, RED);
 
-            m_count += 1;
             return node;
         }
 
@@ -68,8 +60,7 @@ namespace ncore
         {
             ASSERT(node != c_invalid_index);
             m_nodes[node].m_child[LEFT] = c_invalid_index;
-            m_free_head           = node;
-            m_count -= 1;
+            m_free_head                 = node;
         }
 
     }  // namespace ntree32

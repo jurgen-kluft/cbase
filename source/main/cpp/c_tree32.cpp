@@ -54,7 +54,7 @@ namespace ncore
 
         static inline s32 is_red(tree_t& tree, node_t n) { return n != c_invalid_node && tree.v_get_color(n) == RED; }
 
-        bool insert(tree_t& tree, node_t& root, index_t key, compare_fn comparer, void const* user_data, node_t& inserted)
+        bool insert(tree_t& tree, node_t& root, node_t temp, index_t key, compare_fn comparer, void const* user_data, node_t& inserted)
         {
             inserted = c_invalid_node;
             if (root == c_invalid_node)
@@ -67,9 +67,9 @@ namespace ncore
             }
             else
             {
-                node_t head = tree.v_get_temp();  // False tree root
-                node_t g, t;                      // Grandparent & parent
-                node_t p, n;                      // Iterator & parent
+                node_t head = temp;  // False tree root
+                node_t g, t;         // Grandparent & parent
+                node_t p, n;         // Iterator & parent
                 s32    dir = 0, last = 0;
 
                 // Set up our helpers
@@ -276,14 +276,14 @@ namespace ncore
             return 0;
         }
 
-        bool remove(tree_t& tree, node_t& root, index_t key, compare_fn comparer, void const* user_data, node_t& out_removed)
+        bool remove(tree_t& tree, node_t& root, node_t temp, index_t key, compare_fn comparer, void const* user_data, node_t& out_removed)
         {
             if (root == c_invalid_node)
                 return false;
 
-            node_t head = tree.v_get_temp();  // False tree root
-            node_t fn   = c_invalid_node;     // Found node
-            node_t fp   = c_invalid_node;     // Found node parent
+            node_t head = temp;            // False tree root
+            node_t fn   = c_invalid_node;  // Found node
+            node_t fp   = c_invalid_node;  // Found node parent
             s32    dir  = 1;
 
             // Set up our helpers
@@ -538,9 +538,8 @@ namespace ncore
             return true;
         }
 
-        void setup_tree(tree_t& c, u32 max_nodes, void* nodes, void* colors)
+        void setup_tree(tree_t& c, void* nodes, void* colors)
         {
-            c.m_count      = 0;
             c.m_free_index = 0;
             c.m_free_head  = c_invalid_index;
             c.m_nodes      = (tree_t::nnode_t*)nodes;
@@ -549,7 +548,6 @@ namespace ncore
 
         void teardown_tree(tree_t& c)
         {
-            c.m_count      = 0;
             c.m_free_index = 0;
             c.m_free_head  = c_invalid_index;
             c.m_nodes      = nullptr;

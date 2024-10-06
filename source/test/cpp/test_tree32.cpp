@@ -728,9 +728,11 @@ UNITTEST_SUITE_BEGIN(test_tree2)
     {
         UNITTEST_ALLOCATOR;
 
+        const s32  c_find_slot = 64;
+        const s32  c_temp_slot = 65;
         const s32  c_num_keys = 64;
-        static s32 s_find[c_num_keys];
-        static s32 s_keys[c_num_keys + 1];
+        static s32 s_find[c_num_keys + 2];
+        static s32 s_keys[c_num_keys + 2];  // +2 for 'find' and 'temp' slots
 
         static void s_init_keys()
         {
@@ -741,11 +743,24 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             }
         }
 
-        static s8 s_compare_keys(u32 _key, u32 _item, void const *user_data)
+        static s8 s_compare_key_and_node(u32 _key, u32 _item, void const *user_data)
         {
             s32 const *keys = (s32 const *)user_data;
             s32        key  = keys[_key];
             s32        item = keys[_item];
+            if (key < item)
+                return -1;
+            else if (key > item)
+                return 1;
+            else
+                return 0;
+        }
+
+        static s8 s_compare_node_and_node(u32 _nodeA, u32 _nodeB, void const *user_data)
+        {
+            s32 const *keys = (s32 const *)user_data;
+            s32        key  = keys[_nodeA];
+            s32        item = keys[_nodeB];
             if (key < item)
                 return -1;
             else if (key > item)
@@ -764,7 +779,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         UNITTEST_TEST(tree_node)
         {
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes, m_colors);
             s_init_keys();
 
             ntree32::index_t const key = 0;
@@ -834,58 +849,54 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             tree.v_del_node(left);
             tree.v_del_node(right);
 
-            CHECK_EQUAL(0, ntree32::size(tree));
-
             ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(insert_remove)
         {
+            ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
             {
-                s_keys[c_num_keys] = s_find[i];
+                s_keys[c_find_slot] = s_find[i];
                 ntree32::node_t inserted;
-                CHECK_TRUE(ntree32::insert(tree, c_num_keys, s_compare_keys, &s_keys, inserted));
+                CHECK_TRUE(ntree32::insert(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, inserted));
                 s_keys[inserted] = s_find[i];
 
                 const char *result = nullptr;
-                CHECK_TRUE(ntree32::validate(tree, result, s_compare_keys, &s_keys));
+                CHECK_TRUE(ntree32::validate(tree, root, result, s_compare_key_and_node, &s_keys));
                 ntree32::node_t removed;
-                CHECK_TRUE(ntree32::remove(tree, c_num_keys, s_compare_keys, &s_keys, removed));
+                CHECK_TRUE(ntree32::remove(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, removed));
                 CHECK_NOT_EQUAL(ntree32::c_invalid_node, removed);
                 tree.v_del_node(removed);
             }
 
-            CHECK_EQUAL(0, ntree32::size(tree));
-
             ntree32::node_t node;
-            while (!ntree32::clear(tree, node)) {}
-
-            CHECK_EQUAL(0, ntree32::size(tree));
+            while (!ntree32::clear(tree, root, node)) {}
 
             ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_iterate_preorder)
         {
+            ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < 9; ++i)
             {
-                s_keys[c_num_keys] = s_find[i];
+                s_keys[c_find_slot] = s_find[i];
                 ntree32::node_t inserted;
-                CHECK_TRUE(ntree32::insert(tree, c_num_keys, s_compare_keys, &s_keys, inserted));
+                CHECK_TRUE(ntree32::insert(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, inserted));
                 s_keys[inserted] = s_find[i];
             }
 
 #ifdef TEST_ITERATOR
-            ntree32::iterator_t iterator = ntree32::iterate(tree);
+            ntree32::iterator_t iterator = ntree32::iterate(tree, root);
 
             s32             round      = 0;
             s32             preorder[] = {3, 1, 0, 2, 5, 4, 7, 6, 8};
@@ -896,27 +907,28 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             }
             CHECK_EQUAL(9, round);
 #endif
-            while (!ntree32::clear(tree, node)) {}
+            while (!ntree32::clear(tree, root, node)) {}
 
             ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder)
         {
+            ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
             {
-                s_keys[c_num_keys] = s_find[i];
+                s_keys[c_find_slot] = s_find[i];
                 ntree32::node_t inserted;
-                CHECK_TRUE(ntree32::insert(tree, c_num_keys, s_compare_keys, &s_keys, inserted));
+                CHECK_TRUE(ntree32::insert(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, inserted));
                 s_keys[inserted] = s_find[i];
             }
 
 #ifdef TEST_ITERATOR
-            ntree32::iterator_t iterator = ntree32::iterate(tree);
+            ntree32::iterator_t iterator = ntree32::iterate(tree, root);
 
             s32             sortorder = 0;
             ntree32::node_t node;
@@ -927,27 +939,28 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_EQUAL(c_num_keys, sortorder);
 #endif
 
-            while (!ntree32::clear(tree, node)) {}
+            while (!ntree32::clear(tree, root, node)) {}
 
             ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_iterate_sortorder_backwards)
         {
+            ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
             {
-                s_keys[c_num_keys] = s_find[i];
+                s_keys[c_find_slot] = s_find[i];
                 ntree32::node_t inserted;
-                CHECK_TRUE(ntree32::insert(tree, c_num_keys, s_compare_keys, &s_keys, inserted));
+                CHECK_TRUE(ntree32::insert(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, inserted));
                 s_keys[inserted] = s_find[i];
             }
 
 #ifdef TEST_ITERATOR
-            ntree32::iterator_t iterator = ntree32::iterate(tree);
+            ntree32::iterator_t iterator = ntree32::iterate(tree, root);
 
             s32             sortorder = c_num_keys;
             ntree32::node_t node;
@@ -959,27 +972,28 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_EQUAL(0, sortorder);
 #endif
 
-            while (!ntree32::clear(tree, node)) {}
+            while (!ntree32::clear(tree, root, node)) {}
 
             ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_iterate_postorder)
         {
+            ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < 9; ++i)
             {
-                s_keys[c_num_keys] = s_find[i];
+                s_keys[c_find_slot] = s_find[i];
                 ntree32::node_t inserted;
-                CHECK_TRUE(ntree32::insert(tree, c_num_keys, s_compare_keys, &s_keys, inserted));
+                CHECK_TRUE(ntree32::insert(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, inserted));
                 s_keys[inserted] = s_find[i];
             }
 
 #ifdef TEST_ITERATOR
-            ntree32::iterator_t iterator = ntree32::iterate(tree);
+            ntree32::iterator_t iterator = ntree32::iterate(tree, root);
 
             s32       round       = 0;
             s32 const postorder[] = {0, 2, 1, 4, 6, 8, 7, 5, 3};
@@ -992,76 +1006,74 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             CHECK_EQUAL(9, round);
 #endif
 
-            while (!ntree32::clear(tree, node)) {}
+            while (!ntree32::clear(tree, root, node)) {}
 
             ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(void_tree_search)
         {
+            ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
             {
-                s_keys[c_num_keys] = s_find[i];
+                s_keys[c_find_slot] = s_find[i];
                 ntree32::node_t inserted;
-                CHECK_TRUE(ntree32::insert(tree, c_num_keys, s_compare_keys, &s_keys, inserted));
+                CHECK_TRUE(ntree32::insert(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, inserted));
                 s_keys[inserted] = s_find[i];
             }
 
-            ntree32::iterator_t iterator = ntree32::iterate(tree);
+            ntree32::iterator_t iterator = ntree32::iterate(tree, root);
 
             s32             dir = ntree32::LEFT;
             ntree32::node_t node;
             s32             find = (c_num_keys / 2);  // find the key at s_keys[find]
             while (iterator.traverse(tree, dir, node))
             {
-                s8 const c = s_compare_keys(find, node, &s_keys);
+                s8 const c = s_compare_key_and_node(find, node, &s_keys);
                 if (c == 0)
                     break;
                 dir = iterator.getdir(c);
             }
-            CHECK_EQUAL(0, s_compare_keys(find, node, &s_keys));
+            CHECK_EQUAL(0, s_compare_key_and_node(find, node, &s_keys));
 
-            while (!ntree32::clear(tree, node)) {}
+            while (!ntree32::clear(tree, root, node)) {}
 
             ntree32::teardown_tree(tree);
         }
 
         UNITTEST_TEST(s32_tree)
         {
+            ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, c_max_nodes, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes, m_colors);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
             {
-                s_keys[c_num_keys] = s_find[i];
+                s_keys[c_find_slot] = s_find[i];
                 ntree32::node_t inserted;
-                CHECK_TRUE(ntree32::insert(tree, c_num_keys, s_compare_keys, &s_keys, inserted));
+                CHECK_TRUE(ntree32::insert(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, inserted));
                 s_keys[inserted] = s_find[i];
             }
-
-            CHECK_EQUAL(c_num_keys, ntree32::size(tree));
 
             for (s32 i = 0; i < c_num_keys; ++i)
             {
                 ntree32::node_t node = ntree32::c_invalid_node;
-                s_keys[c_num_keys]   = s_keys[i];
-                CHECK_EQUAL(true, ntree32::find(tree, c_num_keys, s_compare_keys, &s_keys, node));
+                s_keys[c_find_slot]   = s_keys[i];
+                CHECK_EQUAL(true, ntree32::find(tree, root, c_find_slot, s_compare_key_and_node, &s_keys, node));
                 CHECK_NOT_EQUAL(ntree32::c_invalid_node, node);
                 CHECK_EQUAL(i, node);
             }
 
             ntree32::node_t node = ntree32::c_invalid_node;
-            s_keys[c_num_keys]   = 11111;
-            CHECK_FALSE(ntree32::find(tree, c_num_keys, s_compare_keys, &s_keys, node));
+            s_keys[c_find_slot]   = 11111;
+            CHECK_FALSE(ntree32::find(tree, root, c_find_slot, s_compare_key_and_node, &s_keys, node));
 
-            while (!ntree32::clear(tree, node)) {}
-
-            CHECK_EQUAL(0, ntree32::size(tree));
+            while (!ntree32::clear(tree, root, node)) {}
 
             ntree32::teardown_tree(tree);
         }
