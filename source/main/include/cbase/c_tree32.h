@@ -15,8 +15,8 @@ namespace ncore
         typedef u32 index_t;
         typedef u32 node_t;
 
-        const u32    c_invalid_index = 0x7FFFFFFF;
-        const node_t c_invalid_node  = 0x7FFFFFFF;
+        const u32    c_invalid_index = 0xFFFFFFFF;
+        const node_t c_invalid_node  = 0xFFFFFFFF;
 
         enum echild_t
         {
@@ -33,22 +33,24 @@ namespace ncore
         // a and b are the indices of nodes/items to compare, user_data is a pointer to the data that is passed to the tree
         typedef s8 (*compare_fn)(u32 a, u32 b, void const* user_data);
 
+        struct nnode_t
+        {
+            node_t m_child[2];
+        };
+
         struct tree_t
         {
             tree_t();
 
+            void   reset();
             void   set_color(node_t node, u8 color);
             u8     get_color(node_t const node) const;
             node_t get_node(node_t const node, s8 ne) const;
             void   set_node(node_t node, s8 ne, node_t set);
             node_t new_node();
             void   del_node(node_t node);
-            static inline s8 getdir(s8 compare) { return (compare + 1) >> 1; }
 
-            struct nnode_t
-            {
-                node_t m_child[2];
-            };
+            static inline s8 getdir(s8 compare) { return (compare + 1) >> 1; }
 
             nnode_t* m_nodes;
             u32      m_free_index;
@@ -64,10 +66,10 @@ namespace ncore
             {
             }
 
-            bool              traverse(tree_t& tree, s32 d, node_t& node);
-            bool              preorder(tree_t& tree, s32 d, node_t& node);
-            bool              sortorder(tree_t& tree, s32 d, node_t& node);
-            bool              postorder(tree_t& tree, s32 d, node_t& node);
+            bool traverse(tree_t& tree, s32 d, node_t& node);
+            bool preorder(tree_t& tree, s32 d, node_t& node);
+            bool sortorder(tree_t& tree, s32 d, node_t& node);
+            bool postorder(tree_t& tree, s32 d, node_t& node);
 
             node_t m_root;
             node_t m_it;
@@ -75,7 +77,7 @@ namespace ncore
             s32    m_stack;
         };
 
-        void setup_tree(tree_t& c, tree_t::nnode_t* nodes);
+        void setup_tree(tree_t& c, nnode_t* nodes);
         void teardown_tree(tree_t& c);
 
         bool       clear(tree_t& c, node_t& root, node_t& n);  // Repeatedly call 'clear' until true is returned

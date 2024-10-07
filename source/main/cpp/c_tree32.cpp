@@ -542,7 +542,7 @@ namespace ncore
             return true;
         }
 
-        void setup_tree(tree_t& c, tree_t::nnode_t* nodes)
+        void setup_tree(tree_t& c, nnode_t* nodes)
         {
             c.m_free_index = 0;
             c.m_free_head  = c_invalid_index;

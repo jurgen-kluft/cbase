@@ -1,2 +1,2 @@
-cbase has no dependencies
-cbase unittest has two dependencies, cunittest and xsystem
+cbase has a dependency on ccore
+cbase unittest has three dependencies, cunittest, cbase and ccore

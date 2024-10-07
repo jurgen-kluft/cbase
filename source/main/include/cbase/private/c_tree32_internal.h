@@ -9,6 +9,12 @@ namespace ncore
         {
         }
 
+        inline void tree_t::reset()
+        {
+            m_free_head  = c_invalid_node;
+            m_free_index = 0;
+        }
+
         inline void tree_t::set_color(node_t node, u8 color)
         {
             ASSERT(node != c_invalid_index);
@@ -24,7 +30,12 @@ namespace ncore
         inline node_t tree_t::get_node(node_t const node, s8 ne) const
         {
             ASSERT(node != c_invalid_index);
-            return m_nodes[node].m_child[ne] & 0x7FFFFFFF;
+            // Since we are using the highest bit to store the color of the node, we need to mask it out
+            // but that also means that 0x7FFFFFFF is the highest value we can store in a node.
+            // To return 0xFFFFFFFF when the node is 0x7FFFFFFF we can do the following bitwise operation:
+            // - ((node + 1) & 0x80000000) | (node & 0x7FFFFFFF)
+            node_t n = m_nodes[node].m_child[ne] & 0x7FFFFFFF;
+            return ((n + 1) & 0x80000000) | n;
         }
         inline void tree_t::set_node(node_t node, s8 ne, node_t set)
         {
@@ -46,16 +57,16 @@ namespace ncore
 
             m_nodes[node].m_child[0] = c_invalid_node;
             m_nodes[node].m_child[1] = c_invalid_node;
-            // set_color(node, RED); // Red is the default color and is equal to 0
-
+            set_color(node, RED);
             return node;
         }
 
         inline void tree_t::del_node(node_t node)
         {
             ASSERT(node != c_invalid_index);
-            m_nodes[node].m_child[LEFT] = c_invalid_index;
-            m_free_head                 = node;
+            m_nodes[node].m_child[LEFT]  = m_free_head;
+            m_nodes[node].m_child[RIGHT] = c_invalid_node;
+            m_free_head                  = node;
         }
 
     }  // namespace ntree32
