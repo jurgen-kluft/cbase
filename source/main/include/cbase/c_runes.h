@@ -407,6 +407,10 @@ namespace ncore
         void trimDelimiters(crunes_t&, uchar32 inLeft, uchar32 inRight);  // Trim delimiters from left and right side
 
         // -------------------------------------------------------------------------------
+        // reading
+        uchar32 read(crunes_t const& str, u32& cursor);
+
+        // -------------------------------------------------------------------------------
         // copy and concatenate
         bool copy(const crunes_t& src, runes_t& dst);
         bool concatenate(runes_t& str, const crunes_t& concat);

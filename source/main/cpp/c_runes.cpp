@@ -2707,6 +2707,13 @@ namespace ncore
             trimRight(str, _right);
         }
 
+        // ------------------------------------------------------------------------------
+        // reading
+        uchar32 read(crunes_t const& str, u32& cursor)
+        {
+            return utf::read_forward(str, cursor);
+        }
+
         bool copy(crunes_t const& _src, runes_t& _dst)
         {
             u32 siter  = get_begin(_src);

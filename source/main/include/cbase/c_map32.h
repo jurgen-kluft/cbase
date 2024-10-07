@@ -36,13 +36,13 @@ namespace ncore
                 , m_values(nullptr)
             {
             }
-            alloc_t*                  m_allocator;
-            ntree32::tree_t           m_tree;
-            ntree32::node_t           m_root;
-            u32                       m_capacity;
-            ntree32::tree_t::nnode_t* m_nodes;
-            K*                        m_keys;
-            V*                        m_values;
+            alloc_t*          m_allocator;
+            ntree32::tree_t   m_tree;
+            ntree32::node_t   m_root;
+            u32               m_capacity;
+            ntree32::nnode_t* m_nodes;
+            K*                m_keys;
+            V*                m_values;
 
             inline u32 find_slot() const { return m_capacity; }
             inline u32 temp_slot() const { return m_capacity + 1; }
@@ -66,7 +66,7 @@ namespace ncore
         inline map32_t(alloc_t* a, u32 capacity = 65535 - 2)
             : m_data(a, capacity)
         {
-            m_data.m_nodes  = g_allocate_array<ntree32::tree_t::nnode_t>(m_data.m_allocator, capacity + 2);
+            m_data.m_nodes  = g_allocate_array<ntree32::nnode_t>(m_data.m_allocator, capacity + 2);
             m_data.m_keys   = g_allocate_array<K>(m_data.m_allocator, capacity + 2);
             m_data.m_values = g_allocate_array<V>(m_data.m_allocator, capacity + 2);
             ntree32::setup_tree(m_data.m_tree, m_data.m_nodes);
@@ -137,12 +137,12 @@ namespace ncore
                 , m_keys(nullptr)
             {
             }
-            alloc_t*                  m_allocator;
-            ntree32::tree_t           m_tree;
-            ntree32::node_t           m_root;
-            u32                       m_capacity;
-            ntree32::tree_t::nnode_t* m_nodes;
-            K*                        m_keys;
+            alloc_t*          m_allocator;
+            ntree32::tree_t   m_tree;
+            ntree32::node_t   m_root;
+            u32               m_capacity;
+            ntree32::nnode_t* m_nodes;
+            K*                m_keys;
 
             inline u32 find_slot() const { return m_capacity; }
             inline u32 temp_slot() const { return m_capacity + 1; }
@@ -165,8 +165,8 @@ namespace ncore
         inline set32_t(alloc_t* a, u32 capacity = 65535 - 2)
             : m_data(a, capacity)
         {
-            m_data.m_nodes  = g_allocate_array<ntree32::tree_t::nnode_t>(m_data.m_allocator, capacity + 2);
-            m_data.m_keys   = g_allocate_array<K>(m_data.m_allocator, capacity + 2);
+            m_data.m_nodes = g_allocate_array<ntree32::nnode_t>(m_data.m_allocator, capacity + 2);
+            m_data.m_keys  = g_allocate_array<K>(m_data.m_allocator, capacity + 2);
             ntree32::setup_tree(m_data.m_tree, m_data.m_nodes);
         }
 

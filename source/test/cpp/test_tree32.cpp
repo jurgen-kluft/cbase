@@ -772,8 +772,8 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        const u32                c_max_nodes = 1022;
-        ntree32::tree_t::nnode_t m_nodes[c_max_nodes + 2];
+        const u32        c_max_nodes = 1022;
+        ntree32::nnode_t m_nodes[c_max_nodes + 2];
 
         UNITTEST_TEST(tree_node)
         {

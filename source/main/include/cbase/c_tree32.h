@@ -40,8 +40,6 @@ namespace ncore
 
         struct tree_t
         {
-            tree_t();
-
             void   reset();
             void   set_color(node_t node, u8 color);
             u8     get_color(node_t const node) const;
@@ -56,6 +54,8 @@ namespace ncore
             u32      m_free_index;
             u32      m_free_head;
         };
+
+        void g_init(tree_t& tree);
 
         struct iterator_t
         {
