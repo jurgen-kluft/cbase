@@ -4,40 +4,35 @@ namespace ncore
     {
         inline tree_t::tree_t()
             : m_nodes(nullptr)
-            , m_colors(nullptr)
             , m_free_index(0)
             , m_free_head(c_invalid_node)
         {
         }
 
-        inline void tree_t::v_set_color(node_t node, u8 color)
+        inline void tree_t::set_color(node_t node, u8 color)
         {
             ASSERT(node != c_invalid_index);
-            index_t iw   = node >> 3;
-            index_t ib   = node & 0x7;
-            m_colors[iw] = (m_colors[iw] & ~((u8)1 << ib)) | ((u8)color << ib);
+            m_nodes[node].m_child[LEFT] = (m_nodes[node].m_child[LEFT] & 0x7FFFFFFF) | (color << 31);
         }
 
-        inline u8 tree_t::v_get_color(node_t const node) const
+        inline u8 tree_t::get_color(node_t const node) const
         {
             ASSERT(node != c_invalid_index);
-            index_t iw = node >> 3;
-            index_t ib = node & 0x7;
-            return ((m_colors[iw] >> ib) & 1);
+            return (m_nodes[node].m_child[LEFT] & 0x80000000) >> 31;
         }
 
-        inline node_t tree_t::v_get_node(node_t const node, s8 ne) const
+        inline node_t tree_t::get_node(node_t const node, s8 ne) const
         {
             ASSERT(node != c_invalid_index);
-            return m_nodes[node].m_child[ne];
+            return m_nodes[node].m_child[ne] & 0x7FFFFFFF;
         }
-        inline void tree_t::v_set_node(node_t node, s8 ne, node_t set)
+        inline void tree_t::set_node(node_t node, s8 ne, node_t set)
         {
             ASSERT(node != c_invalid_index);
-            m_nodes[node].m_child[ne] = set;
+            m_nodes[node].m_child[ne] = (m_nodes[node].m_child[ne] & 0x80000000) | set;
         }
 
-        inline node_t tree_t::v_new_node()
+        inline node_t tree_t::new_node()
         {
             node_t node = m_free_head;
             if (node != c_invalid_node)
@@ -51,12 +46,12 @@ namespace ncore
 
             m_nodes[node].m_child[0] = c_invalid_node;
             m_nodes[node].m_child[1] = c_invalid_node;
-            v_set_color(node, RED);
+            // set_color(node, RED); // Red is the default color and is equal to 0
 
             return node;
         }
 
-        inline void tree_t::v_del_node(node_t node)
+        inline void tree_t::del_node(node_t node)
         {
             ASSERT(node != c_invalid_index);
             m_nodes[node].m_child[LEFT] = c_invalid_index;

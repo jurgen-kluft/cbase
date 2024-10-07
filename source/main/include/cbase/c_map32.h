@@ -32,7 +32,6 @@ namespace ncore
                 , m_root(ntree32::c_invalid_node)
                 , m_capacity(capacity)
                 , m_nodes(nullptr)
-                , m_colors(nullptr)
                 , m_keys(nullptr)
                 , m_values(nullptr)
             {
@@ -42,7 +41,6 @@ namespace ncore
             ntree32::node_t           m_root;
             u32                       m_capacity;
             ntree32::tree_t::nnode_t* m_nodes;
-            u8*                       m_colors;
             K*                        m_keys;
             V*                        m_values;
 
@@ -69,10 +67,9 @@ namespace ncore
             : m_data(a, capacity)
         {
             m_data.m_nodes  = g_allocate_array<ntree32::tree_t::nnode_t>(m_data.m_allocator, capacity + 2);
-            m_data.m_colors = g_allocate_array<u8>(m_data.m_allocator, (capacity + 2 + 31) >> 5);
             m_data.m_keys   = g_allocate_array<K>(m_data.m_allocator, capacity + 2);
             m_data.m_values = g_allocate_array<V>(m_data.m_allocator, capacity + 2);
-            ntree32::setup_tree(m_data.m_tree, m_data.m_nodes, m_data.m_colors);
+            ntree32::setup_tree(m_data.m_tree, m_data.m_nodes);
         }
 
         inline ~map32_t()
@@ -80,12 +77,11 @@ namespace ncore
             ntree32::node_t n;
             while (!ntree32::clear(m_data.m_tree, m_data.m_root, n))
             {
-                m_data.m_tree.v_del_node(n);
+                m_data.m_tree.del_node(n);
             }
             ntree32::teardown_tree(m_data.m_tree);
             g_deallocate_array(m_data.m_allocator, m_data.m_keys);
             g_deallocate_array(m_data.m_allocator, m_data.m_values);
-            g_deallocate_array(m_data.m_allocator, m_data.m_colors);
             g_deallocate_array(m_data.m_allocator, m_data.m_nodes);
         }
 
@@ -93,13 +89,13 @@ namespace ncore
         {
             m_data.m_keys[m_data.find_slot()] = _key;
             ntree32::node_t inserted;
-            if (!ntree32::insert(m_data.m_tree, m_data.m_root, m_data.temp_slot(), m_data.find_slot(), s_compare, &m_data, inserted))
+            if (ntree32::insert(m_data.m_tree, m_data.m_root, m_data.temp_slot(), m_data.find_slot(), s_compare, &m_data, inserted))
             {
-                return false;
+                m_data.m_keys[inserted]   = _key;
+                m_data.m_values[inserted] = _value;
+                return true;
             }
-            m_data.m_keys[inserted]   = _key;
-            m_data.m_values[inserted] = _value;
-            return true;
+            return false;
         }
 
         bool remove(K const& key)
@@ -108,7 +104,7 @@ namespace ncore
             ntree32::node_t removed;
             if (ntree32::remove(m_data.m_tree, m_data.m_root, m_data.temp_slot(), m_data.find_slot(), s_compare, &m_data, removed))
             {
-                m_data.m_tree.v_del_node(removed);
+                m_data.m_tree.del_node(removed);
                 return true;
             }
             return false;
@@ -118,10 +114,12 @@ namespace ncore
         {
             m_data.m_keys[m_data.find_slot()] = _key;
             ntree32::node_t found;
-            bool            result = ntree32::find(m_data.m_tree, m_data.m_root, m_data.find_slot(), s_compare, &m_data, found);
-            if (found != ntree32::c_invalid_node)
+            if (ntree32::find(m_data.m_tree, m_data.m_root, m_data.find_slot(), s_compare, &m_data, found))
+            {
                 _value = m_data.m_values[found];
-            return result;
+                return true;
+            }
+            return false;
         }
     };
 
@@ -136,7 +134,6 @@ namespace ncore
                 , m_root(ntree32::c_invalid_node)
                 , m_capacity(capacity)
                 , m_nodes(nullptr)
-                , m_colors(nullptr)
                 , m_keys(nullptr)
             {
             }
@@ -145,7 +142,6 @@ namespace ncore
             ntree32::node_t           m_root;
             u32                       m_capacity;
             ntree32::tree_t::nnode_t* m_nodes;
-            u8*                       m_colors;
             K*                        m_keys;
 
             inline u32 find_slot() const { return m_capacity; }
@@ -170,9 +166,8 @@ namespace ncore
             : m_data(a, capacity)
         {
             m_data.m_nodes  = g_allocate_array<ntree32::tree_t::nnode_t>(m_data.m_allocator, capacity + 2);
-            m_data.m_colors = g_allocate_array<u8>(m_data.m_allocator, (capacity + 2 + 31) >> 5);
             m_data.m_keys   = g_allocate_array<K>(m_data.m_allocator, capacity + 2);
-            ntree32::setup_tree(m_data.m_tree, m_data.m_nodes, m_data.m_colors);
+            ntree32::setup_tree(m_data.m_tree, m_data.m_nodes);
         }
 
         ~set32_t()
@@ -180,11 +175,10 @@ namespace ncore
             ntree32::node_t n;
             while (!ntree32::clear(m_data.m_tree, m_data.m_root, n))
             {
-                m_data.m_tree.v_del_node(n);
+                m_data.m_tree.del_node(n);
             }
             ntree32::teardown_tree(m_data.m_tree);
             g_deallocate_array(m_data.m_allocator, m_data.m_keys);
-            g_deallocate_array(m_data.m_allocator, m_data.m_colors);
             g_deallocate_array(m_data.m_allocator, m_data.m_nodes);
         }
 
@@ -192,28 +186,31 @@ namespace ncore
         {
             m_data.m_keys[m_data.find_slot()] = _key;
             ntree32::node_t inserted;
-            if (!ntree32::insert(m_data.m_tree, m_data.m_root, m_data.temp_slot(), m_data.find_slot(), s_compare, &m_data, inserted))
+            if (ntree32::insert(m_data.m_tree, m_data.m_root, m_data.temp_slot(), m_data.find_slot(), s_compare, &m_data, inserted))
             {
-                return false;
+                m_data.m_keys[inserted] = _key;
+                return true;
             }
-            m_data.m_keys[inserted] = _key;
-            return true;
+            return false;
         }
 
         bool contains(K const& key) const
         {
             m_data.m_keys[m_data.find_slot()] = key;
             ntree32::node_t found             = ntree32::c_invalid_node;
-            bool            result            = ntree32::find(m_data.m_tree, m_data.m_root, m_data.find_slot(), s_compare, &m_data, found);
-            return result;
+            return ntree32::find(m_data.m_tree, m_data.m_root, m_data.find_slot(), s_compare, &m_data, found);
         }
 
         bool remove(K const& key)
         {
             m_data.m_keys[m_data.find_slot()] = key;
             ntree32::node_t removed;
-            bool            result = ntree32::remove(m_data.m_tree, m_data.m_root, m_data.temp_slot(), m_data.find_slot(), s_compare, &m_data, removed);
-            return result;
+            if (ntree32::remove(m_data.m_tree, m_data.m_root, m_data.temp_slot(), m_data.find_slot(), s_compare, &m_data, removed))
+            {
+                m_data.m_tree.del_node(removed);
+                return true;
+            }
+            return false;
         }
     };
 

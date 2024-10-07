@@ -728,9 +728,9 @@ UNITTEST_SUITE_BEGIN(test_tree2)
     {
         UNITTEST_ALLOCATOR;
 
-        const s32  c_find_slot = 64;
-        const s32  c_temp_slot = 65;
-        const s32  c_num_keys = 64;
+        const s32  c_find_slot = 62;
+        const s32  c_temp_slot = 63;
+        const s32  c_num_keys  = 62;
         static s32 s_find[c_num_keys + 2];
         static s32 s_keys[c_num_keys + 2];  // +2 for 'find' and 'temp' slots
 
@@ -772,82 +772,59 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        const u32                c_max_nodes = 1024;
-        ntree32::tree_t::nnode_t m_nodes[c_max_nodes + 1];
-        u8                       m_colors[(c_max_nodes + 1 + 7) >> 3];
+        const u32                c_max_nodes = 1022;
+        ntree32::tree_t::nnode_t m_nodes[c_max_nodes + 2];
 
         UNITTEST_TEST(tree_node)
         {
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
             ntree32::index_t const key = 0;
 
-            ntree32::node_t node  = tree.v_new_node();
-            ntree32::node_t left  = tree.v_new_node();
-            ntree32::node_t right = tree.v_new_node();
+            ntree32::node_t node  = tree.new_node();
+            ntree32::node_t left  = tree.new_node();
+            ntree32::node_t right = tree.new_node();
 
             ntree32::node_t left_ptr = left;
-            // node->set_left(ctxt, left_ptr);
-            tree.v_set_node(node, ntree32::LEFT, left_ptr);
+            tree.set_node(node, ntree32::LEFT, left_ptr);
 
-            // CHECK_EQUAL(left_ptr, node->get_left(ctxt));
-            CHECK_EQUAL(left_ptr, tree.v_get_node(node, ntree32::LEFT));
+            CHECK_EQUAL(left_ptr, tree.get_node(node, ntree32::LEFT));
 
             ntree32::node_t right_ptr = right;
-            // node->set_right(ctxt, right_ptr);
-            tree.v_set_node(node, ntree32::RIGHT, right_ptr);
-            // CHECK_EQUAL(right_ptr, node->get_right(ctxt));
-            CHECK_EQUAL(right_ptr, tree.v_get_node(node, ntree32::RIGHT));
+            tree.set_node(node, ntree32::RIGHT, right_ptr);
+            CHECK_EQUAL(right_ptr, tree.get_node(node, ntree32::RIGHT));
 
-            // CHECK_EQUAL(true, node->is_red(ctxt));
-            CHECK_EQUAL(true, tree.v_get_color(node) == ntree32::RED);
+            CHECK_EQUAL(true, tree.get_color(node) == ntree32::RED);
 
-            // node->set_black(ctxt);
-            // CHECK_EQUAL(false, node->is_red(ctxt));
-            // node->set_red(ctxt);
-            // CHECK_EQUAL(true, node->is_red(ctxt));
-            // node->set_black(ctxt);
-            // CHECK_EQUAL(false, node->is_red(ctxt));
-            // CHECK_EQUAL(true, node->is_black(ctxt));
-            tree.v_set_color(node, ntree32::BLACK);
-            CHECK_EQUAL(false, tree.v_get_color(node) == ntree32::RED);
-            tree.v_set_color(node, ntree32::RED);
-            CHECK_EQUAL(true, tree.v_get_color(node) == ntree32::RED);
-            tree.v_set_color(node, ntree32::BLACK);
-            CHECK_EQUAL(false, tree.v_get_color(node) == ntree32::RED);
-            CHECK_EQUAL(true, tree.v_get_color(node) == ntree32::BLACK);
+            tree.set_color(node, ntree32::BLACK);
+            CHECK_EQUAL(false, tree.get_color(node) == ntree32::RED);
+            tree.set_color(node, ntree32::RED);
+            CHECK_EQUAL(true, tree.get_color(node) == ntree32::RED);
+            tree.set_color(node, ntree32::BLACK);
+            CHECK_EQUAL(false, tree.get_color(node) == ntree32::RED);
+            CHECK_EQUAL(true, tree.get_color(node) == ntree32::BLACK);
 
             left_ptr  = left;
             right_ptr = right;
-            // node->set_left(ctxt, left_ptr);
-            // node->set_right(ctxt, right_ptr);
-            // CHECK_EQUAL(left_ptr, node->get_child(ctxt, 0));
-            // CHECK_EQUAL(right_ptr, node->get_child(ctxt, 1));
-            // CHECK_EQUAL(true, node->is_black(ctxt));
-            tree.v_set_node(node, ntree32::LEFT, left_ptr);
-            tree.v_set_node(node, ntree32::RIGHT, right_ptr);
-            CHECK_EQUAL(left_ptr, tree.v_get_node(node, ntree32::LEFT));
-            CHECK_EQUAL(right_ptr, tree.v_get_node(node, ntree32::RIGHT));
-            CHECK_EQUAL(true, tree.v_get_color(node) == ntree32::BLACK);
+            tree.set_node(node, ntree32::LEFT, left_ptr);
+            tree.set_node(node, ntree32::RIGHT, right_ptr);
+            CHECK_EQUAL(left_ptr, tree.get_node(node, ntree32::LEFT));
+            CHECK_EQUAL(right_ptr, tree.get_node(node, ntree32::RIGHT));
+            CHECK_EQUAL(true, tree.get_color(node) == ntree32::BLACK);
 
-            // node->set_child(ctxt, 0, left_ptr);
-            // node->set_child(ctxt, 1, right_ptr);
-            tree.v_set_node(node, ntree32::LEFT, left_ptr);
-            tree.v_set_node(node, ntree32::RIGHT, right_ptr);
+            tree.set_node(node, ntree32::LEFT, left_ptr);
+            tree.set_node(node, ntree32::RIGHT, right_ptr);
 
-            // CHECK_EQUAL(left_ptr, node->get_child(ctxt, 0));
-            // CHECK_EQUAL(right_ptr, node->get_child(ctxt, 1));
-            CHECK_EQUAL(left_ptr, tree.v_get_node(node, ntree32::LEFT));
-            CHECK_EQUAL(right_ptr, tree.v_get_node(node, ntree32::RIGHT));
+            CHECK_EQUAL(left_ptr, tree.get_node(node, ntree32::LEFT));
+            CHECK_EQUAL(right_ptr, tree.get_node(node, ntree32::RIGHT));
 
-            // CHECK_EQUAL(true, node->is_black(ctxt));
-            CHECK_EQUAL(true, tree.v_get_color(node) == ntree32::BLACK);
+            CHECK_EQUAL(true, tree.get_color(node) == ntree32::BLACK);
 
-            tree.v_del_node(node);
-            tree.v_del_node(left);
-            tree.v_del_node(right);
+            tree.del_node(node);
+            tree.del_node(left);
+            tree.del_node(right);
 
             ntree32::teardown_tree(tree);
         }
@@ -856,7 +833,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         {
             ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -871,7 +848,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
                 ntree32::node_t removed;
                 CHECK_TRUE(ntree32::remove(tree, root, c_temp_slot, c_find_slot, s_compare_key_and_node, &s_keys, removed));
                 CHECK_NOT_EQUAL(ntree32::c_invalid_node, removed);
-                tree.v_del_node(removed);
+                tree.del_node(removed);
             }
 
             ntree32::node_t node;
@@ -884,7 +861,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         {
             ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
             for (s32 i = 0; i < 9; ++i)
@@ -916,7 +893,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         {
             ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -948,7 +925,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         {
             ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -981,7 +958,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         {
             ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
             for (s32 i = 0; i < 9; ++i)
@@ -1015,7 +992,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         {
             ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -1036,7 +1013,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
                 s8 const c = s_compare_key_and_node(find, node, &s_keys);
                 if (c == 0)
                     break;
-                dir = iterator.getdir(c);
+                dir = tree.getdir(c);
             }
             CHECK_EQUAL(0, s_compare_key_and_node(find, node, &s_keys));
 
@@ -1049,7 +1026,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
         {
             ntree32::node_t root = ntree32::c_invalid_node;
             ntree32::tree_t tree;
-            ntree32::setup_tree(tree, m_nodes, m_colors);
+            ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
             for (s32 i = 0; i < c_num_keys; ++i)
@@ -1063,14 +1040,14 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             for (s32 i = 0; i < c_num_keys; ++i)
             {
                 ntree32::node_t node = ntree32::c_invalid_node;
-                s_keys[c_find_slot]   = s_keys[i];
+                s_keys[c_find_slot]  = s_keys[i];
                 CHECK_EQUAL(true, ntree32::find(tree, root, c_find_slot, s_compare_key_and_node, &s_keys, node));
                 CHECK_NOT_EQUAL(ntree32::c_invalid_node, node);
                 CHECK_EQUAL(i, node);
             }
 
             ntree32::node_t node = ntree32::c_invalid_node;
-            s_keys[c_find_slot]   = 11111;
+            s_keys[c_find_slot]  = 11111;
             CHECK_FALSE(ntree32::find(tree, root, c_find_slot, s_compare_key_and_node, &s_keys, node));
 
             while (!ntree32::clear(tree, root, node)) {}
