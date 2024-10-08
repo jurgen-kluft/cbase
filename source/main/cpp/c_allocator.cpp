@@ -44,13 +44,13 @@ namespace ncore
     {
     }
 
-    fsadexed_array_t::fsadexed_array_t(void* array_item, u32 sizeof_item, u32 countof_item)
-        : m_data(array_item)
-        , m_sizeof(sizeof_item)
-        , m_countof(countof_item)
-        , m_freelist(0xffffffff)
-        , m_freeindex(0)
+    void fsadexed_array_t::setup(void* array_item, u32 sizeof_item, u32 countof_item)
     {
+        m_data = (array_item);
+        m_sizeof = (sizeof_item);
+        m_countof = (countof_item);
+        m_freelist = (0xffffffff);
+        m_freeindex = (0);
         ASSERT(m_sizeof >= sizeof(u32));  // Can only deal with items that are 4 bytes or more
     }
 

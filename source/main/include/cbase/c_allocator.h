@@ -168,19 +168,17 @@ namespace ncore
     {
     public:
         fsadexed_array_t();
-        fsadexed_array_t(void* array_item, u32 sizeof_item, u32 countof_item);
         ~fsadexed_array_t() {}
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
+        void setup(void* array_item, u32 sizeof_item, u32 countof_item);
 
-    protected:
         virtual void* v_allocate();
         virtual void  v_deallocate(void*);
         virtual u32   v_allocsize() const;
         virtual void* v_idx2ptr(u32 index);
         virtual u32   v_ptr2idx(void const* ptr) const;
 
-    private:
         void* m_data;
         u32   m_sizeof;
         u32   m_countof;
