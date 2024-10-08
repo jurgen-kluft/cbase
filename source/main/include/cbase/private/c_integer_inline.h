@@ -7,12 +7,12 @@ namespace ncore
         {
             return integerA <= integerB ? integerA : integerB;
         }
+
         template <class T>
         inline T min(T integerA, T integerB, T integerC)
         {
             return min(integerC, min(integerA, integerB));
         }
-
 
         template <class T>
         inline T max(T integerA, T integerB)

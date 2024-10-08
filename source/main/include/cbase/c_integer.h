@@ -134,15 +134,6 @@ namespace ncore
         inline u32 rol32(u32 integer, u32 shift);          // Roll all the bits in integer to the left by shift number of bits
         inline u32 ror32(u32 integer, u32 shift);          // Roll all the bits in integer to the right by shift number of bits
 
-        // template specialization declaration
-        template <>
-        s32 min(s32 integerA, s32 integerB);  // Return the smallest value
-        template <>
-        s32 min(s32 integerA, s32 integerB, s32 integerC);  // Return the smallest value of 3
-        template <>
-        s32 max(s32 integerA, s32 integerB);  // Return the biggest value
-        template <>
-        s32 max(s32 integerA, s32 integerB, s32 integerC);  // Return the biggest value of 3
     }  // namespace math
 };  // namespace ncore
 
