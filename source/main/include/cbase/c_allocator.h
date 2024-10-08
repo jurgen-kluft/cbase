@@ -11,67 +11,9 @@
 
 namespace ncore
 {
-    class buffer_t;
-
     void     g_init_system_alloc();
     void     g_exit_system_alloc();
     alloc_t* g_get_system_alloc();
-
-    // fixed-size allocator
-    class fsa_t
-    {
-    public:
-        inline u32   allocsize() const { return v_allocsize(); }
-        inline void* allocate() { return v_allocate(); }
-        inline void  deallocate(void* ptr) { v_deallocate(ptr); }
-
-        template <typename T, typename... Args>
-        T* construct(Args... args)
-        {
-            ASSERT(sizeof(T) <= allocsize());
-            void* mem    = v_allocate();
-            T*    object = new (mem) T(args...);
-            return object;
-        }
-
-        template <typename T>
-        void destruct(T* p)
-        {
-            p->~T();
-            v_deallocate(p);
-        }
-
-    protected:
-        virtual u32   v_allocsize() const = 0;
-        virtual void* v_allocate()        = 0;
-        virtual void  v_deallocate(void*) = 0;
-
-        virtual ~fsa_t() {}
-    };
-
-    class fsa_to_alloc_t : public fsa_t
-    {
-    public:
-        fsa_to_alloc_t()
-            : m_allocator(nullptr)
-            , m_size(0)
-        {
-        }
-        fsa_to_alloc_t(u32 size, alloc_t* allocator)
-            : m_allocator(allocator)
-            , m_size(size)
-        {
-        }
-
-    protected:
-        virtual u32   v_size() const { return m_size; }
-        virtual void* v_allocate() { return m_allocator->allocate(m_size, sizeof(void*)); }
-        virtual void  v_deallocate(void* p) { m_allocator->deallocate(p); }
-
-    private:
-        alloc_t* m_allocator;
-        u32      m_size;
-    };
 
     // The dexer interface, 'pointer to index' and 'index to pointer'
     class dexer_t
@@ -96,13 +38,6 @@ namespace ncore
         virtual u32   v_ptr2idx(void const* ptr) const = 0;
     };
 
-    class fsadexed_t : public fsa_t, public dexer_t
-    {
-    public:
-        fsadexed_t() {}
-        ~fsadexed_t() {}
-    };
-
     // Global new and delete
     template <typename T, typename... Args>
     T* g_new(alloc_t* alloc, Args... args)
@@ -119,72 +54,96 @@ namespace ncore
         alloc->deallocate(p);
     }
 
-    template <class T>
-    class cdtor_default_t
+    template <typename T>
+    class pool_t
     {
     public:
-        inline T* construct(void* mem) const { return static_cast<T*>(mem); }
-        inline T* copy_construct(void* mem, T const* other) const
-        {
-            T* item = (T*)(mem);
-            *item   = *other;
-            return item;
-        }
-        inline void destruct(T* obj) const {}
-    };
-
-    template <class T>
-    class cdtor_placement_new_t
-    {
-    public:
-        inline T*   construct(void* mem) const { return new (mem) T(); }
-        inline T*   copy_construct(void* mem, T const* other) const { return new (mem) T(*other); }
-        inline void destruct(T* obj) const { obj->~T(); }
-    };
-
-    class dexed_array_t : public dexer_t
-    {
-    public:
-        dexed_array_t()
-            : m_data(nullptr)
-            , m_sizeof(0)
-            , m_countof(0)
-        {
-        }
-        dexed_array_t(void* array_item, u32 sizeof_item, u32 countof_item);
+        pool_t();
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
-    protected:
-        virtual void* v_idx2ptr(u32 index);
-        virtual u32   v_ptr2idx(void const* ptr) const;
+        void setup(T* array_item, u32 countof_item);
 
-    private:
-        void* m_data;
-        u32   m_sizeof;
-        u32   m_countof;
+        T*   allocate();
+        void deallocate(T*);
+        u32  allocsize() const;
+        T*   idx2ptr(u32 index);
+        u32  ptr2idx(T const* ptr) const;
+
+        T*  m_data;
+        u32 m_countof;
+        u32 m_freelist;
+        u32 m_freeindex;
     };
 
-    class fsadexed_array_t : public fsadexed_t
+    template <typename T>
+    inline pool_t<T>::pool_t()
+        : m_data(nullptr)
+        , m_countof(0)
+        , m_freelist(0xffffffff)
+        , m_freeindex(0xffffffff)
     {
-    public:
-        fsadexed_array_t();
-        ~fsadexed_array_t() {}
+    }
 
-        DCORE_CLASS_PLACEMENT_NEW_DELETE
-        void setup(void* array_item, u32 sizeof_item, u32 countof_item);
+    template <typename T>
+    inline void pool_t<T>::setup(T* array_item, u32 countof_item)
+    {
+        m_data      = (array_item);
+        m_countof   = (countof_item);
+        m_freelist  = (0xffffffff);
+        m_freeindex = (0);
+        ASSERT(sizeof(T) >= sizeof(u32));  // Can only deal with items that are 4 bytes or more
+    }
 
-        virtual void* v_allocate();
-        virtual void  v_deallocate(void*);
-        virtual u32   v_allocsize() const;
-        virtual void* v_idx2ptr(u32 index);
-        virtual u32   v_ptr2idx(void const* ptr) const;
+    template <typename T>
+    u32 pool_t<T>::allocsize() const
+    {
+        return (u32)sizeof(T);
+    }
 
-        void* m_data;
-        u32   m_sizeof;
-        u32   m_countof;
-        u32   m_freelist;
-        u32   m_freeindex;
-    };
+    template <typename T>
+    T* pool_t<T>::allocate()
+    {
+        u32 freeitem = m_freelist;
+        if (freeitem != 0xffffffff)
+        {
+            m_freelist = *(u32*)idx2ptr(freeitem);
+        }
+        else if (m_freeindex < m_countof)
+        {
+            freeitem = m_freeindex++;
+        }
+
+        if (freeitem == 0xffffffff)
+            return nullptr;
+
+        return idx2ptr(freeitem);
+    }
+
+    template <typename T>
+    void pool_t<T>::deallocate(T* p)
+    {
+        u32 const idx  = ptr2idx(p);
+        u32*      item = (u32*)p;
+        *item          = m_freelist;
+        m_freelist     = idx;
+    }
+
+    template <typename T>
+    T* pool_t<T>::idx2ptr(u32 index)
+    {
+        ASSERT(index != 0xffffffff && index < m_freeindex);
+        return &m_data[index];
+    }
+
+    template <typename T>
+    u32 pool_t<T>::ptr2idx(T const* ptr) const
+    {
+        if (ptr == nullptr)
+            return 0xffffffff;
+        u32 const i = (u32)(ptr - m_data);
+        ASSERT(i < m_freeindex);
+        return i;
+    }
 
     void* g_malloc(u32 size, u32 align = sizeof(void*));
     void  g_free(void* ptr);
