@@ -37,11 +37,12 @@ namespace ncore
 
         virtual s32 vwrite(crunes_t const& str)
         {
-            switch (str.get_type())
+            switch (str.m_type)
             {
-                case ascii::TYPE: return write_ascii(str.m_ascii)!=0;
-                case utf16::TYPE: return write_utf16(str.m_utf16)!=0;
-                case utf32::TYPE: return write_utf32(str.m_utf32)!=0;
+                case ascii::TYPE: return write_ascii(str);
+                case ucs2::TYPE: return write_utf16(str);
+                case utf16::TYPE: return write_utf16(str);
+                case utf32::TYPE: return write_utf32(str);
                 default: //@todo: UTF-8
                     break;
             }
@@ -184,11 +185,12 @@ namespace ncore
 
         virtual s32 write(const crunes_t& str)
         {
-            switch (str.get_type())
+            switch (str.m_type)
             {
-                case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii);
-                case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16);
-                case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32);
+                case ascii::TYPE: return out_writer_t::write_ascii(str);
+                case ucs2::TYPE: return out_writer_t::write_utf16(str);
+                case utf16::TYPE: return out_writer_t::write_utf16(str);
+                case utf32::TYPE: return out_writer_t::write_utf32(str);
                 default: //@todo: UTF-8
                     break;
             }

@@ -408,7 +408,6 @@ UNITTEST_SUITE_BEGIN(test_tree)
         {
             const char* result = nullptr;
 
-            bool           inserted;
             ntree::node_t* inserted_node;
 
             item_t temp;

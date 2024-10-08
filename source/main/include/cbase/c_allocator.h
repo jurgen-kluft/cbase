@@ -17,9 +17,6 @@ namespace ncore
     void     g_exit_system_alloc();
     alloc_t* g_get_system_alloc();
 
-    void* g_reallocate(alloc_t* alloc, void* ptr, u32 size, u32 new_size, u32 alignment = sizeof(void*));
-    void* g_allocate_and_clear(alloc_t* alloc, u32 size);
-
     // fixed-size allocator
     class fsa_t
     {
@@ -191,7 +188,7 @@ namespace ncore
         u32   m_freeindex;
     };
 
-    void* g_malloc(u64 size, u16 align = sizeof(void*));
+    void* g_malloc(u32 size, u32 align = sizeof(void*));
     void  g_free(void* ptr);
 
     // Type malloc and free

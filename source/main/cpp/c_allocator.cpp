@@ -1,24 +1,8 @@
 #include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
-#include "cbase/c_memory.h"
 
 namespace ncore
 {
-    void* g_reallocate(alloc_t* alloc, void* ptr, u32 size, u32 new_size, u32 alignment)
-    {
-        void* newptr = alloc->allocate(new_size, alignment);
-        nmem::memcpy(newptr, ptr, size);
-        alloc->deallocate(ptr);
-        return newptr;
-    }
-
-    void* g_allocate_and_clear(alloc_t* alloc, u32 size)
-    {
-        void* ptr = alloc->allocate(size, sizeof(void*));
-        nmem::memset(ptr, 0, size);
-        return ptr;
-    }
-
     static inline u32 s_get_item_idx(void const* array_items, void const* item, u32 sizeof_item)
     {
         u32 const index = (u32)(((u64)item - (u64)array_items) / sizeof_item);
