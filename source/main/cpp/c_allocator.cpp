@@ -19,9 +19,9 @@ namespace ncore
         return ptr;
     }
 
-    static inline u32 s_get_item_idx(void* array_item, void* item, u32 sizeof_item)
+    static inline u32 s_get_item_idx(void const* array_items, void const* item, u32 sizeof_item)
     {
-        u32 const index = (u32)(((u64)item - (u64)array_item) / sizeof_item);
+        u32 const index = (u32)(((u64)item - (u64)array_items) / sizeof_item);
         return index;
     }
 
@@ -34,7 +34,7 @@ namespace ncore
     {
     }
 
-    void* dexed_array_t::v_idx2ptr(u32 index) const
+    void* dexed_array_t::v_idx2ptr(u32 index)
     {
         if (index == 0xffffffff)
             return nullptr;
@@ -42,7 +42,7 @@ namespace ncore
         return s_get_item_ptr(m_data, index, m_sizeof);
     }
 
-    u32 dexed_array_t::v_ptr2idx(void* ptr) const
+    u32 dexed_array_t::v_ptr2idx(void const* ptr) const
     {
         if (ptr == nullptr)
             return 0xffffffff;
@@ -99,7 +99,7 @@ namespace ncore
         m_freelist     = idx;
     }
 
-    void* fsadexed_array_t::v_idx2ptr(u32 index) const
+    void* fsadexed_array_t::v_idx2ptr(u32 index)
     {
         if (index == 0xffffffff)
             return nullptr;
@@ -107,7 +107,7 @@ namespace ncore
         return s_get_item_ptr(m_data, index, m_sizeof);
     }
 
-    u32 fsadexed_array_t::v_ptr2idx(void* ptr) const
+    u32 fsadexed_array_t::v_ptr2idx(void const* ptr) const
     {
         if (ptr == nullptr)
             return 0xffffffff;

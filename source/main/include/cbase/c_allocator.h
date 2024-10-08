@@ -158,8 +158,8 @@ namespace ncore
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
     protected:
-        virtual void* v_idx2ptr(u32 index) const;
-        virtual u32   v_ptr2idx(void* ptr) const;
+        virtual void* v_idx2ptr(u32 index);
+        virtual u32   v_ptr2idx(void const* ptr) const;
 
     private:
         void* m_data;
@@ -180,8 +180,8 @@ namespace ncore
         virtual void* v_allocate();
         virtual void  v_deallocate(void*);
         virtual u32   v_allocsize() const;
-        virtual void* v_idx2ptr(u32 index) const;
-        virtual u32   v_ptr2idx(void* ptr) const;
+        virtual void* v_idx2ptr(u32 index);
+        virtual u32   v_ptr2idx(void const* ptr) const;
 
     private:
         void* m_data;
