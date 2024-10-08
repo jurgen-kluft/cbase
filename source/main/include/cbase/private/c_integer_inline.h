@@ -12,27 +12,12 @@ namespace ncore
         {
             return min(integerC, min(integerA, integerB));
         }
-        template <>
-        inline s32 min(s32 integerA, s32 integerB)
-        {
-            return integerA <= integerB ? integerA : integerB;
-        }
-        template <>
-        inline s32 min(s32 integerA, s32 integerB, s32 integerC)
-        {
-            return min(integerC, min(integerA, integerB));
-        }
+
 
         template <class T>
         inline T max(T integerA, T integerB)
         {
             return integerA >= integerB ? integerA : integerB;
-        }
-        template <>
-        inline s32 max(s32 integerA, s32 integerB)
-        {
-            s32 r = integerA ^ ((integerA ^ integerB) & -(integerA < integerB));
-            return r;
         }
 
         template <class T> T max(T integerA, T integerB, T integerC)
@@ -49,18 +34,6 @@ namespace ncore
                 T t      = integerA;
                 integerA = integerB;
                 integerA = t;
-            }
-        }
-
-        // specialized template for s32
-        template <>
-        inline void sort(s32& X, s32& Y)
-        {
-            if (X > Y)
-            {
-                X = X ^ Y;
-                Y = Y ^ X;
-                X = X ^ Y;
             }
         }
 
