@@ -14,29 +14,6 @@ namespace ncore
         inline f64 abs(f64 inNumber);
         inline f64 neg(f64 inNumber);
 
-        // Snap a value
-        inline f64 snapDown(f64 fValue, f64 fSnapValue);
-        inline f64 snapUp(f64 fValue, f64 fSnapValue);
-
-        //---------------------------------------------------------------------------------------------------------------------
-        // Limits and const values
-        //---------------------------------------------------------------------------------------------------------------------
-        inline f64 positiveZero64();
-        inline f64 negativeZero64();
-#ifdef D_IEEE_FLOATS
-        inline f64 nan64();
-        inline f64 positiveInfinity64();
-        inline f64 negativeInfinity64();
-#endif
-        inline f64 positiveMaximum64();
-        inline f64 negativeMaximum64();
-        inline f64 positiveMinimum64();
-        inline f64 negativeMinimum64();
-
-        // De-normalized (DEN) positive and negative minimums
-        inline f64 positiveMinimumDEN64();
-        inline f64 negativeMinimumDEN64();
-
         //---------------------------------------------------------------------------------------------------------------------
         //    Rational Determination.
         //---------------------------------------------------------------------------------------------------------------------

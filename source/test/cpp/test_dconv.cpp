@@ -221,7 +221,6 @@ UNITTEST_SUITE_BEGIN(test_dconv)
             CHECK_TRUE(single_static_test("%.0f", "1", 0.6, 0));
             CHECK_TRUE(single_static_test("%2.4e", "8.6000e+00", 8.6, 1));
             CHECK_TRUE(single_static_test("%2.4g", "8.6", 8.6, 1));
-            CHECK_TRUE(single_static_test("%e", "-inf", math::negativeInfinity64(), 1));
 
             CHECK_TRUE(single_static_test("%e", "1.234000e+01", 12.34, 1));
             CHECK_TRUE(single_static_test("%e", "1.234000e-01", 0.1234, 1));

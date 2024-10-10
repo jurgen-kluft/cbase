@@ -386,7 +386,7 @@ UNITTEST_SUITE_BEGIN(test_tree)
             ntree::iterator_t iterator;
 
             s32                  dir = ntree::LEFT;
-            ntree::node_t const* data;
+            ntree::node_t const* data = nullptr;
             void*                find = f;
             while (iterator.traverse(s_tree.m_root, dir, data))
             {

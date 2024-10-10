@@ -58,13 +58,11 @@ namespace math
 
     inline f32 positiveZero()
     {
-        u32 f = (u32)0;
-        return toF32(f);
+        return +0.0f;
     }
     inline f32 negativeZero()
     {
-        u32 f = (u32)FF_SIGN_MASK;
-        return toF32(f);
+        return -0.0f;
     }
 #ifdef D_IEEE_FLOATS
     inline f32 nan()
@@ -143,7 +141,7 @@ namespace math
     /**
      * toF32. Returns the u32 as as f32. It's not casted, but the address is, so you get the binary representation back.
      */
-    inline f32 toF32(u32 inInt) { return *(f32*)&inInt; }
+    inline f32 toF32(u32 inInt) { return *(f32 const*)&inInt; }
 
     /**
      * IsEqual, returns True if two floats are the same
