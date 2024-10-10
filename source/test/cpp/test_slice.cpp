@@ -1,6 +1,5 @@
 #include "cbase/c_allocator.h"
 #include "cbase/c_slice.h"
-#include "cbase/test_allocator.h"
 
 #include "cunittest/cunittest.h"
 

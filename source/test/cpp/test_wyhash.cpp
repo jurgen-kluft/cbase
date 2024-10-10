@@ -1,5 +1,4 @@
 #include "cbase/c_wyhash.h"
-#include "cbase/test_allocator.h"
 
 #include "cunittest/cunittest.h"
 

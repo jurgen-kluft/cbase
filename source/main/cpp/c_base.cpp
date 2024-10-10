@@ -1,7 +1,5 @@
 #include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
-// #include "cbase/c_base.h"
-// #include "cbase/c_buffer.h"
 #include "cbase/c_console.h"
 #include "cbase/c_context.h"
 #include "cbase/c_debug.h"
@@ -38,6 +36,21 @@ namespace ncore
     void wyrand_t::generate(u8* outData, u32 numBytes) { nhash::wyrand(&m_seed, outData, numBytes); }
 
 }  // namespace ncore
+
+namespace ncore
+{
+    void* g_malloc(u32 size, u32 align) 
+    { 
+        alloc_t* allocator = context_t::system_alloc();
+        return allocator->allocate(size, align); 
+    }
+    
+    void g_free(void* ptr) 
+    { 
+        alloc_t* allocator = context_t::system_alloc();
+        allocator->deallocate(ptr); 
+    }
+}
 
 namespace cbase
 {
