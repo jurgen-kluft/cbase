@@ -6,20 +6,21 @@
 #endif
 
 #include "ccore/c_debug.h"
+#include "ccore/c_memory.h"
 
 namespace ncore
 {
-    template <typename T> inline void set(T* p, T v1) { p[0] = v1; }
-    template <typename T> inline void set(T* p, T v1, T v2) { p[0] = v1; p[1] = v2; }
-    template <typename T> inline void set(T* p, T v1, T v2, T v3) { p[0] = v1; p[1] = v2; p[2] = v3; }
-    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; }
-    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; }
-    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5, T v6) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; }
-    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; }
-    template <typename T> inline void set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7, T v8) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; p[7] = v8; }
+    template <typename T> inline void g_set(T* p, T v1) { p[0] = v1; }
+    template <typename T> inline void g_set(T* p, T v1, T v2) { p[0] = v1; p[1] = v2; }
+    template <typename T> inline void g_set(T* p, T v1, T v2, T v3) { p[0] = v1; p[1] = v2; p[2] = v3; }
+    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; }
+    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; }
+    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; }
+    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; }
+    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7, T v8) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; p[7] = v8; }
 
     template<typename T, s32 N>
-    inline void copy(T(&dst)[N], T const (&src)[N])
+    inline void g_copy(T(&dst)[N], T const (&src)[N])
     {
         for (s32 i = 0; i < N; i++)
             dst[i] = src[i];
@@ -29,37 +30,6 @@ namespace ncore
     ///@note:			In DEBUG these functions should perform sanity checks on the source and destination memory blocks
     namespace nmem
     {
-        void* memset(void* inDest, u32 inValue, int_t inLength);
-        void* memcpy(void* inDest, const void* inSrc, int_t inLength);
-        s32   memcmp(const void* inLHS, const void* inRHS, int_t inLength);
-        void  memswap(void* inLHS, void* inRHS, int_t inLength);
-        void* memmove(void* inDest, const void* inSrc, int_t inLength);
-
-        template <class T> inline void memswap(T& inLHS, T& inRHS) { memswap(&inLHS, &inRHS, sizeof(T)); }
-        inline void                    memclr(void* inDest, int_t inLength) { memset(inDest, 0, inLength); }
-
-        ///@name Pointer arithmetic
-        inline void* ptr_add(void* ptr, int_t size) { return (void*)((u8*)ptr + size); }
-        inline void* ptr_add_clamp(void* ptr, int_t size, void* lower, void* upper)
-        {
-            void* p = (void*)((u8*)ptr + size);
-            if (p < lower)
-                p = lower;
-            else if (p > upper)
-                p = upper;
-            return p;
-        }
-        inline void* ptr_align(void* ptr, u32 alignment) { return (void*)(((ptr_t)ptr + (ptr_t)(alignment - 1)) & ~((ptr_t)(alignment - 1))); }
-        inline s32   ptr_diff(void* ptr, void* other)
-        {
-            ptr_t d = (u8*)other - (u8*)ptr;
-            return (s32)d;
-        }
-
-        ///@name Conversion
-        inline s64 toKb(s64 inNumBytes) { return (inNumBytes + (s64)512) / (s64)1024; }
-        inline s64 toMb(s64 inNumBytes) { return (inNumBytes + (s64)(512 * 1024)) / (s64)(1024 * 1024); }
-
         ///@name Unaligned memory reading
         u16 const* readunaligned16(u16 const* inAddress, u16& outValue);
         u32 const* readunaligned24(u32 const* inAddress, u32& outValue);
@@ -124,78 +94,8 @@ namespace ncore
         }
     }; // namespace nmem
 
-    template <class T> inline void g_swap(T& a, T& b)
-    {
-        const T c(a);
-        a = b;
-        b = c;
-    }
 
-    inline void g_memset(void* inDest, u32 inValue, int_t inLength) { nmem::memset(inDest, inValue, inLength); }
-    inline void g_memclr(void* inDest, int_t inLength) { nmem::memclr(inDest, inLength); }
-    inline void g_memcpy(void* inDest, const void* inSource, int_t inLength) { nmem::memcpy(inDest, inSource, inLength); }
-    inline s32  g_memcmp(const void* inLHS, const void* inRHS, int_t inLength) { return nmem::memcmp(inLHS, inRHS, inLength); }
-    inline void g_memswap(void* inLHS, void* inRHS, int_t inLength) { nmem::memswap(inLHS, inRHS, inLength); }
 
-    inline s32 g_memcmp2(const u16* inLHS, const u16* inRHS, int_t inLength)
-    {
-        for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
-        {
-            if (*inLHS < *inRHS)
-                return -1;
-            else if (*inLHS > *inRHS)
-                return 1;
-        }
-        return 0;
-    }
-    inline s32 g_memcmp4(const u32* inLHS, const u32* inRHS, int_t inLength)
-    {
-        for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
-        {
-            if (*inLHS < *inRHS)
-                return -1;
-            else if (*inLHS > *inRHS)
-                return 1;
-        }
-        return 0;
-    }
-    inline s32 g_memcmp8(const u64* inLHS, const u64* inRHS, int_t inLength)
-    {
-        for (u32 i = 0; i < inLength; i++, inLHS++, inRHS++)
-        {
-            if (*inLHS < *inRHS)
-                return -1;
-            else if (*inLHS > *inRHS)
-                return 1;
-        }
-        return 0;
-    }
-
-    inline void g_memzero(void* inBlock, int_t inLength) { g_memset(inBlock, 0, inLength); }
-    inline void g_memcopy2(u16* inDest, const u16* inSource, int_t inLength)
-    {
-        for (u32 i = 0; i < inLength; i++)
-            *inDest++ = *inSource++;
-    }
-    ///< Copy <inLength> aligned 16-bit integers from <inSource> to <inDest>
-    inline void g_memcopy4(u32* inDest, const u32* inSource, int_t inLength)
-    {
-        for (u32 i = 0; i < inLength; i++)
-            *inDest++ = *inSource++;
-    }
-    ///< Copy <inLength> aligned 32-bit integers from <inSource> to <inDest>
-    inline void g_memcopy8(u64* inDest, const u64* inSource, int_t inLength)
-    {
-        for (u32 i = 0; i < inLength; i++)
-            *inDest++ = *inSource++;
-    }
-    ///< Copy <inLength> aligned 128-bit integers from <inSource> to <inDest>
-
-    inline void* g_memmove(void* inDest, const void* inSource, int_t inLength) { return nmem::memmove(inDest, inSource, inLength); }
-    inline void  g_memcopy(void* inDest, const void* inSource, int_t inLength) { g_memcpy(inDest, inSource, inLength); }
-    inline s32   g_memcompare(const void* inBlock1, const void* inBlock2, int_t inLength) { return g_memcmp(inBlock1, inBlock2, inLength); }
-    ///< Return the result of the lexicographical compare between memory block <inBlock1> and <inBlock2> of length <inLength>, return <0 if inBlock1<inBlock2, >0 if inBlock1>inBlock2 and 0 if inBlock1==inBlock2
-    inline bool g_memequal(const void* inBlock1, const void* inBlock2, int_t inLength) { return (g_memcompare(inBlock1, inBlock2, inLength) == 0); }
 
 } // namespace ncore
 #endif ///< __C_MEMORY_STD_H__
