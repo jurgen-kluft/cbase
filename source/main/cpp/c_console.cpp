@@ -6,7 +6,7 @@ namespace ncore
     class va_t;
 
 #define D_CONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
-    type::rune local_var_name##Buffer[size];               \
+    type::rune local_var_name##Buffer[size];                \
     runes_t    local_var_name = make_runes(local_var_name##Buffer, 0, 0, (u32)size, type::TYPE);
 
     class console_null : public console_t
@@ -58,7 +58,10 @@ namespace ncore
         console_t::out_t* mOut;
 
     public:
-        console_default(console_t::out_t* _out) : mOut(_out) {}
+        console_default(console_t::out_t* _out)
+            : mOut(_out)
+        {
+        }
 
         virtual ~console_default() {}
 
@@ -89,12 +92,12 @@ namespace ncore
 
     s32 console_default::setColor(console_t::EColor color) { return mOut->color(color); }
 
-    static const char* trueStr = "true";
+    static const char* trueStr  = "true";
     static const char* falseStr = "false";
-    void console_default::write(bool _value)
+    void               console_default::write(bool _value)
     {
-        crunes_t truestr = make_crunes(trueStr, trueStr+4);
-        crunes_t falsestr = make_crunes(falseStr, falseStr+5);
+        crunes_t truestr  = make_crunes(trueStr, trueStr + 4);
+        crunes_t falsestr = make_crunes(falseStr, falseStr + 5);
         write(_value ? truestr : falsestr);
     }
 
@@ -146,20 +149,14 @@ namespace ncore
         mOut->write(cstr);
     }
 
-    void console_default::write(const crunes_t& str)
-    {
-        mOut->write(str);
-    }
+    void console_default::write(const crunes_t& str) { mOut->write(str); }
 
-    void console_default::write(const crunes_t& fmt, const va_t* args, s32 argc)
-    {
-        mOut->write(fmt, args, argc);
-    }
+    void console_default::write(const crunes_t& fmt, const va_t* args, s32 argc) { mOut->write(fmt, args, argc); }
 
     void console_default::writeLine() { mOut->writeln(); }
 
     extern console_t::out_t* gGetDefaultConsoleOut();
-    console_t*              console = nullptr;
+    console_t*               console = nullptr;
 
     void console_t::init_default_console()
     {
@@ -167,4 +164,4 @@ namespace ncore
         console = &sDefaultConsole;
     }
 
-}; // namespace ncore
+};  // namespace ncore

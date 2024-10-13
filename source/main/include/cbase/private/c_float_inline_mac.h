@@ -9,4 +9,4 @@ namespace math
         ASSERT(isPositive(inLHS) && isPositive(inRHS));
         return inLHS > inRHS;
     }
-}; // namespace nf32
+};  // namespace math

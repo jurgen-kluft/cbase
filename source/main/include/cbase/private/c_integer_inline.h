@@ -20,7 +20,8 @@ namespace ncore
             return integerA >= integerB ? integerA : integerB;
         }
 
-        template <class T> T max(T integerA, T integerB, T integerC)
+        template <class T>
+        T max(T integerA, T integerB, T integerC)
         {
             return max(integerC, max(integerA, integerB));
         }

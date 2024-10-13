@@ -69,9 +69,9 @@ namespace ncore
         // Return value but with only the Most Significant Bit "1"
         // If 'value == 0' this function will return 0
         inline u32 mostSignificantOneBit(u32 value)
-        { 
+        {
             unsigned long v;
-            return ::_BitScanReverse(&v, value) ? (1<<v) : 0;
+            return ::_BitScanReverse(&v, value) ? (1 << v) : 0;
         }
 
         // Return the bit index of the Least Significant Bit "1"
@@ -80,7 +80,8 @@ namespace ncore
 
         // Return the bit index of the Most Significant Bit "1"
         // If 'value == 0' this function will return 32
-        inline s8 mostSignificantBit(u32 value) { 
+        inline s8 mostSignificantBit(u32 value)
+        {
             unsigned long v;
             return ::_BitScanReverse(&v, value) ? (s8)v : (s8)32;
         }

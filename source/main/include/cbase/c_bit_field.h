@@ -2,7 +2,7 @@
 #define __CBASE_BITFIELD_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "ccore/c_debug.h"
@@ -55,49 +55,75 @@ namespace ncore
     {
         enum EBits
         {
-            BITS_SET,     // All bits in the specified field are set
-            BITS_CLEARED, // All bits in the specified field are cleared
-            BITS_MIXED    // Some bits in the specified field are set, others are cleared
+            BITS_SET,      // All bits in the specified field are set
+            BITS_CLEARED,  // All bits in the specified field are cleared
+            BITS_MIXED     // Some bits in the specified field are set, others are cleared
         };
 
-        template <typename T, typename E> inline bool is_set(T flags, E inField) { return (flags & ((T)inField)) == ((T)inField); } // Check if all bits in <inField> are set
-        template <typename T, typename E> inline bool is_any_set(T flags, E inField) { return (flags & ((T)inField)) != 0; }        // Check if any bits of <inField> have been set in this bitfield
-        template <typename T, typename E> inline bool is_only_set(T flags, E inField) { return (flags == ((T)inField)); }           // Check if <inField> is the only bit set in this bitfield
-        template <typename T, typename E> inline bool is_cleared(T flags, E inField) { return (flags & ((T)inField)) == 0; }        // Check if all bits in <inField> are cleared
+        template <typename T, typename E>
+        inline bool is_set(T flags, E inField)
+        {
+            return (flags & ((T)inField)) == ((T)inField);
+        }  // Check if all bits in <inField> are set
+        template <typename T, typename E>
+        inline bool is_any_set(T flags, E inField)
+        {
+            return (flags & ((T)inField)) != 0;
+        }  // Check if any bits of <inField> have been set in this bitfield
+        template <typename T, typename E>
+        inline bool is_only_set(T flags, E inField)
+        {
+            return (flags == ((T)inField));
+        }  // Check if <inField> is the only bit set in this bitfield
+        template <typename T, typename E>
+        inline bool is_cleared(T flags, E inField)
+        {
+            return (flags & ((T)inField)) == 0;
+        }  // Check if all bits in <inField> are cleared
 
-        template <typename T, typename E> inline T set(T flags, E inField)
+        template <typename T, typename E>
+        inline T set(T flags, E inField)
         {
             flags |= (T)inField;
             return flags;
         }
 
-        template <typename T, typename E> inline T set(T flags, E inField, E inMask)
+        template <typename T, typename E>
+        inline T set(T flags, E inField, E inMask)
         {
             ASSERTS((T)inField == ((T)inField & (T)inMask), "<inField> contains bits not within the specified mask.");
             flags = (flags & (~(T)inMask)) | (T)inField;
             return flags;
         }
 
-        template <typename T, typename E> inline T test_set(T flags, E inField, bool inValue)
+        template <typename T, typename E>
+        inline T test_set(T flags, E inField, bool inValue)
         {
             flags &= ~(T)inField;
             flags |= ((T)inField & (0 - (T)inValue));
             return flags;
         }
 
-        template <typename T, typename E> inline T clear(T flags, E inField)
+        template <typename T, typename E>
+        inline T clear(T flags, E inField)
         {
             flags &= (~(T)inField);
             return flags;
         }
-        template <typename T> inline void          clear_all(T& flags) { flags = (T)0; }
-        template <typename T, typename E> inline T toggle(T flags, E inField)
+        template <typename T>
+        inline void clear_all(T& flags)
+        {
+            flags = (T)0;
+        }
+        template <typename T, typename E>
+        inline T toggle(T flags, E inField)
         {
             flags ^= (T)inField;
             return flags;
         }
 
-        template <typename T, typename E> inline EBits get_state(T flags, E inField) // get state of a number of bits
+        template <typename T, typename E>
+        inline EBits get_state(T flags, E inField)  // get state of a number of bits
         {
             T result = flags & (T)inField;
             if (result == 0)
@@ -108,9 +134,10 @@ namespace ncore
                 return BITS_MIXED;
         }
 
-    } // namespace nflags
+    }  // namespace nflags
 
-    template <typename ENUM, typename T = u32> struct enum_t
+    template <typename ENUM, typename T = u32>
+    struct enum_t
     {
         typedef T field_t;
         inline enum_t()
@@ -129,12 +156,12 @@ namespace ncore
             ASSERTCT(sizeof(ENUM) <= sizeof(field_t));
         }
 
-        inline bool is_set(ENUM inField) const { return (bitfield & ((field_t)inField)) == ((field_t)inField); } // Check if all bits in <inField> are set
-        inline bool is_any_set(ENUM inField) const { return (bitfield & ((field_t)inField)) != 0; }              // Check if any bits of <inField> have been set in this bitfield
-        inline bool is_only_set(ENUM inField) const { return (bitfield == ((field_t)inField)); }                 // Check if <inField> is the only bit set in this bitfield
-        inline bool is_cleared(ENUM inField) const { return (bitfield & ((field_t)inField)) == 0; }              // Check if all bits in <inField> are cleared
+        inline bool is_set(ENUM inField) const { return (bitfield & ((field_t)inField)) == ((field_t)inField); }  // Check if all bits in <inField> are set
+        inline bool is_any_set(ENUM inField) const { return (bitfield & ((field_t)inField)) != 0; }               // Check if any bits of <inField> have been set in this bitfield
+        inline bool is_only_set(ENUM inField) const { return (bitfield == ((field_t)inField)); }                  // Check if <inField> is the only bit set in this bitfield
+        inline bool is_cleared(ENUM inField) const { return (bitfield & ((field_t)inField)) == 0; }               // Check if all bits in <inField> are cleared
 
-        inline nflags::EBits get_state(ENUM inField) const // get state of a number of bits
+        inline nflags::EBits get_state(ENUM inField) const  // get state of a number of bits
         {
             field_t result = bitfield & (field_t)inField;
             if (result == 0)
@@ -145,20 +172,20 @@ namespace ncore
                 return nflags::BITS_MIXED;
         }
 
-        inline void set(ENUM inField) { bitfield |= (field_t)inField; } // Set <inField>
+        inline void set(ENUM inField) { bitfield |= (field_t)inField; }  // Set <inField>
         inline void set_masked(ENUM inField, ENUM inMask)
         {
             ASSERTS((field_t)inField == ((field_t)inField & (field_t)inMask), "<inField> contains bits not within the specified mask.");
             bitfield = (bitfield & (~inMask)) | inField;
-        } // Mask off <inMask> and then set <inField>
+        }  // Mask off <inMask> and then set <inField>
         inline void test_set(ENUM inField, bool inValue)
         {
             bitfield &= ~(field_t)inField;
             bitfield |= ((field_t)inField & (0 - (field_t)inValue));
-        }                                                                    // Set or clear <inField> depending on <inValue>
-        inline void clear(ENUM inField) { bitfield &= (~(field_t)inField); } // clear <inField>
-        inline void clear_all() { bitfield = (field_t)0; }                   // clear all bits
-        inline void toggle(ENUM inField) { bitfield ^= (field_t)inField; }   // Toggle <inField>
+        }  // Set or clear <inField> depending on <inValue>
+        inline void clear(ENUM inField) { bitfield &= (~(field_t)inField); }  // clear <inField>
+        inline void clear_all() { bitfield = (field_t)0; }                    // clear all bits
+        inline void toggle(ENUM inField) { bitfield ^= (field_t)inField; }    // Toggle <inField>
 
         enum_t<ENUM>& operator=(const enum_t<ENUM>& other)
         {
@@ -191,6 +218,6 @@ namespace ncore
 
 #define DENUM_DECLARE(enum_name) class enum_name;
 
-}; // namespace ncore
+};  // namespace ncore
 
-#endif /// __CBASE_BITFIELD_H__
+#endif  /// __CBASE_BITFIELD_H__

@@ -10,7 +10,7 @@ namespace ncore
         static inline void s_init_node(node_t* node)
         {
             node->set_child(LEFT, nullptr);
-            node->set_child(RIGHT,nullptr);
+            node->set_child(RIGHT, nullptr);
             node->set_color(RED);
         }
 
@@ -379,7 +379,7 @@ namespace ncore
             // Replace and remove the saved node
             if (fn != nullptr)
             {
-                ASSERT(fp->get_child( RIGHT) == fn || fp->get_child( LEFT) == fn);
+                ASSERT(fp->get_child(RIGHT) == fn || fp->get_child(LEFT) == fn);
                 ASSERT(p->get_child(RIGHT) == n || p->get_child(LEFT) == n);
 
                 node_t* child1 = n->get_child(n->get_child(LEFT) == nullptr);
@@ -390,9 +390,9 @@ namespace ncore
                     ASSERT(fp != p);
 
                     // swap 'n' and 'fn', we want to remove the node that was holding 'item'
-                    fp->set_child(fp->get_child( RIGHT) == fn, n);
-                    n->set_child(LEFT, fn->get_child( LEFT));
-                    n->set_child(RIGHT, fn->get_child( RIGHT));
+                    fp->set_child(fp->get_child(RIGHT) == fn, n);
+                    n->set_child(LEFT, fn->get_child(LEFT));
+                    n->set_child(RIGHT, fn->get_child(RIGHT));
                     n->set_color(fn->get_color());
                     if (root == fn)
                         root = n;

@@ -4,9 +4,9 @@ namespace ncore
     {
         inline void g_init(tree_t& tree)
         {
-            tree.m_nodes = nullptr;
+            tree.m_nodes      = nullptr;
             tree.m_free_index = 0;
-            tree.m_free_head = c_invalid_node;
+            tree.m_free_head  = c_invalid_node;
         }
 
         inline void tree_t::reset()

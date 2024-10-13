@@ -29,4 +29,4 @@ namespace ncore
     void log_to_console_imp::writeLine(const crunes_t& str) { console->writeLine(str); }
     void log_to_console_imp::writeLine(const crunes_t& format, const va_t* argv, s32 argc) { console->writeLine(format, argv, argc); }
 
-}; // namespace ncore
+};  // namespace ncore

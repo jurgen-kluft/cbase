@@ -51,7 +51,7 @@ namespace ncore
         }
     }
 
-    const int M = 8; // The threshold for Insertion
+    const int M = 8;  // The threshold for Insertion
 
     //  *****************************************************************************
     //  * The main qsort() routine. This implementation is fully compatible with    *

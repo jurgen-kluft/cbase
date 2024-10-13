@@ -39,18 +39,18 @@ namespace ncore
 
 namespace ncore
 {
-    void* g_malloc(u32 size, u32 align) 
-    { 
+    void* g_malloc(u32 size, u32 align)
+    {
         alloc_t* allocator = context_t::system_alloc();
-        return allocator->allocate(size, align); 
+        return allocator->allocate(size, align);
     }
-    
-    void g_free(void* ptr) 
-    { 
+
+    void g_free(void* ptr)
+    {
         alloc_t* allocator = context_t::system_alloc();
-        allocator->deallocate(ptr); 
+        allocator->deallocate(ptr);
     }
-}
+}  // namespace ncore
 
 namespace cbase
 {

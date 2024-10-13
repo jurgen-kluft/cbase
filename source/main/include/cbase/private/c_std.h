@@ -2,7 +2,7 @@
 #define __CBASE_STD_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 //==============================================================================
@@ -77,7 +77,8 @@ namespace ncore
         /// Assigns the contents of a to b and the contents of b to a.
         /// This is used as a primitive operation by many other algorithms.
         ///
-        template <typename Assignable> inline void swap(Assignable& a, Assignable& b)
+        template <typename Assignable>
+        inline void swap(Assignable& a, Assignable& b)
         {
             Assignable tmp = a;
             a              = b;
@@ -147,10 +148,15 @@ namespace ncore
         // clang-format on
 
         ///< Calls the destructor of \p p without calling delete.
-        template <typename U> inline void destruct(U* p) { p->~U(); }
+        template <typename U>
+        inline void destruct(U* p)
+        {
+            p->~U();
+        }
 
         // Helper templates to not instantiate anything for integral types.
-        template <typename U> void destructors(U first, U last)
+        template <typename U>
+        void destructors(U first, U last)
         {
             for (--last; first <= last; ++first)
                 destruct(&*first);
@@ -172,16 +178,26 @@ namespace ncore
 
         /// Calls the destructor on elements in range [first, last) without calling delete.
         ///
-        template <typename ForwardIterator> inline void destroy(ForwardIterator first, ForwardIterator last)
+        template <typename ForwardIterator>
+        inline void destroy(ForwardIterator first, ForwardIterator last)
         {
             typedef typename ForwardIterator::value_type valuetype;
             destructors<ForwardIterator, cstd::typetrait_t<valuetype>::isSystem>()(first, last);
         }
 
-        template <typename U> inline void construct(U* p) { new (p, core_t()) U; }
-        template <typename U> inline void copy_construct(U* p, U const& x) { new (p, core_t()) U(x); }
+        template <typename U>
+        inline void construct(U* p)
+        {
+            new (p, core_t()) U;
+        }
+        template <typename U>
+        inline void copy_construct(U* p, U const& x)
+        {
+            new (p, core_t()) U(x);
+        }
 
-        template <typename ForwardIterator> inline void construct(ForwardIterator first, ForwardIterator last)
+        template <typename ForwardIterator>
+        inline void construct(ForwardIterator first, ForwardIterator last)
         {
             typedef typename ForwardIterator::value_type valuetype;
             if (cstd::typetrait_t<valuetype>::isSystem == false)
@@ -194,28 +210,32 @@ namespace ncore
         //==============================================================================
         //  Binary functions
         //==============================================================================
-        template <typename Arg1, typename Arg2, typename Result> struct binary_function_t
+        template <typename Arg1, typename Arg2, typename Result>
+        struct binary_function_t
         {
             typedef Arg1   first_argument_type;
             typedef Arg2   second_argument_type;
             typedef Result result_type;
         };
 
-        template <typename Arg, typename Result> struct unary_function_t
+        template <typename Arg, typename Result>
+        struct unary_function_t
         {
             typedef Arg    argument_type;
             typedef Result result_type;
         };
 
 #define STD_BINARY_FUNCTOR(name, rv, func)                                  \
-    template <class T> struct name : public binary_function_t<T, T, rv>     \
+    template <class T>                                                      \
+    struct name : public binary_function_t<T, T, rv>                        \
     {                                                                       \
         inline rv operator()(const T& a, const T& b) const { return func; } \
     };
-#define STD_UNARY_FUNCTOR(name, rv, func)                           \
-    template <class T> struct name : public unary_function_t<T, rv> \
-    {                                                               \
-        inline rv operator()(const T& a) const { return func; }     \
+#define STD_UNARY_FUNCTOR(name, rv, func)                       \
+    template <class T>                                          \
+    struct name : public unary_function_t<T, rv>                \
+    {                                                           \
+        inline rv operator()(const T& a) const { return func; } \
     };
 
         STD_BINARY_FUNCTOR(plus, T, (a + b))
@@ -239,7 +259,7 @@ namespace ncore
         STD_BINARY_FUNCTOR(less_equal, bool, (!(b < a)))
         STD_BINARY_FUNCTOR(compare, s32, (a < b ? -1 : (b < a)))
         STD_UNARY_FUNCTOR(identity, T, (a))
-    } // namespace cstd
-} // namespace ncore
+    }  // namespace cstd
+}  // namespace ncore
 
-#endif ///< __CBASE_STD_H__
+#endif  ///< __CBASE_STD_H__

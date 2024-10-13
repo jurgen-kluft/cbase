@@ -11,6 +11,6 @@ namespace cbase
 {
     ncore::asserthandler_t* gSetAssertHandler();
 
-};  // namespace ncore
+};  // namespace cbase
 
 #endif  /// __CBASE_DEBUG_H__

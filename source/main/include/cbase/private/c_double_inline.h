@@ -5,18 +5,18 @@ namespace math
 {
     namespace DoubleIEEE
     {
-        #define DD_FRACTION_MASK       (0x000FFFFFFFFFFFFFULL)
-        #define DD_EXPONENT_MASK       (0x7FF0000000000000ULL)
-        #define DD_SIGN_MASK           (0x8000000000000000ULL)
-        #define DD_EXPONENT_BIAS       ((1ULL << (11 - 1)) - 1)
-        #define DD_MAX_EXPONENT_BIAS   ((1ULL << 11) - 1)
-        #define DD_GET_FRACTION_SHIFT  (0ULL)
-        #define DD_GET_EXPONENT_SHIFT  (52ULL)
-        #define DD_GET_SIGN_SHIFT      (63ULL)
-        #define DD_FRACTION_BITS       (52ULL)
-        #define DD_EXPONENT_BITS       (11ULL)
-        #define DD_SIGN_BITS           (1ULL)
-    };
+#define DD_FRACTION_MASK      (0x000FFFFFFFFFFFFFULL)
+#define DD_EXPONENT_MASK      (0x7FF0000000000000ULL)
+#define DD_SIGN_MASK          (0x8000000000000000ULL)
+#define DD_EXPONENT_BIAS      ((1ULL << (11 - 1)) - 1)
+#define DD_MAX_EXPONENT_BIAS  ((1ULL << 11) - 1)
+#define DD_GET_FRACTION_SHIFT (0ULL)
+#define DD_GET_EXPONENT_SHIFT (52ULL)
+#define DD_GET_SIGN_SHIFT     (63ULL)
+#define DD_FRACTION_BITS      (52ULL)
+#define DD_EXPONENT_BITS      (11ULL)
+#define DD_SIGN_BITS          (1ULL)
+    };  // namespace DoubleIEEE
 
     /**
      * @return  This funtion returns a negated number

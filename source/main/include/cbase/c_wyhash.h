@@ -16,7 +16,7 @@ namespace ncore
         public:
             wyreg();
             ~wyreg();
-            
+
             void init(alloc_t* allocator, s32 size, u64 seed = 0);
             s32  size() const { return m_size; }
             s32  count() const { return m_count; }
@@ -30,7 +30,8 @@ namespace ncore
             u64*     m_index;
             u64      m_secret[4];
         };
-        template <typename K, typename V> class wymap
+        template <typename K, typename V>
+        class wymap
         {
         public:
             void init(alloc_t* allocator, s32 size, u64 seed = 0);
@@ -45,13 +46,15 @@ namespace ncore
             V*    m_values;
         };
 
-        template <typename K, typename V> void wymap<K, V>::init(alloc_t* allocator, s32 size, u64 seed)
+        template <typename K, typename V>
+        void wymap<K, V>::init(alloc_t* allocator, s32 size, u64 seed)
         {
             m_reg.init(allocator, size, seed);
             m_values = (V*)allocator->allocate(sizeof(V) * m_reg.m_size);
         }
 
-        template <typename K, typename V> bool wymap<K, V>::insert(K const& key, V const& value)
+        template <typename K, typename V>
+        bool wymap<K, V>::insert(K const& key, V const& value)
         {
             s32 pos;
             if (m_reg.insert((void*)&key, (s32)sizeof(key), pos))
@@ -62,7 +65,8 @@ namespace ncore
             return false;
         }
 
-        template <typename K, typename V> bool wymap<K, V>::find(K const& key, V& value) const
+        template <typename K, typename V>
+        bool wymap<K, V>::find(K const& key, V& value) const
         {
             s32 pos;
             if (m_reg.find((void*)&key, (s32)sizeof(key), pos))
@@ -73,13 +77,15 @@ namespace ncore
             return false;
         }
 
-        template <typename K, typename V> bool wymap<K, V>::contains(K const& key) const
+        template <typename K, typename V>
+        bool wymap<K, V>::contains(K const& key) const
         {
             s32 pos;
             return m_reg.find((void*)&key, (s32)sizeof(key), pos);
         }
 
-        template <typename K, typename V> bool wymap<K, V>::remove(K const& key)
+        template <typename K, typename V>
+        bool wymap<K, V>::remove(K const& key)
         {
             s32 pos;
             if (m_reg.remove((void*)&key, (s32)sizeof(key), pos))
@@ -90,7 +96,8 @@ namespace ncore
             return false;
         }
 
-        template <typename T> class wyset
+        template <typename T>
+        class wyset
         {
         public:
             void init(alloc_t* allocator, s32 size, u64 seed = 0);
@@ -103,9 +110,14 @@ namespace ncore
             wyreg m_reg;
         };
 
-        template <typename T> void wyset<T>::init(alloc_t* allocator, s32 size, u64 seed) { m_reg.init(allocator, size, seed); }
+        template <typename T>
+        void wyset<T>::init(alloc_t* allocator, s32 size, u64 seed)
+        {
+            m_reg.init(allocator, size, seed);
+        }
 
-        template <typename T> bool wyset<T>::insert(T const& item)
+        template <typename T>
+        bool wyset<T>::insert(T const& item)
         {
             s32 pos;
             if (m_reg.insert((void*)&item, (s32)sizeof(item), pos))
@@ -115,13 +127,15 @@ namespace ncore
             return false;
         }
 
-        template <typename T> bool wyset<T>::contains(T const& item) const
+        template <typename T>
+        bool wyset<T>::contains(T const& item) const
         {
             s32 pos;
             return m_reg.find((void*)&item, (s32)sizeof(item), pos);
         }
 
-        template <typename T> bool wyset<T>::remove(T const& item)
+        template <typename T>
+        bool wyset<T>::remove(T const& item)
         {
             s32 pos;
             if (m_reg.remove((void*)&item, (s32)sizeof(item), pos))
@@ -131,7 +145,7 @@ namespace ncore
             return false;
         }
 
-    } // namespace nhash
-} // namespace ncore
+    }  // namespace nhash
+}  // namespace ncore
 
-#endif // __CBASE_DEFAULT_WYHASH_H__
+#endif  // __CBASE_DEFAULT_WYHASH_H__

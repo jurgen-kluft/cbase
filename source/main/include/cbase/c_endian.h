@@ -50,7 +50,7 @@ namespace ncore
     };  // namespace nendian_nop
 
     // NOTE: This assumes that data is always stored in Big Endian format.
-	// Network byte order is always Big Endian.
+    // Network byte order is always Big Endian.
 
 #ifdef D_LITTLE_ENDIAN
     namespace nendian    = nendian_swap;
@@ -59,6 +59,6 @@ namespace ncore
     namespace nendian    = nendian_nop;
     namespace nendian_ne = nendian_nop;
 #endif
-};      // namespace ncore
+};  // namespace ncore
 
 #endif  ///< END __CBASE_ENDIAN_H__

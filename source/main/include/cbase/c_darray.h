@@ -116,6 +116,6 @@ namespace ncore
         u32             m_cap_cur;
     };
 
-};      // namespace ncore
+};  // namespace ncore
 
 #endif  // __CBASE_CARRAY_H__

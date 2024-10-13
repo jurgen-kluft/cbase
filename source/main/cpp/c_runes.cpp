@@ -2709,10 +2709,7 @@ namespace ncore
 
         // ------------------------------------------------------------------------------
         // reading
-        uchar32 read(crunes_t const& str, u32& cursor)
-        {
-            return utf::read_forward(str, cursor);
-        }
+        uchar32 read(crunes_t const& str, u32& cursor) { return utf::read_forward(str, cursor); }
 
         bool copy(crunes_t const& _src, runes_t& _dst)
         {

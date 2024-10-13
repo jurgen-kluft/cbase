@@ -132,6 +132,6 @@ namespace ncore
             }
         }
     }
-}; // namespace ncore
+};  // namespace ncore
 
-#endif // __CBASE_CARRAY_H__
+#endif  // __CBASE_CARRAY_H__

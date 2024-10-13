@@ -2,8 +2,8 @@
 
 namespace ncore
 {
-	namespace nmem
-	{
+    namespace nmem
+    {
         ///@name Unaligned memory reading
 
         /**
@@ -139,10 +139,10 @@ namespace ncore
         {
 #ifdef D_LITTLE_ENDIAN
             outValue =
-                ((u64)((u8*)inSrc)[0]) | ((u64)((u8*)inSrc)[1] << 8) | ((u64)((u8*)inSrc)[2] << 16) | ((u64)((u8*)inSrc)[3] << 24) | ((u64)((u8*)inSrc)[4] << 32) | ((u64)((u8*)inSrc)[5] << 40) | ((u64)((u8*)inSrc)[6] << 48) | ((u64)((u8*)inSrc)[7] << 56);
+              ((u64)((u8*)inSrc)[0]) | ((u64)((u8*)inSrc)[1] << 8) | ((u64)((u8*)inSrc)[2] << 16) | ((u64)((u8*)inSrc)[3] << 24) | ((u64)((u8*)inSrc)[4] << 32) | ((u64)((u8*)inSrc)[5] << 40) | ((u64)((u8*)inSrc)[6] << 48) | ((u64)((u8*)inSrc)[7] << 56);
 #else
-        outValue =
-            ((u64)((u8*)inSrc)[0] << 56) | ((u64)((u8*)inSrc)[1] << 48) | ((u64)((u8*)inSrc)[2] << 40) | ((u64)((u8*)inSrc)[3] << 32) | ((u64)((u8*)inSrc)[4] << 24) | ((u64)((u8*)inSrc)[5] << 16) | ((u64)((u8*)inSrc)[6] << 8) | ((u64)((u8*)inSrc)[7] << 0);
+            outValue = ((u64)((u8*)inSrc)[0] << 56) | ((u64)((u8*)inSrc)[1] << 48) | ((u64)((u8*)inSrc)[2] << 40) | ((u64)((u8*)inSrc)[3] << 32) | ((u64)((u8*)inSrc)[4] << 24) | ((u64)((u8*)inSrc)[5] << 16) | ((u64)((u8*)inSrc)[6] << 8) |
+                       ((u64)((u8*)inSrc)[7] << 0);
 #endif
             return (u64 const*)((u8 const*)(inSrc) + 8);
         }
@@ -153,8 +153,8 @@ namespace ncore
             ((u8*)inDest)[0] = (u8)((inData >> 8) & 0xFF);
             ((u8*)inDest)[1] = (u8)((inData >> 0) & 0xFF);
 #else
-        ((u8*)inDest)[0] = (u8)((inData >> 0) & 0xFF);
-        ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
+            ((u8*)inDest)[0] = (u8)((inData >> 0) & 0xFF);
+            ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
 #endif
             return (u16*)((u8*)(inDest) + 2);
         }
@@ -165,9 +165,9 @@ namespace ncore
             ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
             ((u8*)inDest)[2] = (u8)((inData >> 0) & 0xFF);
 #else
-        ((u8*)inDest)[0] = (u8)((inData >> 0) & 0xFF);
-        ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
-        ((u8*)inDest)[2] = (u8)((inData >> 16) & 0xFF);
+            ((u8*)inDest)[0] = (u8)((inData >> 0) & 0xFF);
+            ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
+            ((u8*)inDest)[2] = (u8)((inData >> 16) & 0xFF);
 #endif
             return (u32*)((u8*)(inDest) + 3);
         }
@@ -179,10 +179,10 @@ namespace ncore
             ((u8*)inDest)[2] = (u8)((inData >> 8) & 0xFF);
             ((u8*)inDest)[3] = (u8)((inData >> 0) & 0xFF);
 #else
-        ((u8*)inDest)[0] = (u8)((inData >> 0) & 0xFF);
-        ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
-        ((u8*)inDest)[2] = (u8)((inData >> 16) & 0xFF);
-        ((u8*)inDest)[3] = (u8)((inData >> 24) & 0xFF);
+            ((u8*)inDest)[0] = (u8)((inData >> 0) & 0xFF);
+            ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
+            ((u8*)inDest)[2] = (u8)((inData >> 16) & 0xFF);
+            ((u8*)inDest)[3] = (u8)((inData >> 24) & 0xFF);
 #endif
             return (u32*)((u8*)(inDest) + 4);
         }
@@ -198,17 +198,17 @@ namespace ncore
             ((u8*)inDest)[6] = (u8)((inData >> 8) & 0xFF);
             ((u8*)inDest)[7] = (u8)((inData >> 0) & 0xFF);
 #else
-        ((u8*)inDest)[0] = (u8)((inData >> 0) & 0xFF);
-        ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
-        ((u8*)inDest)[2] = (u8)((inData >> 16) & 0xFF);
-        ((u8*)inDest)[3] = (u8)((inData >> 24) & 0xFF);
-        ((u8*)inDest)[4] = (u8)((inData >> 32) & 0xFF);
-        ((u8*)inDest)[5] = (u8)((inData >> 40) & 0xFF);
-        ((u8*)inDest)[6] = (u8)((inData >> 48) & 0xFF);
-        ((u8*)inDest)[7] = (u8)((inData >> 56) & 0xFF);
+            ((u8*)inDest)[0] = (u8)((inData >> 0) & 0xFF);
+            ((u8*)inDest)[1] = (u8)((inData >> 8) & 0xFF);
+            ((u8*)inDest)[2] = (u8)((inData >> 16) & 0xFF);
+            ((u8*)inDest)[3] = (u8)((inData >> 24) & 0xFF);
+            ((u8*)inDest)[4] = (u8)((inData >> 32) & 0xFF);
+            ((u8*)inDest)[5] = (u8)((inData >> 40) & 0xFF);
+            ((u8*)inDest)[6] = (u8)((inData >> 48) & 0xFF);
+            ((u8*)inDest)[7] = (u8)((inData >> 56) & 0xFF);
 #endif
             return (u64*)((u8*)(inDest) + 8);
         }
-    } // namespace ncore
+    }  // namespace nmem
 
-} // namespace ncore
+}  // namespace ncore

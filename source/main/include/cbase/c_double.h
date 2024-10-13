@@ -67,7 +67,7 @@ namespace ncore
         inline bool isNegative(f64 inNumber);
         inline bool isLessPositive(f64 inLHS, f64 inRHS);
         inline bool isGreater(f64 inLHS, f64 inRHS);
-    }; // namespace xf64
+    };  // namespace math
 
 //==============================================================================
 // INLINES
@@ -94,6 +94,6 @@ namespace ncore
 
 #endif
 
-}; // namespace ncore
+};  // namespace ncore
 
-#endif ///< __CBASE_F64_FUNCTIONS_H__
+#endif  ///< __CBASE_F64_FUNCTIONS_H__

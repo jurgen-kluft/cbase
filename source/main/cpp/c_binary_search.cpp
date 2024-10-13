@@ -42,7 +42,6 @@ namespace ncore
     }
 #endif
 
-
     s32 g_LowerBoundOpaque(void const* key, void const* array, u32 array_size, const void* user_data, less_predicate_fn is_less, equal_predicate_fn is_equal)
     {
         if (array_size == 0)
@@ -63,13 +62,13 @@ namespace ncore
         if (is_equal(key, array, bottom, user_data))
         {
             while (bottom > 0 && is_equal(key, array, bottom - 1, user_data))
-				--bottom;
+                --bottom;
             return bottom;
         }
 
         // any items before bottom are less than key ?
         while (bottom > 0 && is_less(key, array, bottom - 1, user_data))
-			--bottom;
+            --bottom;
 
         return bottom;
     }
@@ -100,7 +99,7 @@ namespace ncore
 
         // any items after bottom are greater than key ?
         while (bottom < array_size - 1 && !is_less(key, array, bottom + 1, user_data))
-			++bottom;
+            ++bottom;
 
         return bottom;
     }

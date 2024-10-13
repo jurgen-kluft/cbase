@@ -122,8 +122,8 @@ namespace ncore
 
         inline u32 size() const { return L; }
 
-        buffer_t   buffer() const { return buffer_t((u8*)m_data, (u8*)m_data + size()); }
-        cbuffer_t  cbuffer() const { return cbuffer_t((u8 const*)m_data, (u8 const*)m_data + size()); }
+        buffer_t  buffer() const { return buffer_t((u8*)m_data, (u8*)m_data + size()); }
+        cbuffer_t cbuffer() const { return cbuffer_t((u8 const*)m_data, (u8 const*)m_data + size()); }
 
         void reset(u8 fill);
 

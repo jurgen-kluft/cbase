@@ -1019,8 +1019,8 @@ namespace ncore
                     }
                     case TypeId::kStrSpan:
                     {
-						cstrspan_t const cstr(argValue.first.cstr, argValue.second.cstr);
-						return state_t::format_string(it, format, cstr);
+                        cstrspan_t const cstr(argValue.first.cstr, argValue.second.cstr);
+                        return state_t::format_string(it, format, cstr);
                     }
                 }
                 return false;

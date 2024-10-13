@@ -23,7 +23,7 @@ namespace ncore
         while (range > 1)
         {
             u32 const middle = range >> 1;
-            //if (!is_less(key, array, bottom + middle, user_data))
+            // if (!is_less(key, array, bottom + middle, user_data))
             if (!(key < array[bottom + middle]))
             {
                 bottom += middle;
@@ -54,7 +54,7 @@ namespace ncore
         while (range > 1)
         {
             u32 const middle = range >> 1;
-            //if (!is_less(key, array, bottom + middle, user_data))
+            // if (!is_less(key, array, bottom + middle, user_data))
             if (!(key < array[bottom + middle]))
             {
                 bottom += middle;

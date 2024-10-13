@@ -498,7 +498,7 @@ namespace ncore
         bool toStr(ascii::prune str, s32 strMaxLen, ascii::pcrune fmt, Args... args)
         {
             const encoded_arg_t encoded_args[] = {arg_t<Args>::encode(args)...};
-            const format_func_t arg_funcs[]  = {arg_t<Args>::formatter()...};
+            const format_func_t arg_funcs[]    = {arg_t<Args>::formatter()...};
 
             args_t _args = {encoded_args, arg_funcs, (s64)(sizeof(encoded_args) / sizeof(encoded_arg_t))};
             return toStr(str, &str[strMaxLen], fmt, _args);

@@ -102,9 +102,9 @@ namespace ncore
         // skip whitespace.
         reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
-        uchar32 c;                      // Current character.
-        reader->peek(c);  // Save sign indication.
-        uchar32 sign = c;               // If '-', then negative, otherwise positive.
+        uchar32 c;         // Current character.
+        reader->peek(c);   // Save sign indication.
+        uchar32 sign = c;  // If '-', then negative, otherwise positive.
 
         // skip sign.
         if ((c == '-') || (c == '+'))
@@ -169,7 +169,7 @@ namespace ncore
     f64 StrToF64(nrunes::ireader_t* reader)
     {
         // Evaluate sign
-        s32 sign = 1;
+        s32     sign = 1;
         uchar32 c;
         if (reader->peek(c) && c == '-')
         {
@@ -379,7 +379,7 @@ namespace ncore
         s32 suppress = 0;
 
         uchar32 c;
-        while (fmt->peek(c)&& c != '\0')
+        while (fmt->peek(c) && c != '\0')
         {
             if (fmt->peek(c) && c != '%' && !parsing)
             {

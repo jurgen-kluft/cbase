@@ -106,7 +106,7 @@ namespace ncore
         inline bool isNegative(f32 inNumber);
         inline bool isLessPositive(f32 inLHS, f32 inRHS);
         inline bool isGreater(f32 inLHS, f32 inRHS);
-    };
+    };  // namespace math
 
 #include "private/c_float_inline.h"
 
@@ -116,6 +116,6 @@ namespace ncore
 #    include "private/c_float_inline_mac.h"
 #endif
 
-}; // namespace ncore
+};  // namespace ncore
 
-#endif ///< __CBASE_F32_FUNCTIONS_H__
+#endif  ///< __CBASE_F32_FUNCTIONS_H__

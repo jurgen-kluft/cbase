@@ -56,14 +56,8 @@ namespace math
         return r;
     }
 
-    inline f32 positiveZero()
-    {
-        return +0.0f;
-    }
-    inline f32 negativeZero()
-    {
-        return -0.0f;
-    }
+    inline f32 positiveZero() { return +0.0f; }
+    inline f32 negativeZero() { return -0.0f; }
 #ifdef D_IEEE_FLOATS
     inline f32 nan()
     {
@@ -299,4 +293,4 @@ namespace math
     inline bool isZero(f32 inNumber) { return bool(inNumber == 0.0f); }
     inline bool isPositive(f32 inNumber) { return bool(inNumber > 0.0f); }
     inline bool isNegative(f32 inNumber) { return bool(inNumber < 0.0f); }
-}; // namespace nf32
+};  // namespace math

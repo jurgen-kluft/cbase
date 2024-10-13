@@ -11,7 +11,7 @@
 namespace ncore
 {
     class va_t;
-    
+
     class log_to_console_imp : public logger_t
     {
         virtual void initialize();
@@ -34,7 +34,7 @@ namespace ncore
         template <typename... Args>
         inline s32 write(crunes_t const& format, Args&&... _args)
         {
-            const va_t argv[] = { &_args... };
+            const va_t argv[] = {&_args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
             write(format, argv, argc);
         }
@@ -53,7 +53,7 @@ namespace ncore
         template <typename... Args>
         inline s32 writeLine(crunes_t const& str, Args&&... _args)
         {
-            const va_t argv[] = { &_args...};
+            const va_t argv[] = {&_args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
             write(str, argv, argc);
         }

@@ -84,7 +84,7 @@ namespace ncore
         static const u64 EMPTY_STRING = 0;
         struct rune
         {
-            u8    r;
+            u8 r;
         };
         typedef rune*       prune;
         typedef const rune* pcrune;
@@ -421,9 +421,14 @@ namespace ncore
         class ireader_t
         {
         public:
-            void reset() { vreset(); }
-            bool valid() const { return vvalid(); }
-            uchar32 peek() const { uchar32 c; vpeek(0, c); return c; }
+            void    reset() { vreset(); }
+            bool    valid() const { return vvalid(); }
+            uchar32 peek() const
+            {
+                uchar32 c;
+                vpeek(0, c);
+                return c;
+            }
             bool peek(uchar32& c) const { return vpeek(0, c); }
             bool peek(s32 n, uchar32& c) const { return vpeek(n, c); }
             bool read(uchar32& c) { return vread(c); }

@@ -13,7 +13,7 @@ namespace ncore
     {
     public:
         virtual ~hasher_t() {}
-        
+
         virtual s32  size() const                         = 0;
         virtual void reset()                              = 0;
         virtual void begin()                              = 0;
@@ -39,21 +39,24 @@ namespace ncore
         u32 strhash32_lowercase(const char* str, const char* end, u64 seed = 0);
         u32 strhash32_lowercase(crunes_t const& str, u64 seed = 0);
 
-        template <typename K> class hashing_t
+        template <typename K>
+        class hashing_t
         {
         public:
             bool is_hashable() const { return false; }
             u64  hash(K const& k) const { return static_cast<u64>(k); }
         };
 
-        template <> class hashing_t<void*>
+        template <>
+        class hashing_t<void*>
         {
         public:
             bool is_hashable() const { return false; }
             u64  hash(void* const k) const { return (u64)k; }
         };
 
-        template <> class hashing_t<const char*>
+        template <>
+        class hashing_t<const char*>
         {
         public:
             bool is_hashable() const { return true; }
@@ -66,7 +69,7 @@ namespace ncore
             }
         };
 
-    } // namespace nhash
-} // namespace ncore
+    }  // namespace nhash
+}  // namespace ncore
 
-#endif // __CBASE_DEFAULT_HASH_H__
+#endif  // __CBASE_DEFAULT_HASH_H__

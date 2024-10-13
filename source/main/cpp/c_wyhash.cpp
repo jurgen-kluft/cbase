@@ -25,9 +25,9 @@ namespace ncore
 
         // 128bit multiply function
 #if (WYHASH_32BIT_MUM)
-        static inline u64  _wyrot(u64 x) { return (x >> 32) | (x << 32); }
+        static inline u64 _wyrot(u64 x) { return (x >> 32) | (x << 32); }
 #endif
-    
+
         static inline void _wymum(u64* A, u64* B)
         {
 #if (WYHASH_32BIT_MUM)
@@ -92,7 +92,7 @@ namespace ncore
 #endif
         static inline u64 _wyr3(const u8* p, uint_t k) { return (((u64)p[0]) << 16) | (((u64)p[k >> 1]) << 8) | p[k - 1]; }
 
-#define _likely_(a) (a)
+#define _likely_(a)   (a)
 #define _unlikely_(a) (a)
 
         // wyhash main function
@@ -148,13 +148,13 @@ namespace ncore
         // static const u64 _wyp[4] = {0xa0761d6478bd642full, 0xe7037ed1a0b428dbull, 0x8ebc6af09c88c6e3ull, 0x589965cc75374cc3ull};
 
         // a useful 64bit-64bit mix function to produce deterministic pseudo random numbers that can pass BigCrush and PractRand
-    //         static inline u64 wyhash64(u64 A, u64 B)
-    //         {
-    //             A ^= 0xa0761d6478bd642full;
-    //             B ^= 0xe7037ed1a0b428dbull;
-    //             _wymum(&A, &B);
-    //             return _wymix(A ^ 0xa0761d6478bd642full, B ^ 0xe7037ed1a0b428dbull);
-    //         }
+        //         static inline u64 wyhash64(u64 A, u64 B)
+        //         {
+        //             A ^= 0xa0761d6478bd642full;
+        //             B ^= 0xe7037ed1a0b428dbull;
+        //             _wymum(&A, &B);
+        //             return _wymix(A ^ 0xa0761d6478bd642full, B ^ 0xe7037ed1a0b428dbull);
+        //         }
 
         // The wyrand PRNG that pass BigCrush and PractRand
         // Referenced externally in c_base.cpp
@@ -171,7 +171,7 @@ namespace ncore
             while (i < size)
             {
                 s += 0xa0761d6478bd642full;
-                u64 const l = _wymix(s, s ^ 0xe7037ed1a0b428dbull);
+                u64 const l  = _wymix(s, s ^ 0xe7037ed1a0b428dbull);
                 u8 const* lp = (u8 const*)&l;
                 for (u32 j = 0; j < 8 && i < size; j++, i++)
                     buffer[i] = lp[j];
@@ -180,18 +180,18 @@ namespace ncore
         }
 
         // convert any 64 bit pseudo random numbers to uniform distribution [0,1). It can be combined with wyrand, wyhash64 or wyhash.
-//        static inline double wy2u01(u64 r)
-//        {
-//            const double _wynorm = 1.0 / (1ull << 52);
-//            return (r >> 12) * _wynorm;
-//        }
+        //        static inline double wy2u01(u64 r)
+        //        {
+        //            const double _wynorm = 1.0 / (1ull << 52);
+        //            return (r >> 12) * _wynorm;
+        //        }
 
         // convert any 64 bit pseudo random numbers to APPROXIMATE Gaussian distribution. It can be combined with wyrand, wyhash64 or wyhash.
-//        static inline double wy2gau(u64 r)
-//        {
-//            const double _wynorm = 1.0 / (1ull << 20);
-//            return ((r & 0x1fffff) + ((r >> 21) & 0x1fffff) + ((r >> 42) & 0x1fffff)) * _wynorm - 3.0;
-//        }
+        //        static inline double wy2gau(u64 r)
+        //        {
+        //            const double _wynorm = 1.0 / (1ull << 20);
+        //            return ((r & 0x1fffff) + ((r >> 21) & 0x1fffff) + ((r >> 42) & 0x1fffff)) * _wynorm - 3.0;
+        //        }
 
 #if (!WYHASH_32BIT_MUM)
         // fast range integer random number generation on [0,k) credit to Daniel Lemire. May not work when WYHASH_32BIT_MUM=1. It can be combined with wyrand, wyhash64 or wyhash.
@@ -336,7 +336,7 @@ namespace ncore
             m_secret[0] = 0;
             m_secret[1] = 0;
             m_secret[2] = 0;
-            m_secret[3] = 0;            
+            m_secret[3] = 0;
         }
 
         wyreg::~wyreg()
@@ -389,5 +389,5 @@ namespace ncore
             }
             return false;
         }
-    } // namespace nhash
-} // namespace ncore
+    }  // namespace nhash
+}  // namespace ncore

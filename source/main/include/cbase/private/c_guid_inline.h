@@ -19,10 +19,7 @@ inline void guid_t::setNull(void) { set(0, 0, 0, 0); }
 
 //-------------------------------------------------------------------------------
 
-inline bool guid_t::isNull(void) const
-{
-    return mGuid.ma32[0] == 0 && mGuid.ma32[1] == 0 && mGuid.ma32[2] == 0 && mGuid.ma32[3] == 0;
-}
+inline bool guid_t::isNull(void) const { return mGuid.ma32[0] == 0 && mGuid.ma32[1] == 0 && mGuid.ma32[2] == 0 && mGuid.ma32[3] == 0; }
 
 //-------------------------------------------------------------------------------
 

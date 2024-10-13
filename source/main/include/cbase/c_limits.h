@@ -7,44 +7,44 @@
 
 namespace ncore
 {
-static const u8 u8_min = 0;
-static const u8 u8_max = 0xFF;
+    static const u8 u8_min = 0;
+    static const u8 u8_max = 0xFF;
 
-static const u16 u16_min = 0;
-static const u16 u16_max = 0xFFFF;
+    static const u16 u16_min = 0;
+    static const u16 u16_max = 0xFFFF;
 
-static const u32 u32_min = 0;
-static const u32 u32_max = 0xFFFFFFFF;
+    static const u32 u32_min = 0;
+    static const u32 u32_max = 0xFFFFFFFF;
 
-static const u64 u64_min = 0;
-static const u64 u64_max = 0xFFFFFFFFFFFFFFFF;
+    static const u64 u64_min = 0;
+    static const u64 u64_max = 0xFFFFFFFFFFFFFFFF;
 
-static const s8 s8_min = -128;
-static const s8 s8_max = 127;
+    static const s8 s8_min = -128;
+    static const s8 s8_max = 127;
 
-static const s16 s16_min = -32768;
-static const s16 s16_max = 32767;
+    static const s16 s16_min = -32768;
+    static const s16 s16_max = 32767;
 
-static const s32 s32_min = (s32)0x80000000;
-static const s32 s32_max = 2147483647;
+    static const s32 s32_min = (s32)0x80000000;
+    static const s32 s32_max = 2147483647;
 
-static const s64 s64_min = (s64)0x8000000000000000LL;
-static const s64 s64_max = (s64)0x7FFFFFFFFFFFFFFFLL;
+    static const s64 s64_min = (s64)0x8000000000000000LL;
+    static const s64 s64_max = (s64)0x7FFFFFFFFFFFFFFFLL;
 
-static const f32 f32_min = -3.402823466e+38f;
-static const f32 f32_max = 3.402823466e+38f;
+    static const f32 f32_min = -3.402823466e+38f;
+    static const f32 f32_max = 3.402823466e+38f;
 
-static const f64 f64_min = -1.7976931348623158e+308;
-static const f64 f64_max = 1.7976931348623158e+308;
+    static const f64 f64_min = -1.7976931348623158e+308;
+    static const f64 f64_max = 1.7976931348623158e+308;
 
-static const byte byte_min = 0;
-static const byte byte_max = 0xFF;
+    static const byte byte_min = 0;
+    static const byte byte_max = 0xFF;
 
-static const sbyte sbyte_min = -128;
-static const sbyte sbyte_max = 127;
+    static const sbyte sbyte_min = -128;
+    static const sbyte sbyte_max = 127;
 
-static const wchar wchar_min = 0;
-static const wchar wchar_max = 0xFFFF;
+    static const wchar wchar_min = 0;
+    static const wchar wchar_max = 0xFFFF;
 
     /**
      * Description:

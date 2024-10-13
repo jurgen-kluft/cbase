@@ -2,7 +2,7 @@
 #define __CBASE_MEMORY_STD_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
 
 #include "ccore/c_debug.h"
@@ -10,17 +10,77 @@
 
 namespace ncore
 {
-    template <typename T> inline void g_set(T* p, T v1) { p[0] = v1; }
-    template <typename T> inline void g_set(T* p, T v1, T v2) { p[0] = v1; p[1] = v2; }
-    template <typename T> inline void g_set(T* p, T v1, T v2, T v3) { p[0] = v1; p[1] = v2; p[2] = v3; }
-    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; }
-    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; }
-    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; }
-    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; }
-    template <typename T> inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7, T v8) { p[0] = v1; p[1] = v2; p[2] = v3; p[3] = v4; p[4] = v5; p[5] = v6; p[6] = v7; p[7] = v8; }
+    template <typename T>
+    inline void g_set(T* p, T v1)
+    {
+        p[0] = v1;
+    }
+    template <typename T>
+    inline void g_set(T* p, T v1, T v2)
+    {
+        p[0] = v1;
+        p[1] = v2;
+    }
+    template <typename T>
+    inline void g_set(T* p, T v1, T v2, T v3)
+    {
+        p[0] = v1;
+        p[1] = v2;
+        p[2] = v3;
+    }
+    template <typename T>
+    inline void g_set(T* p, T v1, T v2, T v3, T v4)
+    {
+        p[0] = v1;
+        p[1] = v2;
+        p[2] = v3;
+        p[3] = v4;
+    }
+    template <typename T>
+    inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5)
+    {
+        p[0] = v1;
+        p[1] = v2;
+        p[2] = v3;
+        p[3] = v4;
+        p[4] = v5;
+    }
+    template <typename T>
+    inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6)
+    {
+        p[0] = v1;
+        p[1] = v2;
+        p[2] = v3;
+        p[3] = v4;
+        p[4] = v5;
+        p[5] = v6;
+    }
+    template <typename T>
+    inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7)
+    {
+        p[0] = v1;
+        p[1] = v2;
+        p[2] = v3;
+        p[3] = v4;
+        p[4] = v5;
+        p[5] = v6;
+        p[6] = v7;
+    }
+    template <typename T>
+    inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7, T v8)
+    {
+        p[0] = v1;
+        p[1] = v2;
+        p[2] = v3;
+        p[3] = v4;
+        p[4] = v5;
+        p[5] = v6;
+        p[6] = v7;
+        p[7] = v8;
+    }
 
-    template<typename T, s32 N>
-    inline void g_copy(T(&dst)[N], T const (&src)[N])
+    template <typename T, s32 N>
+    inline void g_copy(T (&dst)[N], T const (&src)[N])
     {
         for (s32 i = 0; i < N; i++)
             dst[i] = src[i];
@@ -92,10 +152,7 @@ namespace ncore
         {
             return (((u64)inB0) | (((u64)inB1) << 8) | (((u64)inB2) << 16) | (((u64)inB3) << 24) | (((u64)inB4) << 32) | (((u64)inB5) << 40) | (((u64)inB6) << 48) | (((u64)inB7) << 56));
         }
-    }; // namespace nmem
+    };  // namespace nmem
 
-
-
-
-} // namespace ncore
-#endif ///< __C_MEMORY_STD_H__
+}  // namespace ncore
+#endif  ///< __C_MEMORY_STD_H__

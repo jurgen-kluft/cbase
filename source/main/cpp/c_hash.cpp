@@ -128,7 +128,7 @@ namespace ncore
 
                 if (p + 4 <= bEnd)
                 {
-                    h64 ^= (u64)(get32bits(p)) * PRIME64_1;
+                    h64 ^= (u64)(get32bits(p))*PRIME64_1;
                     h64 = rotl64(h64, 23) * PRIME64_2 + PRIME64_3;
                     p += 4;
                 }
@@ -148,7 +148,7 @@ namespace ncore
 
                 return h64;
             }
-        } // namespace xxhash
+        }  // namespace xxhash
 
         // TODO: Implement a xxhash version that can 'lowercase' the 'string' as it hashes.
         namespace xxhash_lowercase
@@ -228,7 +228,7 @@ namespace ncore
 
                 if (p + 4 <= bEnd)
                 {
-                    h64 ^= (u64)(get32bits(p)) * xxhash::PRIME64_1;
+                    h64 ^= (u64)(get32bits(p))*xxhash::PRIME64_1;
                     h64 = xxhash::rotl64(h64, 23) * xxhash::PRIME64_2 + xxhash::PRIME64_3;
                     p += 4;
                 }
@@ -248,7 +248,7 @@ namespace ncore
 
                 return h64;
             }
-        } // namespace xxhash_lowercase
+        }  // namespace xxhash_lowercase
 
         // ----------------------------------------------------------------------------
         u64 datahash(u8 const* data, u32 size, u64 seed) { return xxhash::Hash(data, size, seed); }
@@ -271,9 +271,9 @@ namespace ncore
 
         static u32 hash64_to_hash32(u64 key)
         {
-            key = (~key) + (key << 18); // key = (key << 18) - key - 1;
+            key = (~key) + (key << 18);  // key = (key << 18) - key - 1;
             key = key ^ (key >> 31);
-            key = key * 21; // key = (key + (key << 2)) + (key << 4);
+            key = key * 21;  // key = (key + (key << 2)) + (key << 4);
             key = key ^ (key >> 11);
             key = key + (key << 6);
             key = key ^ (key >> 22);
@@ -367,5 +367,5 @@ namespace ncore
             return 0;
         }
 
-    } // namespace nhash
-};    // namespace ncore
+    }  // namespace nhash
+};  // namespace ncore

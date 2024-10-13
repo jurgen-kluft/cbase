@@ -2,18 +2,18 @@
 #ifdef TARGET_PC
 
 // Windows includes first
-#define WIN32_LEAN_AND_MEAN
-#define NOGDI
-#define NOMB
-#define NOKANJI
-#include <windows.h>
-#include <time.h>
-#include <stdio.h>
+#    define WIN32_LEAN_AND_MEAN
+#    define NOGDI
+#    define NOMB
+#    define NOKANJI
+#    include <windows.h>
+#    include <time.h>
+#    include <stdio.h>
 
-#include "cbase/c_console.h"
-#include "cbase/c_printf.h"
-#include "cbase/c_runes.h"
-#include "cbase/c_va_list.h"
+#    include "cbase/c_console.h"
+#    include "cbase/c_printf.h"
+#    include "cbase/c_runes.h"
+#    include "cbase/c_va_list.h"
 
 namespace ncore
 {
@@ -22,17 +22,17 @@ namespace ncore
     public:
         inline out_writer_t() {}
 
-        virtual s32        vwrite(uchar32 c)
+        virtual s32 vwrite(uchar32 c)
         {
             utf32::rune str[2] = {c, 0};
-            crunes_t src = make_crunes(str, 0, 1, 1);
+            crunes_t    src    = make_crunes(str, 0, 1, 1);
             return write_utf32(src);
         }
 
         virtual s32 vwrite(const char* str, const char* end)
         {
             crunes_t src = make_crunes(str, end);
-            return write_ascii(src)!=0;
+            return write_ascii(src) != 0;
         }
 
         virtual s32 vwrite(crunes_t const& str)
@@ -43,15 +43,13 @@ namespace ncore
                 case ucs2::TYPE: return write_utf16(str);
                 case utf16::TYPE: return write_utf16(str);
                 case utf32::TYPE: return write_utf32(str);
-                default: //@todo: UTF-8
+                default:  //@todo: UTF-8
                     break;
             }
             return 0;
         }
 
-        virtual void vflush()
-        {
-        }
+        virtual void vflush() {}
 
         static void write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
         {
@@ -95,8 +93,8 @@ namespace ncore
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            ascii::pcrune src = &str.m_ascii[ str.m_str ];
-            ascii::pcrune end = &str.m_ascii[ str.m_end ];
+            ascii::pcrune src = &str.m_ascii[str.m_str];
+            ascii::pcrune end = &str.m_ascii[str.m_end];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -122,8 +120,8 @@ namespace ncore
             uchar16   str16[maxlen + 4];
 
             s32           l   = 0;
-            utf16::pcrune src = &str.m_utf16[ str.m_str];
-            utf16::pcrune end = &str.m_utf16[ str.m_end];
+            utf16::pcrune src = &str.m_utf16[str.m_str];
+            utf16::pcrune end = &str.m_utf16[str.m_end];
             while (src < end)
             {
                 uchar16* dst16 = (uchar16*)str16;
@@ -179,7 +177,7 @@ namespace ncore
         virtual void writeln()
         {
             ascii::rune line32[] = {'\r', 0};
-            crunes_t    line = make_crunes(line32, line32 + 1);
+            crunes_t    line     = make_crunes(line32, line32 + 1);
             out_writer_t::write_ascii(line);
         }
 
@@ -191,7 +189,7 @@ namespace ncore
                 case ucs2::TYPE: return out_writer_t::write_utf16(str);
                 case utf16::TYPE: return out_writer_t::write_utf16(str);
                 case utf32::TYPE: return out_writer_t::write_utf32(str);
-                default: //@todo: UTF-8
+                default:  //@todo: UTF-8
                     break;
             }
             return 0;
@@ -211,6 +209,6 @@ namespace ncore
         return &sConsoleOut;
     }
 
-}; // namespace ncore
+};  // namespace ncore
 
 #endif

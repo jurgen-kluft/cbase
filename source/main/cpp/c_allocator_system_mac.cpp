@@ -80,7 +80,6 @@ namespace ncore
 
     alloc_t* g_get_system_alloc() { return &sSystemAllocator; }
 
-
 };  // namespace ncore
 
 #endif

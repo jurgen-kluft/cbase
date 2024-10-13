@@ -157,7 +157,7 @@ namespace ncore
         virtual void clear()      = 0;
 
     public:
-        virtual ~logger_t(){};
+        virtual ~logger_t() {};
 
         virtual void write(bool _value)                                        = 0;
         virtual void write(s32 _value)                                         = 0;

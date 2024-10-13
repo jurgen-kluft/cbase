@@ -37,10 +37,10 @@ namespace ncore
 
         static inline ntree::node_t* s_new_node(void* user_data)
         {
-            data_t* data                = (data_t*)user_data;
-            item_t* item                = g_construct<item_t>(data->m_allocator);
+            data_t* data = (data_t*)user_data;
+            item_t* item = g_construct<item_t>(data->m_allocator);
             item->set_child(ntree::LEFT, nullptr);
-            item->set_child(ntree::RIGHT,nullptr);
+            item->set_child(ntree::RIGHT, nullptr);
             return (ntree::node_t*)item;
         }
 
@@ -182,10 +182,10 @@ namespace ncore
 
         static inline ntree::node_t* s_new_node(void* user_data)
         {
-            data_t* data                = (data_t*)user_data;
-            item_t* item                = g_construct<item_t>(data->m_allocator);
+            data_t* data = (data_t*)user_data;
+            item_t* item = g_construct<item_t>(data->m_allocator);
             item->set_child(ntree::LEFT, nullptr);
-            item->set_child(ntree::RIGHT,nullptr);
+            item->set_child(ntree::RIGHT, nullptr);
             return (ntree::node_t*)item;
         }
 

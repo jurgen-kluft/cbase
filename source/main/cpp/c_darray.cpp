@@ -44,11 +44,11 @@ namespace ncore
                 alloc_t* alloc = context_t::runtime_alloc();
                 if (items == nullptr)
                 {
-                    newitems = alloc->allocate(new_capacity*sizeof_item);
+                    newitems = alloc->allocate(new_capacity * sizeof_item);
                 }
                 else
                 {
-                    newitems = g_reallocate(alloc, items, cur_size*sizeof_item, new_capacity*sizeof_item);
+                    newitems = g_reallocate(alloc, items, cur_size * sizeof_item, new_capacity * sizeof_item);
                 }
 
                 if (!newitems)
@@ -69,4 +69,4 @@ namespace ncore
         return true;
     }
 
-}; // namespace ncore
+};  // namespace ncore

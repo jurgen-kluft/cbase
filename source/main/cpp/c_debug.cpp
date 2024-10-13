@@ -3,7 +3,7 @@
 #include "ccore/c_debug.h"
 
 #ifdef D_ASSERT
-#include "cbase/c_log.h"
+#    include "cbase/c_log.h"
 #endif
 
 namespace ncore
@@ -84,4 +84,4 @@ namespace cbase
         ncore::gSetAssertHandler(assertHandler);
         return assertHandler;
     }
-}  // namespace nbase
+}  // namespace cbase

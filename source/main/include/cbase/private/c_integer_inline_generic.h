@@ -137,7 +137,7 @@ namespace ncore
             {
                 return count;
             }
-            return 64; 
+            return 64;
         }
 
         // find the number of leading zeros in 8-bit
@@ -401,5 +401,5 @@ namespace ncore
             low += (low >> 16);
             return (s8)(low & 0x0000003f) + (s8)(high & 0x0000003f);
         }
-    } // namespace math
-} // namespace ncore
+    }  // namespace math
+}  // namespace ncore

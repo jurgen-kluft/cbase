@@ -75,6 +75,6 @@ namespace ncore
     //
     s32 dconvstr_scan(const char* input, const char** input_end, f64* output, s32* output_erange);
 
-} // namespace ncore
+}  // namespace ncore
 
-#endif // __CBASE_DOUBLE_CONVERT_H__
+#endif  // __CBASE_DOUBLE_CONVERT_H__
