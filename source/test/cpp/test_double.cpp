@@ -62,21 +62,21 @@ UNITTEST_SUITE_BEGIN(test_double)
         UNITTEST_TEST(Bin)
         {
             CHECK_TRUE(math::bin(0.0) == 0);
-            CHECK_TRUE(math::bin(1.0) == D_CONSTANT_64(0x3ff0000000000000));
-            CHECK_TRUE(math::bin(-2.0) == D_CONSTANT_64(0xc000000000000000));
+            CHECK_TRUE(math::bin(1.0) == D_CONSTANT_U64(0x3ff0000000000000));
+            CHECK_TRUE(math::bin(-2.0) == D_CONSTANT_U64(0xc000000000000000));
         }
 
         UNITTEST_TEST(Sbin)
         {
             CHECK_EQUAL(0, math::sbin(0.0));
-            CHECK_TRUE(math::sbin(-2.0) == D_CONSTANT_64(0xc000000000000000));
+            CHECK_TRUE(math::sbin(-2.0) == D_CONSTANT_U64(0xc000000000000000));
         }
 
         UNITTEST_TEST(ToF64)
         {
             CHECK_TRUE(math::toF64((u64)0) == 0.0);
-            CHECK_TRUE(math::toF64(D_CONSTANT_64(0x3ff0000000000000)) == 1.0);
-            CHECK_TRUE(math::toF64(D_CONSTANT_64(0xc000000000000000)) == -2.0);
+            CHECK_TRUE(math::toF64(D_CONSTANT_U64(0x3ff0000000000000)) == 1.0);
+            CHECK_TRUE(math::toF64(D_CONSTANT_U64(0xc000000000000000)) == -2.0);
         }
 
         UNITTEST_TEST(ToS64)
@@ -112,13 +112,13 @@ UNITTEST_SUITE_BEGIN(test_double)
         UNITTEST_TEST(BinaryAnd)
         {
             CHECK_TRUE(math::binaryAnd(0.0, (u64)0) == 0.0);
-            CHECK_TRUE(math::binaryAnd(-2.0, (u64)0x10000000) == math::toF64(D_CONSTANT_64(0xc000000000000000) & 0x10000000));
+            CHECK_TRUE(math::binaryAnd(-2.0, (u64)0x10000000) == math::toF64(D_CONSTANT_U64(0xc000000000000000) & 0x10000000));
         }
 
         UNITTEST_TEST(BinaryOr)
         {
             CHECK_TRUE(math::binaryOr(0.0, (s32)0) == 0.0);
-            CHECK_TRUE(math::binaryOr(-2.0, (s32)10) == math::toF64(D_CONSTANT_64(0xc000000000000000) | 10));
+            CHECK_TRUE(math::binaryOr(-2.0, (s32)10) == math::toF64(D_CONSTANT_U64(0xc000000000000000) | 10));
         }
 
         UNITTEST_TEST(Fraction)
@@ -126,7 +126,7 @@ UNITTEST_SUITE_BEGIN(test_double)
             CHECK_TRUE(math::fraction(0.0) == 0);
             CHECK_TRUE(math::fraction(-2.0) == 0);
             // 0.15625f : 0x3fc4000000000000
-            CHECK_TRUE(math::fraction(0.15625f) == D_CONSTANT_64(0x0004000000000000));
+            CHECK_TRUE(math::fraction(0.15625f) == D_CONSTANT_U64(0x0004000000000000));
         }
 
         UNITTEST_TEST(ExponentBinary)
@@ -146,7 +146,7 @@ UNITTEST_SUITE_BEGIN(test_double)
         UNITTEST_TEST(SignMask)
         {
             CHECK_TRUE(math::signMask(1.0f) == 0);
-            CHECK_TRUE(math::signMask(-2.0f) == D_CONSTANT_64(0x8000000000000000));
+            CHECK_TRUE(math::signMask(-2.0f) == D_CONSTANT_U64(0x8000000000000000));
             CHECK_TRUE(math::signMask(0.15625f) == 0);
         }
 

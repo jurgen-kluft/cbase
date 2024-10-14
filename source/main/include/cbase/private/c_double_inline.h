@@ -65,10 +65,10 @@ namespace math
     inline bool isFinite(f64 inNumber) { return bool(!isInfinite(inNumber) && !isNAN(inNumber)); }
     inline bool isRational(f64 inNumber) { return bool((bin(inNumber) & DD_EXPONENT_MASK) != DD_EXPONENT_MASK); }
 #else
-    inline bool isInfinite(f64 inNumber) { return False; }
-    inline bool isNAN(f64 inNumber) { return False; }
-    inline bool isFinite(f64 inNumber) { return True; }
-    inline bool isRational(f64 inNumber) { return True; }
+    inline bool isInfinite(f64 inNumber) { return false; }
+    inline bool isNAN(f64 inNumber) { return false; }
+    inline bool isFinite(f64 inNumber) { return true; }
+    inline bool isRational(f64 inNumber) { return true; }
 #endif
     /**
      * bin. Returns the f64 as an u64. It's not casted, but the address is casted, so you get the binary representation
@@ -89,12 +89,12 @@ namespace math
     inline u64 toU64(f64 inB) { return (u64)(s64)inB; }
 
     /**
-     * IsEqual, returns True if two doubles are the same
+     * IsEqual, returns true if two doubles are the same
      */
     inline bool isEqual(f64 inNumber, f64 inG) { return bool(bin(inNumber) == bin(inG)); }
 
     /**
-     * IsNotEqual, returns True if the two doubles are not the same
+     * IsNotEqual, returns true if the two doubles are not the same
      */
     inline bool isNotEqual(f64 inNumber, f64 inG) { return bool(bin(inNumber) != bin(inG)); }
 

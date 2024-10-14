@@ -63,7 +63,7 @@ namespace ncore
         }
 
 // read functions
-#if (D_LITTLE_ENDIAN)
+#ifdef D_LITTLE_ENDIAN
         static inline u64 _wyr8(const u8* p)
         {
             u64 v;

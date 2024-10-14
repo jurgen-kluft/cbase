@@ -114,13 +114,13 @@ namespace math
     inline bool isFinite(f32 inNumber) { return bool(!isInfinite(inNumber) && !isNAN(inNumber)); }
     inline bool isRational(f32 inNumber) { return bool((bin(inNumber) & FF_EXPONENT_MASK) != FF_EXPONENT_MASK); }
 #else
-    inline bool isPositiveInfinite(f32 inNumber) { return False; }
-    inline bool isNegativeInfinite(f32 inNumber) { return False; }
+    inline bool isPositiveInfinite(f32 inNumber) { return false; }
+    inline bool isNegativeInfinite(f32 inNumber) { return false; }
 
-    inline bool isInfinite(f32 inNumber) { return False; }
-    inline bool isNAN(f32 inNumber) { return False; }
-    inline bool isFinite(f32 inNumber) { return True; }
-    inline bool isRational(f32 inNumber) { return True; }
+    inline bool isInfinite(f32 inNumber) { return false; }
+    inline bool isNAN(f32 inNumber) { return false; }
+    inline bool isFinite(f32 inNumber) { return true; }
+    inline bool isRational(f32 inNumber) { return true; }
 #endif
     /**
      * bin. Returns the f32 as an u32. It's not casted, but the address is casted, so you get the binary representation.
@@ -138,12 +138,12 @@ namespace math
     inline f32 toF32(u32 inInt) { return *(f32 const*)&inInt; }
 
     /**
-     * IsEqual, returns True if two floats are the same
+     * IsEqual, returns true if two floats are the same
      */
     inline bool isEqual(f32 inNumber, f32 inG) { return bool(bin(inNumber) == bin(inG)); }
 
     /**
-     * IsNotEqual, returns True if the two floats are not the same
+     * IsNotEqual, returns true if the two floats are not the same
      */
     inline bool isNotEqual(f32 inNumber, f32 inG) { return bool(bin(inNumber) != bin(inG)); }
 

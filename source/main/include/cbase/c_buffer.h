@@ -168,22 +168,10 @@ namespace ncore
         int_t     pos() const;
         void      reset();
         int_t     skip(int_t);
-        void      read(bool&);
-        void      read(u8&);
-        void      read(s8&);
-        void      read(u16&);
-        void      read(s16&);
-        void      read(u32&);
-        void      read(s32&);
-        void      read(u64&);
-        void      read(s64&);
-        void      read(f32&);
-        void      read(f64&);
         bool      read_bool();
         u8        read_u8();
         s8        read_s8();
         u16       read_u16();
-        u16       peek_u16() const;
         s16       read_s16();
         u32       read_u32();
         s32       read_s32();
@@ -191,6 +179,17 @@ namespace ncore
         s64       read_s64();
         f32       read_f32();
         f64       read_f64();
+        void      read(bool& value) { value = read_bool(); }
+        void      read(u8& value) { value = read_u8(); }
+        void      read(s8& value) { value = read_s8(); }
+        void      read(u16& value) { value = read_u16(); }
+        void      read(s16& value) { value = read_s16(); }
+        void      read(u32& value) { value = read_u32(); }
+        void      read(s32& value) { value = read_s32(); }
+        void      read(u64& value) { value = read_u64(); }
+        void      read(s64& value) { value = read_s64(); }
+        void      read(f32& value) { value = read_f32(); }
+        void      read(f64& value) { value = read_f64(); }
 
         void read_data(buffer_t& buf);
         void view_data(u32 size, cbuffer_t& buf);

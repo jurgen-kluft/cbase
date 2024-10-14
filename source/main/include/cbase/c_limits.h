@@ -43,9 +43,6 @@ namespace ncore
     static const sbyte sbyte_min = -128;
     static const sbyte sbyte_max = 127;
 
-    static const wchar wchar_min = 0;
-    static const wchar wchar_max = 0xFFFF;
-
     /**
      * Description:
      *     class type_t is a template class, which use the C++ class template specialization.

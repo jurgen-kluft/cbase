@@ -16,8 +16,8 @@ namespace ncore
         inline u32  swap(const u32 A) { return (A >> 24) | (A << 24) | ((A & 0x00FF0000) >> 8) | ((A & 0x0000FF00) << 8); }
         inline u64  swap(const u64 A)
         {
-            return (A >> 56) | (A << 56) | ((A & D_CONSTANT_64(0x00FF000000000000)) >> 40) | ((A & D_CONSTANT_64(0x000000000000FF00)) << 40) | ((A & D_CONSTANT_64(0x0000FF0000000000)) >> 24) | ((A & D_CONSTANT_64(0x0000000000FF0000)) << 24) |
-                   ((A & D_CONSTANT_64(0x000000FF00000000)) >> 8) | ((A & D_CONSTANT_64(0x00000000FF000000)) << 8);
+            return (A >> 56) | (A << 56) | ((A & D_CONSTANT_U64(0x00FF000000000000)) >> 40) | ((A & D_CONSTANT_U64(0x000000000000FF00)) << 40) | ((A & D_CONSTANT_U64(0x0000FF0000000000)) >> 24) | ((A & D_CONSTANT_U64(0x0000000000FF0000)) << 24) |
+                   ((A & D_CONSTANT_U64(0x000000FF00000000)) >> 8) | ((A & D_CONSTANT_U64(0x00000000FF000000)) << 8);
         }
         inline s16 swap(const s16 A) { return (s16)swap((u16)A); }
         inline s32 swap(const s32 A) { return (s32)swap((u32)A); }
