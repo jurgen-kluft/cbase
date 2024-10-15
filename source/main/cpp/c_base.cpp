@@ -70,8 +70,8 @@ namespace cbase
         {
             ncore::byte* buffer_data = (ncore::byte*)system_allocator->allocate((ncore::u32)temporary_allocator_size);
 
-            ncore::alloc_buffer_t* stack_allocator = system_allocator->construct<ncore::alloc_buffer_t>();
-            stack_allocator->init(buffer_data, temporary_allocator_size);
+            ncore::fixed_buffer_alloc_t* stack_allocator = system_allocator->construct<ncore::fixed_buffer_alloc_t>();
+            stack_allocator->setup(buffer_data, temporary_allocator_size);
 
             ncore::random_t* random_generator = system_allocator->construct<ncore::wyrand_t>();
             random_generator->reset((ncore::s64)random_generator);  // randomize the seed
@@ -101,7 +101,7 @@ namespace cbase
             ncore::alloc_t* frame_allocator = nullptr;
             ncore::context_t::set(i, ncore::context_t::FRAME_ALLOCATOR, frame_allocator);
 
-            ncore::alloc_buffer_t* stack_allocator;
+            ncore::fixed_buffer_alloc_t* stack_allocator;
             ncore::context_t::get(i, ncore::context_t::LOCAL_ALLOCATOR, stack_allocator);
 
             ncore::byte* buffer_data = stack_allocator->data();
