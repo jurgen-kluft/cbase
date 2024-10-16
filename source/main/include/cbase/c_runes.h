@@ -251,6 +251,7 @@ namespace ncore
         // conversion (note: cursor and end indices are byte based indices)
         // Warning: string terminators are NOT copied to the output string
         // ascii -> ucs2, utf8, utf16, utf32
+        void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd);
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd);
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd);
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd);
@@ -258,6 +259,7 @@ namespace ncore
         // ucs2 -> ascii, utf8, utf16, utf32
         void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);
+        void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& cursor, u32 outStrEnd);
         // utf8 -> ascii, ucs2, utf16, utf32
@@ -268,14 +270,16 @@ namespace ncore
         void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& cursor, u32 outStrEnd);
         // utf16 -> ascii, ucs2, utf8, utf32
         void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
-        void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);
+        void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
+        void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& cursor, u32 outStrEnd);
         // utf32 -> ascii, ucs2, utf8, utf16
         void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& cursor, u32 outStrEnd);
+        void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& cursor, u32 outStrEnd);
 
         inline s8 compare(ascii::pcrune left, ascii::pcrune right) { return ascii::compare(left, right); }
         inline s8 compare(ucs2::pcrune left, ucs2::pcrune right) { return ucs2::compare(left, right); }
