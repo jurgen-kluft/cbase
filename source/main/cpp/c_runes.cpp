@@ -310,9 +310,8 @@ namespace ncore
 
         }  // namespace writing
 
-        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = inStr[inCursor++];
@@ -320,11 +319,9 @@ namespace ncore
                     break;
                 outStr[outCursor++].r = (u8)c;
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = inStr[inCursor++];
@@ -332,11 +329,9 @@ namespace ncore
                     break;
                 outStr[outCursor++].r = (uchar16)c;
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = inStr[inCursor++];
@@ -344,11 +339,9 @@ namespace ncore
                     break;
                 outStr[outCursor++].r = (uchar16)c;
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = inStr[inCursor++];
@@ -356,13 +349,11 @@ namespace ncore
                     break;
                 outStr[outCursor++].r = c;
             }
-            return outCursor - oldOutCursor;
         }
 
         // ucs2 -> ascii, utf8, utf16, utf32
-        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -370,11 +361,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -382,11 +371,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -394,11 +381,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -406,13 +391,11 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
 
         // utf8 -> ascii, ucs2, utf16, utf32
-        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -420,23 +403,19 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
-            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            while (inCursor < inStrEnd && cursor < outStrEnd)
             {
-                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                uchar8 c = inStr[inCursor++].r;
                 if (c == utf8::TERMINATOR)
                     break;
-                writing::write_forward(outStr, outCursor, c);
+                outStr[cursor++].r = c;
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -444,11 +423,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -456,13 +433,21 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
+        }
+        void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf8::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
         }
 
         // utf16 -> ascii, ucs2, utf8, utf32
-        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -470,11 +455,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -482,11 +465,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -494,11 +475,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -506,13 +485,11 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
 
         // utf32 -> ascii, ucs2, utf8, utf16
-        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -520,11 +497,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -532,11 +507,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -544,11 +517,9 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
-        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
         {
-            u32 oldOutCursor = outCursor;
             while (inCursor < inStrEnd && outCursor < outStrEnd)
             {
                 uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
@@ -556,7 +527,6 @@ namespace ncore
                     break;
                 writing::write_forward(outStr, outCursor, c);
             }
-            return outCursor - oldOutCursor;
         }
 
         static inline uchar32 read_forward(crunes_t const& str, u32& cursor)
