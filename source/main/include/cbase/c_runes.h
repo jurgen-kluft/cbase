@@ -215,6 +215,35 @@ namespace ncore
     namespace nrunes
     {
         // -------------------------------------------------------------------------------
+        // conversion (note: cursor and end indices are byte based indices)
+        // Warning: string terminators are NOT copied to the output string
+        // ascii -> ucs2, utf8, utf16, utf32
+        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd);
+        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd);
+        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd);
+        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd);
+        // ucs2 -> ascii, utf8, utf16, utf32
+        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& cursor, u32 outStrEnd);
+        // utf8 -> ascii, ucs2, utf16, utf32
+        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& cursor, u32 outStrEnd);
+        // utf16 -> ascii, ucs2, utf8, utf32
+        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& cursor, u32 outStrEnd);
+        // utf32 -> ascii, ucs2, utf8, utf16
+        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);
+        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& cursor, u32 outStrEnd);
+
+        // -------------------------------------------------------------------------------
         // contains
         bool contains(crunes_t const& _str, uchar32 _c, bool case_sensitive = true);
         bool contains(runes_t const& _str, uchar32 _c, bool case_sensitive = true);
@@ -496,6 +525,7 @@ namespace ncore
         {
         public:
             s32 write(uchar32 c) { return vwrite(c); }
+            s32 write(const char* str);
             s32 write(const char* str, const char* end) { return vwrite(str, end); }
             s32 write(runes_t const& str)
             {
@@ -515,6 +545,7 @@ namespace ncore
         protected:
             virtual ~iwriter_t() {}
             virtual s32  vwrite(uchar32 c)                        = 0;
+            virtual s32  vwrite(const char* str)                  = 0;
             virtual s32  vwrite(const char* str, const char* end) = 0;
             virtual s32  vwrite(crunes_t const& str)              = 0;
             virtual void vflush()                                 = 0;
@@ -538,6 +569,7 @@ namespace ncore
 
         protected:
             virtual s32  vwrite(uchar32 c);
+            virtual s32  vwrite(const char* str);
             virtual s32  vwrite(const char* str, const char* end);
             virtual s32  vwrite(crunes_t const& str);
             virtual void vflush();

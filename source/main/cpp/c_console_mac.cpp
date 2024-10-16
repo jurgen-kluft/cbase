@@ -25,6 +25,28 @@ namespace ncore
             return write_utf32(src, 0, 1);
         }
 
+        virtual s32 vwrite(const char* str)
+        {
+            const s32 maxlen = 252;
+            char      str8[maxlen + 4];
+
+            s32           l   = 0;
+            ascii::pcrune src = str;
+            while (*src != 0)
+            {
+                char* dst8 = (char*)str8;
+                char* end8 = dst8 + maxlen;
+                while (*src != 0 && dst8 < end8)
+                {
+                    *dst8++ = (char)(*src++);
+                }
+                *dst8 = 0;
+                ::printf("%s", (const char*)str8);
+                l += dst8 - str8;
+            }
+            return l;
+        }
+
         virtual s32 vwrite(const char* str, const char* end)
         {
             u32 len = end - str;

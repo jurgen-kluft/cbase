@@ -12,7 +12,7 @@ namespace ncore
     // Hierarchical Bin Map, keeps track of free bits in a hierarchical way.
     // Note: Tracks free bits
     // Note: Tracks up to 2^20 bits
-    struct binmap_t
+    struct binmap_t // 32 bytes
     {
         // This will output the number of bits in each level and return the number of levels
         static s8  compute_levels(u32 count, u32& l0, u32& l1, u32& l2, u32& l3);

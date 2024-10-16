@@ -16,6 +16,29 @@ namespace ncore
         static const u32 s_invalid     = 0x0000ffff;
         static const u32 s_replacement = 0x0000fffd;
 
+        enum EUnicode
+        {
+            UTF16_BMP_END = 0xFFFF,                       // The last codepoint of the Basic Multilingual Plane, which is the part of Unicode that
+                                                          // UTF-16 can encode without surrogates
+            UNICODE_MAX                      = 0x10FFFF,  // The highest valid Unicode codepoint
+            UTF16_INVALID_CODEPOINT          = 0xFFFD,    // The codepoint that is used to replace invalid encodings
+            UTF16_GENERIC_SURROGATE_VALUE    = 0xD800,    // If a character, masked with UTF16_GENERIC_SURROGATE_MASK, matches this value, it is a surrogate.
+            UTF16_GENERIC_SURROGATE_MASK     = 0xF800,    // The mask to apply to a character before testing it against UTF16_GENERIC_SURROGATE_VALUE
+            UTF16_HIGH_SURROGATE_VALUE       = 0xD800,    // If a character, masked with UTF16_SURROGATE_MASK, matches this value, it is a high surrogate.
+            UTF16_LOW_SURROGATE_VALUE        = 0xDC00,    // If a character, masked with UTF16_SURROGATE_MASK, matches this value, it is a low surrogate.
+            UTF16_SURROGATE_MASK             = 0xFC00,    // The mask to apply to a character before testing it against UTF16_HIGH_SURROGATE_VALUE or UTF16_LOW_SURROGATE_VALUE
+            UTF16_SURROGATE_CODEPOINT_OFFSET = 0x10000,   // The value that is subtracted from a codepoint before encoding it in a surrogate pair
+            UTF16_SURROGATE_CODEPOINT_MASK   = 0x03FF,    // A mask that can be applied to a surrogate to extract the codepoint value contained in it
+            UTF16_SURROGATE_CODEPOINT_BITS   = 10,        // The number of bits of UTF16_SURROGATE_CODEPOINT_MASK
+            UTF8_1_MAX                       = 0x7F,      // The highest codepoint that can be encoded with 1 byte in UTF-8
+            UTF8_2_MAX                       = 0x7FF,     // The highest codepoint that can be encoded with 2 bytes in UTF-8
+            UTF8_3_MAX                       = 0xFFFF,    // The highest codepoint that can be encoded with 3 bytes in UTF-8
+            UTF8_4_MAX                       = 0x10FFFF,  // The highest codepoint that can be encoded with 4 bytes in UTF-8
+            UTF8_CONTINUATION_VALUE          = 0x80,      // If a character, masked with UTF8_CONTINUATION_MASK, matches this value, it is a UTF-8 continuation byte
+            UTF8_CONTINUATION_MASK           = 0xC0,      // The mask to a apply to a character before testing it against UTF8_CONTINUATION_VALUE
+            UTF8_CONTINUATION_CODEPOINT_BITS = 6          // The number of bits of a codepoint that are contained in a UTF-8 continuation byte
+        };
+
         namespace reading
         {
             // UTF sequence sizes
@@ -70,20 +93,10 @@ namespace ncore
             // read
 
             // Read one ascii character from an ascii string and return it as a utf-32 character.
-            static inline uchar32 read_forward(ascii::pcrune bos, u32& str, u32 const end)
-            {
-                if (str < end)
-                    return (uchar32)bos[str++];
-                return ascii::TERMINATOR;
-            }
+            static inline uchar32 read_forward(ascii::pcrune bos, u32& str, u32 end) { return str < end ? (uchar32)bos[str++] : '\0'; }
 
             // Read one ucs-2 character from a ucs-2 string and return it as a utf-32 character.
-            static inline uchar32 read_forward(ucs2::pcrune bos, u32& str, u32 const end)
-            {
-                if (str < end)
-                    return (uchar32)bos[str++].r;
-                return ucs2::TERMINATOR;
-            }
+            static inline uchar32 read_forward(ucs2::pcrune bos, u32& str, u32 end) { return str < end ? (uchar32)bos[str++].r : '\0'; }
 
             // Mask can be computed as (0x7f >> leadingOnes)
             // Size based on the number of leading 1 bits
@@ -91,7 +104,7 @@ namespace ncore
             static const u32 c_minChar[]  = {0, 0x00000000, 0x00000080, 0x00000800, 0x00010000, 0x00200000, 0x04000000};
 
             // Read one utf-8 character from a utf-8 string and return it as a utf-32 character.
-            static uchar32 read_forward(utf8::pcrune data, u32& str, u32 const end)
+            static uchar32 read_forward(utf8::pcrune data, u32& str, u32 end)
             {
                 data = data + str;
 
@@ -106,8 +119,7 @@ namespace ncore
                     return s_invalid;
                 }
 
-                // make sure we have enough data
-                if ((str + size) > end)
+                if (str + size > end)
                 {
                     str = end;
                     return s_invalid;
@@ -141,67 +153,60 @@ namespace ncore
             }
 
             // Read one utf-16 character from a utf-16 string and return it as a utf-32 character.
-            static inline uchar32 read_forward(utf16::pcrune bos, u32& str, u32 const end)
+            static inline uchar32 read_forward(utf16::pcrune bos, u32& str, u32 end)
             {
+                u16 high = bos[str++].r;
+
+                // BMP character
+                if ((high & UTF16_GENERIC_SURROGATE_MASK) != UTF16_GENERIC_SURROGATE_VALUE)
+                    return high;
+
+                // Unmatched low surrogate, invalid
+                if ((high & UTF16_SURROGATE_MASK) != UTF16_HIGH_SURROGATE_VALUE)
+                    return UTF16_INVALID_CODEPOINT;
+
                 if (str >= end)
-                    return cEOS;
+                    return UTF16_INVALID_CODEPOINT;
 
-                uchar16 const c = bos[str].r;
-                u32 const     l = (c < 0xd800) ? 1 : (c < 0xdc00) ? 2 : 0;
+                u16 low = bos[str].r;
 
-                if ((str + l) <= end)
-                {
-                    uchar32 out_c = 0;
-                    for (u32 i = 0; i < l; i++)
-                        out_c = (out_c << 16) | bos[str + i].r;
-                    str += l;
-                    return out_c;
-                }
-                str = end;
-                return '\0';
+                // Unmatched high surrogate, invalid
+                if ((low & UTF16_SURROGATE_MASK) != UTF16_LOW_SURROGATE_VALUE)
+                    return UTF16_INVALID_CODEPOINT;
+
+                // Two correctly matched surrogates, increase index to indicate we've consumed
+                // two characters
+                str++;
+
+                // The high bits of the codepoint are the value bits of the high surrogate
+                // The low bits of the codepoint are the value bits of the low surrogate
+                uchar32 result = high & UTF16_SURROGATE_CODEPOINT_MASK;
+                result <<= UTF16_SURROGATE_CODEPOINT_BITS;
+                result |= low & UTF16_SURROGATE_CODEPOINT_MASK;
+                result += UTF16_SURROGATE_CODEPOINT_OFFSET;
+
+                // And if all else fails, it's valid
+                return result;
             }
 
             // Read one utf-32 character from a utf-32 string and return it as a utf-32 character.
-            static inline uchar32 read_forward(utf32::pcrune bos, u32& str, u32 const end)
-            {
-                if (str >= end)
-                    return cEOS;
-                uchar32 c = bos[str].r;
-                if (c != cEOS)
-                    str++;
-                return c;
-            }
+            static inline uchar32 read_forward(utf32::pcrune bos, u32& str, u32 end) { return str < end ? bos[str++].r : utf32::TERMINATOR; }
 
-            static inline uchar32 read_backward(ascii::pcrune bos, u32& str, u32 const begin)
-            {
-                if (str > begin)
-                    return (uchar32)bos[--str];
-                return ascii::TERMINATOR;
-            }
+            static inline uchar32 read_backward(ascii::pcrune bos, u32& str, u32 begin) { return str > begin ? (uchar32)bos[--str] : '\0'; }
 
-            static inline uchar32 read_backward(ucs2::pcrune bos, u32& str, u32 const begin)
-            {
-                if (str > begin)
-                    return (uchar32)bos[--str].r;
-                return ucs2::TERMINATOR;
-            }
+            static inline uchar32 read_backward(ucs2::pcrune bos, u32& str, u32 begin) { return '\0'; }
 
-            static inline uchar32 read_backward(utf8::pcrune data, u32& str, u32 const begin)
-            {
-                // TODO
-                return '\0';
-            }
+            static inline uchar32 read_backward(utf8::pcrune data, u32& str, u32 begin) { return '\0'; }
 
-            static inline uchar32 read_backward(utf16::pcrune bos, u32& str, u32 const begin)
+            static inline uchar32 read_backward(utf16::pcrune bos, u32& str, u32 begin)
             {
-                if (str > begin)
                 {
-                    uchar16 const c = bos[--str].r;
+                    uchar16 const c = str > begin ? bos[--str].r : 0;
                     if (c < 0xdc00)
                         return c;
-                    if (str > begin)
+
                     {
-                        uchar16 const c2 = bos[--str].r;
+                        uchar16 const c2 = str > begin ? bos[--str].r : 0;
                         if (c2 < 0xd800)
                             return c2;
                         str++;
@@ -210,13 +215,349 @@ namespace ncore
                 return '\0';
             }
 
-            static inline uchar32 read_backward(utf32::pcrune bos, u32& str, u32 const begin)
-            {
-                if (str > begin)
-                    return bos[--str].r;
-                return cEOS;
-            }
+            static inline uchar32 read_backward(utf32::pcrune bos, u32& str, u32 begin) { return str > begin ? bos[--str].r : utf32::TERMINATOR; }
         }  // namespace reading
+
+        namespace writing
+        {
+            // write
+
+            // Write one ascii character to an ascii string.
+            static inline void write_forward(ascii::prune bos, u32& str, uchar32 c)
+            {
+                if (c > 0x7f)
+                {
+                    bos[str++] = '?';
+                }
+                else
+                {
+                    bos[str++] = (u8)c;
+                }
+            }
+
+            // Represents a UTF-8 bit pattern that can be set or verified
+            typedef struct
+            {
+                uchar8 mask;   // The mask that should be applied to the character before testing it
+                uchar8 value;  // The value that the character should be tested against after applying the mask
+            } utf8_pattern;
+
+            // The patterns for leading bytes of a UTF-8 codepoint encoding
+            // Each pattern represents the leading byte for a character encoded with N UTF-8 bytes,
+            // where N is the index + 1
+            static const utf8_pattern s_utf8_leading_bytes[] = {
+              {0x80, 0x00},  // 0xxxxxxx
+              {0xE0, 0xC0},  // 110xxxxx
+              {0xF0, 0xE0},  // 1110xxxx
+              {0xF8, 0xF0}   // 11110xxx
+            };
+
+            // Write one utf-8 character to a utf-8 string.
+            static inline void write_forward(utf8::prune data, u32& str, uchar32 c)
+            {
+                const s32 size = (c < UTF8_1_MAX) ? 1 : (c < UTF8_2_MAX) ? 2 : (c < UTF8_3_MAX) ? 3 : (c < UTF8_4_MAX) ? 4 : 0;
+
+                // TODO Not enough space left on the string ?
+
+                // Write the continuation bytes in reverse order first
+                switch (size)
+                {
+                    case 4: data[str + 3].r = (c & ~UTF8_CONTINUATION_MASK) | UTF8_CONTINUATION_VALUE; c >>= UTF8_CONTINUATION_CODEPOINT_BITS;
+                    case 3: data[str + 2].r = (c & ~UTF8_CONTINUATION_MASK) | UTF8_CONTINUATION_VALUE; c >>= UTF8_CONTINUATION_CODEPOINT_BITS;
+                    case 2:
+                        data[str + 1].r = (c & ~UTF8_CONTINUATION_MASK) | UTF8_CONTINUATION_VALUE;
+                        c >>= UTF8_CONTINUATION_CODEPOINT_BITS;
+                        break;
+                    default: data[str].r = '?'; break;
+                }
+
+                // Write the leading byte
+                utf8_pattern const pattern = s_utf8_leading_bytes[size - 1];
+                data[str].r                = (c & ~(pattern.mask)) | pattern.value;
+            }
+
+            static inline void write_forward(ucs2::prune data, u32& str, uchar32 c)
+            {
+                if (c < 0x10000)
+                {
+                    data[str++].r = (u16)c;
+                }
+                else
+                {
+                    data[str++].r = 0xfffd;
+                }
+            }
+
+            static inline void write_forward(utf16::prune data, u32& str, uchar32 c)
+            {
+                if (c < 0x10000)
+                {
+                    data[str++].r = (u16)c;
+                }
+                else if (c <= UNICODE_MAX)
+                {
+                    c -= UTF16_SURROGATE_CODEPOINT_OFFSET;
+                    data[str++].r = (u16)((c >> UTF16_SURROGATE_CODEPOINT_BITS) + UTF16_HIGH_SURROGATE_VALUE);
+                    data[str++].r = (u16)((c & UTF16_SURROGATE_CODEPOINT_MASK) + UTF16_LOW_SURROGATE_VALUE);
+                }
+                else
+                {
+                    data[str++].r = UTF16_INVALID_CODEPOINT;
+                }
+            }
+
+            static inline void write_forward(utf32::prune data, u32& str, uchar32 c) { data[str++].r = c; }
+
+        }  // namespace writing
+
+        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = inStr[inCursor++];
+                if (c == ascii::TERMINATOR)
+                    break;
+                outStr[outCursor++].r = (u8)c;
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = inStr[inCursor++];
+                if (c == ascii::TERMINATOR)
+                    break;
+                outStr[outCursor++].r = (uchar16)c;
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = inStr[inCursor++];
+                if (c == ascii::TERMINATOR)
+                    break;
+                outStr[outCursor++].r = (uchar16)c;
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = inStr[inCursor++];
+                if (c == ascii::TERMINATOR)
+                    break;
+                outStr[outCursor++].r = c;
+            }
+            return outCursor - oldOutCursor;
+        }
+
+        // ucs2 -> ascii, utf8, utf16, utf32
+        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == ucs2::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == ucs2::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == ucs2::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == ucs2::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+
+        // utf8 -> ascii, ucs2, utf16, utf32
+        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf8::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf8::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf8::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf8::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+
+        // utf16 -> ascii, ucs2, utf8, utf32
+        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf16::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf16::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf16::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf16::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+
+        // utf32 -> ascii, ucs2, utf8, utf16
+        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf32::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf32::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf32::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
+        s32 convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            u32 oldOutCursor = outCursor;
+            while (inCursor < inStrEnd && outCursor < outStrEnd)
+            {
+                uchar32 c = reading::read_forward(inStr, inCursor, inStrEnd);
+                if (c == utf32::TERMINATOR)
+                    break;
+                writing::write_forward(outStr, outCursor, c);
+            }
+            return outCursor - oldOutCursor;
+        }
 
         static inline uchar32 read_forward(crunes_t const& str, u32& cursor)
         {
@@ -3668,6 +4009,53 @@ namespace ncore
             return vwrite(cstr);
         }
 
+        s32 writer_t::vwrite(const char* str)
+        {
+            uchar32 c;
+            s32     count = m_count;
+            switch (m_runes.m_type)
+            {
+                case ascii::TYPE:
+                    while (*str != '\0' && !at_end(m_cursor, m_runes))
+                    {
+                        m_runes.m_ascii[m_cursor++] = (ascii::rune)*str;
+                        m_count += 1;
+                        str++;
+                    }
+                case ucs2::TYPE:
+                    while (*str != '\0' && !at_end(m_cursor, m_runes))
+                    {
+                        m_runes.m_ucs2[m_cursor++].r = *str;
+                        m_count += 1;
+                        str++;
+                    }
+                case utf8::TYPE:
+                    while (*str != '\0' && !at_end(m_cursor, m_runes))
+                    {
+                        m_runes.m_utf8[m_cursor++].r = *str;
+                        m_count += 1;
+                        str++;
+                    }
+                case utf16::TYPE:
+                    while (*str != '\0' && !at_end(m_cursor, m_runes))
+                    {
+                        m_runes.m_utf16[m_cursor++].r = *str;
+                        m_count += 1;
+                        str++;
+                    }
+                case utf32::TYPE:
+                    while (*str != '\0' && !at_end(m_cursor, m_runes))
+                    {
+                        m_runes.m_utf32[m_cursor].r = *str;
+                        m_cursor += 1;
+                        m_count += 1;
+                        str++;
+                    }
+                default: ASSERT(false); break;
+            }
+            return m_count - count;
+        }
+
         s32 writer_t::vwrite(const char* str, const char* end)
         {
             crunes_t cstr = make_crunes(str, end);
@@ -3696,21 +4084,16 @@ namespace ncore
                             m_runes.m_ucs2[m_cursor++].r = c;
                             m_count += 1;
                         }
-                        return m_count - count;
                     case utf8::TYPE:
-                        while (reader.read(c) && !at_end(m_cursor, m_runes))
+                        while (reader.read(c) && utf::write(c, m_runes.m_utf8, m_cursor, m_runes.m_eos))
                         {
-                            utf::write(c, m_runes.m_utf8, m_cursor, m_runes.m_eos);
                             m_count += 1;
                         }
-                        return m_count - count;
                     case utf16::TYPE:
-                        while (reader.read(c) && !at_end(m_cursor, m_runes))
+                        while (reader.read(c) && utf::write(c, m_runes.m_utf16, m_cursor, m_runes.m_eos))
                         {
-                            utf::write(c, m_runes.m_utf16, m_cursor, m_runes.m_eos);
                             m_count += 1;
                         }
-                        return m_count - count;
                     case utf32::TYPE:
                         while (reader.read(c) && !at_end(m_cursor, m_runes))
                         {
@@ -3718,9 +4101,9 @@ namespace ncore
                             m_cursor += 1;
                             m_count += 1;
                         }
-                        return m_count - count;
                     default: ASSERT(false); break;
                 }
+                return m_count - count;
             }
             return 0;
         }
