@@ -55,8 +55,9 @@ namespace ncore
         char* btoa(bool val, char* cursor, char const* end, s8 caseType = TrueFalse | LowerCase);
 
         s32 compare(pcrune left, pcrune right);
-        s32 compare(pcrune str1, pcrune str2, pcrune end1, pcrune end2);
-        s32 strlen(pcrune str, pcrune* end = nullptr, pcrune eos = nullptr);
+        s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
+        s32 strlen(pcrune str);
+        s32 strlen(pcrune str, pcrune& end, pcrune eos = nullptr);
     }  // namespace ascii
 
     namespace ucs2
@@ -72,9 +73,10 @@ namespace ncore
         typedef rune*       prune;
         typedef const rune* pcrune;
 
+        s32 compare(pcrune left, pcrune right);
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
+        s32 strlen(pcrune str);                           // return length of string in runes
         s32 strlen(pcrune str, pcrune& end, pcrune eos);  // return length of string in runes
-
     }  // namespace ucs2
 
     namespace utf8
@@ -89,9 +91,10 @@ namespace ncore
         typedef rune*       prune;
         typedef const rune* pcrune;
 
+        s32 compare(pcrune left, pcrune right);
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
+        s32 strlen(pcrune str);                           // return length of string in runes
         s32 strlen(pcrune str, pcrune& end, pcrune eos);  // return length of string in runes
-
     }  // namespace utf8
 
     namespace utf16
@@ -106,7 +109,9 @@ namespace ncore
         typedef rune*       prune;
         typedef const rune* pcrune;
 
+        s32 compare(pcrune left, pcrune right);
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
+        s32 strlen(pcrune str);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
 
     }  // namespace utf16
@@ -123,7 +128,9 @@ namespace ncore
         typedef rune*       prune;
         typedef const rune* pcrune;
 
+        s32 compare(pcrune left, pcrune right);
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
+        s32 strlen(pcrune str);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
     }  // namespace utf32
 
@@ -214,6 +221,32 @@ namespace ncore
 
     namespace utf
     {
+        enum EUnicode
+        {
+            UTF_MAX_CODEPOINT                = 0x10FFFF,  // The highest valid Unicode codepoint
+            UTF16_BMP_END                    = 0xFFFF,    // Basic Multilingual Plane, that part of Unicode that UTF-16 can encode without surrogates
+            UTF16_INVALID_CODEPOINT          = 0xFFFD,    // The codepoint that is used to replace invalid encodings
+            UTF16_GENERIC_SURROGATE_VALUE    = 0xD800,    // If a character, masked with UTF16_GENERIC_SURROGATE_MASK, matches this value, it is a surrogate.
+            UTF16_GENERIC_SURROGATE_MASK     = 0xF800,    // The mask to apply to a character before testing it against UTF16_GENERIC_SURROGATE_VALUE
+            UTF16_HIGH_SURROGATE_VALUE       = 0xD800,    // If a character, masked with UTF16_SURROGATE_MASK, matches this value, it is a high surrogate.
+            UTF16_HIGH_SURROGATE_MIN         = 0xD800,    // The minimum value of a high surrogate
+            UTF16_HIGH_SURROGATE_MAX         = 0xDBFF,    // The maximum value of a high surrogate
+            UTF16_LOW_SURROGATE_VALUE        = 0xDC00,    // If a character, masked with UTF16_SURROGATE_MASK, matches this value, it is a low surrogate.
+            UTF16_MIN_SURROGATE              = 0xD800,    // The minimum value of a surrogate
+            UTF16_MAX_SURROGATE              = 0xDFFF,    // The maximum value of a surrogate
+            UTF16_SURROGATE_MASK             = 0xFC00,    // The mask to apply to a character before testing it against UTF16_HIGH_SURROGATE_VALUE or UTF16_LOW_SURROGATE_VALUE
+            UTF16_SURROGATE_CODEPOINT_OFFSET = 0x10000,   // The value that is subtracted from a codepoint before encoding it in a surrogate pair
+            UTF16_SURROGATE_CODEPOINT_MASK   = 0x03FF,    // A mask that can be applied to a surrogate to extract the codepoint value contained in it
+            UTF16_SURROGATE_CODEPOINT_BITS   = 10,        // The number of bits of UTF16_SURROGATE_CODEPOINT_MASK
+            UTF8_1_MAX                       = 0x7F,      // The highest codepoint that can be encoded with 1 byte in UTF-8
+            UTF8_2_MAX                       = 0x7FF,     // The highest codepoint that can be encoded with 2 bytes in UTF-8
+            UTF8_3_MAX                       = 0xFFFF,    // The highest codepoint that can be encoded with 3 bytes in UTF-8
+            UTF8_4_MAX                       = 0x10FFFF,  // The highest codepoint that can be encoded with 4 bytes in UTF-8
+            UTF8_CONTINUATION_VALUE          = 0x80,      // If a character, masked with UTF8_CONTINUATION_MASK, matches this value, it is a UTF-8 continuation byte
+            UTF8_CONTINUATION_MASK           = 0xC0,      // The mask to a apply to a character before testing it against UTF8_CONTINUATION_VALUE
+            UTF8_CONTINUATION_CODEPOINT_BITS = 6          // The number of bits of a codepoint that are contained in a UTF-8 continuation byte
+        };
+
         // -------------------------------------------------------------------------------
         // conversion (note: cursor and end indices are byte based indices)
         // Warning: string terminators are NOT copied to the output string
@@ -243,7 +276,12 @@ namespace ncore
         void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf32::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& cursor, u32 outStrEnd);
-    }
+
+        inline s8 compare(ascii::pcrune left, ascii::pcrune right) { return ascii::compare(left, right); }
+        inline s8 compare(ucs2::pcrune left, ucs2::pcrune right) { return ucs2::compare(left, right); }
+        inline s8 compare(utf16::pcrune left, utf16::pcrune right) { return utf16::compare(left, right); }
+        inline s8 compare(utf32::pcrune left, utf32::pcrune right) { return utf32::compare(left, right); }
+    }  // namespace utf
 
     namespace nrunes
     {
