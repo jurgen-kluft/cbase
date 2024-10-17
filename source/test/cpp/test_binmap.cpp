@@ -22,12 +22,14 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(8192));
 
             binmap_t hbb;
-            hbb.init_all_used(256, Allocator);
+            binmap_t::config_t cfg1 = binmap_t::config_t::compute(256);
+            hbb.init_all_used(cfg1, Allocator);
             CHECK_TRUE(hbb.m_l0 == 0xFFFFFFFF);
             CHECK_TRUE(hbb.m_l[0][7] == 0xFFFFFFFF);
             hbb.release(Allocator);
 
-            hbb.init_all_free(248, Allocator);
+            binmap_t::config_t cfg2 = binmap_t::config_t::compute(248);
+            hbb.init_all_free(cfg2, Allocator);
             CHECK_EQUAL(1, hbb.levels());
             CHECK_TRUE(hbb.m_l0 == 0xFFFFFF00);
             CHECK_TRUE(hbb.m_l[0][7] == 0xFF000000);
@@ -39,7 +41,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             u32 const maxbits = 8192;
 
             binmap_t hbb;
-            hbb.init_all_free(maxbits, Allocator);
+            binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
+            hbb.init_all_free(cfg, Allocator);
 
             CHECK_EQUAL(false, hbb.is_used(10));
             hbb.set_used(10);
@@ -54,7 +57,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
-            hbb.init_all_free(maxbits, Allocator);
+            binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
+            hbb.init_all_free(cfg, Allocator);
 
             u32 b1 = 0;
             CHECK_FALSE(hbb.is_used(b1));
@@ -94,7 +98,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
-            hbb.init_all_used(maxbits, Allocator);
+            binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
+            hbb.init_all_used(cfg, Allocator);
 
             for (s32 b = 0; b < 1024; b++)
             {
@@ -121,7 +126,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
-            hbb.init_all_used(maxbits, Allocator);
+            binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
+            hbb.init_all_used(cfg, Allocator);
 
             // Should not be able to hbb.find any '0'
             s32 free_bit = hbb.find();
@@ -143,7 +149,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
-            hbb.init_all_used(maxbits, Allocator);
+            binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
+            hbb.init_all_used(cfg, Allocator);
 
             // Should not be able to hbb.find any '0'
             s32 free_bit = hbb.find_upper();
@@ -169,7 +176,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             u32 const maxbits = 2048;
 
             binmap_t hbb;
-            hbb.init_all_used(maxbits, Allocator);
+            binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
+            hbb.init_all_used(cfg, Allocator);
 
             // Should not be able to hbb.find any '0'
             s32 free_bit = hbb.upper(0);
@@ -195,7 +203,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             u32 const maxbits = 2048;
 
             binmap_t hbb;
-            hbb.init_all_used(maxbits, Allocator);
+            binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
+            hbb.init_all_used(cfg, Allocator);
 
             // Should not be able to hbb.lower any '0'
             s32 free_bit = hbb.lower(maxbits - 1);
@@ -222,7 +231,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
-            hbb.init_all_used(maxbits, Allocator);
+            binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
+            hbb.init_all_used(cfg, Allocator);
 
             u32 const numbits = 100;
             for (s32 b = 0; b < numbits; b += 5)

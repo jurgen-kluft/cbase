@@ -33,23 +33,21 @@ namespace ncore
 
         void release(alloc_t* allocator);
 
-        void init_all_free();
-        void init_all_used();
-
-        void init_all_free(u32 count, alloc_t* allocator);
-        void init_all_used(u32 count, alloc_t* allocator);
 
         void init_all_free(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);
+        void init_all_free();
+        void init_all_free(config_t const& cfg, alloc_t* allocator);
+        void init_all_free_lazy();
+        void init_all_free_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);  // Do not not clear the levels, only the ends
+        void init_all_free_lazy(config_t const& cfg, alloc_t* allocator);
+        void tick_all_free_lazy(u32 bit);
+
+        void init_all_used();
+        void init_all_used(config_t const& cfg, alloc_t* allocator);
         void init_all_used(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);
-
-        // void init_all_free_lazy();
-        // void init_all_free_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);  // Do not not clear the levels, only the ends
-        // void init_all_free_lazy(u32 count, alloc_t* allocator);
-        // void tick_all_free_lazy(u32 bit);
-
         // void init_all_used_lazy();
         // void init_all_used_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);  // Do not not clear the levels, only the ends
-        // void init_all_used_lazy(u32 count, alloc_t* allocator);
+        // void init_all_used_lazy(config_t const& cfg, alloc_t* allocator);
         // void tick_all_used_lazy(u32 bit);  // Progressive lazy initialization
 
         void set_free(u32 bit);

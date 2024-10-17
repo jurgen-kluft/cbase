@@ -32,6 +32,12 @@ namespace ncore
         m_binmap0.release(allocator);
     }
 
+    // --------------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------------
+    // init functions
+    // --------------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------------
+
     void duomap_t::init_all_free()
     {
         u32 const count = size();
@@ -48,6 +54,93 @@ namespace ncore
         }
     }
 
+    void duomap_t::init_all_free(config_t const& cfg, alloc_t* allocator)
+    {
+        reset();
+
+        switch (cfg.m_levels)
+        {
+            case 3: m_binmap0.m_l[2] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[2]);
+            case 2: m_binmap0.m_l[1] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[1]);
+            case 1: m_binmap0.m_l[0] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[0]);
+        }
+        m_binmap0.init_all_free(cfg, m_binmap0.m_l[0], m_binmap0.m_l[1], m_binmap0.m_l[2]);
+
+        switch (cfg.m_levels)
+        {
+            case 3: m_l[1] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[1]); binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 0);
+            case 2: m_l[0] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[0]); binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 0);
+            case 1: binmap_t::clear_level0(cfg, m_l0, 1, 0);
+        }
+    }
+
+    void duomap_t::init_all_free(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2)
+    {
+        reset();
+
+        m_binmap0.m_l[2] = bm0l3;
+        m_binmap0.m_l[1] = bm0l2;
+        m_binmap0.m_l[0] = bm0l1;
+        m_binmap0.init_all_free(cfg, m_binmap0.m_l[0], m_binmap0.m_l[1], m_binmap0.m_l[2]);
+
+        m_l[1] = bm1l2;
+        m_l[0] = bm1l1;
+        binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 0);
+        binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 0);
+        binmap_t::clear_level0(cfg, m_l0, 1, 0);
+    }
+
+    void duomap_t::init_all_free_lazy()
+    {
+        reset();
+
+        m_binmap0.init_all_free_lazy();
+        m_l0 = 0;
+    }
+
+    void duomap_t::init_all_free_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2)
+    {
+        reset();
+
+        m_binmap0.init_all_free_lazy(cfg, bm0l1, bm0l2, bm0l3);
+        m_l[0] = bm1l1;
+        m_l[1] = bm1l2;
+        m_l0   = 0;
+    }
+
+    void duomap_t::init_all_free_lazy(config_t const& cfg, alloc_t* allocator)
+    {
+        reset();
+
+        m_binmap0.init_all_free_lazy(cfg, allocator);
+        switch (cfg.m_levels)
+        {
+            case 3: m_l[1] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[1]);
+            case 2: m_l[0] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[0]);
+            case 1: m_l0 = 0;
+        }
+    }
+
+    void duomap_t::tick_all_free_lazy(u32 bit)
+    {
+        m_binmap0.tick_all_free_lazy(bit);
+
+        u32      wi = bit;
+        s8 const ml = levels();
+        for (s8 il = levels(); il >= 0; --il)
+        {
+            u32*      level = il == 0 ? &m_l0 : (il < ml ? m_l[il - 1] : m_binmap0.m_l[il - 1]);
+            const u32 bi    = wi & 31;
+            wi              = wi >> 5;
+            const u32 wd    = (bi == 0) ? 0 : level[wi];
+            level[wi]       = wd & ~((u32)1 << bi);
+            if (wd != 0)
+                return;
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------------
     void duomap_t::init_all_used()
     {
         config_t cfg = config_t::compute(size());
@@ -66,32 +159,10 @@ namespace ncore
         m_set = cfg.m_count;
     }
 
-    void duomap_t::init_all_free(u32 count, alloc_t* allocator)
+    void duomap_t::init_all_used(config_t const& cfg, alloc_t* allocator)
     {
         reset();
 
-        config_t cfg = config_t::compute(count);
-        switch (cfg.m_levels)
-        {
-            case 3: m_binmap0.m_l[2] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[2]);
-            case 2: m_binmap0.m_l[1] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[1]);
-            case 1: m_binmap0.m_l[0] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[0]);
-        }
-        m_binmap0.init_all_free(cfg, m_binmap0.m_l[0], m_binmap0.m_l[1], m_binmap0.m_l[2]);
-
-        switch (cfg.m_levels)
-        {
-            case 3: m_l[1] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[1]); binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 0);
-            case 2: m_l[0] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[0]); binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 0);
-            case 1: binmap_t::clear_level0(cfg, m_l0, 1, 0);
-        }
-    }
-
-    void duomap_t::init_all_used(u32 count, alloc_t* allocator)
-    {
-        reset();
-
-        config_t cfg = config_t::compute(count);
         switch (cfg.m_levels)
         {
             case 3: m_binmap0.m_l[2] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[2]);
@@ -108,22 +179,6 @@ namespace ncore
         }
 
         m_set = cfg.m_count;
-    }
-
-    void duomap_t::init_all_free(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2)
-    {
-        reset();
-
-        m_binmap0.m_l[2] = bm0l3;
-        m_binmap0.m_l[1] = bm0l2;
-        m_binmap0.m_l[0] = bm0l1;
-        m_binmap0.init_all_free(cfg, m_binmap0.m_l[0], m_binmap0.m_l[1], m_binmap0.m_l[2]);
-
-        m_l[1] = bm1l2;
-        m_l[0] = bm1l1;
-        binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 0);
-        binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 0);
-        binmap_t::clear_level0(cfg, m_l0, 1, 0);
     }
 
     void duomap_t::init_all_used(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2)
@@ -146,13 +201,7 @@ namespace ncore
 
     // --------------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------------
-    // lazy init and tick functions
-    // --------------------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------------------------------------------
 
-    // --------------------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------------
 
