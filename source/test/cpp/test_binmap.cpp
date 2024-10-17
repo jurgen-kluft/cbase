@@ -1,6 +1,6 @@
 #include "cbase/c_allocator.h"
 #include "cbase/c_context.h"
-#include "cbase/c_hbb.h"
+#include "cbase/c_binmap.h"
 #include "cbase/c_memory.h"
 
 #include "cunittest/cunittest.h"
@@ -18,8 +18,8 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
 
         UNITTEST_TEST(some_sizes)
         {
-            CHECK_EQUAL(128 + 32, binmap_t::sizeof_data(1024));
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(8192));
+            CHECK_EQUAL(128 + 32, binmap_t::config_t::sizeof_data(1024));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(8192));
 
             binmap_t hbb;
             hbb.init_all_used(256, Allocator);
@@ -51,7 +51,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
         UNITTEST_TEST(set_and_is_set_many)
         {
             u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
             hbb.init_all_free(maxbits, Allocator);
@@ -91,7 +91,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
         UNITTEST_TEST(find_free_bit_1)
         {
             u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
             hbb.init_all_used(maxbits, Allocator);
@@ -118,7 +118,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
         UNITTEST_TEST(find_free_bit_2)
         {
             u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
             hbb.init_all_used(maxbits, Allocator);
@@ -140,7 +140,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
         UNITTEST_TEST(find_upper)
         {
             u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
             hbb.init_all_used(maxbits, Allocator);
@@ -164,10 +164,62 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             hbb.release(Allocator);
         }
 
+        UNITTEST_TEST(upper)
+        {
+            u32 const maxbits = 2048;
+
+            binmap_t hbb;
+            hbb.init_all_used(maxbits, Allocator);
+
+            // Should not be able to hbb.find any '0'
+            s32 free_bit = hbb.upper(0);
+            CHECK_EQUAL(false, free_bit >= 0);
+
+            hbb.set_free(maxbits / 2);
+            free_bit = hbb.upper(0);
+            CHECK_EQUAL((maxbits / 2), free_bit);
+            hbb.set_used(maxbits / 2);
+
+            for (s32 b = 3; b < maxbits; b += 5)
+            {
+                hbb.set_free(b);
+                free_bit = hbb.upper(b - 2);
+                CHECK_EQUAL(b, free_bit);
+            }
+
+            hbb.release(Allocator);
+        }
+
+        UNITTEST_TEST(lower)
+        {
+            u32 const maxbits = 2048;
+
+            binmap_t hbb;
+            hbb.init_all_used(maxbits, Allocator);
+
+            // Should not be able to hbb.lower any '0'
+            s32 free_bit = hbb.lower(maxbits - 1);
+            CHECK_EQUAL(false, free_bit >= 0);
+
+            hbb.set_free(maxbits / 2);
+            free_bit = hbb.lower(maxbits - 1);
+            CHECK_EQUAL((maxbits / 2), free_bit);
+            hbb.set_used(maxbits / 2);
+
+            for (s32 b = maxbits - 5; b >= 0; b -= 15)
+            {
+                hbb.set_free(b);
+                free_bit = hbb.lower(b + 4);
+                CHECK_EQUAL(b, free_bit);
+            }
+
+            hbb.release(Allocator);
+        }
+
         UNITTEST_TEST(iterator)
         {
             u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::sizeof_data(maxbits));
+            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t hbb;
             hbb.init_all_used(maxbits, Allocator);
@@ -201,9 +253,11 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
 
         UNITTEST_TEST(set_get)
         {
-            u32       l0len, l1len, l2len, l3len;
-            u32 const len = 32 * 32 * 32 * 32;
-            binmap_t::compute_levels(len, l0len, l1len, l2len, l3len);
+            u32 const          len   = 32 * 32 * 32 * 32;
+            binmap_t::config_t cfg   = binmap_t::config_t::compute(len);
+            u32 const          l1len = cfg.m_lnlen[0];
+            u32 const          l2len = cfg.m_lnlen[1];
+            u32 const          l3len = cfg.m_lnlen[2];
 
             u32* l1 = (u32*)Allocator->allocate(sizeof(u32) * ((l1len + 31) >> 5));
             u32* l2 = (u32*)Allocator->allocate(sizeof(u32) * ((l2len + 31) >> 5));
@@ -215,9 +269,10 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             for (s32 i = 0; i < 64; ++i)
             {
                 u32 const count = i * 1024 + ((1 - (i & 1)) * 600);
-                binmap_t::compute_levels(count, l0len, l1len, l2len, l3len);
+                cfg             = binmap_t::config_t::compute(count);
+
                 binmap_t bm;
-                bm.init_all_free(count, l0len, l1, l1len, l2, l2len, l3, l3len);
+                bm.init_all_free(cfg, l1, l2, l3);
 
                 for (u32 b = 0; b < count; b += 2)
                 {
@@ -246,9 +301,11 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
 
         UNITTEST_TEST(set_many_then_find_set)
         {
-            u32       l0len, l1len, l2len, l3len;
-            u32 const len = 32 * 32 * 32;
-            binmap_t::compute_levels(len, l0len, l1len, l2len, l3len);
+            u32 const          len   = 32 * 32 * 32;
+            binmap_t::config_t cfg   = binmap_t::config_t::compute(len);
+            u32 const          l1len = cfg.m_lnlen[0];
+            u32 const          l2len = cfg.m_lnlen[1];
+            u32 const          l3len = cfg.m_lnlen[2];
 
             u32* l1 = (u32*)Allocator->allocate(sizeof(u32) * ((l1len + 31) >> 5));
             u32* l2 = (u32*)Allocator->allocate(sizeof(u32) * ((l2len + 31) >> 5));
@@ -258,18 +315,18 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             nmem::memclr(l3, sizeof(u32) * ((l3len + 31) >> 5));
 
             binmap_t bm;
-            bm.init_all_free(len, l0len, l1, l1len, l2, l2len, l3, l3len);
+            bm.init_all_free(cfg, l1, l2, l3);
 
-            s32 const jump = 35;
-            s32 numset = 0;
-            for (s32 i = 0; i < len; i+=jump)
+            s32 const jump   = 35;
+            s32       numset = 0;
+            for (s32 i = 0; i < len; i += jump)
             {
                 bm.set_used(i);
                 numset += 1;
             }
 
-            s32 valid = 0;
-            s32 iter = 0;
+            s32 valid    = 0;
+            s32 iter     = 0;
             s32 numfound = 0;
             while (true)
             {
@@ -290,9 +347,11 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
 
         UNITTEST_TEST(lazy_init)
         {
-            u32       l0len, l1len, l2len, l3len;
-            u32 const len = 32 * 32 * 32 * 32;
-            binmap_t::compute_levels(len, l0len, l1len, l2len, l3len);
+            u32 const          len   = 32 * 32 * 32 * 32;
+            binmap_t::config_t cfg   = binmap_t::config_t::compute(len);
+            u32 const          l1len = cfg.m_lnlen[0];
+            u32 const          l2len = cfg.m_lnlen[1];
+            u32 const          l3len = cfg.m_lnlen[2];
 
             u32* l1 = (u32*)Allocator->allocate(sizeof(u32) * ((l1len + 31) >> 5));
             u32* l2 = (u32*)Allocator->allocate(sizeof(u32) * ((l2len + 31) >> 5));
@@ -304,10 +363,10 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             for (u32 i = 0; i < 64; ++i)
             {
                 u32 const count = i * 1024 + ((1 - (i & 1)) * 600);
-                binmap_t::compute_levels(count, l0len, l1len, l2len, l3len);
+                cfg             = binmap_t::config_t::compute(count);
 
                 binmap_t bm;
-                bm.init_all_free_lazy(count, l0len, l1, l1len, l2, l2len, l3, l3len);
+                bm.init_all_free_lazy(cfg, l1, l2, l3);
 
                 for (u32 b = 0; b < count; ++b)
                 {

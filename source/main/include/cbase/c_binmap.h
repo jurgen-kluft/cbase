@@ -1,5 +1,5 @@
-#ifndef __C_HIERARCHICAL_BIT_BUFFER_H__
-#define __C_HIERARCHICAL_BIT_BUFFER_H__
+#ifndef __CBASE_BINMAP_H__
+#define __CBASE_BINMAP_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -12,11 +12,23 @@ namespace ncore
     // Hierarchical Bin Map, keeps track of free bits in a hierarchical way.
     // Note: Tracks free bits
     // Note: Tracks up to 2^20 bits
-    struct binmap_t // 32 bytes
+    struct binmap_t  // 32 bytes
     {
+        struct config_t
+        {
+            u32 m_count;
+            u32 m_l0len;
+            u32 m_lnlen[3];  // The level lengths
+            s32 m_levels;
+
+            static config_t compute(u32 count);
+            static u32      sizeof_data(u32 count);
+        };
+
         // This will output the number of bits in each level and return the number of levels
-        static s8  compute_levels(u32 count, u32& l0, u32& l1, u32& l2, u32& l3);
-        static u32 sizeof_data(u32 count);
+        static void clear_level0(config_t const& cfg, u32& l0, s8 btv, s8 cv);
+        static void clear_levelN(s8 lnlen, u32* lndata, s8 btv, s8 cv);
+        static void clear_levels(config_t const& cfg, u32& l0, u32* l1, u32* l2, u32* l3, s8 btv, s8 cv);
 
         inline void reset()
         {
@@ -33,14 +45,16 @@ namespace ncore
         void init_all_free(u32 count, alloc_t* allocator);
         void init_all_used(u32 count, alloc_t* allocator);
 
-        void init_all_free(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len);
-        void init_all_used(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len);
+        void init_all_free(config_t const& cfg, u32* l1, u32* l2, u32* l3);
+        void init_all_used(config_t const& cfg, u32* l1, u32* l2, u32* l3);
 
-        void init_all_free_lazy(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len);  // Do not not clear the levels, only the ends
+        void init_all_free_lazy();
+        void init_all_free_lazy(config_t const& cfg, u32* l1, u32* l2, u32* l3);  // Do not not clear the levels, only the ends
+        void init_all_free_lazy(u32 count, alloc_t* allocator);
         void tick_all_free_lazy(u32 bit);
 
         void init_all_used_lazy();
-        void init_all_used_lazy(u32 count, u32 l0len, u32* l1, u32 l1len, u32* l2, u32 l2len, u32* l3, u32 l3len);  // Do not not clear the levels, only the ends
+        void init_all_used_lazy(config_t const& cfg, u32* l1, u32* l2, u32* l3);  // Do not not clear the levels, only the ends
         void init_all_used_lazy(u32 count, alloc_t* allocator);
         void tick_all_used_lazy(u32 bit);  // Progressive lazy initialization
 
