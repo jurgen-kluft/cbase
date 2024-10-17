@@ -309,7 +309,7 @@ namespace ncore
         return bi;
     }
 
-    s32 binmap_t::upper(u32 pivot)
+    s32 binmap_t::upper(u32 pivot) const
     {
         if ((pivot + 1) >= size())
             return -1;
@@ -366,7 +366,7 @@ namespace ncore
         return -1;
     }
 
-    s32 binmap_t::lower(u32 pivot)
+    s32 binmap_t::lower(u32 pivot) const
     {
         if (pivot >= size())
             return -1;
@@ -419,6 +419,42 @@ namespace ncore
                 }
             }
         };
+        return -1;
+    }
+
+    s32 binmap_t::find_set(u32 bit) const
+    {
+        u32 const maxbits = size();
+        if (bit >= maxbits)
+            return -1;
+
+        u32 const  iw    = bit / 32;
+        u32 const  ml    = levels();
+        u32 const* level = (ml == 0) ? &m_l0 : m_l[ml - 1];
+
+        {
+            u32 const ib = bit & 31;
+            u32 const w  = level[iw] & (0xffffffff << ib);
+            if (w != 0)
+            {
+                s32 const found_bit = (s32)((iw * 32) + math::findFirstBit(w));
+                return (found_bit < maxbits) ? found_bit : -1;
+            }
+        }
+
+        {
+            u32 const nw = (maxbits + 31) >> 5;
+            for (s32 i = iw + 1; i < nw; ++i)
+            {
+                u32 const w = level[i];
+                if (w != 0)
+                {
+                    s32 const found_bit = (s32)((i * 32) + math::findFirstBit(w));
+                    return (found_bit < maxbits) ? found_bit : -1;
+                }
+            }
+        }
+
         return -1;
     }
 

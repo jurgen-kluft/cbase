@@ -55,8 +55,15 @@ namespace ncore
         s32 find_upper() const;    // Finds the last free bit and returns the bit index
         s32 find_upper_and_set();  // Finds the last free bit and sets it to used and returns the bit index
 
-        s32 upper(u32 pivot);  // Finds the first free bit greater than the pivot
-        s32 lower(u32 pivot);  // Finds the first free bit less than the pivot (high to low)
+        s32 upper(u32 pivot) const;  // Finds the first free bit greater than the pivot
+        s32 lower(u32 pivot) const;  // Finds the first free bit less than the pivot (high to low)
+
+        // Finds the set bit from the given bit, this is useful for iterating over the set bits.
+        // Using this as an iterator means you need to increment the returned bit by one to use it in the
+        // next call to find_set.
+        // Note: This function only moves over the lowest level and is thus not taking advantage of the
+        //       hierarchical structure. This means that it is not efficient for large sparse bitmaps.
+        s32 find_set(u32 bit) const;
 
         inline u32 size() const { return m_count & 0x0FFFFFFF; }
         inline s8  levels() const { return m_count >> 28; }

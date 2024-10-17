@@ -244,6 +244,50 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             Allocator->deallocate(l3);
         }
 
+        UNITTEST_TEST(set_many_then_find_set)
+        {
+            u32       l0len, l1len, l2len, l3len;
+            u32 const len = 32 * 32 * 32;
+            binmap_t::compute_levels(len, l0len, l1len, l2len, l3len);
+
+            u32* l1 = (u32*)Allocator->allocate(sizeof(u32) * ((l1len + 31) >> 5));
+            u32* l2 = (u32*)Allocator->allocate(sizeof(u32) * ((l2len + 31) >> 5));
+            u32* l3 = (u32*)Allocator->allocate(sizeof(u32) * ((l3len + 31) >> 5));
+            nmem::memclr(l1, sizeof(u32) * ((l1len + 31) >> 5));
+            nmem::memclr(l2, sizeof(u32) * ((l2len + 31) >> 5));
+            nmem::memclr(l3, sizeof(u32) * ((l3len + 31) >> 5));
+
+            binmap_t bm;
+            bm.init_all_free(len, l0len, l1, l1len, l2, l2len, l3, l3len);
+
+            s32 const jump = 35;
+            s32 numset = 0;
+            for (s32 i = 0; i < len; i+=jump)
+            {
+                bm.set_used(i);
+                numset += 1;
+            }
+
+            s32 valid = 0;
+            s32 iter = 0;
+            s32 numfound = 0;
+            while (true)
+            {
+                iter = bm.find_set((u32)iter);
+                if (iter < 0)
+                    break;
+                numfound += 1;
+                CHECK_EQUAL(valid, iter);
+                iter += 1;
+                valid += jump;
+            }
+            CHECK_EQUAL(numset, numfound);
+
+            Allocator->deallocate(l1);
+            Allocator->deallocate(l2);
+            Allocator->deallocate(l3);
+        }
+
         UNITTEST_TEST(lazy_init)
         {
             u32       l0len, l1len, l2len, l3len;
