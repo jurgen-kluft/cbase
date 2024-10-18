@@ -7,7 +7,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_hbb_t)
+UNITTEST_SUITE_BEGIN(binmap)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -21,7 +21,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             CHECK_EQUAL(128 + 32, binmap_t::config_t::sizeof_data(1024));
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(8192));
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg1 = binmap_t::config_t::compute(256);
             hbb.init_all_used(cfg1, Allocator);
             CHECK_TRUE(hbb.m_l0 == 0xFFFFFFFF);
@@ -40,7 +40,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
         {
             u32 const maxbits = 8192;
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_free(cfg, Allocator);
 
@@ -56,7 +56,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             u32 const maxbits = 8192;
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_free(cfg, Allocator);
 
@@ -97,7 +97,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             u32 const maxbits = 8192;
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_used(cfg, Allocator);
 
@@ -125,7 +125,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             u32 const maxbits = 8192;
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_used(cfg, Allocator);
 
@@ -148,7 +148,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             u32 const maxbits = 8192;
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_used(cfg, Allocator);
 
@@ -175,7 +175,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
         {
             u32 const maxbits = 2048;
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_used(cfg, Allocator);
 
@@ -202,7 +202,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
         {
             u32 const maxbits = 2048;
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_used(cfg, Allocator);
 
@@ -230,7 +230,7 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             u32 const maxbits = 8192;
             CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
-            binmap_t hbb;
+            binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_used(cfg, Allocator);
 
@@ -263,23 +263,18 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
 
         UNITTEST_TEST(set_get)
         {
-            u32 const          len   = 32 * 32 * 32 * 32;
-            binmap_t::config_t cfg   = binmap_t::config_t::compute(len);
-            u32 const          l1len = cfg.m_lnlen[0];
-            u32 const          l2len = cfg.m_lnlen[1];
-            u32 const          l3len = cfg.m_lnlen[2];
+            u32 const len = 256 * cKB;
+            u32*      l1  = (u32*)Allocator->allocate(sizeof(u32) * ((len + 31) >> 5));
+            u32*      l2  = (u32*)Allocator->allocate(sizeof(u32) * ((len + 31) >> 5));
+            u32*      l3  = (u32*)Allocator->allocate(sizeof(u32) * ((len + 31) >> 5));
+            nmem::memclr(l1, sizeof(u32) * ((len + 31) >> 5));
+            nmem::memclr(l2, sizeof(u32) * ((len + 31) >> 5));
+            nmem::memclr(l3, sizeof(u32) * ((len + 31) >> 5));
 
-            u32* l1 = (u32*)Allocator->allocate(sizeof(u32) * ((l1len + 31) >> 5));
-            u32* l2 = (u32*)Allocator->allocate(sizeof(u32) * ((l2len + 31) >> 5));
-            u32* l3 = (u32*)Allocator->allocate(sizeof(u32) * ((l3len + 31) >> 5));
-            nmem::memclr(l1, sizeof(u32) * ((l1len + 31) >> 5));
-            nmem::memclr(l2, sizeof(u32) * ((l2len + 31) >> 5));
-            nmem::memclr(l3, sizeof(u32) * ((l3len + 31) >> 5));
-
-            for (s32 i = 0; i < 64; ++i)
+            for (s32 i = 1; i < 30; i += 5)
             {
-                u32 const count = i * 1024 + ((1 - (i & 1)) * 600);
-                cfg             = binmap_t::config_t::compute(count);
+                u32 const          count = (i * 2000) + ((i & 1) * 600);
+                binmap_t::config_t cfg   = binmap_t::config_t::compute(count);
 
                 binmap_t bm;
                 bm.init_all_free(cfg, l1, l2, l3);
@@ -355,25 +350,20 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
             Allocator->deallocate(l3);
         }
 
-        UNITTEST_TEST(lazy_init)
+        UNITTEST_TEST(lazy_free)
         {
-            u32 const          len   = 32 * 32 * 32 * 32;
-            binmap_t::config_t cfg   = binmap_t::config_t::compute(len);
-            u32 const          l1len = cfg.m_lnlen[0];
-            u32 const          l2len = cfg.m_lnlen[1];
-            u32 const          l3len = cfg.m_lnlen[2];
-
-            u32* l1 = (u32*)Allocator->allocate(sizeof(u32) * ((l1len + 31) >> 5));
-            u32* l2 = (u32*)Allocator->allocate(sizeof(u32) * ((l2len + 31) >> 5));
-            u32* l3 = (u32*)Allocator->allocate(sizeof(u32) * ((l3len + 31) >> 5));
-            nmem::memclr(l1, sizeof(u32) * ((l1len + 31) >> 5));
-            nmem::memclr(l2, sizeof(u32) * ((l2len + 31) >> 5));
-            nmem::memclr(l3, sizeof(u32) * ((l3len + 31) >> 5));
+            u32 const len = 256 * cKB;
+            u32*      l1  = (u32*)Allocator->allocate(sizeof(u32) * ((len + 31) >> 5));
+            u32*      l2  = (u32*)Allocator->allocate(sizeof(u32) * ((len + 31) >> 5));
+            u32*      l3  = (u32*)Allocator->allocate(sizeof(u32) * ((len + 31) >> 5));
+            nmem::memclr(l1, sizeof(u32) * ((len + 31) >> 5));
+            nmem::memclr(l2, sizeof(u32) * ((len + 31) >> 5));
+            nmem::memclr(l3, sizeof(u32) * ((len + 31) >> 5));
 
             for (u32 i = 0; i < 64; ++i)
             {
-                u32 const count = i * 1024 + ((1 - (i & 1)) * 600);
-                cfg             = binmap_t::config_t::compute(count);
+                u32 const          count = i * 1024 + ((1 - (i & 1)) * 600);
+                binmap_t::config_t cfg   = binmap_t::config_t::compute(count);
 
                 binmap_t bm;
                 bm.init_all_free_lazy(cfg, l1, l2, l3);
@@ -399,6 +389,62 @@ UNITTEST_SUITE_BEGIN(test_hbb_t)
                 {
                     u32 const f = bm.find_and_set();
                     CHECK_EQUAL(b, f);
+                }
+
+                // There should not be any more free places in the binmap
+                s32 const f = bm.find();
+                CHECK_EQUAL(-1, f);
+            }
+
+            Allocator->deallocate(l1);
+            Allocator->deallocate(l2);
+            Allocator->deallocate(l3);
+        }
+
+        UNITTEST_TEST(lazy_used)
+        {
+            u32 const          len   = 32 * 32 * 32 * 32;
+            binmap_t::config_t cfg   = binmap_t::config_t::compute(len);
+            u32 const          l1len = cfg.m_lnlen[0];
+            u32 const          l2len = cfg.m_lnlen[1];
+            u32 const          l3len = cfg.m_lnlen[2];
+
+            u32* l1 = (u32*)Allocator->allocate(sizeof(u32) * ((l1len + 31) >> 5));
+            u32* l2 = (u32*)Allocator->allocate(sizeof(u32) * ((l2len + 31) >> 5));
+            u32* l3 = (u32*)Allocator->allocate(sizeof(u32) * ((l3len + 31) >> 5));
+            nmem::memclr(l1, sizeof(u32) * ((l1len + 31) >> 5));
+            nmem::memclr(l2, sizeof(u32) * ((l2len + 31) >> 5));
+            nmem::memclr(l3, sizeof(u32) * ((l3len + 31) >> 5));
+
+            for (u32 i = 0; i < 64; ++i)
+            {
+                u32 const count = i * 1024 + ((1 - (i & 1)) * 600);
+                cfg             = binmap_t::config_t::compute(count);
+
+                binmap_t bm;
+                bm.init_all_used_lazy(cfg, l1, l2, l3);
+
+                for (u32 b = 0; b < count; ++b)
+                {
+                    bm.tick_all_used_lazy(b);
+                }
+
+                for (u32 b = 0; b < count; b += 2)
+                {
+                    CHECK_TRUE(bm.get(b));
+                    bm.set_free(b);
+                    CHECK_FALSE(bm.get(b));
+                }
+                for (u32 b = 0; b < count; b++)
+                {
+                    bool const s = bm.get(b);
+                    CHECK_EQUAL(((b & 1) == 1), s);
+                }
+
+                for (u32 b = 1; b < count; b += 2)
+                {
+                    u32 const f = bm.find_and_set();
+                    CHECK_EQUAL(b - 1, f);
                 }
 
                 // There should not be any more free places in the binmap

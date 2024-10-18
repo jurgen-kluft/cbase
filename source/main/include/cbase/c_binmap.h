@@ -26,8 +26,8 @@ namespace ncore
         };
 
         // This will output the number of bits in each level and return the number of levels
-        static void clear_level0(config_t const& cfg, u32& l0, s8 btv, s8 cv);
-        static void clear_levelN(s8 lnlen, u32* lndata, s8 btv, s8 cv);
+        static void clear_level0(u32 l0len, u32& l0, s8 btv, s8 cv);
+        static void clear_levelN(u32 lnlen, u32* lndata, s8 btv, s8 cv);
         static void clear_levels(config_t const& cfg, u32& l0, u32* l1, u32* l2, u32* l3, s8 btv, s8 cv);
 
         inline void reset()
