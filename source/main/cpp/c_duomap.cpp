@@ -27,9 +27,8 @@ namespace ncore
             case 2: allocator->deallocate(m_l[0]);
             case 1: break;
         }
-        reset();
-
         m_binmap0.release(allocator);
+        reset();
     }
 
     // --------------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +48,7 @@ namespace ncore
         {
             case 3: binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 0);
             case 2: binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 0);
-            case 1: binmap_t::clear_level0(cfg, m_l0, 1, 0);
+            case 1: binmap_t::clear_level0(cfg.m_l0len, m_l0, 1, 0);
             case 0: break;
         }
     }
@@ -70,7 +69,7 @@ namespace ncore
         {
             case 3: m_l[1] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[1]); binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 0);
             case 2: m_l[0] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[0]); binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 0);
-            case 1: binmap_t::clear_level0(cfg, m_l0, 1, 0);
+            case 1: binmap_t::clear_level0(cfg.m_l0len, m_l0, 1, 0);
         }
     }
 
@@ -87,7 +86,7 @@ namespace ncore
         m_l[0] = bm1l1;
         binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 0);
         binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 0);
-        binmap_t::clear_level0(cfg, m_l0, 1, 0);
+        binmap_t::clear_level0(cfg.m_l0len, m_l0, 1, 0);
     }
 
     void duomap_t::init_all_free_lazy()
@@ -123,19 +122,20 @@ namespace ncore
 
     void duomap_t::tick_all_free_lazy(u32 bit)
     {
-        m_binmap0.tick_all_free_lazy(bit);
-
-        u32      wi = bit;
-        s8 const ml = levels();
-        for (s8 il = levels(); il >= 0; --il)
+        if (bit < size())
         {
-            u32*      level = il == 0 ? &m_l0 : (il < ml ? m_l[il - 1] : m_binmap0.m_l[il - 1]);
-            const u32 bi    = wi & 31;
-            wi              = wi >> 5;
-            const u32 wd    = (bi == 0) ? 0 : level[wi];
-            level[wi]       = wd & ~((u32)1 << bi);
-            if (wd != 0)
-                return;
+            m_binmap0.tick_all_free_lazy(bit);
+
+            // For '1' bit tracking, we need to slowly zero out our levels
+            // No need to touch level 0 since it is already set to zero.
+            s8  l  = levels() - 2;
+            u32 wi = bit;
+            while (l >= 0 && ((wi & 31) == 0))
+            {
+                wi         = wi >> 5;
+                m_l[l][wi] = 0;
+                l -= 1;
+            }
         }
     }
 
@@ -152,7 +152,7 @@ namespace ncore
         {
             case 3: binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 1);
             case 2: binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 1);
-            case 1: binmap_t::clear_level0(cfg, m_l0, 1, 1);
+            case 1: binmap_t::clear_level0(cfg.m_l0len, m_l0, 1, 1);
             case 0: break;
         }
 
@@ -175,7 +175,7 @@ namespace ncore
         {
             case 3: m_l[1] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[1]); binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 1);
             case 2: m_l[0] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[0]); binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 1);
-            case 1: binmap_t::clear_level0(cfg, m_l0, 1, 1);
+            case 1: binmap_t::clear_level0(cfg.m_l0len, m_l0, 1, 1);
         }
 
         m_set = cfg.m_count;
@@ -194,129 +194,130 @@ namespace ncore
         m_l[0] = bm1l1;
         binmap_t::clear_levelN(cfg.m_lnlen[1], m_l[1], 1, 1);
         binmap_t::clear_levelN(cfg.m_lnlen[0], m_l[0], 1, 1);
-        binmap_t::clear_level0(cfg, m_l0, 1, 1);
+        binmap_t::clear_level0(cfg.m_l0len, m_l0, 1, 1);
 
         m_set = cfg.m_count;
     }
 
-    // --------------------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------------------------------------------
-
-    // --------------------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------------------------------------------
-
-    void duomap_t::set_used(u32 bit)
+    void duomap_t::init_all_used_lazy()
     {
-        s8 l = levels();
-        if (l > 0)
+        m_binmap0.init_all_used_lazy();
+        m_l0 = 0;
+    }
+
+    void duomap_t::init_all_used_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2)
+    {
+        reset();
+
+        m_binmap0.init_all_used_lazy(cfg, bm0l1, bm0l2, bm0l3);
+        m_l[0] = bm1l1;
+        m_l[1] = bm1l2;
+        m_l0   = 0;
+    }
+
+    void duomap_t::init_all_used_lazy(config_t const& cfg, alloc_t* allocator)
+    {
+        reset();
+
+        m_binmap0.init_all_used_lazy(cfg, allocator);
+        switch (cfg.m_levels)
         {
-            u32 wdb = m_l[l][bit >> 5];
-            if ((wdb & (1 << (bit & 31))) != 0)
-                return;
-
-            // We are sure we are going to set a bit
-            m_set += 1;
-
-            u32 wi = bit;
-            for (--l; l >= 0; --l)
-            {
-                u32 const bi         = (u32)1 << (wi & 31);
-                wi                   = wi >> 5;
-                u32 const wd         = m_binmap0.m_l[l][wi];
-                u32 const wc         = wd | bi;
-                m_binmap0.m_l[l][wi] = wc;
-                if (wc != 0xffffffff)  // If all bits are not set yet -> early out
-                    goto do_binmap1;
-            }
-
-            m_binmap0.m_l0 = m_binmap0.m_l0 | (1 << (wi & 31));
-
-        do_binmap1:
-
-            if (wdb != 0)  // If all bits at the lowest level where not 0 -> early out
-                return;
-
-            // We are going one level up already
-            wi = bit >> 5;
-            // propagate the set bit to the upper levels
-            for (l = levels() - 2; l >= 0; --l)
-            {
-                u32 const bi = (u32)1 << (wi & 31);
-                wi           = wi >> 5;
-                u32 wd       = m_l[l][wi];
-                m_l[l][wi]   = wd | bit;
-                if (wd != 0)  // If all bits where not 0 -> early out
-                    return;
-            }
-
-            m_l0 = m_l0 | (1 << (wi & 31));
-        }
-        else
-        {
-            u32 const bi = (u32)1 << (bit & 31);
-            u32 const l0 = m_l0 | bi;
-            if (l0 == m_l0)
-                return;
-            m_l0           = l0;
-            m_binmap0.m_l0 = m_binmap0.m_l0 | (1 << (bit & 31));
-            m_set += 1;
+            case 3: m_l[1] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[1]);
+            case 2: m_l[0] = (u32*)allocator->allocate(sizeof(u32) * cfg.m_lnlen[0]);
+            case 1: m_l0 = 0;
         }
     }
 
-    void duomap_t::set_free(u32 bit)
+    void duomap_t::tick_all_used_lazy(u32 bit)
     {
-        s8 l = levels();
-        if (l > 0)
+        if (bit < size())
         {
-            u32 const wdb = m_l[l][bit >> 5];
-            if ((wdb & (1 << (bit & 31))) == 0)
-                return;
+            m_binmap0.tick_all_used_lazy(bit);
 
-            // We are sure we are going to clear a bit
-            m_set -= 1;
-
+            // We slowly need to fill our levels with '1' bits, taking care of the tails of each level
+            // Also slowly fill our level 0
             u32 wi = bit;
-            for (--l; l >= 0; --l)
+            s8  l  = levels();
+            if (l > 0)
             {
-                u32 const bi         = (u32)1 << (wi & 31);
-                wi                   = wi >> 5;
-                u32 const wd         = m_binmap0.m_l[l][wi];
-                m_binmap0.m_l[l][wi] = wd & ~bi;
-                if (wd != 0xffffffff)  // If not all bits where set before  -> early out
-                    goto do_binmap1;
+                wi = wi >> 5;
+                for (--l; l > 0; --l)
+                {
+                    if ((wi & 31) != 0)
+                        return;
+                    u32* level = m_l[l - 1];
+                    wi         = wi >> 5;
+                    level[wi]  = 0xffffffff;
+                }
             }
-
-            m_binmap0.m_l0 = m_binmap0.m_l0 & ~(1 << (wi & 31));
-
-        do_binmap1:
-
-            if (wdb != 0)  // If at the lowest level we still have some bits set -> early out
-                return;
-
-            // We are going one level up already
-            wi = bit >> 5;
-            // propagate the bit to the upper levels
-            for (l = levels() - 2; l >= 0; --l)
-            {
-                u32 const bi = (u32)1 << (wi & 31);
-                wi           = wi >> 5;
-                u32 const wd = m_l[l][wi] & ~bi;
-                m_l[l][wi]   = wd;
-                if (wd != 0)  // If there are still bits set -> early out
-                    return;
-            }
-
-            m_l0 = m_l0 & ~(1 << (wi & 31));
+            m_l0 = m_l0 | (1 << (wi & 31));
         }
-        else
+    }
+
+    // --------------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------------
+
+    // --------------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------------
+
+    void duomap_t::set_used(u32 _bit)
+    {
+        if (_bit < size())
         {
-            u32 const bi = (u32)1 << (bit & 31);
-            u32 const l0 = m_l0 & ~bi;
-            if (l0 == m_l0)
+            s8        l   = levels();
+            u32 const wdb = m_binmap0.m_l[l - 1][_bit >> 5];
+            if ((wdb & (1 << (_bit & 31))) != 0)  // If the bit is already set -> early out
                 return;
-            m_l0           = l0;
-            m_binmap0.m_l0 = m_binmap0.m_l0 & ~bi;
+
+            m_binmap0.set_used(_bit);
+            m_set += 1;
+
+            if (wdb == 0)
+            {
+                // We need to be one level up
+                u32 wi = _bit >> 5;
+                for (--l; l >= 0; --l)
+                {
+                    u32*      level = l == 0 ? &m_l0 : m_l[l - 1];
+                    u32 const bi    = (u32)1 << (wi & 31);
+                    wi              = wi >> 5;
+                    u32 wd          = level[wi];
+                    level[wi]       = wd | bi;
+                    if (wd != 0)  // If all bits where not 0 -> early out
+                        return;
+                }
+            }
+        }
+    }
+
+    void duomap_t::set_free(u32 _bit)
+    {
+        if (_bit < size())
+        {
+            s8        l   = levels();
+            u32 const wdb = m_binmap0.m_l[l - 1][_bit >> 5];
+            if ((wdb & (1 << (_bit & 31))) == 0)  // If the bit is already clr -> early out
+                return;
+
+            m_binmap0.set_free(_bit);
             m_set -= 1;
+
+            // check the word the bit was set in, now that we have cleared that bit does
+            // that word result in all bits being 0? If so we need to propagate that up.
+            if ((wdb & ~((u32)1 << (_bit & 31))) == 0)
+            {
+                u32 wi = _bit >> 5;  // Move one level up
+                for (--l; l >= 0; --l)
+                {
+                    u32*      level = l == 0 ? &m_l0 : m_l[l - 1];
+                    u32 const bi    = (u32)1 << (wi & 31);
+                    wi              = wi >> 5;
+                    u32 wd          = level[wi] & ~bi;
+                    level[wi]       = wd;
+                    if (wd != 0)  // All bits are not yet 0 -> early out
+                        return;
+                }
+            }
         }
     }
 
@@ -334,42 +335,11 @@ namespace ncore
     s32 duomap_t::find_free_upper() const { return m_binmap0.find_upper(); }
     s32 duomap_t::find_free_upper_and_set_used()
     {
-        s32 const bit = m_binmap0.find_upper_and_set();
+        s32 const bit = m_binmap0.find_upper();
         if (bit < 0)
             return -1;
-
-        // We found a '0' bit in binmap0 and we have set it to '1', we need to
-        // track this '1' bit here.
         m_set += 1;
-
-        // check the word the bit was set in, if that word was 0 we need to propagate it up
-        s8 l = levels();
-        if (l > 0)
-        {
-            u32 wdb = m_l[l][bit >> 5] & ~(1 << (bit & 31));
-            if (wdb != 0)  // If all bits at the lowest level where not 0 -> early out
-                return bit;
-
-            // We are going one level up already
-            u32 wi = bit >> 5;
-            // propagate the set bit to the upper levels
-            for (l = levels() - 2; l >= 0; --l)
-            {
-                u32 const bi = (u32)1 << (wi & 31);
-                wi           = wi >> 5;
-                u32 wd       = m_l[l][wi];
-                m_l[l][wi]   = wd | bit;
-                if (wd != 0)  // If all bits where not 0 -> early out
-                    return bit;
-            }
-
-            m_l0 = m_l0 | (1 << (wi & 31));
-        }
-        else
-        {
-            m_l0 = m_l0 | (1 << (bit & 31));
-        }
-
+        set_used(bit);
         return bit;
     }
 

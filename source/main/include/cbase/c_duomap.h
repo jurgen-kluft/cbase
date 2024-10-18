@@ -15,7 +15,7 @@ namespace ncore
     // The lowest level has all the bits according to 'count', the next level has 1 bit for each 32 bits in the level below.
     // This advantage of using this duomap instead of two binmaps, is that this duomap shares the lowest level with the binmap.
     // Note: Tracks up to 2^20 bits
-    struct duomap_t  // 32 bytes
+    struct duomap_t
     {
         typedef binmap_t::config_t config_t;
 
@@ -33,7 +33,6 @@ namespace ncore
 
         void release(alloc_t* allocator);
 
-
         void init_all_free(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);
         void init_all_free();
         void init_all_free(config_t const& cfg, alloc_t* allocator);
@@ -45,10 +44,10 @@ namespace ncore
         void init_all_used();
         void init_all_used(config_t const& cfg, alloc_t* allocator);
         void init_all_used(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);
-        // void init_all_used_lazy();
-        // void init_all_used_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);  // Do not not clear the levels, only the ends
-        // void init_all_used_lazy(config_t const& cfg, alloc_t* allocator);
-        // void tick_all_used_lazy(u32 bit);  // Progressive lazy initialization
+        void init_all_used_lazy();
+        void init_all_used_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2);  // Do not not clear the levels, only the ends
+        void init_all_used_lazy(config_t const& cfg, alloc_t* allocator);
+        void tick_all_used_lazy(u32 bit);  // Progressive lazy initialization
 
         void set_free(u32 bit);
         void set_used(u32 bit);
