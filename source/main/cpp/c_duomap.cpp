@@ -92,19 +92,15 @@ namespace ncore
     void duomap_t::init_all_free_lazy()
     {
         reset();
-
         m_binmap0.init_all_free_lazy();
-        m_l0 = 0;
     }
 
     void duomap_t::init_all_free_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2)
     {
         reset();
-
         m_binmap0.init_all_free_lazy(cfg, bm0l1, bm0l2, bm0l3);
         m_l[0] = bm1l1;
         m_l[1] = bm1l2;
-        m_l0   = 0;
     }
 
     void duomap_t::init_all_free_lazy(config_t const& cfg, alloc_t* allocator)
@@ -203,11 +199,13 @@ namespace ncore
     {
         m_binmap0.init_all_used_lazy();
         m_l0 = 0;
+        m_set = size();
     }
 
     void duomap_t::init_all_used_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3, u32* bm1l1, u32* bm1l2)
     {
         reset();
+        m_set = size();
 
         m_binmap0.init_all_used_lazy(cfg, bm0l1, bm0l2, bm0l3);
         m_l[0] = bm1l1;
@@ -218,6 +216,7 @@ namespace ncore
     void duomap_t::init_all_used_lazy(config_t const& cfg, alloc_t* allocator)
     {
         reset();
+        m_set = size();
 
         m_binmap0.init_all_used_lazy(cfg, allocator);
         switch (cfg.m_levels)
@@ -327,8 +326,9 @@ namespace ncore
     s32 duomap_t::find_free_and_set_used()
     {
         s32 const bit = m_binmap0.find();
-        if (bit >= 0)
-            set_used(bit);
+        if (bit < 0)
+            return -1;
+        set_used(bit);
         return bit;
     }
 
@@ -338,7 +338,6 @@ namespace ncore
         s32 const bit = m_binmap0.find_upper();
         if (bit < 0)
             return -1;
-        m_set += 1;
         set_used(bit);
         return bit;
     }
@@ -406,7 +405,7 @@ namespace ncore
         return bit;
     }
 
-    s32 duomap_t::upper_used(u32 pivot) const
+    s32 duomap_t::next_used_up(u32 pivot) const
     {
         if (pivot >= size())
             return -1;
@@ -445,12 +444,12 @@ namespace ncore
         return -1;
     }
 
-    s32 duomap_t::lower_used(u32 pivot) const
+    s32 duomap_t::next_used_down(u32 pivot) const
     {
         if (pivot >= size())
             return -1;
 
-        // Start at bottom level and move up finding a 'set' bit
+        // Start at bottom level, location 'pivot' and find a '1' bit
         u32 iw = (pivot / 32);  // The index of a 32-bit word in level 0
         u32 ib = (pivot & 31);  // The bit number in that 32-bit word
 
@@ -499,14 +498,14 @@ namespace ncore
     void duomap_t::iter_used_t::begin()
     {
         // Find the first free bit, starting from and including 'start'
-        m_cur = m_bm->upper_used(m_cur);
+        m_cur = m_bm->next_used_up(m_cur);
         if (m_cur < 0)
             m_cur = m_end;
     }
 
     void duomap_t::iter_used_t::next()
     {
-        m_cur = m_bm->upper_used(m_cur + 1);
+        m_cur = m_bm->next_used_up(m_cur + 1);
         if (m_cur < 0)
             m_cur = m_end;
     }

@@ -68,8 +68,8 @@ namespace ncore
         s32 find_used_upper() const;
         s32 find_used_upper_and_set_free();
 
-        s32 upper_used(u32 pivot) const;
-        s32 lower_used(u32 pivot) const;
+        s32 next_used_up(u32 pivot) const;
+        s32 next_used_down(u32 pivot) const;
 
         inline u32 size() const { return m_binmap0.size(); }
         inline s8  levels() const { return m_binmap0.levels(); }

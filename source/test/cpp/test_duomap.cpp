@@ -16,7 +16,7 @@ UNITTEST_SUITE_BEGIN(duomap)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        UNITTEST_TEST(set_and_is_set)
+        UNITTEST_TEST(set_used_and_is_used)
         {
             u32 const maxbits = 4096;
 
