@@ -5,7 +5,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_map32_and_set32)
+UNITTEST_SUITE_BEGIN(map32_and_set32)
 {
     UNITTEST_FIXTURE(map)
     {

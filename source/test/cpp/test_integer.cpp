@@ -3,7 +3,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_integer)
+UNITTEST_SUITE_BEGIN(integer)
 {
 	UNITTEST_FIXTURE(main)
 	{
@@ -81,7 +81,7 @@ UNITTEST_SUITE_BEGIN(test_integer)
 			CHECK_EQUAL(256, math::align(300, 256));
 			CHECK_EQUAL(1024, math::align(2011, 1024));
 		}
-		
+
 		UNITTEST_TEST(AlignDown)
 		{
 			CHECK_EQUAL(16, math::alignDown(17, 16));

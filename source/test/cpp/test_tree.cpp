@@ -6,7 +6,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_tree)
+UNITTEST_SUITE_BEGIN(tree)
 {
     UNITTEST_FIXTURE(main)
     {

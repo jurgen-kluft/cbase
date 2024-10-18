@@ -3,7 +3,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_bitfield)
+UNITTEST_SUITE_BEGIN(bitfield)
 {
 	UNITTEST_FIXTURE(main)
 	{

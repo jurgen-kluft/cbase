@@ -243,7 +243,7 @@ namespace ncore
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_string_utf)
+UNITTEST_SUITE_BEGIN(runes_and_utf)
 {
     UNITTEST_FIXTURE(utf8)
     {

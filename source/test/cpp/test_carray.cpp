@@ -3,8 +3,7 @@
 
 using namespace ncore;
 
-
-UNITTEST_SUITE_BEGIN(test_carray_t)
+UNITTEST_SUITE_BEGIN(carray_t)
 {
 	UNITTEST_FIXTURE(main)
 	{
@@ -90,7 +89,7 @@ UNITTEST_SUITE_BEGIN(test_carray_t)
 			CHECK_EQUAL(4, *((s32*)a[7]));
 			CHECK_EQUAL(7, *((s32*)a[4]));
 		}
-		
+
 		UNITTEST_TEST(remove)
 		{
 			carray_t a(array_data, sizeof(s32), 10);

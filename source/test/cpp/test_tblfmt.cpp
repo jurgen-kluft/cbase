@@ -4,7 +4,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_tblfmt)
+UNITTEST_SUITE_BEGIN(tblfmt)
 {
     UNITTEST_FIXTURE(tblfmt)
     {

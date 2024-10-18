@@ -9,7 +9,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_sscanf)
+UNITTEST_SUITE_BEGIN(sscanf)
 {
 	UNITTEST_FIXTURE(main)
 	{

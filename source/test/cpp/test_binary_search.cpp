@@ -3,7 +3,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_binary_search)
+UNITTEST_SUITE_BEGIN(binary_search)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -54,10 +54,10 @@ UNITTEST_SUITE_BEGIN(test_binary_search)
 
             CHECK_EQUAL(sorted_random_number_list[idx_of_n], n);
         }
-        
+
         UNITTEST_TEST(_search2)
         {
-            const s32 list[] = 
+            const s32 list[] =
             {
                 100
             };
@@ -91,7 +91,7 @@ UNITTEST_SUITE_BEGIN(test_binary_search)
 
         UNITTEST_TEST(bigsearch)
         {
-            const u64 sorted_random_number_list[] = 
+            const u64 sorted_random_number_list[] =
             {
                 0x800A9640, 0x800A98C0, 0x800A9B40, 0x800A9DA0, 0x800AA020, 0x800AA520, 0x800AA780
             };

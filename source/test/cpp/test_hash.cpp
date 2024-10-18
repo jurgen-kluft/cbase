@@ -4,7 +4,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_hash)
+UNITTEST_SUITE_BEGIN(hash)
 {
     UNITTEST_FIXTURE(xxhash)
     {

@@ -9,7 +9,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_sprintf)
+UNITTEST_SUITE_BEGIN(sprintf)
 {
 	UNITTEST_FIXTURE(main)
 	{

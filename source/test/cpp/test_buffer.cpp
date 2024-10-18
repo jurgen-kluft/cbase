@@ -5,7 +5,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_buffer_t)
+UNITTEST_SUITE_BEGIN(buffer)
 {
     UNITTEST_FIXTURE(main)
     {

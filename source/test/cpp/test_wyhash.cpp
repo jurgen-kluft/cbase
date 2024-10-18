@@ -4,7 +4,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_wyhash)
+UNITTEST_SUITE_BEGIN(wyhash)
 {
     UNITTEST_FIXTURE(wyreg)
     {

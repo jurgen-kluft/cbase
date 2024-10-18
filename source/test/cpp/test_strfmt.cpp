@@ -38,7 +38,7 @@ namespace ncore
 
 }  // namespace ncore
 
-UNITTEST_SUITE_BEGIN(test_strfmt)
+UNITTEST_SUITE_BEGIN(strfmt)
 {
     UNITTEST_FIXTURE(main)
     {

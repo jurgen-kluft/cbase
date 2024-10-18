@@ -6,7 +6,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_allocator)
+UNITTEST_SUITE_BEGIN(allocator)
 {
     UNITTEST_FIXTURE(main)
     {

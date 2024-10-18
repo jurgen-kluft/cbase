@@ -6,7 +6,7 @@
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_map_and_set)
+UNITTEST_SUITE_BEGIN(map_and_set)
 {
     static const s32 c_num_keys = 100;
 
