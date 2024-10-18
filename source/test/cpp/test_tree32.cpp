@@ -443,7 +443,7 @@ namespace ncore
 
 using namespace ncore;
 
-UNITTEST_SUITE_BEGIN(test_tree2)
+UNITTEST_SUITE_BEGIN(tree32)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -559,7 +559,7 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             XorRandom rng(seed);
             for (s32 i = 0; i < size; ++i)
             {
-                const s32 j = i + ((s32)(rng.next() & 0x7fffffff) % (size - i));
+                const s32 j = (s32)(rng.next() & 0x7fffffff) % size;
                 const s64 t = v[i];
                 v[i]        = v[j];
                 v[j]        = t;
@@ -674,33 +674,21 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
             s64      *values    = (s64 *)Allocator->allocate(num_nodes * sizeof(s64));
 
-            s_rand.seed(0x1234567890abcdef);
             for (s32 i = 0; i < num_nodes; ++i)
             {
-                // make sure we have no duplicates
-                s64 r = s_rand.next();
-                for (s32 j = 0; j < i; ++j)
-                {
-                    if (values[j] == r)
-                    {
-                        r = s_rand.next();
-                        j = -1;
-                    }
-                }
-                values[i] = r;
+                values[i] = (i + 3) * 5;
             }
+            RandomShuffle(values, num_nodes, 0x1234567890abcdef);
 
             rbnode_t *root  = nullptr;
             s32       count = 0;
             for (s32 i = 0; i < num_nodes; ++i)
             {
                 rbnode_t *node = &nodes[i];
-                rb_insert(root, count, (void *)(ptr_t)values[i], compare, node);
+                rb_insert(root, count, (void *)values[i], compare, node);
                 CHECK_NOT_NULL(root);
                 CHECK_NULL(node);
             }
-
-            RandomShuffle(values, num_nodes, 0x1234567890abcdef);
 
             const char *error = nullptr;
             rb_validate(root, compare, error);
@@ -709,10 +697,10 @@ UNITTEST_SUITE_BEGIN(test_tree2)
             // remove all
             for (s32 i = 0; i < num_nodes; ++i)
             {
-                rbnode_t *found = rb_find(root, (void *)(ptr_t)(values[i]), compare);
+                rbnode_t *found = rb_find(root, (void *)values[i], compare);
                 CHECK_NOT_NULL(found);
                 CHECK_EQUAL((ptr_t)found->m_item, values[i]);
-                rbnode_t *removed = rb_remove(root, count, (void *)(ptr_t)(values[i]), compare);
+                rbnode_t *removed = rb_remove(root, count, (void *)values[i], compare);
                 CHECK_NOT_NULL(removed);
                 CHECK_EQUAL((ptr_t)removed->m_item, values[i]);
                 CHECK_EQUAL(found, removed);
