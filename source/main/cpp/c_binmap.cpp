@@ -136,7 +136,7 @@ namespace ncore
 
     void binmap_t::init_all_free_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3)
     {
-        ASSERT((cfg.m_ln[3] == 0 || bm0l3 != nullptr) && (cfg.m_ln[2] == 0 || bm0l2 != nullptr) && (cfg.m_ln[1] == 0 || bm0l1 != nullptr) && (cfg.m_ln[0] > 0));
+        ASSERT((cfg.m_lnlen[2] == 0 || bm0l3 != nullptr) && (cfg.m_lnlen[1] == 0 || bm0l2 != nullptr) && (cfg.m_lnlen[0] == 0 || bm0l1 != nullptr) && (cfg.m_l0len > 0));
 
         m_l[2]  = bm0l3;
         m_l[1]  = bm0l2;
@@ -177,7 +177,7 @@ namespace ncore
 
     void binmap_t::init_all_used_lazy(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3)
     {
-        ASSERT((cfg.m_ln[3] == 0 || bm0l3 != nullptr) && (cfg.m_ln[2] == 0 || bm0l2 != nullptr) && (cfg.m_ln[1] == 0 || bm0l1 != nullptr) && (cfg.m_ln[0] > 0));
+        ASSERT((cfg.m_lnlen[2] == 0 || bm0l3 != nullptr) && (cfg.m_lnlen[1] == 0 || bm0l2 != nullptr) && (cfg.m_lnlen[0] == 0 || bm0l1 != nullptr) && (cfg.m_l0len > 0));
 
         m_l[2]  = bm0l3;
         m_l[1]  = bm0l2;
@@ -211,24 +211,24 @@ namespace ncore
         }
     }
 
-    void binmap_t::init_all_free(config_t const& cfg, u32* l1, u32* l2, u32* l3)
+    void binmap_t::init_all_free(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3)
     {
-        ASSERT((cfg.m_ln[3] == 0 || l3 != nullptr) && (cfg.m_ln[2] == 0 || l2 != nullptr) && (cfg.m_ln[1] == 0 || l1 != nullptr) && (cfg.m_ln[0] > 0));
+        ASSERT((cfg.m_lnlen[2] == 0 || bm0l3 != nullptr) && (cfg.m_lnlen[1] == 0 || bm0l2 != nullptr) && (cfg.m_lnlen[0] == 0 || bm0l1 != nullptr) && (cfg.m_l0len > 0));
         m_count = (cfg.m_levels << 28) | cfg.m_count;
-        m_l[0]  = l1;
-        m_l[1]  = l2;
-        m_l[2]  = l3;
-        clear_levels(cfg, m_l0, l1, l2, l3, 0, 0);
+        m_l[0]  = bm0l1;
+        m_l[1]  = bm0l2;
+        m_l[2]  = bm0l3;
+        clear_levels(cfg, m_l0, bm0l1, bm0l2, bm0l3, 0, 0);
     }
 
-    void binmap_t::init_all_used(config_t const& cfg, u32* l1, u32* l2, u32* l3)
+    void binmap_t::init_all_used(config_t const& cfg, u32* bm0l1, u32* bm0l2, u32* bm0l3)
     {
-        ASSERT((cfg.m_ln[3] == 0 || l3 != nullptr) && (cfg.m_ln[2] == 0 || l2 != nullptr) && (cfg.m_ln[1] == 0 || l1 != nullptr) && (cfg.m_ln[0] > 0));
+        ASSERT((cfg.m_lnlen[2] == 0 || bm0l3 != nullptr) && (cfg.m_lnlen[1] == 0 || bm0l2 != nullptr) && (cfg.m_lnlen[0] == 0 || bm0l1 != nullptr) && (cfg.m_l0len > 0));
         m_count = (cfg.m_levels << 28) | cfg.m_count;
-        m_l[0]  = l1;
-        m_l[1]  = l2;
-        m_l[2]  = l3;
-        clear_levels(cfg, m_l0, l1, l2, l3, 0, 1);
+        m_l[0]  = bm0l1;
+        m_l[1]  = bm0l2;
+        m_l[2]  = bm0l3;
+        clear_levels(cfg, m_l0, bm0l1, bm0l2, bm0l3, 0, 1);
     }
 
     // Note: We are tracking 'empty' place where we can set a bit
@@ -349,13 +349,11 @@ namespace ncore
         if (pivot < size())
         {
             // Start at bottom level and move up finding an empty place
-            u32 iw = (pivot / 32);  // The index of a 32-bit word in bottom level
+            u32 iw = (pivot >> 5);  // The index of a 32-bit word in bottom level
             u32 ib = (pivot & 31);  // The bit number in that 32-bit word
 
             s8 const ml = levels();
             s8       il = ml;
-
-            u32 nwpl = (size() + 31) >> 5;  // Number of words per level, lowest level
             while (il >= 0 && il <= ml)
             {
                 u32 const* level = il == 0 ? &m_l0 : m_l[il - 1];
@@ -372,8 +370,12 @@ namespace ncore
                 {
                     // move one unit in the direction of upper
                     iw += 1;
-                    if (il == ml && iw >= nwpl)
-                        break;
+                    if (il == ml)
+                    {
+                        u32 const nwpl = (size() + 31) >> 5;  // Number of words per level, lowest level
+                        if (iw >= nwpl)
+                            break;
+                    }
                     ib = (iw & 31);
                     iw = (iw >> 5);
                     il -= 1;  // Go up one level
@@ -388,7 +390,7 @@ namespace ncore
     {
         if (pivot < size())
         {
-            u32 iw = (pivot / 32);  // The index of a 32-bit word in level 0
+            u32 iw = (pivot >> 5);  // The index of a 32-bit word in level 0
             u32 ib = (pivot & 31);  // The bit number in that 32-bit word
 
             s8 const ml = levels();
@@ -425,7 +427,7 @@ namespace ncore
         u32 const maxbits = size();
         if (bit < maxbits)
         {
-            u32 const  iw    = bit / 32;
+            u32 const  iw    = bit >> 5;
             u32 const  ml    = levels();
             u32 const* level = (ml == 0) ? &m_l0 : m_l[ml - 1];
 
