@@ -179,6 +179,7 @@ namespace ncore
         s64       read_s64();
         f32       read_f32();
         f64       read_f64();
+
         void      read(bool& value) { value = read_bool(); }
         void      read(u8& value) { value = read_u8(); }
         void      read(s8& value) { value = read_s8(); }
@@ -257,6 +258,17 @@ namespace ncore
         void write(s64);
         void write(f32);
         void write(f64);
+
+        template <typename T>
+        void write(T* ptr)
+        {
+            write((u64)ptr);
+        }
+        template <typename T>
+        void write(T const* ptr)
+        {
+            write((u64)ptr);
+        }
 
         void write_data(buffer_t const& cbuf);
         void write_data(cbuffer_t const& cbuf);
