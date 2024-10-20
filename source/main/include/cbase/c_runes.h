@@ -251,6 +251,12 @@ namespace ncore
         // conversion (note: cursor and end indices are byte based indices)
         // Warning: string terminators are NOT copied to the output string
         // ascii -> ucs2, utf8, utf16, utf32
+        void convert(ascii::pcrune inStr, u32& inCursor, ascii::prune outStr, u32& outCursor, u32 outStrEnd);
+        void convert(ascii::pcrune inStr, u32& inCursor, utf8::prune outStr, u32& outCursor, u32 outStrEnd);
+        void convert(ascii::pcrune inStr, u32& inCursor, ucs2::prune outStr, u32& outCursor, u32 outStrEnd);
+        void convert(ascii::pcrune inStr, u32& inCursor, utf16::prune outStr, u32& outCursor, u32 outStrEnd);
+        void convert(ascii::pcrune inStr, u32& inCursor, utf32::prune outStr, u32& outCursor, u32 outStrEnd);
+
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd);
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& outCursor, u32 outStrEnd);
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd);

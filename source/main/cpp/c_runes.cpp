@@ -301,6 +301,64 @@ namespace ncore
 
         }  // namespace writing
 
+        void convert(ascii::pcrune inStr, u32& inCursor, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            while (outCursor < outStrEnd)
+            {
+                u8 c = inStr[inCursor];
+                if (c == ascii::TERMINATOR)
+                    break;
+                inCursor++;
+                outStr[outCursor++] = (u8)c;
+            }
+        }
+        void convert(ascii::pcrune inStr, u32& inCursor, utf8::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            while (outCursor < outStrEnd)
+            {
+                uchar32 c = inStr[inCursor];
+                if (c == ascii::TERMINATOR)
+                    break;
+                inCursor++;
+                outStr[outCursor++].r = (u8)c;
+            }
+        }
+        void convert(ascii::pcrune inStr, u32& inCursor, ucs2::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            while (outCursor < outStrEnd)
+            {
+                uchar32 c = inStr[inCursor];
+                if (c == ascii::TERMINATOR)
+                    break;
+                inCursor++;
+                outStr[outCursor++].r = (uchar16)c;
+            }
+        }
+        void convert(ascii::pcrune inStr, u32& inCursor, utf16::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            while (outCursor < outStrEnd)
+            {
+                uchar32 c = inStr[inCursor];
+                if (c == ascii::TERMINATOR)
+                    break;
+                inCursor++;
+                outStr[outCursor++].r = (uchar16)c;
+            }
+        }
+        void convert(ascii::pcrune inStr, u32& inCursor, utf32::prune outStr, u32& outCursor, u32 outStrEnd)
+        {
+            while (outCursor < outStrEnd)
+            {
+                uchar32 c = inStr[inCursor];
+                if (c == ascii::TERMINATOR)
+                    break;
+                inCursor++;
+                outStr[outCursor++].r = c;
+            }
+        }
+
+
+
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& outCursor, u32 outStrEnd)
         {
             while (inCursor < inStrEnd && outCursor < outStrEnd)
