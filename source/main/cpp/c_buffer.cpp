@@ -560,7 +560,7 @@ namespace ncore
         char const* srcstr   = str;
         char const* srcend   = str_end;
         u32 const   datasize = (u32)(srcend - srcstr);
-        if (can_write(4 + 4 + datasize))
+        if (can_write(4 + 1 + datasize))
         {
             write((u32)datasize);
             write(str_type);
