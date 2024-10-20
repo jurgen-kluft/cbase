@@ -198,7 +198,7 @@ namespace ncore
     void duomap_t::init_all_used_lazy()
     {
         m_binmap0.init_all_used_lazy();
-        m_l0 = 0;
+        m_l0  = 0;
         m_set = size();
     }
 
@@ -407,76 +407,76 @@ namespace ncore
 
     s32 duomap_t::next_used_up(u32 pivot) const
     {
-        if (pivot >= size())
-            return -1;
-
-        // Start at bottom level and move up finding a '1' bit
-        u32 iw = (pivot / 32);  // The index of a 32-bit word in bottom level
-        u32 ib = (pivot & 31);  // The bit number in that 32-bit word
-
-        s8 const ml = levels();
-        s8       il = ml;
-
-        u32 nwpl = (size() + 31) >> 5;  // Number of words for the lowest level
-        while (il >= 0 && il <= ml)
+        if (pivot < size())
         {
-            u32 const* level = il == 0 ? &m_l0 : (il < ml ? m_l[il - 1] : m_binmap0.m_l[il - 1]);
-            u32 const  w     = level[iw] & (0xffffffff << ib);
-            if (w != 0)
+            // Start at bottom level and move up finding a '1' bit
+            u32 iw = (pivot >> 5);  // The index of a 32-bit word in bottom level
+            u32 ib = (pivot & 31);  // The bit number in that 32-bit word
+
+            s8 const ml = levels();
+            s8       il = ml;
+
+            u32 nwpl = (size() + 31) >> 5;  // Number of words for the lowest level
+            while (il >= 0 && il <= ml)
             {
-                iw = (iw * 32) + math::findFirstBit(w);
-                if (il == ml)
-                    return iw;
-                il += 1;  // Go down one level
-                ib = 0;
+                u32 const* level = il == 0 ? &m_l0 : (il < ml ? m_l[il - 1] : m_binmap0.m_l[il - 1]);
+                u32 const  w     = level[iw] & (0xffffffff << ib);
+                if (w != 0)
+                {
+                    iw = (iw * 32) + math::findFirstBit(w);
+                    if (il == ml)
+                        return iw;
+                    il += 1;  // Go down one level
+                    ib = 0;
+                }
+                else
+                {
+                    // move one unit in the direction of upper
+                    iw += 1;
+                    if (il == ml && iw >= nwpl)
+                        break;
+                    ib = (iw & 31);
+                    iw = (iw >> 5);
+                    il -= 1;  // Go up one level
+                }
             }
-            else
-            {
-                // move one unit in the direction of upper
-                iw += 1;
-                if (il == ml && iw >= nwpl)
-                    break;
-                ib = (iw & 31);
-                iw = (iw / 32);
-                il -= 1;  // Go up one level
-            }
-        };
+        }
         return -1;
     }
 
     s32 duomap_t::next_used_down(u32 pivot) const
     {
-        if (pivot >= size())
-            return -1;
-
-        // Start at bottom level, location 'pivot' and find a '1' bit
-        u32 iw = (pivot / 32);  // The index of a 32-bit word in level 0
-        u32 ib = (pivot & 31);  // The bit number in that 32-bit word
-
-        s8 const ml = levels();
-        s8       il = ml;
-
-        while (il >= 0 && il <= ml)
+        if (pivot < size())
         {
-            u32 const* level = il == 0 ? &m_l0 : (il < ml ? m_l[il - 1] : m_binmap0.m_l[il - 1]);
-            u32 const  w     = level[iw] & (0xffffffff >> (31 - ib));
-            if (w != 0)
+            // Start at bottom level, location 'pivot' and find a '1' bit
+            u32 iw = (pivot >> 5);  // The index of a 32-bit word in level 0
+            u32 ib = (pivot & 31);  // The bit number in that 32-bit word
+
+            s8 const ml = levels();
+            s8       il = ml;
+
+            while (il >= 0 && il <= ml)
             {
-                iw = (iw * 32) + (u32)math::findFirstBit(w);
-                if (il == ml)
-                    return iw;
-                il += 1;  // Go down one level
-                ib = 31;
+                u32 const* level = il == 0 ? &m_l0 : (il < ml ? m_l[il - 1] : m_binmap0.m_l[il - 1]);
+                u32 const  w     = level[iw] & (0xffffffff >> (31 - ib));
+                if (w != 0)
+                {
+                    iw = (iw * 32) + (u32)math::findFirstBit(w);
+                    if (il == ml)
+                        return iw;
+                    il += 1;  // Go down one level
+                    ib = 31;
+                }
+                else
+                {
+                    // move one unit in the direction of lower
+                    iw -= 1;
+                    ib = (iw & 31);
+                    iw = (iw >> 5);
+                    il -= 1;  // Go up one level
+                }
             }
-            else
-            {
-                // move one unit in the direction of lower
-                iw -= 1;
-                ib = (iw & 31);
-                iw = (iw / 32);
-                il -= 1;  // Go up one level
-            }
-        };
+        }
         return -1;
     }
 
