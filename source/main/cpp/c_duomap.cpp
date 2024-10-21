@@ -342,8 +342,8 @@ namespace ncore
         return bit;
     }
 
-    s32 duomap_t::upper_free(u32 pivot) const { return m_binmap0.upper(pivot); }
-    s32 duomap_t::lower_free(u32 pivot) const { return m_binmap0.lower(pivot); }
+    s32 duomap_t::next_free_up(u32 pivot) const { return m_binmap0.upper(pivot); }
+    s32 duomap_t::next_free_down(u32 pivot) const { return m_binmap0.lower(pivot); }
 
     s32 duomap_t::find_used() const
     {

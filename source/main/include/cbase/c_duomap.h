@@ -60,8 +60,8 @@ namespace ncore
         s32 find_free_upper() const;         // Finds the last free bit and returns the bit index
         s32 find_free_upper_and_set_used();  // Finds the last free bit and sets it to used and returns the bit index
 
-        s32 upper_free(u32 pivot) const;  // Finds the first free bit greater than the pivot
-        s32 lower_free(u32 pivot) const;  // Finds the first free bit less than the pivot (high to low)
+        s32 next_free_up(u32 pivot) const;  // Finds the first free bit greater than the pivot
+        s32 next_free_down(u32 pivot) const;  // Finds the first free bit less than the pivot (high to low)
 
         s32 find_used() const;
         s32 find_used_and_set_free();
