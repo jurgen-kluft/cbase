@@ -45,7 +45,7 @@ namespace ncore
 
         virtual void* v_allocate(u32 size, u32 alignment)
         {
-#    ifdef COMPILER_MSVC
+#    ifdef CC_COMPILER_MSVC
 #        ifdef USE_MALLOC_DBG
             void* mem = _aligned_malloc_dbg(size, alignment, nullptr, 0);
 #        else
@@ -61,7 +61,7 @@ namespace ncore
         virtual void v_deallocate(void* ptr)
         {
             --mAllocationCount;
-#    ifdef COMPILER_MSVC
+#    ifdef CC_COMPILER_MSVC
 #        ifdef USE_MALLOC_DBG
             _aligned_free_dbg(ptr);
 #        else

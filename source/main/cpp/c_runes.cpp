@@ -4122,6 +4122,7 @@ namespace ncore
                             case utf16::TYPE: utf::convert(str.m_utf16, str_cursor, str.m_end, m_runes.m_ascii, m_cursor, m_runes.m_eos); break;
                             case utf32::TYPE: utf::convert(str.m_utf32, str_cursor, str.m_end, m_runes.m_ascii, m_cursor, m_runes.m_eos); break;
                         }
+                        break;
                     case ucs2::TYPE:
                         switch (str.m_type)
                         {
@@ -4131,6 +4132,7 @@ namespace ncore
                             case utf16::TYPE: utf::convert(str.m_utf16, str_cursor, str.m_end, m_runes.m_ucs2, m_cursor, m_runes.m_eos); break;
                             case utf32::TYPE: utf::convert(str.m_utf32, str_cursor, str.m_end, m_runes.m_ucs2, m_cursor, m_runes.m_eos); break;
                         }
+                        break;
                     case utf8::TYPE:
                         switch (str.m_type)
                         {
@@ -4140,6 +4142,7 @@ namespace ncore
                             case utf16::TYPE: utf::convert(str.m_utf16, str_cursor, str.m_end, m_runes.m_utf8, m_cursor, m_runes.m_eos); break;
                             case utf32::TYPE: utf::convert(str.m_utf32, str_cursor, str.m_end, m_runes.m_utf8, m_cursor, m_runes.m_eos); break;
                         }
+                        break;
                     case utf16::TYPE:
                         switch (str.m_type)
                         {
@@ -4149,6 +4152,7 @@ namespace ncore
                             case utf16::TYPE: utf::convert(str.m_utf16, str_cursor, str.m_end, m_runes.m_utf16, m_cursor, m_runes.m_eos); break;
                             case utf32::TYPE: utf::convert(str.m_utf32, str_cursor, str.m_end, m_runes.m_utf16, m_cursor, m_runes.m_eos); break;
                         }
+                        break;
                     case utf32::TYPE:
                         switch (str.m_type)
                         {
@@ -4158,6 +4162,7 @@ namespace ncore
                             case utf16::TYPE: utf::convert(str.m_utf16, str_cursor, str.m_end, m_runes.m_utf32, m_cursor, m_runes.m_eos); break;
                             case utf32::TYPE: utf::convert(str.m_utf32, str_cursor, str.m_end, m_runes.m_utf32, m_cursor, m_runes.m_eos); break;
                         }
+                        break;
                     default: ASSERT(false); break;
                 }
                 return str_cursor - str.m_str;
