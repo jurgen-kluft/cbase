@@ -63,7 +63,7 @@ namespace ncore
         inline u8* begin() const { return mArray; }
         inline u8* next(u8* current) const
         {
-            ASSERT(g_ptr_in_range(mArray, (uint_t)mReservedItems * mSizeOfItem, current));
+            ASSERT(g_ptr_inside_range(mArray, (uint_t)mReservedItems * mSizeOfItem, current));
             return current + (uint_t)mSizeOfItem;
         }
         inline u8* end() const { return &mArray[mLength * mSizeOfItem]; }

@@ -10,7 +10,7 @@ namespace ncore
 {
     struct string8
     {
-        size_t     m_len;
+        u32     m_len;
         utf8::rune m_str[512];
 
         template <typename... Args>
@@ -24,7 +24,7 @@ namespace ncore
 
         void append(const u8* s, size_t l)
         {
-            while (l > 0 && m_len < sizeof(m_str) - 1)
+            while (l > 0 && m_len < g_array_size(m_str) - 1)
             {
                 m_str[m_len++].r = *s++;
                 --l;
@@ -34,7 +34,7 @@ namespace ncore
 
     struct string16
     {
-        size_t      m_len;
+        u32 m_len;
         utf16::rune m_str[512];
 
         template <typename... Args>
@@ -48,7 +48,7 @@ namespace ncore
 
         void append(const int* s, size_t l)
         {
-            while (l > 0 && m_len < sizeof(m_str) - 1)
+            while (l > 0 && m_len < g_array_size(m_str) - 1)
             {
                 m_str[m_len++].r = (u16)*s++;
                 --l;
@@ -58,7 +58,7 @@ namespace ncore
 
     struct string32
     {
-        size_t      m_len;
+        u32         m_len;
         utf32::rune m_str[512];
 
         template <typename... Args>
@@ -72,7 +72,7 @@ namespace ncore
 
         void append(const int* s, size_t l)
         {
-            while (l > 0 && m_len < sizeof(m_str) - 1)
+            while (l > 0 && m_len < g_array_size(m_str) - 1)
             {
                 m_str[m_len++].r = (u32)*s++;
                 --l;

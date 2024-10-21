@@ -380,7 +380,7 @@ namespace ncore
         if (m_l0 == 0)
             return -1;
 
-        u32 const l  = levels() - 1;
+        s8 const l  = levels() - 1;
         u32       wi = 0;
         s8        bi = 31 - math::findLastBit(m_l0);
         ASSERT(bi >= 0 && bi < 32);

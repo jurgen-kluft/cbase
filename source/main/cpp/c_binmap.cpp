@@ -437,19 +437,19 @@ namespace ncore
                 if (w != 0)
                 {
                     s32 const found_bit = (s32)((iw * 32) + math::findFirstBit(w));
-                    return (found_bit < maxbits) ? found_bit : -1;
+                    return (found_bit < (s32)maxbits) ? found_bit : -1;
                 }
             }
 
             {
                 u32 const nw = (maxbits + 31) >> 5;
-                for (s32 i = iw + 1; i < nw; ++i)
+                for (u32 i = iw + 1; i < nw; ++i)
                 {
                     u32 const w = level[i];
                     if (w != 0)
                     {
                         s32 const found_bit = (s32)((i * 32) + math::findFirstBit(w));
-                        return (found_bit < maxbits) ? found_bit : -1;
+                        return (found_bit < (s32)maxbits) ? found_bit : -1;
                     }
                 }
             }

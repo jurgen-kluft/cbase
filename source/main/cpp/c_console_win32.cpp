@@ -29,6 +29,32 @@ namespace ncore
             return write_utf32(src);
         }
 
+        virtual s32 vwrite(const char* str)
+        {
+            const s32 maxlen = 124;
+            uchar16   str16[maxlen + 4];
+
+            s32           l   = 0;
+            ascii::pcrune src = str;
+            while (*src != '\0')
+            {
+                uchar16* dst16 = (uchar16*)str16;
+                uchar16* end16 = dst16 + maxlen;
+                s32      ll    = 0;
+                while (*src != '\0' && dst16 < end16)
+                {
+                    uchar32 c = *src++;
+                    write_utf16(c, dst16, end16);
+                    ll += 1;
+                }
+                str16[ll] = 0;
+                ::OutputDebugStringW((LPCWSTR)str16);
+                ::fputws((const wchar_t*)str16, stdout);
+                l += ll;
+            }
+            return l;
+        }
+
         virtual s32 vwrite(const char* str, const char* end)
         {
             crunes_t src = make_crunes(str, end);
