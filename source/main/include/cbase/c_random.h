@@ -17,20 +17,20 @@ namespace ncore
         virtual void generate(u8* outData, u32 numBytes) = 0;
     };
 
-    inline bool random_bool(random_t* rng)
+    inline bool g_random_bool(random_t* rng)
     {
         u8 val;
         rng->generate(&val, 1);
         return val < 128;
     }
-    inline u32 random_u32(random_t* rng)
+    inline u32 g_random_u32(random_t* rng)
     {
         u32 val;
         u8* pval = (u8*)&val;
         rng->generate(pval, 4);
         return val;
     }
-    inline u32 random_u32(random_t* rng, s8 inBits)
+    inline u32 g_random_u32(random_t* rng, s8 inBits)
     {
         ASSERT(inBits <= 32);
         u32 val;
@@ -38,20 +38,20 @@ namespace ncore
         rng->generate(pval, 4);
         return (val >> (32 - inBits));
     }
-    inline s32 random_s32(random_t* rng) { return (s32)(random_u32(rng) & 0x7fffffff); }
-    inline s32 random_s32(random_t* rng, s8 inBits)
+    inline s32 g_random_s32(random_t* rng) { return (s32)(g_random_u32(rng) & 0x7fffffff); }
+    inline s32 g_random_s32(random_t* rng, s8 inBits)
     {
         ASSERT(inBits <= 31);
-        return ((s32)random_u32(rng, inBits + 1) - (s32)(1 << inBits));
+        return ((s32)g_random_u32(rng, inBits + 1) - (s32)(1 << inBits));
     }
-    inline u64 random_u64(random_t* rng)
+    inline u64 g_random_u64(random_t* rng)
     {
         u64 val;
         u8* pval = (u8*)&val;
         rng->generate(pval, 8);
         return val;
     }
-    inline u64 random_u64(random_t* rng, s8 inBits)
+    inline u64 g_random_u64(random_t* rng, s8 inBits)
     {
         ASSERT(inBits <= 64);
         u64 val;
@@ -59,28 +59,28 @@ namespace ncore
         rng->generate(pval, 8);
         return (val >> (64 - inBits));
     }
-    inline s64 random_s64(random_t* rng) { return ((s64)random_u64(rng) & D_CONSTANT_U64(0x7fffffffffffffff)); }
-    inline s64 random_s64(random_t* rng, s8 inBits)
+    inline s64 g_random_s64(random_t* rng) { return ((s64)g_random_u64(rng) & D_CONSTANT_U64(0x7fffffffffffffff)); }
+    inline s64 g_random_s64(random_t* rng, s8 inBits)
     {
         ASSERT(inBits <= 63);
-        return ((s64)random_u64(rng, inBits + 1) - (s64)(1 << inBits));
+        return ((s64)g_random_u64(rng, inBits + 1) - (s64)(1 << inBits));
     }
-    inline f32 random_f32(random_t* rng) { return (f32)random_u32(rng) / (f32)cU32Max; }
-    inline f32 random_f32_min_max(random_t* rng, f32 _min, f32 _max) { return _min + (random_f32(rng) * (_max - _min)); }
-    inline f32 random_f32S(random_t* rng) { return ((random_f32(rng) - 0.5f) * 2.0f); }
-    inline s32 random_s32_0_max(random_t* rng, s32 max) { return (s32)random_u32(rng, 31) % max; }
-    inline s32 random_s32_0_1(random_t* rng) { return random_s32_0_max(rng, 2); }
-    inline s32 random_s32_neg1_pos1(random_t* rng)
+    inline f32 g_random_f32(random_t* rng) { return (f32)g_random_u32(rng) / (f32)cU32Max; }
+    inline f32 g_random_f32_min_max(random_t* rng, f32 _min, f32 _max) { return _min + (g_random_f32(rng) * (_max - _min)); }
+    inline f32 g_random_f32S(random_t* rng) { return ((g_random_f32(rng) - 0.5f) * 2.0f); }
+    inline s32 g_random_s32_0_max(random_t* rng, s32 max) { return (s32)g_random_u32(rng, 31) % max; }
+    inline s32 g_random_s32_0_1(random_t* rng) { return g_random_s32_0_max(rng, 2); }
+    inline s32 g_random_s32_neg1_pos1(random_t* rng)
     {
-        u32 const val = random_u32(rng, 2);
+        u32 const val = g_random_u32(rng, 2);
         if (val < (cU32Max / 3))
             return -1;
         if (val < (cU32Max * 2 / 3))
             return 0;
         return 1;
     }
-    inline f32 random_f32_0_1(random_t* rng) { return random_f32(rng); }
-    inline f64 random_f64_0_1(random_t* rng) { return ((f64)random_u64(rng) / (f64)cU64Max); }
+    inline f32 g_random_f32_0_1(random_t* rng) { return g_random_f32(rng); }
+    inline f64 g_random_f64_0_1(random_t* rng) { return ((f64)g_random_u64(rng) / (f64)cU64Max); }
 
     class xor_random_t : public random_t
     {

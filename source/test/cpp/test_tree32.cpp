@@ -474,7 +474,7 @@ UNITTEST_SUITE_BEGIN(tree32)
 
             s_rand.reset(0x1234567890abcdef);
             for (s32 i = 0; i < num_nodes; ++i)
-                values[i] = random_s64(&s_rand);
+                values[i] = g_random_s64(&s_rand);
 
             rbnode_t *root  = nullptr;
             s32       count = 0;
@@ -502,7 +502,7 @@ UNITTEST_SUITE_BEGIN(tree32)
 
             s_rand.reset(0x1234567890abcdef);
             for (s32 i = 0; i < num_nodes; ++i)
-                values[i] = random_s64(&s_rand);
+                values[i] = g_random_s64(&s_rand);
 
             rbnode_t *root  = nullptr;
             s32       count = 0;
@@ -530,7 +530,7 @@ UNITTEST_SUITE_BEGIN(tree32)
             xor_random_t rng(seed);
             for (s32 i = 0; i < size; ++i)
             {
-                const s32 j = (s32)(random_u32(&rng) & 0x7fffffff) % size;
+                const s32 j = (s32)(g_random_u32(&rng) & 0x7fffffff) % size;
                 const s64 t = v[i];
                 v[i]        = v[j];
                 v[j]        = t;
