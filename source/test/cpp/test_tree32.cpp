@@ -1,5 +1,6 @@
 #include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
+#include "cbase/c_random.h"
 #include "cbase/c_tree32.h"
 
 #include "cunittest/cunittest.h"
@@ -452,37 +453,7 @@ UNITTEST_SUITE_BEGIN(tree32)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        struct XorRandom
-        {
-            u64 s0, s1;
-            inline XorRandom(u64 seed)
-                : s0(seed)
-                , s1(0)
-            {
-                next();
-                next();
-            }
-
-            inline void seed(u64 seed)
-            {
-                s0 = seed;
-                s1 = 0;
-                next();
-                next();
-            }
-
-            inline u64 next(void)
-            {
-                u64 ss1    = s0;
-                u64 ss0    = s1;
-                u64 result = ss0 + ss1;
-                s0         = ss0;
-                ss1 ^= ss1 << 23;
-                s1 = ss1 ^ ss0 ^ (ss1 >> 18) ^ (ss0 >> 5);
-                return result;
-            }
-        };
-        static XorRandom s_rand(0x1234567890abcdef);
+        static xor_random_t s_rand(0x1234567890abcdef);
 
         static s32 compare(void *aa, void *bb)
         {
@@ -501,9 +472,9 @@ UNITTEST_SUITE_BEGIN(tree32)
             rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
             s64      *values    = (s64 *)Allocator->allocate(num_nodes * sizeof(s64));
 
-            s_rand.seed(0x1234567890abcdef);
+            s_rand.reset(0x1234567890abcdef);
             for (s32 i = 0; i < num_nodes; ++i)
-                values[i] = s_rand.next();
+                values[i] = random_s64(&s_rand);
 
             rbnode_t *root  = nullptr;
             s32       count = 0;
@@ -529,9 +500,9 @@ UNITTEST_SUITE_BEGIN(tree32)
             rbnode_t *nodes     = (rbnode_t *)Allocator->allocate(num_nodes * sizeof(rbnode_t));
             s64      *values    = (s64 *)Allocator->allocate(num_nodes * sizeof(s64));
 
-            s_rand.seed(0x1234567890abcdef);
+            s_rand.reset(0x1234567890abcdef);
             for (s32 i = 0; i < num_nodes; ++i)
-                values[i] = s_rand.next();
+                values[i] = random_s64(&s_rand);
 
             rbnode_t *root  = nullptr;
             s32       count = 0;
@@ -556,10 +527,10 @@ UNITTEST_SUITE_BEGIN(tree32)
 
         static void RandomShuffle(s64 * v, s32 size, u64 seed)
         {
-            XorRandom rng(seed);
+            xor_random_t rng(seed);
             for (s32 i = 0; i < size; ++i)
             {
-                const s32 j = (s32)(rng.next() & 0x7fffffff) % size;
+                const s32 j = (s32)(random_u32(&rng) & 0x7fffffff) % size;
                 const s64 t = v[i];
                 v[i]        = v[j];
                 v[j]        = t;

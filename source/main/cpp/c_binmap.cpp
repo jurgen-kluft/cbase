@@ -162,11 +162,10 @@ namespace ncore
             for (s8 l = levels(); l >= 0; --l)
             {
                 u32*      level = l == 0 ? &m_l0 : m_l[l - 1];
-                const u32 li    = wi & (32 - 1);
+                const u32 bi    = wi & (32 - 1);
                 wi              = wi >> 5;
-                const u32 wd    = (li == 0) ? 0xffffffff : level[wi];
-                const u32 bi    = (u32)1 << li;
-                level[wi]       = wd & ~bi;
+                const u32 wd    = (bi == 0) ? 0xffffffff : level[wi];
+                level[wi]       = wd & ~((u32)1 << bi);
                 if (wd != 0xffffffff)
                     return;
             }
