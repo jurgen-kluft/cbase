@@ -49,8 +49,8 @@ namespace ncore
         void init_all_used_lazy(config_t const& cfg, alloc_t* allocator);
         void tick_all_used_lazy(u32 bit);  // Progressive lazy initialization
 
-        void set_free(u32 bit);
-        void set_used(u32 bit);
+        bool set_free(u32 bit);
+        bool set_used(u32 bit);
         bool get(u32 bit) const;
         bool is_free(u32 bit) const { return !get(bit); }
         bool is_used(u32 bit) const { return get(bit); }

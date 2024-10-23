@@ -259,14 +259,14 @@ namespace ncore
     // --------------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------------
 
-    void duomap_t::set_used(u32 _bit)
+    bool duomap_t::set_used(u32 _bit)
     {
         if (_bit < size())
         {
             s8        l   = levels();
             u32 const wdb = m_binmap0.m_l[l - 1][_bit >> 5];
             if ((wdb & (1 << (_bit & 31))) != 0)  // If the bit is already set -> early out
-                return;
+                return false;
 
             m_binmap0.set_used(_bit);
             m_set += 1;
@@ -283,20 +283,22 @@ namespace ncore
                     u32 wd          = level[wi];
                     level[wi]       = wd | bi;
                     if (wd != 0)  // If all bits where not 0 -> early out
-                        return;
+                        return true;
                 }
             }
+            return true;
         }
+        return false;
     }
 
-    void duomap_t::set_free(u32 _bit)
+    bool duomap_t::set_free(u32 _bit)
     {
         if (_bit < size())
         {
             s8        l   = levels();
             u32 const wdb = m_binmap0.m_l[l - 1][_bit >> 5];
             if ((wdb & (1 << (_bit & 31))) == 0)  // If the bit is already clr -> early out
-                return;
+                return false;
 
             m_binmap0.set_free(_bit);
             m_set -= 1;
@@ -314,10 +316,12 @@ namespace ncore
                     u32 wd          = level[wi] & ~bi;
                     level[wi]       = wd;
                     if (wd != 0)  // All bits are not yet 0 -> early out
-                        return;
+                        return true;
                 }
             }
+            return true;
         }
+        return false;
     }
 
     bool duomap_t::get(u32 bit) const { return m_binmap0.get(bit); }
