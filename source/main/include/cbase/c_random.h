@@ -156,6 +156,25 @@ namespace ncore
         }
     };
 
+    class wyrand_t : public random_t
+    {
+    public:
+        wyrand_t()
+            : m_seed(0x7F2F0A584B0A4F3B)
+        {
+        }
+        ~wyrand_t() {}
+
+        virtual void reset(s64 inSeed = 0x7F2F0A584B0A4F3B);
+        virtual u32  rand32();
+        virtual u64  rand64();
+        virtual void generate(u8* outData, u32 numBytes);
+
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
+    private:
+        u64 m_seed;
+    };
+
 };  // namespace ncore
 
 #endif  // __CBASE_RANDOM_H__
