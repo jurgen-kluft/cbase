@@ -11,6 +11,9 @@ namespace ncore
 {
     namespace nhash
     {
+        u64  wyrand(u64* seed);
+        void wyrand(u64* seed, u8* buffer, u32 size);
+
         class wyreg
         {
         public:

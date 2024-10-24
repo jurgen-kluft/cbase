@@ -5,14 +5,10 @@
 #include "cbase/c_debug.h"
 #include "cbase/c_random.h"
 #include "cbase/c_runes.h"
+#include "cbase/c_wyhash.h"
 
 namespace ncore
 {
-    namespace nhash
-    {
-        extern void wyrand(u64* seed, u8* buffer, u32 size);
-    }  // namespace nhash
-
     // Note: This is the default random generator that is used by context_t
     // The user is able to change the random generator by calling context_t::set_random()
     class wyrand_t : public random_t
@@ -25,6 +21,8 @@ namespace ncore
         ~wyrand_t() {}
 
         virtual void reset(s64 inSeed = 0);
+        virtual u32  rand32();
+        virtual u64  rand64();
         virtual void generate(u8* outData, u32 numBytes);
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
@@ -33,6 +31,8 @@ namespace ncore
     };
 
     void wyrand_t::reset(s64 inSeed) { m_seed = (u64)inSeed; }
+    u32  wyrand_t::rand32() { return (u32)nhash::wyrand(&m_seed); }
+    u64  wyrand_t::rand64() { return nhash::wyrand(&m_seed); }
     void wyrand_t::generate(u8* outData, u32 numBytes) { nhash::wyrand(&m_seed, outData, numBytes); }
 
 }  // namespace ncore

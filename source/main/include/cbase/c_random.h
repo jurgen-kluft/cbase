@@ -14,6 +14,8 @@ namespace ncore
     public:
         virtual ~random_t() {}
         virtual void reset(s64 inSeed = 0)               = 0;
+        virtual u32  rand32()                            = 0;
+        virtual u64  rand64()                            = 0;
         virtual void generate(u8* outData, u32 numBytes) = 0;
     };
 
@@ -23,19 +25,11 @@ namespace ncore
         rng->generate(&val, 1);
         return val < 128;
     }
-    inline u32 g_random_u32(random_t* rng)
-    {
-        u32 val;
-        u8* pval = (u8*)&val;
-        rng->generate(pval, 4);
-        return val;
-    }
+    inline u32 g_random_u32(random_t* rng) { return rng->rand32(); }
     inline u32 g_random_u32(random_t* rng, s8 inBits)
     {
         ASSERT(inBits <= 32);
-        u32 val;
-        u8* pval = (u8*)&val;
-        rng->generate(pval, 4);
+        u32 val = rng->rand32();
         return (val >> (32 - inBits));
     }
     inline s32 g_random_s32(random_t* rng) { return (s32)(g_random_u32(rng) & 0x7fffffff); }
@@ -44,26 +38,18 @@ namespace ncore
         ASSERT(inBits <= 31);
         return ((s32)g_random_u32(rng, inBits + 1) - (s32)(1 << inBits));
     }
-    inline u64 g_random_u64(random_t* rng)
-    {
-        u64 val;
-        u8* pval = (u8*)&val;
-        rng->generate(pval, 8);
-        return val;
-    }
+    inline u64 g_random_u64(random_t* rng) { return rng->rand64(); }
     inline u64 g_random_u64(random_t* rng, s8 inBits)
     {
         ASSERT(inBits <= 64);
-        u64 val;
-        u8* pval = (u8*)&val;
-        rng->generate(pval, 8);
+        u64 val = rng->rand64();
         return (val >> (64 - inBits));
     }
     inline s64 g_random_s64(random_t* rng) { return ((s64)g_random_u64(rng) & D_CONSTANT_U64(0x7fffffffffffffff)); }
     inline s64 g_random_s64(random_t* rng, s8 inBits)
     {
         ASSERT(inBits <= 63);
-        return ((s64)g_random_u64(rng, inBits + 1) - (s64)(1 << inBits));
+        return ((s64)g_random_u64(rng, inBits + 1) - ((s64)1 << inBits));
     }
     inline f32 g_random_f32(random_t* rng) { return (f32)g_random_u32(rng) / (f32)cU32Max; }
     inline f32 g_random_f32_min_max(random_t* rng, f32 _min, f32 _max) { return _min + (g_random_f32(rng) * (_max - _min)); }
@@ -100,7 +86,7 @@ namespace ncore
     public:
         inline xor_random_t(u64 seed = 0x1234567890abcdef)
             : s0(seed)
-            , s1(0)
+            , s1(6364136223846793005)
         {
             next();
             next();
@@ -108,11 +94,14 @@ namespace ncore
 
         void reset(s64 seed) override
         {
-            s0 = seed;
-            s1 = 0;
+            s0 = seed + 6364136223846793;
+            s1 = 6364136223846793005;
             next();
             next();
         }
+
+        u32 rand32() override { return (u32)next(); }
+        u64 rand64() override { return next(); }
 
         void generate(u8* outData, u32 numBytes) override
         {
