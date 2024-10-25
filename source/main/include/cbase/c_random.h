@@ -5,6 +5,7 @@
 #    pragma once
 #endif
 
+#include "ccore/c_allocator.h"
 #include "ccore/c_debug.h"
 
 namespace ncore
@@ -171,6 +172,7 @@ namespace ncore
         virtual void generate(u8* outData, u32 numBytes);
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
+
     private:
         u64 m_seed;
     };
