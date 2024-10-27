@@ -8,10 +8,16 @@
 
 namespace ncore
 {
-    // l0 :  32 =  1  * u32
-    // l1 :  1K =  32 * u32
-    // l2 : 32K =  1K * u32
-    // l3 :  1M = 32K * u32
+    // Note: Optimization:
+    // Hold one pointer only:
+    // - If bit 0 is set, then the pointer is { u64 m_l0_and_size_and_levels; }
+    // - If bit 0 is not set, then the pointer points to { u64 m_l0_and_size_and_levels; u32* m_l[]; }
+    //   The array 'm_l' has N pointers depending on the number of levels.
+    //   So the allocations are of a different size:
+    //   - 16 bytes for 1 level
+    //   - 24 bytes for 2 levels
+    //   - 32 bytes for 3 levels
+    //   - etc.
 
     binmap_t::config_t binmap_t::config_t::compute(u32 count)
     {
@@ -263,7 +269,7 @@ namespace ncore
                 wi              = wi >> 5;
                 const u32 wd    = level[wi];
                 level[wi]       = wd & ~bi;
-                // There are already where some empty places -> early out
+                // There where already some empty places -> early out
                 if (wd != 0xFFFFFFFF)
                     return;
             }
