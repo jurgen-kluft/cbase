@@ -30,10 +30,10 @@ namespace ncore
 
     // Segment, 2GB is split into sections of different power-of-2 sizes
     // 4 GB / 64 = 64 MB
-    const u32 c_address_null = 0xffffffff;
     struct range_t
     {
-        const u8    c_null = 0xff;
+        const u32   c_null_address = 0xffffffff;
+        const u8    c_null_node    = 0xff;
         typedef u8  node_t;
         typedef u16 span_t;
 
@@ -46,7 +46,6 @@ namespace ncore
         node_t  m_size_lists[16];       // Every size has its own list
         u16     m_size_list_occupancy;  // Which size list index is occupied
         u8      m_base_size_min;        // ilog2(address_range / 64)
-        u8      m_base_size_range;
         u8      m_node_count_shift;
 
         void setup(alloc_t* allocator, u64 address_range = 1 * cTB, u8 node_count_shift = 8);
@@ -66,21 +65,21 @@ namespace ncore
         m_node_count_shift = node_count_shift;
         m_base_size_min    = math::ilog2(address_range >> node_count_shift);
         for (u32 i = 0; i < g_array_size(m_size_lists); ++i)
-            m_size_lists[i] = c_null;
+            m_size_lists[i] = c_null_node;
 
         u32 const node_count = 1 << node_count_shift;
         m_node_size          = g_allocate_array_and_clear<u8>(allocator, node_count);
-        m_node_next          = g_allocate_array_and_memset<node_t>(allocator, node_count, c_null);
-        m_node_prev          = g_allocate_array_and_memset<node_t>(allocator, node_count, c_null);
+        m_node_next          = g_allocate_array_and_memset<node_t>(allocator, node_count, c_null_node);
+        m_node_prev          = g_allocate_array_and_memset<node_t>(allocator, node_count, c_null_node);
         m_node_free          = g_allocate_array_and_clear<u16>(allocator, (node_count + 15) >> (sizeof(u16) * 2));
 
-        m_base_size_min                 = math::ilog2(address_range / node_count);
-        m_base_size_range               = math::ilog2(address_range) - m_base_size_min;
-        m_size_list_occupancy           = 1 << m_base_size_range;  // Mark the largest size as occupied
-        m_size_lists[m_base_size_range] = 0;                       // The largest node in the size list
-        m_node_size[0]                  = node_count - 1;          // Full size range
-        m_node_next[0]                  = 0;                       // Link the node to itself
-        m_node_prev[0]                  = 0;                       // Link the node to itself
+        m_base_size_min               = math::ilog2(address_range / node_count);
+        const u8 base_size_range      = math::ilog2(address_range) - m_base_size_min;
+        m_size_list_occupancy         = 1 << base_size_range;  // Mark the largest size as occupied
+        m_size_lists[base_size_range] = 0;                     // The largest node in the size list
+        m_node_size[0]                = node_count - 1;        // Full size range
+        m_node_next[0]                = 0;                     // Link the node to itself
+        m_node_prev[0]                = 0;                     // Link the node to itself
     }
 
     void range_t::teardown(alloc_t* allocator)
@@ -104,8 +103,8 @@ namespace ncore
         m_node_size[insert] = (node_t)((span >> 1) - 1);
 
         // Invalidate the next and previous pointers of the new node (debugging)
-        m_node_next[insert] = c_null;
-        m_node_prev[insert] = c_null;
+        m_node_next[insert] = c_null_node;
+        m_node_prev[insert] = c_null_node;
 
         // Add node and insert into the size list that is (index - 1)
         add_size(index - 1, node);
@@ -117,7 +116,7 @@ namespace ncore
     void range_t::add_size(u8 index, node_t node)
     {
         node_t& head = m_size_lists[index];
-        if (head == c_null)
+        if (head == c_null_node)
         {
             head              = node;
             m_node_next[node] = node;
@@ -140,13 +139,13 @@ namespace ncore
         ASSERT(index >= 0 && index <= 8);
         node_t& head                   = m_size_lists[index];
         head                           = (head == node) ? m_node_next[node] : head;
-        head                           = (head == node) ? c_null : head;
+        head                           = (head == node) ? c_null_node : head;
         m_node_next[m_node_prev[node]] = m_node_next[node];
         m_node_prev[m_node_next[node]] = m_node_prev[node];
-        m_node_next[node]              = c_null;
-        m_node_prev[node]              = c_null;
+        m_node_next[node]              = c_null_node;
+        m_node_prev[node]              = c_null_node;
 
-        if (head == c_null)
+        if (head == c_null_node)
             m_size_list_occupancy &= ~(1 << index);
     }
 
@@ -157,7 +156,7 @@ namespace ncore
         u8 const     index = math::ilog2(span);
 
         node_t node = m_size_lists[index];
-        if (node == c_null)
+        if (node == c_null_node)
         {
             // In the occupancy find a bit set that is above our size
             // Mask out the bits below size and then do a find first bit
@@ -184,7 +183,7 @@ namespace ncore
 
     bool range_t::deallocate(u64 address)
     {
-        if (address == c_address_null || address >= (((u64)1 << m_base_size_min) << 8))
+        if (address == c_null_address || address >= (((u64)1 << m_base_size_min) << 8))
             return false;
 
         node_t node = (node_t)(address >> m_base_size_min);
@@ -210,7 +209,7 @@ namespace ncore
             node_t const merged = node < sibling ? node : sibling;  // Always take the left node as the merged node
             node_t const other  = node < sibling ? sibling : node;  // Always take the right node as the other node
             m_node_size[merged] = (u8)((1 << (index + 1)) - 1);     // Double the span (size) of the node
-            m_node_size[other]  = c_null;                           // Invalidate the node that is merged into 'merged'
+            m_node_size[other]  = c_null_node;                      // Invalidate the node that is merged into 'merged'
 
             node  = merged;
             span  = (span_t)m_node_size[node] + 1;
