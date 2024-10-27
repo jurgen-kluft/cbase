@@ -28,110 +28,108 @@ namespace ncore
     to allocate and deallocate sections.
     */
 
-    // clang-format off
-    // 64 nodes
-    //   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54  55  56  57  58  59  60  61  62  63
-    // [ 1 | 1 | 2 | . | 3 | . | . | . | 4 | . | . | . | . | . | . | . | 5 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 6 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . ]
-    // [ 7 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . ]
-    // clang-format on
-
     // Segment, 2GB is split into sections of different power-of-2 sizes
     // 4 GB / 64 = 64 MB
     const u32 c_address_null = 0xffffffff;
     struct range_t
     {
-        const u8 c_null = 0xff;
+        const u8    c_null = 0xff;
+        typedef u8  node_t;
+        typedef u16 span_t;
 
         // node state is 1 bit per node, 0 = free, 0x80 = allocated
         // the lower 7 bits is the size range of the node
-        u8 m_size[64];         // Size is the size_index + 1, so 1 = 32 MB, 2 = 64 MB, 3 = 128 MB, etc.
-        u8 m_node_next[64];    // Next node in the size list
-        u8 m_node_prev[64];    // Previous node in the size list
-        u8 m_size_lists[64];   // Size starts at 32 MB (0) with increments, 64 MB (1), 128 MB (2), 256 MB (3), 512 MB (4), 1 GB (5), 2 GB (6), 4 GB (7)
-        u8 m_base_size_shift;  // ilog2(address_range / 64)
-        u8 m_max_size;
-        u8 m_size_list_occupancy;  // Which size list index is occupied
+        u8     m_size[256];            // Size is the size_index + 1, so 1 = 32 MB, 2 = 256 MB, 3 = 128 MB, etc.
+        node_t m_node_next[256];       // Next node in the size list
+        node_t m_node_prev[256];       // Previous node in the size list
+        u16    m_node_free[16];        // Single bit per node, 0 = free, 1 = allocated
+        node_t m_size_lists[16];       // Every size has its own list
+        u16    m_size_list_occupancy;  // Which size list index is occupied
+        u8     m_base_size_min;        // ilog2(address_range / 64)
+        u8     m_base_size_max;
 
         void setup(u64 address_range);
 
         bool allocate(u64 size, u64& out_address);  // Returns false if the size is not available
-        void deallocate(u64 address);               // Deallocates the memory at the given address
+        bool deallocate(u64 address);               // Deallocates the memory at the given address
 
-        bool split(u8 node);  // Splits the node into two nodes
-        u8   get_sibling(u8 node) const;
+        bool split(node_t node);  // Splits the node into two nodes
 
-        void add_size(u8 size_index, u8 node);
-        void remove_size(u8 size_index, u8 node);
+        void add_size(u8 size_index, node_t node);
+        void remove_size(u8 size_index, node_t node);
     };
 
     void range_t::setup(u64 address_range)
     {
-        m_base_size_shift = math::ilog2(address_range / 64);
-        for (u32 i = 0; i < 8; ++i)
+        for (u32 i = 0; i < 16; ++i)
+        {
+            m_node_free[i]  = 0;
             m_size_lists[i] = c_null;
+        }
 
-        m_max_size               = math::ilog2(address_range) - m_base_size_shift;
-        m_size_list_occupancy    = 1 << m_max_size;  // Mark the largest size as occupied
-        m_size_lists[m_max_size] = 0;                // The largest node in the size list
-        m_size[0]                = m_max_size;       // Full size range (size list index 7)
-        m_node_next[0]           = 0;                // Link the node to itself
-        m_node_prev[0]           = 0;                // Link the node to itself
+        for (u32 i = 0; i < 256; ++i)
+        {
+            m_size[i]      = c_null;
+            m_node_next[i] = c_null;
+            m_node_prev[i] = c_null;
+        }
+
+        m_base_size_min               = math::ilog2(address_range / 256);
+        m_base_size_max               = math::ilog2(address_range) - m_base_size_min;
+        m_size_list_occupancy         = 1 << 8;   // Mark the largest size as occupied
+        m_size_lists[m_base_size_max] = 0;        // The largest node in the size list
+        m_size[0]                     = 256 - 1;  // Full size range
+        m_node_next[0]                = 0;        // Link the node to itself
+        m_node_prev[0]                = 0;        // Link the node to itself
     }
 
-    inline u8 range_t::get_sibling(u8 node) const
+    bool range_t::split(node_t node)
     {
-        u8 const d = 64 >> (m_max_size - m_size[node]);
-        return (node & 1) ? (node - d) : (node + d);
-    }
+        const span_t span  = (span_t)m_size[node] + 1;
+        const u8     index = math::ilog2(span);
 
-    bool range_t::split(u8 node)
-    {
-        const u8 size = m_size[node];
-        remove_size(size, node);
+        remove_size(index, node);
 
         // Split the node into two nodes
-        m_size[node] = size - 1;
-        u8 const d   = 64 >> (m_max_size - (size - 1));
-        if (d == 0)
-            return false;
-
-        u8 const insert = (node & 1) ? (node - d) : (node + d);
-        m_size[insert]  = size - 1;
+        node_t const insert = node + (span >> 1);
+        m_size[node]        = (node_t)((span >> 1) - 1);
+        m_size[insert]      = (node_t)((span >> 1) - 1);
 
         // Invalidate the next and previous pointers of the new node (debugging)
         m_node_next[insert] = c_null;
         m_node_prev[insert] = c_null;
 
-        // Add node and insert into the size list that is (size - 1)
-        add_size(size - 1, node);
-        add_size(size - 1, insert);
+        // Add node and insert into the size list that is (index - 1)
+        add_size(index - 1, node);
+        add_size(index - 1, insert);
+
         return true;
     }
 
-    void range_t::add_size(u8 size, u8 node)
+    void range_t::add_size(u8 index, node_t node)
     {
-        u8& head = m_size_lists[size];
+        node_t& head = m_size_lists[index];
         if (head == c_null)
         {
             head              = node;
             m_node_next[node] = node;
             m_node_prev[node] = node;
+            m_size_list_occupancy |= (1 << index);
             return;
         }
 
-        u8 const prev     = m_node_prev[head];
+        node_t const prev = m_node_prev[head];
         m_node_next[prev] = node;
         m_node_prev[head] = node;
         m_node_next[node] = head;
         m_node_prev[node] = prev;
-
-        m_size_list_occupancy |= (1 << size);
+        m_size_list_occupancy |= (1 << index);
     }
 
-    void range_t::remove_size(u8 size, u8 node)
+    void range_t::remove_size(u8 index, node_t node)
     {
-        ASSERT(size >= 0 && size <= m_max_size);
-        u8& head                       = m_size_lists[size];
+        ASSERT(index >= 0 && index <= 8);
+        node_t& head                   = m_size_lists[index];
         head                           = (head == node) ? m_node_next[node] : head;
         head                           = (head == node) ? c_null : head;
         m_node_next[m_node_prev[node]] = m_node_next[node];
@@ -140,74 +138,79 @@ namespace ncore
         m_node_prev[node]              = c_null;
 
         if (head == c_null)
-            m_size_list_occupancy &= ~(1 << (size - 1));
+            m_size_list_occupancy &= ~(1 << index);
     }
 
     // The only size requests allowed are: 32 MB, 64 MB, 128 MB, 256 MB, 512 MB, 1 GB, 2 GB, 4 GB
-    bool range_t::allocate(u64 allocation_size, u64& out_address)
+    bool range_t::allocate(u64 _size, u64& out_address)
     {
-        s8 const pow2_index = math::ilog2(allocation_size);
-        if (pow2_index < m_base_size_shift || pow2_index > (m_base_size_shift + m_max_size))
-            return false;
+        span_t const span  = (span_t)(_size >> m_base_size_min);
+        u8 const     index = math::ilog2(span);
 
-        s32 const size = (pow2_index - m_base_size_shift);
-        ASSERT(size <= m_max_size);
-
-        u8 node = m_size_lists[size];
+        node_t node = m_size_lists[index];
         if (node == c_null)
         {
             // In the occupancy find a bit set that is above our size
             // Mask out the bits below size and then do a find first bit
-            u8 const occupancy = m_size_list_occupancy & ~((1 << size) - 1);
+            u64 const occupancy = m_size_list_occupancy & ~((1 << index) - 1);
             if (occupancy == 0)  // There are no free sizes available
                 return false;
 
-            u8 bit = math::findFirstBit(occupancy);
-            node   = m_size_lists[bit];
-            while (bit > size)
+            u8 occ = math::findFirstBit(occupancy);
+            node   = m_size_lists[occ];
+            while (occ > index)
             {
                 split(node);  // Split the node until we reach the size
-                bit -= 1;
+                occ -= 1;
             }
         }
-        else
-        {
-            node = m_size_lists[size];
-        }
 
-        remove_size(size, node);
+        remove_size(index, node);
 
-        m_size[node] |= 0x80;  // Set the node as allocated
+        m_node_free[node >> 4] |= (1 << (node & 15));
 
-        out_address = (u64)node << m_base_size_shift;
+        out_address = (u64)node << m_base_size_min;
         return true;
     }
 
-    void range_t::deallocate(u64 address)
+    bool range_t::deallocate(u64 address)
     {
-        if (address == c_address_null || address >= (64 << m_base_size_shift))
-            return;
+        if (address == c_address_null || address >= (((u64)1 << m_base_size_min) << 8))
+            return false;
 
-        s16 const node = address >> m_base_size_shift;
-        m_size[node] &= 0x7f;  // Clear the allocation bit
+        node_t node = (node_t)(address >> m_base_size_min);
+        m_node_free[node >> 4] &= ~(1 << (node & 15));
 
-        // Could be that we are freeing the largest size allocation, this means
-        // that we should not merge the node with its sibling.
-        if (m_size_list_occupancy == 0)
-            return;
+        span_t span  = (span_t)m_size[node] + 1;
+        u8     index = math::ilog2(span);
 
-        // Check if the sibling is free, if so merge the two nodes
-        u8 const d = 64 >> (m_max_size - m_size[node]);
-        if (d == 0)
-            return;
-        u8 const sibling = (node & 1) ? (node - d) : (node + d);
-        if ((m_size[sibling] & 0x80) == 0)
+        while (true)
         {
-            remove_size(m_size[sibling], sibling);  // Sibling is being merged, remove it
-            m_size[node] += 1;                      // Double the size of the node
-            m_size[sibling] = c_null;               // Invalidate the sibling node
-            add_size(m_size[node], node);           // Add the merged node to the size list
+            // Could be that we are freeing the largest size allocation, this means
+            // that we should not merge the node with its sibling.
+            if (span == 256)
+                break;
+
+            const node_t sibling = ((node & ((span << 1) - 1)) == 0) ? node + span : node - span;
+
+            // Check if the sibling is free
+            if ((m_node_free[sibling >> 4] & (1 << (sibling & 15))) != 0)
+                break;
+
+            remove_size(index, sibling);                            // Sibling is being merged, remove it
+            node_t const merged = node < sibling ? node : sibling;  // Always take the left node as the merged node
+            node_t const other  = node < sibling ? sibling : node;  // Always take the right node as the other node
+            m_size[merged]      = (u8)((1 << (index + 1)) - 1);     // Double the span (size) of the node
+            m_size[other]       = c_null;                           // Invalidate the node that is merged into 'merged'
+
+            node  = merged;
+            span  = (span_t)m_size[node] + 1;
+            index = math::ilog2(span);
         }
+
+        add_size(index, node);  // Add the merged node to the size list
+
+        return true;
     }
 }  // namespace ncore
 
@@ -222,17 +225,17 @@ UNITTEST_SUITE_BEGIN(range)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        UNITTEST_TEST(some_sizes)
+        UNITTEST_TEST(allocate)
         {
             range_t range;
-            range.setup(2 * cGB);
+            range.setup(4 * cGB);
 
             u64 address = 0;
             CHECK_TRUE(range.allocate(32 * cMB, address));
             CHECK_EQUAL(0, address);
 
             CHECK_TRUE(range.allocate(32 * cMB, address));
-            CHECK_EQUAL(32 * cGB, address);
+            CHECK_EQUAL(32 * cMB, address);
 
             CHECK_TRUE(range.allocate(64 * cMB, address));
             CHECK_EQUAL(64 * cMB, address);
@@ -248,6 +251,31 @@ UNITTEST_SUITE_BEGIN(range)
 
             CHECK_TRUE(range.allocate(1 * cGB, address));
             CHECK_EQUAL(1 * cGB, address);
+        }
+
+        UNITTEST_TEST(allocate_and_deallocate)
+        {
+            range_t range;
+            range.setup(4 * cGB);
+
+            for (s32 i = 0; i < 16; ++i)
+            {
+                u64 address = 0;
+                CHECK_TRUE(range.allocate(32 * cMB, address));
+                CHECK_EQUAL(0, address);
+
+                u64 address2 = 0;
+                CHECK_TRUE(range.allocate(32 * cMB, address2));
+                CHECK_EQUAL(32 * cMB, address2);
+
+                u64 address3 = 0;
+                CHECK_TRUE(range.allocate(64 * cMB, address3));
+                CHECK_EQUAL(64 * cMB, address3);
+
+                CHECK_TRUE(range.deallocate(address));
+                CHECK_TRUE(range.deallocate(address2));
+                CHECK_TRUE(range.deallocate(address3));
+            }
         }
     }
 }
