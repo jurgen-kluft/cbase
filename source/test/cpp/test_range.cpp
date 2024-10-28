@@ -8,28 +8,8 @@
 
 namespace ncore
 {
-    /*
-    1 TB / 16384 = 64 MB
-
-    Since we also want to use the u16 node[16384] array as a mapping array when
-    deallocating memory, we need to make sure that when we reserve a size of for
-    example 256 MB that we fill in 4 nodes in the array.
-    Same for 512 MB, 1 GB, 2 GB, 4 GB, we need to fill in 8, 16, 32, 64 nodes.
-
-    So we have a node[16384] array and another array section_index[16384] that
-    we use to get the section index.
-
-    For above a certain allocation size we can indicate that we are not mapping
-    to a section but directly to a chunk ?
-
-    Should we take the below range_t and make it hold u16, so that we can cover
-    the 1 TB range with max 65536 nodes, each node is 16 MB in size.
-    This would make managing sections easier, as we can have a global mechanic
-    to allocate and deallocate sections.
-    */
-
-    // Segment, 2GB is split into sections of different power-of-2 sizes
-    // 4 GB / 64 = 64 MB
+    // Segment, 2 GB is split into sections of different power-of-2 sizes
+    // Example: 4 GB / 64 = 64 MB
     struct range_t
     {
         const u32   c_null_address = 0xffffffff;
@@ -48,7 +28,7 @@ namespace ncore
         u8      m_base_size_min;        // ilog2(address_range / 64)
         u8      m_node_count_shift;
 
-        void setup(alloc_t* allocator, u64 address_range = 1 * cTB, u8 node_count_shift = 8);
+        void setup(alloc_t* allocator, u64 address_range, u8 node_count_shift);
         void teardown(alloc_t* allocator);
 
         bool allocate(u64 size, u64& out_address);  // Returns false if the size is not available
@@ -71,10 +51,11 @@ namespace ncore
         m_node_size          = g_allocate_array_and_clear<u8>(allocator, node_count);
         m_node_next          = g_allocate_array_and_memset<node_t>(allocator, node_count, c_null_node);
         m_node_prev          = g_allocate_array_and_memset<node_t>(allocator, node_count, c_null_node);
-        m_node_free          = g_allocate_array_and_clear<u16>(allocator, (node_count + 15) >> (sizeof(u16) * 2));
+        m_node_free          = g_allocate_array_and_clear<u16>(allocator, (node_count + 15) >> 4);
 
-        m_base_size_min               = math::ilog2(address_range / node_count);
-        const u8 base_size_range      = math::ilog2(address_range) - m_base_size_min;
+        const u8 base_size_max        = math::ilog2(address_range);
+        m_base_size_min               = base_size_max - node_count_shift;
+        const u8 base_size_range      = base_size_max - m_base_size_min;
         m_size_list_occupancy         = 1 << base_size_range;  // Mark the largest size as occupied
         m_size_lists[base_size_range] = 0;                     // The largest node in the size list
         m_node_size[0]                = node_count - 1;        // Full size range
@@ -99,8 +80,8 @@ namespace ncore
 
         // Split the node into two nodes
         node_t const insert = node + (span >> 1);
-        m_node_size[node]   = (node_t)((span >> 1) - 1);
-        m_node_size[insert] = (node_t)((span >> 1) - 1);
+        m_node_size[node]   = (u8)((span >> 1) - 1);
+        m_node_size[insert] = (u8)((span >> 1) - 1);
 
         // Invalidate the next and previous pointers of the new node (debugging)
         m_node_next[insert] = c_null_node;
@@ -160,7 +141,7 @@ namespace ncore
         {
             // In the occupancy find a bit set that is above our size
             // Mask out the bits below size and then do a find first bit
-            u64 const occupancy = m_size_list_occupancy & ~((1 << index) - 1);
+            u32 const occupancy = m_size_list_occupancy & ~(((u32)1 << index) - 1);
             if (occupancy == 0)  // There are no free sizes available
                 return false;
 
@@ -209,7 +190,7 @@ namespace ncore
             node_t const merged = node < sibling ? node : sibling;  // Always take the left node as the merged node
             node_t const other  = node < sibling ? sibling : node;  // Always take the right node as the other node
             m_node_size[merged] = (u8)((1 << (index + 1)) - 1);     // Double the span (size) of the node
-            m_node_size[other]  = c_null_node;                      // Invalidate the node that is merged into 'merged'
+            m_node_size[other]  = 0;                                // Invalidate the node that is merged into 'merged'
 
             node  = merged;
             span  = (span_t)m_node_size[node] + 1;

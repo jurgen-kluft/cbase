@@ -26,7 +26,7 @@ namespace ncore
         u8      m_base_size_min;        // ilog2(address_range >> m_node_count_shift)
         u8      m_node_count_shift;     // 16, 15, 14, 13, 12, 11, 10
 
-        void setup(alloc_t* allocator, u64 address_range = 1 * cTB, u8 node_count_shift = 14);
+        void setup(alloc_t* allocator, u64 address_range, u8 node_count_shift);
         void teardown(alloc_t* allocator);
 
         bool allocate(u64 size, u64& out_address);  // Returns false if the size is not available
@@ -48,10 +48,11 @@ namespace ncore
         m_node_size          = g_allocate_array_and_clear<u8>(allocator, node_count);
         m_node_next          = g_allocate_array_and_clear<node_t>(allocator, node_count);
         m_node_prev          = g_allocate_array_and_clear<node_t>(allocator, node_count);
-        m_node_free          = g_allocate_array_and_clear<u16>(allocator, (node_count + 15) >> (sizeof(u16) * 2));
+        m_node_free          = g_allocate_array_and_clear<u16>(allocator, (node_count + 15) >> 4);
 
-        m_base_size_min               = math::ilog2(address_range >> node_count_shift);
-        const u8 base_size_range      = math::ilog2(address_range) - m_base_size_min;
+        const u8 base_size_max        = math::ilog2(address_range);
+        m_base_size_min               = base_size_max - node_count_shift;
+        const u8 base_size_range      = base_size_max - m_base_size_min;
         m_size_list_occupancy         = 1 << base_size_range;  // Mark the largest size as occupied
         m_size_lists[base_size_range] = 0;                     // The largest node in the size list
         m_node_size[0]                = node_count - 1;        // Full size range - 1
@@ -76,8 +77,8 @@ namespace ncore
 
         // Split the node into two nodes
         node_t const insert = node + (span >> 1);
-        m_node_size[node]   = (node_t)((span >> 1) - 1);
-        m_node_size[insert] = (node_t)((span >> 1) - 1);
+        m_node_size[node]   = (u8)((span >> 1) - 1);
+        m_node_size[insert] = (u8)((span >> 1) - 1);
 
         // Invalidate the next and previous pointers of the new node (debugging)
         m_node_next[insert] = c_null_node;
@@ -185,7 +186,7 @@ namespace ncore
             node_t const merged = node < sibling ? node : sibling;  // Always take the left node as the merged node
             node_t const other  = node < sibling ? sibling : node;  // Always take the right node as the other node
             m_node_size[merged] = (u8)((1 << (index + 1)) - 1);     // Double the span (size) of the node
-            m_node_size[other]  = c_null_node;                      // Invalidate the node that is merged into 'merged'
+            m_node_size[other]  = 0;                                // Invalidate the node that is merged into 'merged'
 
             node  = merged;
             span  = (span_t)m_node_size[node] + 1;
