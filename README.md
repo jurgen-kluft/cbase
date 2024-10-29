@@ -9,16 +9,16 @@ Cross platform base library
   - buffer / binary reader / binary writer
   - console
   - endian
-  - hierarchical binmap (hbb_t)
+  - hierarchical bitmap (binmap_t)
   - integer (min/max, clamp, align, ilog2, findLastBit, findFirstBit, countBits, countTrailingZeros/countLeadingZeros)
   - limits (minimum/maximum value of system types)
   - log (logging to console)
-  - printf / sprintf
-  - random (interface)
+  - printf / sprintf / sscanf
+  - random (interface) and random functions
   - runes (ascii, utf-8, utf-16, utf-32) and many string manipulation functions
   - low-level string functions
   - slice
   - sort
   - tree and tree32 (red-black tree)
-  - tls
+  - thread context
   - va-list (va_t)
