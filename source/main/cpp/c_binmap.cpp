@@ -8,17 +8,6 @@
 
 namespace ncore
 {
-    // Note: Optimization:
-    // Hold one pointer only:
-    // - If bit 0 is set, then the pointer is { u64 m_l0_and_size_and_levels; }
-    // - If bit 0 is not set, then the pointer points to { u64 m_l0_and_size_and_levels; u32* m_l[]; }
-    //   The array 'm_l' has N pointers depending on the number of levels.
-    //   So the allocations are of a different size:
-    //   - 16 bytes for 1 level
-    //   - 24 bytes for 2 levels
-    //   - 32 bytes for 3 levels
-    //   - etc.
-
     binmap_t::config_t binmap_t::config_t::compute(u32 count)
     {
         ASSERT(count > 0 && count <= 1 * 1024 * 1024);  // maximum count is 1 Million (5 bits + 5 bits + 5 bits + 5 bits = 20 bits = 1 M)
