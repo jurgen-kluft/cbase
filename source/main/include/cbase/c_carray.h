@@ -11,127 +11,207 @@
 
 namespace ncore
 {
-    class carray_t
+    template <typename T>
+    struct carray_t
     {
-    public:
-        inline carray_t()
-            : mLength(0)
-            , mReservedItems(0)
-            , mSizeOfItem(0)
-            , mArray(0)
-        {
-        }
-        inline carray_t(void* _array, s32 size_of_element, s32 number_of_elements)
-            : mLength(0)
-            , mReservedItems(number_of_elements)
-            , mSizeOfItem(size_of_element)
-            , mArray((u8*)_array)
-        {
-        }
-
-        inline void clear() { mLength = 0; }
-
-        inline s32  size() const { return mLength; }
-        inline s32  reserved() const { return mReservedItems; }
-        inline bool is_empty() const { return mLength == 0; }
-        inline bool is_full() const
-        {
-            ASSERT(mLength <= reserved());
-            return mLength == mReservedItems;
-        }
-
-        inline void push_back(void const* item)
-        {
-            ASSERT(mLength < reserved());
-            nmem::memcpy(&mArray[mLength * mSizeOfItem], item, mSizeOfItem);
-            mLength += 1;
-        }
-        inline bool pop_back(void* out_item)
-        {
-            if (mLength > 0)
-            {
-                --mLength;
-                nmem::memcpy(out_item, &mArray[mLength * mSizeOfItem], mSizeOfItem);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        inline u8* begin() const { return mArray; }
-        inline u8* next(u8* current) const
-        {
-            ASSERT(g_ptr_inside_range(mArray, (uint_t)mReservedItems * mSizeOfItem, current));
-            return current + (uint_t)mSizeOfItem;
-        }
-        inline u8* end() const { return &mArray[mLength * mSizeOfItem]; }
-
-        inline void* operator[](s32 index)
-        {
-            ASSERT(index < (s32)mLength);
-            return &mArray[index * mSizeOfItem];
-        }
-        inline void const* operator[](s32 index) const
-        {
-            ASSERT(index < (s32)mLength);
-            return &mArray[index * mSizeOfItem];
-        }
-
-        inline carray_t operator()(s32 from, s32 to) const
-        {
-            ASSERT(from < to && from < mReservedItems && to < mReservedItems);
-            carray_t c(&mArray[from * mSizeOfItem], mSizeOfItem, to - from);
-            return c;
-        }
-
-        void swap(s32 a, s32 b);
-        void remove(s32 i);
-        void swap_remove(s32 i);
-
-    private:
-        s32 mLength;
-        s32 mReservedItems;
-        s32 mSizeOfItem;
-        u8* mArray;
+        s32 mSize;
+        s32 mCapacity;
+        T*  mArray;
     };
 
-    inline void carray_t::swap(s32 index_a, s32 index_b)
+    template <typename T>
+    struct cview_t
     {
-        ASSERT(index_a < mLength && index_b < mLength);
-        u8* srca = &mArray[index_a * mSizeOfItem];
-        u8* srcb = &mArray[index_b * mSizeOfItem];
-        for (s32 i = 0; i < mSizeOfItem; ++i)
-        {
-            u8 tmp  = srca[i];
-            srca[i] = srcb[i];
-            srcb[i] = tmp;
-        }
+        s32 const      mSize;
+        s32 const      mCapacity;
+        T const* const mArray;
+    };
+
+    template <typename T>
+    carray_t<T> g_create_carray(alloc_t* allocator, s32 number_of_elements)
+    {
+        carray_t<T> array;
+        array.mSize     = 0;
+        array.mCapacity = number_of_elements;
+        array.mArray    = g_allocate_array<T>(allocator, number_of_elements);
+        return array;
     }
 
-    inline void carray_t::remove(s32 index)
+    template <typename T>
+    inline void g_destroy_carray(alloc_t* allocator, carray_t<T>& array)
     {
-        if (index < mLength)
+        g_deallocate_array(allocator, array.mArray);
+        array.mArray    = nullptr;
+        array.mSize     = 0;
+        array.mCapacity = 0;
+    }
+
+    template <typename T>
+    inline void g_clear(carray_t<T>& array)
+    {
+        array.mSize = 0;
+    }
+
+    template <typename T>
+    inline s32 g_size(carray_t<T> const& array)
+    {
+        return array.mSize;
+    }
+
+    template <typename T>
+    inline s32 g_size(cview_t<T> const& array)
+    {
+        return array.mSize;
+    }
+
+    template <typename T>
+    inline s32 g_reserved(carray_t<T> const& array)
+    {
+        return array.mCapacity;
+    }
+
+    template <typename T>
+    inline bool g_is_empty(carray_t<T> const& array)
+    {
+        return array.mSize == 0;
+    }
+
+        template <typename T>
+    inline bool g_is_empty(cview_t<T> const& array)
+    {
+        return array.mSize == 0;
+    }
+
+    template <typename T>
+    inline bool g_is_full(carray_t<T> const& array)
+    {
+        ASSERT(array.mSize <= g_reserved());
+        return array.mSize == array.mCapacity;
+    }
+
+    template <typename T>
+    inline void g_push_back(carray_t<T>& array, T const& item)
+    {
+        ASSERT(array.mSize < g_reserved(array));
+        nmem::memcpy(&array.mArray[array.mSize], &item, sizeof(T));
+        array.mSize += 1;
+    }
+
+    template <typename T>
+    inline bool g_pop_back(carray_t<T>& array, T& out_item)
+    {
+        if (array.mSize > 0)
+        {
+            --array.mSize;
+            nmem::memcpy(&out_item, &array.mArray[array.mSize], sizeof(T));
+            return true;
+        }
+        return false;
+    }
+
+    template <typename T>
+    inline T* g_begin(carray_t<T>& array)
+    {
+        if (array.mSize == 0)
+            return nullptr;
+        return array.mArray;
+    }
+
+    template <typename T>
+    inline T* g_next(carray_t<T>& array, T* current)
+    {
+        if (current >= &array.mArray[0] && current < &array.mArray[array.mSize - 1])
+            return current + 1;
+        return nullptr;
+    }
+
+    template <typename T>
+    inline T* g_end(carray_t<T>& array)
+    {
+        return nullptr;
+    }
+
+    template <typename T>
+    inline T const* g_begin(carray_t<T> const& array)
+    {
+        if (array.mSize == 0)
+            return nullptr;
+        return array.mArray;
+    }
+
+    template <typename T>
+    inline T const* g_next(carray_t<T> const& array, T const* current)
+    {
+        if (current >= &array.mArray[0] && current < &array.mArray[array.mSize - 1])
+            return current + 1;
+        return nullptr;
+    }
+
+    template <typename T>
+    inline T const* g_end(carray_t<T> const& array)
+    {
+        return nullptr;
+    }
+
+    template <typename T>
+    inline T* g_get(carray_t<T>& array, s32 index)
+    {
+        ASSERT(index < (s32)array.mSize);
+        return &array.mArray[index];
+    }
+
+    template <typename T>
+    inline T const* g_get(carray_t<T> const& array, s32 index)
+    {
+        ASSERT(index < (s32)array.mSize);
+        return &array.mArray[index];
+    }
+
+    template <typename T>
+    inline T const* g_get(cview_t<T> const& array, s32 index)
+    {
+        ASSERT(index < (s32)array.mSize);
+        return &array.mArray[index];
+    }
+
+    template <typename T>
+    inline cview_t<T> g_view(carray_t<T>& array, s32 from, s32 to)
+    {
+        ASSERT(from < to && from < array.mCapacity && to < array.mCapacity);
+        return cview_t<T> { to - from, to - from, &array.mArray[from] };
+    }
+
+    template <typename T>
+    inline void g_swap(carray_t<T>& array, s32 index_a, s32 index_b)
+    {
+        ASSERT(index_a < array.mSize && index_b < array.mSize);
+        nmem::memswap(&array.mArray[index_a], &array.mArray[index_b], sizeof(T));
+    }
+
+    template <typename T>
+    inline void g_remove(carray_t<T>& array, s32 index)
+    {
+        if (index < array.mSize)
         {
             s32 const s = index + 1;
-            for (s32 i = s; i < mLength; ++i)
-                g_memcpy(&mArray[(i - 1) * mSizeOfItem], &mArray[i * mSizeOfItem], mSizeOfItem);
-            mLength--;
+            for (s32 i = s; i < array.mSize; ++i)
+                g_memcpy(&array.mArray[(i - 1)], &array.mArray[i], sizeof(T));
+            array.mSize--;
         }
     }
 
-    inline void carray_t::swap_remove(s32 index)
+    template <typename T>
+    inline void g_swap_remove(carray_t<T>& array, s32 index)
     {
-        if (mLength > 0)
+        if (array.mSize > 0)
         {
-            mLength -= 1;
-            if (index < mLength)
+            array.mSize -= 1;
+            if (index < array.mSize)
             {
-                g_memcpy(&mArray[index * mSizeOfItem], &mArray[mLength * mSizeOfItem], mSizeOfItem);
+                g_memcpy(&array.mArray[index], &array.mArray[array.mSize], sizeof(T));
             }
         }
     }
 };  // namespace ncore
 
-#endif  // __CBASE_CARRAY_H__
+#endif   
