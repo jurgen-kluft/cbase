@@ -87,7 +87,7 @@ namespace ncore
 
                 // compute character encoding length, checking for overlong sequences (i.e. characters that don't use the shortest possible encoding).
                 u8       value       = data[0].r;
-                s8 const leadingOnes = math::countLeadingZeros((u8)(~value));
+                s8 const leadingOnes = math::g_countLeadingZeros((u8)(~value));
                 u8 const size        = (c_utf8_sizes >> (leadingOnes << 2)) & 0xF;
 
                 // if (size == 0)

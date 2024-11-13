@@ -381,7 +381,7 @@ UNITTEST_SUITE_END
 
 namespace ncore
 {
-    static inline u16 ffs_bit(u8 byte) { return (u16)math::findLastBit(byte); }
+    static inline u16 ffs_bit(u8 byte) { return (u16)math::g_findLastBit(byte); }
 
     // nullkey is used to compare the key outside the range of a key
     // return:

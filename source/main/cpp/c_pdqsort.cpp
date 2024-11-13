@@ -11,7 +11,7 @@ namespace ncore
     // * ("Algorithms in C", Robert Sedgewick, Addison-Wesley, 1990,               *
     // * ISBN 0-201-51425-7) improvements.                                         *
     // *                                                                           *
-    // * An interative qsort() is faster and requires less stack space than the    *
+    // * An iterative qsort() is faster and requires less stack space than the     *
     // * recursive implementation. If "end recursion removal" is employed, the     *
     // * maximum number of stack entries required will be no more than log to the  *
     // * base 2 of the number of elements in the array being sorted.               *

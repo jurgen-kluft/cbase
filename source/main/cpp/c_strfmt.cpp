@@ -967,7 +967,7 @@ namespace ncore
                 // default_align_left();
 
                 // If precision is specified use it up to string size.
-                const s32 str_length = (state.precision() == -1) ? static_cast<s32>(str.length()) : math::min(static_cast<s32>(state.precision()), static_cast<s32>(str.length()));
+                const s32 str_length = (state.precision() == -1) ? static_cast<s32>(str.length()) : math::g_min(static_cast<s32>(state.precision()), static_cast<s32>(str.length()));
 
                 return format_string(it, state, str, str_length, false);
             }
