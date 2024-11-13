@@ -28,7 +28,7 @@ namespace ncore
             m_binmap0.reset();
             m_l0   = 0;
             m_set  = 0;
-            m_l[0] = m_l[1] = m_l[2] = nullptr;
+            m_l[0] = m_l[1] = nullptr;
         }
 
         void release(alloc_t* allocator);

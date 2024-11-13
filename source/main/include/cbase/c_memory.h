@@ -140,7 +140,6 @@ namespace ncore
             B8_0 = (UI16 & 0xFF);
             UI16 >>= 8;
             B16_8 = (UI16 & 0xFF);
-            UI16 >>= 8;
         }
 
         inline u16 makeu16(u8 inLow, u8 inHigh) { return (u16)(((u32)inLow | ((u32)inHigh << 8)) & 0xffff); }
