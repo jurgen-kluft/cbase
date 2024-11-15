@@ -41,7 +41,7 @@ namespace ncore
 
         virtual void* v_allocate(u32 size, u32 alignment)
         {
-            alignment = math::alignUp(alignment, mDefaultAlignment);
+            alignment = math::g_alignUp(alignment, mDefaultAlignment);
 
             void* ptr;
             posix_memalign(&ptr, alignment, size);
