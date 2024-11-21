@@ -264,7 +264,7 @@ namespace ncore
         if (_bit < size())
         {
             s8        l   = levels();
-            u32 const wdb = m_binmap0.m_l[l - 1][_bit >> 5];
+            u32 const wdb = l > 0 ? m_binmap0.m_l[l - 1][_bit >> 5] : m_l0;
             if ((wdb & (1 << (_bit & 31))) != 0)  // If the bit is already set -> early out
                 return false;
 
@@ -296,7 +296,7 @@ namespace ncore
         if (_bit < size())
         {
             s8        l   = levels();
-            u32 const wdb = m_binmap0.m_l[l - 1][_bit >> 5];
+            u32 const wdb = l > 0 ? m_binmap0.m_l[l - 1][_bit >> 5] : m_l0;
             if ((wdb & (1 << (_bit & 31))) == 0)  // If the bit is already clr -> early out
                 return false;
 
@@ -385,7 +385,7 @@ namespace ncore
             return -1;
 
         s8 const l  = levels() - 1;
-        u32       wi = 0;
+        u32      wi = 0;
         s8       bi = 31 - math::g_findLastBit(m_l0);
         ASSERT(bi >= 0 && bi < 32);
         for (s8 i = 0; i <= l; ++i)
