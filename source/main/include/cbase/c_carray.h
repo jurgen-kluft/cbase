@@ -22,8 +22,8 @@ namespace ncore
     template <typename T>
     struct cview_t
     {
-        s32 const      mSize;
-        s32 const      mCapacity;
+        s32 const      mFrom;
+        s32 const      mTo;
         T const* const mArray;
     };
 
@@ -76,10 +76,10 @@ namespace ncore
         return array.mSize == 0;
     }
 
-        template <typename T>
-    inline bool g_is_empty(cview_t<T> const& array)
+    template <typename T>
+    inline bool g_is_empty(cview_t<T> const& view)
     {
-        return array.mSize == 0;
+        return array.mFrom == array.mTo;
     }
 
     template <typename T>
@@ -168,17 +168,17 @@ namespace ncore
     }
 
     template <typename T>
-    inline T const* g_get(cview_t<T> const& array, s32 index)
+    inline T const* g_get(cview_t<T> const& view, s32 index)
     {
-        ASSERT(index < (s32)array.mSize);
-        return &array.mArray[index];
+        ASSERT(view < (array.mTo - array.mFrom));
+        return &array.mArray[view.mFrom + index];
     }
 
     template <typename T>
     inline cview_t<T> g_view(carray_t<T>& array, s32 from, s32 to)
     {
         ASSERT(from < to && from < array.mCapacity && to < array.mCapacity);
-        return cview_t<T> { to - from, to - from, &array.mArray[from] };
+        return cview_t<T>{from, to, &array.mArray};
     }
 
     template <typename T>
@@ -214,4 +214,4 @@ namespace ncore
     }
 };  // namespace ncore
 
-#endif   
+#endif
