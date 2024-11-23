@@ -61,7 +61,7 @@ namespace ncore
     template <typename T>
     inline s32 g_size(cview_t<T> const& array)
     {
-        return array.mSize;
+        return array.mTo - array.mFrom;
     }
 
     template <typename T>
@@ -79,13 +79,13 @@ namespace ncore
     template <typename T>
     inline bool g_is_empty(cview_t<T> const& view)
     {
-        return array.mFrom == array.mTo;
+        return view.mFrom == view.mTo;
     }
 
     template <typename T>
     inline bool g_is_full(carray_t<T> const& array)
     {
-        ASSERT(array.mSize <= g_reserved());
+        ASSERT(array.mSize <= g_reserved(array));
         return array.mSize == array.mCapacity;
     }
 
@@ -154,31 +154,31 @@ namespace ncore
     }
 
     template <typename T>
-    inline T* g_get(carray_t<T>& array, s32 index)
+    inline T& g_get(carray_t<T>& array, s32 index)
     {
         ASSERT(index < (s32)array.mSize);
-        return &array.mArray[index];
+        return array.mArray[index];
     }
 
     template <typename T>
-    inline T const* g_get(carray_t<T> const& array, s32 index)
+    inline T const& g_get(carray_t<T> const& array, s32 index)
     {
         ASSERT(index < (s32)array.mSize);
-        return &array.mArray[index];
+        return array.mArray[index];
     }
 
     template <typename T>
-    inline T const* g_get(cview_t<T> const& view, s32 index)
+    inline T const& g_get(cview_t<T> const& view, s32 index)
     {
-        ASSERT(view < (array.mTo - array.mFrom));
-        return &array.mArray[view.mFrom + index];
+        ASSERT(index < (view.mTo - view.mFrom));
+        return view.mArray[view.mFrom + index];
     }
 
     template <typename T>
     inline cview_t<T> g_view(carray_t<T>& array, s32 from, s32 to)
     {
         ASSERT(from < to && from < array.mCapacity && to < array.mCapacity);
-        return cview_t<T>{from, to, &array.mArray};
+        return cview_t<T>{from, to, array.mArray};
     }
 
     template <typename T>
