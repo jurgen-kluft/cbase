@@ -42,6 +42,11 @@ namespace ncore
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
 
+        T*  m_data;
+        u32 m_countof;
+        u32 m_freelist;
+        u32 m_freeindex;
+
     protected:
         virtual u32   v_allocsize() const final;
         virtual void* v_allocate() final;
@@ -49,19 +54,14 @@ namespace ncore
 
         virtual void* v_idx2ptr(u32 index) final;
         virtual u32   v_ptr2idx(void const* ptr) const final;
-
-        T*  m_data;
-        u32 m_countof;
-        u32 m_freelist;
-        u32 m_freeindex;
     };
 
     template <typename T>
     inline array_pool_t<T>::array_pool_t()
         : m_data(nullptr)
         , m_countof(0)
-        , m_freelist(0xffffffff)
-        , m_freeindex(0xffffffff)
+        , m_freelist(D_NILL_U32)
+        , m_freeindex(D_NILL_U32)
     {
     }
 
@@ -70,7 +70,7 @@ namespace ncore
     {
         m_data      = array_items;
         m_countof   = number_of_items;
-        m_freelist  = 0xffffffff;
+        m_freelist  = D_NILL_U32;
         m_freeindex = 0;
         ASSERT(sizeof(T) >= sizeof(u32));  // Can only deal with items that are 4 bytes or more
     }
@@ -85,7 +85,7 @@ namespace ncore
     void* array_pool_t<T>::v_allocate()
     {
         u32 freeitem = m_freelist;
-        if (freeitem != 0xffffffff)
+        if (freeitem != D_NILL_U32)
         {
             m_freelist = *(u32*)v_idx2ptr(freeitem);
         }
@@ -94,7 +94,7 @@ namespace ncore
             freeitem = m_freeindex++;
         }
 
-        if (freeitem == 0xffffffff)
+        if (freeitem == D_NILL_U32)
             return nullptr;
 
         return v_idx2ptr(freeitem);
@@ -112,7 +112,7 @@ namespace ncore
     template <typename T>
     void* array_pool_t<T>::v_idx2ptr(u32 index)
     {
-        ASSERT(index != 0xffffffff && index < m_freeindex);
+        ASSERT(index != D_NILL_U32 && index < m_freeindex);
         return &m_data[index];
     }
 
@@ -120,8 +120,8 @@ namespace ncore
     u32 array_pool_t<T>::v_ptr2idx(void const* ptr) const
     {
         if (ptr == nullptr)
-            return 0xffffffff;
-        u32 const i = (u32)(ptr - m_data);
+            return D_NILL_U32;
+        u32 const i = (u32)((T const*)ptr - m_data);
         ASSERT(i < m_freeindex);
         return i;
     }
