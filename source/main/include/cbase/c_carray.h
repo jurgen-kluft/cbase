@@ -14,6 +14,15 @@ namespace ncore
     template <typename T>
     struct carray_t
     {
+        carray_t()
+            : mSize(0)
+            , mCapacity(0)
+            , mArray(nullptr)
+        {
+        }
+
+        inline bool empty() const { return mSize == 0; }
+
         s32 mSize;
         s32 mCapacity;
         T*  mArray;
