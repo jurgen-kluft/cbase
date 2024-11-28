@@ -21,7 +21,32 @@ namespace ncore
         {
         }
 
-        inline bool empty() const { return mSize == 0; }
+        inline s32      size() const { return mSize; }
+        inline T*       data() { return mArray; }
+        inline T const* data() const { return mArray; }
+        inline bool     empty() const { return mCapacity == 0; }
+        inline void     clear() { mSize = 0; }
+
+        inline void reserve(u32 newSize) {}
+        inline void resize(u32 newSize) {}
+
+        inline void push_back(T const& item)
+        {
+            ASSERT(mSize < mCapacity);
+            mArray[mSize++] = item;
+        }
+
+        inline T& operator[](s32 index)
+        {
+            ASSERT(index < mSize);
+            return mArray[index];
+        }
+
+        inline T const& operator[](s32 index) const
+        {
+            ASSERT(index < mSize);
+            return mArray[index];
+        }
 
         s32 mSize;
         s32 mCapacity;
