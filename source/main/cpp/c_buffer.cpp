@@ -160,6 +160,19 @@ namespace ncore
         return 0;
     }
 
+    // Peek
+
+    u16 binary_reader_t::peek_u16() const
+    {
+        u16 b = 0;
+        if (can_read(sizeof(b)))
+        {
+            u8 const* ptr = m_cursor;
+            b             = nuadrw::read_u16(ptr);
+        }
+        return b;
+    }
+
     // Direct Read
 
     bool binary_reader_t::read_bool()

@@ -168,6 +168,9 @@ namespace ncore
         int_t     pos() const;
         void      reset();
         int_t     skip(int_t);
+
+        u16       peek_u16() const;
+
         bool      read_bool();
         u8        read_u8();
         s8        read_s8();
