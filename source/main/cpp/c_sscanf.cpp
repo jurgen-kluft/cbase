@@ -448,7 +448,7 @@ namespace ncore
                         s32 i = 0;
                         reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
 
-                        runes_t runes = make_runes("", 0, 0, 0);
+                        runes_t runes = make_runes((ascii::prune)nullptr, 0, 0, 0);
                         if (i < argc)
                         {
                             va_r_t r = argv[i++];

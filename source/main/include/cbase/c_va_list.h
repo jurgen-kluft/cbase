@@ -734,7 +734,7 @@ namespace ncore
                 case TYPE_UTF16_STR: return make_runes((utf16::prune)mRef, 0, 0, mCap);
                 case TYPE_UTF32_STR: return make_runes((utf32::prune)mRef, 0, 0, mCap);
             }
-            return make_runes("", 0, 0, 0);
+            return make_runes((ascii::prune)mRef, 0, 0, 0);
         }
 
         static va_r_t sEmpty;

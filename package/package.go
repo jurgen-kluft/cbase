@@ -19,18 +19,23 @@ func GetPackage() *denv.Package {
 	unittestpkg := cunittest.GetPackage()
 
 	// The main (cbase) package
-	mainpkg := denv.NewPackage(name)
+	mainpkg := denv.NewPackage(repo_path, repo_name)
 
-	// library
-	mainlib := denv.SetupCppLibProject(name, repo_path+name)
+	// The main library
+	mainlib := denv.SetupCppLibProject(mainpkg, name)
 	mainlib.AddDependencies(corepkg.GetMainLib()...)
 
-	// unittest project
-	maintest := denv.SetupDefaultCppTestProject(name+"_test", repo_path+name)
+	// The main test library
+	testlib := denv.SetupCppTestLibProject(mainpkg, name)
+	testlib.AddDependencies(corepkg.GetTestLib()...)
+
+	// The unittest for this package
+	maintest := denv.SetupCppTestProject(mainpkg, name)
 	maintest.AddDependencies(unittestpkg.GetMainLib()...)
-	maintest.Dependencies = append(maintest.Dependencies, mainlib)
+	maintest.AddDependency(testlib)
 
 	mainpkg.AddMainLib(mainlib)
+	mainpkg.AddTestLib(testlib)
 	mainpkg.AddUnittest(maintest)
 	return mainpkg
 }
