@@ -7,29 +7,29 @@ import (
 )
 
 const (
-	repo_path = "github.com\\jurgen-kluft\\"
+	repo_path = "github.com\\jurgen-kluft"
 	repo_name = "cbase"
 )
 
 func GetPackage() *denv.Package {
 	name := repo_name
 
-	// Dependencies
+	// dependencies
 	corepkg := ccore.GetPackage()
 	unittestpkg := cunittest.GetPackage()
 
-	// The main (cbase) package
+	// main package
 	mainpkg := denv.NewPackage(repo_path, repo_name)
 
-	// The main library
+	// main library
 	mainlib := denv.SetupCppLibProject(mainpkg, name)
 	mainlib.AddDependencies(corepkg.GetMainLib()...)
 
-	// The main test library
+	// main test library
 	testlib := denv.SetupCppTestLibProject(mainpkg, name)
 	testlib.AddDependencies(corepkg.GetTestLib()...)
 
-	// The unittest for this package
+	// unittest for this package
 	maintest := denv.SetupCppTestProject(mainpkg, name)
 	maintest.AddDependencies(unittestpkg.GetMainLib()...)
 	maintest.AddDependency(testlib)
