@@ -15,68 +15,12 @@ namespace ncore
     {
         p[0] = v1;
     }
-    template <typename T>
-    inline void g_set(T* p, T v1, T v2)
+
+    template <typename T, typename... Args>
+    inline void g_set(T* p, T v1, Args... args)
     {
         p[0] = v1;
-        p[1] = v2;
-    }
-    template <typename T>
-    inline void g_set(T* p, T v1, T v2, T v3)
-    {
-        p[0] = v1;
-        p[1] = v2;
-        p[2] = v3;
-    }
-    template <typename T>
-    inline void g_set(T* p, T v1, T v2, T v3, T v4)
-    {
-        p[0] = v1;
-        p[1] = v2;
-        p[2] = v3;
-        p[3] = v4;
-    }
-    template <typename T>
-    inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5)
-    {
-        p[0] = v1;
-        p[1] = v2;
-        p[2] = v3;
-        p[3] = v4;
-        p[4] = v5;
-    }
-    template <typename T>
-    inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6)
-    {
-        p[0] = v1;
-        p[1] = v2;
-        p[2] = v3;
-        p[3] = v4;
-        p[4] = v5;
-        p[5] = v6;
-    }
-    template <typename T>
-    inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7)
-    {
-        p[0] = v1;
-        p[1] = v2;
-        p[2] = v3;
-        p[3] = v4;
-        p[4] = v5;
-        p[5] = v6;
-        p[6] = v7;
-    }
-    template <typename T>
-    inline void g_set(T* p, T v1, T v2, T v3, T v4, T v5, T v6, T v7, T v8)
-    {
-        p[0] = v1;
-        p[1] = v2;
-        p[2] = v3;
-        p[3] = v4;
-        p[4] = v5;
-        p[5] = v6;
-        p[6] = v7;
-        p[7] = v8;
+        g_set(p + 1, args...);
     }
 
     template <typename T, s32 N>
