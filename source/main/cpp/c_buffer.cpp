@@ -129,16 +129,16 @@ namespace ncore
     /// Binary Reader
     /// ---------------------------------------------------------------------------------------
 
-    int_t     binary_reader_t::size() const { return m_end - m_begin; }
-    int_t     binary_reader_t::length() const { return m_end - m_begin; }
-    int_t     binary_reader_t::remain() const { return m_end - m_cursor; }
-    cbuffer_t binary_reader_t::get_current_buffer() const { return cbuffer_t(m_begin, m_cursor); }
-    bool      binary_reader_t::can_read(int_t number_of_bytes) const { return (m_cursor + number_of_bytes) <= m_end; }
-    bool      binary_reader_t::at_end() const { return m_cursor == m_end; }
+    int_t     binary_reader_t::size() const { return m_buffer.m_end - m_buffer.m_begin; }
+    int_t     binary_reader_t::length() const { return m_buffer.m_end - m_buffer.m_begin; }
+    int_t     binary_reader_t::remain() const { return m_buffer.m_end - m_cursor; }
+    cbuffer_t binary_reader_t::get_current_buffer() const { return cbuffer_t(m_buffer.m_begin, m_cursor); }
+    bool      binary_reader_t::can_read(int_t number_of_bytes) const { return (m_cursor + number_of_bytes) <= m_buffer.m_end; }
+    bool      binary_reader_t::at_end() const { return m_cursor == m_buffer.m_end; }
     bool      binary_reader_t::seek(int_t pos)
     {
-        u8 const* cursor = m_begin + pos;
-        if (cursor >= m_begin && cursor <= m_end)
+        u8 const* cursor = m_buffer.m_begin + pos;
+        if (cursor >= m_buffer.m_begin && cursor <= m_buffer.m_end)
         {
             m_cursor = cursor;
             return true;
@@ -146,12 +146,12 @@ namespace ncore
         return false;
     }
 
-    int_t binary_reader_t::pos() const { return m_cursor - m_begin; }
+    int_t binary_reader_t::pos() const { return m_cursor - m_buffer.m_begin; }
     void  binary_reader_t::reset() { m_cursor = 0; }
 
     int_t binary_reader_t::skip(int_t c)
     {
-        int_t const offset = m_cursor - m_begin;
+        int_t const offset = m_cursor - m_buffer.m_begin;
         if (can_read(c))
         {
             m_cursor += c;
@@ -360,21 +360,21 @@ namespace ncore
     /// ---------------------------------------------------------------------------------------
     /// Binary Writer
     /// ---------------------------------------------------------------------------------------
-    int_t binary_writer_t::size() const { return m_cursor - m_begin; }
-    int_t binary_writer_t::length() const { return m_end - m_begin; }
-    int_t binary_writer_t::remain() const { return m_end - m_cursor; }
+    int_t binary_writer_t::size() const { return m_cursor - m_buffer.m_begin; }
+    int_t binary_writer_t::length() const { return m_buffer.m_end - m_buffer.m_begin; }
+    int_t binary_writer_t::remain() const { return m_buffer.m_end - m_cursor; }
 
-    buffer_t binary_writer_t::get_full_buffer() const { return buffer_t(m_begin, m_end); }
+    buffer_t binary_writer_t::get_full_buffer() const { return buffer_t(m_buffer.m_begin, m_buffer.m_end); }
 
-    buffer_t binary_writer_t::get_current_buffer() const { return buffer_t(m_begin, m_cursor); }
+    buffer_t binary_writer_t::get_current_buffer() const { return buffer_t(m_buffer.m_begin, m_cursor); }
 
-    bool binary_writer_t::can_write(int_t num_bytes) const { return ((m_cursor + num_bytes) <= m_end); }
-    bool binary_writer_t::at_end() const { return m_cursor == m_end; }
+    bool binary_writer_t::can_write(int_t num_bytes) const { return ((m_cursor + num_bytes) <= m_buffer.m_end); }
+    bool binary_writer_t::at_end() const { return m_cursor == m_buffer.m_end; }
 
     bool binary_writer_t::seek(int_t pos)
     {
         u8* cursor = m_cursor + pos;
-        if (cursor <= m_end)
+        if (cursor <= m_buffer.m_end)
         {
             m_cursor = cursor;
             return true;
@@ -382,14 +382,14 @@ namespace ncore
         return false;
     }
 
-    int_t binary_writer_t::pos() const { return m_cursor - m_begin; }
-    void  binary_writer_t::reset() { m_cursor = m_begin; }
+    int_t binary_writer_t::pos() const { return m_cursor - m_buffer.m_begin; }
+    void  binary_writer_t::reset() { m_cursor = m_buffer.m_begin; }
 
     int_t binary_writer_t::skip(int_t c)
     {
         if (can_write(c))
         {
-            int_t const offset = m_cursor - m_begin;
+            int_t const offset = m_cursor - m_buffer.m_begin;
             m_cursor += c;
             return offset;
         }
@@ -401,9 +401,9 @@ namespace ncore
         binary_writer_t writer;
         if (can_write(len))
         {
-            writer.m_begin  = m_cursor;
+            writer.m_buffer.m_begin  = m_cursor;
             writer.m_cursor = m_cursor;
-            writer.m_end    = m_cursor + len;
+            writer.m_buffer.m_end    = m_cursor + len;
             m_cursor += len;
         }
         return writer;
@@ -412,13 +412,13 @@ namespace ncore
     binary_writer_t binary_writer_t::range(int_t from, int_t to) const
     {
         ASSERT(from < to);
-        ASSERT((m_cursor + from) < m_end);
-        ASSERT((m_cursor + to) < m_end);
+        ASSERT((m_cursor + from) < m_buffer.m_end);
+        ASSERT((m_cursor + to) < m_buffer.m_end);
 
         binary_writer_t writer;
-        writer.m_begin  = m_cursor + from;
+        writer.m_buffer.m_begin  = m_cursor + from;
         writer.m_cursor = m_cursor + from;
-        writer.m_end    = m_cursor + to;
+        writer.m_buffer.m_end    = m_cursor + to;
         return writer;
     }
 

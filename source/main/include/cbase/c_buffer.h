@@ -52,12 +52,7 @@ namespace ncore
 
         cbuffer_t operator()(u32 from, u32 to) const;
 
-        void copy_to(u8* dst, u8 const* end) const
-        {
-            u8 const* src = (u8 const*)m_begin;
-            while (dst < end && src < m_end)
-                *dst++ = *src++;
-        }
+        void copy_to(buffer_t& dst) const;
 
         binary_reader_t reader() const;
 
@@ -71,16 +66,26 @@ namespace ncore
         inline buffer_t()
             : m_begin(nullptr)
             , m_end(nullptr)
+            , m_cap(nullptr)
         {
         }
         inline explicit buffer_t(u8* data, u8* end)
             : m_begin(data)
             , m_end(end)
+            , m_cap(end)
+        {
+            reset(0);
+        }
+        inline explicit buffer_t(u8* data, u8* end, u8* cap)
+            : m_begin(data)
+            , m_end(end)
+            , m_cap(cap)
         {
             reset(0);
         }
 
         inline int_t size() const { return m_end - m_begin; }
+        inline int_t cap() const { return m_cap - m_begin; }
         inline u8*   data() { return m_begin; }
 
         void reset(u8 fill);
@@ -104,13 +109,14 @@ namespace ncore
 
         buffer_t operator()(u32 from, u32 to) const;
 
-        void copy_from(const cbuffer_t& other) { other.copy_to(m_begin, m_end); }
+        void copy_from(const cbuffer_t& other);
 
         binary_reader_t reader() const;
         binary_writer_t writer() const;
 
         u8* m_begin;
         u8* m_end;
+        u8* m_cap;
     };
 
     template <u32 L>
@@ -140,20 +146,27 @@ namespace ncore
     //
     // Helper class for reading types from binary data
     //
-
     class binary_reader_t
     {
     public:
         inline binary_reader_t()
-            : m_begin(nullptr)
+            : m_buffer()
             , m_cursor(nullptr)
-            , m_end(nullptr)
         {
         }
-        inline binary_reader_t(u8 const* _buffer, u8 const* _end)
-            : m_begin(_buffer)
-            , m_cursor(_buffer)
-            , m_end(_end)
+        inline binary_reader_t(u8 const* begin, u8 const* end)
+            : m_buffer(begin, end)
+            , m_cursor(begin)
+        {
+        }
+        inline binary_reader_t(buffer_t& buffer)
+            : m_buffer(buffer)
+            , m_cursor(buffer.m_begin)
+        {
+        }
+        inline binary_reader_t(cbuffer_t& buffer)
+            : m_buffer(buffer)
+            , m_cursor(buffer.m_begin)
         {
         }
 
@@ -169,31 +182,31 @@ namespace ncore
         void      reset();
         int_t     skip(int_t);
 
-        u16       peek_u16() const;
+        u16 peek_u16() const;
 
-        bool      read_bool();
-        u8        read_u8();
-        s8        read_s8();
-        u16       read_u16();
-        s16       read_s16();
-        u32       read_u32();
-        s32       read_s32();
-        u64       read_u64();
-        s64       read_s64();
-        f32       read_f32();
-        f64       read_f64();
+        bool read_bool();
+        u8   read_u8();
+        s8   read_s8();
+        u16  read_u16();
+        s16  read_s16();
+        u32  read_u32();
+        s32  read_s32();
+        u64  read_u64();
+        s64  read_s64();
+        f32  read_f32();
+        f64  read_f64();
 
-        void      read(bool& value) { value = read_bool(); }
-        void      read(u8& value) { value = read_u8(); }
-        void      read(s8& value) { value = read_s8(); }
-        void      read(u16& value) { value = read_u16(); }
-        void      read(s16& value) { value = read_s16(); }
-        void      read(u32& value) { value = read_u32(); }
-        void      read(s32& value) { value = read_s32(); }
-        void      read(u64& value) { value = read_u64(); }
-        void      read(s64& value) { value = read_s64(); }
-        void      read(f32& value) { value = read_f32(); }
-        void      read(f64& value) { value = read_f64(); }
+        void read(bool& value) { value = read_bool(); }
+        void read(u8& value) { value = read_u8(); }
+        void read(s8& value) { value = read_s8(); }
+        void read(u16& value) { value = read_u16(); }
+        void read(s16& value) { value = read_s16(); }
+        void read(u32& value) { value = read_u32(); }
+        void read(s32& value) { value = read_s32(); }
+        void read(u64& value) { value = read_u64(); }
+        void read(s64& value) { value = read_s64(); }
+        void read(f32& value) { value = read_f32(); }
+        void read(f64& value) { value = read_f64(); }
 
         void read_data(buffer_t& buf);
         void view_data(u32 size, cbuffer_t& buf);
@@ -202,9 +215,8 @@ namespace ncore
         void view_string(const char*& out_str, const char*& out_str_end, s8& str_type);
 
     protected:
-        u8 const* m_begin;
+        cbuffer_t m_buffer;
         u8 const* m_cursor;
-        u8 const* m_end;
     };
 
     //
@@ -215,21 +227,28 @@ namespace ncore
     {
     public:
         inline binary_writer_t()
-            : m_begin(nullptr)
+            : m_buffer()
             , m_cursor(nullptr)
-            , m_end(nullptr)
         {
         }
         inline binary_writer_t(u8* _buffer, u8* _end)
-            : m_begin(_buffer)
+            : m_buffer(_buffer, _end)
             , m_cursor(_buffer)
-            , m_end(_end)
+        {
+        }
+        inline binary_writer_t(u8* _buffer, u8* _end, u8* _cap)
+            : m_buffer(_buffer, _end, _cap)
+            , m_cursor(_buffer)
+        {
+        }
+        inline binary_writer_t(const buffer_t& buffer)
+            : m_buffer(buffer)
+            , m_cursor(buffer.m_begin)
         {
         }
         inline binary_writer_t(binary_writer_t const& other)
-            : m_begin(other.m_begin)
+            : m_buffer(other.m_buffer)
             , m_cursor(other.m_cursor)
-            , m_end(other.m_end)
         {
         }
 
@@ -281,16 +300,13 @@ namespace ncore
 
         binary_writer_t& operator=(const binary_writer_t& other)
         {
-            m_begin  = other.m_begin;
+            m_buffer = other.m_buffer;
             m_cursor = other.m_cursor;
-            m_end    = other.m_end;
             return *this;
         }
 
-    protected:
-        u8* m_begin;
-        u8* m_cursor;
-        u8* m_end;
+        buffer_t m_buffer;
+        u8*      m_cursor;
     };
 
     inline cbuffer_t::cbuffer_t(buffer_t const& buffer)
@@ -378,7 +394,7 @@ namespace ncore
     }
 
     inline binary_reader_t buffer_t::reader() const { return binary_reader_t(m_begin, m_end); }
-    inline binary_writer_t buffer_t::writer() const { return binary_writer_t(m_begin, m_end); }
+    inline binary_writer_t buffer_t::writer() const { return binary_writer_t(m_begin, m_end, m_cap); }
 
     template <u32 L>
     void memory_t<L>::reset(u8 fill)
