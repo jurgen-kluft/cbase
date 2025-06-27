@@ -1,8 +1,8 @@
 #include "ccore/c_target.h"
-#include "cbase/c_context.h"
 #include "cbase/c_allocator.h"
 #include "cbase/c_darray.h"
 #include "cbase/c_limits.h"
+#include "cbase/c_thread_context.h"
 
 namespace ncore
 {
@@ -28,7 +28,7 @@ namespace ncore
         {
             if (items != nullptr)
             {
-                alloc_t* alloc = context_t::runtime_alloc();
+                alloc_t* alloc = thread_context_t::current()->runtime_alloc();
                 alloc->deallocate(items);
                 cur_capacity = 0;
                 items        = nullptr;
@@ -41,7 +41,7 @@ namespace ncore
 
             {
                 void*    newitems;
-                alloc_t* alloc = context_t::runtime_alloc();
+                alloc_t* alloc = thread_context_t::current()->runtime_alloc();
                 if (items == nullptr)
                 {
                     newitems = alloc->allocate(new_capacity * sizeof_item);

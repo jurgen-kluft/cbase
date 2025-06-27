@@ -6,7 +6,7 @@
 #endif
 
 #include "ccore/c_allocator.h"
-#include "cbase/c_context.h"
+#include "cbase/c_thread_context.h"
 #include "ccore/c_debug.h"
 
 namespace ncore

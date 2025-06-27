@@ -6,7 +6,7 @@
 #endif
 
 #include "cbase/c_allocator.h"
-#include "cbase/c_context.h"
+#include "cbase/c_thread_context.h"
 
 namespace ncore
 {
@@ -32,7 +32,7 @@ namespace ncore
             if (memory == nullptr)
                 memory = g_get_default_array_memory_handler();
 
-            alloc_t*    alloc = context_t::runtime_alloc();
+            alloc_t*    alloc = thread_context_t::current()->runtime_alloc();
             void*       mem   = alloc->allocate(sizeof(array_t<T>), sizeof(void*));
             array_t<T>* array = new (mem) array_t<T>();
             array->m_memory   = memory;
@@ -45,7 +45,7 @@ namespace ncore
         static void destroy(array_t<T>*& a)
         {
             a->set_capacity(0);
-            alloc_t* alloc = context_t::runtime_alloc();
+            alloc_t* alloc = thread_context_t::current()->runtime_alloc();
             alloc->deallocate(a);
             a = nullptr;
         }

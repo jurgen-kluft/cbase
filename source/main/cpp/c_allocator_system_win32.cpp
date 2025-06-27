@@ -15,6 +15,8 @@
 
 namespace ncore
 {
+    // TODO: This here should be a virtual memory allocator, that doesn't free any memory when deallocate is called
+
     class allocator_win32_system : public alloc_t
     {
     public:
