@@ -30,7 +30,7 @@ UNITTEST_SUITE_BEGIN(tree)
 
             void deallocate_node(ntree::node_t* node)
             {
-                m_allocator->destruct(node);
+                g_destruct(m_allocator, node);
                 m_size--;
             }
         };

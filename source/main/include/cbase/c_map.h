@@ -127,7 +127,7 @@ namespace ncore
             if (ntree::remove(m_data.m_root, &temp, (void const*)&key, compare_key_with_node, removed))
             {
                 item_t* item = (item_t*)removed;
-                m_data.m_allocator->destruct(item);
+                g_destruct(m_data.m_allocator, item);
                 m_data.m_size--;
                 return true;
             }
@@ -264,7 +264,7 @@ namespace ncore
             if (ntree::remove(m_data.m_root, &temp, (void const*)&key, compare_key_with_node, removed))
             {
                 item_t* item = (item_t*)removed;
-                m_data.m_allocator->destruct(item);
+                g_destruct(m_data.m_allocator, item);
                 return true;
             }
             return false;

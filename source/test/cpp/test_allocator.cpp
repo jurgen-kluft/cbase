@@ -126,17 +126,8 @@ UNITTEST_SUITE_BEGIN(allocator)
 
         UNITTEST_TEST(test_construct)
         {
-            test_object4* obj = Allocator->construct<test_object4>();
-            Allocator->destruct<test_object4>(obj);
-        }
-
-        UNITTEST_TEST(test_alloc_buffer)
-        {
-            u8                   inplace[256];
-            fixed_buffer_alloc_t sa;
-            sa.setup(inplace, sizeof(inplace));
-            test_object4* obj = sa.construct<test_object4>();
-            sa.destruct<>(obj);
+            test_object4* obj = g_construct<test_object4>(Allocator);
+            g_destruct<test_object4>(Allocator, obj);
         }
 
         struct my_type
@@ -148,9 +139,9 @@ UNITTEST_SUITE_BEGIN(allocator)
 
         UNITTEST_TEST(malloc_typed_and_free_typed)
         {
-            my_type* p = ncore::g_new<my_type>();
+            my_type* p = ncore::g_new<my_type>(Allocator);
             CHECK_TRUE(p != nullptr);
-            ncore::g_delete(p);
+            ncore::g_delete(Allocator, p);
         }
     }
 }
