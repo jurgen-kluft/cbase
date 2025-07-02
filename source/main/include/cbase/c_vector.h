@@ -41,7 +41,7 @@ namespace ncore
             , m_size(0)
             , m_capacity(items_capacity)
         {
-            ASSERT(items_capacity < items_reserved);
+            ASSERT(items_capacity <= items_reserved);
             m_arena = nvector::g_alloc_vmem_arena(items_reserved, items_capacity, sizeof(T));
             nvector::g_vmem_arena_reserved(m_arena, items_reserved * sizeof(T));
             m_items = (T*)nvector::g_vmem_arena_allocate(m_arena, items_capacity * sizeof(T), alignof(T));

@@ -32,28 +32,6 @@ namespace cbase
 
         ncore::console_t::init_default_console();
         ncore::context_t context = ncore::g_current_context();
-
-        // The assert handler, system and string allocator are thread safe
-        ncore::asserthandler_t* assert_handler = gSetAssertHandler();
-
-        ncore::stack_alloc_t* stack_allocator = nullptr;
-        // TODO create stack allocator
-
-        ncore::alloc_t* heap_allocator = nullptr;
-        // TODO create heap allocator
-
-        ncore::frame_alloc_t* frame_allocator = nullptr;
-        // TODO create frame allocator
-
-        ncore::random_t* random_generator = new (system_allocator) ncore::wyrand_t();
-        random_generator->reset((ncore::s64)random_generator);  // randomize the seed
-
-        context.set_assert_handler(assert_handler);
-        context.set_system_alloc(system_allocator);
-        context.set_heap_alloc(heap_allocator);
-        context.set_frame_alloc(frame_allocator);
-        context.set_stack_alloc(stack_allocator);
-        context.set_random(random_generator);
     }
 
     void exit()

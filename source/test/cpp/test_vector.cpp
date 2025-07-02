@@ -20,7 +20,7 @@ UNITTEST_SUITE_BEGIN(vector_t)
 
 		UNITTEST_TEST(create_use_destroy)
 		{
-			vector_t<s32> darray( 0, 512);
+			vector_t<s32> darray( 512, 512);
 			CHECK_EQUAL(512, darray.capacity());
 			for (s32 i = 0; i < 512; i++)
 				darray.add_item(i);
@@ -29,7 +29,7 @@ UNITTEST_SUITE_BEGIN(vector_t)
 
 		UNITTEST_TEST(create_setcap_use_destroy)
 		{
-			vector_t<s32> darray( 0, 512);
+			vector_t<s32> darray( 512, 512);
 			CHECK_EQUAL(512, darray.capacity());
 
 			darray.set_capacity(1024);

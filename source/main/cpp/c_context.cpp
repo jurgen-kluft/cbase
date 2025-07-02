@@ -57,7 +57,8 @@ namespace ncore
     {
         if (sThreadLocalContext != nullptr)
         {
-            sThreadLocalContext->m_vmem_arena->release();
+            vmem_arena_t a = *sThreadLocalContext->m_vmem_arena;
+            a.release();
             sThreadLocalContext = nullptr;
         }
     }

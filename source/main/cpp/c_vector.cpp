@@ -56,9 +56,12 @@ namespace ncore
 
         void* g_vmem_arena_allocate(vmem_arena_t* arena, u32 size, s32 alignment)
         {
-            ASSERT(size > 0);
-            ASSERT(alignment > 0 && (alignment & (alignment - 1)) == 0);  // Ensure alignment is a power of two
-            return arena->commit(size, alignment);
+            if (size > 0)
+            {
+                ASSERT(alignment > 0 && (alignment & (alignment - 1)) == 0);  // Ensure alignment is a power of two
+                return arena->commit(size, alignment);
+            }
+            return nullptr;
         }
 
     }  // namespace narray
