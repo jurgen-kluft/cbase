@@ -2,7 +2,7 @@
 #include "ccore/c_debug.h"
 #include "cbase/c_double.h"
 #include "cbase/c_console.h"
-#include "cbase/c_limits.h"
+#include "ccore/c_limits.h"
 #include "cbase/c_memory.h"
 #include "cbase/c_runes.h"
 #include "cbase/c_va_list.h"
