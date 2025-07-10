@@ -67,115 +67,115 @@ namespace ncore
         }
 
         virtual void vflush() {}
-
-        static s32 write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
-        {
-            s32 len = 0;
-            if (rune < 0xd800)
-            {
-                len = 1;
-            }
-            else if (rune < 0xe000)
-            {
-                len = 0;
-            }
-            else if (rune < 0x010000)
-            {
-                len = 1;
-            }
-            else if (rune < 0x110000)
-            {
-                len = 2;
-            }
-
-            if (dest != nullptr && len > 0)
-            {
-                if (len == 1 && dest < end)
-                {
-                    *dest++ = (uchar16)rune;
-                    return 1;
-                }
-                else if ((dest + 1) < end)
-                {
-                    // 20-bit intermediate value
-                    u32 const iv = rune - 0x10000;
-                    *dest++      = static_cast<uchar16>((iv >> 10) + 0xd800);
-                    *dest++      = static_cast<uchar16>((iv & 0x03ff) + 0xdc00);
-                    return 1;
-                }
-            }
-            return 0;
-        }
-
-        static s32 write_ascii(ascii::pcrune _str, u32 _begin, u32 _end)
-        {
-            const s32 maxlen = 252;
-            char      str8[maxlen + 4];
-
-            s32           l   = 0;
-            ascii::pcrune src = _str + _begin;
-            ascii::pcrune end = _str + _end;
-            while (src < end)
-            {
-                char* dst8 = (char*)str8;
-                char* end8 = dst8 + maxlen;
-                while (src < end && dst8 < end8)
-                {
-                    *dst8++ = (char)(*src++);
-                }
-                *dst8 = 0;
-                ::printf("%s", (const char*)str8);
-                l += dst8 - str8;
-            }
-            return l;
-        }
-
-        static s32 write_utf16(utf16::pcrune _str, u32 _begin, u32 _end)
-        {
-            const s32 maxlen = 252;
-            uchar16   str16[maxlen + 4];
-
-            s32           l   = 0;
-            utf16::pcrune src = _str + _begin;
-            utf16::pcrune end = _str + _end;
-            while (src < end)
-            {
-                uchar16* dst16 = (uchar16*)str16;
-                uchar16* end16 = dst16 + maxlen;
-                while (src < end && dst16 < end16)
-                {
-                    *dst16++ = (*src++).r;
-                }
-                *dst16 = 0;
-                ::wprintf(L"%s", (const wchar_t*)str16);
-                l += dst16 - str16;
-            }
-            return l;
-        }
-
-        static s32 write_utf32(utf32::pcrune _str, u32 _begin, u32 _end)
-        {
-            const s32 maxlen = 255;
-            uchar32   str32[maxlen + 1];
-
-            s32           l   = 0;
-            utf32::pcrune src = _str + _begin;
-            utf32::pcrune end = _str + _end;
-            while (src < end)
-            {
-                uchar32* dst32 = (uchar32*)str32;
-                uchar32* end32 = dst32 + maxlen;
-                while (src < end && dst32 < end32)
-                {
-                    *dst32++ = (*src++).r;
-                }
-                *dst32 = 0;
-                ::wprintf(L"%s", (const wchar_t*)str32);
-                l += dst32 - str32;
-            }
-            return l;
-        }
     };
+
+    static s32 write_utf16(uchar32 rune, uchar16*& dest, uchar16 const* end)
+    {
+        s32 len = 0;
+        if (rune < 0xd800)
+        {
+            len = 1;
+        }
+        else if (rune < 0xe000)
+        {
+            len = 0;
+        }
+        else if (rune < 0x010000)
+        {
+            len = 1;
+        }
+        else if (rune < 0x110000)
+        {
+            len = 2;
+        }
+
+        if (dest != nullptr && len > 0)
+        {
+            if (len == 1 && dest < end)
+            {
+                *dest++ = (uchar16)rune;
+                return 1;
+            }
+            else if ((dest + 1) < end)
+            {
+                // 20-bit intermediate value
+                u32 const iv = rune - 0x10000;
+                *dest++      = static_cast<uchar16>((iv >> 10) + 0xd800);
+                *dest++      = static_cast<uchar16>((iv & 0x03ff) + 0xdc00);
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    static s32 write_ascii(ascii::pcrune _str, u32 _begin, u32 _end)
+    {
+        const s32 maxlen = 252;
+        char      str8[maxlen + 4];
+
+        s32           l   = 0;
+        ascii::pcrune src = _str + _begin;
+        ascii::pcrune end = _str + _end;
+        while (src < end)
+        {
+            char* dst8 = (char*)str8;
+            char* end8 = dst8 + maxlen;
+            while (src < end && dst8 < end8)
+            {
+                *dst8++ = (char)(*src++);
+            }
+            *dst8 = 0;
+            ::printf("%s", (const char*)str8);
+            l += dst8 - str8;
+        }
+        return l;
+    }
+
+    static s32 write_utf16(utf16::pcrune _str, u32 _begin, u32 _end)
+    {
+        const s32 maxlen = 252;
+        uchar16   str16[maxlen + 4];
+
+        s32           l   = 0;
+        utf16::pcrune src = _str + _begin;
+        utf16::pcrune end = _str + _end;
+        while (src < end)
+        {
+            uchar16* dst16 = (uchar16*)str16;
+            uchar16* end16 = dst16 + maxlen;
+            while (src < end && dst16 < end16)
+            {
+                *dst16++ = (*src++).r;
+            }
+            *dst16 = 0;
+            ::wprintf(L"%s", (const wchar_t*)str16);
+            l += dst16 - str16;
+        }
+        return l;
+    }
+
+    static s32 write_utf32(utf32::pcrune _str, u32 _begin, u32 _end)
+    {
+        const s32 maxlen = 255;
+        uchar32   str32[maxlen + 1];
+
+        s32           l   = 0;
+        utf32::pcrune src = _str + _begin;
+        utf32::pcrune end = _str + _end;
+        while (src < end)
+        {
+            uchar32* dst32 = (uchar32*)str32;
+            uchar32* end32 = dst32 + maxlen;
+            while (src < end && dst32 < end32)
+            {
+                *dst32++ = (*src++).r;
+            }
+            *dst32 = 0;
+            ::wprintf(L"%s", (const wchar_t*)str32);
+            l += dst32 - str32;
+        }
+        return l;
+    }
 
     class console_out_macos : public console_t::out_t
     {
@@ -242,16 +242,16 @@ namespace ncore
         virtual void writeln()
         {
             ascii::rune line32[] = {'\n', 0};
-            out_writer_t::write_ascii(line32, 0, 1);
+            write_ascii(line32, 0, 1);
         }
 
         virtual s32 write(const crunes_t& str)
         {
             switch (str.m_type)
             {
-                case ascii::TYPE: return out_writer_t::write_ascii(str.m_ascii, str.m_str, str.m_end);
-                case utf16::TYPE: return out_writer_t::write_utf16(str.m_utf16, str.m_str, str.m_end);
-                case utf32::TYPE: return out_writer_t::write_utf32(str.m_utf32, str.m_str, str.m_end);
+                case ascii::TYPE: return write_ascii(str.m_ascii, str.m_str, str.m_end);
+                case utf16::TYPE: return write_utf16(str.m_utf16, str.m_str, str.m_end);
+                case utf32::TYPE: return write_utf32(str.m_utf32, str.m_str, str.m_end);
                 default:  //@todo: UTF-8
                     break;
             }
