@@ -22,8 +22,6 @@ string class (UCS-2, UTF-16)
 
 The package csuperalloc contains a virtual memory allocator.
 
-- split of debugging allocators like memento to cdealloc
-
 ## catomic
 
 Do we still need these lock free data structures ?
@@ -72,7 +70,7 @@ Progress = Alpha
 
 - thread
 - mutex, event, semaphore
-- per thread a context holding (this is part of cbase)
+- per thread a context holding (this is now part of cbase)
   - random number generator
   - string allocator
   - heap allocator
@@ -114,6 +112,3 @@ Localization to support many languages easily in an app.
 1. localization
 2. string compression
 
-## end
-
-that's it... (for now)

@@ -42,6 +42,11 @@ namespace ncore
             wyrand_t*       rnd          = new (arena.commit_and_zero(sizeof(wyrand_t))) wyrand_t();
             rnd->reset((u64)arena.m_base);
 
+            // TODO
+            // - heap allocator
+            // - frame allocator
+            // - stack allocator
+
             *vmem_arena                  = arena;
             system_alloc->m_vmem         = vmem_arena;
             context_data->m_vmem_arena   = vmem_arena;

@@ -6,33 +6,33 @@
 #endif
 
 #include "ccore/c_allocator.h"
-#include "cbase/c_context.h"
-#include "ccore/c_debug.h"
 
 namespace ncore
 {
+    class alloc_t;
+
     void     g_init_system_alloc();
     void     g_exit_system_alloc();
     alloc_t* g_get_system_alloc();
 
+    void* g_malloc(u32 size, u32 align = sizeof(void*));
+    void  g_free(void* ptr);
+
     // Global new and delete
     template <typename T, typename... Args>
-    T* g_new(alloc_t* alloc, Args... args)
+    T* g_new(Args... args)
     {
-        void* mem    = alloc->allocate(sizeof(T));
+        void* mem    = g_malloc(sizeof(T), alignof(T));
         T*    object = new (mem) T(args...);
         return object;
     }
 
     template <typename T>
-    void g_delete(alloc_t* alloc, T* p)
+    void g_delete(T* p)
     {
         p->~T();
-        alloc->deallocate(p);
+        g_free(p);
     }
-
-    void* g_malloc(u32 size, u32 align = sizeof(void*));
-    void  g_free(void* ptr);
 
 };  // namespace ncore
 
