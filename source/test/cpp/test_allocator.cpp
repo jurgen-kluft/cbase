@@ -139,9 +139,9 @@ UNITTEST_SUITE_BEGIN(allocator)
 
         UNITTEST_TEST(malloc_typed_and_free_typed)
         {
-            my_type* p = ncore::g_new<my_type>(Allocator);
+            my_type* p = ncore::g_new<my_type>();
             CHECK_TRUE(p != nullptr);
-            ncore::g_delete(Allocator, p);
+            ncore::g_delete(p);
         }
     }
 }
