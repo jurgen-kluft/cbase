@@ -74,14 +74,12 @@ namespace ncore
             , m_end(end)
             , m_cap(end)
         {
-            reset(0);
         }
         inline explicit buffer_t(u8* data, u8* end, u8* cap)
             : m_begin(data)
             , m_end(end)
             , m_cap(cap)
         {
-            reset(0);
         }
 
         inline int_t size() const { return m_end - m_begin; }
@@ -110,6 +108,7 @@ namespace ncore
         buffer_t operator()(u32 from, u32 to) const;
 
         void copy_from(const cbuffer_t& other);
+        void fill_rest(u8 fill);
 
         binary_reader_t reader() const;
         binary_writer_t writer() const;
@@ -120,11 +119,11 @@ namespace ncore
     };
 
     template <u32 L>
-    class memory_t
+    class data_t
     {
     public:
         u8 m_data[L];
-        inline memory_t() {}
+        inline data_t() {}
 
         inline u32 size() const { return L; }
 
@@ -133,14 +132,20 @@ namespace ncore
 
         void reset(u8 fill);
 
-        s32 compare(const memory_t& other) const;
+        s32 compare(const data_t& other) const;
 
-        bool operator==(const memory_t& other) const;
-        bool operator!=(const memory_t& other) const;
-        bool operator<(const memory_t& other) const;
-        bool operator<=(const memory_t& other) const;
-        bool operator>(const memory_t& other) const;
-        bool operator>=(const memory_t& other) const;
+        inline u8 operator[](u32 i) const
+        {
+            ASSERT(i < L);
+            return m_data[i];
+        }
+
+        bool operator==(const data_t& other) const;
+        bool operator!=(const data_t& other) const;
+        bool operator<(const data_t& other) const;
+        bool operator<=(const data_t& other) const;
+        bool operator>(const data_t& other) const;
+        bool operator>=(const data_t& other) const;
     };
 
     //
@@ -238,7 +243,7 @@ namespace ncore
         }
         inline binary_writer_t(u8* _buffer, u8* _end, u8* _cap)
             : m_buffer(_buffer, _end, _cap)
-            , m_cursor(_buffer)
+            , m_cursor(_end)
         {
         }
         inline binary_writer_t(const buffer_t& buffer)
@@ -292,8 +297,8 @@ namespace ncore
             write((u64)ptr);
         }
 
-        void write_data(buffer_t const& cbuf);
-        void write_data(cbuffer_t const& cbuf);
+        void write_data(buffer_t const& src);      // Only write the bytes from src
+        void write_data(cbuffer_t const& src);     // Only write the bytes from src
         void write_buffer(buffer_t const& cbuf);   // Will write [s32=Length][u8[]=Data]
         void write_buffer(cbuffer_t const& cbuf);  // Will write [s32=Length][u8[]=Data]
         void write_string(const char* str, const char* str_end, s8 str_type);
@@ -374,6 +379,18 @@ namespace ncore
         return cbuffer_t();
     }
 
+    inline void cbuffer_t::copy_to(buffer_t& dst) const
+    {
+        int_t const n = size();
+        if (dst.size() >= n)
+        {
+            u8*       pdst = dst.m_begin;
+            u8 const* psrc = m_begin;
+            for (u32 i = 0; i < n; i++)
+                *pdst++ = *psrc++;
+        }
+    }
+
     inline binary_reader_t cbuffer_t::reader() const { return binary_reader_t(m_begin, m_end); }
 
     inline void buffer_t::reset(u8 fill)
@@ -393,18 +410,27 @@ namespace ncore
         return buffer_t();
     }
 
+    inline void buffer_t::copy_from(const cbuffer_t& other) { other.copy_to(*this); }
+    inline void buffer_t::fill_rest(u8 fill)
+    {
+        const int_t c = cap();
+        int_t       i = size();
+        while (i < c)
+            m_begin[i++] = fill;
+    }
+
     inline binary_reader_t buffer_t::reader() const { return binary_reader_t(m_begin, m_end); }
     inline binary_writer_t buffer_t::writer() const { return binary_writer_t(m_begin, m_end, m_cap); }
 
     template <u32 L>
-    void memory_t<L>::reset(u8 fill)
+    void data_t<L>::reset(u8 fill)
     {
         for (u32 i = 0; i < size(); ++i)
             m_data[i] = fill;
     }
 
     template <u32 L>
-    s32 memory_t<L>::compare(const memory_t& other) const
+    s32 data_t<L>::compare(const data_t& other) const
     {
         if (size() < other.size())
             return -1;
@@ -421,32 +447,32 @@ namespace ncore
     }
 
     template <u32 L>
-    bool memory_t<L>::operator==(const memory_t& other) const
+    bool data_t<L>::operator==(const data_t& other) const
     {
         return compare(other) == 0;
     }
     template <u32 L>
-    bool memory_t<L>::operator!=(const memory_t& other) const
+    bool data_t<L>::operator!=(const data_t& other) const
     {
         return compare(other) != 0;
     }
     template <u32 L>
-    bool memory_t<L>::operator<(const memory_t& other) const
+    bool data_t<L>::operator<(const data_t& other) const
     {
         return compare(other) < 0;
     }
     template <u32 L>
-    bool memory_t<L>::operator<=(const memory_t& other) const
+    bool data_t<L>::operator<=(const data_t& other) const
     {
         return compare(other) <= 0;
     }
     template <u32 L>
-    bool memory_t<L>::operator>(const memory_t& other) const
+    bool data_t<L>::operator>(const data_t& other) const
     {
         return compare(other) > 0;
     }
     template <u32 L>
-    bool memory_t<L>::operator>=(const memory_t& other) const
+    bool data_t<L>::operator>=(const data_t& other) const
     {
         return compare(other) >= 0;
     }
