@@ -3428,6 +3428,20 @@ namespace ncore
         return c;
     }
 
+    crunes_t make_crunes(runes_t const& _str, u32 from, u32 to)
+    {
+        ASSERT(from >= _str.m_str && from <= _str.m_eos);
+        ASSERT(to >= _str.m_str && to <= _str.m_eos);
+        ASSERT(from <= to);
+        crunes_t c;
+        c.m_ascii = _str.m_ascii;
+        c.m_str   = from;
+        c.m_end   = to;
+        c.m_eos   = _str.m_eos;
+        c.m_type  = _str.m_type;
+        return c;
+    }
+
     crunes_t make_crunes(crunes_t const& _str)
     {
         crunes_t c;

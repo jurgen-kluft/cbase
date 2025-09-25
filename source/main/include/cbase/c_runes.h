@@ -134,6 +134,32 @@ namespace ncore
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
     }  // namespace utf32
 
+    // TODO combine runes_t and crunes_t into one struct, like:
+    //
+    // struct str_t
+    // {
+    //     union
+    //     {
+    //         ascii::pcrune m_const_ascii;
+    //         ucs2::pcrune  m_const_ucs2;
+    //         utf8::pcrune  m_const_utf8;
+    //         utf16::pcrune m_const_utf16;
+    //         utf32::pcrune m_const_utf32;
+    //     };
+    //     union
+    //     {
+    //         ascii::prune m_ascii;
+    //         ucs2::prune  m_ucs2;
+    //         utf8::prune  m_utf8;
+    //         utf16::prune m_utf16;
+    //         utf32::prune m_utf32;
+    //     };
+    //     u32 m_str;   // ptr[m_str] is the first character
+    //     u32 m_end;   // ptr[m_end] is one past the last character
+    //     u32 m_eos;   // ptr[m_eos] is the end of the string but always points to a terminator
+    //     u8  m_type;  // type of string (ascii, ucs2, utf8, utf16, utf32)
+    // };
+
     struct crunes_t;
     struct runes_t
     {
