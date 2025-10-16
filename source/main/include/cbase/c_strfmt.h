@@ -46,10 +46,6 @@ namespace ncore
                 : value(value)
             {
             }
-            inline TypeId(const TypeId& other)
-                : value(other.value)
-            {
-            }
 
             u8 value;
         };
@@ -81,10 +77,6 @@ namespace ncore
             }
             inline Flags(EFlag value)
                 : value((u8)value)
-            {
-            }
-            inline Flags(const Flags& other)
-                : value(other.value)
             {
             }
 

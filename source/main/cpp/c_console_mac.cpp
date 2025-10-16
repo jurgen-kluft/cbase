@@ -21,7 +21,7 @@ namespace ncore
 
         virtual s32 vwrite(uchar32 c)
         {
-            utf32::rune src[2] = {c, 0};
+            utf32::rune src[2] = {{c}, {0}};
             return write_utf32(src, 0, 1);
         }
 

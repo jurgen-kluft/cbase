@@ -12,7 +12,7 @@ UNITTEST_SUITE_BEGIN(carray_t)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        static s32 array_data[64];
+        //static s32 array_data[64];
 
         UNITTEST_TEST(construct)
         {

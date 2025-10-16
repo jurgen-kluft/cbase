@@ -684,7 +684,7 @@ UNITTEST_SUITE_BEGIN(tree32)
 
     UNITTEST_FIXTURE(tree2)
     {
-        UNITTEST_ALLOCATOR;
+        //UNITTEST_ALLOCATOR;
 
         const s32  c_find_slot = 62;
         const s32  c_temp_slot = 63;
@@ -739,7 +739,7 @@ UNITTEST_SUITE_BEGIN(tree32)
             ntree32::setup_tree(tree, m_nodes);
             s_init_keys();
 
-            ntree32::index_t const key = 0;
+            //ntree32::index_t const key = 0;
 
             ntree32::node_t node  = tree.new_node();
             ntree32::node_t left  = tree.new_node();
@@ -1001,7 +1001,7 @@ UNITTEST_SUITE_BEGIN(tree32)
                 s_keys[c_find_slot]  = s_keys[i];
                 CHECK_EQUAL(true, ntree32::find(tree, root, c_find_slot, s_compare_key_and_node, &s_keys, node));
                 CHECK_NOT_EQUAL(ntree32::c_invalid_node, node);
-                CHECK_EQUAL(i, node);
+                CHECK_EQUAL((ntree32::node_t)i, node);
             }
 
             ntree32::node_t node = ntree32::c_invalid_node;

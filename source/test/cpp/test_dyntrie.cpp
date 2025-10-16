@@ -71,7 +71,7 @@ namespace ncore
         ASSERT((get_bit >> 3) < keylen);
         return (key[(get_bit >> 3)] & (0x80 >> (get_bit & 0x07))) ? (s8)1 : (s8)0;
     }
-    static u16  ffs_bit(u8 byte);
+    static s8  ffs_bit(u8 byte);
     static bool compare_keys(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start);
     static u16  findfirst_bit_range(u8 keylen1, dynkey_t key1, u8 keylen2, dynkey_t key2, u16 bit_start, u16 node_bit_end, dynkey_t nullkey);
     static u16  findfirst_bit_range_fixedkey(u8 keylen, dynkey_t key1, dynkey_t key2, u16 bit_start, u16 node_bit_end);
@@ -168,7 +168,7 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
 {
     UNITTEST_FIXTURE(main)
     {
-        UNITTEST_ALLOCATOR;
+        // UNITTEST_ALLOCATOR;
         u8 s_nullkey[256] = {0};
 
         struct XorRandom
@@ -278,7 +278,7 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
             CHECK_EQUAL(32, findfirst_bit_range(20, key1, 20, key2, 11, 60, s_nullkey));
         }
 
-        UNITTEST_TEST(insert) 
+        UNITTEST_TEST(insert)
         {
             dyntrie_t trie;
 
@@ -292,8 +292,8 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
             CHECK_TRUE(trie.insert(sizeof(key1), (u8 *)&key1, (dynval_t)&value1));
             CHECK_TRUE(trie.insert(sizeof(key2), (u8 *)&key2, (dynval_t)&value2));
         }
-        
-        UNITTEST_TEST(insert_find_1) 
+
+        UNITTEST_TEST(insert_find_1)
         {
             dyntrie_t trie;
 
@@ -309,12 +309,12 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
             u64 value3 = s_rand.next();
             u64 value4 = s_rand.next();
 
-            CHECK_EQUAL(0, trie.size());
+            CHECK_EQUAL((u32)0, trie.size());
             CHECK_TRUE(trie.insert(sizeof(key1), (u8*)&key1, (dynval_t)&value1));
             CHECK_TRUE(trie.insert(sizeof(key2), (u8*)&key2, (dynval_t)&value2));
             CHECK_TRUE(trie.insert(sizeof(key3), (u8*)&key3, (dynval_t)&value3));
             CHECK_TRUE(trie.insert(sizeof(key4), (u8*)&key4, (dynval_t)&value4));
-            CHECK_EQUAL(4, trie.size());
+            CHECK_EQUAL((u32)4, trie.size());
 
             dynval_t v;
             CHECK_TRUE(trie.find(sizeof(key1), (u8*)&key1, v));
@@ -334,7 +334,7 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
             u64 keys[1000];
             u64 values[1000];
 
-            CHECK_EQUAL(0, trie.size());
+            CHECK_EQUAL((u32)0, trie.size());
 
             for (s32 i = 0; i < 1000; ++i)
             {
@@ -342,12 +342,12 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
                 values[i] = i;
 
                 CHECK_TRUE(trie.insert(sizeof(keys[i]), (u8*)&keys[i], (dynval_t)&values[i]));
-                
+
                 u64 value = 0;
                 CHECK_TRUE(trie.find(sizeof(keys[i]), (u8*)&keys[i], (dynval_t&)value));
             }
 
-            CHECK_EQUAL(1000, trie.size());
+            CHECK_EQUAL((u32)1000, trie.size());
         }
 
         UNITTEST_TEST(insert_max_run_len) {}
@@ -381,7 +381,7 @@ UNITTEST_SUITE_END
 
 namespace ncore
 {
-    static inline u16 ffs_bit(u8 byte) { return (u16)math::g_findLastBit(byte); }
+    static inline s8 ffs_bit(u8 byte) { return math::g_findLastBit(byte); }
 
     // nullkey is used to compare the key outside the range of a key
     // return:
@@ -601,7 +601,7 @@ namespace ncore
         }
 
         dynnode_t* prevnode        = nullptr;
-        s8         prevnode_branch = -1;
+        //s8         prevnode_branch = -1;
         dynnode_t* curnode         = m_root;
         s8         curnode_branch  = -1;
         u16        bit_start       = 0;
@@ -649,7 +649,7 @@ namespace ncore
                 else
                 {  // branch is a node, so we need to continue the search
                     prevnode        = curnode;
-                    prevnode_branch = curnode_branch;
+                    // prevnode_branch = curnode_branch;
                     curnode         = &m_nodes[curnode->get_branch(node_branch)];
                     curnode_branch  = node_branch;
                     bit_start       = bit_diff + 1;
@@ -747,17 +747,17 @@ namespace ncore
         return false;
     }
 
-    bool dyntrie_t::remove(u8 keylen, dynkey_t key, dynval_t& value) 
-    { 
+    bool dyntrie_t::remove(u8 keylen, dynkey_t key, dynval_t& value)
+    {
         // removal of a key is a bit tricky, we need to traverse the tree and find the node that
         // contains the key, then we need to remove the key from the node, remove the node by
         // replacing the parent branch with the other branch
 
-        // when removing an item one thing to keep in mind is that the item index can be 
+        // when removing an item one thing to keep in mind is that the item index can be
         // used in any number of nodes. So we might have to iterate again replacing any
         // item index reference to the one being removed.
 
-        return false; 
+        return false;
     }
 
 }  // namespace ncore

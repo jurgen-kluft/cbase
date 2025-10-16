@@ -116,7 +116,7 @@ UNITTEST_SUITE_BEGIN(binary_search)
                 3630,3681,3727,3744,3744,3860,3899,4025,4025,4025
             };
 
-            const u32 N = sizeof(sorted_random_number_list)/sizeof(s32);
+            const s32 N = sizeof(sorted_random_number_list)/sizeof(s32);
 
             for (s32 i=0; i<N; ++i)
             {
@@ -141,7 +141,7 @@ UNITTEST_SUITE_BEGIN(binary_search)
                 3630,3681,3727,3744,3744,3860,3899,4025,4025,4025
             };
 
-            const u32 N = sizeof(sorted_random_number_list)/sizeof(s32);
+            const s32 N = sizeof(sorted_random_number_list)/sizeof(s32);
 
             for (s32 i=0; i<N; ++i)
             {
@@ -165,7 +165,7 @@ UNITTEST_SUITE_BEGIN(binary_search)
                 3630,3681,3727,3744,3744,3860,3899,4025,4025,4025
             };
 
-            const u32 N = sizeof(sorted_random_number_list)/sizeof(s32);
+            const s32 N = sizeof(sorted_random_number_list)/sizeof(s32);
 
             for (s32 i=0; i<N; ++i)
             {
@@ -173,7 +173,7 @@ UNITTEST_SUITE_BEGIN(binary_search)
                 s32 idx_of_n = g_UpperBound(sorted_random_number_list, N, n);
 
                 s32 l = i;
-                while (((l+1) < (sizeof(sorted_random_number_list)/sizeof(u32))) && (sorted_random_number_list[l+1] == n)) ++l;
+                while (((l+1) < (s32)(sizeof(sorted_random_number_list)/sizeof(u32))) && (sorted_random_number_list[l+1] == n)) ++l;
                 CHECK_EQUAL(l, idx_of_n);
             }
         }
@@ -190,7 +190,7 @@ UNITTEST_SUITE_BEGIN(binary_search)
                 3630,3681,3727,3744,3744,3860,3899,4025,4025,4025
             };
 
-            const u32 N = sizeof(sorted_random_number_list)/sizeof(s32);
+            const s32 N = sizeof(sorted_random_number_list)/sizeof(s32);
 
             for (s32 i=0; i<N; ++i)
             {
@@ -198,7 +198,7 @@ UNITTEST_SUITE_BEGIN(binary_search)
                 s64 idx_of_n = g_UpperBound(sorted_random_number_list, N, n);
 
                 s32 l = i;
-                while (((l+1) < (sizeof(sorted_random_number_list)/sizeof(u32))) && (sorted_random_number_list[l+1] == n)) ++l;
+                while (((l+1) < (s32)(sizeof(sorted_random_number_list)/sizeof(u32))) && (sorted_random_number_list[l+1] == n)) ++l;
                 CHECK_EQUAL(l, idx_of_n);
             }
         }

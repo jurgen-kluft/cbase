@@ -81,10 +81,10 @@ UNITTEST_SUITE_BEGIN(guid_t)
 
 			u32 a,b,c,d;
 			i.get(a,b,c,d);
-			CHECK_EQUAL(1, a);
-			CHECK_EQUAL(2, b);
-			CHECK_EQUAL(3, c);
-			CHECK_EQUAL(4, d);
+			CHECK_EQUAL((u32)1, a);
+			CHECK_EQUAL((u32)2, b);
+			CHECK_EQUAL((u32)3, c);
+			CHECK_EQUAL((u32)4, d);
 		}
 
 		UNITTEST_TEST(get)
@@ -93,17 +93,17 @@ UNITTEST_SUITE_BEGIN(guid_t)
 
 			u32 a,b,c,d;
 			i1.get(a,b,c,d);
-			CHECK_EQUAL(1, a);
-			CHECK_EQUAL(2, b);
-			CHECK_EQUAL(3, c);
-			CHECK_EQUAL(4, d);
+			CHECK_EQUAL((u32)1, a);
+			CHECK_EQUAL((u32)2, b);
+			CHECK_EQUAL((u32)3, c);
+			CHECK_EQUAL((u32)4, d);
 
 			guid_t i2(11, 33, 44, 99);
 			i2.get(a,b,c,d);
-			CHECK_EQUAL(11, a);
-			CHECK_EQUAL(33, b);
-			CHECK_EQUAL(44, c);
-			CHECK_EQUAL(99, d);
+			CHECK_EQUAL((u32)11, a);
+			CHECK_EQUAL((u32)33, b);
+			CHECK_EQUAL((u32)44, c);
+			CHECK_EQUAL((u32)99, d);
 		}
 
 		UNITTEST_TEST(assignment_operator)

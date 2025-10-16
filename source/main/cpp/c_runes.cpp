@@ -14,7 +14,7 @@ namespace ncore
     namespace utf
     {
         static const u32 s_invalid     = 0x0000ffff;
-        static const u32 s_replacement = 0x0000fffd;
+        //static const u32 s_replacement = 0x0000fffd;
 
         namespace reading
         {
@@ -850,7 +850,7 @@ namespace ncore
         s32 strlen(pcrune _str, pcrune& _end, pcrune _eos)
         {
             u32 cur = 0;
-            u32 end = (_eos == nullptr) ? 0x7fffffff : (u32)(_eos - _str);
+            //u32 end = (_eos == nullptr) ? 0x7fffffff : (u32)(_eos - _str);
             while (true)
             {
                 uchar32 c = _str[cur];
@@ -1543,7 +1543,7 @@ namespace ncore
             return r;
         }
 
-        static inline runes_t  nothing_found(runes_t const& str) { return make_runes(str.m_ascii, str.m_str, str.m_str, str.m_eos, str.m_type); }
+        static inline runes_t  nothing_found(runes_t const& str) { return ascii::make_runes(str.m_ascii, str.m_str, str.m_str, str.m_eos, str.m_type); }
         static inline crunes_t nothing_found(crunes_t const& str) { return make_crunes(str.m_ascii, str.m_str, str.m_str, str.m_eos, str.m_type); }
 
         // Find
@@ -1636,7 +1636,7 @@ namespace ncore
                 {
                     return select(_str, str_iter, str_iter2);
                 }
-                uchar32 const c = utf::read_forward(_str, str_iter);
+                //uchar32 const c = utf::read_forward(_str, str_iter);
             }
             return nothing_found(_str);
         }
@@ -2421,8 +2421,8 @@ namespace ncore
         }
 
         //------------------------------------------------------------------------------
-        static uchar32 const sWhitespaceChars[]    = {' ', '\t', '\n', '\r', 0};
-        static u32 const     sWhitespaceCharsCount = 4;
+        //static uchar32 const sWhitespaceChars[]    = {' ', '\t', '\n', '\r', 0};
+        //static u32 const     sWhitespaceCharsCount = 4;
 
         //------------------------------------------------------------------------------
         bool is_decimal(crunes_t const& _str)
@@ -2897,7 +2897,7 @@ namespace ncore
 
         void trim(runes_t& str)
         {
-            utf32::rune charseta[] = {' ', '\t', cEOS};
+            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, &charseta[2]);
             trimLeft(str, charset);
             trimRight(str, charset);
@@ -2905,21 +2905,21 @@ namespace ncore
 
         void trimLeft(runes_t& str)
         {
-            utf32::rune charseta[] = {' ', '\t', cEOS};
+            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, &charseta[2]);
             trimLeft(str, charset);
         }
 
         void trimRight(runes_t& str)
         {
-            utf32::rune charseta[] = {' ', '\t', cEOS};
+            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, &charseta[2]);
             trimRight(str, charset);
         }
 
         void trim(runes_t& str, uchar32 _c)
         {
-            utf32::rune charseta[] = {_c, cEOS};
+            utf32::rune charseta[] = {{_c}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, &charseta[1]);
             trimLeft(str, charset);
             trimRight(str, charset);
@@ -2927,14 +2927,14 @@ namespace ncore
 
         void trimLeft(runes_t& str, uchar32 _c)
         {
-            utf32::rune charset[] = {_c, cEOS};
+            utf32::rune charset[] = {{_c}, {cEOS}};
             crunes_t    ccharset  = make_crunes(charset, 0, 1, 1);
             trimLeft(str, ccharset);
         }
 
         void trimRight(runes_t& str, uchar32 _c)
         {
-            utf32::rune charset[2] = {_c, cEOS};
+            utf32::rune charset[2] = {{_c}, {cEOS}};
             crunes_t    ccharset   = make_crunes(charset, 0, 1, 1);
             trimLeft(str, ccharset);
         }
@@ -2988,14 +2988,14 @@ namespace ncore
 
         void trimQuotes(runes_t& str)
         {
-            utf32::rune charseta[] = {'\'', '"', cEOS};
+            utf32::rune charseta[] = {{'\''}, {'"'}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trim(str, charset);
         }
 
         void trimQuotes(runes_t& str, uchar32 quote)
         {
-            utf32::rune charseta[] = {quote, cEOS};
+            utf32::rune charseta[] = {{quote}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 1, 1);
             trim(str, charset);
         }
@@ -3008,7 +3008,7 @@ namespace ncore
 
         void trim(crunes_t& str)
         {
-            utf32::rune charseta[] = {' ', '\t', cEOS};
+            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trimLeft(str, charset);
             trimRight(str, charset);
@@ -3016,21 +3016,21 @@ namespace ncore
 
         void trimLeft(crunes_t& str)
         {
-            utf32::rune charseta[] = {' ', '\t', cEOS};
+            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trimLeft(str, charset);
         }
 
         void trimRight(crunes_t& str)
         {
-            utf32::rune charseta[] = {' ', '\t', cEOS};
+            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trimRight(str, charset);
         }
 
         void trim(crunes_t& str, uchar32 _c)
         {
-            utf32::rune charseta[] = {_c, cEOS};
+            utf32::rune charseta[] = {{_c}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 1, 1);
             trimLeft(str, charset);
             trimRight(str, charset);
@@ -3038,14 +3038,14 @@ namespace ncore
 
         void trimLeft(crunes_t& str, uchar32 _c)
         {
-            utf32::rune charseta[] = {_c, cEOS};
+            utf32::rune charseta[] = {{_c}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 1, 1);
             trimLeft(str, charset);
         }
 
         void trimRight(crunes_t& str, uchar32 _c)
         {
-            utf32::rune charseta[2] = {_c, cEOS};
+            utf32::rune charseta[2] = {{_c}, {cEOS}};
             crunes_t    charset     = make_crunes(charseta, 0, 1, 1);
             trimLeft(str, charset);
         }
@@ -3088,14 +3088,14 @@ namespace ncore
 
         void trimQuotes(crunes_t& str)
         {
-            utf32::rune charseta[] = {'\'', '"', cEOS};
+            utf32::rune charseta[] = {{'\''}, {'"'}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trim(str, charset);
         }
 
         void trimQuotes(crunes_t& str, uchar32 quote)
         {
-            utf32::rune charseta[] = {quote, cEOS};
+            utf32::rune charseta[] = {{quote}, {cEOS}};
             crunes_t    charset    = make_crunes(charseta, 0, 1, 1);
             trim(str, charset);
         }
@@ -3292,114 +3292,129 @@ namespace ncore
         return r;
     }
 
-    runes_t make_runes(ascii::prune _str, ascii::prune _end, u32 _type)
+    namespace ascii
     {
-        runes_t r;
-        r.m_ascii = _str;
-        r.m_str   = 0;
-        r.m_end   = (u32)(_end - _str);
-        r.m_eos   = (u32)(_end - _str);
-        r.m_type  = _type;
-        return r;
+        runes_t make_runes(prune _str, ascii::prune _end, u32 _type)
+        {
+            runes_t r;
+            r.m_ascii = _str;
+            r.m_str   = 0;
+            r.m_end   = (u32)(_end - _str);
+            r.m_eos   = (u32)(_end - _str);
+            r.m_type  = _type;
+            return r;
+        }
+
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
+        {
+            runes_t r;
+            r.m_ascii = _bos;
+            r.m_str   = _str;
+            r.m_end   = _end;
+            r.m_eos   = _eos;
+            r.m_type  = _type;
+            return r;
+        }
     }
 
-    runes_t make_runes(ascii::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
+    namespace ucs2
     {
-        runes_t r;
-        r.m_ascii = _bos;
-        r.m_str   = _str;
-        r.m_end   = _end;
-        r.m_eos   = _eos;
-        r.m_type  = _type;
-        return r;
+        runes_t make_runes(prune _str, prune _end, u32 _type)
+        {
+            runes_t r;
+            r.m_ucs2 = _str;
+            r.m_str  = 0;
+            r.m_end  = (u32)(_end - _str);
+            r.m_eos  = (u32)(_end - _str);
+            r.m_type = _type;
+            return r;
+        }
+
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
+        {
+            runes_t r;
+            r.m_ucs2 = _bos;
+            r.m_str  = _str;
+            r.m_end  = _end;
+            r.m_eos  = _eos;
+            r.m_type = _type;
+            return r;
+        }
     }
 
-    runes_t make_runes(ucs2::prune _str, ucs2::prune _end, u32 _type)
+    namespace utf8
     {
-        runes_t r;
-        r.m_ucs2 = _str;
-        r.m_str  = 0;
-        r.m_end  = (u32)(_end - _str);
-        r.m_eos  = (u32)(_end - _str);
-        r.m_type = _type;
-        return r;
+        runes_t make_runes(prune _str, prune _end, u32 _type)
+        {
+            runes_t r;
+            r.m_utf8 = _str;
+            r.m_str  = 0;
+            r.m_eos  = (u32)(_end - _str);
+            r.m_end  = (u32)(_end - _str);
+            r.m_type = _type;
+            return r;
+        }
+
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
+        {
+            runes_t r;
+            r.m_utf8 = _bos;
+            r.m_str  = _str;
+            r.m_end  = _end;
+            r.m_eos  = _eos;
+            r.m_type = _type;
+            return r;
+        }
     }
 
-    runes_t make_runes(ucs2::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
+    namespace utf16
     {
-        runes_t r;
-        r.m_ucs2 = _bos;
-        r.m_str  = _str;
-        r.m_end  = _end;
-        r.m_eos  = _eos;
-        r.m_type = _type;
-        return r;
+        runes_t make_runes(prune _str, prune _end, u32 _type)
+        {
+            runes_t r;
+            r.m_utf16 = _str;
+            r.m_str   = 0;
+            r.m_eos   = (u32)(_end - _str);
+            r.m_end   = (u32)(_end - _str);
+            r.m_type  = _type;
+            return r;
+        }
+
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
+        {
+            runes_t r;
+            r.m_utf16 = _bos;
+            r.m_str   = _str;
+            r.m_end   = _end;
+            r.m_eos   = _eos;
+            r.m_type  = _type;
+            return r;
+        }
     }
 
-    runes_t make_runes(utf8::prune _str, utf8::prune _end, u32 _type)
+    namespace utf32
     {
-        runes_t r;
-        r.m_utf8 = _str;
-        r.m_str  = 0;
-        r.m_eos  = (u32)(_end - _str);
-        r.m_end  = (u32)(_end - _str);
-        r.m_type = _type;
-        return r;
-    }
+        runes_t make_runes(prune _str, prune _end, u32 _type)
+        {
+            runes_t r;
+            r.m_utf32 = _str;
+            r.m_str   = 0;
+            r.m_eos   = (u32)(_end - _str);
+            r.m_end   = (u32)(_end - _str);
+            r.m_type  = _type;
+            return r;
+        }
 
-    runes_t make_runes(utf8::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
-    {
-        runes_t r;
-        r.m_utf8 = _bos;
-        r.m_str  = _str;
-        r.m_end  = _end;
-        r.m_eos  = _eos;
-        r.m_type = _type;
-        return r;
-    }
-
-    runes_t make_runes(utf16::prune _str, utf16::prune _end, u32 _type)
-    {
-        runes_t r;
-        r.m_utf16 = _str;
-        r.m_str   = 0;
-        r.m_eos   = (u32)(_end - _str);
-        r.m_end   = (u32)(_end - _str);
-        r.m_type  = _type;
-        return r;
-    }
-
-    runes_t make_runes(utf16::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
-    {
-        runes_t r;
-        r.m_utf16 = _bos;
-        r.m_str   = _str;
-        r.m_end   = _end;
-        r.m_eos   = _eos;
-        r.m_type  = _type;
-        return r;
-    }
-
-    runes_t make_runes(utf32::prune _str, utf32::prune _end, u32 _type)
-    {
-        runes_t r;
-        r.m_utf32 = _str;
-        r.m_str   = 0;
-        r.m_eos   = (u32)(_end - _str);
-        r.m_end   = (u32)(_end - _str);
-        r.m_type  = _type;
-        return r;
-    }
-
-    runes_t make_runes(utf32::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
-    {
-        runes_t r;
-        r.m_utf32 = _bos;
-        r.m_str   = _str;
-        r.m_end   = _end;
-        r.m_eos   = _eos;
-        r.m_type  = _type;
-        return r;
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type)
+        {
+            runes_t r;
+            r.m_utf32 = _bos;
+            r.m_str   = _str;
+            r.m_end   = _end;
+            r.m_eos   = _eos;
+            r.m_type  = _type;
+            return r;
+        }
     }
 
     // ------------------------------------------------------------------------------------------------------------------
@@ -4029,35 +4044,35 @@ namespace ncore
         writer_t::writer_t(ascii::prune str, ascii::prune str_end)
         {
             u32 const len = (u32)(str_end - str);
-            m_runes       = make_runes(str, 0, len, len, ascii::TYPE);
+            m_runes       = ascii::make_runes(str, 0, len, len, ascii::TYPE);
             m_cursor      = 0;
             m_count       = 0;
         }
         writer_t::writer_t(ucs2::prune str, ucs2::prune str_end)
         {
             u32 const len = (u32)(str_end - str);
-            m_runes       = make_runes(str, 0, len, len, ucs2::TYPE);
+            m_runes       = ucs2::make_runes(str, 0, len, len, ucs2::TYPE);
             m_cursor      = 0;
             m_count       = 0;
         }
         writer_t::writer_t(utf8::prune str, utf8::prune str_end)
         {
             u32 const len = (u32)(str_end - str);
-            m_runes       = make_runes(str, 0, len, len, utf8::TYPE);
+            m_runes       = utf8::make_runes(str, 0, len, len, utf8::TYPE);
             m_cursor      = 0;
             m_count       = 0;
         }
         writer_t::writer_t(utf16::prune str, utf16::prune str_end)
         {
             u32 const len = (u32)(str_end - str);
-            m_runes       = make_runes(str, 0, len, len, utf16::TYPE);
+            m_runes       = utf16::make_runes(str, 0, len, len, utf16::TYPE);
             m_cursor      = 0;
             m_count       = 0;
         }
         writer_t::writer_t(utf32::prune str, utf32::prune str_end)
         {
             u32 const len = (u32)(str_end - str);
-            m_runes       = make_runes(str, 0, len, len, utf32::TYPE);
+            m_runes       = utf32::make_runes(str, 0, len, len, utf32::TYPE);
             m_cursor      = 0;
             m_count       = 0;
         }
@@ -4093,7 +4108,7 @@ namespace ncore
 
         s32 writer_t::vwrite(uchar32 c)
         {
-            utf32::rune str[2] = {c, 0};
+            utf32::rune str[2] = {{c}, {0}};
             crunes_t    cstr   = make_crunes(str, 0, 1, 1);
             return vwrite(cstr);
         }

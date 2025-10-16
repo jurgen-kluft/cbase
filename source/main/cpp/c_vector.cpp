@@ -9,7 +9,7 @@ namespace ncore
 {
     namespace nvector
     {
-        vmem_arena_t* g_alloc_vmem_arena(u32 reserved, u32 committed, s32 item_size)
+        vmem_arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size)
         {
             vmem_arena_t a;
             a.reserved(reserved * item_size);
@@ -28,11 +28,11 @@ namespace ncore
             }
         }
 
-        bool g_set_capacity(vmem_arena_t* arena, u32& length, u32 new_capacity, s32 item_size)
+        bool g_set_capacity(vmem_arena_t* arena, s32& length, s32 new_capacity, s32 item_size)
         {
             if (new_capacity > length)
             {
-                u32 reserved = g_get_reserved(arena, item_size);
+                s32 reserved = g_get_reserved(arena, item_size);
                 if (new_capacity > reserved)
                 {
                     return false;
@@ -46,15 +46,15 @@ namespace ncore
             return false;
         }
 
-        u32 g_get_reserved(vmem_arena_t* arena, s32 item_size) { return (arena->m_reserved_pages * (1 << arena->m_page_size_shift)) / item_size; }
+        s32 g_get_reserved(vmem_arena_t* arena, s32 item_size) { return (arena->m_reserved_pages * (1 << arena->m_page_size_shift)) / item_size; }
 
-        void g_vmem_arena_reserved(vmem_arena_t* arena, u32 reserved_size)
+        void g_vmem_arena_reserved(vmem_arena_t* arena, s32 reserved_size)
         {
             ASSERT(reserved_size > 0);
             arena->reserved(reserved_size);
         }
 
-        void* g_vmem_arena_allocate(vmem_arena_t* arena, u32 size, s32 alignment)
+        void* g_vmem_arena_allocate(vmem_arena_t* arena, s32 size, s32 alignment)
         {
             if (size > 0)
             {

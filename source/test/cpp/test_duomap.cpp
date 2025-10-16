@@ -17,7 +17,7 @@ UNITTEST_SUITE_BEGIN(duomap)
 
         UNITTEST_TEST(set_used_and_is_used)
         {
-            u32 const maxbits = 4096;
+            s32 const maxbits = 4096;
 
             duomap_t           dm;
             duomap_t::config_t cfg = duomap_t::config_t::compute(maxbits);
@@ -29,7 +29,7 @@ UNITTEST_SUITE_BEGIN(duomap)
             CHECK_EQUAL(false, dm.is_free(10));
             dm.set_free(10);
 
-            for (u32 bit = 0; bit < maxbits; bit+=1)
+            for (s32 bit = 0; bit < maxbits; bit+=1)
             {
                 CHECK_EQUAL(bit, dm.find_free());
                 dm.set_used(bit);

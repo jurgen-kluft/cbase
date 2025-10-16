@@ -12,30 +12,30 @@ const (
 )
 
 func GetPackage() *denv.Package {
-	name := repo_name
-
 	// dependencies
-	corepkg := ccore.GetPackage()
-	unittestpkg := cunittest.GetPackage()
+	core_pkg := ccore.GetPackage()
+	unittest_pkg := cunittest.GetPackage()
 
 	// main package
-	mainpkg := denv.NewPackage(repo_path, repo_name)
+	main_pkg := denv.NewPackage(repo_path, repo_name)
+	main_pkg.AddPackage(core_pkg)
+	main_pkg.AddPackage(unittest_pkg)
 
 	// main library
-	mainlib := denv.SetupCppLibProject(mainpkg, name)
-	mainlib.AddDependencies(corepkg.GetMainLib()...)
+	mainlib := denv.SetupCppLibProject(main_pkg, repo_name)
+	mainlib.AddDependencies(core_pkg.GetMainLib())
 
 	// main test library
-	testlib := denv.SetupCppTestLibProject(mainpkg, name)
-	testlib.AddDependencies(corepkg.GetTestLib()...)
+	testlib := denv.SetupCppTestLibProject(main_pkg, repo_name)
+	testlib.AddDependencies(core_pkg.GetTestLib())
 
 	// unittest for this package
-	maintest := denv.SetupCppTestProject(mainpkg, name)
-	maintest.AddDependencies(unittestpkg.GetMainLib()...)
+	maintest := denv.SetupCppTestProject(main_pkg, repo_name)
+	maintest.AddDependencies(unittest_pkg.GetMainLib())
 	maintest.AddDependency(testlib)
 
-	mainpkg.AddMainLib(mainlib)
-	mainpkg.AddTestLib(testlib)
-	mainpkg.AddUnittest(maintest)
-	return mainpkg
+	main_pkg.AddMainLib(mainlib)
+	main_pkg.AddTestLib(testlib)
+	main_pkg.AddUnittest(maintest)
+	return main_pkg
 }

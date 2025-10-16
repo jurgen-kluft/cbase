@@ -17,8 +17,8 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(some_sizes)
         {
-            CHECK_EQUAL(128 + 32, binmap_t::config_t::sizeof_data(1024));
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(8192));
+            CHECK_EQUAL((u32)128 + 32, binmap_t::config_t::sizeof_data(1024));
+            CHECK_EQUAL((u32)1024 + 32 + 32, binmap_t::config_t::sizeof_data(8192));
 
             binmap_t           hbb;
             binmap_t::config_t cfg1 = binmap_t::config_t::compute(256);
@@ -37,7 +37,7 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(set_and_is_set)
         {
-            u32 const maxbits = 8192;
+            s32 const maxbits = 8192;
 
             binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
@@ -52,8 +52,8 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(set_and_is_set_many)
         {
-            u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
+            s32 const maxbits = 8192;
+            CHECK_EQUAL((u32)1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
@@ -93,8 +93,8 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(find_free_bit_1)
         {
-            u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
+            s32 const maxbits = 8192;
+            CHECK_EQUAL((u32)1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
@@ -121,8 +121,8 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(find_free_bit_2)
         {
-            u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
+            s32 const maxbits = 8192;
+            CHECK_EQUAL((u32)1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
@@ -144,8 +144,8 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(find_upper)
         {
-            u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
+            s32 const maxbits = 8192;
+            CHECK_EQUAL((u32)1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
@@ -172,7 +172,7 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(upper)
         {
-            u32 const maxbits = 2048;
+            s32 const maxbits = 2048;
 
             binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
@@ -199,7 +199,7 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(lower)
         {
-            u32 const maxbits = 2048;
+            s32 const maxbits = 2048;
 
             binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
@@ -226,14 +226,14 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(iterator)
         {
-            u32 const maxbits = 8192;
-            CHECK_EQUAL(1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
+            s32 const maxbits = 8192;
+            CHECK_EQUAL((u32)1024 + 32 + 32, binmap_t::config_t::sizeof_data(maxbits));
 
             binmap_t           hbb;
             binmap_t::config_t cfg = binmap_t::config_t::compute(maxbits);
             hbb.init_all_used(cfg, Allocator);
 
-            u32 const numbits = 100;
+            s32 const numbits = 100;
             for (s32 b = 0; b < numbits; b += 5)
             {
                 hbb.set_free(b);
@@ -252,7 +252,7 @@ UNITTEST_SUITE_BEGIN(binmap)
             iter.begin();
             while (!iter.end() && i < numbits)
             {
-                CHECK_TRUE(iter.get() == i);
+                CHECK_TRUE(iter.get() == (u32)i);
                 i += 5;
                 iter.next();
             }
@@ -305,7 +305,7 @@ UNITTEST_SUITE_BEGIN(binmap)
 
         UNITTEST_TEST(set_many_then_find_set)
         {
-            u32 const          len   = 32 * 32 * 32;
+            s32 const          len   = 32 * 32 * 32;
             binmap_t::config_t cfg   = binmap_t::config_t::compute(len);
             u32 const          l1len = cfg.m_lnlen[0];
             u32 const          l2len = cfg.m_lnlen[1];

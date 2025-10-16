@@ -152,7 +152,8 @@ namespace ncore
             void widths(Args&&... args)
             {
                 const s8 widths[] = {(s8)(args)...};
-                for (s32 i = 0; i < sizeof(widths) / sizeof(widths[0]); ++i)
+                const s32 N = (s32)(sizeof(widths) / sizeof(widths[0]));
+                for (s32 i = 0; i < N; ++i)
                     widths_[i] = widths[i];
             }
 

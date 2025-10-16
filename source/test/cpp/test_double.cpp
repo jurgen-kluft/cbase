@@ -69,7 +69,7 @@ UNITTEST_SUITE_BEGIN(test_double)
         UNITTEST_TEST(Sbin)
         {
             CHECK_EQUAL(0, math::sbin(0.0));
-            CHECK_TRUE(math::sbin(-2.0) == D_CONSTANT_U64(0xc000000000000000));
+            CHECK_TRUE(math::sbin(-2.0) == D_CONSTANT_S64(0xc000000000000000));
         }
 
         UNITTEST_TEST(ToF64)

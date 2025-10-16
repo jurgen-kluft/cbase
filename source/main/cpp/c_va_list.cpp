@@ -608,31 +608,31 @@ namespace ncore
             case TYPE_FLOAT64: nrunes::parse(rhs, *((f64*)mRef)); break;
             case TYPE_ASCII_STR:
             {
-                runes_t dst = make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
+                runes_t dst = ascii::make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
             case TYPE_USC2_STR:
             {
-                runes_t dst = make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
+                runes_t dst = ucs2::make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
             case TYPE_UTF8_STR:
             {
-                runes_t dst = make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
+                runes_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
             case TYPE_UTF16_STR:
             {
-                runes_t dst = make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
+                runes_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
             case TYPE_UTF32_STR:
             {
-                runes_t dst = make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
+                runes_t dst = utf32::make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
                 nrunes::copy(rhs, dst);
             }
             break;
@@ -660,31 +660,31 @@ namespace ncore
             case TYPE_FLOAT64: *((f64*)mRef) = rhs; break;
             case TYPE_ASCII_STR:
             {
-                runes_t dst = make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
+                runes_t dst = ascii::make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_USC2_STR:
             {
-                runes_t dst = make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
+                runes_t dst = ucs2::make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF8_STR:
             {
-                runes_t dst = make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
+                runes_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF16_STR:
             {
-                runes_t dst = make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
+                runes_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF32_STR:
             {
-                runes_t dst = make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
+                runes_t dst = utf32::make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;

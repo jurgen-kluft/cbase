@@ -112,9 +112,9 @@ UNITTEST_SUITE_BEGIN(buffer)
             CHECK_EQUAL(1, the_s8);
             CHECK_EQUAL(2, the_u16);
             CHECK_EQUAL(3, the_s16);
-            CHECK_EQUAL(4, the_u32);
+            CHECK_EQUAL((u32)4, the_u32);
             CHECK_EQUAL(5, the_s32);
-            CHECK_EQUAL(6, the_u64);
+            CHECK_EQUAL((u64)6, the_u64);
             CHECK_EQUAL(7, the_s64);
             CHECK_EQUAL(8.0, the_f32);
             CHECK_EQUAL(9.0, the_f64);

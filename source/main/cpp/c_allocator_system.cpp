@@ -5,7 +5,7 @@
 
 namespace ncore
 {
-    vmem_arena_t sSystemVmem = {0};
+    vmem_arena_t sSystemVmem;
     vmem_alloc_t sSystemAllocator;
 
     void g_init_system_alloc()

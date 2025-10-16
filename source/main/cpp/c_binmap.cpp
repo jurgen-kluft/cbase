@@ -153,7 +153,7 @@ namespace ncore
         if (bit < size())
         {
             u32      wi = bit;
-            s8 const ml = levels();
+            //s8 const ml = levels();
             for (s8 l = levels(); l >= 0; --l)
             {
                 u32*      level = l == 0 ? &m_l0 : m_l[l - 1];

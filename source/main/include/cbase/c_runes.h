@@ -65,7 +65,6 @@ namespace ncore
         static const u8      TYPE         = 8;
         static const uchar16 TERMINATOR   = {'\0'};
         static const u64     EMPTY_STRING = 0;
-
         struct rune
         {
             uchar16 r;
@@ -86,7 +85,7 @@ namespace ncore
         static const u64 EMPTY_STRING = 0;
         struct rune
         {
-            u8 r;
+            uchar8 r;
         };
         typedef rune*       prune;
         typedef const rune* pcrune;
@@ -113,7 +112,6 @@ namespace ncore
         s32 compare(pcrune str1, u32 len1, pcrune str2, u32 len2);
         s32 strlen(pcrune str);
         s32 strlen(pcrune str, pcrune& end, pcrune eos);
-
     }  // namespace utf16
 
     namespace utf32
@@ -180,20 +178,35 @@ namespace ncore
     runes_t make_runes();
     runes_t make_runes(runes_t const& other);
 
-    runes_t make_runes(ascii::prune _str, ascii::prune _end, u32 _type = ascii::TYPE);
-    runes_t make_runes(ascii::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ascii::TYPE);
+    namespace ascii
+    {
+        runes_t make_runes(prune _str, prune _end, u32 _type = TYPE);
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = TYPE);
+    }  // namespace ascii
 
-    runes_t make_runes(ucs2::prune _str, ucs2::prune _end, u32 _type = ucs2::TYPE);
-    runes_t make_runes(ucs2::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = ucs2::TYPE);
+    namespace ucs2
+    {
+        runes_t make_runes(prune _str, prune _end, u32 _type = TYPE);
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = TYPE);
+    }  // namespace ucs2
 
-    runes_t make_runes(utf8::prune _str, utf8::prune _end, u32 _type = utf8::TYPE);
-    runes_t make_runes(utf8::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf8::TYPE);
+    namespace utf8
+    {
+        runes_t make_runes(prune _str, prune _end, u32 _type = TYPE);
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = TYPE);
+    }  // namespace utf8
 
-    runes_t make_runes(utf16::prune _str, utf16::prune _end, u32 _type = utf16::TYPE);
-    runes_t make_runes(utf16::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf16::TYPE);
+    namespace utf16
+    {
+        runes_t make_runes(prune _str, prune _end, u32 _type = TYPE);
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = TYPE);
+    }  // namespace utf16
 
-    runes_t make_runes(utf32::prune _str, utf32::prune _end, u32 _type = utf32::TYPE);
-    runes_t make_runes(utf32::prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = utf32::TYPE);
+    namespace utf32
+    {
+        runes_t make_runes(prune _str, prune _end, u32 _type = TYPE);
+        runes_t make_runes(prune _bos, u32 _str, u32 _end, u32 _eos, u32 _type = TYPE);
+    }  // namespace utf32
 
     inline void reset(runes_t& str) { str.m_str = str.m_end; }
     inline bool is_empty(runes_t const& str) { return str.m_str == str.m_end || str.m_ascii == nullptr; }
@@ -288,6 +301,7 @@ namespace ncore
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& outCursor, u32 outStrEnd);
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& outCursor, u32 outStrEnd);
         void convert(ascii::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& outCursor, u32 outStrEnd);
+
         // ucs2 -> ascii, utf8, utf16, utf32
         void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(ucs2::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);
@@ -300,6 +314,7 @@ namespace ncore
         void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, ucs2::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf16::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf8::pcrune inStr, u32& inCursor, u32 inStrEnd, utf32::prune outStr, u32& cursor, u32 outStrEnd);
+
         // utf16 -> ascii, ucs2, utf8, utf32
         void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, ascii::prune outStr, u32& cursor, u32 outStrEnd);
         void convert(utf16::pcrune inStr, u32& inCursor, u32 inStrEnd, utf8::prune outStr, u32& cursor, u32 outStrEnd);

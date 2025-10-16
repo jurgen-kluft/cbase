@@ -3,7 +3,6 @@
 #include "ccore/c_debug.h"
 #include "cbase/c_context.h"
 
-
 namespace ncore
 {
     void* g_malloc(u32 size, u32 align)

@@ -11,18 +11,18 @@ namespace cbase
     void init()
     {
         ncore::g_init_system_alloc();
-        ncore::alloc_t* system_allocator = ncore::g_get_system_alloc();
+        //ncore::alloc_t* system_allocator = ncore::g_get_system_alloc();
 
         ncore::console_t::init_default_console();
-        ncore::context_t context = ncore::g_current_context();
+        //ncore::context_t context = ncore::g_current_context();
     }
 
     void exit()
     {
-        ncore::alloc_t* system_alloc = ncore::g_get_system_alloc();
+        //ncore::alloc_t* system_alloc = ncore::g_get_system_alloc();
 
         ncore::g_exit_system_alloc();
-        system_alloc = nullptr;
+        //system_alloc = nullptr;
 
         ncore::context_t context = ncore::g_current_context();
         context.set_assert_handler(nullptr);

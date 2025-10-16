@@ -68,12 +68,6 @@ namespace ncore
         {
             mArg = mArg2 = 0;
         }
-        va_t(const va_t &c)
-            : mArg(c.mArg)
-            , mArg2(c.mArg2)
-            , mArg3(c.mArg3)
-        {
-        }
         explicit va_t(const s8 inVar)
             : mArg3(TYPE_INT8)
         {
@@ -525,14 +519,6 @@ namespace ncore
         {
             mRef = 0;
         }
-        va_r_t(const va_r_t &c)
-            : mType(c.mType)
-            , mSize(c.mSize)
-            , mCap(c.mCap)
-            , mDummy(c.mDummy)
-        {
-            mRef = c.mRef;
-        }
         va_r_t(s8 *inRef)
             : mType(TYPE_INT8)
             , mSize(sizeof(s8))
@@ -728,13 +714,13 @@ namespace ncore
         {
             switch (mType)
             {
-                case TYPE_ASCII_STR: return make_runes((ascii::prune)mRef, 0, 0, mCap);
-                case TYPE_USC2_STR: return make_runes((ucs2::prune)mRef, 0, 0, mCap);
-                case TYPE_UTF8_STR: return make_runes((utf8::prune)mRef, 0, 0, mCap);
-                case TYPE_UTF16_STR: return make_runes((utf16::prune)mRef, 0, 0, mCap);
-                case TYPE_UTF32_STR: return make_runes((utf32::prune)mRef, 0, 0, mCap);
+                case TYPE_ASCII_STR: return ascii::make_runes((ascii::prune)mRef, 0, 0, mCap);
+                case TYPE_USC2_STR: return ucs2::make_runes((ucs2::prune)mRef, 0, 0, mCap);
+                case TYPE_UTF8_STR: return utf8::make_runes((utf8::prune)mRef, 0, 0, mCap);
+                case TYPE_UTF16_STR: return utf16::make_runes((utf16::prune)mRef, 0, 0, mCap);
+                case TYPE_UTF32_STR: return utf32::make_runes((utf32::prune)mRef, 0, 0, mCap);
             }
-            return make_runes((ascii::prune)mRef, 0, 0, 0);
+            return ascii::make_runes((ascii::prune)mRef, 0, 0, 0);
         }
 
         static va_r_t sEmpty;

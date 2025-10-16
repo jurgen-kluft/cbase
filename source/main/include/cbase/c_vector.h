@@ -13,12 +13,12 @@ namespace ncore
 
     namespace nvector
     {
-        vmem_arena_t* g_alloc_vmem_arena(u32 reserved, u32 committed, s32 item_size);
+        vmem_arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size);
         void          g_free_vmem_arena(vmem_arena_t*& arena);
-        bool          g_set_capacity(vmem_arena_t* arena, u32& length, u32 new_capacity, s32 item_size);
-        u32           g_get_reserved(vmem_arena_t* arena, s32 item_size);
-        void          g_vmem_arena_reserved(vmem_arena_t* arena, u32 reserved_size);
-        void*         g_vmem_arena_allocate(vmem_arena_t* arena, u32 size, s32 alignment);
+        bool          g_set_capacity(vmem_arena_t* arena, s32& length, s32 new_capacity, s32 item_size);
+        s32           g_get_reserved(vmem_arena_t* arena, s32 item_size);
+        void          g_vmem_arena_reserved(vmem_arena_t* arena, s32 reserved_size);
+        void*         g_vmem_arena_allocate(vmem_arena_t* arena, s32 size, s32 alignment);
     }  // namespace nvector
 
     // Simple vector_t<> template class that uses a virtual memory arena for storage.
@@ -29,17 +29,17 @@ namespace ncore
         DCORE_CLASS_PLACEMENT_NEW_DELETE
         inline vector_t()
             : m_items(nullptr)
-            , m_arena(nullptr)
             , m_size(0)
             , m_capacity(0)
+            , m_arena(nullptr)
         {
         }
 
-        vector_t(u32 items_capacity, u32 items_reserved)
+        vector_t(s32 items_capacity, s32 items_reserved)
             : m_items(nullptr)
-            , m_arena(nullptr)
             , m_size(0)
             , m_capacity(items_capacity)
+            , m_arena(nullptr)
         {
             ASSERT(items_capacity <= items_reserved);
             m_arena = nvector::g_alloc_vmem_arena(items_reserved, items_capacity, sizeof(T));
@@ -48,12 +48,12 @@ namespace ncore
         }
         ~vector_t() { nvector::g_free_vmem_arena(m_arena); }
 
-        inline bool set_capacity(u32 new_capacity) { return nvector::g_set_capacity(m_arena, m_capacity, new_capacity, sizeof(T)); }
+        inline bool set_capacity(s32 new_capacity) { return nvector::g_set_capacity(m_arena, m_capacity, new_capacity, (s32)sizeof(T)); }
 
-        inline u32  size() const { return m_size; }
-        inline void set_size(u32 size) { m_size = size; }
-        inline u32  capacity() const { return m_capacity; }
-        inline u32  reserved() const { return nvector::g_get_reserved(m_arena, sizeof(T)); }
+        inline s32  size() const { return m_size; }
+        inline void set_size(s32 size) { m_size = size; }
+        inline s32  capacity() const { return m_capacity; }
+        inline s32  reserved() const { return nvector::g_get_reserved(m_arena, sizeof(T)); }
 
         bool add_item(const T& item)
         {
@@ -117,8 +117,8 @@ namespace ncore
         }
 
         T*            m_items;
-        u32           m_size;
-        u32           m_capacity;
+        s32           m_size;
+        s32           m_capacity;
         vmem_arena_t* m_arena;
     };
 

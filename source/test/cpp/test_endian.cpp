@@ -45,8 +45,8 @@ UNITTEST_SUITE_BEGIN(test_endian)
         {
 			u32 a = 0x12345678;
 			u32 b = nendian_swap::swap(a);
-			CHECK_EQUAL(0x12345678, a);
-			CHECK_EQUAL(0x78563412, b);
+			CHECK_EQUAL((u32)0x12345678, a);
+			CHECK_EQUAL((u32)0x78563412, b);
         }
 
         UNITTEST_TEST(_s32)
@@ -69,8 +69,8 @@ UNITTEST_SUITE_BEGIN(test_endian)
         {
 			s64 a = D_CONSTANT_U64(0x90ABCDEF12345678);
 			s64 b = nendian_swap::swap(a);
-			CHECK_EQUAL(D_CONSTANT_U64(0x90ABCDEF12345678), a);
-			CHECK_EQUAL(D_CONSTANT_U64(0x78563412EFCDAB90), b);
+			CHECK_EQUAL(D_CONSTANT_S64(0x90ABCDEF12345678), a);
+			CHECK_EQUAL(D_CONSTANT_S64(0x78563412EFCDAB90), b);
         }
 	}
 }

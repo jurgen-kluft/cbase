@@ -117,7 +117,7 @@ UNITTEST_SUITE_BEGIN(tree)
 
         UNITTEST_TEST(tree_node)
         {
-            void* key = (void*)1;
+            //void* key = (void*)1;
 
             ntree::node_t* node  = s_allocate_node(&s_tree);
             ntree::node_t* left  = s_allocate_node(&s_tree);
@@ -405,7 +405,7 @@ UNITTEST_SUITE_BEGIN(tree)
 
         UNITTEST_TEST(s32_tree)
         {
-            const char* result = nullptr;
+            //const char* result = nullptr;
 
             ntree::node_t* inserted_node;
 

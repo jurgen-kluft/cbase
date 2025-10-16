@@ -42,7 +42,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             crunes_t str1 = make_crunes("this is a system string admin!");
 
             crunes_t f1 = nrunes::find(str1, 'e');
-            CHECK_EQUAL('e', nrunes::first_char(f1));
+            CHECK_EQUAL((uchar32)'e', nrunes::first_char(f1));
             CHECK_TRUE(is_empty(nrunes::find(str1, 'E')));
             CHECK_FALSE(is_empty(nrunes::find(str1, 'E', false)));
 
@@ -77,7 +77,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             ascii::rune dst_runes[256];
             dst_runes[0] = 0;
             dst_runes[1] = 0;
-            runes_t dst  = make_runes(dst_runes, 0, 0, 256 - 1);
+            runes_t dst  = ascii::make_runes(dst_runes, 0, 0, 256 - 1);
 
             crunes_t str1 = make_crunes("this is a system string");
             nrunes::copy(str1, dst);
@@ -175,13 +175,13 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             u32      value;
             crunes_t str = make_crunes("1");
             nrunes::parse(str, value);
-            CHECK_EQUAL(1, value);
+            CHECK_EQUAL((u32)1, value);
             crunes_t str2 = make_crunes("2");
             nrunes::parse(str2, value);
-            CHECK_EQUAL(2, value);
+            CHECK_EQUAL((u32)2, value);
             crunes_t str3 = make_crunes("256");
             nrunes::parse(str3, value);
-            CHECK_EQUAL(256, value);
+            CHECK_EQUAL((u32)256, value);
         }
 
         UNITTEST_TEST(parse_s64)
@@ -203,13 +203,13 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             u64      value;
             crunes_t str = make_crunes("1");
             nrunes::parse(str, value);
-            CHECK_EQUAL(1, value);
+            CHECK_EQUAL((u64)1, value);
             crunes_t str2 = make_crunes("2");
             nrunes::parse(str2, value);
-            CHECK_EQUAL(2, value);
+            CHECK_EQUAL((u64)2, value);
             crunes_t str3 = make_crunes("256");
             nrunes::parse(str3, value);
-            CHECK_EQUAL(256, value);
+            CHECK_EQUAL((u64)256, value);
         }
 
         UNITTEST_TEST(parse_f32)
@@ -384,19 +384,19 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
         UNITTEST_TEST(to)
         {
-            CHECK_EQUAL('B', nrunes::to_upper('b'));
-            CHECK_EQUAL('b', nrunes::to_lower('B'));
-            CHECK_EQUAL('0', nrunes::to_upper('0'));
-            CHECK_EQUAL('9', nrunes::to_lower('9'));
+            CHECK_EQUAL((uchar32)'B', nrunes::to_upper('b'));
+            CHECK_EQUAL((uchar32)'b', nrunes::to_lower('B'));
+            CHECK_EQUAL((uchar32)'0', nrunes::to_upper('0'));
+            CHECK_EQUAL((uchar32)'9', nrunes::to_lower('9'));
 
-            CHECK_EQUAL(0, nrunes::to_digit('0'));
-            CHECK_EQUAL(3, nrunes::to_digit('3'));
-            CHECK_EQUAL(9, nrunes::to_digit('9'));
+            CHECK_EQUAL((u32)0, nrunes::to_digit('0'));
+            CHECK_EQUAL((u32)3, nrunes::to_digit('3'));
+            CHECK_EQUAL((u32)9, nrunes::to_digit('9'));
 
-            CHECK_EQUAL(5, nrunes::hex_to_number('5'));
-            CHECK_EQUAL(10, nrunes::hex_to_number('a'));
-            CHECK_EQUAL(11, nrunes::hex_to_number('B'));
-            CHECK_EQUAL(15, nrunes::hex_to_number('F'));
+            CHECK_EQUAL((u32)5, nrunes::hex_to_number('5'));
+            CHECK_EQUAL((u32)10, nrunes::hex_to_number('a'));
+            CHECK_EQUAL((u32)11, nrunes::hex_to_number('B'));
+            CHECK_EQUAL((u32)15, nrunes::hex_to_number('F'));
         }
 
         UNITTEST_TEST(is_upper)
@@ -483,7 +483,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
         UNITTEST_TEST(first_char)
         {
             crunes_t str1 = make_crunes("a simple string");
-            CHECK_EQUAL('a', nrunes::first_char(str1));
+            CHECK_EQUAL((uchar32)'a', nrunes::first_char(str1));
         }
 
         UNITTEST_TEST(cprintf)
@@ -599,7 +599,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             sscanf(str, format, va_r_t(&myfloat), va_r_t(&myint));
 
             CHECK_EQUAL(1.0f, myfloat);
-            CHECK_EQUAL(100, myint);
+            CHECK_EQUAL((u32)100, myint);
         }
 
         // ---------------------------------------------------------------------------

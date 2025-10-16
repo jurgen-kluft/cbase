@@ -17,7 +17,7 @@ namespace ncore
         // should we have a boolean return value to indicate whether the format is correctly handled?
         void FormatDateTime(encoded_arg_t const& argValue, fmt::strspan_t& dst, fmt::state_t& state)
         {
-            DateTime dt = {argValue.first.u64};
+            //DateTime dt = {argValue.first.u64};
 
             char buf[128];
             fmt::toStr(buf, 128, "{}/{:02d}/{:02d}", 2023, 12, 25);
@@ -1000,7 +1000,8 @@ UNITTEST_SUITE_BEGIN(strfmt)
         UNITTEST_TEST(test_float_conversion)
         {
             const char types[]{'f', 'e', 'g'};
-            for (s32 i = 0; i < sizeof(test_values_fp) / sizeof(test_values_fp[0]); ++i)
+            const s32 N = (s32)(sizeof(test_values_fp) / sizeof(test_values_fp[0]));
+            for (s32 i = 0; i < N; ++i)
             {
                 const double value = test_values_fp[i];
 

@@ -11,11 +11,11 @@ UNITTEST_SUITE_BEGIN(vector_t)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        UNITTEST_ALLOCATOR;
+        //UNITTEST_ALLOCATOR;
 
 		UNITTEST_TEST(create_destroy)
 		{
-			vector_t<s32> darray( 128, 512);
+			vector_t<s32> darray(128, 512);
 		}
 
 		UNITTEST_TEST(create_use_destroy)
