@@ -2318,7 +2318,10 @@ namespace ncore
         crunes_t parse(crunes_t const& _str, bool& value)
         {
             crunes_t    str          = _str;
-            ascii::rune format_str[] = {'%', 'b', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[1] = 'b';
+            format_str[2] = ascii::TERMINATOR;
             crunes_t    format       = make_crunes(format_str, 0, 2, 2);
             sscanf(str, format, va_r_t(&value));
             return str;
@@ -2375,12 +2378,16 @@ namespace ncore
         crunes_t parse(crunes_t const& _str, s64& value, s32 base)
         {
             crunes_t    str          = _str;
-            ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[2] = ascii::TERMINATOR;
             switch (base)
             {
                 case 16: format_str[1] = 'x'; break;
                 case 10: format_str[1] = 'd'; break;
                 case 8: format_str[1] = 'o'; break;
+                default: format_str[1] = 'd'; break;
             };
             crunes_t format = make_crunes(format_str, 0, 2, 2);
             sscanf(str, format, va_r_t(&value));
@@ -2390,12 +2397,16 @@ namespace ncore
         crunes_t parse(crunes_t const& _str, u64& value, s32 base)
         {
             crunes_t    str          = _str;
-            ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[2] = ascii::TERMINATOR;
             switch (base)
             {
                 case 16: format_str[1] = 'x'; break;
                 case 10: format_str[1] = 'd'; break;
                 case 8: format_str[1] = 'o'; break;
+                default: format_str[1] = 'd'; break;
             };
             crunes_t format = make_crunes(format_str, 0, 2, 2);
             sscanf(str, format, va_r_t(&value));
@@ -2405,7 +2416,11 @@ namespace ncore
         crunes_t parse(crunes_t const& _str, f32& value)
         {
             crunes_t    str          = _str;
-            ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[1] = 'f';
+            format_str[2] = ascii::TERMINATOR;
             crunes_t    format       = make_crunes(format_str, 0, 2, 2);
             sscanf(str, format, va_r_t(&value));
             return str;
@@ -2414,7 +2429,11 @@ namespace ncore
         crunes_t parse(crunes_t const& _str, f64& value)
         {
             crunes_t    str          = _str;
-            ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', 'f', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[1] = 'f';
+            format_str[2] = ascii::TERMINATOR;
             crunes_t    format       = make_crunes(format_str, 0, 2, 2);
             sscanf(str, format, va_r_t(&value));
             return str;
@@ -2471,7 +2490,7 @@ namespace ncore
         //------------------------------------------------------------------------------
         bool is_float(crunes_t const& _str)
         {
-            ascii::rune f32chars_str[] = {'E', 'e', '.', '#', 'Q', 'N', 'A', 'B', 'I', 'F', 0};
+            ascii::pcrune f32chars_str = "Ee.#QNABIF";
             crunes_t    f32chars       = make_crunes(f32chars_str, 0, 10, 10);
 
             u32 iter = get_begin(_str);
@@ -2531,12 +2550,16 @@ namespace ncore
 
         void to_string(runes_t& str, s32 val, s32 base)
         {
-            ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[2] = ascii::TERMINATOR;
             switch (base)
             {
                 case 16: format_str[1] = 'x'; break;
                 case 10: format_str[1] = 'd'; break;
                 case 8: format_str[1] = 'o'; break;
+                default: format_str[1] = 'd'; break;
             };
             crunes_t format = make_crunes(format_str, 0, 2, 2);
             sprintf(str, format, va_t(val));
@@ -2544,12 +2567,16 @@ namespace ncore
 
         void to_string(runes_t& str, u32 val, s32 base)
         {
-            ascii::rune format_str[] = {'%', 'u', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', 'u', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[2] = ascii::TERMINATOR;
             switch (base)
             {
                 case 16: format_str[1] = 'x'; break;
                 case 10: format_str[1] = 'u'; break;
                 case 8: format_str[1] = 'o'; break;
+                default: format_str[1] = 'u'; break;
             };
             crunes_t format = make_crunes(format_str, 0, 2, 2);
             sprintf(str, format, va_t(val));
@@ -2559,12 +2586,16 @@ namespace ncore
 
         void to_string(runes_t& str, s64 val, s32 base)
         {
-            ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[2] = ascii::TERMINATOR;
             switch (base)
             {
                 case 16: format_str[1] = 'x'; break;
                 case 10: format_str[1] = 'd'; break;
                 case 8: format_str[1] = 'o'; break;
+                default: format_str[1] = 'd'; break;
             };
             crunes_t format = make_crunes(format_str, 0, 2, 2);
             sprintf(str, format, va_t(val));
@@ -2572,12 +2603,16 @@ namespace ncore
 
         void to_string(runes_t& str, u64 val, s32 base)
         {
-            ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', 'd', ascii::TERMINATOR};
+            ascii::rune format_str[3];
+            format_str[0] = '%';
+            format_str[2] = ascii::TERMINATOR;
             switch (base)
             {
                 case 16: format_str[1] = 'x'; break;
                 case 10: format_str[1] = 'd'; break;
                 case 8: format_str[1] = 'o'; break;
+                default: format_str[1] = 'd'; break;
             };
             crunes_t format = make_crunes(format_str, 0, 2, 2);
             sprintf(str, format, va_t(val));
@@ -2585,7 +2620,14 @@ namespace ncore
 
         void to_string(runes_t& str, f32 val, s32 numFractionalDigits)
         {
-            ascii::rune format_str[] = {'%', '.', '0', '2', 'f', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', '.', '0', '2', 'f', ascii::TERMINATOR};
+            ascii::rune format_str[6];
+            format_str[0] = '%';
+            format_str[1] = '.';
+            format_str[2] = '0';
+            format_str[3] = '2';
+            format_str[4] = 'f';
+            format_str[5] = ascii::TERMINATOR;
             if (numFractionalDigits != 2 && numFractionalDigits > 0 && numFractionalDigits < 100)
             {
                 format_str[2] = (ascii::rune)('0' + numFractionalDigits / 10);
@@ -2597,7 +2639,14 @@ namespace ncore
 
         void to_string(runes_t& str, f64 val, s32 numFractionalDigits)
         {
-            ascii::rune format_str[] = {'%', '.', '0', '2', 'f', ascii::TERMINATOR};
+            //ascii::rune format_str[] = {'%', '.', '0', '2', 'f', ascii::TERMINATOR};
+            ascii::rune format_str[6];
+            format_str[0] = '%';
+            format_str[1] = '.';
+            format_str[2] = '0';
+            format_str[3] = '2';
+            format_str[4] = 'f';
+            format_str[5] = ascii::TERMINATOR;
             if (numFractionalDigits != 2 && numFractionalDigits > 0 && numFractionalDigits < 100)
             {
                 format_str[2] = (ascii::rune)('0' + numFractionalDigits / 10);
@@ -2897,7 +2946,11 @@ namespace ncore
 
         void trim(runes_t& str)
         {
-            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            //utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            utf32::rune charseta[3];
+            charseta[0] = {' '};
+            charseta[1] = {'\t'};
+            charseta[2] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, &charseta[2]);
             trimLeft(str, charset);
             trimRight(str, charset);
@@ -2905,21 +2958,32 @@ namespace ncore
 
         void trimLeft(runes_t& str)
         {
-            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            //utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            utf32::rune charseta[3];
+            charseta[0] = {' '};
+            charseta[1] = {'\t'};
+            charseta[2] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, &charseta[2]);
             trimLeft(str, charset);
         }
 
         void trimRight(runes_t& str)
         {
-            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            //utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            utf32::rune charseta[3];
+            charseta[0] = {' '};
+            charseta[1] = {'\t'};
+            charseta[2] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, &charseta[2]);
             trimRight(str, charset);
         }
 
         void trim(runes_t& str, uchar32 _c)
         {
-            utf32::rune charseta[] = {{_c}, {cEOS}};
+            //utf32::rune charseta[] = {{_c}, {cEOS}};
+            utf32::rune charseta[2];
+            charseta[0] = {_c};
+            charseta[1] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, &charseta[1]);
             trimLeft(str, charset);
             trimRight(str, charset);
@@ -2927,14 +2991,20 @@ namespace ncore
 
         void trimLeft(runes_t& str, uchar32 _c)
         {
-            utf32::rune charset[] = {{_c}, {cEOS}};
+            //utf32::rune charset[] = {{_c}, {cEOS}};
+            utf32::rune charset[2];
+            charset[0] = {_c};
+            charset[1] = {cEOS};
             crunes_t    ccharset  = make_crunes(charset, 0, 1, 1);
             trimLeft(str, ccharset);
         }
 
         void trimRight(runes_t& str, uchar32 _c)
         {
-            utf32::rune charset[2] = {{_c}, {cEOS}};
+            //utf32::rune charset[2] = {{_c}, {cEOS}};
+            utf32::rune charset[2];
+            charset[0] = {_c};
+            charset[1] = {cEOS};
             crunes_t    ccharset   = make_crunes(charset, 0, 1, 1);
             trimLeft(str, ccharset);
         }
@@ -2988,14 +3058,21 @@ namespace ncore
 
         void trimQuotes(runes_t& str)
         {
-            utf32::rune charseta[] = {{'\''}, {'"'}, {cEOS}};
+            //utf32::rune charseta[] = {{'\''}, {'"'}, {cEOS}};
+            utf32::rune charseta[3];
+            charseta[0] = {'\''};
+            charseta[1] = {'"'};
+            charseta[2] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trim(str, charset);
         }
 
         void trimQuotes(runes_t& str, uchar32 quote)
         {
-            utf32::rune charseta[] = {{quote}, {cEOS}};
+            //utf32::rune charseta[] = {{quote}, {cEOS}};
+            utf32::rune charseta[2];
+            charseta[0] = {quote};
+            charseta[1] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 1, 1);
             trim(str, charset);
         }
@@ -3008,7 +3085,11 @@ namespace ncore
 
         void trim(crunes_t& str)
         {
-            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            //utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            utf32::rune charseta[3];
+            charseta[0] = {' '};
+            charseta[1] = {'\t'};
+            charseta[2] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trimLeft(str, charset);
             trimRight(str, charset);
@@ -3016,21 +3097,32 @@ namespace ncore
 
         void trimLeft(crunes_t& str)
         {
-            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            //utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            utf32::rune charseta[3];
+            charseta[0] = {' '};
+            charseta[1] = {'\t'};
+            charseta[2] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trimLeft(str, charset);
         }
 
         void trimRight(crunes_t& str)
         {
-            utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            //utf32::rune charseta[] = {{' '}, {'\t'}, {cEOS}};
+            utf32::rune charseta[3];
+            charseta[0] = {' '};
+            charseta[1] = {'\t'};
+            charseta[2] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trimRight(str, charset);
         }
 
         void trim(crunes_t& str, uchar32 _c)
         {
-            utf32::rune charseta[] = {{_c}, {cEOS}};
+            //utf32::rune charseta[] = {{_c}, {cEOS}};
+            utf32::rune charseta[2];
+            charseta[0] = {_c};
+            charseta[1] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 1, 1);
             trimLeft(str, charset);
             trimRight(str, charset);
@@ -3038,14 +3130,20 @@ namespace ncore
 
         void trimLeft(crunes_t& str, uchar32 _c)
         {
-            utf32::rune charseta[] = {{_c}, {cEOS}};
+            //utf32::rune charseta[] = {{_c}, {cEOS}};
+            utf32::rune charseta[2];
+            charseta[0] = {_c};
+            charseta[1] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 1, 1);
             trimLeft(str, charset);
         }
 
         void trimRight(crunes_t& str, uchar32 _c)
         {
-            utf32::rune charseta[2] = {{_c}, {cEOS}};
+            //utf32::rune charseta[2] = {{_c}, {cEOS}};
+            utf32::rune charseta[2];
+            charseta[0] = {_c};
+            charseta[1] = {cEOS};
             crunes_t    charset     = make_crunes(charseta, 0, 1, 1);
             trimLeft(str, charset);
         }
@@ -3088,14 +3186,21 @@ namespace ncore
 
         void trimQuotes(crunes_t& str)
         {
-            utf32::rune charseta[] = {{'\''}, {'"'}, {cEOS}};
+            //utf32::rune charseta[] = {{'\''}, {'"'}, {cEOS}};
+            utf32::rune charseta[3];
+            charseta[0] = {'\''};
+            charseta[1] = {'"'};
+            charseta[2] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 2, 2);
             trim(str, charset);
         }
 
         void trimQuotes(crunes_t& str, uchar32 quote)
         {
-            utf32::rune charseta[] = {{quote}, {cEOS}};
+            //utf32::rune charseta[] = {{quote}, {cEOS}};
+            utf32::rune charseta[2];
+            charseta[0] = {quote};
+            charseta[1] = {cEOS};
             crunes_t    charset    = make_crunes(charseta, 0, 1, 1);
             trim(str, charset);
         }
@@ -4108,7 +4213,10 @@ namespace ncore
 
         s32 writer_t::vwrite(uchar32 c)
         {
-            utf32::rune str[2] = {{c}, {0}};
+            //utf32::rune str[2] = {{c}, {0}};
+            utf32::rune str[2];
+            str[0].r = c;
+            str[1].r = 0;
             crunes_t    cstr   = make_crunes(str, 0, 1, 1);
             return vwrite(cstr);
         }
