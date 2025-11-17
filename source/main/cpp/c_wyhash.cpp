@@ -3,44 +3,24 @@
 #include "ccore/c_debug.h"
 #include "cbase/c_hash.h"
 #include "cbase/c_memory.h"
-#include "cbase/c_random.h"
+#include "ccore/c_random.h"
 #include "cbase/c_wyhash.h"
 
 namespace ncore
 {
     namespace nhash
     {
-        typedef u8  u8;
-        typedef u32 uint32_t;
-        typedef u64 u64;
-
 // protections that produce different results:
 // 1: normal valid behavior
 // 2: extra protection against entropy loss (probability=2^-63), aka. "blind multiplication"
 #define WYHASH_PROTECTION 1
 
-// 0: normal version, slow on 32 bit systems
-// 1: faster on 32 bit systems but produces different results, incompatible with wy2u0k function
-#define WYHASH_32BIT_MUM 0
-
         // 128bit multiply function
-#if (WYHASH_32BIT_MUM)
         static inline u64 _wyrot(u64 x) { return (x >> 32) | (x << 32); }
-#endif
 
         static inline void _wymum(u64* A, u64* B)
         {
-#if (WYHASH_32BIT_MUM)
-            u64 hh = (*A >> 32) * (*B >> 32), hl = (*A >> 32) * (uint32_t)*B, lh = (uint32_t)*A * (*B >> 32), ll = (u64)(uint32_t)*A * (uint32_t)*B;
-#    if (WYHASH_PROTECTION > 1)
-            *A ^= _wyrot(hl) ^ hh;
-            *B ^= _wyrot(lh) ^ ll;
-#    else
-            *A = _wyrot(hl) ^ hh;
-            *B = _wyrot(lh) ^ ll;
-#    endif
-#else
-            u64 ha = *A >> 32, hb = *B >> 32, la = (uint32_t)*A, lb = (uint32_t)*B, hi, lo;
+            u64 ha = *A >> 32, hb = *B >> 32, la = (u32)*A, lb = (u32)*B, hi, lo;
             u64 rh = ha * hb, rm0 = ha * lb, rm1 = hb * la, rl = la * lb, t = rl + (rm0 << 32), c = t < rl;
             lo = t + (rm1 << 32);
             c += lo < t;
@@ -52,7 +32,6 @@ namespace ncore
             *A = lo;
             *B = hi;
 #    endif
-#endif
         }
 
         // multiply and xor mix function, aka MUM
@@ -67,26 +46,26 @@ namespace ncore
         static inline u64 _wyr8(const u8* p)
         {
             u64 v;
-            nmem::memcpy(&v, p, 8);
+            g_memcpy(&v, p, 8);
             return v;
         }
         static inline u64 _wyr4(const u8* p)
         {
-            uint32_t v;
-            nmem::memcpy(&v, p, 4);
+            u32 v;
+            g_memcpy(&v, p, 4);
             return v;
         }
 #else
         static inline u64 _wyr8(const u8* p)
         {
             u64 v;
-            nmem::memcpy(&v, p, 8);
+            g_memcpy(&v, p, 8);
             return (((v >> 56) & 0xff) | ((v >> 40) & 0xff00) | ((v >> 24) & 0xff0000) | ((v >> 8) & 0xff000000) | ((v << 8) & 0xff00000000) | ((v << 24) & 0xff0000000000) | ((v << 40) & 0xff000000000000) | ((v << 56) & 0xff00000000000000));
         }
         static inline u64 _wyr4(const u8* p)
         {
-            uint32_t v;
-            nmem::memcpy(&v, p, 4);
+            u32 v;
+            g_memcpy(&v, p, 4);
             return (((v >> 24) & 0xff) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | ((v << 24) & 0xff000000));
         }
 #endif
@@ -193,17 +172,16 @@ namespace ncore
         //            return ((r & 0x1fffff) + ((r >> 21) & 0x1fffff) + ((r >> 42) & 0x1fffff)) * _wynorm - 3.0;
         //        }
 
-#if (!WYHASH_32BIT_MUM)
-        // fast range integer random number generation on [0,k) credit to Daniel Lemire. May not work when WYHASH_32BIT_MUM=1. It can be combined with wyrand, wyhash64 or wyhash.
+        // fast range integer random number generation on [0,k) credit to Daniel Lemire.
+        // It can be combined with wyrand, wyhash64 or wyhash.
         static inline u64 wy2u0k(u64 r, u64 k)
         {
             _wymum(&r, &k);
             return k;
         }
-#endif
 
         // make your own secret
-        static inline void make_secret(u64 seed, u64* secret)
+        static inline void wymake_secret(u64 seed, u64* secret)
         {
             u8 c[] = {15,  23,  27,  29,  30,  39,  43,  45,  46,  51,  53,  54,  57,  58,  60,  71,  75,  77,  78,  83,  85,  86,  89,  90,  92,  99,  101, 102, 105, 106, 108, 113, 114, 116, 120,
                       135, 139, 141, 142, 147, 149, 150, 153, 154, 156, 163, 165, 166, 169, 170, 172, 177, 178, 180, 184, 195, 197, 198, 201, 202, 204, 209, 210, 212, 216, 225, 226, 228, 232, 240};
@@ -267,7 +245,7 @@ namespace ncore
         */
         /*
         #ifdef	WYHASHMAP_WEAK_SMALL_FAST	// for small hashmaps whose size < 2^24 and acceptable collision
-        typedef	uint32_t	wyhashmap_t;
+        typedef	u32	wyhashmap_t;
         #else
         typedef	u64	wyhashmap_t;
         #endif
@@ -327,7 +305,7 @@ namespace ncore
             return (s32)i;
         }
 
-        wyreg::wyreg()
+        registry_t::registry_t()
         {
             m_allocator = nullptr;
             m_size      = 0;
@@ -339,7 +317,7 @@ namespace ncore
             m_secret[3] = 0;
         }
 
-        wyreg::~wyreg()
+        registry_t::~registry_t()
         {
             if (m_index)
             {
@@ -348,17 +326,17 @@ namespace ncore
             }
         }
 
-        void wyreg::init(alloc_t* allocator, s32 size, u64 seed)
+        void registry_t::init(alloc_t* allocator, s32 size, u64 seed)
         {
             m_allocator = allocator;
             m_size      = size;
             m_count     = 0;
             m_index     = (u64*)m_allocator->allocate((u32)sizeof(u64) * (u32)m_size);
-            nmem::memset(m_index, 0, (s64)((s32)sizeof(u64) * m_size));
-            make_secret(seed, m_secret);
+            g_memset(m_index, 0, (s64)((s32)sizeof(u64) * m_size));
+            wymake_secret(seed, m_secret);
         }
 
-        bool wyreg::insert(void* key, s32 keysize, s32& pos)
+        bool registry_t::insert(void* key, s32 keysize, s32& pos)
         {
             pos = wyhashmap(m_index, m_size, key, keysize, 1, m_secret);
             if (pos < m_size)
@@ -369,13 +347,13 @@ namespace ncore
             return false;
         }
 
-        bool wyreg::find(void* key, s32 keysize, s32& pos) const
+        bool registry_t::find(void* key, s32 keysize, s32& pos) const
         {
             pos = wyhashmap(m_index, m_size, key, keysize, 0, m_secret);
             return pos < m_size;
         }
 
-        bool wyreg::remove(void* key, s32 keysize, s32& pos)
+        bool registry_t::remove(void* key, s32 keysize, s32& pos)
         {
             pos = wyhashmap(m_index, m_size, key, keysize, 0, m_secret);
             if (pos < m_size)

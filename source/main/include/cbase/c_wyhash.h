@@ -11,14 +11,12 @@ namespace ncore
 {
     namespace nhash
     {
-        u64  wyrand(u64* seed);
-        void wyrand(u64* seed, u8* buffer, u32 size);
-
-        class wyreg
+        // A basic (wyhash based) registry implementation
+        class registry_t
         {
         public:
-            wyreg();
-            ~wyreg();
+            registry_t();
+            ~registry_t();
 
             void init(alloc_t* allocator, s32 size, u64 seed = 0);
             s32  size() const { return m_size; }
@@ -33,8 +31,9 @@ namespace ncore
             u64*     m_index;
             u64      m_secret[4];
         };
+
         template <typename K, typename V>
-        class wymap
+        class wymap_t
         {
         public:
             void init(alloc_t* allocator, s32 size, u64 seed = 0);
@@ -45,19 +44,19 @@ namespace ncore
             bool contains(K const& key) const;
             bool remove(K const& key);
 
-            wyreg m_reg;
-            V*    m_values;
+            registry_t m_reg;
+            V*         m_values;
         };
 
         template <typename K, typename V>
-        void wymap<K, V>::init(alloc_t* allocator, s32 size, u64 seed)
+        void wymap_t<K, V>::init(alloc_t* allocator, s32 size, u64 seed)
         {
             m_reg.init(allocator, size, seed);
             m_values = (V*)allocator->allocate(sizeof(V) * m_reg.m_size);
         }
 
         template <typename K, typename V>
-        bool wymap<K, V>::insert(K const& key, V const& value)
+        bool wymap_t<K, V>::insert(K const& key, V const& value)
         {
             s32 pos;
             if (m_reg.insert((void*)&key, (s32)sizeof(key), pos))
@@ -69,7 +68,7 @@ namespace ncore
         }
 
         template <typename K, typename V>
-        bool wymap<K, V>::find(K const& key, V& value) const
+        bool wymap_t<K, V>::find(K const& key, V& value) const
         {
             s32 pos;
             if (m_reg.find((void*)&key, (s32)sizeof(key), pos))
@@ -81,14 +80,14 @@ namespace ncore
         }
 
         template <typename K, typename V>
-        bool wymap<K, V>::contains(K const& key) const
+        bool wymap_t<K, V>::contains(K const& key) const
         {
             s32 pos;
             return m_reg.find((void*)&key, (s32)sizeof(key), pos);
         }
 
         template <typename K, typename V>
-        bool wymap<K, V>::remove(K const& key)
+        bool wymap_t<K, V>::remove(K const& key)
         {
             s32 pos;
             if (m_reg.remove((void*)&key, (s32)sizeof(key), pos))
@@ -100,7 +99,7 @@ namespace ncore
         }
 
         template <typename T>
-        class wyset
+        class wyset_t
         {
         public:
             void init(alloc_t* allocator, s32 size, u64 seed = 0);
@@ -110,17 +109,17 @@ namespace ncore
             bool contains(T const& item) const;
             bool remove(T const& item);
 
-            wyreg m_reg;
+            registry_t m_reg;
         };
 
         template <typename T>
-        void wyset<T>::init(alloc_t* allocator, s32 size, u64 seed)
+        void wyset_t<T>::init(alloc_t* allocator, s32 size, u64 seed)
         {
             m_reg.init(allocator, size, seed);
         }
 
         template <typename T>
-        bool wyset<T>::insert(T const& item)
+        bool wyset_t<T>::insert(T const& item)
         {
             s32 pos;
             if (m_reg.insert((void*)&item, (s32)sizeof(item), pos))
@@ -131,14 +130,14 @@ namespace ncore
         }
 
         template <typename T>
-        bool wyset<T>::contains(T const& item) const
+        bool wyset_t<T>::contains(T const& item) const
         {
             s32 pos;
             return m_reg.find((void*)&item, (s32)sizeof(item), pos);
         }
 
         template <typename T>
-        bool wyset<T>::remove(T const& item)
+        bool wyset_t<T>::remove(T const& item)
         {
             s32 pos;
             if (m_reg.remove((void*)&item, (s32)sizeof(item), pos))
