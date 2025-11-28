@@ -2,7 +2,7 @@
 #include "cbase/c_allocator.h"
 #include "cbase/c_console.h"
 #include "cbase/c_debug.h"
-#include "cbase/c_random.h"
+#include "ccore/c_random.h"
 #include "cbase/c_runes.h"
 #include "cbase/c_context.h"
 

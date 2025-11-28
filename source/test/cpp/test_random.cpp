@@ -1,5 +1,5 @@
 #include "cbase/c_allocator.h"
-#include "cbase/c_random.h"
+#include "ccore/c_random.h"
 
 #include "cunittest/cunittest.h"
 
@@ -48,7 +48,7 @@ UNITTEST_SUITE_BEGIN(random)
 
         UNITTEST_TEST(random32)
         {
-            wyrand_t random;
+            rand_t random;
             random.reset(0);
             for (size_t i = 0; i < 100; ++i)
             {
@@ -60,7 +60,7 @@ UNITTEST_SUITE_BEGIN(random)
 
         UNITTEST_TEST(random64)
         {
-            wyrand_t random;
+            rand_t random;
             random.reset(0);
             for (size_t i = 0; i < 100; ++i)
             {

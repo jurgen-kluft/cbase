@@ -1,8 +1,8 @@
 #include "cbase/c_allocator.h"
 #include "cbase/c_context.h"
-#include "cbase/c_random.h"
 
 #include "ccore/c_math.h"
+#include "ccore/c_random.h"
 #include "ccore/c_vmem.h"
 
 namespace ncore
@@ -33,13 +33,13 @@ namespace ncore
             commit += math::g_alignUp((s32)sizeof(vmem_arena_t), arena.m_alignment);
             commit += math::g_alignUp((s32)sizeof(context_data_t), arena.m_alignment);
             commit += math::g_alignUp((s32)sizeof(vmem_alloc_t), arena.m_alignment);
-            commit += math::g_alignUp((s32)sizeof(wyrand_t), arena.m_alignment);
+            commit += math::g_alignUp((s32)sizeof(rand_t), arena.m_alignment);
             arena.committed(commit);
 
             vmem_arena_t*   vmem_arena   = (vmem_arena_t*)arena.commit_and_zero(sizeof(vmem_arena_t));
             context_data_t* context_data = (context_data_t*)arena.commit_and_zero(sizeof(context_data_t));
             vmem_alloc_t*   system_alloc = new (arena.commit_and_zero(sizeof(vmem_alloc_t))) vmem_alloc_t();
-            wyrand_t*       rnd          = new (arena.commit_and_zero(sizeof(wyrand_t))) wyrand_t();
+            rand_t*         rnd          = new (arena.commit_and_zero(sizeof(rand_t))) rand_t();
             rnd->reset((u64)arena.m_base);
 
             // TODO

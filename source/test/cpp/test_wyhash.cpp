@@ -17,7 +17,7 @@ UNITTEST_SUITE_BEGIN(wyhash)
 
         UNITTEST_TEST(insert)
         {
-            nhash::wyreg reg;
+            nhash::registry_t reg;
             reg.init(Allocator, 1024, prime);
 
             s32 test_values[] = {0, 1, 2, 3, 4, 5, 6, 7};
@@ -32,7 +32,7 @@ UNITTEST_SUITE_BEGIN(wyhash)
 
         UNITTEST_TEST(insert_find)
         {
-            nhash::wyreg reg;
+            nhash::registry_t reg;
             reg.init(Allocator, 1024, prime);
 
             s32 test_values[] = {0, 1, 2, 3, 4, 5, 6, 7};

@@ -1,6 +1,6 @@
 #include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
-#include "cbase/c_random.h"
+#include "ccore/c_random.h"
 #include "cbase/c_tree32.h"
 
 #include "cunittest/cunittest.h"

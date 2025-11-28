@@ -7,7 +7,7 @@
 #    include "cbase/c_integer.h"
 #    include "cbase/c_memory.h"
 #    include "cbase/c_printf.h"
-#    include "cbase/c_random.h"
+#    include "ccore/c_random.h"
 #    include "cbase/c_runes.h"
 
 #    include "cunittest/cunittest.h"
