@@ -3235,6 +3235,7 @@ namespace ncore
                 write(_dst, diter, c);
             }
             _dst = select(_dst, dbegin, diter);
+            _dst.m_ascii[diter] = 0;
             return true;
         }
 
