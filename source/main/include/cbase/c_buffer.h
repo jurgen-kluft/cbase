@@ -185,7 +185,8 @@ namespace ncore
         bool      seek(int_t cursor);
         int_t     pos() const;
         void      reset();
-        int_t     skip(int_t);
+
+        int_t     skip(int_t n); // Skip n bytes and return previous position
 
         u16 peek_u16() const;
 
@@ -243,7 +244,7 @@ namespace ncore
         }
         inline binary_writer_t(u8* _buffer, u8* _end, u8* _cap)
             : m_buffer(_buffer, _end, _cap)
-            , m_cursor(_end)
+            , m_cursor(_buffer)
         {
         }
         inline binary_writer_t(const buffer_t& buffer)

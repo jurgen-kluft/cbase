@@ -16,9 +16,9 @@ namespace ncore
     // The map and set provided here assume that a key and value are very simple POD types.
     // There is no handling for 'construction' or 'destruction', furthermore there is also
     // NO hashing done on the key.
-    // The index of a node that that is managed by the tree is the same index at which you
-    // can find the key/value, so here there is no indirection between the index at which
-    // you can find the key/value and the node index.
+    // The index of a node that is managed by the tree is the same index at which you can
+    // find the key/value, so here there is no indirection between the index at which you
+    // can find the key/value and the node index.
     // -----------------------------------------------------------------------------------
 
     template <typename K, typename V>

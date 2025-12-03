@@ -56,41 +56,23 @@ namespace ncore
     //
     //-------------------------------------------------------------------------------------------------
     void log_t::write(elevel inLevel, bool _value) { sLogger[inLevel]->write(_value); }
-
     void log_t::write(elevel inLevel, f64 _value) { sLogger[inLevel]->write(_value); }
-
     void log_t::write(elevel inLevel, s32 _value) { sLogger[inLevel]->write(_value); }
-
     void log_t::write(elevel inLevel, s64 _value) { sLogger[inLevel]->write(_value); }
-
     void log_t::write(elevel inLevel, f32 _value) { sLogger[inLevel]->write(_value); }
-
     void log_t::write(elevel inLevel, u32 _value) { sLogger[inLevel]->write(_value); }
-
     void log_t::write(elevel inLevel, u64 _value) { sLogger[inLevel]->write(_value); }
-
     void log_t::write(elevel inLevel, const crunes_t& str) { sLogger[inLevel]->write(str); }
-
     void log_t::write(elevel inLevel, const crunes_t& format, const va_t* argv, s32 argc) { sLogger[inLevel]->write(format, argv, argc); }
-
     void log_t::writeLine(elevel inLevel) { sLogger[inLevel]->writeLine(); }
-
     void log_t::writeLine(elevel inLevel, bool _value) { sLogger[inLevel]->writeLine(_value); }
-
     void log_t::writeLine(elevel inLevel, f64 _value) { sLogger[inLevel]->writeLine(_value); }
-
     void log_t::writeLine(elevel inLevel, s32 _value) { sLogger[inLevel]->writeLine(_value); }
-
     void log_t::writeLine(elevel inLevel, s64 _value) { sLogger[inLevel]->writeLine(_value); }
-
     void log_t::writeLine(elevel inLevel, f32 _value) { sLogger[inLevel]->writeLine(_value); }
-
     void log_t::writeLine(elevel inLevel, u32 _value) { sLogger[inLevel]->writeLine(_value); }
-
     void log_t::writeLine(elevel inLevel, u64 _value) { sLogger[inLevel]->writeLine(_value); }
-
     void log_t::writeLine(elevel inLevel, const crunes_t& str) { sLogger[inLevel]->writeLine(str); }
-
     void log_t::writeLine(elevel inLevel, const crunes_t& format, const va_t* argv, s32 argc) { sLogger[inLevel]->writeLine(format, argv, argc); }
 
 #ifdef D_LOG

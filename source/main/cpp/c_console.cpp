@@ -87,13 +87,13 @@ namespace ncore
     };
 
     void console_default::initialize() {}
-
     void console_default::shutdown() {}
 
     s32 console_default::setColor(console_t::EColor color) { return mOut->color(color); }
 
     static const char* trueStr  = "true";
     static const char* falseStr = "false";
+
     void               console_default::write(bool _value)
     {
         crunes_t truestr  = make_crunes(trueStr, trueStr + 4);

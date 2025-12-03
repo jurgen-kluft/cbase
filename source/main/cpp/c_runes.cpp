@@ -1636,7 +1636,7 @@ namespace ncore
                 {
                     return select(_str, str_iter, str_iter2);
                 }
-                //uchar32 const c = utf::read_forward(_str, str_iter);
+                utf::read_forward(_str, str_iter);
             }
             return nothing_found(_str);
         }

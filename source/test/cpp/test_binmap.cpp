@@ -160,7 +160,7 @@ UNITTEST_SUITE_BEGIN(binmap)
             CHECK_EQUAL((maxbits / 2), free_bit);
             hbb.set_used(maxbits / 2);
 
-            for (s32 b = 0; b < maxbits; --b)
+            for (s32 b = maxbits - 1; b >= 0 ; --b)
             {
                 hbb.set_free(b);
                 free_bit = hbb.find();
