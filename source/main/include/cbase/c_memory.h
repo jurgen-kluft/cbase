@@ -10,17 +10,11 @@
 
 namespace ncore
 {
-    template <typename T>
-    inline void g_set(T* p, T v1)
+    template <typename T, s32 N>
+    inline void g_fill(T (&dst)[N], T v)
     {
-        p[0] = v1;
-    }
-
-    template <typename T, typename... Args>
-    inline void g_set(T* p, T v1, Args... args)
-    {
-        p[0] = v1;
-        g_set(p + 1, args...);
+        for (s32 i = 0; i < N; i++)
+            dst[i] = v;
     }
 
     template <typename T, s32 N>
