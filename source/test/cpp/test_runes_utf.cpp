@@ -19,14 +19,14 @@ namespace ncore
         {
             const u8 str[] = {args...};
             append(str, sizeof(str) / sizeof(str[0]));
-            m_str[m_len].r = '\0';
+            m_str[m_len]= '\0';
         }
 
         void append(const u8* s, size_t l)
         {
             while (l > 0 && m_len < g_array_size(m_str) - 1)
             {
-                m_str[m_len++].r = *s++;
+                m_str[m_len++]= *s++;
                 --l;
             }
         }
@@ -43,14 +43,14 @@ namespace ncore
         {
             const int str[] = {args...};
             append(str, sizeof(str) / sizeof(str[0]));
-            m_str[m_len].r = '\0';
+            m_str[m_len]= '\0';
         }
 
         void append(const int* s, size_t l)
         {
             while (l > 0 && m_len < g_array_size(m_str) - 1)
             {
-                m_str[m_len++].r = (u16)*s++;
+                m_str[m_len++]= (u16)*s++;
                 --l;
             }
         }
@@ -67,14 +67,14 @@ namespace ncore
         {
             const int str[] = {args...};
             append(str, sizeof(str) / sizeof(str[0]));
-            m_str[m_len].r = '\0';
+            m_str[m_len]= '\0';
         }
 
         void append(const int* s, size_t l)
         {
             while (l > 0 && m_len < g_array_size(m_str) - 1)
             {
-                m_str[m_len++].r = (u32)*s++;
+                m_str[m_len++]= (u32)*s++;
                 --l;
             }
         }
@@ -281,8 +281,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
                 {  // utf-8 -> utf-16, compare with str16
                     u32 c8  = 0;
                     u32 c16 = 0;
-                    utf::convert(test.str8.m_str, c8, test.str8.m_len, utf16, c16, len);
-                    utf16[c16].r = '\0';
+                    utf8::to_utf16::convert(test.str8.m_str, c8, test.str8.m_len, utf16, c16, len);
+                    utf16[c16]= '\0';
 
                     // compare utf16
                     CHECK_EQUAL(test.str16.m_len, c16);
@@ -292,8 +292,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
                 {  // utf-8 -> utf-32, compare with str32
                     u32 c8  = 0;
                     u32 c32 = 0;
-                    utf::convert(test.str8.m_str, c8, test.str8.m_len, utf32, c32, len);
-                    utf32[c32].r = '\0';
+                    utf8::to_utf32::convert(test.str8.m_str, c8, test.str8.m_len, utf32, c32, len);
+                    utf32[c32]= '\0';
 
                     // compare utf32
                     CHECK_EQUAL(test.str32.m_len, c32);
@@ -303,8 +303,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
                 { // utf-16 -> utf-8, compare with str8
                     u32 c16 = 0;
                     u32 c8  = 0;
-                    utf::convert(test.str16.m_str, c16, test.str16.m_len, utf8, c8, len);
-                    utf8[c8].r = '\0';
+                    utf16::to_utf8::convert(test.str16.m_str, c16, test.str16.m_len, utf8, c8, len);
+                    utf8[c8]= '\0';
 
                     // compare utf8
                     CHECK_EQUAL_T(test.str8.m_len, c8, test.test_name);
@@ -314,8 +314,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
                 { // utf-16 -> utf-32, compare with str32
                     u32 c16 = 0;
                     u32 c32 = 0;
-                    utf::convert(test.str16.m_str, c16, test.str16.m_len, utf32, c32, len);
-                    utf32[c32].r = '\0';
+                    utf16::to_utf32::convert(test.str16.m_str, c16, test.str16.m_len, utf32, c32, len);
+                    utf32[c32]= '\0';
 
                     // compare utf32
                     CHECK_EQUAL(test.str32.m_len, c32);
@@ -325,8 +325,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
                 { // utf-32 -> utf-8, compare with str8
                     u32 c32 = 0;
                     u32 c8  = 0;
-                    utf::convert(test.str32.m_str, c32, test.str32.m_len, utf8, c8, len);
-                    utf8[c8].r = '\0';
+                    utf32::to_utf8::convert(test.str32.m_str, c32, test.str32.m_len, utf8, c8, len);
+                    utf8[c8]= '\0';
 
                     // compare utf8
                     CHECK_EQUAL(test.str8.m_len, c8);
@@ -336,8 +336,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
                 { // utf-32 -> utf-16, compare with str16
                     u32 c32 = 0;
                     u32 c16 = 0;
-                    utf::convert(test.str32.m_str, c32, test.str32.m_len, utf16, c16, len);
-                    utf16[c16].r = '\0';
+                    utf32::to_utf16::convert(test.str32.m_str, c32, test.str32.m_len, utf16, c16, len);
+                    utf16[c16]= '\0';
 
                     // compare utf16
                     CHECK_EQUAL(test.str16.m_len, c16);
@@ -353,7 +353,7 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
         UNITTEST_TEST(peek_ascii)
         {
             const ascii::rune str[] = {0x66, 0x72, (uchar)0xC3, (uchar)0xA9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
-            crunes_t          src   = make_crunes(str);
+            crunes_t          src   = ascii::make_crunes(str);
             nrunes::reader_t  reader(src);
             CHECK_EQUAL((uchar32)'f', reader.peek());
             CHECK_EQUAL((uchar32)'f', reader.peek());
@@ -363,8 +363,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
 
         UNITTEST_TEST(peek_utf8)
         {
-            const utf8::rune str[] = {{0x66}, {0x72}, {0xC3}, {0xA9}, {0x6E}, {0x63}, {0x68}, {0x0}};  // fr�nch
-            crunes_t         src   = make_crunes(str);
+            const utf8::rune str[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
+            crunes_t         src   = utf8::make_crunes(str);
             nrunes::reader_t reader(src);
             CHECK_EQUAL((uchar32)'f', reader.peek());
             CHECK_EQUAL((uchar32)'f', reader.peek());
@@ -374,8 +374,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
 
         UNITTEST_TEST(peek_utf16)
         {
-            const utf16::rune str[] = {{0x66}, {0x72}, {0xC3}, {0xA9}, {0x6E}, {0x63}, {0x68}, {0x0}};  // fr�nch
-            crunes_t          src   = make_crunes(str);
+            const utf16::rune str[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
+            crunes_t          src   = utf16::make_crunes(str);
             nrunes::reader_t  reader(src);
             CHECK_EQUAL((uchar32)'f', reader.peek());
             CHECK_EQUAL((uchar32)'f', reader.peek());
@@ -385,8 +385,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
 
         UNITTEST_TEST(peek_utf32)
         {
-            const utf32::rune str[] = {{0x66}, {0x72}, {0xC3}, {0xA9}, {0x6E}, {0x63}, {0x68}, {0x0}};  // fr�nch
-            crunes_t          src   = make_crunes(str);
+            const utf32::rune str[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
+            crunes_t          src   = utf32::make_crunes(str);
             nrunes::reader_t  reader(src);
             CHECK_EQUAL((uchar32)'f', reader.peek());
             CHECK_EQUAL((uchar32)'f', reader.peek());
@@ -397,7 +397,7 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
         UNITTEST_TEST(read_ascii)
         {
             const ascii::rune str[] = {0x66, 0x72, (uchar)0xC3, (uchar)0xA9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
-            crunes_t          src   = make_crunes(str);
+            crunes_t          src   = ascii::make_crunes(str);
             nrunes::reader_t  reader(src);
             CHECK_EQUAL((uchar32)'f', reader.read());
             CHECK_EQUAL((uchar32)'r', reader.read());
@@ -412,8 +412,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
 
         UNITTEST_TEST(read_utf8)
         {
-            const utf8::rune str[] = {{0x66}, {0x72}, {0xC3}, {0xA9}, {0x6E}, {0x63}, {0x68}, {0x0}};  // fr�nch
-            crunes_t         src   = make_crunes(str);
+            const utf8::rune str[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
+            crunes_t         src   = utf8::make_crunes(str);
             nrunes::reader_t reader(src);
             CHECK_EQUAL((uchar32)'f', reader.read());
             CHECK_EQUAL((uchar32)'r', reader.read());
@@ -428,8 +428,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
         UNITTEST_TEST(read_utf16)
         {
             //\u{66}\u{72}\u{e9}\u{6e}\u{63}\u{68}
-            const utf16::rune str[] = {{0x66}, {0x72}, {0xE9}, {0x6E}, {0x63}, {0x68}, {0x0}};  // fr�nch
-            crunes_t          src   = make_crunes(str);
+            const utf16::rune str[] = {0x66, 0x72, 0xE9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
+            crunes_t          src   = utf16::make_crunes(str);
             nrunes::reader_t  reader(src);
             CHECK_EQUAL((uchar32)'f', reader.read());
             CHECK_EQUAL((uchar32)'r', reader.read());
@@ -443,8 +443,8 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
 
         UNITTEST_TEST(read_utf32)
         {
-            const utf32::rune str[] = {{0x66}, {0x72}, {0xE9}, {0x6E}, {0x63}, {0x68}, {0x0}};  // fr�nch
-            crunes_t          src   = make_crunes(str);
+            const utf32::rune str[] = {0x66, 0x72, 0xE9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
+            crunes_t          src   = utf32::make_crunes(str);
             nrunes::reader_t  reader(src);
             CHECK_EQUAL((uchar32)'f', reader.read());
             CHECK_EQUAL((uchar32)'r', reader.read());
@@ -458,38 +458,38 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
 
         UNITTEST_TEST(copy_ascii_to_utf32)
         {
-            crunes_t src = make_crunes("test");
+            crunes_t src = ascii::make_crunes("test");
             CHECK_EQUAL('t', src.m_ascii[src.m_str]);
             CHECK_EQUAL('e', src.m_ascii[src.m_str + 1]);
 
             utf32::rune dst_runes[16];
-            runes_t     dst = make_runes(dst_runes, 0, 0, 16);
+            runes_t     dst = utf32::make_runes(dst_runes, 0, 0, 16);
             nrunes::copy(src, dst);
 
-            CHECK_EQUAL((uchar32)'t', dst.m_utf32[dst.m_str].r);
+            CHECK_EQUAL((uchar32)'t', dst.m_utf32[dst.m_str]);
         }
 
         UNITTEST_TEST(read1_utf8)
         {
-            crunes_t         str1  = make_crunes((utf8::pcrune) "test");
-            crunes_t         str11 = make_crunes((ascii::pcrune) "test");
+            crunes_t         str1  = utf8::make_crunes((utf8::pcrune) "test");
+            crunes_t         str11 = ascii::make_crunes((ascii::pcrune) "test");
             nrunes::reader_t reader1(str1);
             for (s32 i = 0; i < 5; ++i)
             {
                 uchar32 ch = reader1.read();
-                CHECK_EQUAL(str11.m_utf8[str11.m_str + i].r, ch);
+                CHECK_EQUAL(str11.m_utf8[str11.m_str + i], ch);
             }
 
-            const utf8::rune str2[] = {{0x66}, {0x72}, {0xC3}, {0xA9}, {0x6E}, {0x63}, {0x68}, {0x0}};  // fr�nch
+            const utf8::rune str2[] = {0x66, 0x72, 0xC3, 0xA9, 0x6E, 0x63, 0x68, 0x0};  // fr�nch
 
-            crunes_t         str = make_crunes(str2, nullptr);
+            crunes_t         str = utf8::make_crunes(str2, nullptr);
             nrunes::reader_t reader(str);
             uchar32          c;
             c = reader.read();
             c = reader.read();
             c = reader.read();
 
-            str = make_crunes(str2);
+            str = utf8::make_crunes(str2);
             nrunes::reader_t reader2(str);
             for (s32 i = 0; i < 6; ++i)
             {
@@ -500,11 +500,11 @@ UNITTEST_SUITE_BEGIN(runes_and_utf)
                 }
                 else if (i > 2)
                 {
-                    CHECK_EQUAL(c, (uchar32)str2[i + 1].r);
+                    CHECK_EQUAL(c, (uchar32)str2[i + 1]);
                 }
                 else
                 {
-                    CHECK_EQUAL(c, (uchar32)str2[i].r);
+                    CHECK_EQUAL(c, (uchar32)str2[i]);
                 }
             }
         }

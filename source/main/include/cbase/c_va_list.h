@@ -631,14 +631,6 @@ namespace ncore
         {
             mRef = (ptr_t)inRef;
         }
-        va_r_t(ucs2::prune inRef, s32 inLength)
-            : mType(TYPE_USC2_STR)
-            , mSize(0)
-            , mCap(inLength)
-            , mDummy(0)
-        {
-            mRef = (ptr_t)inRef;
-        }
         va_r_t(utf8::prune inRef, s32 inLength)
             : mType(TYPE_UTF8_STR)
             , mSize(0)
@@ -647,8 +639,8 @@ namespace ncore
         {
             mRef = (ptr_t)inRef;
         }
-        va_r_t(utf16::prune inRef, s32 inLength)
-            : mType(TYPE_UTF16_STR)
+        va_r_t(ucs2::prune inRef, s32 inLength)
+            : mType(TYPE_USC2_STR)
             , mSize(0)
             , mCap(inLength)
             , mDummy(0)

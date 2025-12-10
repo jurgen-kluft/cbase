@@ -96,8 +96,8 @@ namespace ncore
 
     void               console_default::write(bool _value)
     {
-        crunes_t truestr  = make_crunes(trueStr, trueStr + 4);
-        crunes_t falsestr = make_crunes(falseStr, falseStr + 5);
+        crunes_t truestr  = ascii::make_crunes(trueStr, trueStr + 4);
+        crunes_t falsestr = ascii::make_crunes(falseStr, falseStr + 5);
         write(_value ? truestr : falsestr);
     }
 

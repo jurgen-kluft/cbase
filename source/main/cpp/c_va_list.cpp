@@ -122,7 +122,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::copy(ch, str);
             }
             break;
@@ -221,7 +221,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -274,7 +274,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -330,7 +330,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -383,7 +383,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 bool     b  = false;
                 nrunes::parse(ch, b);
                 i = b ? 1 : 0;
@@ -402,7 +402,7 @@ namespace ncore
         {
             case TYPE_PCRUNES:
             {
-                crunes_t ch = make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 return ch;
             }
             default: break;  // Fall through

@@ -14,10 +14,10 @@ UNITTEST_SUITE_BEGIN(chars)
 		UNITTEST_TEST(test_runez_128)
 		{
             utf32::rune dst_runes[256];
-            dst_runes[0].r = 0;
-            dst_runes[1].r = 0;
-            runes_t dst = make_runes(dst_runes, 0, 0, 256);
-			nrunes::copy(make_crunes("This is a test string"), dst);
+            dst_runes[0] = 0;
+            dst_runes[1] = 0;
+            runes_t dst = utf32::make_runes(dst_runes, 0, 0, 256);
+			nrunes::copy(ascii::make_crunes("This is a test string"), dst);
 		}
 	}
 }

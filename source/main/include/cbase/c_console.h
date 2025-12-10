@@ -86,13 +86,13 @@ namespace ncore
 
         inline void write(const char* str)
         {
-            crunes_t r = make_crunes(str);
+            crunes_t r = ascii::make_crunes(str);
             write(r);
         }
 
         inline void write(const char* str, const char* end)
         {
-            crunes_t r = make_crunes(str, end);
+            crunes_t r = ascii::make_crunes(str, end);
             write(r);
         }
 
@@ -136,13 +136,13 @@ namespace ncore
 
         inline void writeLine(const char* str)
         {
-            crunes_t r = make_crunes(str);
+            crunes_t r = ascii::make_crunes(str);
             writeLine(r);
         }
 
         inline void writeLine(const char* str, const va_t* argv, s32 argc)
         {
-            crunes_t r = make_crunes(str);
+            crunes_t r = ascii::make_crunes(str);
             writeLine(r, argv, argc);
         }
 

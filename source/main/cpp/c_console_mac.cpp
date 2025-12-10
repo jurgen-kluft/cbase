@@ -21,7 +21,7 @@ namespace ncore
 
         virtual s32 vwrite(uchar32 c)
         {
-            utf32::rune src[2] = {{c}, {0}};
+            utf32::rune src[2] = {c, 0};
             return write_utf32(src, 0, 1);
         }
 
@@ -145,7 +145,7 @@ namespace ncore
             uchar16* end16 = dst16 + maxlen;
             while (src < end && dst16 < end16)
             {
-                *dst16++ = (*src++).r;
+                *dst16++ = (*src++);
             }
             *dst16 = 0;
             ::wprintf(L"%s", (const wchar_t*)str16);
@@ -168,7 +168,7 @@ namespace ncore
             uchar32* end32 = dst32 + maxlen;
             while (src < end && dst32 < end32)
             {
-                *dst32++ = (*src++).r;
+                *dst32++ = (*src++);
             }
             *dst32 = 0;
             ::wprintf(L"%s", (const wchar_t*)str32);
