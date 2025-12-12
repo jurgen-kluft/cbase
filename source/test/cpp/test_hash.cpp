@@ -11,7 +11,7 @@ UNITTEST_SUITE_BEGIN(hash)
 #define SANITY_BUFFER_SIZE 2243
 #define XXHASH_TEST(buffer, size, seed, expected)                        \
     {                                                                    \
-        const u64 hash = nhash::datahash((const u8*)buffer, size, seed); \
+        const u64 hash = nhash::datahash64((const u8*)buffer, size, seed); \
         CHECK_EQUAL(expected, hash);                                     \
     }
 

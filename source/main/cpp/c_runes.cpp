@@ -2189,7 +2189,7 @@ namespace ncore
                 uchar32 c      = utf::read_forward(_str, iter);
                 if ((c >= 'A') && (c <= 'Z'))
                 {
-                    c += (uchar32)('a' - 'A');
+                    c += (uchar32)'a' - (uchar32)'A';
                     write(_str, cursor, c);
                 }
             }
@@ -2676,8 +2676,8 @@ namespace ncore
                     break;
                 write(_dst, diter, c);
             }
-            _dst                = select(_dst, dbegin, diter);
-            _dst.m_ascii[diter] = 0;
+            _dst = select(_dst, dbegin, diter);
+            write(_dst, diter, 0);
             return true;
         }
 
