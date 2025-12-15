@@ -3232,6 +3232,39 @@ namespace ncore
 
     namespace nrunes
     {
+        static inline bool contains(const char* chars, u32 count, uchar32 c)
+        {
+            for (u32 i = 0; i < count; i++)
+                if (c == (uchar32)chars[i])
+                    return true;
+            return false;
+        }
+
+        void skip_any(nrunes::ireader_t* reader, const char* chars, u32 count)
+        {
+            while (!reader->end())
+            {
+                uchar32 const c = reader->peek();
+                if (!contains(chars, count, c))
+                    break;
+                reader->read();
+            }
+        }
+
+        s32 skip_until_one_of(nrunes::ireader_t* reader, const char* chars, u32 count)
+        {
+            s32 n = 0;
+            while (!reader->end())
+            {
+                uchar32 const c = reader->peek();
+                if (contains(chars, count, c))
+                    break;
+                reader->read();
+                n++;
+            }
+            return n;
+        }
+
         // ------------------------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------------------------
         reader_t::reader_t() {}
@@ -3298,158 +3331,98 @@ namespace ncore
 
         void reader_t::vreset() { m_cursor = m_runes.m_str; }
 
-        bool reader_t::vpeek(s32 n, uchar32& c) const
+        uchar32 reader_t::vpeek(u32 n) const
         {
-            if (!at_end() && n == 0)
+            if (!at_end())
             {
                 u32 next = m_cursor;
                 switch (m_runes.m_type)
                 {
-                    case ascii::TYPE: c = m_runes.m_ascii[m_cursor] & 0xff; return true;
-                    case ucs2::TYPE: c = ucs2::read_forward(m_runes.m_ucs2, next, m_runes.m_end); return true;
-                    case utf8::TYPE: c = utf8::read_forward(m_runes.m_utf8, next, m_runes.m_end); return true;
-                    case utf16::TYPE: c = utf16::read_forward(m_runes.m_utf16, next, m_runes.m_end); return true;
-                    case utf32::TYPE: c = m_runes.m_utf32[m_cursor]; return true;
+                    case ascii::TYPE:
+                        if ((m_cursor + n) < m_runes.m_end)
+                            return m_runes.m_ascii[m_cursor] & 0xff;
+                        break;
+                    case ucs2::TYPE:
+                        if ((m_cursor + n) < m_runes.m_end)
+                            return ucs2::read_forward(m_runes.m_ucs2, next, m_runes.m_end);
+                        break;
+                    case utf8::TYPE:
+                        ASSERT(n == 0);  // Cannot do random-access peek in UTF-8
+                        return utf8::read_forward(m_runes.m_utf8, next, m_runes.m_end);
+                    case utf16::TYPE:
+                        ASSERT(n == 0);  // Cannot do random-access peek in UTF-16
+                        return utf16::read_forward(m_runes.m_utf16, next, m_runes.m_end);
+                    case utf32::TYPE:
+                        if ((m_cursor + n) < m_runes.m_end)
+                            return m_runes.m_utf32[m_cursor];
                 }
             }
-            else
-            {
-                // n > 0
-                // TODO IMPLEMENTATION
-            }
-
-            c = '\0';
-            return false;
+            return '\0';
         }
 
-        bool reader_t::vread(uchar32& c)
+        uchar32 reader_t::vread()
         {
             if (!at_end())
             {
                 switch (m_runes.m_type)
                 {
-                    case ascii::TYPE: c = m_runes.m_ascii[m_cursor++] & 0xff; break;
-                    case ucs2::TYPE: c = ucs2::read_forward(m_runes.m_ucs2, m_cursor, m_runes.m_end); break;
-                    case utf8::TYPE: c = utf8::read_forward(m_runes.m_utf8, m_cursor, m_runes.m_end); break;
-                    case utf16::TYPE: c = utf16::read_forward(m_runes.m_utf16, m_cursor, m_runes.m_end); break;
-                    case utf32::TYPE: c = m_runes.m_utf32[m_cursor++]; break;
+                    case ascii::TYPE: return m_runes.m_ascii[m_cursor++] & 0xff;
+                    case ucs2::TYPE: return ucs2::read_forward(m_runes.m_ucs2, m_cursor, m_runes.m_end);
+                    case utf8::TYPE: return utf8::read_forward(m_runes.m_utf8, m_cursor, m_runes.m_end);
+                    case utf16::TYPE: return utf16::read_forward(m_runes.m_utf16, m_cursor, m_runes.m_end);
+                    case utf32::TYPE: return m_runes.m_utf32[m_cursor++];
                     default: ASSERT(false); break;
                 }
                 return true;
             }
-            c = '\0';
-            return false;
+            return '\0';
         }
 
-        bool reader_t::vread_line(runes_t& line)
+        crunes_t reader_t::vread(u32 n)
         {
-            // TODO IMPLEMENTATION
-            return false;
+            u32 begin = m_cursor;
+            vskip(n);
+            u32 end = m_cursor;
+            return select(m_runes, begin, end);
         }
 
-        bool reader_t::vview_line(crunes_t& line)
+        crunes_t reader_t::vview(u32 n) const
         {
-            if (at_end())
-                return false;
-
-            u32 next    = m_cursor;
-            line.m_type = m_runes.m_type;
-            switch (m_runes.m_type)
-            {
-                case ascii::TYPE:
-                    line.m_ascii = m_runes.m_ascii;
-                    line.m_str   = m_cursor;
-                    line.m_eos   = m_runes.m_eos;
-                    line.m_end   = m_runes.m_end;
-                    while (!at_end() && line.m_ascii[m_cursor] != '\n')
-                        m_cursor++;
-                    if (!at_end())
-                        m_cursor++;
-                    line.m_end = m_cursor;
-                    break;
-                case ucs2::TYPE:
-                    line.m_ucs2 = m_runes.m_ucs2;
-                    line.m_str  = m_cursor;
-                    line.m_eos  = m_runes.m_eos;
-                    line.m_end  = m_runes.m_end;
-                    while (!at_end() && ucs2::read_forward(m_runes.m_ucs2, next, m_runes.m_end) != '\n')
-                        m_cursor = next;
-                    if (!at_end())
-                        ucs2::read_forward(m_runes.m_ucs2, m_cursor, m_runes.m_end);
-                    line.m_end = m_cursor;
-                    break;
-                case utf8::TYPE:
-                    line.m_utf8 = m_runes.m_utf8;
-                    line.m_str  = m_cursor;
-                    line.m_eos  = m_runes.m_eos;
-                    line.m_end  = m_runes.m_end;
-                    while (!at_end() && utf8::read_forward(m_runes.m_utf8, next, m_runes.m_end) != '\n')
-                        m_cursor = next;
-                    if (!at_end())
-                        utf8::read_forward(m_runes.m_utf8, m_cursor, m_runes.m_end);
-                    line.m_end = m_cursor;
-                    break;
-                case utf16::TYPE:
-                    line.m_utf16 = m_runes.m_utf16;
-                    line.m_str   = m_cursor;
-                    line.m_eos   = m_runes.m_eos;
-                    line.m_end   = m_runes.m_end;
-                    while (!at_end() && utf16::read_forward(m_runes.m_utf16, next, m_runes.m_end) != '\n')
-                        m_cursor = next;
-                    if (!at_end())
-                        utf16::read_forward(m_runes.m_utf16, m_cursor, m_runes.m_end);
-                    line.m_end = m_cursor;
-                    break;
-                case utf32::TYPE:
-                    line.m_utf32 = m_runes.m_utf32;
-                    line.m_str   = m_cursor;
-                    line.m_eos   = m_runes.m_eos;
-                    line.m_end   = m_runes.m_end;
-                    while (!at_end() && line.m_utf32[m_cursor] != '\n')
-                        m_cursor++;
-                    if (!at_end())
-                        m_cursor++;
-                    line.m_end = m_cursor;
-                    break;
-                default: ASSERT(false); break;
-            }
-
-            return true;
+            u32 begin = m_cursor;
+            u32 end   = m_cursor + n;
+            end       = end > m_runes.m_end ? m_runes.m_end : end;
+            return select(m_runes, begin, end);
         }
 
-        void reader_t::vskip(s32 c)
+        void reader_t::vskip(u32 c)
         {
             switch (m_runes.m_type)
             {
                 case ascii::TYPE:
-                    while (c > 0 && !at_end())
-                    {
-                        m_cursor += 1;
-                        c -= 1;
-                    }
+                    m_cursor += c;
+                    if (m_cursor > m_runes.m_end)
+                        m_cursor = m_runes.m_end;
                     break;
 
                 case ucs2::TYPE:
-                    while (c > 0 && !at_end())
-                    {
-                        m_cursor += 1;
-                        c -= 1;
-                    }
+                    m_cursor += c;
+                    if (m_cursor > m_runes.m_end)
+                        m_cursor = m_runes.m_end;
                     break;
 
                 case utf8::TYPE: utf8::skip_forward(m_runes.m_utf8, m_cursor, m_runes.m_str, m_runes.m_end, c); break;
                 case utf16::TYPE: utf16::skip_forward(m_runes.m_utf16, m_cursor, m_runes.m_str, m_runes.m_end, c); break;
 
                 case utf32::TYPE:
-                    while (c > 0 && !at_end())
-                    {
-                        m_cursor += 1;
-                        c -= 1;
-                    }
+                    m_cursor += c;
+                    if (m_cursor > m_runes.m_end)
+                        m_cursor = m_runes.m_end;
                     break;
                 default: ASSERT(false); break;
             }
         }
+
+        bool reader_t::vend() const { return m_cursor >= m_runes.m_end; }
 
         inline static bool s_contains_char(uchar32 const* chars, u32 num_chars, uchar32 c)
         {
@@ -3461,146 +3434,22 @@ namespace ncore
             return false;
         }
 
-        s32 reader_t::vskip_any(uchar32 const* chars, u32 num_chars)
+        reader_t reader_t::reader(u32 from, u32 to) const
         {
-            s32     skipped = -1;
-            uchar32 c       = 0;
-            switch (m_runes.m_type)
-            {
-                case ascii::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        skipped += 1;
-                        uchar32 c = m_runes.m_ascii[m_cursor] & 0xff;
-                        if (!s_contains_char(chars, num_chars, c))
-                            break;
-                        m_cursor += 1;
-                    }
-                    break;
-                case ucs2::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        u32 next = m_cursor;
-                        skipped += 1;
-                        c = ucs2::read_forward(m_runes.m_ucs2, next, m_runes.m_end);
-                        if (!s_contains_char(chars, num_chars, c))
-                            break;
-                        m_cursor += 1;
-                    }
-                    break;
-                case utf8::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        u32 next = m_cursor;
-                        skipped += 1;
-                        c = utf8::read_forward(m_runes.m_utf8, next, m_runes.m_end);
-                        if (!s_contains_char(chars, num_chars, c))
-                            break;
-                        m_cursor = next;
-                    }
-                    break;
-                case utf16::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        u32 next = m_cursor;
-                        skipped += 1;
-                        c = utf16::read_forward(m_runes.m_utf16, next, m_runes.m_end);
-                        if (!s_contains_char(chars, num_chars, c))
-                            break;
-                        m_cursor = next;
-                    }
-                    break;
-                case utf32::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        skipped += 1;
-                        c = m_runes.m_utf32[m_cursor];
-                        if (!s_contains_char(chars, num_chars, c))
-                            break;
-                        m_cursor += 1;
-                    }
-                    break;
-                default: ASSERT(false); break;
-            }
-            return skipped;
-        }
+            from += m_cursor;
+            to += m_cursor;
+            if (to > m_runes.m_end)
+                to = m_runes.m_end;
+            if (from > to)
+                from = to;
 
-        s32 reader_t::vskip_until_one_of(uchar32 const* chars, u32 num_chars)
-        {
-            s32     skipped = -1;
-            uchar32 c       = 0;
-            switch (m_runes.m_type)
-            {
-                case ascii::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        skipped += 1;
-                        uchar32 c = m_runes.m_ascii[m_cursor] & 0xff;
-                        if (s_contains_char(chars, num_chars, c))
-                            return skipped;
-                        m_cursor += 1;
-                    }
-                    break;
-                case ucs2::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        u32 next = m_cursor;
-                        skipped += 1;
-                        c = ucs2::read_forward(m_runes.m_ucs2, next, m_runes.m_end);
-                        if (s_contains_char(chars, num_chars, c))
-                            return skipped;
-                        m_cursor = next;
-                    }
-                    break;
-                case utf8::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        u32 next = m_cursor;
-                        skipped += 1;
-                        c = utf8::read_forward(m_runes.m_utf8, next, m_runes.m_end);
-                        if (s_contains_char(chars, num_chars, c))
-                            return skipped;
-                        m_cursor = next;
-                    }
-                    break;
-                case utf16::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        u32 next = m_cursor;
-                        skipped += 1;
-                        c = utf16::read_forward(m_runes.m_utf16, next, m_runes.m_end);
-                        if (s_contains_char(chars, num_chars, c))
-                            return skipped;
-                        m_cursor = next;
-                    }
-                    break;
-                case utf32::TYPE:
-                    while (m_cursor < m_runes.m_end)
-                    {
-                        skipped += 1;
-                        c = m_runes.m_utf32[m_cursor];
-                        if (s_contains_char(chars, num_chars, c))
-                            return skipped;
-                        m_cursor += 1;
-                    }
-                    break;
-                default: ASSERT(false); break;
-            }
-            return -1;
-        }
-
-        reader_t reader_t::select(u32 const& from, u32 to) const
-        {
             reader_t reader;
-            if (from >= reader.m_runes.m_str && to <= reader.m_runes.m_eos)
-            {
-                reader.m_runes.m_ascii = m_runes.m_ascii;
-                reader.m_runes.m_eos   = m_runes.m_eos;
-                reader.m_runes.m_str   = from;
-                reader.m_runes.m_end   = to;
-                reader.m_runes.m_type  = m_runes.m_type;
-                reader.m_cursor        = from;
-            }
+            reader.m_runes.m_ascii = m_runes.m_ascii;
+            reader.m_runes.m_eos   = m_runes.m_eos;
+            reader.m_runes.m_str   = from;
+            reader.m_runes.m_end   = to;
+            reader.m_runes.m_type  = m_runes.m_type;
+            reader.m_cursor        = from;
             return reader;
         }
 

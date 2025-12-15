@@ -16,8 +16,7 @@ namespace ncore
     {
         bool        bval = false;
         const char* bstr = nullptr;
-        uchar32     c;
-        str->peek(c);
+        uchar32     c    = str->peek();
         if (nrunes::is_equalfold(c, 't'))
         {
             bstr = "true";
@@ -39,7 +38,7 @@ namespace ncore
         else if (nrunes::is_equalfold(c, 'o'))
         {
             str->read();
-            str->peek(c);
+            c = str->peek();
             if (nrunes::is_equalfold(c, 'f'))
             {
                 bstr = "ff";
@@ -90,8 +89,8 @@ namespace ncore
      *------------------------------------------------------------------------------
      */
     //------------------------------------------------------------------------------
-    static uchar32 const sWhitespaceChars[]    = {' ', '\t', '\n', '\r', 0};
-    static u32 const     sWhitespaceCharsCount = 4;
+    static ascii::rune const sWhitespaceChars[]    = {' ', '\t', '\n', '\r'};
+    static u32 const         sWhitespaceCharsCount = 4;
 
     s64 StrToS64(nrunes::ireader_t* reader, s32 base)
     {
@@ -100,11 +99,10 @@ namespace ncore
         ASSERT(base <= (26 + 26 + 10));
 
         // skip whitespace.
-        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+        skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
 
-        uchar32 c;         // Current character.
-        reader->peek(c);   // Save sign indication.
-        uchar32 sign = c;  // If '-', then negative, otherwise positive.
+        uchar32 c    = reader->peek();  // Save sign indication.
+        uchar32 sign = c;               // If '-', then negative, otherwise positive.
 
         // skip sign.
         if ((c == '-') || (c == '+'))
@@ -117,7 +115,7 @@ namespace ncore
         // Decode the rest of the string
         while (true)
         {
-            reader->peek(c);
+            c = reader->peek();
 
             s32 validBase = 0;
             if ((c >= '0') && (c <= '9'))
@@ -170,55 +168,54 @@ namespace ncore
     {
         // Evaluate sign
         s32     sign = 1;
-        uchar32 c;
-        if (reader->peek(c) && c == '-')
+        uchar32 c    = reader->peek();
+        if (c == '-')
         {
             sign = -1;
             reader->read();
         }
 
         // skip trailing zeros
-        while (reader->peek(c) && c == '0')
+        c = reader->peek();
+        while (c == '0')
+        {
             reader->read();
+            c = reader->peek();
+        }
 
         // Convert integer part
         f64 result = 0;
         f64 value;
-        while (reader->peek(c))
+        c = reader->peek();
+        while (c != 0)
         {
-            if (c >= '0' && c <= '9')
-            {
-                value = c - '0';
-                result *= 10.0;
-                result += value;
-                reader->read();
-            }
-            else
-            {
+            if (c < '0' || c > '9')
                 break;
-            }
+            value = c - '0';
+            result *= 10.0;
+            result += value;
+            reader->read();
+            c = reader->peek();
         }
 
         // Detect floating point & mantissa
         f64 mantissa = 0;
         f64 divisor  = 1;
-        if (reader->peek(c) && c == '.')
+        c            = reader->peek();
+        if (c == '.')
         {
             reader->read();
-            while (reader->peek(c))
+            c = reader->peek();
+            while (c != 0)
             {
-                if ((c >= '0' && c <= '9'))
-                {
-                    value = c - '0';
-                    mantissa *= 10.0;
-                    mantissa += value;
-                    divisor *= 10.0;
-                    reader->read();
-                }
-                else
-                {
+                if (c < '0' || c > '9')
                     break;
-                }
+                value = c - '0';
+                mantissa *= 10.0;
+                mantissa += value;
+                divisor *= 10.0;
+                reader->read();
+                c = reader->peek();
             }
         }
 
@@ -230,11 +227,11 @@ namespace ncore
         // Detect exponent
         u32 power = 0;
 
-        reader->peek(c);
+        c = reader->peek();
         if (c == 'e' || c == 'E')
         {
             reader->read();
-            reader->peek(c);
+            c = reader->peek();
             if (c == '-')
             {
                 sign = -1;
@@ -356,17 +353,17 @@ namespace ncore
         INT64_SIZE = 8,
     };
 
-    static const uchar32 sAllDecimalChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
-    static const u32     sAllDecimalCharsCount = 11;
+    static const ascii::rune sAllDecimalChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 0};
+    static const u32         sAllDecimalCharsCount = 11;
 
-    static const uchar32 sAllHexChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
-    static const u32     sAllHexCharsCount = 23;
+    static const ascii::rune sAllHexChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', 0};
+    static const u32         sAllHexCharsCount = 23;
 
-    static const uchar32 sAllOctalChars[]    = {'1', '2', '3', '4', '5', '6', '7', '0', '-', '+', 0};
-    static const u32     sAllOctalCharsCount = 9;
+    static const ascii::rune sAllOctalChars[]    = {'1', '2', '3', '4', '5', '6', '7', '0', '-', '+', 0};
+    static const u32         sAllOctalCharsCount = 9;
 
-    static const uchar32 sAllFloatChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
-    static const u32     sAllFloatCharsCount = 14;
+    static const ascii::rune sAllFloatChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
+    static const u32         sAllFloatCharsCount = 14;
 
     s32 VSScanf(nrunes::ireader_t* reader, nrunes::ireader_t* fmt, const va_r_t* argv, s32 argc)
     {
@@ -378,16 +375,16 @@ namespace ncore
         s32 scanned  = 0;
         s32 suppress = 0;
 
-        uchar32 c;
-        while (fmt->peek(c) && c != '\0')
+        uchar32 c = fmt->peek();
+        while (c != '\0')
         {
-            if (fmt->peek(c) && c != '%' && !parsing)
+            if (c != '%' && !parsing)
             {
                 uchar32 const c = fmt->read();
                 if (nrunes::is_whitespace(c))
                 {
-                    fmt->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
-                    reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                    skip_any(fmt, sWhitespaceChars, sWhitespaceCharsCount);
+                    skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
                 }
                 else
                 {
@@ -396,7 +393,7 @@ namespace ncore
             }
             else
             {
-                if (fmt->peek(c) && c == '%')
+                if (c == '%')
                 {
                     fmt->skip();
 
@@ -408,7 +405,7 @@ namespace ncore
                     l        = 0;
                 }
 
-                fmt->peek(c);
+                c = fmt->peek();
                 switch (c)
                 {
                     case '1':
@@ -446,9 +443,9 @@ namespace ncore
                         fmt->skip();
 
                         s32 i = 0;
-                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                        skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
 
-                        runes_t runes = ascii::make_runes((ascii::prune)nullptr, 0, 0, 0);
+                        runes_t runes = ascii::make_runes((ascii::prune) nullptr, 0, 0, 0);
                         if (i < argc)
                         {
                             va_r_t r = argv[i++];
@@ -459,7 +456,8 @@ namespace ncore
                             nrunes::writer_t str_writer(runes);
 
                             l = 0;
-                            while (reader->peek(c) && c != 0 && c != ' ')
+                            c = reader->peek();
+                            while (c != 0 && c != ' ')
                             {
                                 if (!(flag & SPACE_PAD))
                                 {
@@ -471,6 +469,7 @@ namespace ncore
                                     l++;
                                 }
                                 reader->read();
+                                c = reader->peek();
                             }
                         }
 
@@ -502,10 +501,10 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                        skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
 
                         s64 n1 = 0;
-                        if (reader->skip_until_one_of(sAllDecimalChars, sAllDecimalCharsCount) >= 0)
+                        if (skip_until_one_of(reader, sAllDecimalChars, sAllDecimalCharsCount) >= 0)
                         {
                             n1 = StrToS64(reader, 10);
                         }
@@ -532,10 +531,10 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                        skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
 
                         s64 n2 = 0;
-                        if (reader->skip_until_one_of(sAllDecimalChars, sAllDecimalCharsCount) >= 0)
+                        if (skip_until_one_of(reader, sAllDecimalChars, sAllDecimalCharsCount) >= 0)
                         {
                             n2 = StrToS64(reader, 10);
                         }
@@ -562,10 +561,10 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                        skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
 
                         s64 n2 = 0;
-                        if (reader->skip_until_one_of(sAllOctalChars, sAllOctalCharsCount) >= 0)
+                        if (skip_until_one_of(reader, sAllOctalChars, sAllOctalCharsCount) >= 0)
                         {
                             n2 = StrToS64(reader, 8);
                         }
@@ -593,7 +592,7 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                        skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
 
                         if (w == 0)
                         {
@@ -602,7 +601,7 @@ namespace ncore
                         }
 
                         u64 n2 = 0;
-                        if (reader->skip_until_one_of(sAllHexChars, sAllHexCharsCount) >= 0)
+                        if (skip_until_one_of(reader, sAllHexChars, sAllHexCharsCount) >= 0)
                         {
                             s32 const maxstrlen = 16;
                             uchar32   str[maxstrlen + 1];
@@ -644,10 +643,10 @@ namespace ncore
                     {
                         fmt->skip();
 
-                        reader->skip_any(sWhitespaceChars, sWhitespaceCharsCount);
+                        skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
 
                         f64 n3 = 0;
-                        if (reader->skip_until_one_of(sAllFloatChars, sAllFloatCharsCount) >= 0)
+                        if (skip_until_one_of(reader, sAllFloatChars, sAllFloatCharsCount) >= 0)
                         {
                             n3 = StrToF64(reader);
                         }
@@ -690,6 +689,8 @@ namespace ncore
                         break;
                 }
             }
+
+            c = fmt->peek();
         }
 
         return scanned;

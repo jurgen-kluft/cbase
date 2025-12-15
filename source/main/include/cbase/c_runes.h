@@ -522,41 +522,29 @@ namespace ncore
         class ireader_t
         {
         public:
-            void    reset() { vreset(); }
-            bool    valid() const { return vvalid(); }
-            uchar32 peek() const
-            {
-                uchar32 c;
-                vpeek(0, c);
-                return c;
-            }
-            bool peek(uchar32& c) const { return vpeek(0, c); }
-            bool peek(s32 n, uchar32& c) const { return vpeek(n, c); }
-            bool read(uchar32& c) { return vread(c); }
-            bool read_line(runes_t& line) { return vread_line(line); }
-            bool view_line(crunes_t& line) { return vview_line(line); }
-            void skip(s32 c = 1) { vskip(c); }
-            s32  skip_any(uchar32 const* chars, u32 num_chars) { return vskip_any(chars, num_chars); }
-            s32  skip_until_one_of(uchar32 const* chars, u32 num_chars) { return vskip_until_one_of(chars, num_chars); }
-
-            inline uchar32 read()
-            {
-                uchar32 c;
-                vread(c);
-                return c;
-            }
+            void     reset() { vreset(); }
+            bool     valid() const { return vvalid(); }
+            uchar32  peek() const { return vpeek(0); }
+            uchar32  peekn(u32 n = 0) const { return vpeek(n); }
+            uchar32  read() { return vread(); }
+            crunes_t read(u32 n) { return vread(n); }
+            crunes_t view(u32 n) const { return vview(n); }
+            void     skip(u32 c = 1) { vskip(c); }
+            bool     end() const { return vend(); }
 
         protected:
-            virtual void vreset()                                                = 0;
-            virtual bool vvalid() const                                          = 0;
-            virtual bool vpeek(s32 n, uchar32& c) const                          = 0;
-            virtual bool vread(uchar32& c)                                       = 0;
-            virtual bool vread_line(runes_t& line)                               = 0;
-            virtual bool vview_line(crunes_t& line)                              = 0;
-            virtual void vskip(s32 c)                                            = 0;
-            virtual s32  vskip_any(uchar32 const* chars, u32 num_chars)          = 0;  // return -1 if end of string is reached, otherwise return the number of characters skipped
-            virtual s32  vskip_until_one_of(uchar32 const* chars, u32 num_chars) = 0;  // return -1 if end of string is reached, otherwise return the number of characters skipped
+            virtual void     vreset()           = 0;
+            virtual bool     vvalid() const     = 0;
+            virtual uchar32  vpeek(u32 n) const = 0;
+            virtual uchar32  vread()            = 0;
+            virtual crunes_t vread(u32 n)       = 0;
+            virtual crunes_t vview(u32 n) const = 0;
+            virtual void     vskip(u32 c)       = 0;
+            virtual bool     vend() const       = 0;
         };
+
+        void skip_any(nrunes::ireader_t* reader, const char* chars, u32 count);
+        s32  skip_until_one_of(nrunes::ireader_t* reader, const char* chars, u32 count);
 
         class reader_t : public ireader_t
         {
@@ -570,24 +558,24 @@ namespace ncore
             reader_t(utf32::pcrune str, utf32::pcrune str_end);
             reader_t(crunes_t const& runes);
 
-            reader_t select(u32 const& from, u32 to) const;
-            u32      get_cursor() const { return m_cursor; }
-            void     set_cursor(u32 const& c) { m_cursor = c; }
+            reader_t reader(u32 from, u32 to) const;
+
+            u32  get_cursor() const { return m_cursor; }
+            void set_cursor(u32 const& c) { m_cursor = c; }
 
             crunes_t get_source() const;
             crunes_t get_current() const;
             bool     at_end() const;
 
         protected:
-            virtual bool vvalid() const;
-            virtual void vreset();
-            virtual bool vpeek(s32 n, uchar32& c) const;
-            virtual bool vread(uchar32& c);
-            virtual bool vread_line(runes_t& line);
-            virtual bool vview_line(crunes_t& line);
-            virtual void vskip(s32 c);
-            virtual s32  vskip_any(uchar32 const* chars, u32 num_chars);
-            virtual s32  vskip_until_one_of(uchar32 const* chars, u32 num_chars);
+            virtual void     vreset();
+            virtual bool     vvalid() const;
+            virtual uchar32  vpeek(u32 n) const;
+            virtual uchar32  vread();
+            virtual crunes_t vread(u32 n);
+            virtual crunes_t vview(u32 n) const;
+            virtual void     vskip(u32 c);
+            virtual bool     vend() const;
 
             crunes_t m_runes;
             u32      m_cursor;
@@ -596,22 +584,14 @@ namespace ncore
         class iwriter_t
         {
         public:
-            s32 write(uchar32 c) { return vwrite(c); }
-            s32 write(const char* str);
-            s32 write(const char* str, const char* end) { return vwrite(str, end); }
-            s32 write(runes_t const& str)
-            {
-                crunes_t cstr = make_crunes(str);
-                return vwrite(cstr);
-            }
+            s32  write(uchar32 c) { return vwrite(c); }
+            s32  write(const char* str) { return vwrite(str); }
+            s32  write(const char* str, const char* end) { return vwrite(str, end); }
+            s32  write(runes_t const& str) { return vwrite(make_crunes(str)); }
             s32  write(crunes_t const& str) { return vwrite(str); }
             s32  writeln(runes_t const& str) { return write(str) + writeln(); }
             s32  writeln(crunes_t const& str) { return write(str) + writeln(); }
-            bool writeln()
-            {
-                const char* eos = "\n";
-                return vwrite(eos, eos + 1);
-            }
+            bool writeln() { return vwrite("\n"); }
             void flush() { vflush(); }
 
         protected:
@@ -628,11 +608,11 @@ namespace ncore
         public:
             writer_t(runes_t const& runes);
 
-            runes_t get_destination() const;
-            runes_t get_current() const;
-
             void reset();
             s32  count() const;
+
+            runes_t get_destination() const;
+            runes_t get_current() const;
 
         protected:
             virtual s32  vwrite(uchar32 c);
