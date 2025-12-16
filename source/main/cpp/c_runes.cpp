@@ -1452,6 +1452,17 @@ namespace ncore
             return selectBetweenLast(str, _left, _right);
         }
 
+        bool selectLeftAndRightOf(const crunes_t& inStr, uchar32 inPivot, crunes_t& outLeft, crunes_t& outRight)
+        {
+            // First find inPivot in inStr, 'found' will contain the selection of inPivot in inStr
+            crunes_t found = find(inStr, inPivot);
+            if (is_empty(found))
+                return false;
+            outLeft  = selectBeforeExclude(inStr, found);
+            outRight = selectAfterExclude(inStr, found);
+            return true;
+        }
+
         crunes_t selectBeforeExclude(const crunes_t& _str, const crunes_t& _selection)
         {
             crunes_t str;
@@ -1879,6 +1890,26 @@ namespace ncore
             crunes_t format = ascii::make_crunes(format_str, 0, 2, 2);
             sscanf(str, format, va_r_t(&value));
             return str;
+        }
+
+        u64 parse_mac(crunes_t const& str)
+        {
+            // '001122334455' or '00:11:22:33:44:55' or '00-11-22-33-44-55'
+            crunes_t cursor_str = str;
+            u64      value      = 0;
+            u32      iter       = get_begin(cursor_str);
+            u32      end        = get_end(cursor_str);
+            while (iter < end)
+            {
+                uchar32 c = utf::read_forward(cursor_str, iter);
+                if (c == ':' || c == '-')
+                    continue;
+                const i16 nibble = utf32::hex_to_number(c);
+                value            = (value << 4);
+                if (nibble >= 0)
+                    value = value | (u64)nibble;
+            }
+            return value;
         }
 
         //------------------------------------------------------------------------------
@@ -3263,6 +3294,40 @@ namespace ncore
                 n++;
             }
             return n;
+        }
+
+        void skip_whitespace(nrunes::ireader_t* reader)
+        {
+            while (!reader->end())
+            {
+                uchar32 const c = reader->peek();
+                if (!utf32::is_whitespace(c))
+                    break;
+                reader->read();
+            }
+        }
+
+        crunes_t read_line(nrunes::ireader_t* reader)
+        {
+            crunes_t rest   = reader->view();
+            u32      cursor = rest.m_str;
+            while (cursor < rest.m_end)
+            {
+                uchar32 const c = utf::read_forward(rest, cursor);
+                if (c == '\n' || c == '\r')
+                    break;
+            }
+            crunes_t line = nrunes::select(rest, rest.m_str, cursor);
+
+            u32     cursor2 = cursor;
+            uchar32 c       = utf::read_forward(rest, cursor2);
+            while (c == '\r' || c == '\n')
+            {
+                c = utf::read_forward(rest, cursor2);
+            }
+            cursor = cursor2;
+            reader->skip(cursor - rest.m_str);
+            return line;
         }
 
         // ------------------------------------------------------------------------------------------------------------------

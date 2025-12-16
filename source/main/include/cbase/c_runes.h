@@ -363,6 +363,10 @@ namespace ncore
         crunes_t selectPreviousBetween(const crunes_t& inStr, const crunes_t& inSelection, uchar32 inLeft, uchar32 inRight);
 
         // -------------------------------------------------------------------------------
+        // select left and right of
+        bool selectLeftAndRightOf(const crunes_t& inStr, uchar32 inPivot, crunes_t& outLeft, crunes_t& outRight);
+
+        // -------------------------------------------------------------------------------
         // select before after
         crunes_t selectBeforeExclude(const crunes_t& inStr, const crunes_t& inSelection);
         crunes_t selectBeforeInclude(const crunes_t& inStr, const crunes_t& inSelection);
@@ -418,6 +422,9 @@ namespace ncore
         crunes_t parse(crunes_t const& str, u64& value, s32 base = 10);
         crunes_t parse(crunes_t const& str, f32& value);
         crunes_t parse(crunes_t const& str, f64& value);
+
+        // -------------------------------------------------------------------------------
+        u64 parse_mac(crunes_t const& str);
 
         // -------------------------------------------------------------------------------
         // integer and float value to string
@@ -528,7 +535,7 @@ namespace ncore
             uchar32  peekn(u32 n = 0) const { return vpeek(n); }
             uchar32  read() { return vread(); }
             crunes_t read(u32 n) { return vread(n); }
-            crunes_t view(u32 n) const { return vview(n); }
+            crunes_t view(u32 n = 0xFFFFFFFF) const { return vview(n); }
             void     skip(u32 c = 1) { vskip(c); }
             bool     end() const { return vend(); }
 
@@ -545,6 +552,9 @@ namespace ncore
 
         void skip_any(nrunes::ireader_t* reader, const char* chars, u32 count);
         s32  skip_until_one_of(nrunes::ireader_t* reader, const char* chars, u32 count);
+        void skip_whitespace(nrunes::ireader_t* reader);
+
+        crunes_t read_line(nrunes::ireader_t* reader);
 
         class reader_t : public ireader_t
         {
