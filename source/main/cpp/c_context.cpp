@@ -26,30 +26,27 @@ namespace ncore
     {
         if (sThreadLocalContext == nullptr)
         {
-            arena_t arena;
-            arena.reserved(32 * cMB);
+            arena_t* arena = gCreateArena(4 * cMB, 0);
 
             int_t commit = 0;
-            commit += math::g_alignUp((s32)sizeof(arena_t), arena.alignment());
-            commit += math::g_alignUp((s32)sizeof(context_data_t), arena.alignment());
-            commit += math::g_alignUp((s32)sizeof(arena_alloc_t), arena.alignment());
-            commit += math::g_alignUp((s32)sizeof(rand_t), arena.alignment());
-            arena.committed(commit);
+            commit += math::g_alignUp((s32)sizeof(arena_t), arena->alignment());
+            commit += math::g_alignUp((s32)sizeof(context_data_t), arena->alignment());
+            commit += math::g_alignUp((s32)sizeof(arena_alloc_t), arena->alignment());
+            commit += math::g_alignUp((s32)sizeof(rand_t), arena->alignment());
+            arena->committed(commit);
 
-            arena_t*        vmem_arena   = (arena_t*)arena.commit_and_zero(sizeof(arena_t));
-            context_data_t* context_data = (context_data_t*)arena.commit_and_zero(sizeof(context_data_t));
-            arena_alloc_t*  system_alloc = new (arena.commit_and_zero(sizeof(arena_alloc_t))) arena_alloc_t();
-            rand_t*         rnd          = new (arena.commit_and_zero(sizeof(rand_t))) rand_t();
-            rnd->reset((u64)arena.m_base);
+            context_data_t* context_data = (context_data_t*)arena->alloc_and_zero(sizeof(context_data_t));
+            arena_alloc_t*  system_alloc = new (arena->alloc_and_zero(sizeof(arena_alloc_t))) arena_alloc_t();
+            rand_t*         rnd          = new (arena->alloc_and_zero(sizeof(rand_t))) rand_t();
+            rnd->reset((u64)arena);
 
             // TODO
             // - heap allocator
             // - frame allocator
             // - stack allocator
 
-            *vmem_arena                  = arena;
-            system_alloc->m_vmem         = vmem_arena;
-            context_data->m_arena        = vmem_arena;
+            system_alloc->m_vmem         = arena;
+            context_data->m_arena        = arena;
             context_data->m_system_alloc = system_alloc;
             context_data->m_random       = rnd;
 

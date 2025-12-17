@@ -17,7 +17,6 @@ namespace ncore
         void     g_free_vmem_arena(arena_t*& arena);
         bool     g_set_capacity(arena_t* arena, s32& length, s32 new_capacity, s32 item_size);
         s32      g_get_reserved(arena_t* arena, s32 item_size);
-        void     g_vmem_arena_reserved(arena_t* arena, s32 reserved_size);
         void*    g_vmem_arena_allocate(arena_t* arena, s32 size, s32 alignment);
     }  // namespace nvector
 
@@ -43,7 +42,6 @@ namespace ncore
         {
             ASSERT(items_capacity <= items_reserved);
             m_arena = nvector::g_alloc_vmem_arena(items_reserved, items_capacity, sizeof(T));
-            nvector::g_vmem_arena_reserved(m_arena, items_reserved * sizeof(T));
             m_items = (T*)nvector::g_vmem_arena_allocate(m_arena, items_capacity * sizeof(T), alignof(T));
         }
         ~vector_t() { nvector::g_free_vmem_arena(m_arena); }

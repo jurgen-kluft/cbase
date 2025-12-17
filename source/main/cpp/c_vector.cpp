@@ -11,13 +11,8 @@ namespace ncore
     {
         arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size)
         {
-            arena_t a;
-            a.reserved(reserved * item_size);
-            a.committed(sizeof(arena_t) + (committed * item_size));
-            arena_t* arena = (arena_t*)a.commit_and_zero(sizeof(arena_t));
-            a.commit(committed * item_size);
-            *arena = a;
-            return arena;
+            arena_t* a = gCreateArena((int_t)reserved * item_size, (int_t)committed * item_size);
+            return a;
         }
 
         void g_free_vmem_arena(arena_t*& arena)
@@ -48,18 +43,12 @@ namespace ncore
 
         s32 g_get_reserved(arena_t* arena, s32 item_size) { return (arena->m_reserved_pages * (1 << arena->m_page_size_shift)) / item_size; }
 
-        void g_vmem_arena_reserved(arena_t* arena, s32 reserved_size)
-        {
-            ASSERT(reserved_size > 0);
-            arena->reserved(reserved_size);
-        }
-
         void* g_vmem_arena_allocate(arena_t* arena, s32 size, s32 alignment)
         {
             if (size > 0)
             {
                 ASSERT(alignment > 0 && (alignment & (alignment - 1)) == 0);  // Ensure alignment is a power of two
-                return arena->commit(size, alignment);
+                return arena->alloc(size, alignment);
             }
             return nullptr;
         }
