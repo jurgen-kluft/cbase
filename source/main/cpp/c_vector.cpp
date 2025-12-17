@@ -9,18 +9,18 @@ namespace ncore
 {
     namespace nvector
     {
-        vmem_arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size)
+        arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size)
         {
-            vmem_arena_t a;
+            arena_t a;
             a.reserved(reserved * item_size);
-            a.committed(sizeof(vmem_arena_t) + (committed * item_size));
-            vmem_arena_t* arena = (vmem_arena_t*)a.commit_and_zero(sizeof(vmem_arena_t));
+            a.committed(sizeof(arena_t) + (committed * item_size));
+            arena_t* arena = (arena_t*)a.commit_and_zero(sizeof(arena_t));
             a.commit(committed * item_size);
             *arena = a;
             return arena;
         }
 
-        void g_free_vmem_arena(vmem_arena_t*& arena)
+        void g_free_vmem_arena(arena_t*& arena)
         {
             if (arena != nullptr)
             {
@@ -28,7 +28,7 @@ namespace ncore
             }
         }
 
-        bool g_set_capacity(vmem_arena_t* arena, s32& length, s32 new_capacity, s32 item_size)
+        bool g_set_capacity(arena_t* arena, s32& length, s32 new_capacity, s32 item_size)
         {
             if (new_capacity > length)
             {
@@ -46,15 +46,15 @@ namespace ncore
             return false;
         }
 
-        s32 g_get_reserved(vmem_arena_t* arena, s32 item_size) { return (arena->m_reserved_pages * (1 << arena->m_page_size_shift)) / item_size; }
+        s32 g_get_reserved(arena_t* arena, s32 item_size) { return (arena->m_reserved_pages * (1 << arena->m_page_size_shift)) / item_size; }
 
-        void g_vmem_arena_reserved(vmem_arena_t* arena, s32 reserved_size)
+        void g_vmem_arena_reserved(arena_t* arena, s32 reserved_size)
         {
             ASSERT(reserved_size > 0);
             arena->reserved(reserved_size);
         }
 
-        void* g_vmem_arena_allocate(vmem_arena_t* arena, s32 size, s32 alignment)
+        void* g_vmem_arena_allocate(arena_t* arena, s32 size, s32 alignment)
         {
             if (size > 0)
             {
@@ -64,6 +64,6 @@ namespace ncore
             return nullptr;
         }
 
-    }  // namespace narray
+    }  // namespace nvector
 
 };  // namespace ncore

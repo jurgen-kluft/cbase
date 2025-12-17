@@ -16,7 +16,7 @@ namespace ncore
         frame_alloc_t*   m_frame_allocator;  // specific duration tagged allocations
         stack_alloc_t*   m_stack_alloc;      // function/temporary life-time allocations
         random_t*        m_random;           //
-        vmem_arena_t*    m_vmem_arena;       //
+        arena_t*         m_arena;            //
         void*            m_slot0;            //
     };
 
@@ -26,19 +26,19 @@ namespace ncore
     {
         if (sThreadLocalContext == nullptr)
         {
-            vmem_arena_t arena;
+            arena_t arena;
             arena.reserved(32 * cMB);
 
             int_t commit = 0;
-            commit += math::g_alignUp((s32)sizeof(vmem_arena_t), arena.m_alignment);
-            commit += math::g_alignUp((s32)sizeof(context_data_t), arena.m_alignment);
-            commit += math::g_alignUp((s32)sizeof(vmem_alloc_t), arena.m_alignment);
-            commit += math::g_alignUp((s32)sizeof(rand_t), arena.m_alignment);
+            commit += math::g_alignUp((s32)sizeof(arena_t), arena.alignment());
+            commit += math::g_alignUp((s32)sizeof(context_data_t), arena.alignment());
+            commit += math::g_alignUp((s32)sizeof(arena_alloc_t), arena.alignment());
+            commit += math::g_alignUp((s32)sizeof(rand_t), arena.alignment());
             arena.committed(commit);
 
-            vmem_arena_t*   vmem_arena   = (vmem_arena_t*)arena.commit_and_zero(sizeof(vmem_arena_t));
+            arena_t*        vmem_arena   = (arena_t*)arena.commit_and_zero(sizeof(arena_t));
             context_data_t* context_data = (context_data_t*)arena.commit_and_zero(sizeof(context_data_t));
-            vmem_alloc_t*   system_alloc = new (arena.commit_and_zero(sizeof(vmem_alloc_t))) vmem_alloc_t();
+            arena_alloc_t*  system_alloc = new (arena.commit_and_zero(sizeof(arena_alloc_t))) arena_alloc_t();
             rand_t*         rnd          = new (arena.commit_and_zero(sizeof(rand_t))) rand_t();
             rnd->reset((u64)arena.m_base);
 
@@ -49,7 +49,7 @@ namespace ncore
 
             *vmem_arena                  = arena;
             system_alloc->m_vmem         = vmem_arena;
-            context_data->m_vmem_arena   = vmem_arena;
+            context_data->m_arena        = vmem_arena;
             context_data->m_system_alloc = system_alloc;
             context_data->m_random       = rnd;
 
@@ -62,7 +62,7 @@ namespace ncore
     {
         if (sThreadLocalContext != nullptr)
         {
-            vmem_arena_t a = *sThreadLocalContext->m_vmem_arena;
+            arena_t a = *sThreadLocalContext->m_arena;
             a.release();
             sThreadLocalContext = nullptr;
         }

@@ -18,7 +18,7 @@ namespace ncore
     {
         asserthandler_t* assert_handler();   // assert handler for this thread
         alloc_t*         system_alloc();     // application life-time allocations
-        alloc_t*         heap_alloc();       // system life-time allocations
+        alloc_t*         heap_alloc();       // random life-time allocations
         frame_alloc_t*   frame_allocator();  // specific duration tagged allocations
         stack_alloc_t*   stack_alloc();      // function/temporary life-time allocations
         random_t*        random();           // random number generator

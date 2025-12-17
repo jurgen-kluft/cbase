@@ -9,16 +9,16 @@
 
 namespace ncore
 {
-    struct vmem_arena_t;
+    struct arena_t;
 
     namespace nvector
     {
-        vmem_arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size);
-        void          g_free_vmem_arena(vmem_arena_t*& arena);
-        bool          g_set_capacity(vmem_arena_t* arena, s32& length, s32 new_capacity, s32 item_size);
-        s32           g_get_reserved(vmem_arena_t* arena, s32 item_size);
-        void          g_vmem_arena_reserved(vmem_arena_t* arena, s32 reserved_size);
-        void*         g_vmem_arena_allocate(vmem_arena_t* arena, s32 size, s32 alignment);
+        arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size);
+        void     g_free_vmem_arena(arena_t*& arena);
+        bool     g_set_capacity(arena_t* arena, s32& length, s32 new_capacity, s32 item_size);
+        s32      g_get_reserved(arena_t* arena, s32 item_size);
+        void     g_vmem_arena_reserved(arena_t* arena, s32 reserved_size);
+        void*    g_vmem_arena_allocate(arena_t* arena, s32 size, s32 alignment);
     }  // namespace nvector
 
     // Simple vector_t<> template class that uses a virtual memory arena for storage.
@@ -116,10 +116,10 @@ namespace ncore
             return 0;
         }
 
-        T*            m_items;
-        s32           m_size;
-        s32           m_capacity;
-        vmem_arena_t* m_arena;
+        T*       m_items;
+        s32      m_size;
+        s32      m_capacity;
+        arena_t* m_arena;
     };
 
 };  // namespace ncore
