@@ -12,7 +12,7 @@ namespace ncore
     {
         ASSERT(count > 0 && count <= 1 * 1024 * 1024);  // maximum count is 1 Million (5 bits + 5 bits + 5 bits + 5 bits = 20 bits = 1 M)
         config_t cfg;
-        cfg.m_levels   = (math::g_mostSignificantBit(count - 1) / 5);  // We can have a maximum of 4 levels, each level holds 5 bits
+        cfg.m_levels   = (math::mostSignificantBit(count - 1) / 5);  // We can have a maximum of 4 levels, each level holds 5 bits
         cfg.m_count    = count;
         cfg.m_lnlen[0] = 0;
         cfg.m_lnlen[1] = 0;
@@ -287,12 +287,12 @@ namespace ncore
 
         u32 const l  = levels();
         u32       wi = 0;
-        s8        bi = math::g_findFirstBit(~m_l0);
+        s8        bi = math::findFirstBit(~m_l0);
         ASSERT(bi >= 0 && bi < 32);
         for (u32 i = 0; i < l; ++i)
         {
             wi = (wi << 5) + bi;
-            bi = math::g_findFirstBit(~m_l[i][wi]);
+            bi = math::findFirstBit(~m_l[i][wi]);
             ASSERT(bi >= 0 && bi < 32);
         }
 
@@ -316,13 +316,13 @@ namespace ncore
         u32 const l  = levels();
         u32       wi = 0;
         ASSERT(~m_l0 != 0);
-        s8 bi = 31 - math::g_findLastBit(~m_l0);
+        s8 bi = 31 - math::findLastBit(~m_l0);
         ASSERT(bi >= 0 && bi < 32);
         for (u32 i = 0; i < l; ++i)
         {
             wi = (wi << 5) + bi;
             ASSERT(~m_l[i][wi] != 0);
-            bi = 31 - math::g_findLastBit(~m_l[i][wi]);
+            bi = 31 - math::findLastBit(~m_l[i][wi]);
             ASSERT(bi >= 0 && bi < 32);
         }
 
@@ -354,7 +354,7 @@ namespace ncore
                 u32 const  w     = (~level[iw]) & (0xffffffff << ib);
                 if (w != 0)
                 {
-                    iw = (iw * 32) + math::g_findFirstBit(w);
+                    iw = (iw * 32) + math::findFirstBit(w);
                     if (il == ml)
                         return iw < size() ? (s32)iw : -1;
                     il += 1;  // Go down one level
@@ -395,7 +395,7 @@ namespace ncore
                 u32 const  w     = (~level[iw]) & (0xffffffff >> (31 - ib));
                 if (w != 0)
                 {
-                    iw = (iw * 32) + (u32)math::g_findFirstBit(w);
+                    iw = (iw * 32) + (u32)math::findFirstBit(w);
                     if (il == ml)
                         return iw < size() ? (s32)iw : -1;
                     il += 1;  // Go down one level
@@ -430,7 +430,7 @@ namespace ncore
                 u32 const w  = level[iw] & (0xffffffff << ib);
                 if (w != 0)
                 {
-                    s32 const found_bit = (s32)((iw * 32) + math::g_findFirstBit(w));
+                    s32 const found_bit = (s32)((iw * 32) + math::findFirstBit(w));
                     return (found_bit < (s32)maxbits) ? found_bit : -1;
                 }
             }
@@ -442,7 +442,7 @@ namespace ncore
                     u32 const w = level[i];
                     if (w != 0)
                     {
-                        s32 const found_bit = (s32)((i * 32) + math::g_findFirstBit(w));
+                        s32 const found_bit = (s32)((i * 32) + math::findFirstBit(w));
                         return (found_bit < (s32)maxbits) ? found_bit : -1;
                     }
                 }

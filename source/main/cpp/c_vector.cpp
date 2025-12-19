@@ -11,7 +11,7 @@ namespace ncore
     {
         arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size)
         {
-            arena_t* a = gCreateArena((int_t)reserved * item_size, (int_t)committed * item_size);
+            arena_t* a = narena::create((int_t)reserved * item_size, (int_t)committed * item_size);
             return a;
         }
 
@@ -19,7 +19,7 @@ namespace ncore
         {
             if (arena != nullptr)
             {
-                arena->release();
+                narena::release(arena);
             }
         }
 
@@ -34,7 +34,7 @@ namespace ncore
                 }
 
                 // Set the new committed size
-                arena->committed(new_capacity * item_size);
+                narena::commit(arena, new_capacity * item_size);
                 length = new_capacity;
                 return true;
             }
@@ -48,7 +48,7 @@ namespace ncore
             if (size > 0)
             {
                 ASSERT(alignment > 0 && (alignment & (alignment - 1)) == 0);  // Ensure alignment is a power of two
-                return arena->alloc(size, alignment);
+                return narena::alloc(arena, size, alignment);
             }
             return nullptr;
         }

@@ -12,13 +12,13 @@ UNITTEST_SUITE_BEGIN(carray_t)
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-        //static s32 array_data[64];
+        // static s32 array_data[64];
 
         UNITTEST_TEST(construct)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 5);
-            CHECK_EQUAL(0, g_size(a));
-            CHECK_EQUAL(5, g_reserved(a));
+            CHECK_EQUAL((u32)0, g_size(a));
+            CHECK_EQUAL((u32)5, g_capacity(a));
             g_destroy_carray<s32>(Allocator, a);
         }
 
@@ -26,14 +26,14 @@ UNITTEST_SUITE_BEGIN(carray_t)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 5);
 
-            CHECK_EQUAL(0, g_size(a));
-            CHECK_EQUAL(5, g_reserved(a));
+            CHECK_EQUAL((u32)0, g_size(a));
+            CHECK_EQUAL((u32)5, g_capacity(a));
 
             s32 value = 1;
             g_push_back(a, value);
 
-            CHECK_EQUAL(1, g_size(a));
-            CHECK_EQUAL(5, g_reserved(a));
+            CHECK_EQUAL((u32)1, g_size(a));
+            CHECK_EQUAL((u32)5, g_capacity(a));
             g_destroy_carray<s32>(Allocator, a);
         }
 
@@ -41,14 +41,14 @@ UNITTEST_SUITE_BEGIN(carray_t)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 5);
 
-            CHECK_EQUAL(0, g_size(a));
-            CHECK_EQUAL(5, g_reserved(a));
+            CHECK_EQUAL((u32)0, g_size(a));
+            CHECK_EQUAL((u32)5, g_capacity(a));
 
             s32 value;
             CHECK_FALSE(g_pop_back(a, value));
 
-            CHECK_EQUAL(0, g_size(a));
-            CHECK_EQUAL(5, g_reserved(a));
+            CHECK_EQUAL((u32)0, g_size(a));
+            CHECK_EQUAL((u32)5, g_capacity(a));
             g_destroy_carray<s32>(Allocator, a);
         }
 
@@ -56,27 +56,27 @@ UNITTEST_SUITE_BEGIN(carray_t)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 5);
 
-            CHECK_EQUAL(0, g_size(a));
-            CHECK_EQUAL(5, g_reserved(a));
+            CHECK_EQUAL((u32)0, g_size(a));
+            CHECK_EQUAL((u32)5, g_capacity(a));
 
             s32 value = 1;
             g_push_back(a, value);
-            CHECK_EQUAL(1, g_size(a));
-            CHECK_EQUAL(5, g_reserved(a));
+            CHECK_EQUAL((u32)1, g_size(a));
+            CHECK_EQUAL((u32)5, g_capacity(a));
 
             CHECK_TRUE(g_pop_back(a, value));
             CHECK_EQUAL(1, value);
 
-            CHECK_EQUAL(0, g_size(a));
-            CHECK_EQUAL(5, g_reserved(a));
+            CHECK_EQUAL((u32)0, g_size(a));
+            CHECK_EQUAL((u32)5, g_capacity(a));
             g_destroy_carray<s32>(Allocator, a);
         }
 
         UNITTEST_TEST(operator_index)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 10);
-            for (s32 i = 0; i < g_reserved(a); ++i)
-                g_push_back(a, i);
+            for (u32 i = 0; i < g_capacity(a); ++i)
+                g_push_back(a, (s32)i);
 
             s32& value = g_get(a, 0);
             value += 10;
@@ -89,8 +89,8 @@ UNITTEST_SUITE_BEGIN(carray_t)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 10);
 
-            for (s32 i = 0; i < g_reserved(a); ++i)
-                g_push_back(a, i);
+            for (u32 i = 0; i < g_capacity(a); ++i)
+                g_push_back(a, (s32)i);
 
             g_swap(a, 4, 7);
             CHECK_EQUAL(4, a.mArray[7]);
@@ -102,24 +102,24 @@ UNITTEST_SUITE_BEGIN(carray_t)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 10);
 
-            for (s32 i = 0; i < g_reserved(a); ++i)
-                g_push_back(a, i);
+            for (u32 i = 0; i < g_capacity(a); ++i)
+                g_push_back(a, (s32)i);
 
-            CHECK_EQUAL(10, g_size(a));
-            CHECK_EQUAL(10, g_reserved(a));
+            CHECK_EQUAL((u32)10, g_size(a));
+            CHECK_EQUAL((u32)10, g_capacity(a));
 
             g_remove(a, 4);
 
-            CHECK_EQUAL(9, g_size(a));
-            CHECK_EQUAL(10, g_reserved(a));
+            CHECK_EQUAL((u32)9, g_size(a));
+            CHECK_EQUAL((u32)10, g_capacity(a));
 
             CHECK_EQUAL(5, a.mArray[4]);
             CHECK_EQUAL(6, a.mArray[5]);
             CHECK_EQUAL(9, a.mArray[8]);
 
             g_remove(a, 8);
-            CHECK_EQUAL(8, g_size(a));
-            CHECK_EQUAL(10, g_reserved(a));
+            CHECK_EQUAL((u32)8, g_size(a));
+            CHECK_EQUAL((u32)10, g_capacity(a));
             CHECK_EQUAL(8, a.mArray[7]);
             g_destroy_carray<s32>(Allocator, a);
         }
@@ -128,24 +128,24 @@ UNITTEST_SUITE_BEGIN(carray_t)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 10);
 
-            for (s32 i = 0; i < g_reserved(a); ++i)
-                g_push_back(a, i);
+            for (u32 i = 0; i < g_capacity(a); ++i)
+                g_push_back(a, (s32)i);
 
-            CHECK_EQUAL(10, g_size(a));
-            CHECK_EQUAL(10, g_reserved(a));
+            CHECK_EQUAL((u32)10, g_size(a));
+            CHECK_EQUAL((u32)10, g_capacity(a));
 
             g_swap_remove(a, 4);
 
-            CHECK_EQUAL(9, g_size(a));
-            CHECK_EQUAL(10, g_reserved(a));
+            CHECK_EQUAL((u32)9, g_size(a));
+            CHECK_EQUAL((u32)10, g_capacity(a));
 
             CHECK_EQUAL(9, a.mArray[4]);
             CHECK_EQUAL(5, a.mArray[5]);
             CHECK_EQUAL(8, a.mArray[8]);
 
             g_swap_remove(a, 8);
-            CHECK_EQUAL(8, g_size(a));
-            CHECK_EQUAL(10, g_reserved(a));
+            CHECK_EQUAL((u32)8, g_size(a));
+            CHECK_EQUAL((u32)10, g_capacity(a));
             CHECK_EQUAL(7, a.mArray[7]);
             g_destroy_carray<s32>(Allocator, a);
         }
@@ -154,11 +154,11 @@ UNITTEST_SUITE_BEGIN(carray_t)
         {
             carray_t<s32> a = g_create_carray<s32>(Allocator, 10);
 
-            for (s32 i = 0; i < g_reserved(a); ++i)
-                g_push_back(a, i);
+            for (u32 i = 0; i < g_capacity(a); ++i)
+                g_push_back(a, (s32)i);
 
             cview_t<s32> b = g_view(a, 4, 8);
-            CHECK_EQUAL(4, g_size(b));
+            CHECK_EQUAL((u32)4, g_size(b));
             CHECK_EQUAL(4, b.mArray[b.mFrom + 0]);
             CHECK_EQUAL(4, g_get(b, 0));
             CHECK_EQUAL(5, b.mArray[b.mFrom + 1]);

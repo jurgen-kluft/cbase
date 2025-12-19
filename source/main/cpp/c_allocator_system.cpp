@@ -5,19 +5,19 @@
 
 namespace ncore
 {
-    arena_t*      sSystemVmem;
-    arena_alloc_t sSystemAllocator;
+    arena_t*         sSystemVmem;
+    narena::aalloc_t sSystemAllocator;
 
     void g_init_system_alloc()
     {
-        sSystemVmem             = gCreateArena(1 * cGB, 8 * cMB);
+        sSystemVmem             = narena::create(1 * cGB, 8 * cMB);
         sSystemAllocator.m_vmem = sSystemVmem;
     }
 
     void g_exit_system_alloc()
     {
         sSystemAllocator.m_vmem = nullptr;
-        sSystemVmem->release();
+        narena::release(sSystemVmem);
         sSystemVmem = nullptr;
     }
 

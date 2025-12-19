@@ -26,18 +26,18 @@ namespace ncore
     {
         if (sThreadLocalContext == nullptr)
         {
-            arena_t* arena = gCreateArena(4 * cMB, 0);
+            arena_t* arena = narena::create(4 * cMB, 0);
 
             int_t commit = 0;
-            commit += math::g_alignUp((s32)sizeof(arena_t), arena->alignment());
-            commit += math::g_alignUp((s32)sizeof(context_data_t), arena->alignment());
-            commit += math::g_alignUp((s32)sizeof(arena_alloc_t), arena->alignment());
-            commit += math::g_alignUp((s32)sizeof(rand_t), arena->alignment());
-            arena->committed(commit);
+            commit += math::alignUp((s32)sizeof(arena_t), narena::alignment(arena));
+            commit += math::alignUp((s32)sizeof(context_data_t), narena::alignment(arena));
+            commit += math::alignUp((s32)sizeof(narena::aalloc_t), narena::alignment(arena));
+            commit += math::alignUp((s32)sizeof(rand_t), narena::alignment(arena));
+            narena::commit(arena, commit);
 
-            context_data_t* context_data = (context_data_t*)arena->alloc_and_zero(sizeof(context_data_t));
-            arena_alloc_t*  system_alloc = new (arena->alloc_and_zero(sizeof(arena_alloc_t))) arena_alloc_t();
-            rand_t*         rnd          = new (arena->alloc_and_zero(sizeof(rand_t))) rand_t();
+            context_data_t*   context_data = (context_data_t*)narena::alloc_and_zero(arena, sizeof(context_data_t));
+            narena::aalloc_t* system_alloc = new (narena::alloc_and_zero(arena, sizeof(narena::aalloc_t))) narena::aalloc_t();
+            rand_t*           rnd          = new (narena::alloc_and_zero(arena, sizeof(rand_t))) rand_t();
             rnd->reset((u64)arena);
 
             // TODO
@@ -59,8 +59,7 @@ namespace ncore
     {
         if (sThreadLocalContext != nullptr)
         {
-            arena_t a = *sThreadLocalContext->m_arena;
-            a.release();
+            narena::release(sThreadLocalContext->m_arena);
             sThreadLocalContext = nullptr;
         }
     }

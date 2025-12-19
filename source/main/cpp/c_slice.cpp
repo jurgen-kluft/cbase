@@ -95,7 +95,7 @@ namespace ncore
         data_t* data = &sNull;
         if (mAllocator != nullptr)
         {
-            math::g_clampRange(from, to, 0, mItemCount);
+            math::clampRange(from, to, 0, mItemCount);
 
             if (capacity < (to - from))
                 capacity = to - from;

@@ -357,13 +357,13 @@ namespace ncore
         s8       i  = 0;
         s8 const l  = levels() - 1;
         u32      wi = 0;
-        s8       bi = math::g_findFirstBit(m_l0);
+        s8       bi = math::findFirstBit(m_l0);
         ASSERT(bi >= 0 && bi < 32);
 
         for (; i <= l; ++i)
         {
             wi = (wi << 5) + bi;
-            bi = (i < l) ? math::g_findFirstBit(m_l[i][wi]) : math::g_findFirstBit(m_binmap0.m_l[i][wi]);
+            bi = (i < l) ? math::findFirstBit(m_l[i][wi]) : math::findFirstBit(m_binmap0.m_l[i][wi]);
             ASSERT(bi >= 0 && bi < 32);
         }
 
@@ -386,14 +386,14 @@ namespace ncore
 
         s8 const l  = levels() - 1;
         u32      wi = 0;
-        s8       bi = 31 - math::g_findLastBit(m_l0);
+        s8       bi = 31 - math::findLastBit(m_l0);
         ASSERT(bi >= 0 && bi < 32);
         for (s8 i = 0; i <= l; ++i)
         {
             wi           = (wi << 5) + bi;
             u32 const wc = i < l ? m_l[i][wi] : m_binmap0.m_l[i][wi];
             ASSERT(wc != 0);
-            bi = 31 - math::g_findLastBit(wc);
+            bi = 31 - math::findLastBit(wc);
             ASSERT(bi >= 0 && bi < 32);
         }
 
@@ -427,7 +427,7 @@ namespace ncore
                 u32 const  w     = level[iw] & (0xffffffff << ib);
                 if (w != 0)
                 {
-                    iw = (iw * 32) + math::g_findFirstBit(w);
+                    iw = (iw * 32) + math::findFirstBit(w);
                     if (il == ml)
                         return iw;
                     il += 1;  // Go down one level
@@ -465,7 +465,7 @@ namespace ncore
                 u32 const  w     = level[iw] & (0xffffffff >> (31 - ib));
                 if (w != 0)
                 {
-                    iw = (iw * 32) + (u32)math::g_findFirstBit(w);
+                    iw = (iw * 32) + (u32)math::findFirstBit(w);
                     if (il == ml)
                         return iw;
                     il += 1;  // Go down one level
