@@ -491,7 +491,7 @@ namespace ncore
         void trim(runes_t&);                                             // Trim whitespace from left and right side
         void trimLeft(runes_t&);                                         // Trim whitespace from left side
         void trimRight(runes_t&);                                        // Trim whitespace from right side
-        void trim(runes_t&, uchar32 inChar);                             // Trim characters in <inCharSet> from left and right side
+        void trim(runes_t&, uchar32 inChar);                             // Trim character <inChar> from left and right side
         void trimLeft(runes_t&, uchar32 inChar);                         // Trim character <inChar> from left side
         void trimRight(runes_t&, uchar32 inChar);                        // Trim character <inChar> from right side
         void trim(runes_t&, crunes_t const& inCharSet);                  // Trim characters in <inCharSet> from left and right side
