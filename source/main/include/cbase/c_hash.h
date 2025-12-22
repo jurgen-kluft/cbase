@@ -28,8 +28,8 @@ namespace ncore
         u64 strhash(crunes_t const& str, u64 seed = 0);
         u64 strhash_lowercase(crunes_t const& str, u64 seed = 0);
 
-        u32 strhash32(crunes_t const& str, u64 seed = 0);
-        u32 strhash32_lowercase(crunes_t const& str, u64 seed = 0);
+        u32 strhash32(crunes_t const& str, u32 seed = 0);
+        u32 strhash32_lowercase(crunes_t const& str, u32 seed = 0);
     }  // namespace nhash
 
 }  // namespace ncore

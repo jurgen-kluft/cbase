@@ -25,7 +25,7 @@ namespace ncore
         virtual s32 vwrite(uchar32 c)
         {
             utf32::rune str[2] = {c, 0};
-            crunes_t    src    = make_crunes(str, 0, 1, 1);
+            crunes_t    src    = utf32::make_crunes(str, 0, 1, 1);
             return write_utf32(src);
         }
 
@@ -57,7 +57,7 @@ namespace ncore
 
         virtual s32 vwrite(const char* str, const char* end)
         {
-            crunes_t src = make_crunes(str, end);
+            crunes_t src = ascii::make_crunes(str, end);
             return write_ascii(src) != 0;
         }
 
@@ -156,7 +156,7 @@ namespace ncore
                 while (src < end && dst16 < end16)
                 {
                     utf16::rune c = *src++;
-                    write_utf16(c.r, dst16, end16);
+                    write_utf16(c, dst16, end16);
                     ll += 1;
                 }
                 str16[ll] = 0;
@@ -183,7 +183,7 @@ namespace ncore
                 while (src < end && dst16 < end16)
                 {
                     utf32::rune c = *src++;
-                    write_utf16(c.r, dst16, end16);
+                    write_utf16(c, dst16, end16);
                     ll += 1;
                 }
                 str16[ll] = 0;
@@ -203,7 +203,7 @@ namespace ncore
         virtual void writeln()
         {
             ascii::rune line32[] = {'\r', 0};
-            crunes_t    line     = make_crunes(line32, line32 + 1);
+            crunes_t    line     = ascii::make_crunes(line32, line32 + 1);
             out_writer_t::write_ascii(line);
         }
 

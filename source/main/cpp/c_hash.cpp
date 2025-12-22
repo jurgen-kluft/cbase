@@ -41,7 +41,7 @@ namespace ncore
             return 0;
         }
 
-        u32 strhash32(crunes_t const& str, u64 seed)
+        u32 strhash32(crunes_t const& str, u32 seed)
         {
             if ((str.m_type) == ascii::TYPE)
             {
@@ -56,7 +56,7 @@ namespace ncore
             return 0;
         }
 
-        u32 strhash32_lowercase(crunes_t const& str, u64 seed)
+        u32 strhash32_lowercase(crunes_t const& str, u32 seed)
         {
             if ((str.m_type) == ascii::TYPE)
             {
