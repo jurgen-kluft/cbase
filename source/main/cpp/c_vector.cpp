@@ -19,7 +19,7 @@ namespace ncore
         {
             if (arena != nullptr)
             {
-                narena::release(arena);
+                narena::destroy(arena);
             }
         }
 

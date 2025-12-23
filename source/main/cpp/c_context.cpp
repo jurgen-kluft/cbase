@@ -59,7 +59,7 @@ namespace ncore
     {
         if (sThreadLocalContext != nullptr)
         {
-            narena::release(sThreadLocalContext->m_arena);
+            narena::destroy(sThreadLocalContext->m_arena);
             sThreadLocalContext = nullptr;
         }
     }

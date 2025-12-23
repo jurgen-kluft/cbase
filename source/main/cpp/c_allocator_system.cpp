@@ -17,7 +17,7 @@ namespace ncore
     void g_exit_system_alloc()
     {
         sSystemAllocator.m_vmem = nullptr;
-        narena::release(sSystemVmem);
+        narena::destroy(sSystemVmem);
         sSystemVmem = nullptr;
     }
 
