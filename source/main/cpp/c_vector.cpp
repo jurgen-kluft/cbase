@@ -3,7 +3,7 @@
 #include "cbase/c_vector.h"
 #include "ccore/c_limits.h"
 #include "cbase/c_context.h"
-#include "ccore/c_vmem.h"
+#include "ccore/c_arena.h"
 
 namespace ncore
 {
@@ -11,7 +11,7 @@ namespace ncore
     {
         arena_t* g_alloc_vmem_arena(s32 reserved, s32 committed, s32 item_size)
         {
-            arena_t* a = narena::create((int_t)reserved * item_size, (int_t)committed * item_size);
+            arena_t* a = narena::new_arena((int_t)reserved * item_size, (int_t)committed * item_size);
             return a;
         }
 

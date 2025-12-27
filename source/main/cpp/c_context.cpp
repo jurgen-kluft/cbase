@@ -3,7 +3,7 @@
 
 #include "ccore/c_math.h"
 #include "ccore/c_random.h"
-#include "ccore/c_vmem.h"
+#include "ccore/c_arena.h"
 
 namespace ncore
 {
@@ -26,7 +26,7 @@ namespace ncore
     {
         if (sThreadLocalContext == nullptr)
         {
-            arena_t* arena = narena::create(4 * cMB, 0);
+            arena_t* arena = narena::new_arena(4 * cMB, 0);
 
             int_t commit = 0;
             commit += math::alignUp((s32)sizeof(arena_t), narena::alignment(arena));

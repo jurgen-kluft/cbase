@@ -1,7 +1,7 @@
 #include "ccore/c_target.h"
 
 #include "cbase/c_allocator.h"
-#include "ccore/c_vmem.h"
+#include "ccore/c_arena.h"
 
 namespace ncore
 {
@@ -10,7 +10,7 @@ namespace ncore
 
     void g_init_system_alloc()
     {
-        sSystemVmem             = narena::create(1 * cGB, 8 * cMB);
+        sSystemVmem             = narena::new_arena(1 * cGB, 8 * cMB);
         sSystemAllocator.m_vmem = sSystemVmem;
     }
 
