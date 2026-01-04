@@ -45,7 +45,7 @@ namespace ncore
             // - frame allocator
             // - stack allocator
 
-            system_alloc->m_vmem         = arena;
+            system_alloc->m_arena        = arena;
             context_data->m_arena        = arena;
             context_data->m_system_alloc = system_alloc;
             context_data->m_random       = rnd;
@@ -59,7 +59,8 @@ namespace ncore
     {
         if (sThreadLocalContext != nullptr)
         {
-            narena::destroy(sThreadLocalContext->m_arena);
+            arena_t* arena = sThreadLocalContext->m_arena;
+            narena::destroy(arena);
             sThreadLocalContext = nullptr;
         }
     }
