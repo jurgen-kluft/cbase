@@ -5,8 +5,8 @@
 
 namespace ncore
 {
-    arena_t*         sSystemArena = nullptr;
-    narena::aalloc_t sSystemAllocator;
+    arena_t*      sSystemArena = nullptr;
+    arena_alloc_t sSystemAllocator;
 
     void g_init_system_alloc()
     {

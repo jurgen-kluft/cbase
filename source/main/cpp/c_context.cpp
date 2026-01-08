@@ -31,12 +31,12 @@ namespace ncore
             int_t commit = 0;
             commit += math::alignUp((s32)sizeof(arena_t), narena::alignment(arena));
             commit += math::alignUp((s32)sizeof(context_data_t), narena::alignment(arena));
-            commit += math::alignUp((s32)sizeof(narena::aalloc_t), narena::alignment(arena));
+            commit += math::alignUp((s32)sizeof(arena_alloc_t), narena::alignment(arena));
             commit += math::alignUp((s32)sizeof(rand_t), narena::alignment(arena));
             narena::commit(arena, commit);
 
             context_data_t*   context_data = (context_data_t*)narena::alloc_and_zero(arena, sizeof(context_data_t));
-            narena::aalloc_t* system_alloc = new (narena::alloc_and_zero(arena, sizeof(narena::aalloc_t))) narena::aalloc_t();
+            arena_alloc_t* system_alloc = new (narena::alloc_and_zero(arena, sizeof(arena_alloc_t))) arena_alloc_t();
             rand_t*           rnd          = new (narena::alloc_and_zero(arena, sizeof(rand_t))) rand_t();
             rnd->reset((u64)arena);
 
