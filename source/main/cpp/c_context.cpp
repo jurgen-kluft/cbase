@@ -28,16 +28,17 @@ namespace ncore
         {
             arena_t* arena = narena::new_arena(4 * cMB, 0);
 
-            int_t commit = 0;
-            commit += math::alignUp((s32)sizeof(arena_t), narena::alignment(arena));
-            commit += math::alignUp((s32)sizeof(context_data_t), narena::alignment(arena));
-            commit += math::alignUp((s32)sizeof(arena_alloc_t), narena::alignment(arena));
-            commit += math::alignUp((s32)sizeof(rand_t), narena::alignment(arena));
+            const u32 alignment = 8;
+            int_t     commit    = 0;
+            commit += math::alignUp((s32)sizeof(arena_t), alignment);
+            commit += math::alignUp((s32)sizeof(context_data_t), alignment);
+            commit += math::alignUp((s32)sizeof(arena_alloc_t), alignment);
+            commit += math::alignUp((s32)sizeof(rand_t), alignment);
             narena::commit(arena, commit);
 
-            context_data_t*   context_data = (context_data_t*)narena::alloc_and_zero(arena, sizeof(context_data_t));
-            arena_alloc_t* system_alloc = new (narena::alloc_and_zero(arena, sizeof(arena_alloc_t))) arena_alloc_t();
-            rand_t*           rnd          = new (narena::alloc_and_zero(arena, sizeof(rand_t))) rand_t();
+            context_data_t* context_data = (context_data_t*)narena::alloc_and_zero(arena, sizeof(context_data_t), alignment);
+            arena_alloc_t*  system_alloc = new (narena::alloc_and_zero(arena, sizeof(arena_alloc_t), alignment)) arena_alloc_t();
+            rand_t*         rnd          = new (narena::alloc_and_zero(arena, sizeof(rand_t), alignment)) rand_t();
             rnd->reset((u64)arena);
 
             // TODO
