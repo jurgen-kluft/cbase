@@ -240,7 +240,7 @@ UNITTEST_SUITE_BEGIN(test_dyntrie)
 
         UNITTEST_TEST(ffs_bit)
         {
-            CHECK_EQUAL(8, ffs_bit(0x00));
+            CHECK_EQUAL(0, ffs_bit(0x00));
             CHECK_EQUAL(7, ffs_bit(0x01));
             CHECK_EQUAL(0, ffs_bit(0x80));
         }
@@ -381,7 +381,11 @@ UNITTEST_SUITE_END
 
 namespace ncore
 {
-    static inline s8 ffs_bit(u8 byte) { return math::findLastBit(byte); }
+    static inline s8 ffs_bit(u8 byte)
+    {
+        const s8 bit = math::findLastBit(byte);
+        return bit == -1 ? 0 : bit;
+    }
 
     // nullkey is used to compare the key outside the range of a key
     // return:
