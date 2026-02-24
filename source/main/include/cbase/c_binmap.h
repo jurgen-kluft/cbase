@@ -9,6 +9,8 @@ namespace ncore
 {
     class alloc_t;
 
+    // TODO, remove this, since all binmap functions are now in ccore
+
     // Hierarchical Bin Map, keeps track of free bits in a hierarchical way.
     // Note: Tracks free bits
     // Note: Tracks up to 2^20 bits

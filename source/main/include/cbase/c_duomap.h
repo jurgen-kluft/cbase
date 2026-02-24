@@ -11,9 +11,11 @@ namespace ncore
 {
     class alloc_t;
 
+    // TODO, remove this, since all duomap functions are now in ccore
+
     // Hierarchical Bin Map, keeps track of both '1' and '0' bits in a hierarchical manner.
     // The lowest level has all the bits according to 'count', the next level has 1 bit for each 32 bits in the level below.
-    // This advantage of using this duomap instead of two binmaps, is that this duomap shares the lowest level with the binmap.
+    // The advantage of using this duomap instead of two binmaps, is that a duomap shares the lowest level.
     // Note: Tracks up to 2^20 bits
     struct duomap_t
     {
