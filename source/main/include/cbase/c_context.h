@@ -35,7 +35,7 @@ namespace ncore
         context_data_t* m_data;
     };
 
-    context_t g_current_context();  // returns the current thread context
+    context_t* g_current_context();  // returns the current thread context
     void      g_release_context();  // releases the current thread context
 
 }  // namespace ncore

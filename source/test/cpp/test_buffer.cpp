@@ -1,4 +1,4 @@
-#include "cbase/c_carray.h"
+#include "ccore/c_array.h"
 #include "cbase/c_buffer.h"
 #include "cbase/c_runes.h"
 #include "cunittest/cunittest.h"

@@ -22,14 +22,14 @@ UNITTEST_SUITE_BEGIN(context)
         {
 			gInstance.mInteger = 1;
 			gInstance.mFloat = 2.0f;
-            context_t context = g_current_context();
-			context.set_slot0((void*)&gInstance);
+            context_t* context = g_current_context();
+			context->set_slot0((void*)&gInstance);
 		}
 
 		UNITTEST_TEST(get)
 		{
-            context_t context = g_current_context();
-			OurTlsObject* obj = (OurTlsObject*)context.slot0();
+            context_t* context = g_current_context();
+			OurTlsObject* obj = (OurTlsObject*)context->slot0();
 			CHECK_EQUAL(1, obj->mInteger);
 			CHECK_EQUAL(2.0f, obj->mFloat);
 		}

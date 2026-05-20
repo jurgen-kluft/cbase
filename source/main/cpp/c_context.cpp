@@ -20,11 +20,11 @@ namespace ncore
         void*            m_slot0;            //
     };
 
-    thread_local context_data_t* sThreadLocalContext = nullptr;
+    thread_local context_t sThreadLocalContext = {nullptr};
 
-    static context_t s_get_context()
+    static context_t* s_get_context()
     {
-        if (sThreadLocalContext == nullptr)
+        if (sThreadLocalContext.m_data == nullptr)
         {
             arena_t* arena = narena::new_arena(4 * cMB, 0);
 
@@ -51,93 +51,93 @@ namespace ncore
             context_data->m_system_alloc = system_alloc;
             context_data->m_random       = rnd;
 
-            sThreadLocalContext = context_data;
+            sThreadLocalContext.m_data = context_data;
         }
-        return context_t{sThreadLocalContext};
+        return &sThreadLocalContext;
     }
 
     static void s_release_context()
     {
-        if (sThreadLocalContext != nullptr)
+        if (sThreadLocalContext.m_data != nullptr)
         {
-            arena_t* arena = sThreadLocalContext->m_arena;
+            arena_t* arena = sThreadLocalContext.m_data->m_arena;
             narena::destroy(arena);
-            sThreadLocalContext = nullptr;
+            sThreadLocalContext.m_data = nullptr;
         }
     }
 
-    context_t g_current_context() { return s_get_context(); }
+    context_t* g_current_context() { return s_get_context(); }
     void      g_release_context() { s_release_context(); }
 
     asserthandler_t* context_t::assert_handler()
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         return ctx->m_assert_handler;
     }
     alloc_t* context_t::system_alloc()
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         return ctx->m_system_alloc;
     }
     alloc_t* context_t::heap_alloc()
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         return ctx->m_heap_alloc;
     }
     frame_alloc_t* context_t::frame_allocator()
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         return ctx->m_frame_allocator;
     }
     stack_alloc_t* context_t::stack_alloc()
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         return ctx->m_stack_alloc;
     }
     random_t* context_t::random()
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         return ctx->m_random;
     }
     void* context_t::slot0()
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         return ctx->m_slot0;
     }
 
     void context_t::set_assert_handler(asserthandler_t* p)
     {
-        context_data_t* ctx   = sThreadLocalContext;
+        context_data_t* ctx   = sThreadLocalContext.m_data;
         ctx->m_assert_handler = p;
     }
     void context_t::set_system_alloc(alloc_t* a)
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         ctx->m_system_alloc = a;
     }
     void context_t::set_heap_alloc(alloc_t* a)
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         ctx->m_heap_alloc   = a;
     }
     void context_t::set_frame_alloc(frame_alloc_t* a)
     {
-        context_data_t* ctx    = sThreadLocalContext;
+        context_data_t* ctx    = sThreadLocalContext.m_data;
         ctx->m_frame_allocator = a;
     }
     void context_t::set_stack_alloc(stack_alloc_t* a)
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         ctx->m_stack_alloc  = a;
     }
     void context_t::set_random(random_t* r)
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         ctx->m_random       = r;
     }
     void context_t::set_slot0(void* p)
     {
-        context_data_t* ctx = sThreadLocalContext;
+        context_data_t* ctx = sThreadLocalContext.m_data;
         ctx->m_slot0        = p;
     }
 

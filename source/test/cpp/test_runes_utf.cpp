@@ -1,5 +1,4 @@
 #include "cbase/c_allocator.h"
-#include "cbase/c_carray.h"
 #include "cbase/c_va_list.h"
 #include "cbase/c_runes.h"
 #include "cbase/c_runes.h"

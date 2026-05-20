@@ -24,8 +24,8 @@ namespace cbase
         ncore::g_exit_system_alloc();
         //system_alloc = nullptr;
 
-        ncore::context_t context = ncore::g_current_context();
-        context.set_assert_handler(nullptr);
+        ncore::context_t* context = ncore::g_current_context();
+        context->set_assert_handler(nullptr);
         ncore::g_release_context();
     }
 

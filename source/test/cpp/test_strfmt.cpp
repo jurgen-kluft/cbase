@@ -1,4 +1,3 @@
-#include "cbase/c_carray.h"
 #include "cbase/c_strfmt.h"
 
 #include "cunittest/cunittest.h"

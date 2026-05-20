@@ -124,8 +124,10 @@ namespace ncore
             {
                 s32 const to_itemcount = to;
                 u8*       data         = (u8*)mAllocator->allocate((u32)(to_itemcount * mItemSize), sizeof(void*));
-                nmem::memcpy(data, mData, to_itemcount * mItemSize);
+                nmem::memcpy(data, mData, mItemCount * mItemSize);
                 mItemCount = to_itemcount;
+                mAllocator->deallocate(mData);
+                mData = data;
             }
         }
     }
@@ -146,7 +148,7 @@ namespace ncore
             }
             if (_data != nullptr)
             {
-                nmem::memcpy(data + head2copy, _data, count);
+                nmem::memcpy(data + head2copy, _data, gap2skip);
             }
             if (tail2copy > 0)
             {
@@ -375,7 +377,7 @@ namespace ncore
         index += mFrom;
         if (index < 0)
             return nullptr;
-        else if (index > mTo)
+        else if (index >= mTo)
             return nullptr;
         s32 const data_offset = mData->mItemSize * index;
         return &mData->mData[data_offset];
