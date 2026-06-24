@@ -696,7 +696,7 @@ namespace ncore
         return scanned;
     }
 
-    s32 sscanf_(crunes_t& str, crunes_t const& fmt, const va_r_t* argv, s32 argc)
+    s32 sscanf_(runes_t& str, runes_t const& fmt, const va_r_t* argv, s32 argc)
     {
         nrunes::reader_t buf_reader(str);
         nrunes::reader_t fmt_reader(fmt);

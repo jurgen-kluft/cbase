@@ -1,8 +1,3 @@
-/**
- * @file Head file x_console.h
- * Core Console for Input, Output and Error
- */
-
 #ifndef __CBASE_CONSOLE_H__
 #define __CBASE_CONSOLE_H__
 #include "ccore/c_target.h"
@@ -49,13 +44,13 @@ namespace ncore
         class out_t
         {
         public:
-            virtual s32  color(console_t::EColor color)                         = 0;
-            virtual s32  write(crunes_t const& str)                             = 0;
-            virtual s32  write(crunes_t const& str, const va_t* argv, s32 argc) = 0;
-            virtual void writeln()                                              = 0;
+            virtual s32  color(console_t::EColor color)                        = 0;
+            virtual s32  write(runes_t const& str)                             = 0;
+            virtual s32  write(runes_t const& str, const va_t* argv, s32 argc) = 0;
+            virtual void writeln()                                             = 0;
 
             template <typename... Args>
-            inline s32 write(crunes_t const& str, Args&&... _args)
+            inline s32 write(runes_t const& str, Args&&... _args)
             {
                 const va_t argv[] = {_args...};
                 const s32  argc   = sizeof(argv) / sizeof(argv[0]);
@@ -80,19 +75,18 @@ namespace ncore
         virtual void write(u32 _value)  = 0;
         virtual void write(u64 _value)  = 0;
 
-        virtual void write(const runes_t& str)                              = 0;
-        virtual void write(const crunes_t& str)                             = 0;
-        virtual void write(const crunes_t& fmt, const va_t* argv, s32 argc) = 0;
+        virtual void write(const runes_t& str)                             = 0;
+        virtual void write(const runes_t& fmt, const va_t* argv, s32 argc) = 0;
 
         inline void write(const char* str)
         {
-            crunes_t r = ascii::make_crunes(str);
+            runes_t r = ascii::make_const_runes(str);
             write(r);
         }
 
         inline void write(const char* str, const char* end)
         {
-            crunes_t r = ascii::make_crunes(str, end);
+            runes_t r = ascii::make_const_runes(str, end);
             write(r);
         }
 
@@ -136,22 +130,22 @@ namespace ncore
 
         inline void writeLine(const char* str)
         {
-            crunes_t r = ascii::make_crunes(str);
+            runes_t r = ascii::make_const_runes(str);
             writeLine(r);
         }
 
         inline void writeLine(const char* str, const va_t* argv, s32 argc)
         {
-            crunes_t r = ascii::make_crunes(str);
+            runes_t r = ascii::make_const_runes(str);
             writeLine(r, argv, argc);
         }
 
-        inline void writeLine(const crunes_t& str)
+        inline void writeLine(const runes_t& str)
         {
             write(str);
             writeLine();
         }
-        inline void writeLine(const crunes_t& format, const va_t* argv, s32 argc)
+        inline void writeLine(const runes_t& format, const va_t* argv, s32 argc)
         {
             write(format, argv, argc);
             writeLine();

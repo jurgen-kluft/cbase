@@ -46,7 +46,7 @@ namespace ncore
     {
         // high, word2, word1, low
         ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
-        crunes_t      fmt    = ascii::make_crunes(fmtstr, fmtstr + 19);
+        runes_t      fmt    = ascii::make_const_runes(fmtstr, fmtstr + 19);
         sprintf(str, fmt, va_t(mGuid.ma32[0]), va_t(mGuid.ma32[1]), va_t(mGuid.ma32[2]), va_t(mGuid.ma32[3]));
     }
 
@@ -63,13 +63,13 @@ namespace ncore
      *------------------------------------------------------------------------------
      */
 
-    void guid_t::fromString(crunes_t const& _str)
+    void guid_t::fromString(runes_t const& _str)
     {
         setNull();
 
         ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
-        crunes_t      fmt    = ascii::make_crunes(fmtstr, fmtstr + 19);
-        crunes_t      str    = make_crunes(_str);
+        runes_t      fmt    = ascii::make_const_runes(fmtstr, fmtstr + 19);
+        runes_t      str    = _str;
         sscanf(str, fmt, &mGuid.ma32[0], &mGuid.ma32[1], &mGuid.ma32[2], &mGuid.ma32[3]);
     }
 };  // namespace ncore

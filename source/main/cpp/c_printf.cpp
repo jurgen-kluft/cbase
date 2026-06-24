@@ -1100,7 +1100,7 @@ namespace ncore
         return ret;
     }
 
-    s32 vzprintf(nrunes::iwriter_t* writer, const crunes_t& format, const va_t* argv, s32 argc)
+    s32 vzprintf(nrunes::iwriter_t* writer, const runes_t& format, const va_t* argv, s32 argc)
     {
         va_iter_t   va_iter      = {argv, 0, argc};
         const char* format_begin = &format.m_ascii[format.m_str];
@@ -1110,7 +1110,7 @@ namespace ncore
         return ret;
     }
 
-    s32 sprintf_(runes_t& str, crunes_t const& format, const va_t* argv, s32 argc)
+    s32 sprintf_(runes_t& str, runes_t const& format, const va_t* argv, s32 argc)
     {
         nrunes::writer_t str_writer(str);
         const s32        ret = vzprintf(&str_writer, format, argv, argc);
@@ -1118,7 +1118,7 @@ namespace ncore
         return ret;
     }
 
-    s32 cprintf_(crunes_t const& format, const va_t* argv, s32 argc)
+    s32 cprintf_(runes_t const& format, const va_t* argv, s32 argc)
     {
         const s32 ret = vprintf_(&format.m_ascii[format.m_str], &format.m_ascii[format.m_end], argv, argc);
         return ret;

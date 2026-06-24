@@ -15,7 +15,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
         UNITTEST_TEST(copy)
         {
-            crunes_t str = ascii::make_crunes("this is a system string");
+            runes_t str = ascii::make_const_runes("this is a system string");
 
             utf32::rune dst_runes[256];
             dst_runes[0] = 0;
@@ -34,42 +34,42 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             nrunes::copy(str, str2);
 
             CHECK_EQUAL(-1, nrunes::compare(str2, str));
-            CHECK_EQUAL(0, nrunes::compare(str2, ascii::make_crunes("this is a system")));
+            CHECK_EQUAL(0, nrunes::compare(str2, ascii::make_const_runes("this is a system")));
         }
 
         UNITTEST_TEST(find)
         {
-            crunes_t str1 = ascii::make_crunes("this is a system string admin!");
+            runes_t str1 = ascii::make_const_runes("this is a system string admin!");
 
-            crunes_t f1 = nrunes::find(str1, 'e');
+            runes_t f1 = nrunes::find(str1, 'e');
             CHECK_EQUAL((uchar32)'e', nrunes::first_char(f1));
             CHECK_TRUE(is_empty(nrunes::find(str1, 'E')));
             CHECK_FALSE(is_empty(nrunes::find(str1, 'E', false)));
 
-            crunes_t tofind = ascii::make_crunes("system");
-            crunes_t found  = nrunes::find(str1, tofind);
-            CHECK_TRUE(found == ascii::make_crunes("system"));
+            runes_t tofind = ascii::make_const_runes("system");
+            runes_t found  = nrunes::find(str1, tofind);
+            CHECK_TRUE(found == ascii::make_const_runes("system"));
 
-            crunes_t str3 = ascii::make_crunes("SYSTEM");
+            runes_t str3 = ascii::make_const_runes("SYSTEM");
             CHECK_TRUE(is_empty(nrunes::find(str1, str3)));
             CHECK_FALSE(is_empty(nrunes::find(str1, str3, false)));
 
-            crunes_t str4 = ascii::make_crunes("adMin!");
+            runes_t str4 = ascii::make_const_runes("adMin!");
             CHECK_TRUE(is_empty(nrunes::find(str1, str4)));
             CHECK_FALSE(is_empty(nrunes::find(str1, str4, false)));
         }
 
         UNITTEST_TEST(find_one_of)
         {
-            crunes_t str1 = ascii::make_crunes("this is a system string");
+            runes_t str1 = ascii::make_const_runes("this is a system string");
 
-            crunes_t set1  = ascii::make_crunes("bcde");
-            crunes_t found = nrunes::findOneOf(str1, set1);
-            CHECK_TRUE(found == ascii::make_crunes("e"));
+            runes_t set1  = ascii::make_const_runes("bcde");
+            runes_t found = nrunes::findOneOf(str1, set1);
+            CHECK_TRUE(found == ascii::make_const_runes("e"));
 
-            crunes_t set2 = ascii::make_crunes("BCDE");
+            runes_t set2 = ascii::make_const_runes("BCDE");
             found         = nrunes::findOneOf(str1, set2, false);
-            CHECK_TRUE(found == ascii::make_crunes("e"));
+            CHECK_TRUE(found == ascii::make_const_runes("e"));
         }
 
         UNITTEST_TEST(replace)
@@ -79,15 +79,15 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             dst_runes[1] = 0;
             runes_t dst  = ascii::make_runes(dst_runes, 0, 0, 256 - 1);
 
-            crunes_t str1 = ascii::make_crunes("this is a system string");
+            runes_t str1 = ascii::make_const_runes("this is a system string");
             nrunes::copy(str1, dst);
-            crunes_t str2 = ascii::make_crunes("this is a copied string");
+            runes_t str2 = ascii::make_const_runes("this is a copied string");
 
-            crunes_t find_str = ascii::make_crunes("system");
-            crunes_t found    = make_crunes(nrunes::find(dst, find_str));
-            CHECK_TRUE(found == ascii::make_crunes("system"));
+            runes_t find_str = ascii::make_const_runes("system");
+            runes_t found    = make_runes(nrunes::find(dst, find_str));
+            CHECK_TRUE(found == ascii::make_const_runes("system"));
 
-            crunes_t replace_str = ascii::make_crunes("copied");
+            runes_t replace_str = ascii::make_const_runes("copied");
             nrunes::findReplace(dst, find_str, replace_str);
 
             CHECK_EQUAL(0, nrunes::compare(dst, str2));
@@ -95,21 +95,21 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
         UNITTEST_TEST(compare)
         {
-            crunes_t str1 = ascii::make_crunes("this is a system string");
-            crunes_t str2 = ascii::make_crunes("this is a system string");
+            runes_t str1 = ascii::make_const_runes("this is a system string");
+            runes_t str2 = ascii::make_const_runes("this is a system string");
             CHECK_EQUAL(0, nrunes::compare(str1, str2));
 
-            crunes_t str3 = ascii::make_crunes("a");
-            crunes_t str4 = ascii::make_crunes("b");
+            runes_t str3 = ascii::make_const_runes("a");
+            runes_t str4 = ascii::make_const_runes("b");
             CHECK_EQUAL(-1, nrunes::compare(str3, str4));
             CHECK_EQUAL(0, nrunes::compare(str3, str3));
             CHECK_EQUAL(0, nrunes::compare(str4, str4));
             CHECK_EQUAL(1, nrunes::compare(str4, str3));
 
-            crunes_t str5 = ascii::make_crunes("a");
-            crunes_t str6 = ascii::make_crunes("A");
-            crunes_t str7 = ascii::make_crunes("b");
-            crunes_t str8 = ascii::make_crunes("B");
+            runes_t str5 = ascii::make_const_runes("a");
+            runes_t str6 = ascii::make_const_runes("A");
+            runes_t str7 = ascii::make_const_runes("b");
+            runes_t str8 = ascii::make_const_runes("B");
             CHECK_EQUAL(1, nrunes::compare(str5, str6));
             CHECK_EQUAL(0, nrunes::compare(str5, str6, false));
             CHECK_EQUAL(1, nrunes::compare(str7, str8));
@@ -123,35 +123,35 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             dst_runes[1] = 0;
             runes_t dst    = utf32::make_runes(dst_runes, 0, 0, 256);
 
-            crunes_t str1 = ascii::make_crunes("this is a ");
+            runes_t str1 = ascii::make_const_runes("this is a ");
             nrunes::copy(str1, dst);
 
-            crunes_t str2 = ascii::make_crunes("copied string");
+            runes_t str2 = ascii::make_const_runes("copied string");
             nrunes::concatenate(dst, str2);
 
-            crunes_t str3 = ascii::make_crunes("this is a copied string");
+            runes_t str3 = ascii::make_const_runes("this is a copied string");
             CHECK_EQUAL(0, nrunes::compare(dst, str3));
         }
 
         UNITTEST_TEST(parse_bool)
         {
             bool     value;
-            crunes_t str = ascii::make_crunes("True");
+            runes_t str = ascii::make_const_runes("True");
             nrunes::parse(str, value);
             CHECK_EQUAL(true, value);
-            crunes_t str2 = ascii::make_crunes("Off");
+            runes_t str2 = ascii::make_const_runes("Off");
             nrunes::parse(str2, value);
             CHECK_EQUAL(false, value);
-            crunes_t str3 = ascii::make_crunes("On");
+            runes_t str3 = ascii::make_const_runes("On");
             nrunes::parse(str3, value);
             CHECK_EQUAL(true, value);
-            crunes_t str4 = ascii::make_crunes("false");
+            runes_t str4 = ascii::make_const_runes("false");
             nrunes::parse(str4, value);
             CHECK_EQUAL(false, value);
-            crunes_t str6 = ascii::make_crunes("Yes");
+            runes_t str6 = ascii::make_const_runes("Yes");
             nrunes::parse(str6, value);
             CHECK_EQUAL(true, value);
-            crunes_t str5 = ascii::make_crunes("No");
+            runes_t str5 = ascii::make_const_runes("No");
             nrunes::parse(str5, value);
             CHECK_EQUAL(false, value);
         }
@@ -159,13 +159,13 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
         UNITTEST_TEST(parse_s32)
         {
             s32      value;
-            crunes_t str = ascii::make_crunes("1");
+            runes_t str = ascii::make_const_runes("1");
             nrunes::parse(str, value);
             CHECK_EQUAL(1, value);
-            crunes_t str2 = ascii::make_crunes("2");
+            runes_t str2 = ascii::make_const_runes("2");
             nrunes::parse(str2, value);
             CHECK_EQUAL(2, value);
-            crunes_t str3 = ascii::make_crunes("256");
+            runes_t str3 = ascii::make_const_runes("256");
             nrunes::parse(str3, value);
             CHECK_EQUAL(256, value);
         }
@@ -173,13 +173,13 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
         UNITTEST_TEST(parse_u32)
         {
             u32      value;
-            crunes_t str = ascii::make_crunes("1");
+            runes_t str = ascii::make_const_runes("1");
             nrunes::parse(str, value);
             CHECK_EQUAL((u32)1, value);
-            crunes_t str2 = ascii::make_crunes("2");
+            runes_t str2 = ascii::make_const_runes("2");
             nrunes::parse(str2, value);
             CHECK_EQUAL((u32)2, value);
-            crunes_t str3 = ascii::make_crunes("256");
+            runes_t str3 = ascii::make_const_runes("256");
             nrunes::parse(str3, value);
             CHECK_EQUAL((u32)256, value);
         }
@@ -187,13 +187,13 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
         UNITTEST_TEST(parse_s64)
         {
             s64      value;
-            crunes_t str = ascii::make_crunes("1");
+            runes_t str = ascii::make_const_runes("1");
             nrunes::parse(str, value);
             CHECK_EQUAL(1, value);
-            crunes_t str2 = ascii::make_crunes("2");
+            runes_t str2 = ascii::make_const_runes("2");
             nrunes::parse(str2, value);
             CHECK_EQUAL(2, value);
-            crunes_t str3 = ascii::make_crunes("256");
+            runes_t str3 = ascii::make_const_runes("256");
             nrunes::parse(str3, value);
             CHECK_EQUAL(256, value);
         }
@@ -201,13 +201,13 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
         UNITTEST_TEST(parse_u64)
         {
             u64      value;
-            crunes_t str = ascii::make_crunes("1");
+            runes_t str = ascii::make_const_runes("1");
             nrunes::parse(str, value);
             CHECK_EQUAL((u64)1, value);
-            crunes_t str2 = ascii::make_crunes("2");
+            runes_t str2 = ascii::make_const_runes("2");
             nrunes::parse(str2, value);
             CHECK_EQUAL((u64)2, value);
-            crunes_t str3 = ascii::make_crunes("256");
+            runes_t str3 = ascii::make_const_runes("256");
             nrunes::parse(str3, value);
             CHECK_EQUAL((u64)256, value);
         }
@@ -215,13 +215,13 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
         UNITTEST_TEST(parse_f32)
         {
             f32      value;
-            crunes_t str = ascii::make_crunes("1.1");
+            runes_t str = ascii::make_const_runes("1.1");
             nrunes::parse(str, value);
             CHECK_EQUAL(1.1f, value);
-            crunes_t str2 = ascii::make_crunes("2.5");
+            runes_t str2 = ascii::make_const_runes("2.5");
             nrunes::parse(str2, value);
             CHECK_EQUAL(2.5f, value);
-            crunes_t str3 = ascii::make_crunes("-256.33");
+            runes_t str3 = ascii::make_const_runes("-256.33");
             nrunes::parse(str3, value);
             CHECK_EQUAL(-256.33f, value);
         }
@@ -229,47 +229,47 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
         UNITTEST_TEST(parse_f64)
         {
             f64      value;
-            crunes_t str = ascii::make_crunes("1.1");
+            runes_t str = ascii::make_const_runes("1.1");
             nrunes::parse(str, value);
             CHECK_EQUAL(1.1, value);
-            crunes_t str2 = ascii::make_crunes("2.5");
+            runes_t str2 = ascii::make_const_runes("2.5");
             nrunes::parse(str2, value);
             CHECK_EQUAL(2.5, value);
-            crunes_t str3 = ascii::make_crunes("-256.33");
+            runes_t str3 = ascii::make_const_runes("-256.33");
             nrunes::parse(str3, value);
             CHECK_EQUAL(-256.33, value);
         }
 
         UNITTEST_TEST(is_decimal)
         {
-            crunes_t decimal_str     = ascii::make_crunes("2017");
-            crunes_t non_decimal_str = ascii::make_crunes("20a1a");
+            runes_t decimal_str     = ascii::make_const_runes("2017");
+            runes_t non_decimal_str = ascii::make_const_runes("20a1a");
             CHECK_EQUAL(true, nrunes::is_decimal(decimal_str));
             CHECK_EQUAL(false, nrunes::is_decimal(non_decimal_str));
         }
 
         UNITTEST_TEST(is_hexadecimal)
         {
-            crunes_t hexadecimal_str     = ascii::make_crunes("20aabbccddeeff");
-            crunes_t non_hexadecimal_str = ascii::make_crunes("20aabbccddeeffw");
+            runes_t hexadecimal_str     = ascii::make_const_runes("20aabbccddeeff");
+            runes_t non_hexadecimal_str = ascii::make_const_runes("20aabbccddeeffw");
             CHECK_EQUAL(true, nrunes::is_hexadecimal(hexadecimal_str));
             CHECK_EQUAL(false, nrunes::is_hexadecimal(non_hexadecimal_str));
-            crunes_t hexadecimal_with_prefix_str = ascii::make_crunes("0x20aabbccddeeff");
+            runes_t hexadecimal_with_prefix_str = ascii::make_const_runes("0x20aabbccddeeff");
             CHECK_EQUAL(true, nrunes::is_hexadecimal(hexadecimal_with_prefix_str, true));
         }
 
         UNITTEST_TEST(is_float)
         {
-            crunes_t float_str     = ascii::make_crunes("3.1415");
-            crunes_t non_float_str = ascii::make_crunes("3a.14_15");
+            runes_t float_str     = ascii::make_const_runes("3.1415");
+            runes_t non_float_str = ascii::make_const_runes("3a.14_15");
             CHECK_EQUAL(true, nrunes::is_float(float_str));
             CHECK_EQUAL(false, nrunes::is_float(non_float_str));
         }
 
         UNITTEST_TEST(is_GUID)
         {
-            crunes_t guid_str     = ascii::make_crunes("11335577:22446688:557799BB:88AACCEE");
-            crunes_t non_guid_str = ascii::make_crunes("335577:446688:7799BB:AACCEE");
+            runes_t guid_str     = ascii::make_const_runes("11335577:22446688:557799BB:88AACCEE");
+            runes_t non_guid_str = ascii::make_const_runes("335577:446688:7799BB:AACCEE");
             CHECK_EQUAL(true, nrunes::is_GUID(guid_str));
             CHECK_EQUAL(false, nrunes::is_GUID(non_guid_str));
         }
@@ -283,7 +283,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             s32 value = 31415;
             nrunes::to_string(str, value);
-            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_crunes("31415")));
+            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_const_runes("31415")));
         }
 
         UNITTEST_TEST(tostring_u32)
@@ -295,7 +295,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             u32 value = 31415;
             nrunes::to_string(str, value);
-            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_crunes("31415")));
+            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_const_runes("31415")));
         }
 
         UNITTEST_TEST(tostring_s64)
@@ -307,7 +307,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             s64 value = 31415;
             nrunes::to_string(str, value);
-            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_crunes("31415")));
+            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_const_runes("31415")));
         }
 
         UNITTEST_TEST(tostring_u64)
@@ -319,7 +319,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             u64 value = 31415;
             nrunes::to_string(str, value);
-            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_crunes("31415")));
+            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_const_runes("31415")));
         }
 
         UNITTEST_TEST(tostring_f32)
@@ -331,7 +331,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             f32 value = 3.1415f;
             nrunes::to_string(str, value, 4);
-            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_crunes("3.1415")));
+            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_const_runes("3.1415")));
         }
 
         UNITTEST_TEST(tostring_f64)
@@ -343,7 +343,7 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             f64 value = 3.1415;
             nrunes::to_string(str, value, 4);
-            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_crunes("3.1415")));
+            CHECK_EQUAL(0, nrunes::compare(str, ascii::make_const_runes("3.1415")));
         }
 
         UNITTEST_TEST(is)
@@ -401,41 +401,41 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
         UNITTEST_TEST(is_upper)
         {
-            crunes_t str = ascii::make_crunes("THIS IS AN UPPERCASE STRING");
+            runes_t str = ascii::make_const_runes("THIS IS AN UPPERCASE STRING");
             CHECK_EQUAL(true, nrunes::is_upper(str));
-            crunes_t str2 = ascii::make_crunes("THIS IS UPPERCASE STRING with some lowercase");
+            runes_t str2 = ascii::make_const_runes("THIS IS UPPERCASE STRING with some lowercase");
             CHECK_EQUAL(false, nrunes::is_upper(str2));
         }
 
         UNITTEST_TEST(is_lower)
         {
-            crunes_t str1 = ascii::make_crunes("this is a lowercase string");
+            runes_t str1 = ascii::make_const_runes("this is a lowercase string");
             CHECK_EQUAL(true, nrunes::is_lower(str1));
-            crunes_t str2 = ascii::make_crunes("THIS IS UPPERCASE STRING with some lowercase");
+            runes_t str2 = ascii::make_const_runes("THIS IS UPPERCASE STRING with some lowercase");
             CHECK_EQUAL(false, nrunes::is_lower(str2));
         }
 
         UNITTEST_TEST(is_capitalized)
         {
-            crunes_t str1 = ascii::make_crunes("This Is A Capitalized String");
+            runes_t str1 = ascii::make_const_runes("This Is A Capitalized String");
             CHECK_EQUAL(true, nrunes::is_capitalized(str1));
-            crunes_t str2 = ascii::make_crunes("This Is Not all Capitalized");
+            runes_t str2 = ascii::make_const_runes("This Is Not all Capitalized");
             CHECK_EQUAL(false, nrunes::is_capitalized(str2));
         }
 
         UNITTEST_TEST(is_delimited)
         {
-            crunes_t str1 = ascii::make_crunes("<this Is A delimited String>");
+            runes_t str1 = ascii::make_const_runes("<this Is A delimited String>");
             CHECK_EQUAL(true, nrunes::is_delimited(str1, '<', '>'));
-            crunes_t str2 = ascii::make_crunes("[This Is Not all Capitalized");
+            runes_t str2 = ascii::make_const_runes("[This Is Not all Capitalized");
             CHECK_EQUAL(false, nrunes::is_delimited(str2, '[', ']'));
         }
 
         UNITTEST_TEST(is_quoted)
         {
-            crunes_t str1 = ascii::make_crunes("'this Is A quoted String'");
+            runes_t str1 = ascii::make_const_runes("'this Is A quoted String'");
             CHECK_EQUAL(true, nrunes::is_delimited(str1, '\'', '\''));
-            crunes_t str2 = ascii::make_crunes("'This Is Not correctly quoted Capitalized\"");
+            runes_t str2 = ascii::make_const_runes("'This Is Not correctly quoted Capitalized\"");
             CHECK_EQUAL(false, nrunes::is_delimited(str2, '\'', '\''));
         }
 
@@ -446,8 +446,8 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             str_runes[1] = 0;
             runes_t str    = utf32::make_runes(str_runes, 0, 0, 256);
 
-            crunes_t str1 = ascii::make_crunes("this is a lower case string");
-            crunes_t str2 = ascii::make_crunes("THIS IS A LOWER CASE STRING");
+            runes_t str1 = ascii::make_const_runes("this is a lower case string");
+            runes_t str2 = ascii::make_const_runes("THIS IS A LOWER CASE STRING");
             nrunes::copy(str1, str);
             nrunes::to_upper(str);
             CHECK_EQUAL(0, nrunes::compare(str2, str));
@@ -460,8 +460,8 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             str_runes[1] = 0;
             runes_t str    = utf32::make_runes(str_runes, 0, 0, 256);
 
-            crunes_t str1 = ascii::make_crunes("THIS IS AN UPPER CASE STRING");
-            crunes_t str2 = ascii::make_crunes("this is an upper case string");
+            runes_t str1 = ascii::make_const_runes("THIS IS AN UPPER CASE STRING");
+            runes_t str2 = ascii::make_const_runes("this is an upper case string");
             nrunes::copy(str1, str);
             nrunes::to_lower(str);
             CHECK_EQUAL(0, nrunes::compare(str2, str));
@@ -469,9 +469,9 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
         UNITTEST_TEST(starts_with)
         {
-            crunes_t str1   = ascii::make_crunes("a simple string");
-            crunes_t str2   = ascii::make_crunes("need a longer string");
-            crunes_t start2 = ascii::make_crunes("need");
+            runes_t str1   = ascii::make_const_runes("a simple string");
+            runes_t str2   = ascii::make_const_runes("need a longer string");
+            runes_t start2 = ascii::make_const_runes("need");
 
             CHECK_EQUAL(true, nrunes::starts_with(str1, 'a'));
             CHECK_EQUAL(false, nrunes::starts_with(str2, 'a'));
@@ -482,16 +482,16 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
         UNITTEST_TEST(first_char)
         {
-            crunes_t str1 = ascii::make_crunes("a simple string");
+            runes_t str1 = ascii::make_const_runes("a simple string");
             CHECK_EQUAL((uchar32)'a', nrunes::first_char(str1));
         }
 
         UNITTEST_TEST(cprintf)
         {
             s32 const i   = 100;
-            crunes_t  str = ascii::make_crunes("hello");
+            runes_t  str = ascii::make_const_runes("hello");
 
-            crunes_t fmt    = ascii::make_crunes("%d %s");
+            runes_t fmt    = ascii::make_const_runes("%d %s");
             s32      length = cprintf(fmt, va_t(i), va_t(str));
             CHECK_EQUAL(9, length);
 
@@ -501,14 +501,14 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             runes_t dst    = utf32::make_runes(dst_runes, 0, 0, 256);
 
             sprintf(dst, fmt, va_t(i), va_t(str));
-            CHECK_EQUAL(0, nrunes::compare(dst, ascii::make_crunes("100 hello")));
+            CHECK_EQUAL(0, nrunes::compare(dst, ascii::make_const_runes("100 hello")));
         }
 
         UNITTEST_TEST(vcprintf)
         {
             s32      i      = 100;
-            crunes_t str    = ascii::make_crunes("hello");
-            crunes_t fmt    = ascii::make_crunes("%d %s");
+            runes_t str    = ascii::make_const_runes("hello");
+            runes_t fmt    = ascii::make_const_runes("%d %s");
             s32      length = cprintf(fmt, va_t(i), va_t(str));
             CHECK_EQUAL(9, length);
         }
@@ -522,11 +522,11 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             s32 i = 100;
 
-            crunes_t str = ascii::make_crunes("hello");
-            crunes_t fmt = ascii::make_crunes("%d %s");
+            runes_t str = ascii::make_const_runes("hello");
+            runes_t fmt = ascii::make_const_runes("%d %s");
 
             sprintf(dst, fmt, va_t(i), va_t(str));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("100 hello")) == 0);
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("100 hello")) == 0);
 
             // Check all format functionality?
         }
@@ -541,36 +541,36 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             // ---------------------------------------------------------------------------
             // Boolean, True/False and Yes/No verification
             reset(dst);
-            sprintf(dst, ascii::make_crunes("%b"), va_t(true));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("true")) == 0);
+            sprintf(dst, ascii::make_const_runes("%b"), va_t(true));
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("true")) == 0);
 
             reset(dst);
-            sprintf(dst, ascii::make_crunes("%B"), va_t(true));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("TRUE")) == 0);
+            sprintf(dst, ascii::make_const_runes("%B"), va_t(true));
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("TRUE")) == 0);
 
             reset(dst);
-            sprintf(dst, ascii::make_crunes("%b"), va_t(false));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("false")) == 0);
+            sprintf(dst, ascii::make_const_runes("%b"), va_t(false));
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("false")) == 0);
 
             reset(dst);
-            sprintf(dst, ascii::make_crunes("%#b"), va_t(false));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("False")) == 0);
+            sprintf(dst, ascii::make_const_runes("%#b"), va_t(false));
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("False")) == 0);
 
             reset(dst);
-            sprintf(dst, ascii::make_crunes("%y"), va_t(true));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("yes")) == 0);
+            sprintf(dst, ascii::make_const_runes("%y"), va_t(true));
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("yes")) == 0);
 
             reset(dst);
-            sprintf(dst, ascii::make_crunes("%y"), va_t(false));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("no")) == 0);
+            sprintf(dst, ascii::make_const_runes("%y"), va_t(false));
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("no")) == 0);
 
             reset(dst);
-            sprintf(dst, ascii::make_crunes("%Y"), va_t(true));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("YES")) == 0);
+            sprintf(dst, ascii::make_const_runes("%Y"), va_t(true));
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("YES")) == 0);
 
             reset(dst);
-            sprintf(dst, ascii::make_crunes("%#y"), va_t(true));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("Yes")) == 0);
+            sprintf(dst, ascii::make_const_runes("%#y"), va_t(true));
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("Yes")) == 0);
             // ---------------------------------------------------------------------------
         }
 
@@ -582,17 +582,17 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
             runes_t dst    = utf32::make_runes(dst_runes, 0, 0, 256);
 
             s32      i   = 100;
-            crunes_t str = ascii::make_crunes("hello");
-            crunes_t fmt = ascii::make_crunes("%d %s");
+            runes_t str = ascii::make_const_runes("hello");
+            runes_t fmt = ascii::make_const_runes("%d %s");
             sprintf(dst, fmt, va_t(i), va_t(str));
-            CHECK_TRUE(nrunes::compare(dst, ascii::make_crunes("100 hello")) == 0);
+            CHECK_TRUE(nrunes::compare(dst, ascii::make_const_runes("100 hello")) == 0);
         }
 
         UNITTEST_TEST(sscanf)
         {
             // Test scanf
-            crunes_t str    = ascii::make_crunes("1.0 100");
-            crunes_t format = ascii::make_crunes("%f %u");
+            runes_t str    = ascii::make_const_runes("1.0 100");
+            runes_t format = ascii::make_const_runes("%f %u");
 
             f32 myfloat;
             u32 myint;
@@ -605,17 +605,17 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
         // ---------------------------------------------------------------------------
         UNITTEST_TEST(path_parser_1)
         {
-            crunes_t fullpath = ascii::make_crunes("C:\\projects\\binary_reader\\bin\\binary_reader.cpp.old");
-            crunes_t out_device;
-            crunes_t out_path;
-            crunes_t out_filename;
-            crunes_t out_extension;
-            crunes_t out_first_folder;
+            runes_t fullpath = ascii::make_const_runes("C:\\projects\\binary_reader\\bin\\binary_reader.cpp.old");
+            runes_t out_device;
+            runes_t out_path;
+            runes_t out_filename;
+            runes_t out_extension;
+            runes_t out_first_folder;
 
-            crunes_t slash     = ascii::make_crunes("\\");
-            crunes_t devicesep = ascii::make_crunes(":\\");
+            runes_t slash     = ascii::make_const_runes("\\");
+            runes_t devicesep = ascii::make_const_runes(":\\");
             out_device         = nrunes::findSelectUntilIncluded(fullpath, devicesep);
-            crunes_t filepath  = nrunes::selectAfterExclude(fullpath, out_device);
+            runes_t filepath  = nrunes::selectAfterExclude(fullpath, out_device);
             out_path           = nrunes::findLastSelectUntilIncluded(filepath, slash);
             out_filename       = nrunes::selectAfterExclude(fullpath, out_path);
             out_filename       = nrunes::findLastSelectUntil(out_filename, '.');
@@ -625,31 +625,31 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             out_first_folder = nrunes::findSelectUntil(out_path, slash);
 
-            crunes_t device = ascii::make_crunes("C");
+            runes_t device = ascii::make_const_runes("C");
             CHECK_TRUE(device == out_device);
-            crunes_t path = ascii::make_crunes("projects\\binary_reader\\bin\\");
+            runes_t path = ascii::make_const_runes("projects\\binary_reader\\bin\\");
             CHECK_TRUE(path == out_path);
-            crunes_t filename = ascii::make_crunes("binary_reader.cpp");
+            runes_t filename = ascii::make_const_runes("binary_reader.cpp");
             CHECK_TRUE(filename == out_filename);
-            crunes_t extension = ascii::make_crunes(".old");
+            runes_t extension = ascii::make_const_runes(".old");
             CHECK_TRUE(extension == out_extension);
-            crunes_t first_folder = ascii::make_crunes("projects");
+            runes_t first_folder = ascii::make_const_runes("projects");
             CHECK_TRUE(first_folder == out_first_folder);
         }
 
         UNITTEST_TEST(path_parser_2)
         {
-            crunes_t fullpath = ascii::make_crunes("C:\\binary_reader.cpp.old");
-            crunes_t out_device;
-            crunes_t out_path;
-            crunes_t out_filename;
-            crunes_t out_extension;
-            crunes_t out_first_folder;
+            runes_t fullpath = ascii::make_const_runes("C:\\binary_reader.cpp.old");
+            runes_t out_device;
+            runes_t out_path;
+            runes_t out_filename;
+            runes_t out_extension;
+            runes_t out_first_folder;
 
-            crunes_t slash     = ascii::make_crunes("\\");
-            crunes_t devicesep = ascii::make_crunes(":\\");
+            runes_t slash     = ascii::make_const_runes("\\");
+            runes_t devicesep = ascii::make_const_runes(":\\");
             out_device         = nrunes::findSelectUntilIncluded(fullpath, devicesep);
-            crunes_t filepath  = nrunes::selectAfterExclude(fullpath, out_device);
+            runes_t filepath  = nrunes::selectAfterExclude(fullpath, out_device);
             out_path           = nrunes::findLastSelectUntilIncluded(filepath, slash);
             out_filename       = nrunes::selectAfterExclude(fullpath, out_path);
             out_filename       = nrunes::findLastSelectUntil(out_filename, '.');
@@ -659,15 +659,15 @@ UNITTEST_SUITE_BEGIN(runes_ascii)
 
             out_first_folder = nrunes::findSelectUntil(out_path, slash);
 
-            crunes_t device = ascii::make_crunes("C");
+            runes_t device = ascii::make_const_runes("C");
             CHECK_TRUE(device == out_device);
-            crunes_t path = ascii::make_crunes("");
+            runes_t path = ascii::make_const_runes("");
             CHECK_TRUE(path == out_path);
-            crunes_t filename = ascii::make_crunes("binary_reader.cpp");
+            runes_t filename = ascii::make_const_runes("binary_reader.cpp");
             CHECK_TRUE(filename == out_filename);
-            crunes_t extension = ascii::make_crunes(".old");
+            runes_t extension = ascii::make_const_runes(".old");
             CHECK_TRUE(extension == out_extension);
-            crunes_t first_folder = ascii::make_crunes("");
+            runes_t first_folder = ascii::make_const_runes("");
             CHECK_TRUE(first_folder == out_first_folder);
         }
     }

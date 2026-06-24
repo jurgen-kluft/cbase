@@ -36,7 +36,7 @@ namespace ncore
         bool operator!=(const guid_t&) const;
 
         void toString(runes_t& str) const;
-        void fromString(crunes_t const& str);
+        void fromString(runes_t const& str);
 
     private:
         enum ESizes

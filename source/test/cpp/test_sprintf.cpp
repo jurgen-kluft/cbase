@@ -21,12 +21,12 @@ UNITTEST_SUITE_BEGIN(sprintf)
             utf32::rune str_runes[256];
             str_runes[0] = 0;
             str_runes[1] = 0;
-            runes_t  str   = utf32::make_runes(str_runes, 0, 0, 256);
-            crunes_t fmt   = ascii::make_crunes("%f");
+            runes_t str  = utf32::make_runes(str_runes, 0, 0, 256);
+            runes_t fmt  = ascii::make_const_runes("%f");
 
             f64 d = 3.1415;
             sprintf(str, fmt, va_t(d));
-            crunes_t answer_str = ascii::make_crunes("3.141500");
+            runes_t answer_str = ascii::make_const_runes("3.141500");
             CHECK_EQUAL(0, nrunes::compare(answer_str, str));
         }
 
@@ -35,11 +35,11 @@ UNITTEST_SUITE_BEGIN(sprintf)
             utf32::rune str_runes[256];
             str_runes[0] = 0;
             str_runes[1] = 0;
-            runes_t  str   = utf32::make_runes(str_runes, 0, 0, 256);
-            crunes_t fmt   = ascii::make_crunes("the %s");
+            runes_t str  = utf32::make_runes(str_runes, 0, 0, 256);
+            runes_t fmt  = ascii::make_const_runes("the %s");
 
             sprintf(str, fmt, va_t("test string"));
-            crunes_t cmp = ascii::make_crunes("the test string");
+            runes_t cmp = ascii::make_const_runes("the test string");
             CHECK_EQUAL(0, nrunes::compare(str, cmp));
         }
     }

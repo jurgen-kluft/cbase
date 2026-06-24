@@ -154,14 +154,14 @@ UNITTEST_SUITE_BEGIN(guid_t)
             dst_runes[255] = 0;
             runes_t dst    = utf32::make_runes(dst_runes, 0, 0, 256 - 1);
 
-            crunes_t guidStr = ascii::make_crunes("11335577:22446688:557799BB:88AACCEE");
+            runes_t guidStr = ascii::make_const_runes("11335577:22446688:557799BB:88AACCEE");
             id.toString(dst);
             CHECK_EQUAL(0, nrunes::compare(dst, guidStr));
         }
 
         UNITTEST_TEST(fromString)
         {
-            crunes_t guidStr = ascii::make_crunes("11335577:22446688:557799BB:88AACCEE");
+            runes_t guidStr = ascii::make_const_runes("11335577:22446688:557799BB:88AACCEE");
             guid_t   id1;
             id1.fromString(guidStr);
             guid_t id2(0x11335577, 0x22446688, 0x557799BB, 0x88AACCEE);

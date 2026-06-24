@@ -49,7 +49,7 @@ namespace ncore
                 offset += 2;
 
                 const char* format_end = UpdateStringFormat(format_begin, state.widths_[i]);
-                crunes_t    format     = ascii::make_crunes(format_begin, format_end);
+                runes_t     format     = ascii::make_const_runes(format_begin, format_end);
 
                 runes_t          str = utf32::make_runes((utf32::prune)state.row_ + offset, (utf32::prune)state.row_ + offset + state.widths_[i]);
                 nrunes::writer_t writer(str);
@@ -166,9 +166,7 @@ namespace ncore
 
         template <typename T>
         inline static u32 distance_to_size32(T const* str, T const* end)
-        {
-            return (u32)((uint_t)end - (uint_t)str);
-        }
+        { return (u32)((uint_t)end - (uint_t)str); }
 
         void tbl_row_to_utf8(tbl_state_t& state, utf8::prune str, utf8::pcrune end)
         {
@@ -180,7 +178,7 @@ namespace ncore
 
             // convert the utf32 row string to utf8
             runes_t          utf_8  = utf8::make_runes(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf8::TYPE);
-            crunes_t         utf_32 = ascii::make_crunes((ascii::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
+            runes_t          utf_32 = utf32::make_const_runes((utf32::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
             nrunes::writer_t writer(utf_8);
             writer.write(utf_32);
         }
@@ -195,7 +193,7 @@ namespace ncore
 
             // convert the utf32 row string to utf16
             runes_t          utf_16 = utf16::make_runes(str, 0, distance_to_size32(str, end), distance_to_size32(str, end), utf16::TYPE);
-            crunes_t         utf_32 = ascii::make_crunes((ascii::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
+            runes_t          utf_32 = utf32::make_const_runes((utf32::pcrune)state.row_, 0, (u32)state.row_len_, (u32)state.row_len_);
             nrunes::writer_t writer(utf_16);
             writer.write(utf_32);
         }

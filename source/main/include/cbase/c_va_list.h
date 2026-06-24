@@ -130,7 +130,7 @@ namespace ncore
         }
         explicit va_t(const char *inVar);
         explicit va_t(const wchar_t *inVar);
-        explicit va_t(crunes_t const &str);
+        explicit va_t(runes_t const &str);
 
         EType type() const { return (EType)(mArg3 & TYPE_MASK); }
         char  specifier() const;
@@ -165,7 +165,7 @@ namespace ncore
         operator f32() const { return convertToFloat(); }
         operator f64() const { return convertToDouble(); }
         operator bool() const { return convertToBool(); }
-        operator crunes_t() const { return convertToCRunes(); }
+        operator runes_t() const { return convertToRunes(); }
         operator const char *() const { return *(const char **)&mArg; }
         operator const wchar_t *() const { return *(const wchar_t **)&mArg; }
         operator s32 *() const { return *(s32 **)&mArg; }
@@ -186,7 +186,7 @@ namespace ncore
         f32      convertToFloat() const;
         f64      convertToDouble() const;
         bool     convertToBool() const;
-        crunes_t convertToCRunes() const;
+        runes_t  convertToRunes() const;
 
         ptr_t mArg;
         u32   mArg2;
@@ -667,7 +667,7 @@ namespace ncore
         va_r_t &operator=(f32 rhs);
         va_r_t &operator=(f64 rhs);
         va_r_t &operator=(bool rhs);
-        va_r_t &operator=(const crunes_t &rhs);
+        va_r_t &operator=(const runes_t &rhs);
         va_r_t &operator=(va_t const &rhs);
 
         va_r_t &operator+=(s32 rhs);

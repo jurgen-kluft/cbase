@@ -115,11 +115,11 @@ namespace ncore
         static void write(elevel inLevel, u64 _value);
         static void write(elevel inLevel, f32 _value);
         static void write(elevel inLevel, f64 _value);
-        static void write(elevel inLevel, const crunes_t& str);
-        static void write(elevel inLevel, const crunes_t& format, const va_t* argv, s32 argc);
+        static void write(elevel inLevel, const runes_t& str);
+        static void write(elevel inLevel, const runes_t& format, const va_t* argv, s32 argc);
 
         template <typename... Args>
-        inline static void write(elevel inLevel, crunes_t const& format, Args&&... _args)
+        inline static void write(elevel inLevel, runes_t const& format, Args&&... _args)
         {
             const va_t argv[] = {_args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
@@ -134,11 +134,11 @@ namespace ncore
         static void writeLine(elevel inLevel, u64 _value);
         static void writeLine(elevel inLevel, f32 _value);
         static void writeLine(elevel inLevel, f64 _value);
-        static void writeLine(elevel inLevel, const crunes_t& str);
-        static void writeLine(elevel inLevel, const crunes_t& format, const va_t* argv, s32 argc);
+        static void writeLine(elevel inLevel, const runes_t& str);
+        static void writeLine(elevel inLevel, const runes_t& format, const va_t* argv, s32 argc);
 
         template <typename... Args>
-        inline static void writeLine(elevel inLevel, crunes_t const& format, Args&&... _args)
+        inline static void writeLine(elevel inLevel, runes_t const& format, Args&&... _args)
         {
             const va_t argv[] = {_args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
@@ -166,11 +166,11 @@ namespace ncore
         virtual void write(u64 _value)                                         = 0;
         virtual void write(f32 _value)                                         = 0;
         virtual void write(f64 _value)                                         = 0;
-        virtual void write(const crunes_t& str)                                = 0;
-        virtual void write(const crunes_t& format, const va_t* argv, s32 argc) = 0;
+        virtual void write(const runes_t& str)                                = 0;
+        virtual void write(const runes_t& format, const va_t* argv, s32 argc) = 0;
 
         template <typename... Args>
-        inline void write(crunes_t const& format, Args&&... _args)
+        inline void write(runes_t const& format, Args&&... _args)
         {
             const va_t argv[] = {_args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
@@ -185,11 +185,11 @@ namespace ncore
         virtual void writeLine(u64 _value)                                         = 0;
         virtual void writeLine(f32 _value)                                         = 0;
         virtual void writeLine(f64 _value)                                         = 0;
-        virtual void writeLine(const crunes_t& str)                                = 0;
-        virtual void writeLine(const crunes_t& format, const va_t* argv, s32 argc) = 0;
+        virtual void writeLine(const runes_t& str)                                = 0;
+        virtual void writeLine(const runes_t& format, const va_t* argv, s32 argc) = 0;
 
         template <typename... Args>
-        inline void writeLine(crunes_t const& format, Args&&... _args)
+        inline void writeLine(runes_t const& format, Args&&... _args)
         {
             const va_t argv[] = {_args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);

@@ -29,7 +29,7 @@ namespace ncore
         }
     }
 
-    va_t::va_t(crunes_t const& str)
+    va_t::va_t(runes_t const& str)
         : mArg3(TYPE_PCRUNES)
     {
         mArg3 |= (str.m_type);
@@ -39,6 +39,12 @@ namespace ncore
             case utf8::TYPE: mArg = (ptr_t)(&str.m_utf8[str.m_str]); break;
             case utf16::TYPE: mArg = (ptr_t)(&str.m_utf16[str.m_str]); break;
             case utf32::TYPE: mArg = (ptr_t)(&str.m_utf32[str.m_str]); break;
+            case ucs2::TYPE: mArg = (ptr_t)(&str.m_ucs2[str.m_str]); break;
+            case ascii::CONST_TYPE: mArg = (ptr_t)(&str.m_const_ascii[str.m_str]); break;
+            case utf8::CONST_TYPE: mArg = (ptr_t)(&str.m_const_utf8[str.m_str]); break;
+            case utf16::CONST_TYPE: mArg = (ptr_t)(&str.m_const_utf16[str.m_str]); break;
+            case utf32::CONST_TYPE: mArg = (ptr_t)(&str.m_const_utf32[str.m_str]); break;
+            case ucs2::CONST_TYPE: mArg = (ptr_t)(&str.m_const_ucs2[str.m_str]); break;
             default: break;
         }
         mArg2 = str.m_end - str.m_str;
@@ -122,7 +128,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::copy(ch, str);
             }
             break;
@@ -221,7 +227,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -274,7 +280,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -330,7 +336,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 nrunes::parse(ch, i);
             }
             break;
@@ -383,7 +389,7 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 bool     b  = false;
                 nrunes::parse(ch, b);
                 i = b ? 1 : 0;
@@ -396,18 +402,18 @@ namespace ncore
         return i != 0;
     }
 
-    crunes_t va_t::convertToCRunes() const
+    runes_t va_t::convertToRunes() const
     {
         switch (mArg3 & TYPE_MASK)
         {
             case TYPE_PCRUNES:
             {
-                crunes_t ch = ascii::make_crunes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 return ch;
             }
             default: break;  // Fall through
         };
-        return crunes_t();
+        return make_runes();
     }
 
     va_r_t va_r_t::sEmpty;
@@ -590,7 +596,7 @@ namespace ncore
         return *this;
     }
 
-    va_r_t& va_r_t::operator=(const crunes_t& rhs)
+    va_r_t& va_r_t::operator=(const runes_t& rhs)
     {
         switch (mType)
         {

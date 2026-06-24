@@ -30,8 +30,7 @@ namespace ncore
         virtual void write(u64 _value);
 
         virtual void write(const runes_t& str);
-        virtual void write(const crunes_t& str);
-        virtual void write(const crunes_t& fmt, const va_t* args, s32 argc);
+        virtual void write(const runes_t& fmt, const va_t* args, s32 argc);
 
         virtual void writeLine();
     };
@@ -47,8 +46,7 @@ namespace ncore
     void console_null::write(u32 _value) {}
     void console_null::write(u64 _value) {}
     void console_null::write(const runes_t& str) {}
-    void console_null::write(const crunes_t& str) {}
-    void console_null::write(const crunes_t& fmt, const va_t* args, s32 argc) {}
+    void console_null::write(const runes_t& fmt, const va_t* args, s32 argc) {}
     void console_null::writeLine() {}
 
     static console_null sNullConsole;
@@ -80,8 +78,7 @@ namespace ncore
         virtual void write(u64 _value);
 
         virtual void write(const runes_t& str);
-        virtual void write(const crunes_t& str);
-        virtual void write(const crunes_t& fmt, const va_t* args, s32 argc);
+        virtual void write(const runes_t& fmt, const va_t* args, s32 argc);
 
         virtual void writeLine();
     };
@@ -96,8 +93,8 @@ namespace ncore
 
     void               console_default::write(bool _value)
     {
-        crunes_t truestr  = ascii::make_crunes(trueStr, trueStr + 4);
-        crunes_t falsestr = ascii::make_crunes(falseStr, falseStr + 5);
+        runes_t truestr  = ascii::make_const_runes(trueStr, trueStr + 4);
+        runes_t falsestr = ascii::make_const_runes(falseStr, falseStr + 5);
         write(_value ? truestr : falsestr);
     }
 
@@ -145,13 +142,10 @@ namespace ncore
 
     void console_default::write(const runes_t& str)
     {
-        crunes_t cstr = make_crunes(str);
-        mOut->write(cstr);
+        mOut->write(str);
     }
 
-    void console_default::write(const crunes_t& str) { mOut->write(str); }
-
-    void console_default::write(const crunes_t& fmt, const va_t* args, s32 argc) { mOut->write(fmt, args, argc); }
+    void console_default::write(const runes_t& fmt, const va_t* args, s32 argc) { mOut->write(fmt, args, argc); }
 
     void console_default::writeLine() { mOut->writeln(); }
 

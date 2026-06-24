@@ -11,12 +11,12 @@ namespace ncore
         // calculate the hash of a string, this string can be ascii, utf-8, utf-16 or utf-32.
         // so use an intermediate buffer to convert the string into utf-32 and feed that to
         // the hash algorithm.
-        u64 strhash(crunes_t const& strdata, u64 seed)
+        u64 strhash(runes_t const& strdata, u64 seed)
         {
-            if ((strdata.m_type) == ascii::TYPE)
+            if (strdata.m_type == ascii::TYPE || strdata.m_type == ascii::CONST_TYPE)
             {
-                const char* begin = &strdata.m_ascii[strdata.m_str];
-                const char* end   = &strdata.m_ascii[strdata.m_str];
+                const char* begin = &strdata.m_const_ascii[strdata.m_str];
+                const char* end   = &strdata.m_const_ascii[strdata.m_str];
                 return strhash64(begin, end, seed);
             }
 
@@ -26,12 +26,12 @@ namespace ncore
             return 0;
         }
 
-        u64 strhash_lowercase(crunes_t const& strdata, u64 seed)
+        u64 strhash_lowercase(runes_t const& strdata, u64 seed)
         {
-            if ((strdata.m_type) == ascii::TYPE)
+            if (strdata.m_type == ascii::TYPE || strdata.m_type == ascii::CONST_TYPE)
             {
-                const char* begin = &strdata.m_ascii[strdata.m_str];
-                const char* end   = &strdata.m_ascii[strdata.m_str];
+                const char* begin = &strdata.m_const_ascii[strdata.m_str];
+                const char* end   = &strdata.m_const_ascii[strdata.m_str];
                 return strhash64_lowercase(begin, end, seed);
             }
 
@@ -41,12 +41,12 @@ namespace ncore
             return 0;
         }
 
-        u32 strhash32(crunes_t const& str, u32 seed)
+        u32 strhash32(runes_t const& str, u32 seed)
         {
-            if ((str.m_type) == ascii::TYPE)
+            if (str.m_type == ascii::TYPE || str.m_type == ascii::CONST_TYPE)
             {
-                const char* begin = &str.m_ascii[str.m_str];
-                const char* end   = &str.m_ascii[str.m_str];
+                const char* begin = &str.m_const_ascii[str.m_str];
+                const char* end   = &str.m_const_ascii[str.m_str];
                 return strhash32(begin, end, seed);
             }
 
@@ -56,12 +56,12 @@ namespace ncore
             return 0;
         }
 
-        u32 strhash32_lowercase(crunes_t const& str, u32 seed)
+        u32 strhash32_lowercase(runes_t const& str, u32 seed)
         {
-            if ((str.m_type) == ascii::TYPE)
+            if (str.m_type == ascii::TYPE || str.m_type == ascii::CONST_TYPE)
             {
-                const char* begin = &str.m_ascii[str.m_str];
-                const char* end   = &str.m_ascii[str.m_str];
+                const char* begin = &str.m_const_ascii[str.m_str];
+                const char* end   = &str.m_const_ascii[str.m_str];
                 return strhash32_lowercase(begin, end, seed);
             }
 
