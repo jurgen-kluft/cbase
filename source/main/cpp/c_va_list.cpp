@@ -29,7 +29,7 @@ namespace ncore
         }
     }
 
-    va_t::va_t(runes_t const& str)
+    va_t::va_t(str_t const& str)
         : mArg3(TYPE_PCRUNES)
     {
         mArg3 |= (str.m_type);
@@ -70,26 +70,26 @@ namespace ncore
         }
     }
 
-    void va_t::convertToRunes(runes_t& str) const
+    void va_t::convertToRunes(str_t& str) const
     {
         switch (mArg3 & TYPE_MASK)
         {
             case TYPE_BOOL:
             {
                 bool v = (*(bool*)&mArg);
-                nrunes::to_string(str, v);
+                to_string(str, v);
             }
             break;
             case TYPE_UINT32:
             {
                 u32 v = (*(u32*)&mArg);
-                nrunes::to_string(str, v);
+                to_string(str, v);
             }
             break;
             case TYPE_INT32:
             {
                 s32 v = (*(s32*)&mArg);
-                nrunes::to_string(str, v);
+                to_string(str, v);
             }
             break;
 
@@ -97,39 +97,39 @@ namespace ncore
             case TYPE_INT8:
             {
                 s32 v = (*(s8*)&mArg);
-                nrunes::to_string(str, v);
+                to_string(str, v);
             }
             break;
             case TYPE_UINT16:
             case TYPE_INT16:
             {
                 s32 v = (*(s16*)&mArg);
-                nrunes::to_string(str, v);
+                to_string(str, v);
             }
             break;
             case TYPE_UINT64:
             case TYPE_INT64:
             {
                 s64 v = (*(s64*)&mArg);
-                nrunes::to_string(str, v);
+                to_string(str, v);
             }
             break;
             case TYPE_FLOAT32:
             {
                 f32 v = (*(f32*)&mArg);
-                nrunes::to_string(str, v);
+                to_string(str, v);
             }
             break;
             case TYPE_FLOAT64:
             {
                 f64 v = (*(f64*)&mArg);
-                nrunes::to_string(str, v);
+                to_string(str, v);
             }
             break;
             case TYPE_PCRUNES:
             {
-                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
-                nrunes::copy(ch, str);
+                str_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                copy(ch, str);
             }
             break;
             default: break;  // Fall through
@@ -227,8 +227,8 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
-                nrunes::parse(ch, i);
+                str_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                parse(ch, i);
             }
             break;
             default: break;  // Fall through
@@ -280,8 +280,8 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
-                nrunes::parse(ch, i);
+                str_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                parse(ch, i);
             }
             break;
             default: break;  // Fall through
@@ -336,8 +336,8 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
-                nrunes::parse(ch, i);
+                str_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                parse(ch, i);
             }
             break;
             default: break;  // Fall through
@@ -389,9 +389,9 @@ namespace ncore
             break;
             case TYPE_PCRUNES:
             {
-                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                str_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 bool     b  = false;
-                nrunes::parse(ch, b);
+                parse(ch, b);
                 i = b ? 1 : 0;
             }
             break;
@@ -402,13 +402,13 @@ namespace ncore
         return i != 0;
     }
 
-    runes_t va_t::convertToRunes() const
+    str_t va_t::convertToRunes() const
     {
         switch (mArg3 & TYPE_MASK)
         {
             case TYPE_PCRUNES:
             {
-                runes_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
+                str_t ch = ascii::make_const_runes((const char*)mArg, 0, mArg2, mArg2, (u32)mArg3 & 0x0F);
                 return ch;
             }
             default: break;  // Fall through
@@ -596,50 +596,50 @@ namespace ncore
         return *this;
     }
 
-    va_r_t& va_r_t::operator=(const runes_t& rhs)
+    va_r_t& va_r_t::operator=(const str_t& rhs)
     {
         switch (mType)
         {
-            case TYPE_BOOL: nrunes::parse(rhs, *((bool*)mRef)); break;
-            case TYPE_UINT32: nrunes::parse(rhs, *((u32*)mRef)); break;
-            case TYPE_INT32: nrunes::parse(rhs, *((s32*)mRef)); break;
-            case TYPE_AINT32: nrunes::parse(rhs, *((s32*)mRef)); break;
-            case TYPE_UINT8: nrunes::parse(rhs, *((u8*)mRef)); break;
-            case TYPE_INT8: nrunes::parse(rhs, *((s8*)mRef)); break;
-            case TYPE_UINT16: nrunes::parse(rhs, *((u16*)mRef)); break;
-            case TYPE_INT16: nrunes::parse(rhs, *((s16*)mRef)); break;
-            case TYPE_UINT64: nrunes::parse(rhs, *((u64*)mRef)); break;
-            case TYPE_INT64: nrunes::parse(rhs, *((s64*)mRef)); break;
-            case TYPE_FLOAT32: nrunes::parse(rhs, *((f32*)mRef)); break;
-            case TYPE_FLOAT64: nrunes::parse(rhs, *((f64*)mRef)); break;
+            case TYPE_BOOL: parse(rhs, *((bool*)mRef)); break;
+            case TYPE_UINT32: parse(rhs, *((u32*)mRef)); break;
+            case TYPE_INT32: parse(rhs, *((s32*)mRef)); break;
+            case TYPE_AINT32: parse(rhs, *((s32*)mRef)); break;
+            case TYPE_UINT8: parse(rhs, *((u8*)mRef)); break;
+            case TYPE_INT8: parse(rhs, *((s8*)mRef)); break;
+            case TYPE_UINT16: parse(rhs, *((u16*)mRef)); break;
+            case TYPE_INT16: parse(rhs, *((s16*)mRef)); break;
+            case TYPE_UINT64: parse(rhs, *((u64*)mRef)); break;
+            case TYPE_INT64: parse(rhs, *((s64*)mRef)); break;
+            case TYPE_FLOAT32: parse(rhs, *((f32*)mRef)); break;
+            case TYPE_FLOAT64: parse(rhs, *((f64*)mRef)); break;
             case TYPE_ASCII_STR:
             {
-                runes_t dst = ascii::make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
-                nrunes::copy(rhs, dst);
+                str_t dst = ascii::make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
+                copy(rhs, dst);
             }
             break;
             case TYPE_USC2_STR:
             {
-                runes_t dst = ucs2::make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
-                nrunes::copy(rhs, dst);
+                str_t dst = ucs2::make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
+                copy(rhs, dst);
             }
             break;
             case TYPE_UTF8_STR:
             {
-                runes_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
-                nrunes::copy(rhs, dst);
+                str_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
+                copy(rhs, dst);
             }
             break;
             case TYPE_UTF16_STR:
             {
-                runes_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
-                nrunes::copy(rhs, dst);
+                str_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
+                copy(rhs, dst);
             }
             break;
             case TYPE_UTF32_STR:
             {
-                runes_t dst = utf32::make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
-                nrunes::copy(rhs, dst);
+                str_t dst = utf32::make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
+                copy(rhs, dst);
             }
             break;
             default: break;  // Fall through
@@ -666,31 +666,31 @@ namespace ncore
             case TYPE_FLOAT64: *((f64*)mRef) = rhs; break;
             case TYPE_ASCII_STR:
             {
-                runes_t dst = ascii::make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
+                str_t dst = ascii::make_runes((char*)mRef, 0, 0, mCap, ascii::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_USC2_STR:
             {
-                runes_t dst = ucs2::make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
+                str_t dst = ucs2::make_runes((ucs2::prune)mRef, 0, 0, mCap, ucs2::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF8_STR:
             {
-                runes_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
+                str_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf8::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF16_STR:
             {
-                runes_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
+                str_t dst = utf16::make_runes((utf16::prune)mRef, 0, 0, mCap, utf16::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;
             case TYPE_UTF32_STR:
             {
-                runes_t dst = utf32::make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
+                str_t dst = utf32::make_runes((utf32::prune)mRef, 0, 0, mCap, utf32::TYPE);
                 rhs.convertToRunes(dst);
             }
             break;

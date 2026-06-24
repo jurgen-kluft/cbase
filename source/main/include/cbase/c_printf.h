@@ -15,15 +15,15 @@ namespace ncore
     void _putflush();  // Indicate that we are done
 
     s32 printf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
-    s32 sprintf_(runes_t& str, runes_t const& format, const va_t* argv, s32 argc);
+    s32 sprintf_(str_t& str, str_t const& format, const va_t* argv, s32 argc);
     s32 snprintf_(char* buffer, const char* buffer_end, const char* format, const char* format_end, const va_t* argv, s32 argc);
     s32 vprintf_(const char* format, const char* format_end, const va_t* argv, s32 argc);
-    s32 cprintf_(runes_t const& format, const va_t* argv, s32 argc);
+    s32 cprintf_(str_t const& format, const va_t* argv, s32 argc);
     s32 fctprintf(void (*out)(const char* str, u32 n, void* arg), void* arg, const char* format, const char* format_end, const va_t* argv, s32 argc);
-    s32 vzprintf(nrunes::iwriter_t* writer, const runes_t& str, const va_t* argv, s32 argc);
-    s32 sscanf_(runes_t& str, runes_t const& format, const va_r_t* argv, s32 argc);
+    s32 vzprintf(iwriter_t* writer, const str_t& str, const va_t* argv, s32 argc);
+    s32 sscanf_(str_t& str, str_t const& format, const va_r_t* argv, s32 argc);
 
-    inline void printf(runes_t const& str)
+    inline void printf(str_t const& str)
     {
         const va_t* argv = nullptr;
         const s32   argc = 0;
@@ -31,7 +31,7 @@ namespace ncore
     }
 
     template <typename... Args>
-    inline void printf(runes_t const& format, Args&&... args)
+    inline void printf(str_t const& format, Args&&... args)
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
@@ -39,7 +39,7 @@ namespace ncore
     }
 
     template <typename... Args>
-    inline void sprintf(runes_t& str, runes_t const& format, Args&&... args)
+    inline void sprintf(str_t& str, str_t const& format, Args&&... args)
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
@@ -48,7 +48,7 @@ namespace ncore
     }
 
     template <typename... Args>
-    inline s32 cprintf(runes_t const& format, Args&&... args)
+    inline s32 cprintf(str_t const& format, Args&&... args)
     {
         const va_t argv[] = {args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
@@ -56,7 +56,7 @@ namespace ncore
     }
 
     template <typename... Args>
-    inline s32 sscanf(runes_t& str, runes_t const& format, Args&&... args)
+    inline s32 sscanf(str_t& str, str_t const& format, Args&&... args)
     {
         const va_r_t argv[] = {args...};
         const s32    argc   = sizeof(argv) / sizeof(argv[0]);

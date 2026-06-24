@@ -15,8 +15,8 @@ UNITTEST_SUITE_BEGIN(sscanf)
     {
         UNITTEST_TEST(scan_hash128)
         {
-            runes_t example = ascii::make_const_runes("00112233445566778899AABBCCDDEEFF");
-            runes_t fmt     = ascii::make_const_runes("%02x%02x%02x%02x");
+            str_t example = ascii::make_const_runes("00112233445566778899AABBCCDDEEFF");
+            str_t fmt     = ascii::make_const_runes("%02x%02x%02x%02x");
 
             u8 d[16];
             for (s32 i = 0; i < 16; i += 4)
@@ -31,8 +31,8 @@ UNITTEST_SUITE_BEGIN(sscanf)
 
         UNITTEST_TEST(test_va_r_t)
         {
-            runes_t example = ascii::make_const_runes("512,768 -> 256,128");
-            runes_t fmt     = ascii::make_const_runes("%u,%u -> %u,%u");
+            str_t example = ascii::make_const_runes("512,768 -> 256,128");
+            str_t fmt     = ascii::make_const_runes("%u,%u -> %u,%u");
 
             u16 d[4];
             sscanf(example, fmt, va_r_t(&d[0]), va_r_t(&d[1]), va_r_t(&d[2]), va_r_t(&d[3]));
@@ -44,8 +44,8 @@ UNITTEST_SUITE_BEGIN(sscanf)
 
         UNITTEST_TEST(test_va_r_list_t)
         {
-            runes_t example = ascii::make_const_runes("512,768 -> 256,128");
-            runes_t fmt     = ascii::make_const_runes("%u,%u -> %u,%u");
+            str_t example = ascii::make_const_runes("512,768 -> 256,128");
+            str_t fmt     = ascii::make_const_runes("%u,%u -> %u,%u");
 
             u16 d[4];
 

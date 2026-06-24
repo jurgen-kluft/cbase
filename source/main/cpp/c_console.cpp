@@ -7,7 +7,7 @@ namespace ncore
 
 #define D_CONSOLE_LOCAL_STR_BUF(type, local_var_name, size) \
     type::rune local_var_name##Buffer[size];                \
-    runes_t    local_var_name = type::make_runes(local_var_name##Buffer, 0, 0, (u32)size, type::TYPE);
+    str_t    local_var_name = type::make_runes(local_var_name##Buffer, 0, 0, (u32)size, type::TYPE);
 
     class console_null : public console_t
     {
@@ -29,8 +29,8 @@ namespace ncore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
-        virtual void write(const runes_t& str);
-        virtual void write(const runes_t& fmt, const va_t* args, s32 argc);
+        virtual void write(const str_t& str);
+        virtual void write(const str_t& fmt, const va_t* args, s32 argc);
 
         virtual void writeLine();
     };
@@ -45,8 +45,8 @@ namespace ncore
     void console_null::write(f32 _value) {}
     void console_null::write(u32 _value) {}
     void console_null::write(u64 _value) {}
-    void console_null::write(const runes_t& str) {}
-    void console_null::write(const runes_t& fmt, const va_t* args, s32 argc) {}
+    void console_null::write(const str_t& str) {}
+    void console_null::write(const str_t& fmt, const va_t* args, s32 argc) {}
     void console_null::writeLine() {}
 
     static console_null sNullConsole;
@@ -77,8 +77,8 @@ namespace ncore
         virtual void write(u32 _value);
         virtual void write(u64 _value);
 
-        virtual void write(const runes_t& str);
-        virtual void write(const runes_t& fmt, const va_t* args, s32 argc);
+        virtual void write(const str_t& str);
+        virtual void write(const str_t& fmt, const va_t* args, s32 argc);
 
         virtual void writeLine();
     };
@@ -93,59 +93,59 @@ namespace ncore
 
     void               console_default::write(bool _value)
     {
-        runes_t truestr  = ascii::make_const_runes(trueStr, trueStr + 4);
-        runes_t falsestr = ascii::make_const_runes(falseStr, falseStr + 5);
+        str_t truestr  = ascii::make_const_runes(trueStr, trueStr + 4);
+        str_t falsestr = ascii::make_const_runes(falseStr, falseStr + 5);
         write(_value ? truestr : falsestr);
     }
 
     void console_default::write(f64 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
-        nrunes::to_string(tmp, _value, 2);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(s32 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
-        nrunes::to_string(tmp, _value, 2);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(s64 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 64);
-        nrunes::to_string(tmp, _value, 2);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(f32 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
-        nrunes::to_string(tmp, _value, 2);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(u32 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
-        nrunes::to_string(tmp, _value, 2);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
     void console_default::write(u64 _value)
     {
         D_CONSOLE_LOCAL_STR_BUF(ascii, tmp, 256);
-        nrunes::to_string(tmp, _value, 2);
+        to_string(tmp, _value, 2);
         write(tmp);
     }
 
-    void console_default::write(const runes_t& str)
+    void console_default::write(const str_t& str)
     {
         mOut->write(str);
     }
 
-    void console_default::write(const runes_t& fmt, const va_t* args, s32 argc) { mOut->write(fmt, args, argc); }
+    void console_default::write(const str_t& fmt, const va_t* args, s32 argc) { mOut->write(fmt, args, argc); }
 
     void console_default::writeLine() { mOut->writeln(); }
 

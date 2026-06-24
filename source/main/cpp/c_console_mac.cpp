@@ -14,7 +14,7 @@ namespace ncore
     static s32 write_utf16(utf16::pcrune _str, u32 _begin, u32 _end);
     static s32 write_utf32(utf32::pcrune _str, u32 _begin, u32 _end);
 
-    class out_writer_t : public nrunes::iwriter_t
+    class out_writer_t : public iwriter_t
     {
     public:
         inline out_writer_t() {}
@@ -53,7 +53,7 @@ namespace ncore
             return write_ascii(str, 0, len);
         }
 
-        virtual s32 vwrite(runes_t const& str)
+        virtual s32 vwrite(str_t const& str)
         {
             switch (str.m_type)
             {
@@ -245,7 +245,7 @@ namespace ncore
             write_ascii(line32, 0, 1);
         }
 
-        virtual s32 write(const runes_t& str)
+        virtual s32 write(const str_t& str)
         {
             switch (str.m_type)
             {
@@ -258,7 +258,7 @@ namespace ncore
             return 0;
         }
 
-        virtual s32 write(const runes_t& str, const va_t* argv, s32 argc)
+        virtual s32 write(const str_t& str, const va_t* argv, s32 argc)
         {
             out_writer_t dstwriter;
             vzprintf(&dstwriter, str, argv, argc);

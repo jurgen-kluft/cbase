@@ -42,11 +42,11 @@ namespace ncore
 
     //-------------------------------------------------------------------------------
 
-    void guid_t::toString(runes_t& str) const
+    void guid_t::toString(str_t& str) const
     {
         // high, word2, word1, low
         ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
-        runes_t      fmt    = ascii::make_const_runes(fmtstr, fmtstr + 19);
+        str_t      fmt    = ascii::make_const_runes(fmtstr, fmtstr + 19);
         sprintf(str, fmt, va_t(mGuid.ma32[0]), va_t(mGuid.ma32[1]), va_t(mGuid.ma32[2]), va_t(mGuid.ma32[3]));
     }
 
@@ -63,13 +63,13 @@ namespace ncore
      *------------------------------------------------------------------------------
      */
 
-    void guid_t::fromString(runes_t const& _str)
+    void guid_t::fromString(str_t const& _str)
     {
         setNull();
 
         ascii::pcrune fmtstr = "%08X:%08X:%08X:%08X";
-        runes_t      fmt    = ascii::make_const_runes(fmtstr, fmtstr + 19);
-        runes_t      str    = _str;
+        str_t      fmt    = ascii::make_const_runes(fmtstr, fmtstr + 19);
+        str_t      str    = _str;
         sscanf(str, fmt, &mGuid.ma32[0], &mGuid.ma32[1], &mGuid.ma32[2], &mGuid.ma32[3]);
     }
 };  // namespace ncore

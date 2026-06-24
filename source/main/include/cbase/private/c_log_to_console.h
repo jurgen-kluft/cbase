@@ -28,11 +28,11 @@ namespace ncore
         virtual void write(f32 value);
         virtual void write(u32 value);
         virtual void write(u64 value);
-        virtual void write(const runes_t& str);
-        virtual void write(const runes_t& format, const va_t* argv, s32 argc);
+        virtual void write(const str_t& str);
+        virtual void write(const str_t& format, const va_t* argv, s32 argc);
 
         template <typename... Args>
-        inline s32 write(runes_t const& format, Args&&... _args)
+        inline s32 write(str_t const& format, Args&&... _args)
         {
             const va_t argv[] = {&_args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
@@ -47,11 +47,11 @@ namespace ncore
         virtual void writeLine(f32 value);
         virtual void writeLine(u32 value);
         virtual void writeLine(u64 value);
-        virtual void writeLine(const runes_t& str);
-        virtual void writeLine(const runes_t& format, const va_t* argv, s32 argc);
+        virtual void writeLine(const str_t& str);
+        virtual void writeLine(const str_t& format, const va_t* argv, s32 argc);
 
         template <typename... Args>
-        inline s32 writeLine(runes_t const& str, Args&&... _args)
+        inline s32 writeLine(str_t const& str, Args&&... _args)
         {
             const va_t argv[] = {&_args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);

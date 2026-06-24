@@ -9,42 +9,42 @@
 
 namespace ncore
 {
-    // nrunes::reader_t -> rune_reader_t
+    // reader_t -> rune_reader_t
     // CharWriter -> rune_writer_t
 
-    static bool MatchBoolStr(nrunes::ireader_t* str, bool& boolean)
+    static bool MatchBoolStr(ireader_t* str, bool& boolean)
     {
         bool        bval = false;
         const char* bstr = nullptr;
         uchar32     c    = str->peek();
-        if (nrunes::is_equalfold(c, 't'))
+        if (is_equalfold(c, 't'))
         {
             bstr = "true";
             bval = true;
         }
-        else if (nrunes::is_equalfold(c, 'f'))
+        else if (is_equalfold(c, 'f'))
         {
             bstr = "false";
         }
-        else if (nrunes::is_equalfold(c, 'y'))
+        else if (is_equalfold(c, 'y'))
         {
             bstr = "yes";
             bval = true;
         }
-        else if (nrunes::is_equalfold(c, 'n'))
+        else if (is_equalfold(c, 'n'))
         {
             bstr = "no";
         }
-        else if (nrunes::is_equalfold(c, 'o'))
+        else if (is_equalfold(c, 'o'))
         {
             str->read();
             c = str->peek();
-            if (nrunes::is_equalfold(c, 'f'))
+            if (is_equalfold(c, 'f'))
             {
                 bstr = "ff";
                 bval = false;
             }
-            else if (nrunes::is_equalfold(c, 'n'))
+            else if (is_equalfold(c, 'n'))
             {
                 bval = true;
                 bstr = "n";
@@ -60,7 +60,7 @@ namespace ncore
                 uchar32 sc = str->read();
                 if (sc == '\0')
                     return false;
-                if (nrunes::is_equalfold(bc, sc) == false)
+                if (is_equalfold(bc, sc) == false)
                     return false;
             }
             return true;
@@ -92,7 +92,7 @@ namespace ncore
     static ascii::rune const sWhitespaceChars[]    = {' ', '\t', '\n', '\r'};
     static u32 const         sWhitespaceCharsCount = 4;
 
-    s64 StrToS64(nrunes::ireader_t* reader, s32 base)
+    s64 StrToS64(ireader_t* reader, s32 base)
     {
         ASSERT(reader != nullptr);
         ASSERT(base > 2);
@@ -160,11 +160,11 @@ namespace ncore
     }
 
     // <COMBINE atod64 >
-    s32 StrToS32(nrunes::ireader_t* reader, s32 base) { return (s32)StrToS64(reader, base); }
+    s32 StrToS32(ireader_t* reader, s32 base) { return (s32)StrToS64(reader, base); }
 
     //------------------------------------------------------------------------------
 
-    f64 StrToF64(nrunes::ireader_t* reader)
+    f64 StrToF64(ireader_t* reader)
     {
         // Evaluate sign
         s32     sign = 1;
@@ -365,7 +365,7 @@ namespace ncore
     static const ascii::rune sAllFloatChars[]    = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'e', '+', '-', 0};
     static const u32         sAllFloatCharsCount = 14;
 
-    s32 VSScanf(nrunes::ireader_t* reader, nrunes::ireader_t* fmt, const va_r_t* argv, s32 argc)
+    s32 VSScanf(ireader_t* reader, ireader_t* fmt, const va_r_t* argv, s32 argc)
     {
         s32 i        = 0;
         s32 w        = 0;
@@ -381,7 +381,7 @@ namespace ncore
             if (c != '%' && !parsing)
             {
                 uchar32 const c = fmt->read();
-                if (nrunes::is_whitespace(c))
+                if (is_whitespace(c))
                 {
                     skip_any(fmt, sWhitespaceChars, sWhitespaceCharsCount);
                     skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
@@ -445,7 +445,7 @@ namespace ncore
                         s32 i = 0;
                         skip_any(reader, sWhitespaceChars, sWhitespaceCharsCount);
 
-                        runes_t runes = ascii::make_runes((ascii::prune) nullptr, 0, 0, 0);
+                        str_t runes = ascii::make_runes((ascii::prune) nullptr, 0, 0, 0);
                         if (i < argc)
                         {
                             va_r_t r = argv[i++];
@@ -453,7 +453,7 @@ namespace ncore
                         }
 
                         {
-                            nrunes::writer_t str_writer(runes);
+                            writer_t str_writer(runes);
 
                             l = 0;
                             c = reader->peek();
@@ -613,7 +613,7 @@ namespace ncore
                                 if (str[strlen] == '\0')
                                     break;
                             }
-                            nrunes::reader_t str_reader((utf32::pcrune)str, (utf32::pcrune)str + strlen);
+                            reader_t str_reader((utf32::pcrune)str, (utf32::pcrune)str + strlen);
                             n2 = (u64)StrToS64(&str_reader, 16);
                         }
 
@@ -696,10 +696,10 @@ namespace ncore
         return scanned;
     }
 
-    s32 sscanf_(runes_t& str, runes_t const& fmt, const va_r_t* argv, s32 argc)
+    s32 sscanf_(str_t& str, str_t const& fmt, const va_r_t* argv, s32 argc)
     {
-        nrunes::reader_t buf_reader(str);
-        nrunes::reader_t fmt_reader(fmt);
+        reader_t buf_reader(str);
+        reader_t fmt_reader(fmt);
         s32              scanned = VSScanf(&buf_reader, &fmt_reader, argv, argc);
         str                      = buf_reader.get_current();
         return scanned;

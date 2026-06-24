@@ -11,7 +11,7 @@ namespace ncore
         // calculate the hash of a string, this string can be ascii, utf-8, utf-16 or utf-32.
         // so use an intermediate buffer to convert the string into utf-32 and feed that to
         // the hash algorithm.
-        u64 strhash(runes_t const& strdata, u64 seed)
+        u64 strhash(str_t const& strdata, u64 seed)
         {
             if (strdata.m_type == ascii::TYPE || strdata.m_type == ascii::CONST_TYPE)
             {
@@ -26,7 +26,7 @@ namespace ncore
             return 0;
         }
 
-        u64 strhash_lowercase(runes_t const& strdata, u64 seed)
+        u64 strhash_lowercase(str_t const& strdata, u64 seed)
         {
             if (strdata.m_type == ascii::TYPE || strdata.m_type == ascii::CONST_TYPE)
             {
@@ -41,7 +41,7 @@ namespace ncore
             return 0;
         }
 
-        u32 strhash32(runes_t const& str, u32 seed)
+        u32 strhash32(str_t const& str, u32 seed)
         {
             if (str.m_type == ascii::TYPE || str.m_type == ascii::CONST_TYPE)
             {
@@ -56,7 +56,7 @@ namespace ncore
             return 0;
         }
 
-        u32 strhash32_lowercase(runes_t const& str, u32 seed)
+        u32 strhash32_lowercase(str_t const& str, u32 seed)
         {
             if (str.m_type == ascii::TYPE || str.m_type == ascii::CONST_TYPE)
             {

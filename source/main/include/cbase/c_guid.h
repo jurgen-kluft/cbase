@@ -7,7 +7,7 @@
 
 namespace ncore
 {
-    struct runes_t;
+    struct str_t;
     struct crunes_t;
 
     /**
@@ -35,8 +35,8 @@ namespace ncore
         bool operator==(const guid_t&) const;
         bool operator!=(const guid_t&) const;
 
-        void toString(runes_t& str) const;
-        void fromString(runes_t const& str);
+        void toString(str_t& str) const;
+        void fromString(str_t const& str);
 
     private:
         enum ESizes

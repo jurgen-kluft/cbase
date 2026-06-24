@@ -16,8 +16,8 @@ UNITTEST_SUITE_BEGIN(chars)
             utf32::rune dst_runes[256];
             dst_runes[0] = 0;
             dst_runes[1] = 0;
-            runes_t dst = utf32::make_runes(dst_runes, 0, 0, 256);
-			nrunes::copy(ascii::make_const_runes("This is a test string"), dst);
+            str_t dst = utf32::make_runes(dst_runes, 0, 0, 256);
+			copy(ascii::make_const_runes("This is a test string"), dst);
 		}
 	}
 }
