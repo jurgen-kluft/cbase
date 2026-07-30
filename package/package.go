@@ -31,7 +31,7 @@ func GetPackage() *denv.Package {
 
 	// unittest for this package
 	maintest := denv.SetupCppTestProject(main_pkg, repo_name)
-	maintest.AddDependencies(unittest_pkg.GetMainLib())
+	maintest.AddDependencies(unittest_pkg.GetTestLib())
 	maintest.AddDependency(testlib)
 
 	main_pkg.AddMainLib(mainlib)
